@@ -1,43 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:frontend/presentation/login_screen.dart';
+import 'package:frontend/presentation/signup_screen.dart';
+import 'package:frontend/presentation/splash_screen.dart';
+import 'package:frontend/src/providers/app_provider.dart';
+import 'package:frontend/src/providers/auth_provider.dart';
+import 'package:frontend/src/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:sizer/sizer.dart';
-import 'src/providers/auth_provider.dart';
-import 'src/screens/splash_screen.dart';
-import 'src/theme/app_theme.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
-      child: const BridalPOSApp(),
-    ),
-  );
+  runApp(const MaqboolFabricApp());
+
   doWhenWindowReady(() {
-    final win = appWindow;
-    win.minSize = const Size(750, 600);
-    win.size = const Size(1280, 720);
-    win.alignment = Alignment.center;
-    win.title = "Elegant Bridal POS";
-    win.show();
+    const initialSize = Size(1200, 800);
+    appWindow.minSize = const Size(900, 600);
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.title = "Maqbool Fabric - Premium POS";
+    appWindow.show();
   });
 }
 
-/// The main application widget for the Elegant Bridal POS system.
-class BridalPOSApp extends StatelessWidget {
-  const BridalPOSApp({super.key});
+class MaqboolFabricApp extends StatelessWidget {
+  const MaqboolFabricApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return MaterialApp(
-          title: 'Elegant Bridal POS',
-          theme: AppTheme.theme,
-          home: const SplashScreen(),
-          debugShowCheckedModeBanner: false,
-        );
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AppProvider()),
+      ],
+      child: Sizer(
+        builder: (context, orientation, deviceType) {
+          return MaterialApp(
+            title: 'Maqbool Fabrics',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.light,
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const SplashScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignupScreen(),
+            },
+          );
+        },
+      ),
     );
   }
 }
