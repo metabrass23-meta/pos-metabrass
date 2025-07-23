@@ -35,15 +35,26 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # State Management
+  provider:
+
+  # Desktop Window Management
   bitsdojo_window:
   desktop_multi_window:
+
+  # Responsive Design
   sizer:
+
+  # Additional Premium Features
   google_fonts:
-  provider:
+  flutter_svg:
+  animations:
+  flutter_animate:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  msix:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
