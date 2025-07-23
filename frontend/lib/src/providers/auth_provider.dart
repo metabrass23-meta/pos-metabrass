@@ -1,47 +1,83 @@
 import 'package:flutter/material.dart';
 
-/// Model for user data.
-class User {
-  final String name;
-  final String email;
+enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
-  User({required this.name, required this.email});
-}
+class AuthProvider extends ChangeNotifier {
+  AuthState _state = AuthState.initial;
+  String? _errorMessage;
+  bool _isLoading = false;
 
-/// Manages authentication state for the Elegant Bridal POS application.
-class AuthProvider with ChangeNotifier {
-  User? _user;
-  bool _isLoggedIn = false;
+  AuthState get state => _state;
+  String? get errorMessage => _errorMessage;
+  bool get isLoading => _isLoading;
 
-  User? get user => _user;
-  bool get isLoggedIn => _isLoggedIn;
-
-  /// Mock login method (replace with real API call in production).
-  Future<bool> login(String email, String password) async {
-    if (email.isNotEmpty && password.length >= 6) {
-      _user = User(name: 'Guest', email: email);
-      _isLoggedIn = true;
-      notifyListeners();
-      return true;
-    }
-    return false;
-  }
-
-  /// Mock signup method (replace with real API call in production).
-  Future<bool> signup(String name, String email, String password) async {
-    if (name.isNotEmpty && email.isNotEmpty && password.length >= 6) {
-      _user = User(name: name, email: email);
-      _isLoggedIn = true;
-      notifyListeners();
-      return true;
-    }
-    return false;
-  }
-
-  /// Logs out the user.
-  void logout() {
-    _user = null;
-    _isLoggedIn = false;
+  void _setState(AuthState newState) {
+    _state = newState;
     notifyListeners();
+  }
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String? error) {
+    _errorMessage = error;
+    notifyListeners();
+  }
+
+  Future<void> login(String email, String password) async {
+    _setLoading(true);
+    _setError(null);
+    _setState(AuthState.loading);
+
+    try {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Mock validation
+      if (email.isNotEmpty && password.length >= 6) {
+        _setState(AuthState.authenticated);
+      } else {
+        throw Exception('Invalid credentials');
+      }
+    } catch (e) {
+      _setError(e.toString());
+      _setState(AuthState.error);
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> signup(String name, String email, String password) async {
+    _setLoading(true);
+    _setError(null);
+    _setState(AuthState.loading);
+
+    try {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Mock validation
+      if (name.isNotEmpty && email.isNotEmpty && password.length >= 6) {
+        _setState(AuthState.authenticated);
+      } else {
+        throw Exception('Invalid information provided');
+      }
+    } catch (e) {
+      _setError(e.toString());
+      _setState(AuthState.error);
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void logout() {
+    _setState(AuthState.unauthenticated);
+    _setError(null);
+  }
+
+  void clearError() {
+    _setError(null);
   }
 }
