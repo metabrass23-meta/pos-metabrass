@@ -8,18 +8,23 @@ import '../../../src/theme/app_theme.dart';
 import '../premium_text_button.dart';
 import '../premium_text_field.dart';
 
-class AddCategoryDialog extends StatefulWidget {
-  const AddCategoryDialog({super.key});
+class EditCategoryDialog extends StatefulWidget {
+  final Category category;
+
+  const EditCategoryDialog({
+    super.key,
+    required this.category,
+  });
 
   @override
-  State<AddCategoryDialog> createState() => _AddCategoryDialogState();
+  State<EditCategoryDialog> createState() => _EditCategoryDialogState();
 }
 
-class _AddCategoryDialogState extends State<AddCategoryDialog>
+class _EditCategoryDialogState extends State<EditCategoryDialog>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -28,6 +33,9 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController(text: widget.category.name);
+    _descriptionController = TextEditingController(text: widget.category.description);
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -60,11 +68,12 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
     super.dispose();
   }
 
-  void _handleSubmit() async {
+  void _handleUpdate() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<CategoryProvider>(context, listen: false);
 
-      await provider.addCategory(
+      await provider.updateCategory(
+        widget.category.id,
         _nameController.text.trim(),
         _descriptionController.text.trim(),
       );
@@ -88,7 +97,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Category added successfully!',
+              'Category updated successfully!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -128,13 +137,13 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                 constraints: BoxConstraints(
                   maxWidth: ResponsiveBreakpoints.responsive(
                     context,
-                      tablet: 85.w,   // 95% width on tablets
-                      small: 80.w,    // 90% width on small screens
-                      medium: 70.w,   // 80% width on medium screens
-                      large: 60.w,    // 70% width on large screens
-                      ultrawide: 50.w, // 60% width on ultrawide
-                    ),
-                    maxHeight: 70.h, // Maximum 90% of screen height
+                    tablet: 95.w,
+                    small: 90.w,
+                    medium: 80.w,
+                    large: 70.w,
+                    ultrawide: 60.w,
+                  ),
+                  maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -148,13 +157,12 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                     ),
                   ],
                 ),
-                child: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: _buildTabletLayout(),
-                  small: _buildMobileLayout(),
-                  medium: _buildDesktopLayout(),
-                  large: _buildDesktopLayout(),
-                  ultrawide: _buildDesktopLayout(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    _buildFormContent(),
+                  ],
                 ),
               ),
             ),
@@ -164,42 +172,12 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
     );
   }
 
-  Widget _buildTabletLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        _buildFormContent(isCompact: true),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        _buildFormContent(isCompact: true),
-      ],
-    );
-  }
-
-  Widget _buildDesktopLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        _buildFormContent(isCompact: false),
-      ],
-    );
-  }
-
   Widget _buildHeader() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+          colors: [Colors.blue, Colors.blueAccent],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
@@ -215,7 +193,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Icon(
-              Icons.add_circle_outline,
+              Icons.edit_outlined,
               color: AppTheme.pureWhite,
               size: context.iconSize('large'),
             ),
@@ -228,7 +206,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Category' : 'Add New Category',
+                  context.shouldShowCompactLayout ? 'Edit Category' : 'Edit Category',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -239,7 +217,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new product category',
+                    'Update category information',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -250,6 +228,28 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               ],
             ),
           ),
+
+          // Category ID Badge
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            ),
+            child: Text(
+              widget.category.id,
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.pureWhite,
+              ),
+            ),
+          ),
+
+          SizedBox(width: context.smallPadding),
 
           Material(
             color: Colors.transparent,
@@ -271,7 +271,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
     );
   }
 
-  Widget _buildFormContent({required bool isCompact}) {
+  Widget _buildFormContent() {
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -282,7 +282,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
             // Category Name Field
             PremiumTextField(
               label: 'Category Name',
-              hint: isCompact
+              hint: context.shouldShowCompactLayout
                   ? 'Enter category name'
                   : 'Enter category name (e.g., Bridal Dresses)',
               controller: _nameController,
@@ -303,21 +303,21 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
 
             SizedBox(height: context.cardPadding),
 
-            // Description Field with responsive lines
+            // Description Field
             PremiumTextField(
               label: 'Description',
-              hint: isCompact
+              hint: context.shouldShowCompactLayout
                   ? 'Enter description (optional)'
                   : 'Enter category description (optional)',
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: ResponsiveBreakpoints.responsive(
                 context,
-                tablet: 2,    // Fewer lines on tablets
-                small: 3,     // Fewer lines on small screens
-                medium: 4,    // Standard lines on medium screens
-                large: 5,     // More lines on large screens
-                ultrawide: 6, // Maximum lines on ultrawide
+                tablet: 2,
+                small: 3,
+                medium: 4,
+                large: 5,
+                ultrawide: 6,
               ),
               validator: (value) {
                 if (value != null && value.length > 200) {
@@ -326,7 +326,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                 return null;
               },
               onChanged: (value) {
-                setState(() {}); // Update character count
+                setState(() {});
               },
             ),
 
@@ -347,9 +347,40 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               ),
             ),
 
+            SizedBox(height: context.smallPadding),
+
+            // Last Updated Info
+            Container(
+              padding: EdgeInsets.all(context.smallPadding),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.blue,
+                    size: context.iconSize('small'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Expanded(
+                    child: Text(
+                      'Last updated: ${_formatDateTime(widget.category.lastEdited)}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             SizedBox(height: context.mainPadding),
 
-            // Action Buttons with responsive layout
+            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -368,15 +399,16 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Add Button (full width)
+        // Update Button (full width)
         Consumer<CategoryProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Category',
-              onPressed: provider.isLoading ? null : _handleSubmit,
+              text: 'Update Category',
+              onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
-              icon: Icons.add_rounded,
+              icon: Icons.save_rounded,
+              backgroundColor: Colors.blue,
             );
           },
         ),
@@ -413,21 +445,26 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
 
         SizedBox(width: context.cardPadding),
 
-        // Add Button
+        // Update Button
         Expanded(
           child: Consumer<CategoryProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Category',
-                onPressed: provider.isLoading ? null : _handleSubmit,
+                text: 'Update Category',
+                onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
-                icon: Icons.add_rounded,
+                icon: Icons.save_rounded,
+                backgroundColor: Colors.blue,
               );
             },
           ),
         ),
       ],
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year} at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }
