@@ -23,6 +23,7 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': null},
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
     {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': null},
+    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
     {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
     {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': null},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
@@ -100,7 +101,7 @@ class PremiumSidebar extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Maqbool Fabrics',
+                          'Maqbool Fashion',
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
@@ -226,7 +227,9 @@ class PremiumSidebar extends StatelessWidget {
                                     vertical: context.smallPadding / 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23'
+                                    color: item['badge'] == '8'
+                                        ? Colors.green.withOpacity(0.9)
+                                        : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
