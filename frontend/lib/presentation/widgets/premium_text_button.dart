@@ -25,7 +25,7 @@ class PremiumButton extends StatefulWidget {
     this.backgroundColor,
     this.textColor,
     this.width,
-    this.height = 56,
+    this.height = 50,
   });
 
   @override
@@ -123,7 +123,7 @@ class _PremiumButtonState extends State<PremiumButton>
                         if (widget.icon != null) ...[
                           Icon(
                             widget.icon,
-                            size: 2.5.sp, // Changed from 2.2.w to 2.5.sp for better icon scaling
+                            size: 12.sp, // Changed from 2.2.w to 2.5.sp for better icon scaling
                             color: widget.isOutlined
                                 ? (widget.textColor ??
                                 widget.backgroundColor ??
@@ -135,7 +135,7 @@ class _PremiumButtonState extends State<PremiumButton>
                         Text(
                           widget.text,
                           style: GoogleFonts.inter(
-                            fontSize: 13.sp, // Changed from 2.w to 2.sp for better text scaling
+                            fontSize: 10.sp, // Changed from 2.w to 2.sp for better text scaling
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                             color: widget.isOutlined
