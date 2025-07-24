@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../premium_text_button.dart';
+import '../global/text_button.dart';
 
 class DeleteLaborDialog extends StatefulWidget {
   final Labor labor;
