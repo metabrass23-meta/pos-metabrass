@@ -14,6 +14,7 @@ class PremiumTextField extends StatefulWidget {
   final FormFieldValidator<String>? validator;
   final int maxLines;
   final bool enabled;
+  final ValueChanged<String>? onChanged; // Added onChanged parameter
 
   const PremiumTextField({
     super.key,
@@ -27,6 +28,7 @@ class PremiumTextField extends StatefulWidget {
     this.validator,
     this.maxLines = 1,
     this.enabled = true,
+    this.onChanged, // Added to constructor
   });
 
   @override
@@ -84,8 +86,9 @@ class _PremiumTextFieldState extends State<PremiumTextField>
           validator: widget.validator,
           maxLines: widget.maxLines,
           enabled: widget.enabled,
+          onChanged: widget.onChanged, // Pass onChanged to TextFormField
           style: GoogleFonts.inter(
-            fontSize: 11.sp, // Changed from 2.w to 2.sp for better text scaling
+            fontSize: 10.sp,
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
           ),
@@ -95,7 +98,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
               widget.prefixIcon,
-              size: 13.sp, // Changed from 2.4.w to 3.sp for better icon scaling
+              size: 12.sp,
               color: _isFocused
                   ? AppTheme.primaryMaroon
                   : const Color(0xFF9E9E9E),
@@ -145,12 +148,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             ),
             labelStyle: GoogleFonts.inter(
               color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
-              fontSize: 11.8.sp, // Changed from 1.8.w to 1.8.sp for better text scaling
+              fontSize: 10.sp,
               fontWeight: FontWeight.w500,
             ),
             hintStyle: GoogleFonts.inter(
               color: const Color(0xFF9E9E9E),
-              fontSize: 1.8.sp, // Changed from 1.8.w to 1.8.sp for better text scaling
+              fontSize: 10.sp,
               fontWeight: FontWeight.w400,
             ),
           ),
