@@ -57,52 +57,49 @@ class _CategoryPageState extends State<CategoryPage> {
       return _buildUnsupportedScreen();
     }
 
-    return ChangeNotifierProvider(
-      create: (_) => CategoryProvider(),
-      child: Scaffold(
-        backgroundColor: AppTheme.creamWhite,
-        body: Padding(
-          padding: EdgeInsets.all(context.mainPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Responsive Header Section
-              ResponsiveBreakpoints.responsive(
-                context,
-                tablet: _buildTabletHeader(),
-                small: _buildMobileHeader(),
-                medium: _buildDesktopHeader(),
-                large: _buildDesktopHeader(),
-                ultrawide: _buildDesktopHeader(),
+    return Scaffold(
+      backgroundColor: AppTheme.creamWhite,
+      body: Padding(
+        padding: EdgeInsets.all(context.mainPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Responsive Header Section
+            ResponsiveBreakpoints.responsive(
+              context,
+              tablet: _buildTabletHeader(),
+              small: _buildMobileHeader(),
+              medium: _buildDesktopHeader(),
+              large: _buildDesktopHeader(),
+              ultrawide: _buildDesktopHeader(),
+            ),
+
+            SizedBox(height: context.mainPadding),
+
+            // Responsive Stats Cards
+            Consumer<CategoryProvider>(
+              builder: (context, provider, child) {
+                return context.statsCardColumns == 2
+                    ? _buildMobileStatsGrid(provider)
+                    : _buildDesktopStatsRow(provider);
+              },
+            ),
+
+            SizedBox(height: context.cardPadding * 0.5),
+
+            // Responsive Search Section
+            _buildSearchSection(),
+
+            SizedBox(height: context.cardPadding * 0.5),
+
+            // Categories Table
+            Expanded(
+              child: CategoryTable(
+                onEdit: _showEditCategoryDialog,
+                onDelete: _showDeleteCategoryDialog,
               ),
-
-              SizedBox(height: context.mainPadding),
-
-              // Responsive Stats Cards
-              Consumer<CategoryProvider>(
-                builder: (context, provider, child) {
-                  return context.statsCardColumns == 2
-                      ? _buildMobileStatsGrid(provider)
-                      : _buildDesktopStatsRow(provider);
-                },
-              ),
-
-              SizedBox(height: context.cardPadding * 0.5),
-
-              // Responsive Search Section
-              _buildSearchSection(),
-
-              SizedBox(height: context.cardPadding * 0.5),
-
-              // Categories Table
-              Expanded(
-                child: CategoryTable(
-                  onEdit: _showEditCategoryDialog,
-                  onDelete: _showDeleteCategoryDialog,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -260,7 +257,6 @@ class _CategoryPageState extends State<CategoryPage> {
           colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
         ),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-
       ),
       child: Material(
         color: Colors.transparent,
@@ -424,8 +420,6 @@ class _CategoryPageState extends State<CategoryPage> {
   Widget _buildSearchBar() {
     return SizedBox(
       height: context.buttonHeight / 1.5,
-
-
       child: Consumer<CategoryProvider>(
         builder: (context, provider, child) {
           return TextField(
@@ -587,8 +581,8 @@ class _CategoryPageState extends State<CategoryPage> {
                   style: GoogleFonts.inter(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,    // Smaller for tablets
-                      small: 11.2.sp,     // Sizer sp units
+                      tablet: 10.8.sp,
+                      small: 11.2.sp,
                       medium: 11.5.sp,
                       large: 11.8.sp,
                       ultrawide: 12.2.sp,
