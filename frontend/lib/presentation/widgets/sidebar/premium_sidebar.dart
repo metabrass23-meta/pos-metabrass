@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 
 class PremiumSidebar extends StatelessWidget {
   final bool isExpanded;
@@ -34,6 +35,9 @@ class PremiumSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: isExpanded
+          ? context.sidebarExpandedWidth
+          : context.sidebarCollapsedWidth,
       height: 100.h,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -47,8 +51,8 @@ class PremiumSidebar extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 2.w,
-            offset: Offset(0.5.w, 0),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(context.smallPadding / 2, 0),
           ),
         ],
       ),
@@ -56,7 +60,7 @@ class PremiumSidebar extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: EdgeInsets.all(1.w),
+            padding: EdgeInsets.all(context.cardPadding / 2),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -69,28 +73,28 @@ class PremiumSidebar extends StatelessWidget {
               children: [
                 // Logo
                 Container(
-                  width: 3.5.w,
-                  height: 3.5.w,
+                  width: 2.5.w,
+                  height: 2.5.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppTheme.pureWhite,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
-                        blurRadius: 0.8.w,
-                        offset: Offset(0, 0.3.w),
+                        blurRadius: context.shadowBlur('light'),
+                        offset: Offset(0, context.smallPadding / 2),
                       ),
                     ],
                   ),
                   child: Icon(
                     Icons.diamond_sharp,
-                    size: 18.sp,
+                    size: context.iconSize('medium'),
                     color: AppTheme.primaryMaroon,
                   ),
                 ),
 
                 if (isExpanded) ...[
-                  SizedBox(width: 1.5.w),
+                  SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +102,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           'Maqbool Fabrics',
                           style: GoogleFonts.playfairDisplay(
-                            fontSize: 14.2.sp,
+                            fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
                             letterSpacing: 0.5,
@@ -107,7 +111,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           'Premium POS',
                           style: GoogleFonts.inter(
-                            fontSize: 10.4.sp,
+                            fontSize: context.captionFontSize,
                             fontWeight: FontWeight.w300,
                             color: AppTheme.pureWhite.withOpacity(0.8),
                           ),
@@ -122,13 +126,13 @@ class PremiumSidebar extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: onToggle,
-                    borderRadius: BorderRadius.circular(0.8.w),
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
                     child: Container(
-                      padding: EdgeInsets.all(0.8.w),
+                      padding: EdgeInsets.all(context.smallPadding / 2),
                       child: Icon(
                         isExpanded ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
                         color: AppTheme.pureWhite.withOpacity(0.9),
-                        size: 2.5.sp,
+                        size: context.iconSize('medium'),
                       ),
                     ),
                   ),
@@ -140,7 +144,7 @@ class PremiumSidebar extends StatelessWidget {
           // Menu Items
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 1.h),
+              padding: context.sectionPadding / 4,
               itemCount: menuItems.length,
               itemBuilder: (context, index) {
                 final item = menuItems[index];
@@ -149,25 +153,25 @@ class PremiumSidebar extends StatelessWidget {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: EdgeInsets.symmetric(
-                    horizontal: isExpanded ? 1.w : 0.5.w,
-                    vertical: 0.3.h,
+                    horizontal: isExpanded ? context.cardPadding : context.smallPadding,
+                    vertical: context.smallPadding / 2.5,
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => onMenuSelected(index),
-                      borderRadius: BorderRadius.circular(1.2.w),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: EdgeInsets.symmetric(
-                          horizontal: isExpanded ? 1.5.w : 1.w,
-                          vertical: 1.5.h,
+                          horizontal: isExpanded ? context.cardPadding : context.smallPadding,
+                          vertical: context.cardPadding / 2,
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppTheme.pureWhite.withOpacity(0.15)
                               : Colors.transparent,
-                          borderRadius: BorderRadius.circular(1.2.w),
+                          borderRadius: BorderRadius.circular(context.borderRadius()),
                           border: isSelected
                               ? Border.all(
                             color: AppTheme.pureWhite.withOpacity(0.3),
@@ -179,32 +183,32 @@ class PremiumSidebar extends StatelessWidget {
                           children: [
                             // Icon
                             Container(
-                              width: 3.w,
-                              height: 3.w,
+                              width: context.iconSize('large'),
+                              height: context.iconSize('large'),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? AppTheme.accentGold.withOpacity(0.2)
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(0.8.w),
+                                borderRadius: BorderRadius.circular(context.borderRadius('small')),
                               ),
                               child: Icon(
                                 item['icon'],
                                 color: isSelected
                                     ? AppTheme.accentGold
                                     : AppTheme.pureWhite.withOpacity(0.8),
-                                size: 12.2.sp,
+                                size: context.iconSize('medium'),
                               ),
                             ),
 
                             if (isExpanded) ...[
-                              SizedBox(width: 1.5.w),
+                              SizedBox(width: context.smallPadding),
 
                               // Title
                               Expanded(
                                 child: Text(
                                   item['title'],
                                   style: GoogleFonts.inter(
-                                    fontSize: 10.8.sp,
+                                    fontSize: context.bodyFontSize,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                                     color: isSelected
                                         ? AppTheme.pureWhite
@@ -218,19 +222,19 @@ class PremiumSidebar extends StatelessWidget {
                               if (item['badge'] != null) ...[
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: 0.8.w,
-                                    vertical: 0.3.h,
+                                    horizontal: context.smallPadding,
+                                    vertical: context.smallPadding / 2,
                                   ),
                                   decoration: BoxDecoration(
                                     color: item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23'
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
-                                    borderRadius: BorderRadius.circular(1.w),
+                                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                   ),
                                   child: Text(
                                     item['badge'],
                                     style: GoogleFonts.inter(
-                                      fontSize: 9.3.sp,
+                                      fontSize: context.captionFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.pureWhite,
                                     ),
@@ -251,7 +255,7 @@ class PremiumSidebar extends StatelessWidget {
           // Footer
           if (isExpanded) ...[
             Container(
-              padding: EdgeInsets.all(2.w),
+              padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
@@ -263,18 +267,18 @@ class PremiumSidebar extends StatelessWidget {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 1.6.w,
+                    radius: context.iconSize('medium') / 2,
                     backgroundColor: AppTheme.accentGold,
                     child: Text(
                       'A',
                       style: GoogleFonts.inter(
-                        fontSize: 10.8.sp,
+                        fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primaryMaroon,
                       ),
                     ),
                   ),
-                  SizedBox(width: 1.w),
+                  SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +286,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           'Admin User',
                           style: GoogleFonts.inter(
-                            fontSize: 10.6.sp,
+                            fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w500,
                             color: AppTheme.pureWhite,
                           ),
@@ -290,7 +294,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           'admin@maqboolfabric.com',
                           style: GoogleFonts.inter(
-                            fontSize: 9.2.sp,
+                            fontSize: context.captionFontSize,
                             fontWeight: FontWeight.w300,
                             color: AppTheme.pureWhite.withOpacity(0.7),
                           ),
