@@ -92,6 +92,17 @@ class ResponsiveBreakpoints {
     ).clamp(60.0, 100.0);
   }
 
+  static double getHeadingFontSize(BuildContext context) {
+    return responsive(
+      context,
+      tablet: 16.8.sp,    // Smaller for tablets
+      small: 15.2.sp,     // Sizer sp units
+      medium: 17.5.sp,
+      large: 17.8.sp,
+      ultrawide: 18.2.sp,
+    );
+  }
+
   // Enhanced font sizes with tablet support
   static double getHeaderFontSize(BuildContext context) {
     return responsive(
@@ -289,6 +300,15 @@ class ResponsiveBreakpoints {
             medium: 12.sp,
             large: 12.sp,
             ultrawide: 12.sp
+        );
+      case 'special':
+        return responsive(
+            context,
+            tablet: 30.sp,
+            small: 30.sp,
+            medium: 30.sp,
+            large: 30.sp,
+            ultrawide: 30.sp
         );
       default:
         return responsive(
@@ -531,6 +551,7 @@ extension ResponsiveContext on BuildContext {
 
   // Typography with Sizer scaling
   double get headerFontSize => ResponsiveBreakpoints.getHeaderFontSize(this);
+  double get headingFontSize => ResponsiveBreakpoints.getHeadingFontSize(this);
   double get bodyFontSize => ResponsiveBreakpoints.getBodyFontSize(this);
   double get subtitleFontSize => ResponsiveBreakpoints.getSubtitleFontSize(this);
   double get captionFontSize => ResponsiveBreakpoints.getCaptionFontSize(this);
