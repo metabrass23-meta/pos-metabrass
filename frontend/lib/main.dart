@@ -2,9 +2,9 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/auth/login_screen.dart';
-import 'package:frontend/presentation/screens/dashboard_screen.dart';
+import 'package:frontend/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:frontend/presentation/screens/auth/signup_screen.dart';
-import 'package:frontend/presentation/splash_screen.dart';
+import 'package:frontend/presentation/screens/splash/splash_screen.dart';
 import 'package:frontend/src/providers/app_provider.dart';
 import 'package:frontend/src/providers/auth_provider.dart';
 import 'package:frontend/src/providers/category_provider.dart';

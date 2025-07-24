@@ -5,8 +5,8 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
-import '../../widgets/premium_text_button.dart';
-import '../../widgets/premium_text_field.dart';
+import '../../widgets/global/text_button.dart';
+import '../../widgets/global/text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

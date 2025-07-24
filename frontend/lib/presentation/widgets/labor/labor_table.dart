@@ -136,6 +136,12 @@ class LaborTable extends StatelessWidget {
           ),
         ],
 
+        // Advance Column (always visible)
+        Expanded(
+          flex: columnFlexes[context.shouldShowFullLayout ? 10 : context.isMediumDesktop ? 7 : context.shouldShowCompactLayout ? 2 : 6],
+          child: _buildHeaderCell(context, 'Advance'),
+        ),
+
         // Additional Columns (only on large screens)
         if (context.shouldShowFullLayout) ...[
           Expanded(
@@ -154,15 +160,11 @@ class LaborTable extends StatelessWidget {
             flex: columnFlexes[9],
             child: _buildHeaderCell(context, 'Age'),
           ),
-          Expanded(
-            flex: columnFlexes[10],
-            child: _buildHeaderCell(context, 'Advance'),
-          ),
         ],
 
         // Actions Column (always visible)
         Expanded(
-          flex: columnFlexes[context.shouldShowFullLayout ? 11 : context.isMediumDesktop ? 7 : 2],
+          flex: columnFlexes[context.shouldShowFullLayout ? 11 : context.isMediumDesktop ? 8 : context.shouldShowCompactLayout ? 3 : 7],
           child: _buildHeaderCell(context, 'Actions'),
         ),
       ],
@@ -339,6 +341,23 @@ class LaborTable extends StatelessWidget {
             SizedBox(width: context.smallPadding),
           ],
 
+          // Advance Column (always visible)
+          Expanded(
+            flex: columnFlexes[context.shouldShowFullLayout ? 10 : context.isMediumDesktop ? 7 : context.shouldShowCompactLayout ? 2 : 6],
+            child: Text(
+              'PKR ${labor.advancePayment.toStringAsFixed(0)}',
+              style: GoogleFonts.inter(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[700],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+          SizedBox(width: context.smallPadding),
+
           // Additional Columns (only on large screens)
           if (context.shouldShowFullLayout) ...[
             Expanded(
@@ -397,25 +416,11 @@ class LaborTable extends StatelessWidget {
               ),
             ),
             SizedBox(width: context.smallPadding),
-            Expanded(
-              flex: columnFlexes[10],
-              child: Text(
-                'PKR ${labor.advancePayment.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
           ],
 
           // Actions Column with responsive button sizing
           Expanded(
-            flex: columnFlexes[context.shouldShowFullLayout ? 11 : context.isMediumDesktop ? 11 : 2],
+            flex: columnFlexes[context.shouldShowFullLayout ? 11 : context.isMediumDesktop ? 8 : context.shouldShowCompactLayout ? 3 : 7],
             child: ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactActions(context, labor),

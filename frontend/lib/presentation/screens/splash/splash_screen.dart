@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import '../src/providers/app_provider.dart';
-import '../src/theme/app_theme.dart';
-import '../src/utils/responsive_breakpoints.dart';
+import '../../../src/providers/app_provider.dart';
+import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
