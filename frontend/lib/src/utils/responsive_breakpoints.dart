@@ -70,9 +70,9 @@ class ResponsiveBreakpoints {
   static double getSidebarExpandedWidth(BuildContext context) {
     final baseWidth = responsive(
       context,
-      tablet: 30.w,     // 30% of screen width for tablets
+      tablet: 25.w,     // 30% of screen width for tablets
       small: 25.w,      // 25% of screen width
-      medium: 22.w,     // 22% of screen width
+      medium: 15.w,     // 22% of screen width
       large: 20.w,      // 20% of screen width
       ultrawide: 18.w,  // 18% of screen width
     );
@@ -209,11 +209,22 @@ class ResponsiveBreakpoints {
   static List<int> getTableColumnFlexes(BuildContext context) {
     return responsive(
       context,
-      tablet: [1, 2, 1, 1, 1, 2],          // Very compressed for tablets
-      small: [1, 2, 2, 1, 2, 2],           // Compressed for small screens
-      medium: [1, 2, 3, 1, 3, 2],          // Balanced for medium screens
-      large: [1, 2, 4, 1, 3, 3],           // More space for description
-      ultrawide: [1, 2, 5, 1, 3, 4],       // Extra space for ultrawide
+      tablet: [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],          // Very compressed for tablets
+      small: [1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1 ,1],           // Compressed for small screens
+      medium: [1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],          // Balanced for medium screens
+      large: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1],           // More space for description
+      ultrawide: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1],       // Extra space for ultrawide
+    );
+  }
+
+  static List<int> getLaborTableColumnFlexes(BuildContext context) {
+    return responsive(
+      context,
+      tablet: [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],          // Very compressed for tablets
+      small: [1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1 ,1],           // Compressed for small screens
+      medium: [1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],          // Balanced for medium screens
+      large: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1],           // More space for description
+      ultrawide: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1],       // Extra space for ultrawide
     );
   }
 
@@ -547,6 +558,7 @@ extension ResponsiveContext on BuildContext {
   // Layout helpers
   int get statsCardColumns => ResponsiveBreakpoints.getStatsCardColumns(this);
   List<int> get tableColumnFlexes => ResponsiveBreakpoints.getTableColumnFlexes(this);
+  List<int> get laborTableColumnFlexes => ResponsiveBreakpoints.getLaborTableColumnFlexes(this);
   int get gridCrossAxisCount => ResponsiveBreakpoints.getGridCrossAxisCount(this);
 
   // Edge insets helpers
