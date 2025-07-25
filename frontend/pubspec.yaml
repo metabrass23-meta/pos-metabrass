@@ -50,6 +50,7 @@ dependencies:
   flutter_svg:
   animations:
   flutter_animate:
+  syncfusion_flutter_datagrid:
 
 dev_dependencies:
   flutter_test:

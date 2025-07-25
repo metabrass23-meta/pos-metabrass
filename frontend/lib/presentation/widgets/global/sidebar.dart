@@ -21,6 +21,7 @@ class PremiumSidebar extends StatelessWidget {
   final List<Map<String, dynamic>> menuItems = const [
     {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
     {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': null},
+    {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'}, // Added Orders at index 2
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
     {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': null},
     {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
@@ -232,6 +233,8 @@ class PremiumSidebar extends StatelessWidget {
                                         ? Colors.blue.withOpacity(0.9)
                                         : item['badge'] == '8'
                                         ? Colors.green.withOpacity(0.9)
+                                        : item['badge'] == '7' // New Orders badge color
+                                        ? Colors.purple.withOpacity(0.9)
                                         : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
