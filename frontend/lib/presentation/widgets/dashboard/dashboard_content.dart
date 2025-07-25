@@ -12,6 +12,7 @@ import '../../../src/theme/app_theme.dart';
 import '../../screens/category/category_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
+import '../../screens/customer/customer_screen.dart';
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
@@ -31,6 +32,8 @@ class DashboardContent extends StatelessWidget {
       return const LaborPage();
     } else if (selectedIndex == 4) {
       return const VendorPage();
+    } else if (selectedIndex == 5) {
+      return const CustomerPage();
     } else {
       return _buildPlaceholderContent(context);
     }
@@ -161,12 +164,12 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Total Products',
-                            value: stats['totalProducts']['value'],
-                            change: stats['totalProducts']['change'],
-                            isPositive: stats['totalProducts']['isPositive'],
-                            icon: Icons.inventory_2_rounded,
-                            color: Colors.purple,
+                            title: 'Active Customers',
+                            value: stats['activeCustomers']['value'],
+                            change: stats['activeCustomers']['change'],
+                            isPositive: stats['activeCustomers']['isPositive'],
+                            icon: Icons.people_rounded,
+                            color: Colors.indigo,
                           ),
                         ),
                         SizedBox(
@@ -231,13 +234,7 @@ class DashboardContent extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.pureWhite,
                 borderRadius: BorderRadius.circular(context.borderRadius()),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: context.shadowBlur(),
-                    offset: Offset(0, context.smallPadding),
-                  ),
-                ],
+
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,6 +263,14 @@ class DashboardContent extends StatelessWidget {
                   // Activity Items
                   _buildActivityItem(
                     context,
+                    'New customer registered: Aisha Khan',
+                    'Premium customer from Karachi',
+                    '15 minutes ago',
+                    Icons.person_add_rounded,
+                    Colors.indigo,
+                  ),
+                  _buildActivityItem(
+                    context,
                     'New vendor registered: Ali Textiles',
                     'Muhammad Ali - Fabric Supplier',
                     '30 minutes ago',
@@ -274,19 +279,11 @@ class DashboardContent extends StatelessWidget {
                   ),
                   _buildActivityItem(
                     context,
-                    'New order received from Aisha Khan',
-                    'Bridal Dress - ₨ 85,000',
+                    'Customer purchase completed',
+                    'Zara Sheikh - ₨ 120,000 Wedding Collection',
                     '2 hours ago',
                     Icons.shopping_bag_rounded,
                     Colors.green,
-                  ),
-                  _buildActivityItem(
-                    context,
-                    'Payment completed for order #MF002',
-                    'Fatima Ali - ₨ 45,000',
-                    '3 hours ago',
-                    Icons.payment_rounded,
-                    Colors.blue,
                   ),
                   _buildActivityItem(
                     context,
@@ -345,7 +342,7 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(height: context.formFieldSpacing * 2),
 
                         _buildMetricRow(context, 'Revenue Target', '₨ 3,00,000', '82%', Colors.blue),
-                        _buildMetricRow(context, 'Orders Target', '1,500', '83%', Colors.green),
+                        _buildMetricRow(context, 'Customer Growth', '200', '78%', Colors.indigo),
                         _buildMetricRow(context, 'Vendor Partnerships', '25', '88%', Colors.teal),
                         _buildMetricRow(context, 'Conversion Rate', '65%', '92%', Colors.orange),
                       ],
@@ -355,7 +352,7 @@ class DashboardContent extends StatelessWidget {
 
                 SizedBox(width: context.cardPadding),
 
-                // Top Vendors
+                // Top Customers
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.all(context.cardPadding),
@@ -376,13 +373,13 @@ class DashboardContent extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.store_rounded,
-                              color: Colors.teal,
+                              Icons.people_rounded,
+                              color: Colors.indigo,
                               size: context.iconSize('medium'),
                             ),
                             SizedBox(width: context.smallPadding),
                             Text(
-                              'Top Vendors',
+                              'Top Customers',
                               style: GoogleFonts.inter(
                                 fontSize: context.headerFontSize,
                                 fontWeight: FontWeight.w600,
@@ -394,16 +391,18 @@ class DashboardContent extends StatelessWidget {
 
                         SizedBox(height: context.formFieldSpacing * 2),
 
-                        _buildVendorRow(context, 'Ali Textiles & Co.', 'Karachi', '₨ 2,50,000'),
-                        _buildVendorRow(context, 'Khan Fabrics', 'Lahore', '₨ 1,85,000'),
-                        _buildVendorRow(context, 'Hassan Brothers Trading', 'Karachi', '₨ 1,45,000'),
-                        _buildVendorRow(context, 'Sheikh Embroidery Works', 'Islamabad', '₨ 98,000'),
+                        _buildCustomerRow(context, 'Zara Sheikh', 'VIP Customer', 'Rs. 1,20,000'),
+                        _buildCustomerRow(context, 'Aisha Khan', 'Premium Customer', 'Rs. 85,000'),
+                        _buildCustomerRow(context, 'Hina Malik', 'Corporate Client', 'Rs. 95,000'),
+                        _buildCustomerRow(context, 'Fatima Ali', 'Regular Customer', 'Rs. 45,000'),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
+
+            SizedBox(height: context.formFieldSpacing * 2),
           ],
         ),
       ),
@@ -536,7 +535,7 @@ class DashboardContent extends StatelessWidget {
     );
   }
 
-  Widget _buildVendorRow(BuildContext context, String name, String city, String revenue) {
+  Widget _buildCustomerRow(BuildContext context, String name, String type, String totalSpent) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       child: Row(
@@ -545,12 +544,12 @@ class DashboardContent extends StatelessWidget {
             width: context.iconSize('medium') * 1.5,
             height: context.iconSize('medium') * 1.5,
             decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.1),
+              color: Colors.indigo.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
             child: Icon(
-              Icons.store_rounded,
-              color: Colors.teal,
+              Icons.person_rounded,
+              color: Colors.indigo,
               size: context.iconSize('small'),
             ),
           ),
@@ -570,7 +569,7 @@ class DashboardContent extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '$city • $revenue',
+                  '$type • $totalSpent',
                   style: GoogleFonts.inter(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
@@ -592,6 +591,7 @@ class DashboardContent extends StatelessWidget {
       'Products',
       'Labor',
       'Vendors',
+      'Customers',
       'Advance',
       'Payment',
       'Sales',
