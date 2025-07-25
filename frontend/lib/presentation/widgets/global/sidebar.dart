@@ -24,6 +24,7 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
     {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': null},
     {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
+    {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
     {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
     {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': null},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
@@ -227,7 +228,9 @@ class PremiumSidebar extends StatelessWidget {
                                     vertical: context.smallPadding / 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: item['badge'] == '8'
+                                    color: item['badge'] == '156'
+                                        ? Colors.blue.withOpacity(0.9)
+                                        : item['badge'] == '8'
                                         ? Colors.green.withOpacity(0.9)
                                         : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
