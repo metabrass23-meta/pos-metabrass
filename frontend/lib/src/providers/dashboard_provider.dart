@@ -12,7 +12,8 @@ class DashboardProvider extends ChangeNotifier {
     'Categories',
     'Products',
     'Labor',
-    'Vendors', // Added Vendors to menu titles
+    'Vendors',
+    'Customers', // Added Customers to menu titles
     'Advance',
     'Payment',
     'Sales',
@@ -34,10 +35,10 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Dashboard Statistics - Updated to include Active Vendors
+  // Dashboard Statistics - Updated to include Active Customers
   Map<String, dynamic> get dashboardStats => {
     'totalSales': {
-      'value': '₨ 2,45,000',
+      'value': 'Rs. 2,45,000',
       'change': '+12.5%',
       'isPositive': true,
     },
@@ -56,6 +57,11 @@ class DashboardProvider extends ChangeNotifier {
       'change': '+2',
       'isPositive': true,
     },
+    'activeCustomers': {
+      'value': '156',
+      'change': '+18',
+      'isPositive': true,
+    },
     'pendingOrders': {
       'value': '23',
       'change': '-2.3%',
@@ -68,7 +74,7 @@ class DashboardProvider extends ChangeNotifier {
       'id': '#MF001',
       'customer': 'Aisha Khan',
       'type': 'Bridal Dress',
-      'amount': '₨ 85,000',
+      'amount': 'Rs. 85,000',
       'status': 'In Progress',
       'date': 'Today',
     },
@@ -76,7 +82,7 @@ class DashboardProvider extends ChangeNotifier {
       'id': '#MF002',
       'customer': 'Fatima Ali',
       'type': 'Groom Sherwani',
-      'amount': '₨ 45,000',
+      'amount': 'Rs. 45,000',
       'status': 'Completed',
       'date': 'Yesterday',
     },
@@ -84,7 +90,7 @@ class DashboardProvider extends ChangeNotifier {
       'id': '#MF003',
       'customer': 'Sarah Ahmed',
       'type': 'Party Dress',
-      'amount': '₨ 25,000',
+      'amount': 'Rs. 25,000',
       'status': 'Pending',
       'date': '2 days ago',
     },
@@ -92,7 +98,7 @@ class DashboardProvider extends ChangeNotifier {
       'id': '#MF004',
       'customer': 'Zara Sheikh',
       'type': 'Wedding Lehenga',
-      'amount': '₨ 120,000',
+      'amount': 'Rs. 120,000',
       'status': 'In Progress',
       'date': '3 days ago',
     },
@@ -112,31 +118,66 @@ class DashboardProvider extends ChangeNotifier {
     {
       'name': 'Ali Textiles & Co.',
       'city': 'Karachi',
-      'revenue': '₨ 2,50,000',
+      'revenue': 'Rs. 2,50,000',
       'orders': 45,
     },
     {
       'name': 'Khan Fabrics',
       'city': 'Lahore',
-      'revenue': '₨ 1,85,000',
+      'revenue': 'Rs. 1,85,000',
       'orders': 38,
     },
     {
       'name': 'Hassan Brothers Trading',
       'city': 'Karachi',
-      'revenue': '₨ 1,45,000',
+      'revenue': 'Rs. 1,45,000',
       'orders': 32,
     },
     {
       'name': 'Sheikh Embroidery Works',
       'city': 'Islamabad',
-      'revenue': '₨ 98,000',
+      'revenue': 'Rs. 98,000',
       'orders': 25,
     },
   ];
 
-  // Recent activities including vendor activities
+  // Customer-related data for dashboard
+  List<Map<String, dynamic>> get topCustomers => [
+    {
+      'name': 'Zara Sheikh',
+      'type': 'VIP Customer',
+      'totalSpent': 'Rs. 1,20,000',
+      'orders': 8,
+    },
+    {
+      'name': 'Aisha Khan',
+      'type': 'Premium Customer',
+      'totalSpent': 'Rs. 85,000',
+      'orders': 5,
+    },
+    {
+      'name': 'Hina Malik',
+      'type': 'Corporate Client',
+      'totalSpent': 'Rs. 95,000',
+      'orders': 6,
+    },
+    {
+      'name': 'Fatima Ali',
+      'type': 'Regular Customer',
+      'totalSpent': 'Rs. 45,000',
+      'orders': 3,
+    },
+  ];
+
+  // Recent activities including vendor and customer activities
   List<Map<String, dynamic>> get recentActivities => [
+    {
+      'title': 'New customer registered: Aisha Khan',
+      'subtitle': 'Premium customer from Karachi',
+      'time': '15 minutes ago',
+      'icon': Icons.person_add_rounded,
+      'color': Colors.indigo,
+    },
     {
       'title': 'New vendor registered: Ali Textiles',
       'subtitle': 'Muhammad Ali - Fabric Supplier',
@@ -145,18 +186,11 @@ class DashboardProvider extends ChangeNotifier {
       'color': Colors.teal,
     },
     {
-      'title': 'New order received from Aisha Khan',
-      'subtitle': 'Bridal Dress - ₨ 85,000',
+      'title': 'Customer purchase completed',
+      'subtitle': 'Zara Sheikh - Rs. 120,000 Wedding Collection',
       'time': '2 hours ago',
       'icon': Icons.shopping_bag_rounded,
       'color': Colors.green,
-    },
-    {
-      'title': 'Payment completed for order #MF002',
-      'subtitle': 'Fatima Ali - ₨ 45,000',
-      'time': '3 hours ago',
-      'icon': Icons.payment_rounded,
-      'color': Colors.blue,
     },
     {
       'title': 'Vendor delivery received',
@@ -167,19 +201,19 @@ class DashboardProvider extends ChangeNotifier {
     },
   ];
 
-  // Performance metrics with vendor data
+  // Performance metrics with vendor and customer data
   Map<String, dynamic> get performanceMetrics => {
     'revenueTarget': {
       'label': 'Revenue Target',
-      'value': '₨ 3,00,000',
+      'value': 'Rs. 3,00,000',
       'percentage': '82%',
       'color': Colors.blue,
     },
-    'ordersTarget': {
-      'label': 'Orders Target',
-      'value': '1,500',
-      'percentage': '83%',
-      'color': Colors.green,
+    'customerGrowth': {
+      'label': 'Customer Growth',
+      'value': '200',
+      'percentage': '78%',
+      'color': Colors.indigo,
     },
     'vendorPartnerships': {
       'label': 'Vendor Partnerships',
@@ -195,13 +229,24 @@ class DashboardProvider extends ChangeNotifier {
     },
   };
 
+  // Customer statistics summary
+  Map<String, dynamic> get customerStats => {
+    'totalCustomers': 156,
+    'activeCustomers': 142,
+    'newThisMonth': 18,
+    'vipCustomers': 8,
+    'totalRevenue': 'Rs. 8,45,000',
+    'averageOrderValue': 'Rs. 55,000',
+    'topSpendingCity': 'Karachi',
+  };
+
   // Vendor statistics summary
   Map<String, dynamic> get vendorStats => {
     'totalVendors': 8,
     'activeVendors': 8,
     'newThisMonth': 2,
-    'totalRevenue': '₨ 6,78,000',
-    'averageOrderValue': '₨ 35,000',
+    'totalRevenue': 'Rs. 6,78,000',
+    'averageOrderValue': 'Rs. 35,000',
     'topPerformingCity': 'Karachi',
   };
 
@@ -212,7 +257,7 @@ class DashboardProvider extends ChangeNotifier {
       'subtitle': 'Create new order',
       'icon': Icons.add_shopping_cart_rounded,
       'color': Colors.green,
-      'index': 7, // Sales page index
+      'index': 8, // Sales page index
     },
     {
       'title': 'Add Product',
@@ -222,11 +267,11 @@ class DashboardProvider extends ChangeNotifier {
       'index': 2, // Products page index
     },
     {
-      'title': 'Add Labor',
-      'subtitle': 'Register worker',
+      'title': 'Add Customer',
+      'subtitle': 'Register client',
       'icon': Icons.person_add_rounded,
-      'color': Colors.purple,
-      'index': 3, // Labor page index
+      'color': Colors.indigo,
+      'index': 5, // Customer page index
     },
     {
       'title': 'Add Vendor',
@@ -240,14 +285,14 @@ class DashboardProvider extends ChangeNotifier {
       'subtitle': 'Analytics & insights',
       'icon': Icons.analytics_rounded,
       'color': Colors.orange,
-      'index': 10, // Reports page index
+      'index': 11, // Reports page index
     },
     {
       'title': 'Manage Stock',
       'subtitle': 'Inventory control',
       'icon': Icons.inventory_rounded,
       'color': Colors.red,
-      'index': 9, // Stock page index
+      'index': 10, // Stock page index
     },
   ];
 
@@ -261,29 +306,33 @@ class DashboardProvider extends ChangeNotifier {
     switch (period) {
       case 'today':
         return {
-          'sales': '₨ 45,230',
+          'sales': 'Rs. 45,230',
           'orders': 23,
+          'customers': 156,
           'vendors': 8,
           'products': 432,
         };
       case 'week':
         return {
-          'sales': '₨ 3,24,500',
+          'sales': 'Rs. 3,24,500',
           'orders': 156,
+          'customers': 156,
           'vendors': 8,
           'products': 432,
         };
       case 'month':
         return {
-          'sales': '₨ 12,45,000',
+          'sales': 'Rs. 12,45,000',
           'orders': 672,
+          'customers': 156,
           'vendors': 8,
           'products': 432,
         };
       default:
         return {
-          'sales': '₨ 2,45,000',
+          'sales': 'Rs. 2,45,000',
           'orders': 1247,
+          'customers': 156,
           'vendors': 8,
           'products': 432,
         };
@@ -296,4 +345,29 @@ class DashboardProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 1));
     notifyListeners();
   }
+
+  // Customer analytics
+  Map<String, dynamic> get customerAnalytics => {
+    'totalRevenue': 845000.0,
+    'averageOrderValue': 55000.0,
+    'conversionRate': 78.0,
+    'retentionRate': 85.0,
+    'lifetimeValue': 125000.0,
+  };
+
+  // Get customer segments
+  Map<String, List<Map<String, dynamic>>> get customerSegments => {
+    'vip': [
+      {'name': 'Zara Sheikh', 'spent': 120000, 'orders': 8},
+      {'name': 'Hina Malik', 'spent': 95000, 'orders': 6},
+    ],
+    'premium': [
+      {'name': 'Aisha Khan', 'spent': 85000, 'orders': 5},
+      {'name': 'Sarah Ahmed', 'spent': 75000, 'orders': 4},
+    ],
+    'regular': [
+      {'name': 'Fatima Ali', 'spent': 45000, 'orders': 3},
+      {'name': 'Mehwish Qureshi', 'spent': 35000, 'orders': 2},
+    ],
+  };
 }
