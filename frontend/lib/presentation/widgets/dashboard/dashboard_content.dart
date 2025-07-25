@@ -13,6 +13,7 @@ import '../../screens/category/category_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/customer/customer_screen.dart';
+import '../../screens/order/order_screen.dart'; // Add this import for order screen
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
@@ -28,6 +29,8 @@ class DashboardContent extends StatelessWidget {
       return _buildDashboard(context);
     } else if (selectedIndex == 1) {
       return const CategoryPage();
+    } else if (selectedIndex == 2) {
+      return const OrderPage(); // Add order screen here (index 2)
     } else if (selectedIndex == 3) {
       return const LaborPage();
     } else if (selectedIndex == 4) {
@@ -588,6 +591,7 @@ class DashboardContent extends StatelessWidget {
     final List<String> pageNames = [
       'Dashboard',
       'Categories',
+      'Orders', // Updated to reflect the new order at index 2
       'Products',
       'Labor',
       'Vendors',
