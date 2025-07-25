@@ -31,11 +31,11 @@ class DashboardContent extends StatelessWidget {
       return const CategoryPage();
     } else if (selectedIndex == 2) {
       return const OrderPage(); // Add order screen here (index 2)
-    } else if (selectedIndex == 3) {
-      return const LaborPage();
     } else if (selectedIndex == 4) {
-      return const VendorPage();
+      return const LaborPage();
     } else if (selectedIndex == 5) {
+      return const VendorPage();
+    } else if (selectedIndex == 6) {
       return const CustomerPage();
     } else {
       return _buildPlaceholderContent(context);
