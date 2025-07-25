@@ -11,6 +11,7 @@ import 'package:frontend/src/providers/category_provider.dart';
 import 'package:frontend/src/providers/dashboard_provider.dart';
 import 'package:frontend/src/providers/labor_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
+import 'package:frontend/src/providers/customer_provider.dart';
 import 'package:frontend/src/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -46,6 +47,7 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => LaborProvider()),
         ChangeNotifierProvider(create: (_) => VendorProvider()),
+        ChangeNotifierProvider(create: (_) => CustomerProvider()),
       ],
       child: Sizer(
         builder: (context, orientation, deviceType) {
