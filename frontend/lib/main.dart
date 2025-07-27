@@ -5,12 +5,14 @@ import 'package:frontend/presentation/screens/auth/login_screen.dart';
 import 'package:frontend/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:frontend/presentation/screens/auth/signup_screen.dart';
 import 'package:frontend/presentation/screens/splash/splash_screen.dart';
+import 'package:frontend/src/providers/advance_payment_provider.dart';
 import 'package:frontend/src/providers/app_provider.dart';
 import 'package:frontend/src/providers/auth_provider.dart';
 import 'package:frontend/src/providers/category_provider.dart';
 import 'package:frontend/src/providers/dashboard_provider.dart';
 import 'package:frontend/src/providers/labor_provider.dart';
 import 'package:frontend/src/providers/order_provider.dart';
+import 'package:frontend/src/providers/product_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/customer_provider.dart';
 import 'package:frontend/src/theme/app_theme.dart';
@@ -26,8 +28,8 @@ void main() {
     doWhenWindowReady(() {
       appWindow
         ..minSize = Size(1024, 768)
-        ..maxSize = Size(1920, 1080)  // Optional max size
-        ..size = Size(1280, 720)      // Initial size
+        ..maxSize = Size(1920, 1080)
+        ..size = Size(1024, 768)
         ..alignment = Alignment.center
         ..title = "Maqbool Fashion"
         ..show();
@@ -44,17 +46,19 @@ class MaqboolFabricApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
-        ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => LaborProvider()),
         ChangeNotifierProvider(create: (_) => VendorProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => AdvancePaymentProvider()),
       ],
       child: Sizer(
         builder: (context, orientation, deviceType) {
           return MaterialApp(
-            title: 'Maqbool Fabric - Premium POS',
+            title: 'Maqbool Fashion - Premium POS',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
