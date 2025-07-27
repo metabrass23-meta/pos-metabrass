@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
+import 'package:frontend/presentation/screens/product/product_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
@@ -30,13 +32,17 @@ class DashboardContent extends StatelessWidget {
     } else if (selectedIndex == 1) {
       return const CategoryPage();
     } else if (selectedIndex == 2) {
-      return const OrderPage(); // Add order screen here (index 2)
+      return const OrderPage();
+    } else if (selectedIndex == 3) {
+      return const ProductPage();
     } else if (selectedIndex == 4) {
       return const LaborPage();
     } else if (selectedIndex == 5) {
       return const VendorPage();
     } else if (selectedIndex == 6) {
       return const CustomerPage();
+    } else if (selectedIndex == 7) {
+      return const AdvancePaymentPage();
     } else {
       return _buildPlaceholderContent(context);
     }
