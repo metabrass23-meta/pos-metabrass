@@ -433,7 +433,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> wit
               builder: (context, provider, child) {
                 return DropdownButtonFormField<String>(
                   value: _selectedLaborId,
-                  isDense: false, // Prevents compression to ensure text visibility
+                  isDense: false,
                   decoration: InputDecoration(
                     labelText: 'Labor',
                     labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
@@ -441,7 +441,17 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> wit
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                     ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 25, horizontal: 16), // Increased vertical padding for taller field and text visibility
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: ResponsiveBreakpoints.responsive(
+                        context,
+                        tablet: 20,
+                        small: 22,
+                        medium: 24,
+                        large: 26,
+                        ultrawide: 28,
+                      ),
+                      horizontal: 16,
+                    ),
                   ),
                   items: provider.laborers
                       .map((labor) => DropdownMenuItem<String>(
