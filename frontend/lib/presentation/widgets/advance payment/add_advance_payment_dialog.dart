@@ -20,6 +20,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _scrollController = ScrollController();
 
   Labor? _selectedLabor;
   DateTime _selectedDate = DateTime.now();
@@ -54,6 +55,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     _animationController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -204,6 +206,16 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     }
   }
 
+  void _selectReceiptImage() {
+    // This method is no longer needed as we're using DesktopImageUploadWidget
+    // The image selection is handled by the DesktopImageUploadWidget component
+  }
+
+  void _removeReceiptImage() {
+    // This method is no longer needed as we're using DesktopImageUploadWidget
+    // The image removal is handled by the DesktopImageUploadWidget component
+  }
+
   double get remainingAfterAdvance {
     if (_selectedLabor == null) return 0;
     final amount = double.tryParse(_amountController.text) ?? 0;
@@ -226,12 +238,19 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                   maxWidth: ResponsiveBreakpoints.responsive(
                     context,
                     tablet: 95.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
+                    small: 90.w,
+                    medium: 80.w,
+                    large: 70.w,
+                    ultrawide: 60.w,
                   ),
-                  maxHeight: 85.h,
+                  maxHeight: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 90.h,
+                    small: 95.h,
+                    medium: 85.h,
+                    large: 80.h,
+                    ultrawide: 75.h,
+                  ),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -245,61 +264,27 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                     ),
                   ],
                 ),
-                child: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: _buildTabletLayout(),
-                  small: _buildMobileLayout(),
-                  medium: _buildDesktopLayout(),
-                  large: _buildDesktopLayout(),
-                  ultrawide: _buildDesktopLayout(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(
+                      child: ResponsiveBreakpoints.responsive(
+                        context,
+                        tablet: _buildScrollableContent(),
+                        small: _buildScrollableContent(),
+                        medium: _buildDesktopLayout(),
+                        large: _buildDesktopLayout(),
+                        ultrawide: _buildDesktopLayout(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTabletLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDesktopLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: false),
-          ),
-        ),
-      ],
     );
   }
 
@@ -377,96 +362,214 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     );
   }
 
-  Widget _buildFormContent({required bool isCompact}) {
-    return Padding(
-      padding: EdgeInsets.all(context.cardPadding),
-      child: Form(
-        key: _formKey,
-        child: isCompact
-            ? Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: _buildFormFields(isCompact: true),
-        )
-            : Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: _buildFormFields(isCompact: false),
-              ),
-            ),
-            SizedBox(width: context.cardPadding * 1.5),
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Receipt Image',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize * 1.2,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.charcoalGray,
-                    ),
-                  ),
-                  SizedBox(height: context.smallPadding),
-                  Text(
-                    'Upload receipt image for this advance payment (optional)',
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  SizedBox(height: context.cardPadding),
-                  DesktopImageUploadWidget(
-                    initialImagePath: _receiptImagePath,
-                    onImageChanged: (imagePath) {
-                      setState(() {
-                        _receiptImagePath = imagePath;
-                      });
-                    },
-                    label: 'Receipt Image (Optional)',
-                    height: ResponsiveBreakpoints.responsive(
-                      context,
-                      tablet: 25.h,
-                      small: 30.h,
-                      medium: 35.h,
-                      large: 40.h,
-                      ultrawide: 45.h,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+  Widget _buildScrollableContent() {
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Form Fields Section
+              _buildFormFieldsCard(),
+              SizedBox(height: context.cardPadding),
+
+              // Receipt Upload Section
+              _buildReceiptCard(),
+              SizedBox(height: context.mainPadding),
+
+              // Action Buttons
+              _buildActionButtons(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildFormFields({required bool isCompact}) {
-    return [
-      Consumer<AdvancePaymentProvider>(
-        builder: (context, provider, child) {
-          return DropdownButtonFormField<Labor>(
-            value: _selectedLabor,
-            isDense: false, // Prevents compression to ensure text visibility
-            decoration: InputDecoration(
-              labelText: 'Select Labor',
-              labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-              prefixIcon: Icon(Icons.person_outline, size: context.iconSize('medium')),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(context.borderRadius()),
+  Widget _buildFormFieldsCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Section Header
+          Row(
+            children: [
+              Icon(
+                Icons.edit_document,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
               ),
-              contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 16), // Increased vertical padding for taller field and text visibility
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Payment Information',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+
+          // Form Fields
+          _buildLaborSelection(),
+          SizedBox(height: context.cardPadding),
+          _buildAmountField(),
+          SizedBox(height: context.cardPadding),
+          _buildDescriptionField(),
+          SizedBox(height: context.cardPadding),
+          _buildDateTimeFields(),
+
+          // Calculation Preview
+          if (_selectedLabor != null && _amountController.text.isNotEmpty) ...[
+            SizedBox(height: context.cardPadding),
+            _buildCalculationPreview(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReceiptCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Section Header
+          Row(
+            children: [
+              Icon(
+                Icons.receipt_rounded,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Receipt Image (Optional)',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.charcoalGray,
+                      ),
+                    ),
+                    Text(
+                      'Upload receipt image for better record keeping',
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+
+          // Receipt Upload Widget
+          _buildResponsiveImageUpload(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Form Fields Section
+              _buildFormFieldsCard(),
+              SizedBox(height: context.cardPadding),
+
+              // Receipt Section - Full Width Below Fields
+              _buildReceiptCard(),
+              SizedBox(height: context.mainPadding),
+
+              // Action Buttons
+              _buildActionButtons(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLaborSelection() {
+    return Consumer<AdvancePaymentProvider>(
+      builder: (context, provider, child) {
+        return DropdownButtonFormField<Labor>(
+          value: _selectedLabor,
+          isDense: false,
+          decoration: InputDecoration(
+            labelText: 'Select Labor',
+            labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
+            prefixIcon: Icon(Icons.person_outline, size: context.iconSize('medium')),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+              borderSide: BorderSide.none,
             ),
-            items: provider.laborers
-                .map((labor) => DropdownMenuItem<Labor>(
-              value: labor,
+            contentPadding: EdgeInsets.symmetric(
+              vertical: ResponsiveBreakpoints.responsive(
+                context,
+                tablet: 16,
+                small: 18,
+                medium: 20,
+                large: 22,
+                ultrawide: 24,
+              ),
+              horizontal: 16,
+            ),
+          ),
+          items: provider.laborers.map((labor) => DropdownMenuItem<Labor>(
+            value: labor,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '${labor.name} - ${labor.role}',
@@ -475,6 +578,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  SizedBox(height: 2),
                   Text(
                     'Remaining: PKR ${labor.remainingSalary.toStringAsFixed(0)}',
                     style: GoogleFonts.inter(
@@ -484,227 +588,276 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                   ),
                 ],
               ),
-            ))
-                .toList(),
-            onChanged: (labor) {
-              setState(() {
-                _selectedLabor = labor;
-              });
-            },
-            validator: (value) => value == null ? 'Please select a labor' : null,
-          );
-        },
+            ),
+          )).toList(),
+          onChanged: (labor) {
+            setState(() {
+              _selectedLabor = labor;
+            });
+          },
+          validator: (value) => value == null ? 'Please select a labor' : null,
+        );
+      },
+    );
+  }
+
+  Widget _buildAmountField() {
+    return PremiumTextField(
+      label: 'Advance Amount (PKR)',
+      hint: context.shouldShowCompactLayout ? 'Enter amount' : 'Enter advance amount (PKR)',
+      controller: _amountController,
+      prefixIcon: Icons.attach_money_rounded,
+      keyboardType: TextInputType.number,
+      onChanged: (value) => setState(() {}),
+      validator: (value) {
+        if (value?.isEmpty ?? true) return 'Please enter advance amount';
+        final amount = double.tryParse(value!);
+        if (amount == null || amount <= 0) return 'Please enter a valid amount';
+        if (_selectedLabor != null && amount > _selectedLabor!.remainingSalary) {
+          return 'Amount exceeds remaining salary';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDescriptionField() {
+    return PremiumTextField(
+      label: 'Description',
+      hint: context.shouldShowCompactLayout ? 'Enter reason' : 'Enter reason for advance payment',
+      controller: _descriptionController,
+      prefixIcon: Icons.description_outlined,
+      maxLines: ResponsiveBreakpoints.responsive(
+        context,
+        tablet: 2,
+        small: 3,
+        medium: 3,
+        large: 4,
+        ultrawide: 4,
       ),
-      SizedBox(height: context.cardPadding),
-      PremiumTextField(
-        label: 'Advance Amount (PKR)',
-        hint: isCompact ? 'Enter amount' : 'Enter advance amount (PKR)',
-        controller: _amountController,
-        prefixIcon: Icons.attach_money_rounded,
-        keyboardType: TextInputType.number,
-        onChanged: (value) => setState(() {}),
-        validator: (value) {
-          if (value?.isEmpty ?? true) return 'Please enter advance amount';
-          final amount = double.tryParse(value!);
-          if (amount == null || amount <= 0) return 'Please enter a valid amount';
-          if (_selectedLabor != null && amount > _selectedLabor!.remainingSalary) {
-            return 'Amount exceeds remaining salary';
-          }
-          return null;
-        },
-      ),
-      SizedBox(height: context.cardPadding),
-      PremiumTextField(
-        label: 'Description',
-        hint: isCompact ? 'Enter reason' : 'Enter reason for advance payment',
-        controller: _descriptionController,
-        prefixIcon: Icons.description_outlined,
-        maxLines: ResponsiveBreakpoints.responsive(
-          context,
-          tablet: 2,
-          small: 3,
-          medium: 4,
-          large: 5,
-          ultrawide: 6,
-        ),
-        validator: (value) {
-          if (value?.isEmpty ?? true) return 'Please enter description';
-          if (value!.length < 5) return 'Description must be at least 5 characters';
-          return null;
-        },
-      ),
-      SizedBox(height: context.cardPadding),
-      Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: _selectDate,
-              child: PremiumTextField(
-                label: 'Date',
-                hint: 'Select date',
-                controller: TextEditingController(
-                    text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
-                prefixIcon: Icons.calendar_today,
-                enabled: false,
+      validator: (value) {
+        if (value?.isEmpty ?? true) return 'Please enter description';
+        if (value!.length < 5) return 'Description must be at least 5 characters';
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDateTimeFields() {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: _selectDate,
+            child: PremiumTextField(
+              label: 'Date',
+              hint: 'Select date',
+              controller: TextEditingController(
+                text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
               ),
+              prefixIcon: Icons.calendar_today,
+              enabled: false,
             ),
           ),
-          SizedBox(width: context.cardPadding),
-          Expanded(
-            child: GestureDetector(
-              onTap: _selectTime,
-              child: PremiumTextField(
-                label: 'Time',
-                hint: 'Select time',
-                controller: TextEditingController(
-                    text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}'),
-                prefixIcon: Icons.access_time,
-                enabled: false,
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: GestureDetector(
+            onTap: _selectTime,
+            child: PremiumTextField(
+              label: 'Time',
+              hint: 'Select time',
+              controller: TextEditingController(
+                text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
               ),
+              prefixIcon: Icons.access_time,
+              enabled: false,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalculationPreview() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.3) : Colors.blue.withOpacity(0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            remainingAfterAdvance < 0 ? Icons.warning_rounded : Icons.calculate_rounded,
+            color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
+            size: context.iconSize('medium'),
+          ),
+          SizedBox(width: context.smallPadding),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Current Remaining: PKR ${_selectedLabor!.remainingSalary.toStringAsFixed(0)}',
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
+                  ),
+                ),
+                Text(
+                  'After Advance: PKR ${remainingAfterAdvance.toStringAsFixed(0)}',
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-      if (_selectedLabor != null && _amountController.text.isNotEmpty) ...[
-        SizedBox(height: context.cardPadding),
-        Container(
-          padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(
-            color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-            border: Border.all(
-              color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.3) : Colors.blue.withOpacity(0.3),
-            ),
-          ),
-          child: Row(
+    );
+  }
+
+  Widget _buildReceiptSection() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
             children: [
               Icon(
-                remainingAfterAdvance < 0 ? Icons.warning_rounded : Icons.calculate_rounded,
-                color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
+                Icons.receipt_rounded,
+                color: AppTheme.primaryMaroon,
                 size: context.iconSize('medium'),
               ),
               SizedBox(width: context.smallPadding),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Current Remaining: PKR ${_selectedLabor!.remainingSalary.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.charcoalGray,
-                      ),
-                    ),
-                    Text(
-                      'After Advance: PKR ${remainingAfterAdvance.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Receipt Image (Optional)',
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ],
-      SizedBox(height: context.mainPadding),
-      if (isCompact) ...[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Receipt Image',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 1.2,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.charcoalGray,
-              ),
+          SizedBox(height: context.smallPadding),
+          Text(
+            'Upload receipt image for this advance payment',
+            style: GoogleFonts.inter(
+              fontSize: context.subtitleFontSize,
+              color: Colors.grey[600],
             ),
-            SizedBox(height: context.smallPadding),
-            Text(
-              'Upload receipt image for this advance payment (optional)',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                color: Colors.grey[600],
-              ),
+          ),
+          SizedBox(height: context.cardPadding),
+          _buildResponsiveImageUpload(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResponsiveImageUpload() {
+    return Container(
+      height: ResponsiveBreakpoints.responsive(
+        context,
+        tablet: 35.h,
+        small: 40.h,
+        medium: 45.h,
+        large: 50.h,
+        ultrawide: 55.h,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: ResponsiveImageUploadWidget(
+        initialImagePath: _receiptImagePath,
+        onImageChanged: (imagePath) {
+          setState(() {
+            _receiptImagePath = imagePath;
+          });
+        },
+        label: 'Receipt Image (Optional)',
+        context: context,
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    if (context.shouldShowCompactLayout) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Consumer<AdvancePaymentProvider>(
+            builder: (context, provider, child) {
+              return PremiumButton(
+                text: 'Add Payment',
+                onPressed: provider.isLoading ? null : _handleSubmit,
+                isLoading: provider.isLoading,
+                height: context.buttonHeight,
+                icon: Icons.add_rounded,
+                backgroundColor: AppTheme.primaryMaroon,
+              );
+            },
+          ),
+          SizedBox(height: context.cardPadding),
+          PremiumButton(
+            text: 'Cancel',
+            onPressed: _handleCancel,
+            isOutlined: true,
+            height: context.buttonHeight,
+            backgroundColor: Colors.grey[600],
+            textColor: Colors.grey[600],
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: PremiumButton(
+              text: 'Cancel',
+              onPressed: _handleCancel,
+              isOutlined: true,
+              height: context.buttonHeight / 1.5,
+              backgroundColor: Colors.grey[600],
+              textColor: Colors.grey[600],
             ),
-            SizedBox(height: context.cardPadding),
-            DesktopImageUploadWidget(
-              initialImagePath: _receiptImagePath,
-              onImageChanged: (imagePath) {
-                setState(() {
-                  _receiptImagePath = imagePath;
-                });
-              },
-              label: 'Receipt Image (Optional)',
-              height: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 25.h,
-                small: 30.h,
-                medium: 35.h,
-                large: 40.h,
-                ultrawide: 45.h,
-              ),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<AdvancePaymentProvider>(
+          ),
+          SizedBox(width: context.cardPadding),
+          Expanded(
+            flex: 2,
+            child: Consumer<AdvancePaymentProvider>(
               builder: (context, provider, child) {
                 return PremiumButton(
                   text: 'Add Payment',
                   onPressed: provider.isLoading ? null : _handleSubmit,
                   isLoading: provider.isLoading,
-                  height: context.buttonHeight,
+                  height: context.buttonHeight / 1.5,
                   icon: Icons.add_rounded,
                   backgroundColor: AppTheme.primaryMaroon,
                 );
               },
             ),
-            SizedBox(height: context.cardPadding),
-            PremiumButton(
-              text: 'Cancel',
-              onPressed: _handleCancel,
-              isOutlined: true,
-              height: context.buttonHeight,
-              backgroundColor: Colors.grey[600],
-              textColor: Colors.grey[600],
-            ),
-          ],
-        ),
-      ] else ...[
-        Row(
-          children: [
-            Expanded(
-              child: PremiumButton(
-                text: 'Cancel',
-                onPressed: _handleCancel,
-                isOutlined: true,
-                height: context.buttonHeight / 1.5,
-                backgroundColor: Colors.grey[600],
-                textColor: Colors.grey[600],
-              ),
-            ),
-            SizedBox(width: context.cardPadding),
-            Expanded(
-              flex: 2,
-              child: Consumer<AdvancePaymentProvider>(
-                builder: (context, provider, child) {
-                  return PremiumButton(
-                    text: 'Add Payment',
-                    onPressed: provider.isLoading ? null : _handleSubmit,
-                    isLoading: provider.isLoading,
-                    height: context.buttonHeight / 1.5,
-                    icon: Icons.add_rounded,
-                    backgroundColor: AppTheme.primaryMaroon,
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    ];
-  }}
+          ),
+        ],
+      );
+    }
+  }
+}
