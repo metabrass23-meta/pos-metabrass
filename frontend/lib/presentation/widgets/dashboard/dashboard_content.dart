@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
+import 'package:frontend/presentation/screens/payment/payment_screen.dart';
 import 'package:frontend/presentation/screens/product/product_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
@@ -43,6 +44,8 @@ class DashboardContent extends StatelessWidget {
       return const CustomerPage();
     } else if (selectedIndex == 7) {
       return const AdvancePaymentPage();
+    } else if (selectedIndex == 8) {
+      return const PaymentPage();
     } else {
       return _buildPlaceholderContent(context);
     }
