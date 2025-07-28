@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
+import 'package:frontend/presentation/screens/payables/payables_screen.dart';
 import 'package:frontend/presentation/screens/payment/payment_screen.dart';
 import 'package:frontend/presentation/screens/product/product_screen.dart';
+import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
@@ -16,15 +18,12 @@ import '../../screens/category/category_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/customer/customer_screen.dart';
-import '../../screens/order/order_screen.dart'; // Add this import for order screen
+import '../../screens/order/order_screen.dart';
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
 
-  const DashboardContent({
-    super.key,
-    required this.selectedIndex,
-  });
+  const DashboardContent({super.key, required this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +45,10 @@ class DashboardContent extends StatelessWidget {
       return const AdvancePaymentPage();
     } else if (selectedIndex == 8) {
       return const PaymentPage();
+    } else if (selectedIndex == 9) {
+      return const ReceivablesPage();
+    } else if (selectedIndex == 10) {
+      return const PayablesPage();
     } else {
       return _buildPlaceholderContent(context);
     }
@@ -66,10 +69,7 @@ class DashboardContent extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.primaryMaroon,
-                    AppTheme.secondaryMaroon,
-                  ],
+                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
                 ),
                 borderRadius: BorderRadius.circular(context.borderRadius()),
               ),
@@ -145,11 +145,12 @@ class DashboardContent extends StatelessWidget {
                 final stats = provider.dashboardStats;
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    final cardCount = context.statsCardColumns.clamp(2, 4); // Ensure at least 2 columns
-                    final cardWidth = constraints.maxWidth / cardCount - context.cardPadding * (cardCount - 1) / cardCount;
+                    final cardCount = context.statsCardColumns.clamp(2, 4);
+                    final cardWidth =
+                        constraints.maxWidth / cardCount - context.cardPadding * (cardCount - 1) / cardCount;
                     return Wrap(
-                      spacing: context.cardPadding, // Responsive spacing between cards
-                      runSpacing: context.formFieldSpacing, // Responsive spacing between rows
+                      spacing: context.cardPadding,
+                      runSpacing: context.formFieldSpacing,
                       children: [
                         SizedBox(
                           width: cardWidth,
@@ -214,10 +215,7 @@ class DashboardContent extends StatelessWidget {
                   child: Column(
                     children: [
                       // Sales Chart
-                      SizedBox(
-                        height: context.chartHeight,
-                        child: const SalesChartCard(),
-                      ),
+                      SizedBox(height: context.chartHeight, child: const SalesChartCard()),
 
                       SizedBox(height: context.formFieldSpacing * 2),
 
@@ -230,10 +228,7 @@ class DashboardContent extends StatelessWidget {
                 SizedBox(width: context.cardPadding),
 
                 // Right Column
-                Expanded(
-                  flex: context.tableColumnFlexes[1],
-                  child: const RecentOrdersCard(),
-                ),
+                Expanded(flex: context.tableColumnFlexes[1], child: const RecentOrdersCard()),
               ],
             ),
 
@@ -246,7 +241,6 @@ class DashboardContent extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.pureWhite,
                 borderRadius: BorderRadius.circular(context.borderRadius()),
-
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,23 +416,20 @@ class DashboardContent extends StatelessWidget {
   }
 
   Widget _buildActivityItem(
-      BuildContext context,
-      String title,
-      String subtitle,
-      String time,
-      IconData icon,
-      Color color,
-      ) {
+    BuildContext context,
+    String title,
+    String subtitle,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
         color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        border: Border.all(
-          color: color.withOpacity(0.1),
-          width: 0.05.w,
-        ),
+        border: Border.all(color: color.withOpacity(0.1), width: 0.05.w),
       ),
       child: Row(
         children: [
@@ -449,11 +440,7 @@ class DashboardContent extends StatelessWidget {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.iconSize('large') * 0.75),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
 
           SizedBox(width: context.smallPadding),
@@ -559,11 +546,7 @@ class DashboardContent extends StatelessWidget {
               color: Colors.indigo.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
-            child: Icon(
-              Icons.person_rounded,
-              color: Colors.indigo,
-              size: context.iconSize('small'),
-            ),
+            child: Icon(Icons.person_rounded, color: Colors.indigo, size: context.iconSize('small')),
           ),
 
           SizedBox(width: context.smallPadding),
@@ -600,13 +583,15 @@ class DashboardContent extends StatelessWidget {
     final List<String> pageNames = [
       'Dashboard',
       'Categories',
-      'Orders', // Updated to reflect the new order at index 2
+      'Orders',
       'Products',
       'Labor',
       'Vendors',
       'Customers',
       'Advance',
       'Payment',
+      'Receivables',
+      'Payables',
       'Sales',
       'Expenses',
       'Stock',
@@ -624,9 +609,7 @@ class DashboardContent extends StatelessWidget {
               width: context.dialogWidth * 0.5,
               height: context.dialogWidth * 0.5,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-                ),
+                gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
                 borderRadius: BorderRadius.circular(context.borderRadius('large')),
                 boxShadow: [
                   BoxShadow(
