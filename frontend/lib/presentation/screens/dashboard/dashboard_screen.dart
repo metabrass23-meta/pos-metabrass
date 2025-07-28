@@ -5,7 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/dashboard/dashboard_content.dart';
-import '../../widgets/global/sidebar.dart';
+import '../../widgets/globals/sidebar.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

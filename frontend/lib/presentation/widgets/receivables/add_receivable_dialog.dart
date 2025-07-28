@@ -3,29 +3,30 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import '../../../src/providers/advance_payment_provider.dart';
+import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../globals/image_upload.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
-class AddAdvancePaymentDialog extends StatefulWidget {
-  const AddAdvancePaymentDialog({super.key});
+class AddReceivableDialog extends StatefulWidget {
+  const AddReceivableDialog({super.key});
 
   @override
-  State<AddAdvancePaymentDialog> createState() => _AddAdvancePaymentDialogState();
+  State<AddReceivableDialog> createState() => _AddReceivableDialogState();
 }
 
-class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with SingleTickerProviderStateMixin {
+class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _debtorNameController = TextEditingController();
+  final _debtorPhoneController = TextEditingController();
+  final _amountGivenController = TextEditingController();
+  final _reasonController = TextEditingController();
+  final _notesController = TextEditingController();
+  final _amountReturnedController = TextEditingController();
   final _scrollController = ScrollController();
 
-  Labor? _selectedLabor;
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
-  String? _receiptImagePath;
+  DateTime _dateLent = DateTime.now();
+  DateTime _expectedReturnDate = DateTime.now().add(const Duration(days: 30));
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -53,34 +54,42 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
   @override
   void dispose() {
     _animationController.dispose();
-    _amountController.dispose();
-    _descriptionController.dispose();
+    _debtorNameController.dispose();
+    _debtorPhoneController.dispose();
+    _amountGivenController.dispose();
+    _reasonController.dispose();
+    _notesController.dispose();
+    _amountReturnedController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedLabor == null) {
-        _showErrorSnackbar('Please select a labor');
+      final amountGiven = double.parse(_amountGivenController.text.trim());
+      final amountReturned = double.tryParse(_amountReturnedController.text.trim()) ?? 0.0;
+
+      if (amountReturned > amountGiven) {
+        _showErrorSnackbar('Amount returned cannot exceed amount given');
         return;
       }
 
-      final amount = double.parse(_amountController.text.trim());
-      if (amount > _selectedLabor!.remainingSalary) {
-        _showErrorSnackbar('Amount cannot exceed remaining salary of PKR ${_selectedLabor!.remainingSalary.toStringAsFixed(0)}');
+      if (_expectedReturnDate.isBefore(_dateLent)) {
+        _showErrorSnackbar('Expected return date cannot be before date lent');
         return;
       }
 
-      final advancePaymentProvider = Provider.of<AdvancePaymentProvider>(context, listen: false);
+      final receivablesProvider = Provider.of<ReceivablesProvider>(context, listen: false);
 
-      await advancePaymentProvider.addAdvancePayment(
-        laborId: _selectedLabor!.id,
-        amount: amount,
-        description: _descriptionController.text.trim(),
-        date: _selectedDate,
-        time: _selectedTime,
-        receiptImagePath: _receiptImagePath,
+      await receivablesProvider.addReceivable(
+        debtorName: _debtorNameController.text.trim(),
+        debtorPhone: _debtorPhoneController.text.trim(),
+        amountGiven: amountGiven,
+        reasonOrItem: _reasonController.text.trim(),
+        dateLent: _dateLent,
+        expectedReturnDate: _expectedReturnDate,
+        amountReturned: amountReturned,
+        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
       if (mounted) {
@@ -102,7 +111,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Advance payment added successfully!',
+              'Receivable added successfully!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -160,10 +169,10 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     });
   }
 
-  Future<void> _selectDate() async {
+  Future<void> _selectDateLent() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: _dateLent,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -177,17 +186,23 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
         );
       },
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != _dateLent) {
       setState(() {
-        _selectedDate = picked;
+        _dateLent = picked;
+        // Update expected return date to be at least 1 day after date lent
+        if (_expectedReturnDate.isBefore(_dateLent.add(const Duration(days: 1)))) {
+          _expectedReturnDate = _dateLent.add(const Duration(days: 30));
+        }
       });
     }
   }
 
-  Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(
+  Future<void> _selectExpectedReturnDate() async {
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialTime: _selectedTime,
+      initialDate: _expectedReturnDate,
+      firstDate: _dateLent.add(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -199,27 +214,17 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
         );
       },
     );
-    if (picked != null && picked != _selectedTime) {
+    if (picked != null && picked != _expectedReturnDate) {
       setState(() {
-        _selectedTime = picked;
+        _expectedReturnDate = picked;
       });
     }
   }
 
-  void _selectReceiptImage() {
-    // This method is no longer needed as we're using DesktopImageUploadWidget
-    // The image selection is handled by the DesktopImageUploadWidget component
-  }
-
-  void _removeReceiptImage() {
-    // This method is no longer needed as we're using DesktopImageUploadWidget
-    // The image removal is handled by the DesktopImageUploadWidget component
-  }
-
-  double get remainingAfterAdvance {
-    if (_selectedLabor == null) return 0;
-    final amount = double.tryParse(_amountController.text) ?? 0;
-    return _selectedLabor!.remainingSalary - amount;
+  double get balanceRemaining {
+    final amountGiven = double.tryParse(_amountGivenController.text) ?? 0;
+    final amountReturned = double.tryParse(_amountReturnedController.text) ?? 0;
+    return amountGiven - amountReturned;
   }
 
   @override
@@ -309,7 +314,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Icon(
-              Icons.payment_rounded,
+              Icons.account_balance_wallet_rounded,
               color: AppTheme.pureWhite,
               size: context.iconSize('large'),
             ),
@@ -320,7 +325,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Payment' : 'Add Advance Payment',
+                  context.shouldShowCompactLayout ? 'Add Receivable' : 'Add New Receivable',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -331,7 +336,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Record new advance payment to labor with receipt',
+                    'Record amount lent to customer or supplier',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -374,15 +379,14 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Form Fields Section
-              _buildFormFieldsCard(),
+              _buildDebtorInfoCard(),
               SizedBox(height: context.cardPadding),
-
-              // Receipt Upload Section
-              _buildReceiptCard(),
+              _buildAmountCard(),
+              SizedBox(height: context.cardPadding),
+              _buildDetailsCard(),
+              SizedBox(height: context.cardPadding),
+              _buildDatesCard(),
               SizedBox(height: context.mainPadding),
-
-              // Action Buttons
               _buildActionButtons(),
             ],
           ),
@@ -391,7 +395,34 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     );
   }
 
-  Widget _buildFormFieldsCard() {
+  Widget _buildDesktopLayout() {
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildDebtorInfoCard(),
+              SizedBox(height: context.cardPadding),
+              _buildAmountCard(),
+              SizedBox(height: context.cardPadding),
+              _buildDetailsCard(),
+              SizedBox(height: context.cardPadding),
+              _buildDatesCard(),
+              SizedBox(height: context.mainPadding),
+              _buildActionButtons(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDebtorInfoCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -409,17 +440,16 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Section Header
           Row(
             children: [
               Icon(
-                Icons.edit_document,
+                Icons.person_outline,
                 color: AppTheme.primaryMaroon,
                 size: context.iconSize('medium'),
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Information',
+                'Debtor Information',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -429,31 +459,40 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Form Fields
-          _buildLaborSelection(),
+          PremiumTextField(
+            label: 'Debtor Name',
+            hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter debtor full name',
+            controller: _debtorNameController,
+            prefixIcon: Icons.person_outline,
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Please enter debtor name';
+              if (value!.length < 2) return 'Name must be at least 2 characters';
+              return null;
+            },
+          ),
           SizedBox(height: context.cardPadding),
-          _buildAmountField(),
-          SizedBox(height: context.cardPadding),
-          _buildDescriptionField(),
-          SizedBox(height: context.cardPadding),
-          _buildDateTimeFields(),
-
-          // Calculation Preview
-          if (_selectedLabor != null && _amountController.text.isNotEmpty) ...[
-            SizedBox(height: context.cardPadding),
-            _buildCalculationPreview(),
-          ],
+          PremiumTextField(
+            label: 'Phone Number',
+            hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (+92XXXXXXXXXX)',
+            controller: _debtorPhoneController,
+            prefixIcon: Icons.phone_outlined,
+            keyboardType: TextInputType.phone,
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Please enter phone number';
+              if (value!.length < 10) return 'Please enter a valid phone number';
+              return null;
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildReceiptCard() {
+  Widget _buildAmountCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
@@ -467,233 +506,234 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Section Header
           Row(
             children: [
               Icon(
-                Icons.receipt_rounded,
+                Icons.attach_money_rounded,
                 color: AppTheme.primaryMaroon,
                 size: context.iconSize('medium'),
               ),
               SizedBox(width: context.smallPadding),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Receipt Image (Optional)',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
-                    ),
-                    Text(
-                      'Upload receipt image for better record keeping',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
+              Text(
+                'Amount Details',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
                 ),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Receipt Upload Widget
-          _buildResponsiveImageUpload(),
+          PremiumTextField(
+            label: 'Amount Given (PKR)',
+            hint: context.shouldShowCompactLayout ? 'Enter amount' : 'Enter amount given to debtor',
+            controller: _amountGivenController,
+            prefixIcon: Icons.trending_up_rounded,
+            keyboardType: TextInputType.number,
+            onChanged: (value) => setState(() {}),
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Please enter amount given';
+              final amount = double.tryParse(value!);
+              if (amount == null || amount <= 0) return 'Please enter a valid amount';
+              return null;
+            },
+          ),
+          SizedBox(height: context.cardPadding),
+          PremiumTextField(
+            label: 'Amount Returned (PKR)',
+            hint: 'Optional - if any amount already returned',
+            controller: _amountReturnedController,
+            prefixIcon: Icons.trending_down_rounded,
+            keyboardType: TextInputType.number,
+            onChanged: (value) => setState(() {}),
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                final amountReturned = double.tryParse(value);
+                if (amountReturned == null || amountReturned < 0) return 'Please enter a valid amount';
+                final amountGiven = double.tryParse(_amountGivenController.text) ?? 0;
+                if (amountReturned > amountGiven) return 'Cannot exceed amount given';
+              }
+              return null;
+            },
+          ),
+          if (_amountGivenController.text.isNotEmpty || _amountReturnedController.text.isNotEmpty) ...[
+            SizedBox(height: context.cardPadding),
+            _buildBalancePreview(),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildDesktopLayout() {
-    return Scrollbar(
-      controller: _scrollController,
-      thumbVisibility: true,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        padding: EdgeInsets.all(context.cardPadding),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Form Fields Section
-              _buildFormFieldsCard(),
-              SizedBox(height: context.cardPadding),
-
-              // Receipt Section - Full Width Below Fields
-              _buildReceiptCard(),
-              SizedBox(height: context.mainPadding),
-
-              // Action Buttons
-              _buildActionButtons(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLaborSelection() {
-    return Consumer<AdvancePaymentProvider>(
-      builder: (context, provider, child) {
-        return DropdownButtonFormField<Labor>(
-          value: _selectedLabor,
-          isDense: false,
-          decoration: InputDecoration(
-            labelText: 'Select Labor',
-            labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-            prefixIcon: Icon(Icons.person_outline, size: context.iconSize('medium')),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 16,
-                small: 18,
-                medium: 20,
-                large: 22,
-                ultrawide: 24,
-              ),
-              horizontal: 16,
-            ),
-          ),
-          items: provider.laborers.map((labor) => DropdownMenuItem<Labor>(
-            value: labor,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${labor.name} - ${labor.role}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Remaining: PKR ${labor.remainingSalary.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: labor.remainingSalary <= 0 ? Colors.red : Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )).toList(),
-          onChanged: (labor) {
-            setState(() {
-              _selectedLabor = labor;
-            });
-          },
-          validator: (value) => value == null ? 'Please select a labor' : null,
-        );
-      },
-    );
-  }
-
-  Widget _buildAmountField() {
-    return PremiumTextField(
-      label: 'Advance Amount (PKR)',
-      hint: context.shouldShowCompactLayout ? 'Enter amount' : 'Enter advance amount (PKR)',
-      controller: _amountController,
-      prefixIcon: Icons.attach_money_rounded,
-      keyboardType: TextInputType.number,
-      onChanged: (value) => setState(() {}),
-      validator: (value) {
-        if (value?.isEmpty ?? true) return 'Please enter advance amount';
-        final amount = double.tryParse(value!);
-        if (amount == null || amount <= 0) return 'Please enter a valid amount';
-        if (_selectedLabor != null && amount > _selectedLabor!.remainingSalary) {
-          return 'Amount exceeds remaining salary';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildDescriptionField() {
-    return PremiumTextField(
-      label: 'Description',
-      hint: context.shouldShowCompactLayout ? 'Enter reason' : 'Enter reason for advance payment',
-      controller: _descriptionController,
-      prefixIcon: Icons.description_outlined,
-      maxLines: ResponsiveBreakpoints.responsive(
-        context,
-        tablet: 2,
-        small: 3,
-        medium: 3,
-        large: 4,
-        ultrawide: 4,
-      ),
-      validator: (value) {
-        if (value?.isEmpty ?? true) return 'Please enter description';
-        if (value!.length < 5) return 'Description must be at least 5 characters';
-        return null;
-      },
-    );
-  }
-
-  Widget _buildDateTimeFields() {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: _selectDate,
-            child: PremiumTextField(
-              label: 'Date',
-              hint: 'Select date',
-              controller: TextEditingController(
-                text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-              ),
-              prefixIcon: Icons.calendar_today,
-              enabled: false,
-            ),
-          ),
-        ),
-        SizedBox(width: context.cardPadding),
-        Expanded(
-          child: GestureDetector(
-            onTap: _selectTime,
-            child: PremiumTextField(
-              label: 'Time',
-              hint: 'Select time',
-              controller: TextEditingController(
-                text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
-              ),
-              prefixIcon: Icons.access_time,
-              enabled: false,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCalculationPreview() {
+  Widget _buildDetailsCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.description_outlined,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Transaction Details',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+          PremiumTextField(
+            label: 'Reason/Item',
+            hint: context.shouldShowCompactLayout ? 'Reason for lending' : 'Enter reason for lending or item description',
+            controller: _reasonController,
+            prefixIcon: Icons.assignment_outlined,
+            maxLines: ResponsiveBreakpoints.responsive(
+              context,
+              tablet: 2,
+              small: 2,
+              medium: 3,
+              large: 3,
+              ultrawide: 3,
+            ),
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Please enter reason or item';
+              if (value!.length < 5) return 'Please provide more details';
+              return null;
+            },
+          ),
+          SizedBox(height: context.cardPadding),
+          PremiumTextField(
+            label: 'Notes (Optional)',
+            hint: context.shouldShowCompactLayout ? 'Additional notes' : 'Enter additional notes or terms',
+            controller: _notesController,
+            prefixIcon: Icons.note_outlined,
+            maxLines: ResponsiveBreakpoints.responsive(
+              context,
+              tablet: 3,
+              small: 3,
+              medium: 4,
+              large: 4,
+              ultrawide: 4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDatesCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Date Information',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: _selectDateLent,
+                  child: PremiumTextField(
+                    label: 'Date Lent',
+                    hint: 'Select date',
+                    controller: TextEditingController(
+                      text: '${_dateLent.day}/${_dateLent.month}/${_dateLent.year}',
+                    ),
+                    prefixIcon: Icons.calendar_today,
+                    enabled: false,
+                  ),
+                ),
+              ),
+              SizedBox(width: context.cardPadding),
+              Expanded(
+                child: GestureDetector(
+                  onTap: _selectExpectedReturnDate,
+                  child: PremiumTextField(
+                    label: 'Expected Return Date',
+                    hint: 'Select date',
+                    controller: TextEditingController(
+                      text: '${_expectedReturnDate.day}/${_expectedReturnDate.month}/${_expectedReturnDate.year}',
+                    ),
+                    prefixIcon: Icons.event_available,
+                    enabled: false,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+          _buildDateInfoRow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBalancePreview() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.1) : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(
-          color: remainingAfterAdvance < 0 ? Colors.red.withOpacity(0.3) : Colors.blue.withOpacity(0.3),
+          color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.3) : Colors.red.withOpacity(0.3),
         ),
       ),
       child: Row(
         children: [
           Icon(
-            remainingAfterAdvance < 0 ? Icons.warning_rounded : Icons.calculate_rounded,
-            color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
+            Icons.calculate_rounded,
+            color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
             size: context.iconSize('medium'),
           ),
           SizedBox(width: context.smallPadding),
@@ -702,7 +742,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Current Remaining: PKR ${_selectedLabor!.remainingSalary.toStringAsFixed(0)}',
+                  'Balance Remaining',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
@@ -710,11 +750,11 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                   ),
                 ),
                 Text(
-                  'After Advance: PKR ${remainingAfterAdvance.toStringAsFixed(0)}',
+                  'PKR ${balanceRemaining.toStringAsFixed(0)}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
-                    color: remainingAfterAdvance < 0 ? Colors.red : Colors.blue,
+                    color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
                   ),
                 ),
               ],
@@ -725,76 +765,34 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
     );
   }
 
-  Widget _buildReceiptSection() {
+  Widget _buildDateInfoRow() {
+    final daysDifference = _expectedReturnDate.difference(_dateLent).inDays;
     return Container(
-      padding: EdgeInsets.all(context.cardPadding),
+      padding: EdgeInsets.all(context.smallPadding),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.grey.shade200),
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius('small')),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.receipt_rounded,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Expanded(
-                child: Text(
-                  'Receipt Image (Optional)',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-              ),
-            ],
+          Icon(
+            Icons.info_outline,
+            color: Colors.blue,
+            size: context.iconSize('small'),
           ),
-          SizedBox(height: context.smallPadding),
-          Text(
-            'Upload receipt image for this advance payment',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              color: Colors.grey[600],
+          SizedBox(width: context.smallPadding),
+          Expanded(
+            child: Text(
+              daysDifference > 0
+                  ? 'Lending period: $daysDifference days'
+                  : 'Please select a valid return date',
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize,
+                color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700],
+              ),
             ),
           ),
-          SizedBox(height: context.cardPadding),
-          _buildResponsiveImageUpload(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildResponsiveImageUpload() {
-    return Container(
-      height: ResponsiveBreakpoints.responsive(
-        context,
-        tablet: 35.h,
-        small: 40.h,
-        medium: 45.h,
-        large: 50.h,
-        ultrawide: 55.h,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: ResponsiveImageUploadWidget(
-        initialImagePath: _receiptImagePath,
-        onImageChanged: (imagePath) {
-          setState(() {
-            _receiptImagePath = imagePath;
-          });
-        },
-        label: 'Receipt Image (Optional)',
-        context: context,
       ),
     );
   }
@@ -804,10 +802,10 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Consumer<AdvancePaymentProvider>(
+          Consumer<ReceivablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Payment',
+                text: 'Add Receivable',
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight,
@@ -843,10 +841,10 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
           SizedBox(width: context.cardPadding),
           Expanded(
             flex: 2,
-            child: Consumer<AdvancePaymentProvider>(
+            child: Consumer<ReceivablesProvider>(
               builder: (context, provider, child) {
                 return PremiumButton(
-                  text: 'Add Payment',
+                  text: 'Add Receivable',
                   onPressed: provider.isLoading ? null : _handleSubmit,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight / 1.5,

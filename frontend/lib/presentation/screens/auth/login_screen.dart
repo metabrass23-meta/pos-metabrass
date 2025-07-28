@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
-import '../../widgets/global/text_button.dart';
-import '../../widgets/global/text_field.dart';
+import '../../widgets/globals/text_button.dart';
+import '../../widgets/globals/text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

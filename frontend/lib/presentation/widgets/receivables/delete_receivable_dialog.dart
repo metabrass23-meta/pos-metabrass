@@ -3,23 +3,23 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import '../../../src/providers/payment_provider.dart';
+import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 
-class DeletePaymentDialog extends StatefulWidget {
-  final Payment payment;
+class DeleteReceivableDialog extends StatefulWidget {
+  final Receivable receivable;
 
-  const DeletePaymentDialog({
+  const DeleteReceivableDialog({
     super.key,
-    required this.payment,
+    required this.receivable,
   });
 
   @override
-  State<DeletePaymentDialog> createState() => _DeletePaymentDialogState();
+  State<DeleteReceivableDialog> createState() => _DeleteReceivableDialogState();
 }
 
-class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTickerProviderStateMixin {
+class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -55,9 +55,9 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   void _handleDelete() async {
-    final provider = Provider.of<PaymentProvider>(context, listen: false);
+    final provider = Provider.of<ReceivablesProvider>(context, listen: false);
 
-    await provider.deletePayment(widget.payment.id);
+    await provider.deleteReceivable(widget.receivable.id);
 
     if (mounted) {
       _showSuccessSnackbar();
@@ -77,7 +77,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Payment deleted successfully!',
+              'Receivable deleted successfully!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -161,7 +161,11 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        _buildContent(isCompact: true),
+        Flexible(
+          child: SingleChildScrollView(
+            child: _buildContent(isCompact: true),
+          ),
+        ),
       ],
     );
   }
@@ -171,7 +175,11 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        _buildContent(isCompact: true),
+        Flexible(
+          child: SingleChildScrollView(
+            child: _buildContent(isCompact: true),
+          ),
+        ),
       ],
     );
   }
@@ -181,7 +189,11 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        _buildContent(isCompact: false),
+        Flexible(
+          child: SingleChildScrollView(
+            child: _buildContent(isCompact: false),
+          ),
+        ),
       ],
     );
   }
@@ -218,7 +230,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Payment' : 'Delete Payment Record',
+                  context.shouldShowCompactLayout ? 'Delete Receivable' : 'Delete Receivable Record',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -298,8 +310,8 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
           SizedBox(height: context.mainPadding),
           Text(
             isCompact
-                ? 'Are you sure you want to delete this payment?'
-                : 'Are you absolutely sure you want to delete this payment record?',
+                ? 'Are you sure you want to delete this receivable?'
+                : 'Are you absolutely sure you want to delete this receivable record?',
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
@@ -332,7 +344,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       ),
                       child: Text(
-                        widget.payment.id,
+                        widget.receivable.id,
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
@@ -343,7 +355,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        widget.payment.laborName,
+                        widget.receivable.debtorName,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -362,7 +374,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Net Amount:',
+                            'Amount Given:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -370,7 +382,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                             ),
                           ),
                           Text(
-                            'PKR ${widget.payment.netAmount.toStringAsFixed(0)}',
+                            'PKR ${widget.receivable.amountGiven.toStringAsFixed(0)}',
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
@@ -385,7 +397,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Date:',
+                            'Balance Remaining:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -393,11 +405,11 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                             ),
                           ),
                           Text(
-                            '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}',
+                            'PKR ${widget.receivable.balanceRemaining.toStringAsFixed(0)}',
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.charcoalGray,
+                              color: widget.receivable.balanceRemaining > 0 ? Colors.orange : Colors.green,
                             ),
                           ),
                         ],
@@ -413,40 +425,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Payment Method:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Icon(
-                                widget.payment.paymentMethodIcon,
-                                color: widget.payment.paymentMethodColor,
-                                size: context.iconSize('small'),
-                              ),
-                              SizedBox(width: context.smallPadding / 2),
-                              Text(
-                                widget.payment.paymentMethod,
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: widget.payment.paymentMethodColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Payment Month:',
+                            'Phone:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -454,7 +433,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                             ),
                           ),
                           Text(
-                            widget.payment.paymentMonth,
+                            widget.receivable.debtorPhone,
                             style: GoogleFonts.inter(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
@@ -464,65 +443,94 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         ],
                       ),
                     ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Status:',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.smallPadding,
+                              vertical: context.smallPadding / 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: widget.receivable.statusColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                            ),
+                            child: Text(
+                              widget.receivable.statusText,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: widget.receivable.statusColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                if (widget.payment.bonus > 0 || widget.payment.deduction > 0) ...[
-                  SizedBox(height: context.smallPadding),
-                  Row(
-                    children: [
-                      if (widget.payment.bonus > 0) ...[
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Bonus:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.captionFontSize,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                'PKR ${widget.payment.bonus.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
+                SizedBox(height: context.smallPadding),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Expected Return:',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
                           ),
-                        ),
-                      ],
-                      if (widget.payment.deduction > 0) ...[
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Deduction:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.captionFontSize,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                'PKR ${widget.payment.deduction.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            widget.receivable.formattedExpectedReturnDate,
+                            style: GoogleFonts.inter(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: widget.receivable.isOverdue ? Colors.red : AppTheme.charcoalGray,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    if (widget.receivable.isOverdue) ...[
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Days Overdue:',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            Text(
+                              '${widget.receivable.daysOverdue} days',
+                              style: GoogleFonts.inter(
+                                fontSize: context.subtitleFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ],
-                  ),
-                ],
+                  ],
+                ),
                 SizedBox(height: context.smallPadding),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -530,7 +538,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Description:',
+                        'Reason/Item:',
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
@@ -538,7 +546,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         ),
                       ),
                       Text(
-                        widget.payment.description,
+                        widget.receivable.reasonOrItem,
                         style: GoogleFonts.inter(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w400,
@@ -569,8 +577,8 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                 Expanded(
                   child: Text(
                     isCompact
-                        ? 'This will permanently delete the payment record.'
-                        : 'This will permanently delete the payment record and all associated data. This action cannot be undone.',
+                        ? 'This will permanently delete the receivable record.'
+                        : 'This will permanently delete the receivable record and all associated data. This action cannot be undone.',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -607,10 +615,10 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
           textColor: AppTheme.pureWhite,
         ),
         SizedBox(height: context.cardPadding),
-        Consumer<PaymentProvider>(
+        Consumer<ReceivablesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Payment',
+              text: 'Delete Receivable',
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -639,7 +647,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
         SizedBox(width: context.cardPadding),
         Expanded(
           flex: 1,
-          child: Consumer<PaymentProvider>(
+          child: Consumer<ReceivablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
                 text: 'Delete',

@@ -6,8 +6,8 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../global/text_button.dart';
-import '../global/text_field.dart';
+import '../globals/text_button.dart';
+import '../globals/text_field.dart';
 
 class EditOrderDialog extends StatefulWidget {
   final Order order;

@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../global/text_button.dart';
-import '../global/text_field.dart';
+import '../globals/text_button.dart';
+import '../globals/text_field.dart';
 
 class EditProductDialog extends StatefulWidget {
   final Product product;
