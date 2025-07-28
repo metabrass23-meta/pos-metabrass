@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../global/text_button.dart';
+import '../globals/text_button.dart';
 
 class DeletePaymentDialog extends StatefulWidget {
   final Payment payment;
