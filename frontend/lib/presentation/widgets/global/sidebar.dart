@@ -20,14 +20,14 @@ class PremiumSidebar extends StatelessWidget {
 
   final List<Map<String, dynamic>> menuItems = const [
     {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
-    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': null},
+    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
     {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
-    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': null},
+    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
     {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
     {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
     {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
-    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': null},
+    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
     {'icon': Icons.trending_down_rounded, 'title': 'Expenses', 'badge': null},
     {'icon': Icons.inventory_rounded, 'title': 'Stock', 'badge': '5'},
