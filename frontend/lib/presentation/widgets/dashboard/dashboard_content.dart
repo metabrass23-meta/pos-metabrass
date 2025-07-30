@@ -4,6 +4,7 @@ import 'package:frontend/presentation/screens/payables/payables_screen.dart';
 import 'package:frontend/presentation/screens/payment/payment_screen.dart';
 import 'package:frontend/presentation/screens/product/product_screen.dart';
 import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
+import 'package:frontend/presentation/screens/sales/sales_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
@@ -49,6 +50,8 @@ class DashboardContent extends StatelessWidget {
       return const ReceivablesPage();
     } else if (selectedIndex == 10) {
       return const PayablesPage();
+    } else if (selectedIndex == 11) {
+      return const SalesPage();
     } else {
       return _buildPlaceholderContent(context);
     }

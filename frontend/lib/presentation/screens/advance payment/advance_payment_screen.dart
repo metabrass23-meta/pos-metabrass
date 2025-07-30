@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/advance payment/add_advance_payment_dialog.dart';
