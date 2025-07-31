@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/presentation/screens/;expenses/expenses_screen.dart';
 import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
 import 'package:frontend/presentation/screens/payables/payables_screen.dart';
 import 'package:frontend/presentation/screens/payment/payment_screen.dart';
@@ -20,6 +21,7 @@ import '../../screens/labor/labor_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/customer/customer_screen.dart';
 import '../../screens/order/order_screen.dart';
+import '../../screens/zakat/zakat_screen.dart';
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
@@ -52,6 +54,10 @@ class DashboardContent extends StatelessWidget {
       return const PayablesPage();
     } else if (selectedIndex == 11) {
       return const SalesPage();
+    } else if (selectedIndex == 12) {
+      return const ExpensesPage();
+    } else if (selectedIndex == 13) {
+      return const ZakatPage();
     } else {
       return _buildPlaceholderContent(context);
     }
@@ -419,13 +425,13 @@ class DashboardContent extends StatelessWidget {
   }
 
   Widget _buildActivityItem(
-    BuildContext context,
-    String title,
-    String subtitle,
-    String time,
-    IconData icon,
-    Color color,
-  ) {
+      BuildContext context,
+      String title,
+      String subtitle,
+      String time,
+      IconData icon,
+      Color color,
+      ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       padding: EdgeInsets.all(context.cardPadding),
@@ -596,7 +602,8 @@ class DashboardContent extends StatelessWidget {
       'Receivables',
       'Payables',
       'Sales',
-      'Expenses',
+      'Expense',
+      'Zakat',
       'Stock',
       'Reports',
       'Settings',

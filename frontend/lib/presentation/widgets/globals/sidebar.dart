@@ -31,7 +31,8 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
     {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
-    {'icon': Icons.trending_down_rounded, 'title': 'Expenses', 'badge': null},
+    {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
+    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
     {'icon': Icons.inventory_rounded, 'title': 'Stock', 'badge': '5'},
     {'icon': Icons.analytics_rounded, 'title': 'Reports', 'badge': null},
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
@@ -237,10 +238,14 @@ class PremiumSidebar extends StatelessWidget {
                                         ? Colors.green.withOpacity(0.9)
                                         : item['badge'] == '7'
                                         ? Colors.purple.withOpacity(0.9)
-                                        : item['badge'] == '15' // Receivables badge color
+                                        : item['badge'] == '15'
                                         ? Colors.cyan.withOpacity(0.9)
-                                        : item['badge'] == '9' // Payables badge color
+                                        : item['badge'] == '9'
                                         ? Colors.red.withOpacity(0.9)
+                                        : item['badge'] == '16'
+                                        ? Colors.yellow.withOpacity(0.9)
+                                        : item['badge'] == '4'
+                                        ? Colors.pink.withOpacity(0.9)
                                         : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
