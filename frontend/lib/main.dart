@@ -1,15 +1,18 @@
 import 'dart:io' show Platform;
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/auth/login_screen.dart';
-import 'package:frontend/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:frontend/presentation/screens/auth/signup_screen.dart';
+import 'package:frontend/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:frontend/presentation/screens/splash/splash_screen.dart';
 import 'package:frontend/src/providers/advance_payment_provider.dart';
 import 'package:frontend/src/providers/app_provider.dart';
 import 'package:frontend/src/providers/auth_provider.dart';
 import 'package:frontend/src/providers/category_provider.dart';
+import 'package:frontend/src/providers/customer_provider.dart';
 import 'package:frontend/src/providers/dashboard_provider.dart';
+import 'package:frontend/src/providers/expenses_provider.dart';
 import 'package:frontend/src/providers/labor_provider.dart';
 import 'package:frontend/src/providers/order_provider.dart';
 import 'package:frontend/src/providers/payables_provider.dart';
@@ -18,11 +21,10 @@ import 'package:frontend/src/providers/product_provider.dart';
 import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
-import 'package:frontend/src/providers/customer_provider.dart';
+import 'package:frontend/src/providers/zakat_provider.dart';
 import 'package:frontend/src/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 void main() {
   runApp(const MaqboolFabricApp());
@@ -62,6 +64,8 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReceivablesProvider()),
         ChangeNotifierProvider(create: (_) => PayablesProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),
+        ChangeNotifierProvider(create: (_) => ExpensesProvider()),
+        ChangeNotifierProvider(create: (_) => ZakatProvider()),
       ],
       child: Sizer(
         builder: (context, orientation, deviceType) {

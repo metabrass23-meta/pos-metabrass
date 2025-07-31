@@ -28,10 +28,10 @@ dependencies:
   flutter_svg:
   animations:
   flutter_animate:
-  syncfusion_flutter_datagrid:
   file_picker:
   path:
   path_provider:
+  syncfusion_flutter_datepicker:
 
 dev_dependencies:
   flutter_test:
