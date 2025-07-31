@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/screens/;expenses/expenses_screen.dart';
 import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
 import 'package:frontend/presentation/screens/payables/payables_screen.dart';
 import 'package:frontend/presentation/screens/payment/payment_screen.dart';
+import 'package:frontend/presentation/screens/principal%20acc/principal_acc_screen.dart';
 import 'package:frontend/presentation/screens/product/product_screen.dart';
 import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
 import 'package:frontend/presentation/screens/sales/sales_screen.dart';
@@ -11,16 +11,18 @@ import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart'
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/stats_card.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../screens/category/category_screen.dart';
-import '../../screens/labor/labor_screen.dart';
-import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/customer/customer_screen.dart';
+import '../../screens/expenses/expenses_screen.dart';
+import '../../screens/labor/labor_screen.dart';
 import '../../screens/order/order_screen.dart';
+import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
 
 class DashboardContent extends StatelessWidget {
@@ -58,6 +60,8 @@ class DashboardContent extends StatelessWidget {
       return const ExpensesPage();
     } else if (selectedIndex == 13) {
       return const ZakatPage();
+    } else if (selectedIndex == 14) {
+      return const PrincipalAccountPage();
     } else {
       return _buildPlaceholderContent(context);
     }
