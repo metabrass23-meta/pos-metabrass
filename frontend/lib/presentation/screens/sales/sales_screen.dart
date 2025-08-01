@@ -9,9 +9,9 @@ import '../../../src/theme/app_theme.dart';
 import '../../widgets/sales/cart_sidebar.dart';
 import '../../widgets/sales/checkout_dialog.dart';
 import '../../widgets/sales/delete_sales_dialog.dart';
+import '../../widgets/sales/edit_sale_dialog.dart';
 import '../../widgets/sales/product_grid.dart';
 import '../../widgets/sales/sales_table.dart';
-import '../../widgets/sales/edit_sale_dialog.dart';
 import '../../widgets/sales/view_sales_dialog.dart';
 
 class SalesPage extends StatefulWidget {

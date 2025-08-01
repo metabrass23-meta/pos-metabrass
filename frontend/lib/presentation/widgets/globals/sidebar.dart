@@ -29,11 +29,12 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
     {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
     {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
+
     {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
     {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
     {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
-    {'icon': Icons.inventory_rounded, 'title': 'Stock', 'badge': '5'},
+    {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
     {'icon': Icons.analytics_rounded, 'title': 'Reports', 'badge': null},
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
   ];
