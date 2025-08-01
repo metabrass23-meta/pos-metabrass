@@ -29,31 +29,25 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
     {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
     {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
-
     {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
     {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
     {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
     {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
     {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
-    {'icon': Icons.analytics_rounded, 'title': 'Reports', 'badge': null},
+    {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: isExpanded
-          ? context.sidebarExpandedWidth
-          : context.sidebarCollapsedWidth,
+      width: isExpanded ? context.sidebarExpandedWidth : context.sidebarCollapsedWidth,
       height: 100.h,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppTheme.primaryMaroon,
-            AppTheme.secondaryMaroon,
-          ],
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
         ),
         boxShadow: [
           BoxShadow(
@@ -70,10 +64,7 @@ class PremiumSidebar extends StatelessWidget {
             padding: EdgeInsets.all(context.cardPadding / 2),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: AppTheme.pureWhite.withOpacity(0.1),
-                  width: 0.1.w,
-                ),
+                bottom: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
               ),
             ),
             child: Row(
@@ -175,15 +166,10 @@ class PremiumSidebar extends StatelessWidget {
                           vertical: context.cardPadding / 2,
                         ),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppTheme.pureWhite.withOpacity(0.15)
-                              : Colors.transparent,
+                          color: isSelected ? AppTheme.pureWhite.withOpacity(0.15) : Colors.transparent,
                           borderRadius: BorderRadius.circular(context.borderRadius()),
                           border: isSelected
-                              ? Border.all(
-                            color: AppTheme.pureWhite.withOpacity(0.3),
-                            width: 0.05.w,
-                          )
+                              ? Border.all(color: AppTheme.pureWhite.withOpacity(0.3), width: 0.05.w)
                               : null,
                         ),
                         child: Row(
@@ -193,16 +179,12 @@ class PremiumSidebar extends StatelessWidget {
                               width: context.iconSize('large'),
                               height: context.iconSize('large'),
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppTheme.accentGold.withOpacity(0.2)
-                                    : Colors.transparent,
+                                color: isSelected ? AppTheme.accentGold.withOpacity(0.2) : Colors.transparent,
                                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
                               ),
                               child: Icon(
                                 item['icon'],
-                                color: isSelected
-                                    ? AppTheme.accentGold
-                                    : AppTheme.pureWhite.withOpacity(0.8),
+                                color: isSelected ? AppTheme.accentGold : AppTheme.pureWhite.withOpacity(0.8),
                                 size: context.iconSize('medium'),
                               ),
                             ),
@@ -247,7 +229,9 @@ class PremiumSidebar extends StatelessWidget {
                                         ? Colors.yellow.withOpacity(0.9)
                                         : item['badge'] == '4'
                                         ? Colors.pink.withOpacity(0.9)
-                                        : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
+                                        : (item['badge'] == '5' ||
+                                              item['badge'] == '12' ||
+                                              item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -279,10 +263,7 @@ class PremiumSidebar extends StatelessWidget {
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: AppTheme.pureWhite.withOpacity(0.1),
-                    width: 0.1.w,
-                  ),
+                  top: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
                 ),
               ),
               child: Row(
