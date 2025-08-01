@@ -22,6 +22,7 @@ import '../../screens/customer/customer_screen.dart';
 import '../../screens/expenses/expenses_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/order/order_screen.dart';
+import '../../screens/profit loss/profit_loss_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
 
@@ -62,6 +63,8 @@ class DashboardContent extends StatelessWidget {
       return const ZakatPage();
     } else if (selectedIndex == 14) {
       return const PrincipalAccountPage();
+    } else if (selectedIndex == 15) {
+      return const ProfitLossPage();
     } else {
       return _buildPlaceholderContent(context);
     }
