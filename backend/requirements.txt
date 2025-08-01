@@ -1,3 +1,30 @@
+# Core Django and DRF
 Django
 djangorestframework
+django-cors-headers
+
+# Database
 psycopg2-binary
+
+# Authentication & Security
+djangorestframework-simplejwt
+django-oauth-toolkit
+
+# API Documentation
+drf-spectacular
+django-extensions
+
+# Development tools
+python-decouple
+django-debug-toolbar
+
+# Image handling
+Pillow
+
+# Utilities
+python-dateutil
+pytz
+
+# Testing
+factory-boy
+pytest-django
