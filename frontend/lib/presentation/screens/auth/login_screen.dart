@@ -31,13 +31,71 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      // Clear any previous errors
+      authProvider.clearError();
+
       authProvider.login(
-        _emailController.text,
+        _emailController.text.trim(),
         _passwordController.text,
       ).then((_) {
         if (authProvider.state == AuthState.authenticated) {
-          Navigator.of(context).pushReplacementNamed('/dashboard');
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Welcome back! Login successful.',
+                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
+
+          // Navigate to dashboard after a short delay
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            if (mounted) {
+              Navigator.of(context).pushReplacementNamed('/dashboard');
+            }
+          });
+        } else if (authProvider.state == AuthState.error) {
+          // Error will be displayed by the Consumer widget below
+          // But also show a snackbar for immediate feedback
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Login failed. Please check your credentials.',
+                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
         }
+      }).catchError((error) {
+        // Handle any unexpected errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'An unexpected error occurred. Please try again.',
+              style: GoogleFonts.inter(fontSize: context.captionFontSize),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+            ),
+            margin: EdgeInsets.all(context.mainPadding),
+          ),
+        );
       });
     }
   }
@@ -196,8 +254,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value?.isEmpty ?? true) {
                                 return 'Please enter your email';
                               }
-                              if (!value!.contains('@')) {
-                                return 'Please enter a valid email';
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+                                return 'Please enter a valid email address';
                               }
                               return null;
                             },
@@ -229,9 +287,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value?.isEmpty ?? true) {
                                 return 'Please enter your password';
                               }
-                              if (value!.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
                               return null;
                             },
                           ),
@@ -243,7 +298,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {
-                                // Handle forgot password
+                                // TODO: Implement forgot password functionality
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Forgot password feature coming soon!',
+                                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                    ),
+                                    backgroundColor: AppTheme.primaryMaroon,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                    ),
+                                    margin: EdgeInsets.all(context.mainPadding),
+                                  ),
+                                );
                               },
                               child: Text(
                                 'Forgot Password?',
@@ -272,24 +341,73 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           SizedBox(height: context.cardPadding),
 
-                          // Error Message
+                          // Enhanced Error Message Display
                           Consumer<AuthProvider>(
                             builder: (context, authProvider, child) {
                               if (authProvider.errorMessage != null) {
                                 return Container(
-                                  padding: EdgeInsets.all(context.smallPadding),
+                                  margin: EdgeInsets.only(top: context.smallPadding),
+                                  padding: EdgeInsets.all(context.cardPadding),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                                    border: Border.all(color: Colors.red.shade200),
-                                  ),
-                                  child: Text(
-                                    authProvider.errorMessage!,
-                                    style: GoogleFonts.inter(
-                                      color: Colors.red.shade700,
-                                      fontSize: context.captionFontSize,
+                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                    border: Border.all(
+                                      color: Colors.red.shade200,
+                                      width: 1.5,
                                     ),
-                                    textAlign: TextAlign.center,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.red.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red.shade600,
+                                        size: context.iconSize('medium'),
+                                      ),
+                                      SizedBox(width: context.smallPadding),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Login Failed',
+                                              style: GoogleFonts.inter(
+                                                color: Colors.red.shade700,
+                                                fontSize: context.bodyFontSize,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(height: context.smallPadding / 2),
+                                            Text(
+                                              authProvider.errorMessage!,
+                                              style: GoogleFonts.inter(
+                                                color: Colors.red.shade600,
+                                                fontSize: context.captionFontSize,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () => authProvider.clearError(),
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red.shade400,
+                                          size: context.iconSize('small'),
+                                        ),
+                                        constraints: const BoxConstraints(),
+                                        padding: EdgeInsets.zero,
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ],
                                   ),
                                 );
                               }
