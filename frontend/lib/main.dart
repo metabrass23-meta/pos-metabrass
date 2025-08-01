@@ -25,10 +25,20 @@ import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/zakat_provider.dart';
 import 'package:frontend/src/theme/app_theme.dart';
+// Add these new imports for API integration
+import 'package:frontend/src/services/api_client.dart';
+import 'package:frontend/src/utils/storage_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize API services
+  await StorageService().init();
+  ApiClient().init();
+
   runApp(const MaqboolFabricApp());
 
   // Add this for desktop platforms
@@ -52,7 +62,8 @@ class MaqboolFabricApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        // Initialize AuthProvider with API integration
+        ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),

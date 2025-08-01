@@ -44,21 +44,89 @@ class _SignupScreenState extends State<SignupScreen> {
               style: GoogleFonts.inter(fontSize: context.captionFontSize),
             ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+            ),
+            margin: EdgeInsets.all(context.mainPadding),
           ),
         );
         return;
       }
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.signup(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
-      ).then((_) {
-        if (authProvider.state == AuthState.authenticated) {
-          Navigator.of(context).pushReplacementNamed('/dashboard');
-        }
-      });
+
+      // Clear any previous errors
+      authProvider.clearError();
+
+      authProvider
+          .signup(
+            _nameController.text.trim(),
+            _emailController.text.trim(),
+            _passwordController.text,
+            _confirmPasswordController.text,
+            _acceptTerms,
+          )
+          .then((_) {
+            if (authProvider.state == AuthState.authenticated) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Account created successfully! Welcome to Maqbool Fashion.',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                  ),
+                  margin: EdgeInsets.all(context.mainPadding),
+                ),
+              );
+
+              // Navigate to dashboard after a short delay
+              Future.delayed(const Duration(milliseconds: 1500), () {
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed('/dashboard');
+                }
+              });
+            } else if (authProvider.state == AuthState.error) {
+              // Error will be displayed by the Consumer widget below
+              // But also show a snackbar for immediate feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Registration failed. Please check the details below.',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                  ),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                  ),
+                  margin: EdgeInsets.all(context.mainPadding),
+                ),
+              );
+            }
+          })
+          .catchError((error) {
+            // Handle any unexpected errors
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'An unexpected error occurred. Please try again.',
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                ),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                ),
+                margin: EdgeInsets.all(context.mainPadding),
+              ),
+            );
+          });
     }
   }
 
@@ -82,10 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
-                  colors: [
-                    AppTheme.secondaryMaroon,
-                    AppTheme.primaryMaroon,
-                  ],
+                  colors: [AppTheme.secondaryMaroon, AppTheme.primaryMaroon],
                 ),
               ),
               child: Center(
@@ -258,9 +323,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 });
                               },
                               icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
+                                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                 size: context.iconSize('medium'),
                               ),
                             ),
@@ -404,19 +467,65 @@ class _SignupScreenState extends State<SignupScreen> {
                             builder: (context, authProvider, child) {
                               if (authProvider.errorMessage != null) {
                                 return Container(
-                                  padding: EdgeInsets.all(context.smallPadding),
+                                  margin: EdgeInsets.only(top: context.smallPadding),
+                                  padding: EdgeInsets.all(context.cardPadding),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                                    border: Border.all(color: Colors.red.shade200),
+                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                    border: Border.all(color: Colors.red.shade200, width: 1.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.red.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                  child: Text(
-                                    authProvider.errorMessage!,
-                                    style: GoogleFonts.inter(
-                                      color: Colors.red.shade700,
-                                      fontSize: context.bodyFontSize,
-                                    ),
-                                    textAlign: TextAlign.center,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red.shade600,
+                                        size: context.iconSize('medium'),
+                                      ),
+                                      SizedBox(width: context.smallPadding),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Registration Failed',
+                                              style: GoogleFonts.inter(
+                                                color: Colors.red.shade700,
+                                                fontSize: context.bodyFontSize,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(height: context.smallPadding / 2),
+                                            Text(
+                                              authProvider.errorMessage!,
+                                              style: GoogleFonts.inter(
+                                                color: Colors.red.shade600,
+                                                fontSize: context.captionFontSize,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () => authProvider.clearError(),
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red.shade400,
+                                          size: context.iconSize('small'),
+                                        ),
+                                        constraints: const BoxConstraints(),
+                                        padding: EdgeInsets.zero,
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ],
                                   ),
                                 );
                               }

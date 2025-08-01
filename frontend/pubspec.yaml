@@ -32,12 +32,17 @@ dependencies:
   path:
   path_provider:
   syncfusion_flutter_datepicker:
+  dio:
+  shared_preferences:
+  json_annotation:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   msix:
   flutter_lints: ^5.0.0
+  json_serializable:
+  build_runner:
 
 flutter:
   uses-material-design: true
