@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 
@@ -37,6 +39,166 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
   ];
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+          ),
+          backgroundColor: AppTheme.creamWhite,
+          title: Row(
+            children: [
+              Icon(
+                Icons.logout_rounded,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Confirm Logout',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: context.headerFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to logout from your account?',
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              color: Colors.grey[600],
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                return ElevatedButton(
+                  onPressed: authProvider.isLoading
+                      ? null
+                      : () async {
+                    Navigator.of(context).pop(); // Close dialog first
+
+                    // Show loading snackbar
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppTheme.pureWhite,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.smallPadding),
+                            Text(
+                              'Logging out...',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: AppTheme.primaryMaroon,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius('medium'),
+                          ),
+                        ),
+                        margin: EdgeInsets.all(context.mainPadding),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+
+                    // Perform logout
+                    await authProvider.logout();
+
+                    // Navigate to login screen
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/login',
+                          (route) => false,
+                    );
+
+                    if (context.mounted) {
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Successfully logged out. See you soon!',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                            ),
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius('medium'),
+                            ),
+                          ),
+                          margin: EdgeInsets.all(context.mainPadding),
+                        ),
+                      );
+
+
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryMaroon,
+                    foregroundColor: AppTheme.pureWhite,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: authProvider.isLoading
+                      ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.pureWhite,
+                      ),
+                    ),
+                  )
+                      : Text(
+                    'Logout',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,8 +392,8 @@ class PremiumSidebar extends StatelessWidget {
                                         : item['badge'] == '4'
                                         ? Colors.pink.withOpacity(0.9)
                                         : (item['badge'] == '5' ||
-                                              item['badge'] == '12' ||
-                                              item['badge'] == '23')
+                                        item['badge'] == '12' ||
+                                        item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -257,58 +419,121 @@ class PremiumSidebar extends StatelessWidget {
             ),
           ),
 
-          // Footer
-          if (isExpanded) ...[
-            Container(
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
-                ),
+          // Footer with User Info and Logout
+          Container(
+            padding: EdgeInsets.all(context.cardPadding),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
               ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: context.iconSize('medium') / 2,
-                    backgroundColor: AppTheme.accentGold,
-                    child: Text(
-                      'A',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryMaroon,
+            ),
+            child: Column(
+              children: [
+                if (isExpanded) ...[
+                  // User Info Row with Logout Button
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      final user = authProvider.currentUser;
+                      return Row(
+                        children: [
+                          CircleAvatar(
+                            radius: context.iconSize('medium') / 2,
+                            backgroundColor: AppTheme.accentGold,
+                            child: Text(
+                              user?.fullName.isNotEmpty == true
+                                  ? user!.fullName[0].toUpperCase()
+                                  : 'U',
+                              style: GoogleFonts.inter(
+                                fontSize: context.bodyFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.primaryMaroon,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: context.smallPadding),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user?.fullName ?? 'User',
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppTheme.pureWhite,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  user?.email ?? 'user@email.com',
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.captionFontSize,
+                                    fontWeight: FontWeight.w300,
+                                    color: AppTheme.pureWhite.withOpacity(0.7),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Logout Button on the right
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _showLogoutDialog(context),
+                              borderRadius: BorderRadius.circular(context.borderRadius()),
+                              child: Container(
+                                padding: EdgeInsets.all(context.smallPadding / 1.5),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                                  border: Border.all(
+                                    color: Colors.red.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.logout_rounded,
+                                  color: Colors.red.shade300,
+                                  size: context.iconSize('small'),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ] else ...[
+                  // Collapsed state - just logout icon
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _showLogoutDialog(context),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      child: Container(
+                        padding: EdgeInsets.all(context.smallPadding),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                          border: Border.all(
+                            color: Colors.red.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.logout_rounded,
+                          color: Colors.red.shade300,
+                          size: context.iconSize('medium'),
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(width: context.smallPadding),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Admin User',
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.pureWhite,
-                          ),
-                        ),
-                        Text(
-                          'admin@maqboolfabric.com',
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            fontWeight: FontWeight.w300,
-                            color: AppTheme.pureWhite.withOpacity(0.7),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
-              ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );
