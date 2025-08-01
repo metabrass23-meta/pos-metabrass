@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import login, logout
 from django.utils import timezone
+from django.db import transaction
 from .models import User
 from .serializers import (
     UserRegistrationSerializer,
@@ -23,19 +24,28 @@ def register_user(request):
     serializer = UserRegistrationSerializer(data=request.data)
     
     if serializer.is_valid():
-        user = serializer.save()
-        
-        # Create authentication token
-        token, created = Token.objects.get_or_create(user=user)
-        
-        return Response({
-            'success': True,
-            'message': 'User registered successfully.',
-            'data': {
-                'user': UserSerializer(user).data,
-                'token': token.key
-            }
-        }, status=status.HTTP_201_CREATED)
+        try:
+            with transaction.atomic():
+                user = serializer.save()
+                
+                # Create authentication token
+                token, created = Token.objects.get_or_create(user=user)
+                
+                return Response({
+                    'success': True,
+                    'message': 'User registered successfully.',
+                    'data': {
+                        'user': UserSerializer(user).data,
+                        'token': token.key
+                    }
+                }, status=status.HTTP_201_CREATED)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Registration failed due to server error.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
         'success': False,
@@ -56,26 +66,34 @@ def login_user(request):
     )
     
     if serializer.is_valid():
-        user = serializer.validated_data['user']
-        
-        # Update last login
-        user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
-        
-        # Get or create token
-        token, created = Token.objects.get_or_create(user=user)
-        
-        # Login user (for session-based auth if needed)
-        login(request, user)
-        
-        return Response({
-            'success': True,
-            'message': 'Login successful.',
-            'data': {
-                'user': UserSerializer(user).data,
-                'token': token.key
-            }
-        }, status=status.HTTP_200_OK)
+        try:
+            user = serializer.validated_data['user']
+            
+            # Update last login
+            user.last_login = timezone.now()
+            user.save(update_fields=['last_login'])
+            
+            # Get or create token
+            token, created = Token.objects.get_or_create(user=user)
+            
+            # Login user (for session-based auth if needed)
+            login(request, user)
+            
+            return Response({
+                'success': True,
+                'message': 'Login successful.',
+                'data': {
+                    'user': UserSerializer(user).data,
+                    'token': token.key
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Login failed due to server error.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
         'success': False,
@@ -92,11 +110,20 @@ def logout_user(request):
     """
     try:
         # Delete the user's token
-        request.user.auth_token.delete()
+        token = Token.objects.get(user=request.user)
+        token.delete()
         
         # Logout user from session
         logout(request)
         
+        return Response({
+            'success': True,
+            'message': 'Logout successful.'
+        }, status=status.HTTP_200_OK)
+        
+    except Token.DoesNotExist:
+        # Token doesn't exist, but still logout the session
+        logout(request)
         return Response({
             'success': True,
             'message': 'Logout successful.'
@@ -164,25 +191,34 @@ def change_password(request):
     )
     
     if serializer.is_valid():
-        user = request.user
-        user.set_password(serializer.validated_data['new_password'])
-        user.save()
-        
-        # Delete old token and create new one for security
         try:
-            user.auth_token.delete()
-        except:
-            pass
-        
-        token = Token.objects.create(user=user)
-        
-        return Response({
-            'success': True,
-            'message': 'Password changed successfully.',
-            'data': {
-                'token': token.key
-            }
-        }, status=status.HTTP_200_OK)
+            user = request.user
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            
+            # Delete old token and create new one for security
+            try:
+                old_token = Token.objects.get(user=user)
+                old_token.delete()
+            except Token.DoesNotExist:
+                pass
+            
+            token = Token.objects.create(user=user)
+            
+            return Response({
+                'success': True,
+                'message': 'Password changed successfully.',
+                'data': {
+                    'token': token.key
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Password change failed due to server error.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
         'success': False,

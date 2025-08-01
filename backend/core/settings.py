@@ -37,7 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    
     'posapi',
 ]
 
@@ -180,16 +184,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# CORS Settings (if you need CORS for your Flutter app)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Add your Flutter app's URL here
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-# If you want to allow all origins during development (NOT recommended for production)
-# CORS_ALLOW_ALL_ORIGINS = True
+# During development, you can use this (NOT recommended for production)
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Security Settings for API
 SECURE_BROWSER_XSS_FILTER = True
