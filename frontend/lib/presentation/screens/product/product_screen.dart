@@ -68,7 +68,7 @@ class _ProductPageState extends State<ProductPage> {
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
+        padding: EdgeInsets.all(context.mainPadding / 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -153,9 +153,9 @@ class _ProductPageState extends State<ProductPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Product Management',
+                'Products Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -183,9 +183,9 @@ class _ProductPageState extends State<ProductPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Product Management',
+          'Products Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,

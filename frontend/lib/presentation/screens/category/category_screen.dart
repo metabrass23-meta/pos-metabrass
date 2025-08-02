@@ -69,7 +69,7 @@ class _CategoryPageState extends State<CategoryPage> {
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
+        padding: EdgeInsets.all(context.mainPadding / 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -165,9 +165,9 @@ class _CategoryPageState extends State<CategoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Category Management',
+                'Categories Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -198,9 +198,9 @@ class _CategoryPageState extends State<CategoryPage> {
       children: [
         // Page Title
         Text(
-          'Category Management',
+          'Categories Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
