@@ -38,6 +38,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(null=True, blank=True)
     
+    @property
+    def is_staff(self):
+        """Allow superusers to access admin without is_staff field"""
+        return self.is_superuser
+    
     objects = UserManager()
     
     USERNAME_FIELD = 'email'

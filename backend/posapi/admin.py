@@ -7,8 +7,8 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     """Custom User Admin"""
     
-    list_display = ('email', 'full_name', 'is_active', 'date_joined', 'agreed_to_terms')
-    list_filter = ('is_active', 'agreed_to_terms', 'date_joined')
+    list_display = ('email', 'full_name', 'is_active', 'is_superuser', 'date_joined', 'agreed_to_terms')
+    list_filter = ('is_active', 'is_superuser', 'agreed_to_terms', 'date_joined')
     search_fields = ('email', 'full_name')
     ordering = ('-date_joined',)
     
@@ -34,4 +34,4 @@ class CustomUserAdmin(UserAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related()
-    
+        
