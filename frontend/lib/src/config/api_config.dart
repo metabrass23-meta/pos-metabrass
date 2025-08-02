@@ -15,7 +15,8 @@ class ApiConfig {
   static const String createCategory = '/categories/create/';
   static String getCategoryById(String id) => '/categories/$id/';
   static String updateCategory(String id) => '/categories/$id/update/';
-  static String deleteCategory(String id) => '/categories/$id/delete/';
+  static String deleteCategory(String id) => '/categories/$id/delete/'; // Hard delete
+  static String softDeleteCategory(String id) => '/categories/$id/soft-delete/'; // Soft delete
   static String restoreCategory(String id) => '/categories/$id/restore/';
 
   // Request timeouts
@@ -24,10 +25,7 @@ class ApiConfig {
   static const int sendTimeout = 15000; // 15 seconds
 
   // Headers
-  static const Map<String, String> defaultHeaders = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+  static const Map<String, String> defaultHeaders = {'Content-Type': 'application/json', 'Accept': 'application/json'};
 
   // Storage keys
   static const String tokenKey = 'auth_token';
