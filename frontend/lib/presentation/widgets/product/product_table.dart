@@ -6,11 +6,32 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
-class ProductTable extends StatelessWidget {
+class EnhancedProductTable extends StatefulWidget {
   final Function(Product) onEdit;
   final Function(Product) onDelete;
+  final Function(Product) onView;
 
-  const ProductTable({super.key, required this.onEdit, required this.onDelete});
+  const EnhancedProductTable({
+    super.key,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onView,
+  });
+
+  @override
+  State<EnhancedProductTable> createState() => _EnhancedProductTableState();
+}
+
+class _EnhancedProductTableState extends State<EnhancedProductTable> {
+  final ScrollController _horizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    _verticalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,107 +47,189 @@ class ProductTable extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          // Responsive Table Header
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.borderRadius('large')),
-                topRight: Radius.circular(context.borderRadius('large')),
+      child: Consumer<ProductProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return Center(
+              child: SizedBox(
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 8.w,
+                  small: 6.w,
+                  medium: 5.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                height: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 8.w,
+                  small: 6.w,
+                  medium: 5.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                child: const CircularProgressIndicator(
+                  color: AppTheme.primaryMaroon,
+                  strokeWidth: 3,
+                ),
               ),
-            ),
-            child: _buildResponsiveHeaderRow(context),
-          ),
+            );
+          }
 
-          // Table Content
-          Expanded(
-            child: Consumer<ProductProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
+          if (provider.products.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          return Scrollbar(
+            controller: _horizontalController,
+            thumbVisibility: true,
+            child: Column(
+              children: [
+                // Table Header with Horizontal Scroll
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray.withOpacity(0.5),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(context.borderRadius('large')),
+                      topRight: Radius.circular(context.borderRadius('large')),
                     ),
-                  );
-                }
+                  ),
+                  child: SingleChildScrollView(
+                    controller: _horizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: Container(
+                      width: _getTableWidth(context),
+                      padding: EdgeInsets.all(context.cardPadding),
+                      child: _buildTableHeader(context),
+                    ),
+                  ),
+                ),
 
-                if (provider.products.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-
-                return ListView.builder(
-                  itemCount: provider.products.length,
-                  itemBuilder: (context, index) {
-                    final product = provider.products[index];
-                    return _buildResponsiveTableRow(context, product, index);
-                  },
-                );
-              },
+                // Table Content with Synchronized Scroll
+                Expanded(
+                  child: Scrollbar(
+                    controller: _verticalController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _horizontalController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: Container(
+                        width: _getTableWidth(context),
+                        child: ListView.builder(
+                          controller: _verticalController,
+                          itemCount: provider.products.length,
+                          itemBuilder: (context, index) {
+                            final product = provider.products[index];
+                            return _buildTableRow(context, product, index);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildResponsiveHeaderRow(BuildContext context) {
+  double _getTableWidth(BuildContext context) {
+    // Fixed table width to ensure all columns are visible - increased for more columns
+    return ResponsiveBreakpoints.responsive(
+      context,
+      tablet: 1600.0,
+      small: 1700.0,
+      medium: 1800.0,
+      large: 1900.0,
+      ultrawide: 2000.0,
+    );
+  }
+
+  Widget _buildTableHeader(BuildContext context) {
+    final columnWidths = _getColumnWidths(context);
+
     return Row(
       children: [
-        // Product ID Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 2 : 1,
+        // Product ID
+        Container(
+          width: columnWidths[0],
           child: _buildHeaderCell(context, 'Product ID'),
         ),
 
-        // Product Name Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 3 : 2,
-          child: _buildHeaderCell(context, context.shouldShowCompactLayout ? 'Product' : 'Product Name'),
+        // Product Name
+        Container(
+          width: columnWidths[1],
+          child: _buildHeaderCell(context, 'Product Name'),
         ),
 
-        // Color/Fabric Column (hidden on compact)
-        if (!context.shouldShowCompactLayout) ...[
-          Expanded(flex: 1, child: _buildHeaderCell(context, 'Color')),
-          Expanded(flex: 1, child: _buildHeaderCell(context, 'Fabric')),
-        ],
-
-        // Price Column
-        Expanded(flex: context.shouldShowCompactLayout ? 2 : 1, child: _buildHeaderCell(context, 'Price')),
-
-        // Quantity/Stock Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 2 : 1,
-          child: _buildHeaderCell(context, context.shouldShowCompactLayout ? 'Stock' : 'Quantity'),
+        // Product Details
+        Container(
+          width: columnWidths[2],
+          child: _buildHeaderCell(context, 'Details'),
         ),
 
-        // Pieces Column (hidden on tablets and small)
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(flex: 1, child: _buildHeaderCell(context, 'Pieces')),
-        ],
+        // Price
+        Container(
+          width: columnWidths[3],
+          child: _buildHeaderCell(context, 'Price'),
+        ),
 
-        // Actions Column
-        Expanded(flex: context.shouldShowCompactLayout ? 1 : 2, child: _buildHeaderCell(context, 'Actions')),
+        // Color
+        Container(
+          width: columnWidths[4],
+          child: _buildHeaderCell(context, 'Color'),
+        ),
+
+        // Fabric
+        Container(
+          width: columnWidths[5],
+          child: _buildHeaderCell(context, 'Fabric'),
+        ),
+
+        // Quantity
+        Container(
+          width: columnWidths[6],
+          child: _buildHeaderCell(context, 'Quantity'),
+        ),
+
+        // Stock Status
+        Container(
+          width: columnWidths[7],
+          child: _buildHeaderCell(context, 'Stock Status'),
+        ),
+
+        // Pieces
+        Container(
+          width: columnWidths[8],
+          child: _buildHeaderCell(context, 'Pieces'),
+        ),
+
+        // Actions
+        Container(
+          width: columnWidths[9],
+          child: _buildHeaderCell(context, 'Actions'),
+        ),
       ],
     );
+  }
+
+  List<double> _getColumnWidths(BuildContext context) {
+    return [
+      120.0, // Product ID
+      200.0, // Product Name
+      250.0, // Product Details
+      120.0, // Price
+      120.0, // Color
+      120.0, // Fabric
+      100.0, // Quantity
+      130.0, // Stock Status
+      200.0, // Pieces
+      320.0, // Actions - increased width for three buttons
+    ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
@@ -141,22 +244,32 @@ class ProductTable extends StatelessWidget {
     );
   }
 
-  Widget _buildResponsiveTableRow(BuildContext context, Product product, int index) {
+  Widget _buildTableRow(BuildContext context, Product product, int index) {
+    final columnWidths = _getColumnWidths(context);
+
     return Container(
-      padding: EdgeInsets.all(context.cardPadding / 2.5),
       decoration: BoxDecoration(
-        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
+        color: index.isEven
+            ? AppTheme.pureWhite
+            : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: 0.5,
+          ),
+        ),
       ),
+      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Product ID Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
+          // Product ID
+          Container(
+            width: columnWidths[0],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
               ),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
@@ -174,120 +287,12 @@ class ProductTable extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Product Name Column with responsive layout
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 3 : 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // Show color, fabric and detail here on compact layouts
-                if (context.shouldShowCompactLayout) ...[
-                  SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    '${product.color} • ${product.fabric}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    product.detail,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Color Column (hidden on compact layouts)
-          if (!context.shouldShowCompactLayout) ...[
-            Expanded(
-              flex: 1,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: _getColorFromName(product.color).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  border: Border.all(color: _getColorFromName(product.color).withOpacity(0.3), width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _getColorFromName(product.color),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Expanded(
-                      child: Text(
-                        product.color,
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: _getColorFromName(product.color),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-
-            // Fabric Column
-            Expanded(
-              flex: 1,
-              child: Text(
-                product.fabric,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-          ],
-
-          // Price Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
+          // Product Name
+          Container(
+            width: columnWidths[1],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
-              'PKR ${product.price.toStringAsFixed(0)}',
+              product.name,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
@@ -298,148 +303,286 @@ class ProductTable extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Quantity/Stock Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${product.quantity} units',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          // Product Details
+          Container(
+            width: columnWidths[2],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: product.detail.isNotEmpty
+                ? Text(
+              product.detail,
+              style: GoogleFonts.inter(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            )
+                : Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                'No details',
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[500],
+                  fontStyle: FontStyle.italic,
                 ),
-                SizedBox(height: context.smallPadding / 4),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding,
-                    vertical: context.smallPadding / 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: product.stockStatusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  ),
-                  child: Text(
-                    product.stockStatusText,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: product.stockStatusColor,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
+          // Price
+          Container(
+            width: columnWidths[3],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Text(
+              'PKR ${product.price.toStringAsFixed(0)}',
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoalGray,
+              ),
+            ),
+          ),
 
-          // Pieces Column (responsive visibility)
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          // Color
+          Container(
+            width: columnWidths[4],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: _getColorFromName(product.color).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                border: Border.all(
+                  color: _getColorFromName(product.color).withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    product.piecesText,
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: _getColorFromName(product.color),
+                      shape: BoxShape.circle,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(width: context.smallPadding / 2),
+                  Expanded(
+                    child: Text(
+                      product.color,
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: _getColorFromName(product.color),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          // Actions Column with responsive button sizing
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 1 : 2,
-            child: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactActions(context, product),
-              small: _buildCompactActions(context, product),
-              medium: _buildStandardActions(context, product),
-              large: _buildExpandedActions(context, product),
-              ultrawide: _buildExpandedActions(context, product),
+          // Fabric
+          Container(
+            width: columnWidths[5],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.brown.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                product.fabric,
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.brown[600],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+          ),
+
+          // Quantity
+          Container(
+            width: columnWidths[6],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Text(
+              '${product.quantity}',
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
+            ),
+          ),
+
+          // Stock Status
+          Container(
+            width: columnWidths[7],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: product.stockStatusColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                product.stockStatusText,
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: product.stockStatusColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
+          // Pieces
+          Container(
+            width: columnWidths[8],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: product.pieces.isNotEmpty
+                ? Wrap(
+              spacing: context.smallPadding / 2,
+              runSpacing: context.smallPadding / 2,
+              children: product.pieces.take(2).map((piece) {
+                return Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.smallPadding / 2,
+                    vertical: context.smallPadding / 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMaroon.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(
+                      color: AppTheme.primaryMaroon.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    piece,
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize * 0.9,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryMaroon,
+                    ),
+                  ),
+                );
+              }).toList()
+                ..addAll(product.pieces.length > 2
+                    ? [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.smallPadding / 2,
+                      vertical: context.smallPadding / 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    ),
+                    child: Text(
+                      '+${product.pieces.length - 2}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize * 0.9,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                ]
+                    : []),
+            )
+                : Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                'No pieces',
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[500],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ),
+
+          // Actions
+          Container(
+            width: columnWidths[9],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: _buildActions(context, product),
           ),
         ],
       ),
     );
   }
 
-  // Compact actions for tablets and small screens
-  Widget _buildCompactActions(BuildContext context, Product product) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'edit') {
-          onEdit(product);
-        } else if (value == 'delete') {
-          onDelete(product);
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Edit',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Delete',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        padding: EdgeInsets.all(context.smallPadding),
-        decoration: BoxDecoration(
-          color: AppTheme.lightGray,
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        ),
-        child: Icon(Icons.more_vert, size: context.iconSize('small'), color: AppTheme.charcoalGray),
-      ),
-    );
-  }
-
-  // Standard actions for medium screens
-  Widget _buildStandardActions(BuildContext context, Product product) {
+  Widget _buildActions(BuildContext context, Product product) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // View Button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => widget.onView(product),
+            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            child: Container(
+              padding: EdgeInsets.all(context.smallPadding * 0.5),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Icon(
+                Icons.visibility_outlined,
+                color: Colors.purple,
+                size: context.iconSize('small'),
+              ),
+            ),
+          ),
+        ),
+
+        SizedBox(width: context.smallPadding / 2),
+
         // Edit Button
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onEdit(product),
+            onTap: () => widget.onEdit(product),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
@@ -447,18 +590,22 @@ class ProductTable extends StatelessWidget {
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+              child: Icon(
+                Icons.edit_outlined,
+                color: Colors.blue,
+                size: context.iconSize('small'),
+              ),
             ),
           ),
         ),
 
-        SizedBox(width: context.smallPadding),
+        SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onDelete(product),
+            onTap: () => widget.onDelete(product),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
@@ -466,89 +613,10 @@ class ProductTable extends StatelessWidget {
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Expanded actions for large screens
-  Widget _buildExpandedActions(BuildContext context, Product product) {
-    return Row(
-      children: [
-        // Edit Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onEdit(product),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Edit',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Delete Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onDelete(product),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Delete',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+                size: context.iconSize('small'),
               ),
             ),
           ),
@@ -583,7 +651,11 @@ class ProductTable extends StatelessWidget {
               color: AppTheme.lightGray,
               borderRadius: BorderRadius.circular(context.borderRadius('xl')),
             ),
-            child: Icon(Icons.inventory_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
+            child: Icon(
+              Icons.inventory_outlined,
+              size: context.iconSize('xl'),
+              color: Colors.grey[400],
+            ),
           ),
 
           SizedBox(height: context.mainPadding),

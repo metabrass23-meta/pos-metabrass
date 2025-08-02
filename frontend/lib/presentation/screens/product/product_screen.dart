@@ -9,6 +9,7 @@ import '../../widgets/product/add_product_dialog.dart';
 import '../../widgets/product/delete_product_dialog.dart';
 import '../../widgets/product/edit_product_dialog.dart';
 import '../../widgets/product/product_table.dart';
+import '../../widgets/product/view_product_dialog.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -50,6 +51,14 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  void _showViewProductDialog(Product product) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ViewProductDetailsDialog(product: product),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -59,7 +68,7 @@ class _ProductPageState extends State<ProductPage> {
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
+        padding: EdgeInsets.all(context.mainPadding / 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -83,9 +92,10 @@ class _ProductPageState extends State<ProductPage> {
             _buildSearchSection(),
             SizedBox(height: context.cardPadding * 0.5),
             Expanded(
-              child: ProductTable(
+              child: EnhancedProductTable(
                 onEdit: _showEditProductDialog,
                 onDelete: _showDeleteProductDialog,
+                onView: _showViewProductDialog,
               ),
             ),
           ],
@@ -143,9 +153,9 @@ class _ProductPageState extends State<ProductPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Product Management',
+                'Products Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -153,7 +163,7 @@ class _ProductPageState extends State<ProductPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Manage product inventory and details',
+                'Manage product inventory and details with comprehensive tools',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -173,9 +183,9 @@ class _ProductPageState extends State<ProductPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Product Management',
+          'Products Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -183,7 +193,7 @@ class _ProductPageState extends State<ProductPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage inventory',
+          'Manage product inventory',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
