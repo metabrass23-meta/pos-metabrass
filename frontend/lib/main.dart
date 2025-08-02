@@ -58,6 +58,8 @@ void main() async {
 class MaqboolFabricApp extends StatelessWidget {
   const MaqboolFabricApp({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
