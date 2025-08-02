@@ -9,6 +9,7 @@ import '../../widgets/product/add_product_dialog.dart';
 import '../../widgets/product/delete_product_dialog.dart';
 import '../../widgets/product/edit_product_dialog.dart';
 import '../../widgets/product/product_table.dart';
+import '../../widgets/product/view_product_dialog.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -50,6 +51,14 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  void _showViewProductDialog(Product product) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ViewProductDetailsDialog(product: product),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -83,9 +92,10 @@ class _ProductPageState extends State<ProductPage> {
             _buildSearchSection(),
             SizedBox(height: context.cardPadding * 0.5),
             Expanded(
-              child: ProductTable(
+              child: EnhancedProductTable(
                 onEdit: _showEditProductDialog,
                 onDelete: _showDeleteProductDialog,
+                onView: _showViewProductDialog,
               ),
             ),
           ],
@@ -153,7 +163,7 @@ class _ProductPageState extends State<ProductPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Manage product inventory and details',
+                'Manage product inventory and details with comprehensive tools',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -183,7 +193,7 @@ class _ProductPageState extends State<ProductPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage inventory',
+          'Manage product inventory',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
