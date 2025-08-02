@@ -187,23 +187,29 @@ def update_category(request, category_id):
 @permission_classes([IsAuthenticated])
 def delete_category(request, category_id):
     """
-    Soft delete a category (set is_active=False)
+    Hard delete a category (permanently remove from database)
     """
     try:
         category = get_object_or_404(Category, id=category_id)
         
-        if not category.is_active:
-            return Response({
-                'success': False,
-                'message': 'Category is already inactive.',
-                'errors': {'detail': 'This category has already been deleted.'}
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Store category name for response message
+        category_name = category.name
         
-        category.soft_delete()
+        # Check if category is being used by products (optional safety check)
+        # Uncomment this if you have a Product model that references categories
+        # if hasattr(category, 'products') and category.products.exists():
+        #     return Response({
+        #         'success': False,
+        #         'message': 'Cannot delete category as it is being used by products.',
+        #         'errors': {'detail': 'This category is currently assigned to one or more products.'}
+        #     }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Permanently delete the category
+        category.delete()
         
         return Response({
             'success': True,
-            'message': 'Category deleted successfully.'
+            'message': f'Category "{category_name}" deleted permanently.'
         }, status=status.HTTP_200_OK)
         
     except Category.DoesNotExist:
@@ -217,6 +223,44 @@ def delete_category(request, category_id):
         return Response({
             'success': False,
             'message': 'Category deletion failed.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def soft_delete_category(request, category_id):
+    """
+    Soft delete a category (set is_active=False) - Alternative endpoint
+    """
+    try:
+        category = get_object_or_404(Category, id=category_id)
+        
+        if not category.is_active:
+            return Response({
+                'success': False,
+                'message': 'Category is already inactive.',
+                'errors': {'detail': 'This category has already been soft deleted.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        category.soft_delete()
+        
+        return Response({
+            'success': True,
+            'message': 'Category soft deleted successfully.'
+        }, status=status.HTTP_200_OK)
+        
+    except Category.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Category not found.',
+            'errors': {'detail': 'Category with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Category soft deletion failed.',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -330,20 +374,24 @@ class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView
         }, status=status.HTTP_200_OK)
     
     def destroy(self, request, *args, **kwargs):
-        """Custom delete method for soft deletion"""
+        """Custom delete method for hard deletion"""
         instance = self.get_object()
+        category_name = instance.name
         
-        if not instance.is_active:
-            return Response({
-                'success': False,
-                'message': 'Category is already inactive.',
-                'errors': {'detail': 'This category has already been deleted.'}
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Optional safety check for products using this category
+        # Uncomment if you have Product model
+        # if hasattr(instance, 'products') and instance.products.exists():
+        #     return Response({
+        #         'success': False,
+        #         'message': 'Cannot delete category as it is being used by products.',
+        #         'errors': {'detail': 'This category is currently assigned to one or more products.'}
+        #     }, status=status.HTTP_400_BAD_REQUEST)
         
-        instance.soft_delete()
+        # Permanently delete
+        instance.delete()
         
         return Response({
             'success': True,
-            'message': 'Category deleted successfully.'
+            'message': f'Category "{category_name}" deleted permanently.'
         }, status=status.HTTP_200_OK)
     
