@@ -290,16 +290,36 @@ class CategoryErrorHandler {
       BuildContext context, {
         required String itemName,
         String? additionalMessage,
+        bool isPermanent = true, // New parameter to indicate permanent deletion
       }) async {
     return await showConfirmDialog(
       context,
-      title: 'Delete Category',
+      title: isPermanent ? 'Delete Category Permanently' : 'Delete Category',
       message: additionalMessage ??
-          'Are you sure you want to delete "$itemName"? This action cannot be undone.',
-      confirmText: 'Delete',
+          (isPermanent
+              ? 'Are you sure you want to permanently delete "$itemName"? This action cannot be undone and the category will be completely removed from the database.'
+              : 'Are you sure you want to delete "$itemName"? This action cannot be undone.'),
+      confirmText: isPermanent ? 'Delete Permanently' : 'Delete',
       cancelText: 'Cancel',
       confirmColor: Colors.red,
-      icon: Icons.warning_rounded,
+      icon: isPermanent ? Icons.delete_forever_rounded : Icons.warning_rounded,
+    );
+  }
+
+  static Future<bool?> showSoftDeleteConfirmDialog(
+      BuildContext context, {
+        required String itemName,
+        String? additionalMessage,
+      }) async {
+    return await showConfirmDialog(
+      context,
+      title: 'Deactivate Category',
+      message: additionalMessage ??
+          'Are you sure you want to deactivate "$itemName"? The category will be hidden but can be restored later.',
+      confirmText: 'Deactivate',
+      cancelText: 'Cancel',
+      confirmColor: Colors.orange,
+      icon: Icons.visibility_off_rounded,
     );
   }
 

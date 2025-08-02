@@ -369,7 +369,7 @@ class CategoryProvider extends ChangeNotifier {
     }
   }
 
-  /// Delete category
+  /// Delete category permanently (hard delete)
   Future<bool> deleteCategory(String id) async {
     _isLoading = true;
     notifyListeners();
@@ -378,7 +378,7 @@ class CategoryProvider extends ChangeNotifier {
       final response = await _categoryService.deleteCategory(id);
 
       if (response.success) {
-        // Remove category from local list
+        // Remove category from local list permanently
         _categories.removeWhere((cat) => cat.id == id);
         _applyFilters();
 
@@ -395,6 +395,43 @@ class CategoryProvider extends ChangeNotifier {
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to delete category: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Soft delete category (set as inactive) - Alternative option
+  Future<bool> softDeleteCategory(String id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _categoryService.softDeleteCategory(id);
+
+      if (response.success) {
+        // Update category in local list to mark as inactive
+        final index = _categories.indexWhere((cat) => cat.id == id);
+        if (index != -1) {
+          // Since Category class doesn't have isActive, we'll remove it from the list
+          // In a real implementation, you might want to add isActive to Category class
+          _categories.removeAt(index);
+          _applyFilters();
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to soft delete category: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
       return false;

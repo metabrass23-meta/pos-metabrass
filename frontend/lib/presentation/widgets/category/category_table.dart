@@ -426,36 +426,6 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Export/Print Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Export category ${category.id}'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.download_outlined,
-                color: Colors.green,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
-
         // Delete Button
         Material(
           color: Colors.transparent,

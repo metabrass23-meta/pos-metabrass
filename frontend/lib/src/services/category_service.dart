@@ -5,6 +5,7 @@ import '../models/api_response.dart';
 import '../models/category/category_api_responses.dart';
 import '../models/category/category_model.dart';
 import '../utils/storage_service.dart';
+import '../utils/debug_helper.dart'; // Add this import
 import 'api_client.dart';
 
 class CategoryService {
@@ -26,6 +27,8 @@ class CategoryService {
         ApiConfig.categories,
         queryParameters: queryParams,
       );
+
+      DebugHelper.printApiResponse('GET Categories', response.data);
 
       if (response.statusCode == 200) {
         final apiResponse = ApiResponse<CategoriesListResponse>.fromJson(
@@ -78,7 +81,7 @@ class CategoryService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Get categories error: ${e.toString()}');
+      DebugHelper.printError('Get categories', e);
       return ApiResponse<CategoriesListResponse>(
         success: false,
         message: 'An unexpected error occurred while getting categories',
@@ -131,15 +134,22 @@ class CategoryService {
         description: description,
       );
 
+      DebugHelper.printJson('Create Category Request', request.toJson());
+
       final response = await _apiClient.post(
         ApiConfig.createCategory,
         data: request.toJson(),
       );
 
+      DebugHelper.printApiResponse('POST Create Category', response.data);
+
       if (response.statusCode == 201) {
         final apiResponse = ApiResponse<CategoryModel>.fromJson(
           response.data,
-              (data) => CategoryModel.fromJson(data),
+              (data) {
+            DebugHelper.printCategoryModel('Category Data Before Parse', data);
+            return CategoryModel.fromJson(data);
+          },
         );
 
         // Update cache with new category
@@ -156,7 +166,7 @@ class CategoryService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Create category DioException: ${e.toString()}');
+      DebugHelper.printError('Create category DioException', e);
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<CategoryModel>(
         success: false,
@@ -164,10 +174,10 @@ class CategoryService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Create category error: ${e.toString()}');
+      DebugHelper.printError('Create category', e);
       return ApiResponse<CategoryModel>(
         success: false,
-        message: 'An unexpected error occurred while creating category',
+        message: 'An unexpected error occurred while creating category: ${e.toString()}',
       );
     }
   }
@@ -225,7 +235,7 @@ class CategoryService {
     }
   }
 
-  /// Delete a category (soft delete)
+  /// Delete a category permanently (hard delete)
   Future<ApiResponse<void>> deleteCategory(String id) async {
     try {
       final response = await _apiClient.delete(ApiConfig.deleteCategory(id));
@@ -236,7 +246,7 @@ class CategoryService {
 
         return ApiResponse<void>(
           success: true,
-          message: response.data['message'] ?? 'Category deleted successfully',
+          message: response.data['message'] ?? 'Category deleted permanently',
         );
       } else {
         return ApiResponse<void>(
@@ -258,6 +268,49 @@ class CategoryService {
       return ApiResponse<void>(
         success: false,
         message: 'An unexpected error occurred while deleting category',
+      );
+    }
+  }
+
+  /// Soft delete a category (set is_active=False) - Alternative option
+  Future<ApiResponse<void>> softDeleteCategory(String id) async {
+    try {
+      final response = await _apiClient.post(ApiConfig.softDeleteCategory(id));
+
+      if (response.statusCode == 200) {
+        // Update cache to mark as inactive
+        final cachedCategories = await _getCachedCategories();
+        final index = cachedCategories.indexWhere((cat) => cat.id == id);
+        if (index != -1) {
+          final updatedCategory = cachedCategories[index].copyWith(isActive: false);
+          cachedCategories[index] = updatedCategory;
+          await _cacheCategories(cachedCategories);
+        }
+
+        return ApiResponse<void>(
+          success: true,
+          message: response.data['message'] ?? 'Category soft deleted successfully',
+        );
+      } else {
+        return ApiResponse<void>(
+          success: false,
+          message: response.data['message'] ?? 'Failed to soft delete category',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
+    } on DioException catch (e) {
+      debugPrint('Soft delete category DioException: ${e.toString()}');
+      final apiError = ApiError.fromDioError(e);
+      return ApiResponse<void>(
+        success: false,
+        message: apiError.displayMessage,
+        errors: apiError.errors,
+      );
+    } catch (e) {
+      debugPrint('Soft delete category error: ${e.toString()}');
+      return ApiResponse<void>(
+        success: false,
+        message: 'An unexpected error occurred while soft deleting category',
       );
     }
   }
