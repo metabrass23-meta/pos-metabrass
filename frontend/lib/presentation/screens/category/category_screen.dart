@@ -9,6 +9,7 @@ import '../../widgets/category/add_category_dailog.dart';
 import '../../widgets/category/category_table.dart';
 import '../../widgets/category/delete_category_dialog.dart';
 import '../../widgets/category/edit_category_dialog.dart';
+import '../../widgets/category/view_category_details_dialog.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -47,6 +48,14 @@ class _CategoryPageState extends State<CategoryPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => DeleteCategoryDialog(category: category),
+    );
+  }
+
+  void _showViewCategoryDialog(Category category) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ViewCategoryDetailsDialog(category: category),
     );
   }
 
@@ -92,11 +101,12 @@ class _CategoryPageState extends State<CategoryPage> {
 
             SizedBox(height: context.cardPadding * 0.5),
 
-            // Categories Table
+            // Enhanced Categories Table with View functionality
             Expanded(
-              child: CategoryTable(
+              child: EnhancedCategoryTable(
                 onEdit: _showEditCategoryDialog,
                 onDelete: _showDeleteCategoryDialog,
+                onView: _showViewCategoryDialog,
               ),
             ),
           ],
@@ -165,7 +175,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Organize and manage your product categories with ease',
+                'Organize and manage your product categories with comprehensive tools',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -198,7 +208,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Organize and manage your product categories',
+          'Organize and manage product categories',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -298,13 +308,41 @@ class _CategoryPageState extends State<CategoryPage> {
     final stats = provider.categoryStats;
     return Row(
       children: [
-        Expanded(child: _buildStatsCard('Total Categories', stats['total'].toString(), Icons.category_rounded, Colors.blue)),
+        Expanded(
+          child: _buildStatsCard(
+              'Total Categories',
+              stats['total'].toString(),
+              Icons.category_rounded,
+              Colors.blue
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Recently Added', stats['recentlyAdded'].toString(), Icons.new_releases_rounded, Colors.green)),
+        Expanded(
+          child: _buildStatsCard(
+              'Recently Added',
+              stats['recentlyAdded'].toString(),
+              Icons.new_releases_rounded,
+              Colors.green
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Most Popular', stats['mostPopular'], Icons.trending_up_rounded, Colors.purple)),
+        Expanded(
+          child: _buildStatsCard(
+              'Most Popular',
+              stats['mostPopular'],
+              Icons.trending_up_rounded,
+              Colors.purple
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Recently Updated', stats['recentlyUpdated'].toString(), Icons.update_rounded, Colors.orange)),
+        Expanded(
+          child: _buildStatsCard(
+              'Recently Updated',
+              stats['recentlyUpdated'].toString(),
+              Icons.update_rounded,
+              Colors.orange
+          ),
+        ),
       ],
     );
   }
@@ -315,17 +353,45 @@ class _CategoryPageState extends State<CategoryPage> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.category_rounded, Colors.blue)),
+            Expanded(
+              child: _buildStatsCard(
+                  'Total',
+                  stats['total'].toString(),
+                  Icons.category_rounded,
+                  Colors.blue
+              ),
+            ),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('Recent', stats['recentlyAdded'].toString(), Icons.new_releases_rounded, Colors.green)),
+            Expanded(
+              child: _buildStatsCard(
+                  'Recent',
+                  stats['recentlyAdded'].toString(),
+                  Icons.new_releases_rounded,
+                  Colors.green
+              ),
+            ),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Popular', stats['mostPopular'], Icons.trending_up_rounded, Colors.purple)),
+            Expanded(
+              child: _buildStatsCard(
+                  'Popular',
+                  stats['mostPopular'],
+                  Icons.trending_up_rounded,
+                  Colors.purple
+              ),
+            ),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('Updated', stats['recentlyUpdated'].toString(), Icons.update_rounded, Colors.orange)),
+            Expanded(
+              child: _buildStatsCard(
+                  'Updated',
+                  stats['recentlyUpdated'].toString(),
+                  Icons.update_rounded,
+                  Colors.orange
+              ),
+            ),
           ],
         ),
       ],

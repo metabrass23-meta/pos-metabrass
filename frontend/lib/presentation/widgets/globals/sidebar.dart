@@ -6,45 +6,20 @@ import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 
-class PremiumSidebar extends StatelessWidget {
+class LogoutDialogWidget extends StatefulWidget {
   final bool isExpanded;
-  final int selectedIndex;
-  final Function(int) onMenuSelected;
-  final VoidCallback onToggle;
+  const LogoutDialogWidget({super.key, required this.isExpanded});
 
-  const PremiumSidebar({
-    super.key,
-    required this.isExpanded,
-    required this.selectedIndex,
-    required this.onMenuSelected,
-    required this.onToggle,
-  });
+  @override
+  _LogoutDialogWidgetState createState() => _LogoutDialogWidgetState();
+}
 
-  final List<Map<String, dynamic>> menuItems = const [
-    {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
-    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
-    {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
-    {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
-    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
-    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
-    {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
-    {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
-    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
-    {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
-    {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
-    {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
-    {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
-    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
-    {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
-    {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
-    {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
-  ];
-
+class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(context.borderRadius('medium')),
@@ -78,7 +53,7 @@ class PremiumSidebar extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 'Cancel',
                 style: GoogleFonts.inter(
@@ -94,9 +69,8 @@ class PremiumSidebar extends StatelessWidget {
                   onPressed: authProvider.isLoading
                       ? null
                       : () async {
-                    Navigator.of(context).pop(); // Close dialog first
-
-                    // Show loading snackbar
+                    debugPrint('Logout button pressed');
+                    Navigator.of(dialogContext).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
@@ -131,38 +105,65 @@ class PremiumSidebar extends StatelessWidget {
                         duration: const Duration(seconds: 2),
                       ),
                     );
-
-                    // Perform logout
-                    await authProvider.logout();
-
-                    // Navigate to login screen
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/login',
-                          (route) => false,
-                    );
-
-                    if (context.mounted) {
-                      // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Successfully logged out. See you soon!',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
+                    try {
+                      await authProvider.logout();
+                      debugPrint('Logout completed successfully');
+                      if (mounted) {
+                        debugPrint('Navigating to /login');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/login',
+                              (route) => false,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Successfully logged out. See you soon!',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
                             ),
-                          ),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              context.borderRadius('medium'),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius('medium'),
+                              ),
                             ),
+                            margin: EdgeInsets.all(context.mainPadding),
                           ),
-                          margin: EdgeInsets.all(context.mainPadding),
-                        ),
-                      );
-
-
+                        );
+                      } else {
+                        debugPrint('Context not mounted, skipping navigation');
+                      }
+                    } catch (e) {
+                      debugPrint('Logout error: $e');
+                      if (mounted) {
+                        debugPrint('Navigating to /login after error');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/login',
+                              (route) => false,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Logged out locally due to an error.',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
+                            ),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius('medium'),
+                              ),
+                            ),
+                            margin: EdgeInsets.all(context.mainPadding),
+                          ),
+                        );
+                      } else {
+                        debugPrint('Context not mounted after error, skipping navigation');
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -199,6 +200,84 @@ class PremiumSidebar extends StatelessWidget {
       },
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showLogoutDialog(context),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Container(
+          padding: EdgeInsets.all(widget.isExpanded ? context.smallPadding / 1.5 : context.smallPadding),
+          decoration: BoxDecoration(
+            color: Colors.red.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
+          ),
+          child: widget.isExpanded
+              ? Row(
+            children: [
+              Icon(
+                Icons.logout_rounded,
+                color: Colors.red.shade300,
+                size: context.iconSize('small'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Logout',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ],
+          )
+              : Icon(
+            Icons.logout_rounded,
+            color: Colors.red.shade300,
+            size: context.iconSize('medium'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PremiumSidebar extends StatelessWidget {
+  final bool isExpanded;
+  final int selectedIndex;
+  final Function(int) onMenuSelected;
+  final VoidCallback onToggle;
+
+  const PremiumSidebar({
+    super.key,
+    required this.isExpanded,
+    required this.selectedIndex,
+    required this.onMenuSelected,
+    required this.onToggle,
+  });
+
+  final List<Map<String, dynamic>> menuItems = const [
+    {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
+    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
+    {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
+    {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
+    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
+    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
+    {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
+    {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
+    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
+    {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
+    {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
+    {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
+    {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
+    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
+    {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
+    {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
+    {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -440,9 +519,7 @@ class PremiumSidebar extends StatelessWidget {
                             radius: context.iconSize('medium') / 2,
                             backgroundColor: AppTheme.accentGold,
                             child: Text(
-                              user?.fullName.isNotEmpty == true
-                                  ? user!.fullName[0].toUpperCase()
-                                  : 'U',
+                              user?.fullName.isNotEmpty == true ? user!.fullName[0].toUpperCase() : 'U',
                               style: GoogleFonts.inter(
                                 fontSize: context.bodyFontSize,
                                 fontWeight: FontWeight.w600,
@@ -477,59 +554,15 @@ class PremiumSidebar extends StatelessWidget {
                             ),
                           ),
 
-                          // Logout Button on the right
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => _showLogoutDialog(context),
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
-                              child: Container(
-                                padding: EdgeInsets.all(context.smallPadding / 1.5),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                                  border: Border.all(
-                                    color: Colors.red.withOpacity(0.3),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.logout_rounded,
-                                  color: Colors.red.shade300,
-                                  size: context.iconSize('small'),
-                                ),
-                              ),
-                            ),
-                          ),
+                          // Logout Button
+                          LogoutDialogWidget(isExpanded: true),
                         ],
                       );
                     },
                   ),
                 ] else ...[
                   // Collapsed state - just logout icon
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _showLogoutDialog(context),
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                      child: Container(
-                        padding: EdgeInsets.all(context.smallPadding),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.logout_rounded,
-                          color: Colors.red.shade300,
-                          size: context.iconSize('medium'),
-                        ),
-                      ),
-                    ),
-                  ),
+                  LogoutDialogWidget(isExpanded: false),
                 ],
               ],
             ),
