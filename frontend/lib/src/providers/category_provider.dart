@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import '../models/category/category_api_responses.dart';
+import '../models/category/category_model.dart';
+import '../services/category_service.dart';
 
+// Compatibility adapter to convert between CategoryModel and your existing Category class
 class Category {
   final String id;
   final String name;
@@ -15,7 +19,18 @@ class Category {
     required this.lastEdited,
   });
 
-  // Formatted date for display (added from Zakat module)
+  // Convert from CategoryModel (API) to Category (UI)
+  factory Category.fromCategoryModel(CategoryModel model) {
+    return Category(
+      id: model.id,
+      name: model.name,
+      description: model.description,
+      dateCreated: model.createdAt,
+      lastEdited: model.updatedAt,
+    );
+  }
+
+  // Formatted date for display
   String get formattedDateCreated {
     return '${dateCreated.day.toString().padLeft(2, '0')}/${dateCreated.month.toString().padLeft(2, '0')}/${dateCreated.year}';
   }
@@ -24,7 +39,7 @@ class Category {
     return '${lastEdited.day.toString().padLeft(2, '0')}/${lastEdited.month.toString().padLeft(2, '0')}/${lastEdited.year}';
   }
 
-  // Relative date (e.g., "Today", "Yesterday", "2 days ago") - added from Zakat module
+  // Relative date (e.g., "Today", "Yesterday", "2 days ago")
   String get relativeDateCreated {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -78,7 +93,6 @@ class Category {
     );
   }
 
-  // Convert to JSON (added from Zakat module)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -89,7 +103,6 @@ class Category {
     };
   }
 
-  // Create from JSON (added from Zakat module)
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
@@ -102,93 +115,159 @@ class Category {
 }
 
 class CategoryProvider extends ChangeNotifier {
+  final CategoryService _categoryService = CategoryService();
+
   List<Category> _categories = [];
   List<Category> _filteredCategories = [];
   String _searchQuery = '';
   bool _isLoading = false;
+  String? _errorMessage;
+  bool _hasError = false;
 
-  // Additional properties from Zakat module
+  // Pagination
+  PaginationInfo? _paginationInfo;
+  int _currentPage = 1;
+  int _pageSize = 20;
+  bool _showInactive = false;
+
+  // Additional properties
   String _sortBy = 'dateCreated'; // 'dateCreated', 'lastEdited', 'name', 'id'
   bool _sortAscending = false;
 
+  // Getters
   List<Category> get categories => _filteredCategories;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
-
-  // Additional getters from Zakat module
+  String? get errorMessage => _errorMessage;
+  bool get hasError => _hasError;
+  PaginationInfo? get paginationInfo => _paginationInfo;
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  bool get showInactive => _showInactive;
   String get sortBy => _sortBy;
   bool get sortAscending => _sortAscending;
 
   CategoryProvider() {
-    _initializeCategories();
+    loadCategories();
   }
 
-  void _initializeCategories() {
-    _categories = [
-      Category(
-        id: 'CAT001',
-        name: 'Bridal Dresses',
-        description: 'Elegant bridal wear collection with premium fabrics and intricate designs',
-        dateCreated: DateTime.now().subtract(const Duration(days: 30)),
-        lastEdited: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      Category(
-        id: 'CAT002',
-        name: 'Groom Sherwanis',
-        description: 'Traditional and modern sherwanis for grooms with contemporary styling',
-        dateCreated: DateTime.now().subtract(const Duration(days: 25)),
-        lastEdited: DateTime.now().subtract(const Duration(days: 3)),
-      ),
-      Category(
-        id: 'CAT003',
-        name: 'Party Wear',
-        description: 'Stylish party and formal wear for special occasions and celebrations',
-        dateCreated: DateTime.now().subtract(const Duration(days: 20)),
-        lastEdited: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      Category(
-        id: 'CAT004',
-        name: 'Wedding Suits',
-        description: 'Premium wedding suit collection with tailored fits and luxury materials',
-        dateCreated: DateTime.now().subtract(const Duration(days: 15)),
-        lastEdited: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Category(
-        id: 'CAT005',
-        name: 'Casual Wear',
-        description: 'Comfortable daily wear options with modern designs and quality fabrics',
-        dateCreated: DateTime.now().subtract(const Duration(days: 10)),
-        lastEdited: DateTime.now(),
-      ),
-      Category(
-        id: 'CAT006',
-        name: 'Formal Wear',
-        description: 'Professional business attire and formal clothing for corporate events',
-        dateCreated: DateTime.now().subtract(const Duration(days: 8)),
-        lastEdited: DateTime.now().subtract(const Duration(hours: 12)),
-      ),
-      Category(
-        id: 'CAT007',
-        name: 'Traditional Wear',
-        description: 'Authentic traditional clothing preserving cultural heritage and craftsmanship',
-        dateCreated: DateTime.now().subtract(const Duration(days: 6)),
-        lastEdited: DateTime.now().subtract(const Duration(hours: 6)),
-      ),
-      // Added one more category for better demo
-      Category(
-        id: 'CAT008',
-        name: 'Evening Wear',
-        description: 'Sophisticated evening attire for special dinners, galas, and formal events',
-        dateCreated: DateTime.now().subtract(const Duration(days: 4)),
-        lastEdited: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-    ];
+  /// Load categories from API
+  Future<void> loadCategories({
+    int? page,
+    int? pageSize,
+    String? search,
+    bool? showInactive,
+    bool showLoadingIndicator = true,
+  }) async {
+    if (showLoadingIndicator) {
+      _isLoading = true;
+      _hasError = false;
+      _errorMessage = null;
+      notifyListeners();
+    }
 
-    _filteredCategories = List.from(_categories);
-    _sortCategories(); // Added sorting from Zakat module
+    try {
+      final params = CategoryListParams(
+        page: page ?? _currentPage,
+        pageSize: pageSize ?? _pageSize,
+        search: search ?? _searchQuery,
+        showInactive: showInactive ?? _showInactive,
+      );
+
+      final response = await _categoryService.getCategories(params: params);
+
+      if (response.success && response.data != null) {
+        final categoriesData = response.data!;
+
+        // Convert CategoryModel to Category for UI compatibility
+        _categories = categoriesData.categories
+            .map((categoryModel) => Category.fromCategoryModel(categoryModel))
+            .toList();
+
+        _filteredCategories = List.from(_categories);
+        _paginationInfo = categoriesData.pagination;
+
+        // Update pagination state
+        _currentPage = params.page;
+        _pageSize = params.pageSize;
+        _searchQuery = params.search ?? '';
+        _showInactive = params.showInactive;
+
+        _sortCategories();
+        _hasError = false;
+        _errorMessage = null;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to load categories: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  // Sort categories (added from Zakat module)
+  /// Refresh categories (pull-to-refresh)
+  Future<void> refreshCategories() async {
+    _currentPage = 1; // Reset to first page
+    await loadCategories(page: 1, showLoadingIndicator: false);
+  }
+
+  /// Load next page
+  Future<void> loadNextPage() async {
+    if (_paginationInfo?.hasNext == true) {
+      await loadCategories(page: _currentPage + 1, showLoadingIndicator: false);
+    }
+  }
+
+  /// Load previous page
+  Future<void> loadPreviousPage() async {
+    if (_paginationInfo?.hasPrevious == true) {
+      await loadCategories(page: _currentPage - 1, showLoadingIndicator: false);
+    }
+  }
+
+  /// Search categories
+  Future<void> searchCategories(String query) async {
+    _searchQuery = query.toLowerCase();
+    _currentPage = 1; // Reset to first page when searching
+    await loadCategories(search: _searchQuery, page: 1);
+  }
+
+  /// Clear search
+  Future<void> clearSearch() async {
+    _searchQuery = '';
+    _currentPage = 1;
+    await loadCategories(search: '', page: 1);
+  }
+
+  /// Toggle show inactive categories
+  Future<void> toggleShowInactive() async {
+    _showInactive = !_showInactive;
+    _currentPage = 1;
+    await loadCategories(showInactive: _showInactive, page: 1);
+  }
+
+  /// Sort categories
+  void setSortBy(String sortBy, {bool? ascending}) {
+    _sortBy = sortBy;
+    if (ascending != null) {
+      _sortAscending = ascending;
+    } else {
+      // Toggle if same field, otherwise default to descending for dates, ascending for text
+      if (_sortBy == sortBy) {
+        _sortAscending = !_sortAscending;
+      } else {
+        _sortAscending = (sortBy == 'name' || sortBy == 'id');
+      }
+    }
+    _sortCategories();
+    notifyListeners();
+  }
+
+  /// Apply sorting to current categories
   void _sortCategories() {
     _filteredCategories.sort((a, b) {
       int comparison;
@@ -211,24 +290,165 @@ class CategoryProvider extends ChangeNotifier {
     });
   }
 
-  // Sort functionality (added from Zakat module)
-  void setSortBy(String sortBy, {bool? ascending}) {
-    _sortBy = sortBy;
-    if (ascending != null) {
-      _sortAscending = ascending;
-    } else {
-      // Toggle if same field, otherwise default to descending for dates, ascending for text
-      if (_sortBy == sortBy) {
-        _sortAscending = !_sortAscending;
-      } else {
-        _sortAscending = (sortBy == 'name' || sortBy == 'id');
-      }
-    }
-    _sortCategories();
+  /// Add new category
+  Future<bool> addCategory(String name, String description) async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final response = await _categoryService.createCategory(
+        name: name,
+        description: description,
+      );
+
+      if (response.success && response.data != null) {
+        // Add the new category to local list immediately
+        final newCategory = Category.fromCategoryModel(response.data!);
+        _categories.add(newCategory);
+        _applyFilters();
+
+        // Also refresh from server to ensure consistency
+        await loadCategories(showLoadingIndicator: false);
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to create category: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
-  // Apply search filters (enhanced from Zakat module)
+  /// Update existing category
+  Future<bool> updateCategory(String id, String name, String description) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _categoryService.updateCategory(
+        id: id,
+        name: name,
+        description: description,
+      );
+
+      if (response.success && response.data != null) {
+        // Update the category in local list
+        final updatedCategory = Category.fromCategoryModel(response.data!);
+        final index = _categories.indexWhere((cat) => cat.id == id);
+        if (index != -1) {
+          _categories[index] = updatedCategory;
+          _applyFilters();
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to update category: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Delete category
+  Future<bool> deleteCategory(String id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _categoryService.deleteCategory(id);
+
+      if (response.success) {
+        // Remove category from local list
+        _categories.removeWhere((cat) => cat.id == id);
+        _applyFilters();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to delete category: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Restore category
+  Future<bool> restoreCategory(String id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _categoryService.restoreCategory(id);
+
+      if (response.success && response.data != null) {
+        // Update the category in local list
+        final restoredCategory = Category.fromCategoryModel(response.data!);
+        final index = _categories.indexWhere((cat) => cat.id == id);
+        if (index != -1) {
+          _categories[index] = restoredCategory;
+        } else {
+          _categories.add(restoredCategory);
+        }
+        _applyFilters();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to restore category: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Get category by ID
+  Category? getCategoryById(String id) {
+    try {
+      return _categories.firstWhere((cat) => cat.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Apply search filters to local data
   void _applyFilters() {
     if (_searchQuery.isEmpty) {
       _filteredCategories = List.from(_categories);
@@ -242,89 +462,14 @@ class CategoryProvider extends ChangeNotifier {
     _sortCategories();
   }
 
-  void searchCategories(String query) {
-    _searchQuery = query.toLowerCase(); // Enhanced to lowercase
-
-    _applyFilters(); // Use the new method
+  /// Clear error state
+  void clearError() {
+    _hasError = false;
+    _errorMessage = null;
     notifyListeners();
   }
 
-  // Generate new ID (enhanced from Zakat module)
-  String _generateId() {
-    final maxId = _categories.isEmpty
-        ? 0
-        : _categories
-        .map((c) => int.tryParse(c.id.replaceAll('CAT', '')) ?? 0)
-        .reduce((a, b) => a > b ? a : b);
-    return 'CAT${(maxId + 1).toString().padLeft(3, '0')}';
-  }
-
-  Future<void> addCategory(String name, String description) async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final newCategory = Category(
-      id: _generateId(), // Use the enhanced method
-      name: name,
-      description: description,
-      dateCreated: DateTime.now(),
-      lastEdited: DateTime.now(),
-    );
-
-    _categories.add(newCategory);
-    _applyFilters(); // Use the new method
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> updateCategory(String id, String name, String description) async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final index = _categories.indexWhere((cat) => cat.id == id);
-    if (index != -1) {
-      _categories[index] = _categories[index].copyWith(
-        name: name,
-        description: description,
-        lastEdited: DateTime.now(),
-      );
-      _applyFilters(); // Use the new method
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> deleteCategory(String id) async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    _categories.removeWhere((cat) => cat.id == id);
-    _applyFilters(); // Use the new method
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Category? getCategoryById(String id) {
-    try {
-      return _categories.firstWhere((cat) => cat.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Enhanced statistics for dashboard (from Zakat module)
+  /// Enhanced statistics for dashboard
   Map<String, dynamic> get categoryStats {
     final now = DateTime.now();
     final currentYear = now.year;
@@ -366,14 +511,12 @@ class CategoryProvider extends ChangeNotifier {
     };
   }
 
-  // Additional utility methods from Zakat module
-
-  // Get categories by year
+  /// Get categories by year
   List<Category> getCategoriesByYear(int year) {
     return _categories.where((cat) => cat.dateCreated.year == year).toList();
   }
 
-  // Get categories by month
+  /// Get categories by month
   List<Category> getCategoriesByMonth(int year, int month) {
     return _categories
         .where((cat) =>
@@ -381,7 +524,7 @@ class CategoryProvider extends ChangeNotifier {
         .toList();
   }
 
-  // Get recently updated categories
+  /// Get recently updated categories
   List<Category> getRecentlyUpdated({int days = 7}) {
     final cutoffDate = DateTime.now().subtract(Duration(days: days));
     return _categories
@@ -390,7 +533,7 @@ class CategoryProvider extends ChangeNotifier {
       ..sort((a, b) => b.lastEdited.compareTo(a.lastEdited));
   }
 
-  // Get recently created categories
+  /// Get recently created categories
   List<Category> getRecentlyCreated({int days = 7}) {
     final cutoffDate = DateTime.now().subtract(Duration(days: days));
     return _categories
@@ -399,92 +542,72 @@ class CategoryProvider extends ChangeNotifier {
       ..sort((a, b) => b.dateCreated.compareTo(a.dateCreated));
   }
 
-  // Export data (placeholder for future implementation)
+  /// Export data (placeholder for future implementation)
   Future<void> exportData() async {
     // Implementation for exporting category data
-    // This could export to CSV, PDF, etc.
     await Future.delayed(const Duration(milliseconds: 500));
   }
 
-  // Import data (placeholder for future implementation)
-  Future<void> importData(List<Map<String, dynamic>> data) async {
-    // Implementation for importing category data
-    // This could import from CSV, JSON, etc.
+  /// Clear all categories cache
+  Future<void> clearCache() async {
+    await _categoryService.clearCache();
+  }
+
+  /// Check if has cached data
+  Future<bool> hasCachedData() async {
+    return await _categoryService.hasCachedCategories();
+  }
+
+  /// Bulk operations
+  Future<bool> deleteMultipleCategories(List<String> ids) async {
     _isLoading = true;
     notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 1000));
 
     try {
-      final importedCategories = data.map((item) => Category.fromJson(item)).toList();
-      _categories.addAll(importedCategories);
-      _applyFilters();
+      bool allSuccess = true;
+      for (String id in ids) {
+        final response = await _categoryService.deleteCategory(id);
+        if (!response.success) {
+          allSuccess = false;
+          _errorMessage = response.message;
+        }
+      }
+
+      if (allSuccess) {
+        // Remove categories from local list
+        _categories.removeWhere((cat) => ids.contains(cat.id));
+        _applyFilters();
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return allSuccess;
     } catch (e) {
-      // Handle import error
+      _hasError = true;
+      _errorMessage = 'Failed to delete categories: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
-  // Refresh data (for pull-to-refresh functionality)
-  Future<void> refreshData() async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    // In a real app, this would fetch data from an API
-    _applyFilters();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // Clear all categories (for testing purposes)
-  void clearAllCategories() {
-    _categories.clear();
-    _filteredCategories.clear();
-    notifyListeners();
-  }
-
-  // Bulk operations (added from Zakat module)
-  Future<void> deleteMultipleCategories(List<String> ids) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    _categories.removeWhere((cat) => ids.contains(cat.id));
-    _applyFilters();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // Duplicate category (added from Zakat module)
-  Future<void> duplicateCategory(String id) async {
+  /// Duplicate category
+  Future<bool> duplicateCategory(String id) async {
     final originalCategory = getCategoryById(id);
-    if (originalCategory == null) return;
+    if (originalCategory == null) return false;
 
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 600));
-
-    final duplicatedCategory = Category(
-      id: _generateId(),
-      name: '${originalCategory.name} (Copy)',
-      description: originalCategory.description,
-      dateCreated: DateTime.now(),
-      lastEdited: DateTime.now(),
+    return await addCategory(
+      '${originalCategory.name} (Copy)',
+      originalCategory.description,
     );
+  }
 
-    _categories.add(duplicatedCategory);
-    _applyFilters();
-
-    _isLoading = false;
-    notifyListeners();
+  /// Set page size
+  Future<void> setPageSize(int pageSize) async {
+    if (_pageSize != pageSize) {
+      _pageSize = pageSize;
+      _currentPage = 1; // Reset to first page
+      await loadCategories(pageSize: _pageSize, page: 1);
+    }
   }
 }
