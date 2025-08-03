@@ -21,9 +21,10 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   final _detailController = TextEditingController();
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
+  final _colorController = TextEditingController();
+  final _fabricController = TextEditingController();
 
-  String? _selectedColor;
-  String? _selectedFabric;
+  String? _selectedCategoryId;
   List<String> _selectedPieces = [];
 
   late AnimationController _animationController;
@@ -56,17 +57,23 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     _detailController.dispose();
     _priceController.dispose();
     _quantityController.dispose();
+    _colorController.dispose();
+    _fabricController.dispose();
     super.dispose();
   }
 
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedColor == null) {
-        _showErrorSnackbar('Please select a color');
+      if (_colorController.text.trim().isEmpty) {
+        _showErrorSnackbar('Please enter a color');
         return;
       }
-      if (_selectedFabric == null) {
-        _showErrorSnackbar('Please select a fabric');
+      if (_fabricController.text.trim().isEmpty) {
+        _showErrorSnackbar('Please enter a fabric');
+        return;
+      }
+      if (_selectedCategoryId == null) {
+        _showErrorSnackbar('Please select a category');
         return;
       }
       if (_selectedPieces.isEmpty) {
@@ -76,19 +83,24 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
-      await productProvider.addProduct(
+      final success = await productProvider.addProduct(
         name: _nameController.text.trim(),
         detail: _detailController.text.trim(),
         price: double.parse(_priceController.text.trim()),
-        color: _selectedColor!,
-        fabric: _selectedFabric!,
+        color: _colorController.text.trim(),
+        fabric: _fabricController.text.trim(),
         pieces: _selectedPieces,
         quantity: int.parse(_quantityController.text.trim()),
+        categoryId: _selectedCategoryId!,
       );
 
       if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+        if (success) {
+          _showSuccessSnackbar();
+          Navigator.of(context).pop();
+        } else {
+          _showErrorSnackbar(productProvider.errorMessage ?? 'Failed to add product');
+        }
       }
     }
   }
@@ -135,18 +147,20 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               size: context.iconSize('medium'),
             ),
             SizedBox(width: context.smallPadding),
-            Text(
-              message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
               ),
             ),
           ],
         ),
         backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -410,46 +424,33 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             ),
             SizedBox(height: context.cardPadding),
 
-            // Color Selection
+            // Category Selection
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
                 return DropdownButtonFormField<String>(
-                  value: _selectedColor,
+                  value: _selectedCategoryId,
                   decoration: InputDecoration(
-                    labelText: 'Color',
-                    prefixIcon: Icon(Icons.color_lens_outlined),
+                    labelText: 'Category',
+                    prefixIcon: Icon(Icons.category_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                     ),
                   ),
-                  items: provider.availableColors
-                      .map((color) => DropdownMenuItem<String>(
-                    value: color,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: _getColorFromName(color),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text(color),
-                      ],
-                    ),
+                  items: provider.categories
+                      .where((category) => category.isActive)
+                      .map((category) => DropdownMenuItem<String>(
+                    value: category.id,
+                    child: Text(category.name),
                   ))
                       .toList(),
-                  onChanged: (color) {
+                  onChanged: (categoryId) {
                     setState(() {
-                      _selectedColor = color;
+                      _selectedCategoryId = categoryId;
                     });
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select a color';
+                      return 'Please select a category';
                     }
                     return null;
                   },
@@ -458,36 +459,38 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             ),
             SizedBox(height: context.cardPadding),
 
-            // Fabric Selection
-            Consumer<ProductProvider>(
-              builder: (context, provider, child) {
-                return DropdownButtonFormField<String>(
-                  value: _selectedFabric,
-                  decoration: InputDecoration(
-                    labelText: 'Fabric',
-                    prefixIcon: Icon(Icons.texture_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
-                  items: provider.availableFabrics
-                      .map((fabric) => DropdownMenuItem<String>(
-                    value: fabric,
-                    child: Text(fabric),
-                  ))
-                      .toList(),
-                  onChanged: (fabric) {
-                    setState(() {
-                      _selectedFabric = fabric;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a fabric';
-                    }
-                    return null;
-                  },
-                );
+            // Color Input Field
+            PremiumTextField(
+              label: 'Color',
+              hint: isCompact ? 'Enter color' : 'Enter color name (e.g., Red, Blue, Turquoise)',
+              controller: _colorController,
+              prefixIcon: Icons.color_lens_outlined,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter a color';
+                }
+                if (value!.length < 2) {
+                  return 'Color name must be at least 2 characters';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: context.cardPadding),
+
+            // Fabric Input Field
+            PremiumTextField(
+              label: 'Fabric',
+              hint: isCompact ? 'Enter fabric' : 'Enter fabric type (e.g., Cotton, Silk, Chiffon)',
+              controller: _fabricController,
+              prefixIcon: Icons.texture_outlined,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter a fabric';
+                }
+                if (value!.length < 2) {
+                  return 'Fabric name must be at least 2 characters';
+                }
+                return null;
               },
             ),
             SizedBox(height: context.cardPadding),
@@ -632,44 +635,5 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         ),
       ],
     );
-  }
-
-  Color _getColorFromName(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'red':
-        return Colors.red;
-      case 'blue':
-        return Colors.blue;
-      case 'green':
-        return Colors.green;
-      case 'yellow':
-        return Colors.yellow;
-      case 'orange':
-        return Colors.orange;
-      case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
-      case 'black':
-        return Colors.black;
-      case 'white':
-        return Colors.grey;
-      case 'brown':
-        return Colors.brown;
-      case 'gray':
-        return Colors.grey;
-      case 'navy':
-        return Colors.indigo;
-      case 'maroon':
-        return const Color(0xFF800000);
-      case 'gold':
-        return const Color(0xFFFFD700);
-      case 'silver':
-        return Colors.grey[400]!;
-      case 'beige':
-        return const Color(0xFFF5F5DC);
-      default:
-        return Colors.grey;
-    }
   }
 }
