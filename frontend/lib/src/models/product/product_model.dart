@@ -48,16 +48,18 @@ class Product {
       id: json['id'] as String,
       name: json['name'] as String,
       detail: json['detail'] as String? ?? '',
-      price: (json['price'] as num).toDouble(),
+      // Handle price as string or number
+      price: _parseDouble(json['price']),
       color: json['color'] as String,
       fabric: json['fabric'] as String,
-      pieces: List<String>.from(json['pieces'] as List? ?? []),
+      pieces: _parsePieces(json['pieces']),
       quantity: json['quantity'] as int? ?? 0,
       categoryId: json['category_id'] as String?,
       categoryName: json['category_name'] as String?,
       stockStatus: json['stock_status'] as String? ?? 'UNKNOWN',
       stockStatusDisplay: json['stock_status_display'] as String? ?? 'Unknown',
-      totalValue: (json['total_value'] as num?)?.toDouble() ?? 0.0,
+      // Handle total_value as string or number
+      totalValue: _parseDouble(json['total_value']),
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
@@ -67,6 +69,31 @@ class Product {
       createdById: json['created_by_id'] as int?,
       createdByEmail: json['created_by_email'] as String?,
     );
+  }
+
+  // Helper method to parse double from string or number
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  // Helper method to parse pieces - handle both array and string
+  static List<String> _parsePieces(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((e) => e.toString()).toList();
+    }
+    if (value is String) {
+      // If it's a string, split by comma and clean up
+      if (value.isEmpty) return [];
+      return value.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    }
+    return [];
   }
 
   Map<String, dynamic> toJson() {
@@ -402,7 +429,7 @@ class ProductStatistics {
   factory ProductStatistics.fromJson(Map<String, dynamic> json) {
     return ProductStatistics(
       totalProducts: json['total_products'] as int? ?? 0,
-      totalInventoryValue: (json['total_inventory_value'] as num?)?.toDouble() ?? 0.0,
+      totalInventoryValue: Product._parseDouble(json['total_inventory_value']),
       lowStockCount: json['low_stock_count'] as int? ?? 0,
       outOfStockCount: json['out_of_stock_count'] as int? ?? 0,
       categoryBreakdown: (json['category_breakdown'] as List? ?? [])
@@ -443,7 +470,7 @@ class CategoryStats {
       categoryName: json['category__name'] as String? ?? '',
       count: json['count'] as int? ?? 0,
       totalQuantity: json['total_quantity'] as int? ?? 0,
-      totalValue: (json['total_value'] as num?)?.toDouble(),
+      totalValue: Product._parseDouble(json['total_value']),
     );
   }
 

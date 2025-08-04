@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -11,12 +12,7 @@ class EnhancedProductTable extends StatefulWidget {
   final Function(Product) onDelete;
   final Function(Product) onView;
 
-  const EnhancedProductTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onView,
-  });
+  const EnhancedProductTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
 
   @override
   State<EnhancedProductTable> createState() => _EnhancedProductTableState();
@@ -68,10 +64,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
-                child: const CircularProgressIndicator(
-                  color: AppTheme.primaryMaroon,
-                  strokeWidth: 3,
-                ),
+                child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
           }
@@ -138,14 +131,15 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible - increased for more columns
+    // Fixed table width to ensure all columns are visible, adjusted for removed Product ID column
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 1600.0,
-      small: 1700.0,
-      medium: 1800.0,
-      large: 1900.0,
-      ultrawide: 2000.0,
+      tablet: 1800.0 - 120.0,
+      // Removed 120.0 for Product ID
+      small: 1900.0 - 120.0,
+      medium: 2000.0 - 120.0,
+      large: 2100.0 - 120.0,
+      ultrawide: 2200.0 - 120.0,
     );
   }
 
@@ -154,81 +148,61 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
     return Row(
       children: [
-        // Product ID
-        Container(
-          width: columnWidths[0],
-          child: _buildHeaderCell(context, 'Product ID'),
-        ),
+        // Product ID (Commented out)
+        // Container(
+        //   width: columnWidths[0],
+        //   child: _buildHeaderCell(context, 'Product ID'),
+        // ),
 
         // Product Name
         Container(
-          width: columnWidths[1],
+          width: columnWidths[0], // Shifted index due to commented column
           child: _buildHeaderCell(context, 'Product Name'),
         ),
 
-        // Product Details
-        Container(
-          width: columnWidths[2],
-          child: _buildHeaderCell(context, 'Details'),
-        ),
+        // Details
+        Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Details')),
 
         // Price
-        Container(
-          width: columnWidths[3],
-          child: _buildHeaderCell(context, 'Price'),
-        ),
+        Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Price')),
 
         // Color
-        Container(
-          width: columnWidths[4],
-          child: _buildHeaderCell(context, 'Color'),
-        ),
+        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Color')),
 
         // Fabric
-        Container(
-          width: columnWidths[5],
-          child: _buildHeaderCell(context, 'Fabric'),
-        ),
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Fabric')),
 
         // Quantity
-        Container(
-          width: columnWidths[6],
-          child: _buildHeaderCell(context, 'Quantity'),
-        ),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'Quantity')),
 
         // Stock Status
-        Container(
-          width: columnWidths[7],
-          child: _buildHeaderCell(context, 'Stock Status'),
-        ),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Stock Status')),
 
         // Pieces
-        Container(
-          width: columnWidths[8],
-          child: _buildHeaderCell(context, 'Pieces'),
-        ),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, 'Pieces')),
+
+        // Created Date
+        Container(width: columnWidths[8], child: _buildHeaderCell(context, 'Created Date')),
 
         // Actions
-        Container(
-          width: columnWidths[9],
-          child: _buildHeaderCell(context, 'Actions'),
-        ),
+        Container(width: columnWidths[9], child: _buildHeaderCell(context, 'Actions')),
       ],
     );
   }
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      120.0, // Product ID
+      // 120.0, // Product ID (Commented out)
       200.0, // Product Name
-      250.0, // Product Details
+      250.0, // Details
       120.0, // Price
       120.0, // Color
       120.0, // Fabric
       100.0, // Quantity
       130.0, // Stock Status
-      200.0, // Pieces
-      320.0, // Actions - increased width for three buttons
+      180.0, // Pieces
+      150.0, // Created Date
+      280.0, // Actions
     ];
   }
 
@@ -249,47 +223,40 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
     return Container(
       decoration: BoxDecoration(
-        color: index.isEven
-            ? AppTheme.pureWhite
-            : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.5,
-          ),
-        ),
+        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Product ID
-          Container(
-            width: columnWidths[0],
-            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                product.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+          // Product ID (Commented out)
+          // Container(
+          //   width: columnWidths[0],
+          //   padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(
+          //       horizontal: context.smallPadding / 2,
+          //       vertical: context.smallPadding / 4,
+          //     ),
+          //     decoration: BoxDecoration(
+          //       color: AppTheme.primaryMaroon.withOpacity(0.1),
+          //       borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          //     ),
+          //     child: Text(
+          //       product.id,
+          //       style: GoogleFonts.inter(
+          //         fontSize: context.captionFontSize,
+          //         fontWeight: FontWeight.w600,
+          //         color: AppTheme.primaryMaroon,
+          //       ),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
 
           // Product Name
           Container(
-            width: columnWidths[1],
+            width: columnWidths[0], // Shifted index
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.name,
@@ -305,46 +272,46 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Product Details
           Container(
-            width: columnWidths[2],
+            width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: product.detail.isNotEmpty
                 ? Text(
-              product.detail,
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            )
+                    product.detail,
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.charcoalGray,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  )
                 : Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                'No details',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[500],
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.smallPadding / 2,
+                      vertical: context.smallPadding / 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    ),
+                    child: Text(
+                      'No details',
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
           ),
 
           // Price
           Container(
-            width: columnWidths[3],
+            width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
-              'PKR ${product.price.toStringAsFixed(0)}',
+              product.formattedPrice,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w700,
@@ -355,7 +322,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Color
           Container(
-            width: columnWidths[4],
+            width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -365,10 +332,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               decoration: BoxDecoration(
                 color: _getColorFromName(product.color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(
-                  color: _getColorFromName(product.color).withOpacity(0.3),
-                  width: 1,
-                ),
+                border: Border.all(color: _getColorFromName(product.color).withOpacity(0.3), width: 1),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -401,7 +365,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Fabric
           Container(
-            width: columnWidths[5],
+            width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -427,7 +391,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Quantity
           Container(
-            width: columnWidths[6],
+            width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${product.quantity}',
@@ -441,7 +405,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Stock Status
           Container(
-            width: columnWidths[7],
+            width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -466,39 +430,59 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Pieces
           Container(
-            width: columnWidths[8],
+            width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: product.pieces.isNotEmpty
                 ? Wrap(
-              spacing: context.smallPadding / 2,
-              runSpacing: context.smallPadding / 2,
-              children: product.pieces.take(2).map((piece) {
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding / 2,
-                    vertical: context.smallPadding / 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryMaroon.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    border: Border.all(
-                      color: AppTheme.primaryMaroon.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    piece,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize * 0.9,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.primaryMaroon,
-                    ),
-                  ),
-                );
-              }).toList()
-                ..addAll(product.pieces.length > 2
-                    ? [
-                  Container(
+                    spacing: context.smallPadding / 2,
+                    runSpacing: context.smallPadding / 2,
+                    children:
+                        product.pieces.take(2).map((piece) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.smallPadding / 2,
+                              vertical: context.smallPadding / 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryMaroon.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                              border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
+                            ),
+                            child: Text(
+                              piece,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize * 0.9,
+                                fontWeight: FontWeight.w500,
+                                color: AppTheme.primaryMaroon,
+                              ),
+                            ),
+                          );
+                        }).toList()..addAll(
+                          product.pieces.length > 2
+                              ? [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.smallPadding / 2,
+                                      vertical: context.smallPadding / 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                                    ),
+                                    child: Text(
+                                      '+${product.pieces.length - 2}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.captionFontSize * 0.9,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              : [],
+                        ),
+                  )
+                : Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: context.smallPadding / 2,
                       vertical: context.smallPadding / 4,
@@ -508,35 +492,41 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
                     ),
                     child: Text(
-                      '+${product.pieces.length - 2}',
+                      'No pieces',
                       style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize * 0.9,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ),
-                ]
-                    : []),
-            )
-                : Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                'No pieces',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[500],
-                  fontStyle: FontStyle.italic,
+          ),
+
+          // Created Date
+          Container(
+            width: columnWidths[8],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatDate(product.createdAt),
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
-              ),
+                Text(
+                  _getRelativeDate(product.createdAt),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -567,11 +557,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                 color: Colors.purple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.visibility_outlined,
-                color: Colors.purple,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -590,11 +576,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -613,11 +595,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -651,11 +629,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               color: AppTheme.lightGray,
               borderRadius: BorderRadius.circular(context.borderRadius('xl')),
             ),
-            child: Icon(
-              Icons.inventory_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            child: Icon(Icons.inventory_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
@@ -773,6 +747,34 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
         return const Color(0xFFF5F5DC);
       default:
         return Colors.grey;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  String _getRelativeDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(date.year, date.month, date.day);
+    final difference = today.difference(targetDate).inDays;
+
+    if (difference == 0) {
+      return 'Today';
+    } else if (difference == 1) {
+      return 'Yesterday';
+    } else if (difference < 7) {
+      return '$difference days ago';
+    } else if (difference < 30) {
+      final weeks = (difference / 7).floor();
+      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+    } else if (difference < 365) {
+      final months = (difference / 30).floor();
+      return months == 1 ? '1 month ago' : '$months months ago';
+    } else {
+      final years = (difference / 365).floor();
+      return years == 1 ? '1 year ago' : '$years years ago';
     }
   }
 }

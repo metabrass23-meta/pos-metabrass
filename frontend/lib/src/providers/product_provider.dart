@@ -235,6 +235,7 @@ class ProductProvider extends ChangeNotifier {
     required String categoryId,
   }) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -253,6 +254,7 @@ class ProductProvider extends ChangeNotifier {
         _products.insert(0, response.data!); // Add to beginning
         _applyLocalFilters();
         await loadStatistics(); // Refresh stats
+        _errorMessage = null;
         return true;
       } else {
         _errorMessage = response.message;
@@ -268,7 +270,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  /// Update existing product
+  /// Update existing product - ENHANCED VERSION WITH PROPER STATE MANAGEMENT
   Future<bool> updateProduct({
     required String id,
     String? name,
@@ -281,6 +283,7 @@ class ProductProvider extends ChangeNotifier {
     String? categoryId,
   }) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -297,12 +300,31 @@ class ProductProvider extends ChangeNotifier {
       );
 
       if (response.success && response.data != null) {
+        // Update the product in the local list
         final index = _products.indexWhere((product) => product.id == id);
         if (index != -1) {
           _products[index] = response.data!;
-          _applyLocalFilters();
-          await loadStatistics(); // Refresh stats
         }
+
+        // Also update in filtered products
+        final filteredIndex = _filteredProducts.indexWhere((product) => product.id == id);
+        if (filteredIndex != -1) {
+          _filteredProducts[filteredIndex] = response.data!;
+        }
+
+        await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+
+        // Force notify listeners to ensure UI updates
+        notifyListeners();
+
+        // Additional safety measure - trigger another notification after a brief delay
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (!_isDisposed) {
+            notifyListeners();
+          }
+        });
+
         return true;
       } else {
         _errorMessage = response.message;
@@ -318,9 +340,10 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  /// Delete product
+  /// Hard delete product (permanent)
   Future<bool> deleteProduct(String id) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -328,8 +351,10 @@ class ProductProvider extends ChangeNotifier {
 
       if (response.success) {
         _products.removeWhere((product) => product.id == id);
-        _applyLocalFilters();
+        _filteredProducts.removeWhere((product) => product.id == id);
         await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
         return true;
       } else {
         _errorMessage = response.message;
@@ -345,8 +370,71 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  /// Update product quantity
+  /// Soft delete product (deactivate)
+  Future<bool> softDeleteProduct(String id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _productService.softDeleteProduct(id);
+
+      if (response.success) {
+        // Remove from current lists (as it's now inactive)
+        _products.removeWhere((product) => product.id == id);
+        _filteredProducts.removeWhere((product) => product.id == id);
+        await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.message;
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to deactivate product: $e';
+      debugPrint('Error deactivating product: $e');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Restore soft deleted product
+  Future<bool> restoreProduct(String id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _productService.restoreProduct(id);
+
+      if (response.success && response.data != null) {
+        _products.insert(0, response.data!); // Add to beginning
+        _applyLocalFilters();
+        await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.message;
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to restore product: $e';
+      debugPrint('Error restoring product: $e');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Update product quantity - ENHANCED VERSION
   Future<bool> updateProductQuantity(String id, int newQuantity) async {
+    _errorMessage = null;
+
     try {
       final response = await _productService.updateProductQuantity(
         productId: id,
@@ -354,15 +442,28 @@ class ProductProvider extends ChangeNotifier {
       );
 
       if (response.success) {
+        // Update the product in local lists
         final index = _products.indexWhere((product) => product.id == id);
         if (index != -1) {
-          _products[index] = _products[index].copyWith(
+          final updatedProduct = _products[index].copyWith(
             quantity: newQuantity,
             updatedAt: DateTime.now(),
           );
-          _applyLocalFilters();
-          await loadStatistics(); // Refresh stats
+          _products[index] = updatedProduct;
         }
+
+        final filteredIndex = _filteredProducts.indexWhere((product) => product.id == id);
+        if (filteredIndex != -1) {
+          final updatedProduct = _filteredProducts[filteredIndex].copyWith(
+            quantity: newQuantity,
+            updatedAt: DateTime.now(),
+          );
+          _filteredProducts[filteredIndex] = updatedProduct;
+        }
+
+        await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
         return true;
       } else {
         _errorMessage = response.message;
@@ -378,6 +479,7 @@ class ProductProvider extends ChangeNotifier {
   /// Bulk update quantities
   Future<bool> bulkUpdateQuantities(Map<String, int> updates) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -388,7 +490,7 @@ class ProductProvider extends ChangeNotifier {
       final response = await _productService.bulkUpdateQuantities(updates: updateItems);
 
       if (response.success) {
-        // Update local cache
+        // Update local products with new quantities
         for (final entry in updates.entries) {
           final index = _products.indexWhere((product) => product.id == entry.key);
           if (index != -1) {
@@ -397,9 +499,19 @@ class ProductProvider extends ChangeNotifier {
               updatedAt: DateTime.now(),
             );
           }
+
+          final filteredIndex = _filteredProducts.indexWhere((product) => product.id == entry.key);
+          if (filteredIndex != -1) {
+            _filteredProducts[filteredIndex] = _filteredProducts[filteredIndex].copyWith(
+              quantity: entry.value,
+              updatedAt: DateTime.now(),
+            );
+          }
         }
-        _applyLocalFilters();
+
         await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
         return true;
       } else {
         _errorMessage = response.message;
@@ -453,6 +565,7 @@ class ProductProvider extends ChangeNotifier {
   /// Duplicate product
   Future<bool> duplicateProduct(String id, {String? newName}) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -465,6 +578,8 @@ class ProductProvider extends ChangeNotifier {
         _products.insert(0, response.data!); // Add to beginning
         _applyLocalFilters();
         await loadStatistics(); // Refresh stats
+        _errorMessage = null;
+        notifyListeners();
         return true;
       } else {
         _errorMessage = response.message;
@@ -691,6 +806,35 @@ class ProductProvider extends ChangeNotifier {
     };
   }
 
+  /// Manually refresh product in list (helper method for external updates)
+  void refreshProductInList(Product updatedProduct) {
+    final index = _products.indexWhere((product) => product.id == updatedProduct.id);
+    if (index != -1) {
+      _products[index] = updatedProduct;
+    }
+
+    final filteredIndex = _filteredProducts.indexWhere((product) => product.id == updatedProduct.id);
+    if (filteredIndex != -1) {
+      _filteredProducts[filteredIndex] = updatedProduct;
+    }
+
+    notifyListeners();
+  }
+
+  /// Force refresh from server (helper method for troubleshooting)
+  Future<void> forceRefresh() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await loadProducts();
+      await loadStatistics();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Clear all data
   void clearData() {
     _products.clear();
@@ -713,8 +857,12 @@ class ProductProvider extends ChangeNotifier {
     await initialize();
   }
 
+  // Track disposal to prevent notifications after disposal
+  bool _isDisposed = false;
+
   @override
   void dispose() {
+    _isDisposed = true;
     _searchTimer?.cancel();
     super.dispose();
   }

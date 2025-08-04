@@ -6,16 +6,14 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../globals/drop_down.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class EditProductDialog extends StatefulWidget {
   final Product product;
 
-  const EditProductDialog({
-    super.key,
-    required this.product,
-  });
+  const EditProductDialog({super.key, required this.product});
 
   @override
   State<EditProductDialog> createState() => _EditProductDialogState();
@@ -49,18 +47,17 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     _selectedCategoryId = widget.product.categoryId;
     _selectedPieces = List.from(widget.product.pieces);
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -114,11 +111,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Product updated successfully!',
@@ -133,9 +126,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -145,11 +136,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -166,9 +153,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -217,10 +202,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildHeader(),
-                      _buildFormContent(),
-                    ],
+                    children: [_buildHeader(), _buildFormContent()],
                   ),
                 ),
               ),
@@ -235,9 +217,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.blue, Colors.blueAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -251,11 +231,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.edit_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -311,11 +287,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -415,22 +387,15 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             // Category Selection
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
-                return DropdownButtonFormField<String>(
-                  value: _selectedCategoryId,
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    prefixIcon: Icon(Icons.category_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
+                return PremiumDropdownField<String>(
+                  label: 'Category',
+                  hint: context.shouldShowCompactLayout ? 'Select category' : 'Select product category',
+                  prefixIcon: Icons.category_outlined,
                   items: provider.categories
                       .where((category) => category.isActive)
-                      .map((category) => DropdownMenuItem<String>(
-                    value: category.id,
-                    child: Text(category.name),
-                  ))
+                      .map((category) => DropdownItem<String>(value: category.id, label: category.name))
                       .toList(),
+                  value: _selectedCategoryId,
                   onChanged: (categoryId) {
                     setState(() {
                       _selectedCategoryId = categoryId;
@@ -450,7 +415,9 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             // Color Input Field
             PremiumTextField(
               label: 'Color',
-              hint: context.shouldShowCompactLayout ? 'Enter color' : 'Enter color name (e.g., Red, Blue, Turquoise)',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter color'
+                  : 'Enter color name (e.g., Red, Blue, Turquoise)',
               controller: _colorController,
               prefixIcon: Icons.color_lens_outlined,
               validator: (value) {
@@ -468,7 +435,9 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             // Fabric Input Field
             PremiumTextField(
               label: 'Fabric',
-              hint: context.shouldShowCompactLayout ? 'Enter fabric' : 'Enter fabric type (e.g., Cotton, Silk, Chiffon)',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter fabric'
+                  : 'Enter fabric type (e.g., Cotton, Silk, Chiffon)',
               controller: _fabricController,
               prefixIcon: Icons.texture_outlined,
               validator: (value) {
@@ -540,10 +509,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         'Please select at least one piece',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          color: Colors.red,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
                   ],

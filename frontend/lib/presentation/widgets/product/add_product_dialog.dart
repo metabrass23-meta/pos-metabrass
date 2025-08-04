@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../globals/drop_down.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -34,18 +35,17 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -110,11 +110,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Product added successfully!',
@@ -129,9 +125,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -141,11 +135,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -162,9 +152,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -230,10 +218,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
       ),
     );
   }
@@ -242,10 +227,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
       ),
     );
   }
@@ -254,10 +236,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: false),
-        ],
+        children: [_buildHeader(), _buildFormContent(isCompact: false)],
       ),
     );
   }
@@ -266,9 +245,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -282,11 +259,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.inventory_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.inventory_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -323,11 +296,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -427,25 +396,18 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             // Category Selection
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
-                return DropdownButtonFormField<String>(
-                  value: _selectedCategoryId,
-                  decoration: InputDecoration(
-                    labelText: 'Category',
-                    prefixIcon: Icon(Icons.category_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
+                return PremiumDropdownField<String>(
+                  label: 'Category',
+                  hint: isCompact ? 'Select category' : 'Select product category',
+                  prefixIcon: Icons.category_outlined,
                   items: provider.categories
                       .where((category) => category.isActive)
-                      .map((category) => DropdownMenuItem<String>(
-                    value: category.id,
-                    child: Text(category.name),
-                  ))
+                      .map((category) => DropdownItem<String>(value: category.id, label: category.name))
                       .toList(),
-                  onChanged: (categoryId) {
+                  value: _selectedCategoryId,
+                  onChanged: (value) {
                     setState(() {
-                      _selectedCategoryId = categoryId;
+                      _selectedCategoryId = value;
                     });
                   },
                   validator: (value) {
@@ -552,10 +514,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         'Please select at least one piece',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          color: Colors.red,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
                   ],
