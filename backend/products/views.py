@@ -736,4 +736,4 @@ def duplicate_product(request, product_id):
             'message': 'Product duplication failed.',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+        

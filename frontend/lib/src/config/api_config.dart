@@ -19,16 +19,41 @@ class ApiConfig {
   static String softDeleteCategory(String id) => '/categories/$id/soft-delete/'; // Soft delete
   static String restoreCategory(String id) => '/categories/$id/restore/';
 
+  // Product Endpoints
+  static const String products = '/products/';
+  static const String createProduct = '/products/create/';
+  static String getProductById(String id) => '/products/$id/';
+  static String updateProduct(String id) => '/products/$id/update/';
+  static String deleteProduct(String id) => '/products/$id/delete/'; // Hard delete
+  static String softDeleteProduct(String id) => '/products/$id/soft-delete/'; // Soft delete
+  static String restoreProduct(String id) => '/products/$id/restore/';
+
+  // Product Search & Filtering
+  static const String searchProducts = '/products/search/';
+  static String productsByCategory(String categoryId) => '/products/category/$categoryId/';
+  static const String lowStockProducts = '/products/low-stock/';
+  static const String productStatistics = '/products/statistics/';
+
+  // Product Operations
+  static String updateProductQuantity(String id) => '/products/$id/quantity/';
+  static const String bulkUpdateQuantities = '/products/bulk-update-quantities/';
+  static String duplicateProduct(String id) => '/products/$id/duplicate/';
+
   // Request timeouts
   static const int connectTimeout = 15000; // 15 seconds
   static const int receiveTimeout = 15000; // 15 seconds
   static const int sendTimeout = 15000; // 15 seconds
 
   // Headers
-  static const Map<String, String> defaultHeaders = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+  static const Map<String, String> defaultHeaders = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
 
   // Storage keys
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';
   static const String categoriesCacheKey = 'cached_categories';
+  static const String productsCacheKey = 'cached_products';
+  static const String productStatsCacheKey = 'cached_product_stats';
 }

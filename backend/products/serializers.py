@@ -287,9 +287,11 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'detail',  # Added
             'price',
             'color',
             'fabric',
+            'pieces',  # Added
             'quantity',
             'category_name',
             'stock_status',

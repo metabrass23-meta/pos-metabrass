@@ -3,11 +3,13 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/product/add_product_dialog.dart';
 import '../../widgets/product/delete_product_dialog.dart';
 import '../../widgets/product/edit_product_dialog.dart';
+import '../../widgets/product/filter_product_dialog.dart';
 import '../../widgets/product/product_table.dart';
 import '../../widgets/product/view_product_dialog.dart';
 
@@ -20,6 +22,15 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the provider when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProductProvider>().initialize();
+    });
+  }
 
   @override
   void dispose() {
@@ -59,6 +70,53 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const FilterProductsDialog(),
+    );
+  }
+
+  void _exportProducts() {
+    final provider = context.read<ProductProvider>();
+    final data = provider.exportProductData();
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.download_done,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Text(
+              'Export completed! ${data.length} products exported.',
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _refreshProducts() async {
+    await context.read<ProductProvider>().refreshProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -67,39 +125,91 @@ class _ProductPageState extends State<ProductPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding / 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<ProductProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: EnhancedProductTable(
-                onEdit: _showEditProductDialog,
-                onDelete: _showDeleteProductDialog,
-                onView: _showViewProductDialog,
+      body: RefreshIndicator(
+        onRefresh: _refreshProducts,
+        child: Padding(
+          padding: EdgeInsets.all(context.mainPadding / 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildTabletHeader(),
+                small: _buildMobileHeader(),
+                medium: _buildDesktopHeader(),
+                large: _buildDesktopHeader(),
+                ultrawide: _buildDesktopHeader(),
+              ),
+              SizedBox(height: context.mainPadding),
+              Consumer<ProductProvider>(
+                builder: (context, provider, child) {
+                  // Show error message if any
+                  if (provider.errorMessage != null) {
+                    return _buildErrorWidget(provider.errorMessage!);
+                  }
+
+                  return context.statsCardColumns == 2
+                      ? _buildMobileStatsGrid(provider)
+                      : _buildDesktopStatsRow(provider);
+                },
+              ),
+              SizedBox(height: context.cardPadding * 0.5),
+              _buildSearchSection(),
+              SizedBox(height: context.cardPadding * 0.5),
+              Expanded(
+                child: EnhancedProductTable(
+                  onEdit: _showEditProductDialog,
+                  onDelete: _showDeleteProductDialog,
+                  onView: _showViewProductDialog,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget(String message) {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: context.iconSize('medium'),
+          ),
+          SizedBox(width: context.smallPadding),
+          Expanded(
+            child: Text(
+              message,
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                color: Colors.red[700],
               ),
             ),
-          ],
-        ),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<ProductProvider>().clearError();
+              _refreshProducts();
+            },
+            child: Text(
+              'Retry',
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.red[700],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -469,35 +579,44 @@ class _ProductPageState extends State<ProductPage> {
   Widget _buildFilterButton() {
     return Container(
       height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _showFilterDialog,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+            decoration: BoxDecoration(
+              color: AppTheme.lightGray,
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+              border: Border.all(
+                color: Colors.grey.shade300,
+                width: 1,
               ),
             ),
-          ],
-        ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.filter_list_rounded,
+                  color: AppTheme.primaryMaroon,
+                  size: context.iconSize('medium'),
+                ),
+                if (!context.isTablet) ...[
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Filter',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryMaroon,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -505,35 +624,44 @@ class _ProductPageState extends State<ProductPage> {
   Widget _buildExportButton() {
     return Container(
       height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _exportProducts,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+            decoration: BoxDecoration(
+              color: AppTheme.accentGold.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+              border: Border.all(
+                color: AppTheme.accentGold.withOpacity(0.3),
+                width: 1,
               ),
             ),
-          ],
-        ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.download_rounded,
+                  color: AppTheme.accentGold,
+                  size: context.iconSize('medium'),
+                ),
+                if (!context.isTablet) ...[
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Export',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.accentGold,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
