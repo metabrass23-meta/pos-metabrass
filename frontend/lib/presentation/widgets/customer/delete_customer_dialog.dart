@@ -7,23 +7,27 @@ import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 
-class DeleteCustomerDialog extends StatefulWidget {
+class EnhancedDeleteCustomerDialog extends StatefulWidget {
   final Customer customer;
 
-  const DeleteCustomerDialog({
+  const EnhancedDeleteCustomerDialog({
     super.key,
     required this.customer,
   });
 
   @override
-  State<DeleteCustomerDialog> createState() => _DeleteCustomerDialogState();
+  State<EnhancedDeleteCustomerDialog> createState() => _EnhancedDeleteCustomerDialogState();
 }
 
-class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with SingleTickerProviderStateMixin {
+class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<double> _shakeAnimation;
+
+  bool _isPermanentDelete = true; // Toggle between permanent and soft delete
+  bool _confirmationChecked = false; // Requires user to check confirmation
 
   @override
   void initState() {
@@ -33,17 +37,29 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
+    ));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    ));
 
-    _shakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
-    );
+    _shakeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
 
     _animationController.forward();
   }
@@ -55,14 +71,59 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
   }
 
   void _handleDelete() async {
+    if (!_confirmationChecked) {
+      _showValidationSnackbar();
+      return;
+    }
+
     final provider = Provider.of<CustomerProvider>(context, listen: false);
 
-    await provider.deleteCustomer(widget.customer.id);
+    bool success;
+    if (_isPermanentDelete) {
+      success = await provider.deleteCustomer(widget.customer.id);
+    } else {
+      success = await provider.softDeleteCustomer(widget.customer.id);
+    }
 
     if (mounted) {
-      _showSuccessSnackbar();
-      Navigator.of(context).pop();
+      if (success) {
+        _showSuccessSnackbar();
+        Navigator.of(context).pop();
+      } else {
+        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete customer');
+      }
     }
+  }
+
+  void _showValidationSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.warning_outlined,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Text(
+              'Please confirm that you understand this action',
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
   }
 
   void _showSuccessSnackbar() {
@@ -77,7 +138,9 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Customer deleted successfully!',
+              _isPermanentDelete
+                  ? 'Customer deleted permanently!'
+                  : 'Customer deactivated successfully!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -88,6 +151,39 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -146,7 +242,9 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildHeader(),
-                      _buildContent(),
+                      Expanded(
+                        child: _buildContent(),
+                      ),
                     ],
                   ),
                 ),
@@ -162,8 +260,10 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.red, Colors.redAccent],
+        gradient: LinearGradient(
+          colors: _isPermanentDelete
+              ? [Colors.red, Colors.redAccent]
+              : [Colors.orange, Colors.orangeAccent],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
@@ -179,18 +279,20 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Icon(
-              Icons.warning_rounded,
+              _isPermanentDelete ? Icons.delete_forever_rounded : Icons.visibility_off_rounded,
               color: AppTheme.pureWhite,
               size: context.iconSize('large'),
             ),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Customer' : 'Delete Customer Record',
+                  _isPermanentDelete ? 'Delete Permanently' : 'Deactivate Customer',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -201,7 +303,9 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    _isPermanentDelete
+                        ? 'This action cannot be undone'
+                        : 'Customer can be restored later',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -212,6 +316,7 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
               ],
             ),
           ),
+
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -233,158 +338,303 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
   }
 
   Widget _buildContent() {
-    return Padding(
-      padding: EdgeInsets.all(context.cardPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              width: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 5.w,
-                small: 5.w,
-                medium: 5.w,
-                large: 5.w,
-                ultrawide: 5.w,
-              ),
-              height: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 5.w,
-                small: 5.w,
-                medium: 5.w,
-                large: 5.w,
-                ultrawide: 5.w,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.delete_forever_rounded,
-                size: context.iconSize('xl'),
-                color: Colors.red,
-              ),
-            ),
-          ),
-          SizedBox(height: context.mainPadding),
-          Text(
-            context.shouldShowCompactLayout
-                ? 'Are you sure you want to delete this customer record?'
-                : 'Are you absolutely sure you want to delete this customer record?',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize * 1.1,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: context.cardPadding),
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: Colors.red.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(context.cardPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Delete Type Toggle
+              Container(
+                padding: EdgeInsets.all(context.smallPadding),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                ),
+                child: Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.smallPadding,
-                        vertical: context.smallPadding / 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                      ),
-                      child: Text(
-                        widget.customer.id,
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
-                      ),
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.blue,
+                      size: context.iconSize('small'),
                     ),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        widget.customer.name,
+                        'Choose deletion type:',
                         style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
+                          fontSize: context.subtitleFontSize,
+                          fontWeight: FontWeight.w500,
                           color: AppTheme.charcoalGray,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                if (!context.isTablet) ...[
-                  SizedBox(height: context.smallPadding),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '${widget.customer.phone} | ${widget.customer.email}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[600],
+              ),
+
+              SizedBox(height: context.cardPadding),
+
+              // Delete Options
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isPermanentDelete = true;
+                          _confirmationChecked = false; // Reset confirmation
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(context.cardPadding),
+                        decoration: BoxDecoration(
+                          color: _isPermanentDelete
+                              ? Colors.red.withOpacity(0.1)
+                              : Colors.grey.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                          border: Border.all(
+                            color: _isPermanentDelete ? Colors.red : Colors.grey.shade300,
+                            width: _isPermanentDelete ? 2 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.delete_forever_rounded,
+                              color: _isPermanentDelete ? Colors.red : Colors.grey,
+                              size: context.iconSize('medium'),
+                            ),
+                            SizedBox(height: context.smallPadding),
+                            Text(
+                              'Permanent Delete',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: _isPermanentDelete ? Colors.red : Colors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: context.smallPadding / 2),
+                            Text(
+                              'Completely removes from database',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize * 0.9,
+                                color: _isPermanentDelete ? Colors.red[600] : Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  SizedBox(width: context.cardPadding),
+
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isPermanentDelete = false;
+                          _confirmationChecked = false; // Reset confirmation
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(context.cardPadding),
+                        decoration: BoxDecoration(
+                          color: !_isPermanentDelete
+                              ? Colors.orange.withOpacity(0.1)
+                              : Colors.grey.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                          border: Border.all(
+                            color: !_isPermanentDelete ? Colors.orange : Colors.grey.shade300,
+                            width: !_isPermanentDelete ? 2 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.visibility_off_rounded,
+                              color: !_isPermanentDelete ? Colors.orange : Colors.grey,
+                              size: context.iconSize('medium'),
+                            ),
+                            SizedBox(height: context.smallPadding),
+                            Text(
+                              'Deactivate',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: !_isPermanentDelete ? Colors.orange : Colors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: context.smallPadding / 2),
+                            Text(
+                              'Hides but can be restored',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize * 0.9,
+                                color: !_isPermanentDelete ? Colors.orange[600] : Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
-              ],
-            ),
-          ),
-          SizedBox(height: context.cardPadding),
-          Container(
-            padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.orange,
-                  size: context.iconSize('small'),
-                ),
-                SizedBox(width: context.smallPadding),
-                Expanded(
-                  child: Text(
-                    context.shouldShowCompactLayout
-                        ? 'This will permanently delete the customer record.'
-                        : 'This will permanently delete the customer record and all associated data. This action cannot be undone.',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.orange[700],
-                    ),
+              ),
+
+              SizedBox(height: context.mainPadding),
+
+              // Customer Details Card
+              Container(
+                padding: EdgeInsets.all(context.cardPadding),
+                decoration: BoxDecoration(
+                  color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                  border: Border.all(
+                    color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.2),
+                    width: 1,
                   ),
                 ),
-              ],
-            ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.smallPadding,
+                            vertical: context.smallPadding / 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                          ),
+                          child: Text(
+                            widget.customer.id,
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: _isPermanentDelete ? Colors.red : Colors.orange,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(width: context.smallPadding),
+
+                        Expanded(
+                          child: Text(
+                            widget.customer.name,
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.charcoalGray,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    if (!context.isTablet) ...[
+                      SizedBox(height: context.smallPadding),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '${widget.customer.phone} | ${widget.customer.email}',
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+
+                    if (widget.customer.lastPurchase != null) ...[
+                      SizedBox(height: context.smallPadding),
+                      Container(
+                        padding: EdgeInsets.all(context.smallPadding),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.shopping_cart,
+                              color: Colors.blue,
+                              size: context.iconSize('small'),
+                            ),
+                            SizedBox(width: context.smallPadding),
+                            Text(
+                              'Last Purchase: PKR ${widget.customer.lastPurchase!.toStringAsFixed(0)}',
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              SizedBox(height: context.cardPadding),
+
+              // Confirmation Checkbox
+              Container(
+                padding: EdgeInsets.all(context.smallPadding),
+                decoration: BoxDecoration(
+                  color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                ),
+                child: CheckboxListTile(
+                  value: _confirmationChecked,
+                  onChanged: (value) {
+                    setState(() {
+                      _confirmationChecked = value ?? false;
+                    });
+                  },
+                  title: Text(
+                    _isPermanentDelete
+                        ? 'I understand this will permanently delete the customer and cannot be undone'
+                        : 'I understand this will deactivate the customer',
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],
+                    ),
+                  ),
+                  activeColor: _isPermanentDelete ? Colors.red : Colors.orange,
+                  dense: true,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ),
+
+              SizedBox(height: context.mainPadding),
+
+              // Action Buttons
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildCompactButtons(),
+                small: _buildCompactButtons(),
+                medium: _buildDesktopButtons(),
+                large: _buildDesktopButtons(),
+                ultrawide: _buildDesktopButtons(),
+              ),
+            ],
           ),
-          SizedBox(height: context.mainPadding),
-          ResponsiveBreakpoints.responsive(
-            context,
-            tablet: _buildCompactButtons(),
-            small: _buildCompactButtons(),
-            medium: _buildDesktopButtons(),
-            large: _buildDesktopButtons(),
-            ultrawide: _buildDesktopButtons(),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -393,6 +643,7 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Cancel Button (full width, primary action)
         PremiumButton(
           text: 'Cancel',
           onPressed: _handleCancel,
@@ -400,16 +651,19 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
           backgroundColor: Colors.grey[600],
           textColor: AppTheme.pureWhite,
         ),
+
         SizedBox(height: context.cardPadding),
+
+        // Delete Button (full width, destructive action)
         Consumer<CustomerProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Customer',
+              text: _isPermanentDelete ? 'Delete Permanently' : 'Deactivate Customer',
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
-              icon: Icons.delete_forever_rounded,
-              backgroundColor: Colors.red,
+              icon: _isPermanentDelete ? Icons.delete_forever_rounded : Icons.visibility_off_rounded,
+              backgroundColor: _isPermanentDelete ? Colors.red : Colors.orange,
             );
           },
         ),
@@ -420,6 +674,7 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
   Widget _buildDesktopButtons() {
     return Row(
       children: [
+        // Cancel Button (safe action)
         Expanded(
           flex: 2,
           child: PremiumButton(
@@ -430,18 +685,21 @@ class _DeleteCustomerDialogState extends State<DeleteCustomerDialog> with Single
             textColor: AppTheme.pureWhite,
           ),
         ),
+
         SizedBox(width: context.cardPadding),
+
+        // Delete Button (destructive action)
         Expanded(
           flex: 1,
           child: Consumer<CustomerProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: _isPermanentDelete ? 'Delete' : 'Deactivate',
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
-                icon: Icons.delete_forever_rounded,
-                backgroundColor: Colors.red,
+                icon: _isPermanentDelete ? Icons.delete_forever_rounded : Icons.visibility_off_rounded,
+                backgroundColor: _isPermanentDelete ? Colors.red : Colors.orange,
               );
             },
           ),

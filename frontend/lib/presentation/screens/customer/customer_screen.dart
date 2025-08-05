@@ -9,6 +9,7 @@ import '../../widgets/customer/add_customer_dialog.dart';
 import '../../widgets/customer/customer_table.dart';
 import '../../widgets/customer/delete_customer_dialog.dart';
 import '../../widgets/customer/edit_customer_dialog.dart';
+import '../../widgets/customer/view_customer_dialog.dart';
 
 class CustomerPage extends StatefulWidget {
   const CustomerPage({super.key});
@@ -46,7 +47,15 @@ class _CustomerPageState extends State<CustomerPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => DeleteCustomerDialog(customer: customer),
+      builder: (context) => EnhancedDeleteCustomerDialog(customer: customer),
+    );
+  }
+
+  void _showViewCustomerDialog(Customer customer) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ViewCustomerDetailsDialog(customer: customer),
     );
   }
 
@@ -59,10 +68,11 @@ class _CustomerPageState extends State<CustomerPage> {
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
+        padding: EdgeInsets.all(context.mainPadding / 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Responsive Header Section
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildTabletHeader(),
@@ -71,7 +81,10 @@ class _CustomerPageState extends State<CustomerPage> {
               large: _buildDesktopHeader(),
               ultrawide: _buildDesktopHeader(),
             ),
+
             SizedBox(height: context.mainPadding),
+
+            // Responsive Stats Cards
             Consumer<CustomerProvider>(
               builder: (context, provider, child) {
                 return context.statsCardColumns == 2
@@ -79,13 +92,20 @@ class _CustomerPageState extends State<CustomerPage> {
                     : _buildDesktopStatsRow(provider);
               },
             ),
+
             SizedBox(height: context.cardPadding * 0.5),
+
+            // Responsive Search Section
             _buildSearchSection(),
+
             SizedBox(height: context.cardPadding * 0.5),
+
+            // Enhanced Customer Table with View functionality
             Expanded(
-              child: CustomerTable(
+              child: EnhancedCustomerTable(
                 onEdit: _showEditCustomerDialog,
                 onDelete: _showDeleteCustomerDialog,
+                onView: _showViewCustomerDialog,
               ),
             ),
           ],
@@ -138,6 +158,7 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildDesktopHeader() {
     return Row(
       children: [
+        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +166,7 @@ class _CustomerPageState extends State<CustomerPage> {
               Text(
                 'Customer Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -153,7 +174,7 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Manage your customer relationships',
+                'Organize and manage your customer relationships with comprehensive tools',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -163,6 +184,8 @@ class _CustomerPageState extends State<CustomerPage> {
             ],
           ),
         ),
+
+        // Add Customer Button
         _buildAddButton(),
       ],
     );
@@ -172,10 +195,11 @@ class _CustomerPageState extends State<CustomerPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Page Title
         Text(
           'Customer Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -183,7 +207,7 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage your customers',
+          'Organize and manage customer relationships',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -191,6 +215,8 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Customer Button (full width on tablet)
         SizedBox(
           width: double.infinity,
           child: _buildAddButton(),
@@ -203,6 +229,7 @@ class _CustomerPageState extends State<CustomerPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Compact Page Title
         Text(
           'Customers',
           style: GoogleFonts.playfairDisplay(
@@ -214,7 +241,7 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage customers',
+          'Manage customer relationships',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -222,6 +249,8 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Customer Button (full width)
         SizedBox(
           width: double.infinity,
           child: _buildAddButton(),
@@ -279,20 +308,40 @@ class _CustomerPageState extends State<CustomerPage> {
     return Row(
       children: [
         Expanded(
-            child: _buildStatsCard('Total Customers', stats['total'].toString(),
-                Icons.people_rounded, Colors.blue)),
+          child: _buildStatsCard(
+              'Total Customers',
+              stats['total'].toString(),
+              Icons.people_rounded,
+              Colors.blue
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('New This Month',
-                stats['newThisMonth'].toString(), Icons.person_add_rounded, Colors.green)),
+          child: _buildStatsCard(
+              'New This Month',
+              stats['newThisMonth'].toString(),
+              Icons.person_add_rounded,
+              Colors.green
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Avg Purchase', 'PKR ${stats['averagePurchase']}',
-                Icons.shopping_cart_rounded, Colors.purple)),
+          child: _buildStatsCard(
+              'Avg Purchase',
+              'PKR ${stats['averagePurchase']}',
+              Icons.shopping_cart_rounded,
+              Colors.purple
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Recent Buyers', stats['recentBuyers'].toString(),
-                Icons.shopping_bag_rounded, Colors.orange)),
+          child: _buildStatsCard(
+              'Recent Buyers',
+              stats['recentBuyers'].toString(),
+              Icons.shopping_bag_rounded,
+              Colors.orange
+          ),
+        ),
       ],
     );
   }
@@ -304,24 +353,44 @@ class _CustomerPageState extends State<CustomerPage> {
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.people_rounded, Colors.blue)),
+              child: _buildStatsCard(
+                  'Total',
+                  stats['total'].toString(),
+                  Icons.people_rounded,
+                  Colors.blue
+              ),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('New', stats['newThisMonth'].toString(),
-                    Icons.person_add_rounded, Colors.green)),
+              child: _buildStatsCard(
+                  'New',
+                  stats['newThisMonth'].toString(),
+                  Icons.person_add_rounded,
+                  Colors.green
+              ),
+            ),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Avg Purchase', 'PKR ${stats['averagePurchase']}',
-                    Icons.shopping_cart_rounded, Colors.purple)),
+              child: _buildStatsCard(
+                  'Avg Purchase',
+                  'PKR ${stats['averagePurchase']}',
+                  Icons.shopping_cart_rounded,
+                  Colors.purple
+              ),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('Recent', stats['recentBuyers'].toString(),
-                    Icons.shopping_bag_rounded, Colors.orange)),
+              child: _buildStatsCard(
+                  'Recent',
+                  stats['recentBuyers'].toString(),
+                  Icons.shopping_bag_rounded,
+                  Colors.orange
+              ),
+            ),
           ],
         ),
       ],
@@ -356,16 +425,31 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
+        // Search Bar
         Expanded(
           flex: 3,
           child: _buildSearchBar(),
         ),
+
         SizedBox(width: context.cardPadding),
+
+        // Show Inactive Toggle
+        Expanded(
+          flex: 1,
+          child: _buildShowInactiveToggle(),
+        ),
+
+        SizedBox(width: context.smallPadding),
+
+        // Filter Button
         Expanded(
           flex: 1,
           child: _buildFilterButton(),
         ),
+
         SizedBox(width: context.smallPadding),
+
+        // Export Button
         Expanded(
           flex: 1,
           child: _buildExportButton(),
@@ -381,6 +465,8 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(height: context.cardPadding),
         Row(
           children: [
+            Expanded(child: _buildShowInactiveToggle()),
+            SizedBox(width: context.cardPadding),
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildExportButton()),
@@ -397,6 +483,8 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(height: context.smallPadding),
         Row(
           children: [
+            Expanded(child: _buildShowInactiveToggle()),
+            SizedBox(width: context.smallPadding),
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildExportButton()),
@@ -453,6 +541,50 @@ class _CustomerPageState extends State<CustomerPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildShowInactiveToggle() {
+    return Consumer<CustomerProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          height: context.buttonHeight / 1.5,
+          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+          decoration: BoxDecoration(
+            color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.lightGray,
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            border: Border.all(
+              color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.3) : Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: InkWell(
+            onTap: provider.toggleShowInactive,
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  provider.showInactive ? Icons.visibility : Icons.visibility_off,
+                  color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+                  size: context.iconSize('medium'),
+                ),
+                if (!context.isTablet) ...[
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -557,7 +689,9 @@ class _CustomerPageState extends State<CustomerPage> {
               size: context.iconSize('medium'),
             ),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
