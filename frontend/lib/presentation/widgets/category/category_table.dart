@@ -54,17 +54,17 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
               child: SizedBox(
                 width: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 8.w,
+                  tablet: 3.w,
                   small: 6.w,
-                  medium: 5.w,
+                  medium: 3.w,
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
                 height: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 8.w,
+                  tablet: 4.w,
                   small: 6.w,
-                  medium: 5.w,
+                  medium: 4.w,
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
@@ -100,7 +100,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                     physics: const ClampingScrollPhysics(),
                     child: Container(
                       width: _getTableWidth(context),
-                      padding: EdgeInsets.all(context.cardPadding),
+                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
                       child: _buildTableHeader(context),
                     ),
                   ),
@@ -155,10 +155,10 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
     return Row(
       children: [
         // Category ID
-        Container(
-          width: columnWidths[0],
-          child: _buildHeaderCell(context, 'Category ID'),
-        ),
+        // Container(
+        //   width: columnWidths[0],
+        //   child: _buildHeaderCell(context, 'Category ID'),
+        // ),
 
         // Name
         Container(
@@ -235,29 +235,29 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
       child: Row(
         children: [
           // Category ID
-          Container(
-            width: columnWidths[0],
-            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                category.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+          // Container(
+          //   width: columnWidths[0],
+          //   padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(
+          //       horizontal: context.smallPadding / 2,
+          //       vertical: context.smallPadding / 4,
+          //     ),
+          //     decoration: BoxDecoration(
+          //       color: AppTheme.primaryMaroon.withOpacity(0.1),
+          //       borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          //     ),
+          //     child: Text(
+          //       category.id,
+          //       style: GoogleFonts.inter(
+          //         fontSize: context.captionFontSize,
+          //         fontWeight: FontWeight.w600,
+          //         color: AppTheme.primaryMaroon,
+          //       ),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
 
           // Name
           Container(

@@ -44,6 +44,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     _quantityController = TextEditingController(text: widget.product.quantity.toString());
     _colorController = TextEditingController(text: widget.product.color);
     _fabricController = TextEditingController(text: widget.product.fabric);
+
+    // FIXED: Initialize category ID - handle case where API only returns category_name
     _selectedCategoryId = widget.product.categoryId;
     _selectedPieces = List.from(widget.product.pieces);
 
@@ -60,6 +62,89 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
+
+    // FIXED: Load categories and find the correct category ID
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCategoriesAndSetSelected();
+    });
+  }
+
+  // FIXED: Method to load categories and set the correct selected category
+  Future<void> _loadCategoriesAndSetSelected() async {
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+
+    // Load categories if not already loaded
+    if (provider.categories.isEmpty) {
+      await provider.loadCategories();
+    }
+
+    if (mounted) {
+      _setSelectedCategory();
+    }
+  }
+
+  // FIXED: Method to set the selected category based on available data
+  void _setSelectedCategory() {
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+
+    if (provider.categories.isEmpty) {
+      print('🚨 No categories available');
+      return;
+    }
+
+    print(
+      '🔍 Looking for category. Product categoryId: ${widget.product.categoryId}, categoryName: ${widget.product.categoryName}',
+    );
+    print('📝 Available categories: ${provider.categories.map((c) => '${c.name} (${c.id})').join(', ')}');
+
+    String? foundCategoryId;
+
+    // First try: Use categoryId if available
+    if (widget.product.categoryId != null && widget.product.categoryId!.isNotEmpty) {
+      final categoryExists = provider.categories.any(
+        (cat) => cat.id == widget.product.categoryId && cat.isActive,
+      );
+
+      if (categoryExists) {
+        foundCategoryId = widget.product.categoryId;
+        print('✅ Found category by ID: $foundCategoryId');
+      }
+    }
+
+    // Second try: Find by category name if ID didn't work
+    if (foundCategoryId == null &&
+        widget.product.categoryName != null &&
+        widget.product.categoryName!.isNotEmpty) {
+      try {
+        final categoryByName = provider.categories.firstWhere(
+          (cat) => cat.name.toLowerCase() == widget.product.categoryName!.toLowerCase() && cat.isActive,
+        );
+        foundCategoryId = categoryByName.id;
+        print('✅ Found category by name: ${widget.product.categoryName} -> $foundCategoryId');
+      } catch (e) {
+        print('❌ Could not find category by name: ${widget.product.categoryName}');
+      }
+    }
+
+    // Third try: Default to first active category if nothing found
+    if (foundCategoryId == null && provider.categories.isNotEmpty) {
+      final firstActiveCategory = provider.categories.firstWhere(
+        (cat) => cat.isActive,
+        orElse: () => provider.categories.first,
+      );
+      foundCategoryId = firstActiveCategory.id;
+      print('⚠️ Using default category: ${firstActiveCategory.name} -> $foundCategoryId');
+    }
+
+    // Update the selected category
+    if (foundCategoryId != null && _selectedCategoryId != foundCategoryId) {
+      setState(() {
+        _selectedCategoryId = foundCategoryId;
+      });
+      print('🔄 Updated selected category to: $foundCategoryId');
+    } else {
+      print('ℹ️ Selected category unchanged: $_selectedCategoryId');
+    }
   }
 
   @override
@@ -384,29 +469,109 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             ),
             SizedBox(height: context.cardPadding),
 
-            // Category Selection
+            // FIXED: Category Selection with proper debugging and state management
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
-                return PremiumDropdownField<String>(
-                  label: 'Category',
-                  hint: context.shouldShowCompactLayout ? 'Select category' : 'Select product category',
-                  prefixIcon: Icons.category_outlined,
-                  items: provider.categories
-                      .where((category) => category.isActive)
-                      .map((category) => DropdownItem<String>(value: category.id, label: category.name))
-                      .toList(),
-                  value: _selectedCategoryId,
-                  onChanged: (categoryId) {
-                    setState(() {
-                      _selectedCategoryId = categoryId;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
+                // Show loading indicator while categories are being loaded
+                if (provider.categories.isEmpty && provider.isLoading) {
+                  return Container(
+                    padding: EdgeInsets.all(context.cardPadding),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryMaroon),
+                        ),
+                        SizedBox(width: context.smallPadding),
+                        Text(
+                          'Loading categories...',
+                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Show message if no categories available
+                if (provider.categories.isEmpty && !provider.isLoading) {
+                  return Container(
+                    padding: EdgeInsets.all(context.cardPadding),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.warning_outlined, color: Colors.orange),
+                        SizedBox(width: context.smallPadding),
+                        Expanded(
+                          child: Text(
+                            'No categories available. Please add categories first.',
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              color: Colors.orange[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // FIXED: Debug info - remove this in production
+                print('🎯 Rendering dropdown. Selected: $_selectedCategoryId');
+                print(
+                  '📋 Available categories: ${provider.categories.map((c) => '${c.name}(${c.id})').join(', ')}',
+                );
+
+                final activeCategories = provider.categories.where((category) => category.isActive).toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // FIXED: Show current product category info for debugging
+                    if (widget.product.categoryName != null) ...[
+                      Container(
+                        padding: EdgeInsets.all(context.smallPadding),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                        ),
+                        child: Text(
+                          'Product Category: ${widget.product.categoryName} ${widget.product.categoryId != null ? '(ID: ${widget.product.categoryId})' : '(No ID)'}',
+                          style: GoogleFonts.inter(
+                            fontSize: context.captionFontSize,
+                            color: Colors.blue[700],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: context.smallPadding),
+                    ],
+
+                    PremiumDropdownField<String>(
+                      label: 'Category',
+                      hint: context.shouldShowCompactLayout ? 'Select category' : 'Select product category',
+                      prefixIcon: Icons.category_outlined,
+                      items: activeCategories
+                          .map((category) => DropdownItem<String>(value: category.id, label: category.name))
+                          .toList(),
+                      value: _selectedCategoryId,
+                      onChanged: (categoryId) {
+                        print('🔄 Category changed to: $categoryId');
+                        setState(() {
+                          _selectedCategoryId = categoryId;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select a category';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 );
               },
             ),
