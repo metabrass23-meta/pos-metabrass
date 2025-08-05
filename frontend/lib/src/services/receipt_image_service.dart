@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class DesktopReceiptImageService {
   // Pick image file from Windows file explorer
@@ -196,7 +196,8 @@ class DesktopReceiptImageService {
       final File imageFile = File(imagePath);
       if (await imageFile.exists()) {
         // PowerShell command to copy image to clipboard
-        final String psCommand = '''
+        final String psCommand =
+            '''
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 \$img = [System.Drawing.Image]::FromFile("$imagePath")
@@ -204,11 +205,7 @@ Add-Type -AssemblyName System.Drawing
 \$img.Dispose()
 ''';
 
-        await Process.run(
-          'powershell',
-          ['-Command', psCommand],
-          runInShell: true,
-        );
+        await Process.run('powershell', ['-Command', psCommand], runInShell: true);
       }
     } catch (e) {
       throw Exception('Failed to copy image to clipboard: $e');

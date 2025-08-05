@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/models/product/product_model.dart';
-import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 
@@ -55,9 +54,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.blue, Colors.blueAccent],
-                ),
+                gradient: const LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(context.borderRadius('large')),
                   topRight: Radius.circular(context.borderRadius('large')),
@@ -125,9 +122,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(context.cardPadding),
-                child: Column(
-                  children: existingOrders.map((order) => _buildOrderCard(order)).toList(),
-                ),
+                child: Column(children: existingOrders.map((order) => _buildOrderCard(order)).toList()),
               ),
             ),
 
@@ -151,17 +146,11 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                           },
                           borderRadius: BorderRadius.circular(context.borderRadius()),
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: context.cardPadding / 1.5,
-                            ),
+                            padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.add_rounded,
-                                  color: Colors.blue,
-                                  size: context.iconSize('medium'),
-                                ),
+                                Icon(Icons.add_rounded, color: Colors.blue, size: context.iconSize('medium')),
                                 SizedBox(width: context.smallPadding),
                                 Text(
                                   'Create New Order',
@@ -233,10 +222,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                     ),
                     Text(
                       order['phone'],
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -270,10 +256,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     'Order Date',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     order['orderDate'],
@@ -290,10 +273,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     'Delivery Date',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     order['deliveryDate'],
@@ -310,10 +290,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     'Amount',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     'PKR ${order['amount']}',
@@ -337,19 +314,12 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.note_outlined,
-                    size: context.iconSize('small'),
-                    color: Colors.blue[700],
-                  ),
+                  Icon(Icons.note_outlined, size: context.iconSize('small'), color: Colors.blue[700]),
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
                       order['notes'],
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.blue[700],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -366,9 +336,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                     onTap: () => _addToExistingOrder(order),
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: context.smallPadding,
-                      ),
+                      padding: EdgeInsets.symmetric(vertical: context.smallPadding),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -377,11 +345,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.add_rounded,
-                            size: context.iconSize('small'),
-                            color: Colors.blue,
-                          ),
+                          Icon(Icons.add_rounded, size: context.iconSize('small'), color: Colors.blue),
                           SizedBox(width: context.smallPadding / 2),
                           Text(
                             'Add to Order',
@@ -485,4 +449,3 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
     // Show create new order dialog
   }
 }
-

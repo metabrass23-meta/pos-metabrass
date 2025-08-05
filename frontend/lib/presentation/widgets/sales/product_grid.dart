@@ -6,23 +6,18 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/models/product/product_model.dart';
-import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'add_to_cart_dialog.dart';
 import 'custom_order_dialog.dart';
-import 'existing_orders_dialog.dart';
 import 'customize_and_add_dialog.dart';
+import 'existing_orders_dialog.dart';
 
 class ProductGrid extends StatelessWidget {
   final String searchQuery;
   final String selectedCategory;
 
-  const ProductGrid({
-    super.key,
-    required this.searchQuery,
-    required this.selectedCategory,
-  });
+  const ProductGrid({super.key, required this.searchQuery, required this.selectedCategory});
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +46,7 @@ class ProductGrid extends StatelessWidget {
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
-                child: const CircularProgressIndicator(
-                  color: AppTheme.primaryMaroon,
-                  strokeWidth: 3,
-                ),
+                child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
           }
@@ -131,13 +123,16 @@ class ProductGrid extends StatelessWidget {
 
     // Apply search filter
     if (searchQuery.isNotEmpty) {
-      products = products.where((product) =>
-      product.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product.detail.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product.color.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product.fabric.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product.piecesText.toLowerCase().contains(searchQuery.toLowerCase())
-      ).toList();
+      products = products
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                product.detail.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                product.color.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                product.fabric.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                product.piecesText.toLowerCase().contains(searchQuery.toLowerCase()),
+          )
+          .toList();
     }
 
     return products;
@@ -366,10 +361,7 @@ class ProductGrid extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: _getColorFromName(product.color),
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 1,
-                              ),
+                              border: Border.all(color: Colors.grey.shade300, width: 1),
                             ),
                           ),
                           SizedBox(width: context.smallPadding / 2),
@@ -434,15 +426,11 @@ class ProductGrid extends StatelessWidget {
                                   onTap: () => _quickAddToCart(context, product, provider),
                                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: context.smallPadding / 2,
-                                    ),
+                                    padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryMaroon.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                                      border: Border.all(
-                                        color: AppTheme.primaryMaroon.withOpacity(0.3),
-                                      ),
+                                      border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -605,11 +593,7 @@ class ProductGrid extends StatelessWidget {
               color: AppTheme.lightGray,
               borderRadius: BorderRadius.circular(context.borderRadius('xl')),
             ),
-            child: Icon(
-              Icons.inventory_2_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            child: Icon(Icons.inventory_2_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
@@ -666,10 +650,7 @@ class ProductGrid extends StatelessWidget {
                     vertical: context.cardPadding / 2,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppTheme.primaryMaroon,
-                      width: 1,
-                    ),
+                    border: Border.all(color: AppTheme.primaryMaroon, width: 1),
                     borderRadius: BorderRadius.circular(context.borderRadius()),
                   ),
                   child: Row(
@@ -855,9 +836,7 @@ class ProductGrid extends StatelessWidget {
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -983,9 +962,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.orange, Colors.deepOrange],
-                ),
+                gradient: const LinearGradient(colors: [Colors.orange, Colors.deepOrange]),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(context.borderRadius('large')),
                   topRight: Radius.circular(context.borderRadius('large')),
@@ -1069,9 +1046,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                     children: [5, 10, 15, 20, 25].map((discount) {
                       return Expanded(
                         child: Container(
-                          margin: EdgeInsets.only(
-                            right: discount != 25 ? context.smallPadding / 2 : 0,
-                          ),
+                          margin: EdgeInsets.only(right: discount != 25 ? context.smallPadding / 2 : 0),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -1084,9 +1059,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                               },
                               borderRadius: BorderRadius.circular(context.borderRadius()),
                               child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.smallPadding,
-                                ),
+                                padding: EdgeInsets.symmetric(vertical: context.smallPadding),
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Colors.orange.withOpacity(0.3)),
                                   borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -1209,9 +1182,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                               onTap: () => Navigator.of(context).pop(),
                               borderRadius: BorderRadius.circular(context.borderRadius()),
                               child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.cardPadding / 1.5,
-                                ),
+                                padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
                                 child: Text(
                                   'Cancel',
                                   style: GoogleFonts.inter(
@@ -1231,38 +1202,34 @@ class _DiscountDialogState extends State<DiscountDialog> {
                         flex: 2,
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Colors.orange, Colors.deepOrange],
-                            ),
+                            gradient: const LinearGradient(colors: [Colors.orange, Colors.deepOrange]),
                             borderRadius: BorderRadius.circular(context.borderRadius()),
                           ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: _calculatedDiscount > 0 ? () {
-                                // Apply discount and add to cart
-                                Provider.of<SalesProvider>(context, listen: false)
-                                    .addToCartWithDiscount(
-                                  widget.product,
-                                  1,
-                                  _calculatedDiscount,
-                                );
-                                Navigator.of(context).pop();
+                              onTap: _calculatedDiscount > 0
+                                  ? () {
+                                      // Apply discount and add to cart
+                                      Provider.of<SalesProvider>(
+                                        context,
+                                        listen: false,
+                                      ).addToCartWithDiscount(widget.product, 1, _calculatedDiscount);
+                                      Navigator.of(context).pop();
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Added ${widget.product.name} with ${_isPercentage ? _percentageController.text + "%" : "PKR " + _calculatedDiscount.toStringAsFixed(0)} discount',
-                                    ),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              } : null,
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Added ${widget.product.name} with ${_isPercentage ? _percentageController.text + "%" : "PKR " + _calculatedDiscount.toStringAsFixed(0)} discount',
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    }
+                                  : null,
                               borderRadius: BorderRadius.circular(context.borderRadius()),
                               child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.cardPadding / 1.5,
-                                ),
+                                padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
