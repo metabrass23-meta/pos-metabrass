@@ -50,17 +50,17 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               child: SizedBox(
                 width: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 8.w,
+                  tablet: 3.w,
                   small: 6.w,
-                  medium: 5.w,
+                  medium: 3.w,
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
                 height: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 8.w,
+                  tablet: 4.w,
                   small: 6.w,
-                  medium: 5.w,
+                  medium: 4.w,
                   large: 4.w,
                   ultrawide: 3.w,
                 ),
@@ -93,7 +93,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                     physics: const ClampingScrollPhysics(),
                     child: Container(
                       width: _getTableWidth(context),
-                      padding: EdgeInsets.all(context.cardPadding),
+                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
                       child: _buildTableHeader(context),
                     ),
                   ),
