@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../models/product/product_model.dart';
 import 'customer_provider.dart';
-import 'product_provider.dart';
 
 // Sale Item Model for products in cart
 class SaleItem {
@@ -143,10 +142,15 @@ class Sale {
 
   // Helper getters
   String get formattedInvoiceNumber => 'INV-$invoiceNumber';
+
   String get dateTimeText => '${dateOfSale.day}/${dateOfSale.month}/${dateOfSale.year}';
+
   int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
+
   bool get isPaid => status == 'Paid';
+
   bool get isPartial => status == 'Partial';
+
   bool get isUnpaid => status == 'Unpaid';
 
   Color get statusColor {
@@ -191,8 +195,11 @@ class AuditLog {
 // Additional helper extension for existing Product model
 extension ProductSalesExtension on Product {
   bool get isInStock => quantity > 0;
+
   bool get isLowStock => quantity <= 5;
+
   String get displayName => name;
+
   String get category => fabric; // Using fabric as category for now
 
   Color get stockStatusColor {
@@ -226,20 +233,32 @@ class SalesProvider extends ChangeNotifier {
 
   // Getters
   List<Sale> get sales => _filteredSales;
+
   List<Customer> get customers => _customers;
+
   List<Product> get products => _products;
+
   List<AuditLog> get auditLogs => _auditLogs;
+
   String get searchQuery => _searchQuery;
+
   bool get isLoading => _isLoading;
 
   // Current sale getters
   List<SaleItem> get currentCart => _currentCart;
+
   Customer? get selectedCustomer => _selectedCustomer;
+
   double get overallDiscount => _overallDiscount;
+
   double get gstPercentage => _gstPercentage;
+
   double get taxPercentage => _taxPercentage;
+
   String get paymentMethod => _paymentMethod;
+
   String get notes => _notes;
+
   List<Product> get wishlist => _wishlist;
 
   SalesProvider() {
@@ -522,13 +541,15 @@ class SalesProvider extends ChangeNotifier {
       _filteredSales = List.from(_sales);
     } else {
       _filteredSales = _sales
-          .where((sale) =>
-      sale.id.toLowerCase().contains(query.toLowerCase()) ||
-          sale.invoiceNumber.toLowerCase().contains(query.toLowerCase()) ||
-          sale.customerName.toLowerCase().contains(query.toLowerCase()) ||
-          sale.customerPhone.toLowerCase().contains(query.toLowerCase()) ||
-          sale.paymentMethod.toLowerCase().contains(query.toLowerCase()) ||
-          sale.status.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (sale) =>
+                sale.id.toLowerCase().contains(query.toLowerCase()) ||
+                sale.invoiceNumber.toLowerCase().contains(query.toLowerCase()) ||
+                sale.customerName.toLowerCase().contains(query.toLowerCase()) ||
+                sale.customerPhone.toLowerCase().contains(query.toLowerCase()) ||
+                sale.paymentMethod.toLowerCase().contains(query.toLowerCase()) ||
+                sale.status.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
     }
 
@@ -537,8 +558,9 @@ class SalesProvider extends ChangeNotifier {
 
   // Enhanced cart management with discount support
   void addToCartWithDiscount(Product product, int quantity, double discount, {String? customizationNotes}) {
-    final existingItemIndex = _currentCart.indexWhere((item) =>
-    item.productId == product.id && item.customizationNotes == customizationNotes);
+    final existingItemIndex = _currentCart.indexWhere(
+      (item) => item.productId == product.id && item.customizationNotes == customizationNotes,
+    );
 
     if (existingItemIndex != -1) {
       // Update existing item with new discount
@@ -580,10 +602,7 @@ class SalesProvider extends ChangeNotifier {
       final newQuantity = existingItem.quantity + quantity;
       final lineTotal = (product.price * newQuantity) - existingItem.itemDiscount;
 
-      _currentCart[existingItemIndex] = existingItem.copyWith(
-        quantity: newQuantity,
-        lineTotal: lineTotal,
-      );
+      _currentCart[existingItemIndex] = existingItem.copyWith(quantity: newQuantity, lineTotal: lineTotal);
     } else {
       // Add new item
       final lineTotal = product.price * quantity;
@@ -613,10 +632,7 @@ class SalesProvider extends ChangeNotifier {
     if (itemIndex != -1) {
       final item = _currentCart[itemIndex];
       final lineTotal = (item.unitPrice * quantity) - item.itemDiscount;
-      _currentCart[itemIndex] = item.copyWith(
-        quantity: quantity,
-        lineTotal: lineTotal,
-      );
+      _currentCart[itemIndex] = item.copyWith(quantity: quantity, lineTotal: lineTotal);
       notifyListeners();
     }
   }
@@ -626,10 +642,7 @@ class SalesProvider extends ChangeNotifier {
     if (itemIndex != -1) {
       final item = _currentCart[itemIndex];
       final lineTotal = (item.unitPrice * item.quantity) - discount;
-      _currentCart[itemIndex] = item.copyWith(
-        itemDiscount: discount,
-        lineTotal: lineTotal,
-      );
+      _currentCart[itemIndex] = item.copyWith(itemDiscount: discount, lineTotal: lineTotal);
       notifyListeners();
     }
   }
@@ -648,20 +661,17 @@ class SalesProvider extends ChangeNotifier {
   }
 
   void addToCartWithCustomization(
-      Product product,
-      int quantity,
-      {
-        double itemDiscount = 0.0,
-        String? customizationNotes,
-        Map<String, dynamic>? customOptions,
-      }
-      ) {
+    Product product,
+    int quantity, {
+    double itemDiscount = 0.0,
+    String? customizationNotes,
+    Map<String, dynamic>? customOptions,
+  }) {
     final lineTotal = (product.price * quantity) - itemDiscount;
 
     // Check if similar item exists (same product + customization)
-    final existingIndex = _currentCart.indexWhere((item) =>
-    item.productId == product.id &&
-        item.customizationNotes == customizationNotes
+    final existingIndex = _currentCart.indexWhere(
+      (item) => item.productId == product.id && item.customizationNotes == customizationNotes,
     );
 
     if (existingIndex != -1) {
@@ -779,7 +789,7 @@ class SalesProvider extends ChangeNotifier {
   // Customer management integration
   void selectCustomerById(String customerId) {
     final customer = _customers.firstWhere(
-          (c) => c.id == customerId,
+      (c) => c.id == customerId,
       orElse: () => throw Exception('Customer not found'),
     );
     setSelectedCustomer(customer);
@@ -792,7 +802,7 @@ class SalesProvider extends ChangeNotifier {
   // Product availability checks
   bool isProductAvailable(String productId, int requestedQuantity) {
     final product = _products.firstWhere(
-          (p) => p.id == productId,
+      (p) => p.id == productId,
       orElse: () => throw Exception('Product not found'),
     );
     return product.quantity >= requestedQuantity;
@@ -811,10 +821,7 @@ class SalesProvider extends ChangeNotifier {
   }
 
   // CRUD operations
-  Future<void> createSale({
-    required double amountPaid,
-    String? splitPaymentDetails,
-  }) async {
+  Future<void> createSale({required double amountPaid, String? splitPaymentDetails}) async {
     if (_currentCart.isEmpty) return;
 
     _isLoading = true;
@@ -878,7 +885,8 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateSale(Sale sale, {
+  Future<void> updateSale(
+    Sale sale, {
     double? amountPaid,
     String? paymentMethod,
     String? status,
@@ -957,8 +965,12 @@ class SalesProvider extends ChangeNotifier {
     final orderId = 'ORD${DateTime.now().millisecondsSinceEpoch}';
 
     // Add audit log
-    _addAuditLog(orderId, 'Custom Order Created', 'Admin',
-        'Custom order created for ${customer.name} - ${product.name}');
+    _addAuditLog(
+      orderId,
+      'Custom Order Created',
+      'Admin',
+      'Custom order created for ${customer.name} - ${product.name}',
+    );
 
     _isLoading = false;
     notifyListeners();
@@ -1023,9 +1035,10 @@ class SalesProvider extends ChangeNotifier {
   }
 
   void clearCartItem(String productId, {String? customizationNotes}) {
-    _currentCart.removeWhere((item) =>
-    item.productId == productId &&
-        (customizationNotes == null || item.customizationNotes == customizationNotes)
+    _currentCart.removeWhere(
+      (item) =>
+          item.productId == productId &&
+          (customizationNotes == null || item.customizationNotes == customizationNotes),
     );
     notifyListeners();
   }
@@ -1213,7 +1226,8 @@ class SalesProvider extends ChangeNotifier {
       // Text search
       if (query != null && query.isNotEmpty) {
         final searchLower = query.toLowerCase();
-        final matchesText = sale.id.toLowerCase().contains(searchLower) ||
+        final matchesText =
+            sale.id.toLowerCase().contains(searchLower) ||
             sale.invoiceNumber.toLowerCase().contains(searchLower) ||
             sale.customerName.toLowerCase().contains(searchLower) ||
             sale.customerPhone.toLowerCase().contains(searchLower) ||
@@ -1257,25 +1271,29 @@ class SalesProvider extends ChangeNotifier {
       return true;
     }).toList();
 
-    return salesToExport.map((sale) => {
-      'Sale ID': sale.id,
-      'Invoice Number': sale.formattedInvoiceNumber,
-      'Customer Name': sale.customerName,
-      'Customer Phone': sale.customerPhone,
-      'Items Count': sale.totalItems,
-      'Subtotal': sale.subtotal.toStringAsFixed(2),
-      'Overall Discount': sale.overallDiscount.toStringAsFixed(2),
-      'GST %': sale.gstPercentage.toStringAsFixed(1),
-      'Tax %': sale.taxPercentage.toStringAsFixed(1),
-      'Grand Total': sale.grandTotal.toStringAsFixed(2),
-      'Amount Paid': sale.amountPaid.toStringAsFixed(2),
-      'Remaining Amount': sale.remainingAmount.toStringAsFixed(2),
-      'Payment Method': sale.paymentMethod,
-      'Status': sale.status,
-      'Date': sale.dateTimeText,
-      'Notes': sale.notes,
-      'Created By': sale.createdBy,
-    }).toList();
+    return salesToExport
+        .map(
+          (sale) => {
+            'Sale ID': sale.id,
+            'Invoice Number': sale.formattedInvoiceNumber,
+            'Customer Name': sale.customerName,
+            'Customer Phone': sale.customerPhone,
+            'Items Count': sale.totalItems,
+            'Subtotal': sale.subtotal.toStringAsFixed(2),
+            'Overall Discount': sale.overallDiscount.toStringAsFixed(2),
+            'GST %': sale.gstPercentage.toStringAsFixed(1),
+            'Tax %': sale.taxPercentage.toStringAsFixed(1),
+            'Grand Total': sale.grandTotal.toStringAsFixed(2),
+            'Amount Paid': sale.amountPaid.toStringAsFixed(2),
+            'Remaining Amount': sale.remainingAmount.toStringAsFixed(2),
+            'Payment Method': sale.paymentMethod,
+            'Status': sale.status,
+            'Date': sale.dateTimeText,
+            'Notes': sale.notes,
+            'Created By': sale.createdBy,
+          },
+        )
+        .toList();
   }
 
   // Utility methods
@@ -1308,10 +1326,13 @@ class SalesProvider extends ChangeNotifier {
   }
 
   List<Sale> getSalesByDateRange(DateTime fromDate, DateTime toDate) {
-    return _sales.where((sale) =>
-    sale.dateOfSale.isAfter(fromDate.subtract(const Duration(days: 1))) &&
-        sale.dateOfSale.isBefore(toDate.add(const Duration(days: 1)))
-    ).toList();
+    return _sales
+        .where(
+          (sale) =>
+              sale.dateOfSale.isAfter(fromDate.subtract(const Duration(days: 1))) &&
+              sale.dateOfSale.isBefore(toDate.add(const Duration(days: 1))),
+        )
+        .toList();
   }
 
   List<AuditLog> getAuditLogsBySale(String saleId) {
@@ -1327,12 +1348,15 @@ class SalesProvider extends ChangeNotifier {
   List<Product> searchProducts(String query) {
     if (query.isEmpty) return _products;
 
-    return _products.where((product) =>
-    product.name.toLowerCase().contains(query.toLowerCase()) ||
-        product.detail.toLowerCase().contains(query.toLowerCase()) ||
-        product.color.toLowerCase().contains(query.toLowerCase()) ||
-        product.fabric.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+    return _products
+        .where(
+          (product) =>
+              product.name.toLowerCase().contains(query.toLowerCase()) ||
+              product.detail.toLowerCase().contains(query.toLowerCase()) ||
+              product.color.toLowerCase().contains(query.toLowerCase()) ||
+              product.fabric.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
   }
 
   // Cart validation
@@ -1362,11 +1386,14 @@ class SalesProvider extends ChangeNotifier {
   // Quick stats for dashboard
   Map<String, dynamic> get quickStats {
     final today = DateTime.now();
-    final todaySales = _sales.where((sale) =>
-    sale.dateOfSale.day == today.day &&
-        sale.dateOfSale.month == today.month &&
-        sale.dateOfSale.year == today.year
-    ).length;
+    final todaySales = _sales
+        .where(
+          (sale) =>
+              sale.dateOfSale.day == today.day &&
+              sale.dateOfSale.month == today.month &&
+              sale.dateOfSale.year == today.year,
+        )
+        .length;
 
     final totalRevenue = _sales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
     final totalOutstanding = _sales.fold<double>(0, (sum, sale) => sum + sale.remainingAmount);

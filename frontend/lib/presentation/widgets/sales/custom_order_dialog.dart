@@ -6,11 +6,10 @@ import 'package:sizer/sizer.dart';
 
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/customer_provider.dart';
-import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../globals/text_field.dart';
 import '../globals/text_button.dart';
+import '../globals/text_field.dart';
 import 'order_success_dialog.dart';
 
 class CreateCustomOrderDialog extends StatefulWidget {
@@ -22,7 +21,8 @@ class CreateCustomOrderDialog extends StatefulWidget {
   State<CreateCustomOrderDialog> createState() => _CreateCustomOrderDialogState();
 }
 
-class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with SingleTickerProviderStateMixin {
+class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
   final _quantityController = TextEditingController(text: '1');
@@ -48,18 +48,17 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
 
@@ -85,12 +84,9 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
   void _handleCreateOrder() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedCustomer == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Please select a customer'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Please select a customer'), backgroundColor: Colors.red));
         return;
       }
 
@@ -119,12 +115,9 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         setState(() => _isLoading = false);
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to create order: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to create order: $e'), backgroundColor: Colors.red));
         }
       }
     }
@@ -164,7 +157,9 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
     }
 
     if (_customOptions.isNotEmpty) {
-      notes.add('Custom Options: ${_customOptions.map((option) => '${option['label']}: ${option['value']}').join(', ')}');
+      notes.add(
+        'Custom Options: ${_customOptions.map((option) => '${option['label']}: ${option['value']}').join(', ')}',
+      );
     }
 
     return notes.join('\n');
@@ -260,9 +255,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.purple, Colors.purpleAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.purple, Colors.purpleAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -276,11 +269,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.assignment_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.assignment_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -419,11 +408,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.inventory_2_outlined,
-                color: Colors.purple,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.inventory_2_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Information',
@@ -469,10 +454,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       widget.product.detail,
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -506,10 +488,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 children: [
                   Text(
                     'Base Price',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     'PKR ${widget.product.price.toStringAsFixed(0)}',
@@ -541,11 +520,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.person_rounded,
-                color: Colors.blue,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.person_rounded, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Customer Selection',
@@ -576,40 +551,41 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
                         'Select Customer *',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          color: Colors.grey[500],
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                       ),
                     ),
                     onChanged: (customer) => setState(() => _selectedCustomer = customer),
-                    items: provider.customers.map((customer) => DropdownMenuItem<Customer?>(
-                      value: customer,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              customer.name,
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.charcoalGray,
+                    items: provider.customers
+                        .map(
+                          (customer) => DropdownMenuItem<Customer?>(
+                            value: customer,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    customer.name,
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.bodyFontSize,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.charcoalGray,
+                                    ),
+                                  ),
+                                  Text(
+                                    customer.phone,
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.captionFontSize,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              customer.phone,
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )).toList(),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               );
@@ -627,11 +603,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.person_rounded,
-                    color: Colors.blue,
-                    size: context.iconSize('medium'),
-                  ),
+                  Icon(Icons.person_rounded, color: Colors.blue, size: context.iconSize('medium')),
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Column(
@@ -677,11 +649,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.event_note_rounded,
-                color: Colors.orange,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.event_note_rounded, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Order Details',
@@ -719,13 +687,15 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: _quantity > 1 ? () {
-                          setState(() {
-                            _quantity--;
-                            _quantityController.text = _quantity.toString();
-                          });
-                          _updateTotalAmount();
-                        } : null,
+                        onTap: _quantity > 1
+                            ? () {
+                                setState(() {
+                                  _quantity--;
+                                  _quantityController.text = _quantity.toString();
+                                });
+                                _updateTotalAmount();
+                              }
+                            : null,
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                         child: Container(
                           padding: EdgeInsets.all(context.smallPadding),
@@ -778,11 +748,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                         child: Container(
                           padding: EdgeInsets.all(context.smallPadding),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.orange,
-                            size: context.iconSize('medium'),
-                          ),
+                          child: Icon(Icons.add, color: Colors.orange, size: context.iconSize('medium')),
                         ),
                       ),
                     ),
@@ -843,10 +809,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                           ),
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.grey[600],
-                      ),
+                      Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
                     ],
                   ),
                 ),
@@ -871,11 +834,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.tune_rounded,
-                color: Colors.green,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.tune_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Customization Options',
@@ -927,11 +886,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.add_rounded,
-                      color: Colors.green,
-                      size: context.iconSize('medium'),
-                    ),
+                    Icon(Icons.add_rounded, color: Colors.green, size: context.iconSize('medium')),
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Add Custom Option',
@@ -1022,11 +977,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.attach_money_rounded,
-                color: Colors.indigo,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.attach_money_rounded, color: Colors.indigo, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Pricing Details',
@@ -1102,9 +1053,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               final amount = (_totalAmount * percentage) / 100;
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(
-                    right: percentage != 100 ? context.smallPadding / 2 : 0,
-                  ),
+                  margin: EdgeInsets.only(right: percentage != 100 ? context.smallPadding / 2 : 0),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -1116,19 +1065,13 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       },
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.smallPadding / 2,
-                        ),
+                        padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: _advanceAmount == amount
-                                ? Colors.indigo
-                                : Colors.indigo.withOpacity(0.3),
+                            color: _advanceAmount == amount ? Colors.indigo : Colors.indigo.withOpacity(0.3),
                           ),
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          color: _advanceAmount == amount
-                              ? Colors.indigo.withOpacity(0.1)
-                              : null,
+                          color: _advanceAmount == amount ? Colors.indigo.withOpacity(0.1) : null,
                         ),
                         child: Text(
                           '$percentage%',
@@ -1207,10 +1150,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Advance Payment:',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        color: Colors.green[700],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.green[700]),
                     ),
                     Text(
                       'PKR ${_advanceAmount.toStringAsFixed(0)}',
@@ -1228,10 +1168,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Remaining Amount:',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        color: Colors.orange[700],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                     ),
                     Text(
                       'PKR ${(_totalAmount - _advanceAmount).toStringAsFixed(0)}',
@@ -1341,11 +1278,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.add_rounded,
-                      color: Colors.green,
-                      size: context.iconSize('medium'),
-                    ),
+                    Icon(Icons.add_rounded, color: Colors.green, size: context.iconSize('medium')),
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Add Custom Option',

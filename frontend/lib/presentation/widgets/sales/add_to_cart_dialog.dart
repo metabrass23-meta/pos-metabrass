@@ -5,11 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/models/product/product_model.dart';
-import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import '../globals/text_field.dart';
 import '../globals/text_button.dart';
+import '../globals/text_field.dart';
 
 class EnhancedAddToCartDialog extends StatefulWidget {
   final Product product;
@@ -20,7 +19,8 @@ class EnhancedAddToCartDialog extends StatefulWidget {
   State<EnhancedAddToCartDialog> createState() => _EnhancedAddToCartDialogState();
 }
 
-class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with SingleTickerProviderStateMixin {
+class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController(text: '1');
   final _notesController = TextEditingController();
@@ -39,18 +39,17 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
 
@@ -70,13 +69,13 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
 
-      final customPrice = _isCustomPrice ? double.tryParse(_customPriceController.text) ?? widget.product.price : widget.product.price;
+      final customPrice = _isCustomPrice
+          ? double.tryParse(_customPriceController.text) ?? widget.product.price
+          : widget.product.price;
       final notes = _hasNotes && _notesController.text.isNotEmpty ? _notesController.text : null;
 
       // Create a modified product if custom price is used
-      final productToAdd = _isCustomPrice
-          ? widget.product.copyWith(price: customPrice)
-          : widget.product;
+      final productToAdd = _isCustomPrice ? widget.product.copyWith(price: customPrice) : widget.product;
 
       provider.addToCartWithCustomization(
         productToAdd,
@@ -110,9 +109,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
         ),
       );
     });
@@ -194,9 +191,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -248,11 +243,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -304,11 +295,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.checkroom_outlined,
-              color: Colors.grey[500],
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.checkroom_outlined, color: Colors.grey[500], size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -338,10 +325,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${widget.product.color} • ${widget.product.fabric}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -399,12 +383,14 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: _quantity > 1 ? () {
-                        setState(() {
-                          _quantity--;
-                          _quantityController.text = _quantity.toString();
-                        });
-                      } : null,
+                      onTap: _quantity > 1
+                          ? () {
+                              setState(() {
+                                _quantity--;
+                                _quantityController.text = _quantity.toString();
+                              });
+                            }
+                          : null,
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
                         padding: EdgeInsets.all(context.smallPadding),
@@ -428,10 +414,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
                       ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                      ),
+                      decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
                       onChanged: (value) {
                         final qty = int.tryParse(value) ?? 1;
                         setState(() {
@@ -449,12 +432,14 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: _quantity < widget.product.quantity ? () {
-                        setState(() {
-                          _quantity++;
-                          _quantityController.text = _quantity.toString();
-                        });
-                      } : null,
+                      onTap: _quantity < widget.product.quantity
+                          ? () {
+                              setState(() {
+                                _quantity++;
+                                _quantityController.text = _quantity.toString();
+                              });
+                            }
+                          : null,
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
                         padding: EdgeInsets.all(context.smallPadding),
@@ -546,10 +531,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             SizedBox(width: context.smallPadding),
             Text(
               'Custom Price',
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -581,10 +563,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   'Unit Price:',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${widget.product.price.toStringAsFixed(0)}',
@@ -623,9 +602,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               final discountAmount = (_currentPrice * percentage) / 100;
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(
-                    right: percentage != 20 ? context.smallPadding / 2 : 0,
-                  ),
+                  margin: EdgeInsets.only(right: percentage != 20 ? context.smallPadding / 2 : 0),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -636,9 +613,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                       },
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.smallPadding / 2,
-                        ),
+                        padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: _itemDiscount == discountAmount
@@ -646,9 +621,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                                 : Colors.orange.withOpacity(0.3),
                           ),
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          color: _itemDiscount == discountAmount
-                              ? Colors.orange.withOpacity(0.1)
-                              : null,
+                          color: _itemDiscount == discountAmount ? Colors.orange.withOpacity(0.1) : null,
                         ),
                         child: Text(
                           '$percentage%',
@@ -705,10 +678,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   ),
                   child: Text(
                     'Clear Discount',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.red,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                   ),
                 ),
               ),
@@ -777,10 +747,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 'Unit Price:',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${_currentPrice.toStringAsFixed(0)}',
@@ -798,10 +765,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 'Quantity:',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 _quantity.toString(),
@@ -819,10 +783,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 'Subtotal:',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${(_currentPrice * _quantity).toStringAsFixed(0)}',
@@ -842,10 +803,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   'Discount:',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    color: Colors.orange[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                 ),
                 Text(
                   '- PKR ${_itemDiscount.toStringAsFixed(0)}',

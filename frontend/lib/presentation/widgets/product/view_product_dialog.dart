@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+
 import '../../../src/models/product/product_model.dart';
-import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
-import 'package:frontend/src/utils/responsive_breakpoints.dart';
 
 class ViewProductDetailsDialog extends StatefulWidget {
   final Product product;
@@ -25,24 +25,17 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -115,11 +108,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
       ],
     );
   }
@@ -129,11 +118,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
       ],
     );
   }
@@ -143,11 +128,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: false),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: false))),
       ],
     );
   }
@@ -156,9 +137,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.green, Colors.greenAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.green, Colors.greenAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -172,11 +151,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.inventory_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.inventory_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -207,10 +182,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -232,11 +204,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -290,11 +258,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.label_outline,
-                color: Colors.blue,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.label_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Name',
@@ -320,15 +284,8 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.inventory,
-                    color: AppTheme.pureWhite,
-                    size: context.iconSize('small'),
-                  ),
+                  decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                  child: Icon(Icons.inventory, color: AppTheme.pureWhite, size: context.iconSize('small')),
                 ),
                 SizedBox(width: context.cardPadding),
                 Text(
@@ -359,11 +316,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.description_outlined,
-                color: Colors.grey[700],
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.description_outlined, color: Colors.grey[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Details',
@@ -385,19 +338,13 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: Text(
-              widget.product.detail?.isEmpty ?? true
-                  ? 'No details provided'
-                  : widget.product.detail!,
+              widget.product.detail?.isEmpty ?? true ? 'No details provided' : widget.product.detail!,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
-                color: widget.product.detail?.isEmpty ?? true
-                    ? Colors.grey[500]
-                    : AppTheme.charcoalGray,
+                color: widget.product.detail?.isEmpty ?? true ? Colors.grey[500] : AppTheme.charcoalGray,
                 height: 1.5,
-                fontStyle: widget.product.detail?.isEmpty ?? true
-                    ? FontStyle.italic
-                    : FontStyle.normal,
+                fontStyle: widget.product.detail?.isEmpty ?? true ? FontStyle.italic : FontStyle.normal,
               ),
             ),
           ),
@@ -638,11 +585,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.palette_outlined,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.palette_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Attributes',
@@ -673,18 +616,11 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
       children: [
         Row(
           children: [
-            Icon(
-              Icons.color_lens_outlined,
-              size: 16,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.color_lens_outlined, size: 16, color: Colors.grey[600]),
             SizedBox(width: context.smallPadding),
             Text(
               'Color:',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                color: Colors.grey[700],
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
             ),
             SizedBox(width: context.smallPadding),
             Expanded(
@@ -712,18 +648,11 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Icon(
-              Icons.texture_outlined,
-              size: 16,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.texture_outlined, size: 16, color: Colors.grey[600]),
             SizedBox(width: context.smallPadding),
             Text(
               'Fabric:',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                color: Colors.grey[700],
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
             ),
             SizedBox(width: context.smallPadding),
             Expanded(
@@ -780,11 +709,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.color_lens_outlined,
-                      size: 12,
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.color_lens_outlined, size: 12, color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       widget.product.color ?? 'N/A',
@@ -826,11 +751,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.texture_outlined,
-                      size: 12,
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.texture_outlined, size: 12, color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       widget.product.fabric ?? 'N/A',
@@ -863,11 +784,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.category_outlined,
-                color: Colors.orange,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.category_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Pieces',
@@ -890,42 +807,39 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             ),
             child: (widget.product.pieces?.isNotEmpty ?? false)
                 ? Wrap(
-              spacing: context.smallPadding,
-              runSpacing: context.smallPadding,
-              children: widget.product.pieces!.map((piece) {
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding,
-                    vertical: context.smallPadding / 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    border: Border.all(
-                      color: Colors.orange.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    piece,
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.orange[700],
-                    ),
-                  ),
-                );
-              }).toList(),
-            )
+                    spacing: context.smallPadding,
+                    runSpacing: context.smallPadding,
+                    children: widget.product.pieces!.map((piece) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.smallPadding,
+                          vertical: context.smallPadding / 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                          border: Border.all(color: Colors.orange.withOpacity(0.3), width: 1),
+                        ),
+                        child: Text(
+                          piece,
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.orange[700],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  )
                 : Text(
-              'No pieces specified',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[500],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
+                    'No pieces specified',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[500],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
           ),
           SizedBox(height: context.cardPadding),
           Container(
@@ -938,11 +852,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.verified_outlined,
-                  color: Colors.green[700],
-                  size: context.iconSize('small'),
-                ),
+                Icon(Icons.verified_outlined, color: Colors.green[700], size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   'Product Active',

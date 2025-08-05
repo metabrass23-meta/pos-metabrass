@@ -2,8 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
+
 import '../../../src/providers/app_provider.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -20,8 +19,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
   late AnimationController _progressController;
@@ -57,109 +55,76 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _initializeAnimations() {
     // Initialize controllers with staggered durations for complexity
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 2500),
-      vsync: this,
-    );
-    _textController = AnimationController(
-      duration: const Duration(milliseconds: 1800),
-      vsync: this,
-    );
-    _progressController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
-      vsync: this,
-    );
-    _backgroundController = AnimationController(
-      duration: const Duration(milliseconds: 4000),
-      vsync: this,
-    );
-    _particleController = AnimationController(
-      duration: const Duration(milliseconds: 6000),
-      vsync: this,
-    );
-    _shimmerController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _orbitalController = AnimationController(
-      duration: const Duration(milliseconds: 8000),
-      vsync: this,
-    );
-    _lightRayController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
-      vsync: this,
-    );
+    _logoController = AnimationController(duration: const Duration(milliseconds: 2500), vsync: this);
+    _textController = AnimationController(duration: const Duration(milliseconds: 1800), vsync: this);
+    _progressController = AnimationController(duration: const Duration(milliseconds: 3000), vsync: this);
+    _backgroundController = AnimationController(duration: const Duration(milliseconds: 4000), vsync: this);
+    _particleController = AnimationController(duration: const Duration(milliseconds: 6000), vsync: this);
+    _shimmerController = AnimationController(duration: const Duration(milliseconds: 2000), vsync: this);
+    _pulseController = AnimationController(duration: const Duration(milliseconds: 1200), vsync: this);
+    _orbitalController = AnimationController(duration: const Duration(milliseconds: 8000), vsync: this);
+    _lightRayController = AnimationController(duration: const Duration(milliseconds: 3000), vsync: this);
 
     // Complex logo animations with multiple phases
     _logoScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: 1.3)
-            .chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween<double>(begin: 0.0, end: 1.3).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 70,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.3, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOutBack)),
+        tween: Tween<double>(begin: 1.3, end: 1.0).chain(CurveTween(curve: Curves.easeOutBack)),
         weight: 30,
       ),
     ]).animate(_logoController);
 
     _logoRotationAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: -1.5, end: 0.2)
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween<double>(begin: -1.5, end: 0.2).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 80,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.2, end: 0.0)
-            .chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween<double>(begin: 0.2, end: 0.0).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 20,
       ),
     ]).animate(_logoController);
 
-    _logoOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeInQuart),
-    ));
+    _logoOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeInQuart),
+      ),
+    );
 
     _logoFloatAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
 
     // Advanced text animations
     _textSlideAnimation = TweenSequence<Offset>([
       TweenSequenceItem(
-        tween: Tween<Offset>(begin: const Offset(0, 2), end: const Offset(0, -0.1))
-            .chain(CurveTween(curve: Curves.easeOutExpo)),
+        tween: Tween<Offset>(
+          begin: const Offset(0, 2),
+          end: const Offset(0, -0.1),
+        ).chain(CurveTween(curve: Curves.easeOutExpo)),
         weight: 70,
       ),
       TweenSequenceItem(
-        tween: Tween<Offset>(begin: const Offset(0, -0.1), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween<Offset>(
+          begin: const Offset(0, -0.1),
+          end: Offset.zero,
+        ).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 30,
       ),
     ]).animate(_textController);
 
     _textOpacityAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: 0.8)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(begin: 0.0, end: 0.8).chain(CurveTween(curve: Curves.easeIn)),
         weight: 60,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.8, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(begin: 0.8, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
         weight: 40,
       ),
     ]).animate(_textController);
@@ -167,59 +132,38 @@ class _SplashScreenState extends State<SplashScreen>
     _textGlowAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut));
 
     // Complex background animations
     _backgroundAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _backgroundController,
-      curve: Curves.easeInOutSine,
-    ));
+    ).animate(CurvedAnimation(parent: _backgroundController, curve: Curves.easeInOutSine));
 
     _particleAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _particleController,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _particleController, curve: Curves.linear));
 
     _shimmerAnimation = Tween<double>(
       begin: -2.0,
       end: 3.0,
-    ).animate(CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.easeInOutSine,
-    ));
+    ).animate(CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOutSine));
 
     _pulseAnimation = Tween<double>(
       begin: 0.8,
       end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
 
     _orbitalAnimation = Tween<double>(
       begin: 0.0,
       end: 2.0,
-    ).animate(CurvedAnimation(
-      parent: _orbitalController,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _orbitalController, curve: Curves.linear));
 
     _lightRayAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _lightRayController,
-      curve: Curves.easeInOutQuad,
-    ));
+    ).animate(CurvedAnimation(parent: _lightRayController, curve: Curves.easeInOutQuad));
   }
 
   void _startAnimation() async {
@@ -282,7 +226,7 @@ class _SplashScreenState extends State<SplashScreen>
         break;
       case AuthState.initial:
       case AuthState.loading:
-      // Still loading, wait a bit more
+        // Still loading, wait a bit more
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted && !_hasNavigated) {
             _navigateBasedOnAuthState(authProvider);
@@ -340,9 +284,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: AnimatedBuilder(
                   animation: _lightRayController,
                   builder: (context, child) {
-                    return CustomPaint(
-                      painter: LightRaysPainter(_lightRayAnimation.value),
-                    );
+                    return CustomPaint(painter: LightRaysPainter(_lightRayAnimation.value));
                   },
                 ),
               ),
@@ -406,8 +348,7 @@ class LightRaysPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     final centerX = size.width / 2;
     final centerY = size.height / 2;
@@ -418,26 +359,16 @@ class LightRaysPainter extends CustomPainter {
       final gradient = RadialGradient(
         center: Alignment.center,
         radius: 0.8,
-        colors: [
-          AppTheme.accentGold.withOpacity(0.1 * animationValue),
-          Colors.transparent,
-        ],
+        colors: [AppTheme.accentGold.withOpacity(0.1 * animationValue), Colors.transparent],
       );
 
       paint.shader = gradient.createShader(
-        Rect.fromCenter(
-          center: Offset(centerX, centerY),
-          width: size.width,
-          height: size.height,
-        ),
+        Rect.fromCenter(center: Offset(centerX, centerY), width: size.width, height: size.height),
       );
 
       final path = Path();
       path.moveTo(centerX, centerY);
-      path.lineTo(
-        centerX + size.width * math.cos(angle),
-        centerY + size.height * math.sin(angle),
-      );
+      path.lineTo(centerX + size.width * math.cos(angle), centerY + size.height * math.sin(angle));
       path.lineTo(
         centerX + size.width * math.cos(angle + 0.2),
         centerY + size.height * math.sin(angle + 0.2),
