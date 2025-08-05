@@ -197,12 +197,12 @@ def delete_category(request, category_id):
         
         # Check if category is being used by products (optional safety check)
         # Uncomment this if you have a Product model that references categories
-        # if hasattr(category, 'products') and category.products.exists():
-        #     return Response({
-        #         'success': False,
-        #         'message': 'Cannot delete category as it is being used by products.',
-        #         'errors': {'detail': 'This category is currently assigned to one or more products.'}
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+        if hasattr(category, 'products') and category.products.exists():
+            return Response({
+                'success': False,
+                'message': 'Cannot delete category as it is being used by products.',
+                'errors': {'detail': 'This category is currently assigned to one or more products.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Permanently delete the category
         category.delete()
@@ -380,12 +380,12 @@ class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView
         
         # Optional safety check for products using this category
         # Uncomment if you have Product model
-        # if hasattr(instance, 'products') and instance.products.exists():
-        #     return Response({
-        #         'success': False,
-        #         'message': 'Cannot delete category as it is being used by products.',
-        #         'errors': {'detail': 'This category is currently assigned to one or more products.'}
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+        if hasattr(instance, 'products') and instance.products.exists():
+            return Response({
+                'success': False,
+                'message': 'Cannot delete category as it is being used by products.',
+                'errors': {'detail': 'This category is currently assigned to one or more products.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Permanently delete
         instance.delete()
