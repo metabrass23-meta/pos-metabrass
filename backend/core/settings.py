@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'posapi',
     'categories',
     'products',
+    'customers',
 ]
 
 MIDDLEWARE = [

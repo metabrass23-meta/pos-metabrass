@@ -62,9 +62,9 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                 ),
                 height: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 4.w,
+                  tablet: 3.w,
                   small: 6.w,
-                  medium: 4.w,
+                  medium: 3.w,
                   large: 4.w,
                   ultrawide: 3.w,
                 ),

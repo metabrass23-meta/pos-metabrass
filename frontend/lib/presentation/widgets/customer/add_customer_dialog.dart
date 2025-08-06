@@ -15,16 +15,39 @@ class AddCustomerDialog extends StatefulWidget {
   State<AddCustomerDialog> createState() => _AddCustomerDialogState();
 }
 
-class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTickerProviderStateMixin {
+class _AddCustomerDialogState extends State<AddCustomerDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+
+  // Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _countryController = TextEditingController(text: 'Pakistan');
+  final _businessNameController = TextEditingController();
+  final _taxNumberController = TextEditingController();
+  final _notesController = TextEditingController();
 
+  // Form state
+  String _selectedCustomerType = 'INDIVIDUAL';
+  bool _showBusinessFields = false;
+
+  // Animation
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+
+  // Options
+  final List<String> _customerTypes = ['INDIVIDUAL', 'BUSINESS'];
+  final List<String> _commonCities = [
+    'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad',
+    'Multan', 'Peshawar', 'Quetta'
+  ];
+  final List<String> _commonCountries = [
+    'Pakistan', 'UAE', 'Saudi Arabia', 'UK', 'USA', 'Canada', 'Australia'
+  ];
 
   @override
   void initState() {
@@ -51,24 +74,62 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _descriptionController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _countryController.dispose();
+    _businessNameController.dispose();
+    _taxNumberController.dispose();
+    _notesController.dispose();
     super.dispose();
+  }
+
+  void _handleCustomerTypeChange(String type) {
+    setState(() {
+      _selectedCustomerType = type;
+      _showBusinessFields = type == 'BUSINESS';
+      if (!_showBusinessFields) {
+        _businessNameController.clear();
+        _taxNumberController.clear();
+      }
+    });
   }
 
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<CustomerProvider>(context, listen: false);
 
-      await provider.addCustomer(
+      final success = await provider.addCustomer(
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
         email: _emailController.text.trim(),
-        description: _descriptionController.text.trim(),
+        address: _addressController.text.trim().isEmpty
+            ? null
+            : _addressController.text.trim(),
+        city: _cityController.text.trim().isEmpty
+            ? null
+            : _cityController.text.trim(),
+        country: _countryController.text.trim().isEmpty
+            ? null
+            : _countryController.text.trim(),
+        customerType: _selectedCustomerType,
+        businessName: _showBusinessFields && _businessNameController.text.trim().isNotEmpty
+            ? _businessNameController.text.trim()
+            : null,
+        taxNumber: _showBusinessFields && _taxNumberController.text.trim().isNotEmpty
+            ? _taxNumberController.text.trim()
+            : null,
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
       );
 
       if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+        if (success) {
+          _showSuccessSnackbar();
+          Navigator.of(context).pop();
+        } else {
+          _showErrorSnackbar(provider.errorMessage ?? 'Failed to add customer');
+        }
       }
     }
   }
@@ -104,6 +165,39 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
     );
   }
 
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
   void _handleCancel() {
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
@@ -125,11 +219,11 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
                 constraints: BoxConstraints(
                   maxWidth: ResponsiveBreakpoints.responsive(
                     context,
-                    tablet: 85.w,
-                    small: 80.w,
-                    medium: 70.w,
-                    large: 60.w,
-                    ultrawide: 50.w,
+                    tablet: 90.w,
+                    small: 85.w,
+                    medium: 75.w,
+                    large: 65.w,
+                    ultrawide: 55.w,
                   ),
                   maxHeight: 90.h,
                 ),
@@ -145,55 +239,20 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
                     ),
                   ],
                 ),
-                child: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: _buildTabletLayout(),
-                  small: _buildMobileLayout(),
-                  medium: _buildDesktopLayout(),
-                  large: _buildDesktopLayout(),
-                  ultrawide: _buildDesktopLayout(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(
+                      child: _buildFormContent(),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTabletLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDesktopLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: false),
-        ],
-      ),
     );
   }
 
@@ -240,7 +299,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Register a new customer',
+                    'Create a new customer profile',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -271,89 +330,442 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
     );
   }
 
-  Widget _buildFormContent({required bool isCompact}) {
-    return Padding(
+  Widget _buildFormContent() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Customer Type Selection
+              _buildCustomerTypeSection(),
+
+              SizedBox(height: context.cardPadding),
+
+              // Basic Information Section
+              _buildBasicInfoSection(),
+
+              SizedBox(height: context.cardPadding),
+
+              // Contact Information Section
+              _buildContactInfoSection(),
+
+              // Business Information Section (conditionally shown)
+              if (_showBusinessFields) ...[
+                SizedBox(height: context.cardPadding),
+                _buildBusinessInfoSection(),
+              ],
+
+              SizedBox(height: context.cardPadding),
+
+              // Additional Information Section
+              _buildAdditionalInfoSection(),
+
+              SizedBox(height: context.mainPadding),
+
+              // Action Buttons
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildCompactButtons(),
+                small: _buildCompactButtons(),
+                medium: _buildDesktopButtons(),
+                large: _buildDesktopButtons(),
+                ultrawide: _buildDesktopButtons(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomerTypeSection() {
+    return Container(
       padding: EdgeInsets.all(context.cardPadding),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            PremiumTextField(
-              label: 'Name',
-              hint: isCompact ? 'Enter name' : 'Enter customer name',
-              controller: _nameController,
-              prefixIcon: Icons.person_outline,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a name';
-                }
-                if (value!.length < 2) {
-                  return 'Name must be at least 2 characters';
-                }
-                if (value.length > 50) {
-                  return 'Name must be less than 50 characters';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Phone Number',
-              hint: isCompact ? 'Enter phone' : 'Enter phone number (e.g., +923001234567)',
-              controller: _phoneController,
-              prefixIcon: Icons.phone_outlined,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a phone number';
-                }
-                if (!RegExp(r'^\+92\d{9}$').hasMatch(value!)) {
-                  return 'Please enter a valid phone number (+92XXXXXXXXX)';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Email',
-              hint: isCompact ? 'Enter email' : 'Enter email address',
-              controller: _emailController,
-              prefixIcon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter an email address';
-                }
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-                  return 'Please enter a valid email address';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Description',
-              hint: isCompact ? 'Enter description' : 'Enter customer description (optional)',
-              controller: _descriptionController,
-              prefixIcon: Icons.description_outlined,
-              maxLines: 3,
-              validator: (value) {
-                if (value != null && value.isNotEmpty && value.length > 500) {
-                  return 'Description must be less than 500 characters';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.mainPadding),
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactButtons(),
-              small: _buildCompactButtons(),
-              medium: _buildDesktopButtons(),
-              large: _buildDesktopButtons(),
-              ultrawide: _buildDesktopButtons(),
-            ),
-          ],
+      decoration: BoxDecoration(
+        color: AppTheme.primaryMaroon.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: AppTheme.primaryMaroon.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Customer Type',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+          Row(
+            children: _customerTypes.map((type) => Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: type == _customerTypes.last ? 0 : context.smallPadding,
+                ),
+                child: InkWell(
+                  onTap: () => _handleCustomerTypeChange(type),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                  child: Container(
+                    padding: EdgeInsets.all(context.cardPadding / 1.5),
+                    decoration: BoxDecoration(
+                      color: _selectedCustomerType == type
+                          ? AppTheme.primaryMaroon.withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      border: Border.all(
+                        color: _selectedCustomerType == type
+                            ? AppTheme.primaryMaroon
+                            : Colors.grey.shade300,
+                        width: _selectedCustomerType == type ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          type == 'BUSINESS' ? Icons.business : Icons.person,
+                          color: _selectedCustomerType == type
+                              ? AppTheme.primaryMaroon
+                              : Colors.grey[600],
+                          size: context.iconSize('small'),
+                        ),
+                        SizedBox(width: context.smallPadding / 2),
+                        Text(
+                          type == 'BUSINESS' ? 'Business' : 'Individual',
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: _selectedCustomerType == type
+                                ? AppTheme.primaryMaroon
+                                : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBasicInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Basic Information', Icons.info_outline),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Full Name *',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter name'
+              : 'Enter customer\'s full name',
+          controller: _nameController,
+          prefixIcon: Icons.person_outline,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter customer name';
+            }
+            if (value!.length < 2) {
+              return 'Name must be at least 2 characters';
+            }
+            if (value.length > 100) {
+              return 'Name must be less than 100 characters';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        SizedBox(height: context.cardPadding),
+
+        // Phone Number
+        PremiumTextField(
+          label: 'Phone Number *',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter phone'
+              : 'Enter phone number (e.g., +923001234567)',
+          controller: _phoneController,
+          prefixIcon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter phone number';
+            }
+            if (value!.length < 10) {
+              return 'Please enter a valid phone number';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+
+        // Email
+        PremiumTextField(
+          label: 'Email Address *',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter email'
+              : 'Enter email address',
+          controller: _emailController,
+          prefixIcon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter email address';
+            }
+            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+              return 'Please enter a valid email address';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+
+        // Address
+        PremiumTextField(
+          label: 'Address',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter address'
+              : 'Enter complete address (optional)',
+          controller: _addressController,
+          prefixIcon: Icons.location_on_outlined,
+          maxLines: 2,
+        ),
+        SizedBox(height: context.cardPadding),
+
+        // City and Country Row
+        ResponsiveBreakpoints.responsive(
+          context,
+          tablet: _buildLocationFieldsColumn(),
+          small: _buildLocationFieldsColumn(),
+          medium: _buildLocationFieldsRow(),
+          large: _buildLocationFieldsRow(),
+          ultrawide: _buildLocationFieldsRow(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationFieldsRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildCityField(),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: _buildCountryField(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationFieldsColumn() {
+    return Column(
+      children: [
+        _buildCityField(),
+        SizedBox(height: context.cardPadding),
+        _buildCountryField(),
+      ],
+    );
+  }
+
+  Widget _buildCityField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PremiumTextField(
+          label: 'City',
+          hint: 'Enter city',
+          controller: _cityController,
+          prefixIcon: Icons.location_city_outlined,
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding / 2,
+          runSpacing: context.smallPadding / 4,
+          children: _commonCities.take(4).map((city) => _buildQuickSelectChip(
+            label: city,
+            onTap: () => setState(() => _cityController.text = city),
+          )).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCountryField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PremiumTextField(
+          label: 'Country',
+          hint: 'Enter country',
+          controller: _countryController,
+          prefixIcon: Icons.public_outlined,
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding / 2,
+          runSpacing: context.smallPadding / 4,
+          children: _commonCountries.take(4).map((country) => _buildQuickSelectChip(
+            label: country,
+            onTap: () => setState(() => _countryController.text = country),
+          )).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessInfoSection() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Business Information', Icons.business_outlined),
+          SizedBox(height: context.cardPadding),
+
+          // Business Name
+          PremiumTextField(
+            label: 'Business Name *',
+            hint: context.shouldShowCompactLayout
+                ? 'Enter business name'
+                : 'Enter registered business name',
+            controller: _businessNameController,
+            prefixIcon: Icons.business_center_outlined,
+            validator: _showBusinessFields ? (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Business name is required for business customers';
+              }
+              if (value!.length > 200) {
+                return 'Business name must be less than 200 characters';
+              }
+              return null;
+            } : null,
+          ),
+          SizedBox(height: context.cardPadding),
+
+          // Tax Number
+          PremiumTextField(
+            label: 'Tax/NTN Number',
+            hint: context.shouldShowCompactLayout
+                ? 'Enter tax number'
+                : 'Enter tax or NTN number (optional)',
+            controller: _taxNumberController,
+            prefixIcon: Icons.receipt_outlined,
+            validator: (value) {
+              if (value != null && value.isNotEmpty && value.length > 50) {
+                return 'Tax number must be less than 50 characters';
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdditionalInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Additional Information', Icons.note_outlined),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Notes',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter notes'
+              : 'Enter any additional notes about the customer (optional)',
+          controller: _notesController,
+          prefixIcon: Icons.description_outlined,
+          maxLines: 3,
+          validator: (value) {
+            if (value != null && value.isNotEmpty && value.length > 500) {
+              return 'Notes must be less than 500 characters';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: AppTheme.primaryMaroon,
+          size: context.iconSize('medium'),
+        ),
+        SizedBox(width: context.smallPadding),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.charcoalGray,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
+        decoration: BoxDecoration(
+          color: AppTheme.accentGold.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          border: Border.all(
+            color: AppTheme.accentGold.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: context.captionFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.accentGold,
+          ),
         ),
       ),
     );
@@ -371,6 +783,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
               isLoading: provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.add_rounded,
+              backgroundColor: AppTheme.primaryMaroon,
             );
           },
         ),
@@ -402,6 +815,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
+          flex: 2,
           child: Consumer<CustomerProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
@@ -410,6 +824,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog> with SingleTicker
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.add_rounded,
+                backgroundColor: AppTheme.primaryMaroon,
               );
             },
           ),

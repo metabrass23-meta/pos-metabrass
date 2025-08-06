@@ -39,6 +39,48 @@ class ApiConfig {
   static const String bulkUpdateQuantities = '/products/bulk-update-quantities/';
   static String duplicateProduct(String id) => '/products/$id/duplicate/';
 
+  // Customer Endpoints
+  static const String customers = '/customers/';
+  static const String createCustomer = '/customers/create/';
+  static String getCustomerById(String id) => '/customers/$id/';
+  static String updateCustomer(String id) => '/customers/$id/update/';
+  static String deleteCustomer(String id) => '/customers/$id/delete/'; // Hard delete
+  static String softDeleteCustomer(String id) => '/customers/$id/soft-delete/'; // Soft delete
+  static String restoreCustomer(String id) => '/customers/$id/restore/';
+
+  // Customer Search & Filtering
+  static const String searchCustomers = '/customers/search/';
+  static String customersByStatus(String status) => '/customers/status/$status/';
+  static String customersByType(String type) => '/customers/type/$type/';
+  static String customersByCity(String city) => '/customers/city/$city/';
+  static String customersByCountry(String country) => '/customers/country/$country/';
+
+  // Customer Segments
+  static const String pakistaniCustomers = '/customers/pakistani/';
+  static const String internationalCustomers = '/customers/international/';
+  static const String newCustomers = '/customers/new/';
+  static const String recentCustomers = '/customers/recent/';
+
+  // Customer Statistics & Analytics
+  static const String customerStatistics = '/customers/statistics/';
+
+  // Customer Contact Management
+  static String updateCustomerContact(String id) => '/customers/$id/contact/';
+  static String verifyCustomerContact(String id) => '/customers/$id/verify/';
+
+  // Customer Activity Tracking
+  static String updateCustomerActivity(String id) => '/customers/$id/activity/';
+
+  // Customer Bulk Operations
+  static const String bulkCustomerActions = '/customers/bulk-actions/';
+
+  // Customer Operations
+  static String duplicateCustomer(String id) => '/customers/$id/duplicate/';
+
+  // Customer Integration endpoints (future)
+  static String customerOrders(String id) => '/customers/$id/orders/';
+  static String customerSales(String id) => '/customers/$id/sales/';
+
   // Request timeouts
   static const int connectTimeout = 15000; // 15 seconds
   static const int receiveTimeout = 15000; // 15 seconds
@@ -56,4 +98,6 @@ class ApiConfig {
   static const String categoriesCacheKey = 'cached_categories';
   static const String productsCacheKey = 'cached_products';
   static const String productStatsCacheKey = 'cached_product_stats';
+  static const String customersCacheKey = 'cached_customers';
+  static const String customerStatsCacheKey = 'cached_customer_stats';
 }
