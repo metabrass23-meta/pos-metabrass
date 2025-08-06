@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/customer/add_customer_dialog.dart';
+import '../../widgets/customer/custom_filter_dialog.dart';
 import '../../widgets/customer/customer_table.dart';
 import '../../widgets/customer/delete_customer_dialog.dart';
 import '../../widgets/customer/edit_customer_dialog.dart';
@@ -20,6 +21,15 @@ class CustomerPage extends StatefulWidget {
 
 class _CustomerPageState extends State<CustomerPage> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Load initial data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CustomerProvider>().refreshCustomers();
+    });
+  }
 
   @override
   void dispose() {
@@ -59,6 +69,94 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => CustomerFilterDialog(),
+    );
+  }
+
+  Future<void> _handleRefresh() async {
+    final provider = context.read<CustomerProvider>();
+    await provider.refreshCustomers();
+
+    if (provider.hasError) {
+      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh customers');
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  void _handleExport() async {
+    try {
+      final provider = context.read<CustomerProvider>();
+      await provider.exportData();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppTheme.pureWhite,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Customer data exported successfully',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackbar('Failed to export data: ${e.toString()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -67,49 +165,56 @@ class _CustomerPageState extends State<CustomerPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding / 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Responsive Header Section
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
+      body: Consumer<CustomerProvider>(
+        builder: (context, provider, child) {
+          return RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: AppTheme.primaryMaroon,
+            child: Padding(
+              padding: EdgeInsets.all(context.mainPadding / 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Responsive Header Section
+                  ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: _buildTabletHeader(),
+                    small: _buildMobileHeader(),
+                    medium: _buildDesktopHeader(),
+                    large: _buildDesktopHeader(),
+                    ultrawide: _buildDesktopHeader(),
+                  ),
 
-            SizedBox(height: context.mainPadding),
+                  SizedBox(height: context.mainPadding),
 
-            // Responsive Stats Cards
-            Consumer<CustomerProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
+                  // Responsive Stats Cards
+                  context.statsCardColumns == 2
+                      ? _buildMobileStatsGrid(provider)
+                      : _buildDesktopStatsRow(provider),
 
-            SizedBox(height: context.cardPadding * 0.5),
+                  SizedBox(height: context.cardPadding * 0.5),
 
-            // Responsive Search Section
-            _buildSearchSection(),
+                  // Responsive Search Section
+                  _buildSearchSection(provider),
 
-            SizedBox(height: context.cardPadding * 0.5),
+                  SizedBox(height: context.cardPadding * 0.5),
 
-            // Enhanced Customer Table with View functionality
-            Expanded(
-              child: EnhancedCustomerTable(
-                onEdit: _showEditCustomerDialog,
-                onDelete: _showDeleteCustomerDialog,
-                onView: _showViewCustomerDialog,
+                  // Active Filters Display
+                  _buildActiveFilters(provider),
+
+                  // Enhanced Customer Table with View functionality
+                  Expanded(
+                    child: EnhancedCustomerTable(
+                      onEdit: _showEditCustomerDialog,
+                      onDelete: _showDeleteCustomerDialog,
+                      onView: _showViewCustomerDialog,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -397,7 +502,7 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildSearchSection() {
+  Widget _buildSearchSection(CustomerProvider provider) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 2),
       decoration: BoxDecoration(
@@ -413,22 +518,22 @@ class _CustomerPageState extends State<CustomerPage> {
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
-        tablet: _buildTabletSearchLayout(),
-        small: _buildMobileSearchLayout(),
-        medium: _buildDesktopSearchLayout(),
-        large: _buildDesktopSearchLayout(),
-        ultrawide: _buildDesktopSearchLayout(),
+        tablet: _buildTabletSearchLayout(provider),
+        small: _buildMobileSearchLayout(provider),
+        medium: _buildDesktopSearchLayout(provider),
+        large: _buildDesktopSearchLayout(provider),
+        ultrawide: _buildDesktopSearchLayout(provider),
       ),
     );
   }
 
-  Widget _buildDesktopSearchLayout() {
+  Widget _buildDesktopSearchLayout(CustomerProvider provider) {
     return Row(
       children: [
         // Search Bar
         Expanded(
           flex: 3,
-          child: _buildSearchBar(),
+          child: _buildSearchBar(provider),
         ),
 
         SizedBox(width: context.cardPadding),
@@ -436,7 +541,7 @@ class _CustomerPageState extends State<CustomerPage> {
         // Show Inactive Toggle
         Expanded(
           flex: 1,
-          child: _buildShowInactiveToggle(),
+          child: _buildShowInactiveToggle(provider),
         ),
 
         SizedBox(width: context.smallPadding),
@@ -444,7 +549,7 @@ class _CustomerPageState extends State<CustomerPage> {
         // Filter Button
         Expanded(
           flex: 1,
-          child: _buildFilterButton(),
+          child: _buildFilterButton(provider),
         ),
 
         SizedBox(width: context.smallPadding),
@@ -458,16 +563,16 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildTabletSearchLayout() {
+  Widget _buildTabletSearchLayout(CustomerProvider provider) {
     return Column(
       children: [
-        _buildSearchBar(),
+        _buildSearchBar(provider),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildShowInactiveToggle()),
+            Expanded(child: _buildShowInactiveToggle(provider)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildFilterButton()),
+            Expanded(child: _buildFilterButton(provider)),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -476,16 +581,16 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildMobileSearchLayout() {
+  Widget _buildMobileSearchLayout(CustomerProvider provider) {
     return Column(
       children: [
-        _buildSearchBar(),
+        _buildSearchBar(provider),
         SizedBox(height: context.smallPadding),
         Row(
           children: [
-            Expanded(child: _buildShowInactiveToggle()),
+            Expanded(child: _buildShowInactiveToggle(provider)),
             SizedBox(width: context.smallPadding),
-            Expanded(child: _buildFilterButton()),
+            Expanded(child: _buildFilterButton(provider)),
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -494,132 +599,134 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(CustomerProvider provider) {
     return SizedBox(
       height: context.buttonHeight / 1.5,
-      child: Consumer<CustomerProvider>(
-        builder: (context, provider, child) {
-          return TextField(
-            controller: _searchController,
-            onChanged: provider.searchCustomers,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
+      child: TextField(
+        controller: _searchController,
+        onChanged: provider.searchCustomers,
+        style: GoogleFonts.inter(
+          fontSize: context.bodyFontSize,
+          color: AppTheme.charcoalGray,
+        ),
+        decoration: InputDecoration(
+          hintText: context.isTablet
+              ? 'Search customers...'
+              : 'Search customers by name, phone, email...',
+          hintStyle: GoogleFonts.inter(
+            fontSize: context.bodyFontSize * 0.9,
+            color: Colors.grey[500],
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Colors.grey[500],
+            size: context.iconSize('medium'),
+          ),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+            onPressed: () {
+              _searchController.clear();
+              provider.clearSearch();
+            },
+            icon: Icon(
+              Icons.clear_rounded,
+              color: Colors.grey[500],
+              size: context.iconSize('small'),
             ),
-            decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search customers...'
-                  : 'Search customers by name, ID, phone, or email...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchCustomers('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
-            ),
-          );
-        },
+          )
+              : null,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: context.cardPadding / 2,
+            vertical: context.cardPadding / 2,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildShowInactiveToggle() {
-    return Consumer<CustomerProvider>(
-      builder: (context, provider, child) {
-        return Container(
-          height: context.buttonHeight / 1.5,
-          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-          decoration: BoxDecoration(
-            color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.lightGray,
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-            border: Border.all(
-              color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.3) : Colors.grey.shade300,
-              width: 1,
-            ),
-          ),
-          child: InkWell(
-            onTap: provider.toggleShowInactive,
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  provider.showInactive ? Icons.visibility : Icons.visibility_off,
-                  color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
-                  size: context.iconSize('medium'),
-                ),
-                if (!context.isTablet) ...[
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterButton() {
+  Widget _buildShowInactiveToggle(CustomerProvider provider) {
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
       decoration: BoxDecoration(
-        color: AppTheme.lightGray,
+        color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.lightGray,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.3) : Colors.grey.shade300,
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
-              ),
+      child: InkWell(
+        onTap: provider.toggleShowInactive,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              provider.showInactive ? Icons.visibility : Icons.visibility_off,
+              color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+              size: context.iconSize('medium'),
             ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(CustomerProvider provider) {
+    final hasActiveFilters = provider.selectedStatus != null ||
+        provider.selectedType != null ||
+        provider.selectedCity != null ||
+        provider.selectedCountry != null ||
+        provider.verificationFilter != null;
+
+    return Container(
+      height: context.buttonHeight / 1.5,
+      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+      decoration: BoxDecoration(
+        color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.1) : AppTheme.lightGray,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.3) : Colors.grey.shade300,
+          width: 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: _showFilterDialog,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              hasActiveFilters ? Icons.filter_alt : Icons.filter_list_rounded,
+              color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+              size: context.iconSize('medium'),
+            ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                hasActiveFilters ? 'Filters (${_getActiveFilterCount(provider)})' : 'Filter',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -636,28 +743,153 @@ class _CustomerPageState extends State<CustomerPage> {
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: InkWell(
+        onTap: _handleExport,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.download_rounded,
+              color: AppTheme.accentGold,
+              size: context.iconSize('medium'),
+            ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Export',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.accentGold,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveFilters(CustomerProvider provider) {
+    final activeFilters = <String>[];
+
+    if (provider.selectedStatus != null) {
+      activeFilters.add('Status: ${provider.selectedStatus}');
+    }
+    if (provider.selectedType != null) {
+      activeFilters.add('Type: ${provider.selectedType}');
+    }
+    if (provider.selectedCity != null) {
+      activeFilters.add('City: ${provider.selectedCity}');
+    }
+    if (provider.selectedCountry != null) {
+      activeFilters.add('Country: ${provider.selectedCountry}');
+    }
+    if (provider.verificationFilter != null) {
+      activeFilters.add('Verified: ${provider.verificationFilter}');
+    }
+
+    if (activeFilters.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: context.cardPadding * 0.5),
+      child: Wrap(
+        spacing: context.smallPadding,
+        runSpacing: context.smallPadding / 2,
         children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
+          ...activeFilters.map((filter) => Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryMaroon.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              border: Border.all(
+                color: AppTheme.primaryMaroon.withOpacity(0.3),
+                width: 1,
               ),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  filter,
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+                SizedBox(width: context.smallPadding / 2),
+                InkWell(
+                  onTap: () => _clearSpecificFilter(filter, provider),
+                  child: Icon(
+                    Icons.close,
+                    size: context.iconSize('small'),
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+              ],
+            ),
+          )),
+
+          // Clear All Filters Button
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              border: Border.all(
+                color: Colors.red.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: InkWell(
+              onTap: provider.clearAllFilters,
+              child: Text(
+                'Clear All',
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red[700],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _clearSpecificFilter(String filterText, CustomerProvider provider) {
+    if (filterText.startsWith('Status:')) {
+      provider.setStatusFilter(null);
+    } else if (filterText.startsWith('Type:')) {
+      provider.setTypeFilter(null);
+    } else if (filterText.startsWith('City:')) {
+      provider.setCityFilter(null);
+    } else if (filterText.startsWith('Country:')) {
+      provider.setCountryFilter(null);
+    } else if (filterText.startsWith('Verified:')) {
+      provider.setVerificationFilter(null);
+    }
+  }
+
+  int _getActiveFilterCount(CustomerProvider provider) {
+    int count = 0;
+    if (provider.selectedStatus != null) count++;
+    if (provider.selectedType != null) count++;
+    if (provider.selectedCity != null) count++;
+    if (provider.selectedCountry != null) count++;
+    if (provider.verificationFilter != null) count++;
+    return count;
   }
 
   Widget _buildStatsCard(String title, String value, IconData icon, Color color) {

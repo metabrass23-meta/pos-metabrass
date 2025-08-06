@@ -1,49 +1,41 @@
 import 'package:flutter/material.dart';
+import '../models/customer/customer_api_responses.dart';
+import '../models/customer/customer_model.dart';
+import '../services/customer_service.dart';
 
+// Compatibility adapter to convert between CustomerModel and your existing Customer class
 class Customer {
   final String id;
   final String name;
   final String phone;
   final String email;
-  final String description;
-  final double? lastPurchase;
-  final DateTime? lastPurchaseDate;
+  final String? description;
   final DateTime createdAt;
-  final bool isActive; // Added for soft delete functionality
+  final DateTime? lastPurchaseDate;
+  final double? lastPurchase;
 
   Customer({
     required this.id,
     required this.name,
     required this.phone,
     required this.email,
-    required this.description,
-    this.lastPurchase,
-    this.lastPurchaseDate,
+    this.description,
     required this.createdAt,
-    this.isActive = true, // Default to active
+    this.lastPurchaseDate,
+    this.lastPurchase,
   });
 
-  Customer copyWith({
-    String? id,
-    String? name,
-    String? phone,
-    String? email,
-    String? description,
-    double? lastPurchase,
-    DateTime? lastPurchaseDate,
-    DateTime? createdAt,
-    bool? isActive,
-  }) {
+  // Convert from CustomerModel (API) to Customer (UI)
+  factory Customer.fromCustomerModel(CustomerModel model) {
     return Customer(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      phone: phone ?? this.phone,
-      email: email ?? this.email,
-      description: description ?? this.description,
-      lastPurchase: lastPurchase ?? this.lastPurchase,
-      lastPurchaseDate: lastPurchaseDate ?? this.lastPurchaseDate,
-      createdAt: createdAt ?? this.createdAt,
-      isActive: isActive ?? this.isActive,
+      id: model.id,
+      name: model.name,
+      phone: model.phone,
+      email: model.email,
+      description: model.notes,
+      createdAt: model.createdAt,
+      lastPurchaseDate: model.lastOrderDate,
+      lastPurchase: null, // This would come from order integration
     );
   }
 
@@ -52,27 +44,12 @@ class Customer {
     return '${createdAt.day.toString().padLeft(2, '0')}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.year}';
   }
 
-  String get formattedLastPurchaseDate {
-    if (lastPurchaseDate == null) return 'N/A';
-    return '${lastPurchaseDate!.day.toString().padLeft(2, '0')}/${lastPurchaseDate!.month.toString().padLeft(2, '0')}/${lastPurchaseDate!.year}';
-  }
-
   // Relative date (e.g., "Today", "Yesterday", "2 days ago")
   String get relativeCreatedAt {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final recordDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
-    final difference = today.difference(recordDate).inDays;
-
-    return _getRelativeDateString(difference);
-  }
-
-  String get relativeLastPurchaseDate {
-    if (lastPurchaseDate == null) return 'N/A';
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final recordDate = DateTime(lastPurchaseDate!.year, lastPurchaseDate!.month, lastPurchaseDate!.day);
-    final difference = today.difference(recordDate).inDays;
+    final customerDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
+    final difference = today.difference(customerDate).inDays;
 
     return _getRelativeDateString(difference);
   }
@@ -96,6 +73,28 @@ class Customer {
     }
   }
 
+  Customer copyWith({
+    String? id,
+    String? name,
+    String? phone,
+    String? email,
+    String? description,
+    DateTime? createdAt,
+    DateTime? lastPurchaseDate,
+    double? lastPurchase,
+  }) {
+    return Customer(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      lastPurchaseDate: lastPurchaseDate ?? this.lastPurchaseDate,
+      lastPurchase: lastPurchase ?? this.lastPurchase,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -103,10 +102,9 @@ class Customer {
       'phone': phone,
       'email': email,
       'description': description,
-      'lastPurchase': lastPurchase,
-      'lastPurchaseDate': lastPurchaseDate?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
-      'isActive': isActive,
+      'lastPurchaseDate': lastPurchaseDate?.toIso8601String(),
+      'lastPurchase': lastPurchase,
     };
   }
 
@@ -117,25 +115,44 @@ class Customer {
       phone: json['phone'],
       email: json['email'],
       description: json['description'],
-      lastPurchase: json['lastPurchase']?.toDouble(),
+      createdAt: DateTime.parse(json['createdAt']),
       lastPurchaseDate: json['lastPurchaseDate'] != null
           ? DateTime.parse(json['lastPurchaseDate'])
           : null,
-      createdAt: DateTime.parse(json['createdAt']),
-      isActive: json['isActive'] ?? true,
+      lastPurchase: json['lastPurchase']?.toDouble(),
     );
   }
 }
 
 class CustomerProvider extends ChangeNotifier {
-  List<Customer> _allCustomers = []; // All customers including inactive
-  List<Customer> _customers = []; // Active customers only
+  final CustomerService _customerService = CustomerService();
+
+  List<Customer> _customers = [];
   List<Customer> _filteredCustomers = [];
   String _searchQuery = '';
   bool _isLoading = false;
   String? _errorMessage;
   bool _hasError = false;
-  bool _showInactive = false; // Toggle to show inactive customers
+
+  // Pagination
+  PaginationInfo? _paginationInfo;
+  int _currentPage = 1;
+  int _pageSize = 20;
+  bool _showInactive = false;
+
+  // Filters
+  String? _selectedStatus;
+  String? _selectedType;
+  String? _selectedCity;
+  String? _selectedCountry;
+  String? _verificationFilter;
+
+  // Sorting
+  String _sortBy = 'created_at'; // 'name', 'created_at', 'updated_at', 'last_order_date', 'status', 'customer_type'
+  bool _sortAscending = false;
+
+  // Statistics
+  CustomerStatisticsResponse? _customerStatistics;
 
   // Getters
   List<Customer> get customers => _filteredCustomers;
@@ -143,200 +160,349 @@ class CustomerProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasError => _hasError;
+  PaginationInfo? get paginationInfo => _paginationInfo;
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
   bool get showInactive => _showInactive;
+  String? get selectedStatus => _selectedStatus;
+  String? get selectedType => _selectedType;
+  String? get selectedCity => _selectedCity;
+  String? get selectedCountry => _selectedCountry;
+  String? get verificationFilter => _verificationFilter;
+  String get sortBy => _sortBy;
+  bool get sortAscending => _sortAscending;
+  CustomerStatisticsResponse? get customerStatistics => _customerStatistics;
 
   CustomerProvider() {
-    _initializeCustomers();
+    loadCustomers();
+    loadCustomerStatistics();
   }
 
-  void _initializeCustomers() {
-    _allCustomers = [
-      Customer(
-        id: 'CUS001',
-        name: 'Aisha Khan',
-        phone: '+923001234567',
-        email: 'aisha.khan@email.com',
-        description: 'Premium customer, prefers bridal wear',
-        lastPurchase: 85000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 15)),
-        createdAt: DateTime.now().subtract(const Duration(days: 120)),
-        isActive: true,
-      ),
-      Customer(
-        id: 'CUS002',
-        name: 'Fatima Ali',
-        phone: '+923009876543',
-        email: 'fatima.ali@email.com',
-        description: 'Regular customer, casual and formal wear',
-        lastPurchase: 45000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 8)),
-        createdAt: DateTime.now().subtract(const Duration(days: 80)),
-        isActive: true,
-      ),
-      Customer(
-        id: 'CUS003',
-        name: 'Sarah Ahmed',
-        phone: '+923005555555',
-        email: 'sarah.ahmed@email.com',
-        description: 'Occasional buyer, party dresses',
-        lastPurchase: 25000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 45)),
-        createdAt: DateTime.now().subtract(const Duration(days: 200)),
-        isActive: true,
-      ),
-      Customer(
-        id: 'CUS004',
-        name: 'Zara Sheikh',
-        phone: '+923007777777',
-        email: 'zara.sheikh@email.com',
-        description: 'VIP customer, wedding collections',
-        lastPurchase: 120000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 3)),
-        createdAt: DateTime.now().subtract(const Duration(days: 60)),
-        isActive: true,
-      ),
-      Customer(
-        id: 'CUS005',
-        name: 'Mehwish Qureshi',
-        phone: '+923002222222',
-        email: 'mehwish.q@email.com',
-        description: 'New customer, interested in casual wear',
-        lastPurchase: null,
-        lastPurchaseDate: null,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        isActive: true,
-      ),
-      Customer(
-        id: 'CUS006',
-        name: 'Hina Malik',
-        phone: '+923003333333',
-        email: 'hina.malik@email.com',
-        description: 'Corporate client, bulk orders',
-        lastPurchase: 95000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 20)),
-        createdAt: DateTime.now().subtract(const Duration(days: 150)),
-        isActive: true,
-      ),
-      // Add some inactive customers for testing
-      Customer(
-        id: 'CUS007',
-        name: 'Inactive Customer',
-        phone: '+923004444444',
-        email: 'inactive@email.com',
-        description: 'This customer has been deactivated',
-        lastPurchase: 15000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 90)),
-        createdAt: DateTime.now().subtract(const Duration(days: 300)),
-        isActive: false,
-      ),
-    ];
+  /// Load customers from API
+  Future<void> loadCustomers({
+    int? page,
+    int? pageSize,
+    String? search,
+    bool? showInactive,
+    String? status,
+    String? customerType,
+    String? city,
+    String? country,
+    String? verified,
+    bool showLoadingIndicator = true,
+  }) async {
+    if (showLoadingIndicator) {
+      _isLoading = true;
+      _hasError = false;
+      _errorMessage = null;
+      notifyListeners();
+    }
 
-    _updateCustomersList();
+    try {
+      final params = CustomerListParams(
+        page: page ?? _currentPage,
+        pageSize: pageSize ?? _pageSize,
+        search: search ?? _searchQuery,
+        showInactive: showInactive ?? _showInactive,
+        customerType: customerType ?? _selectedType,
+        status: status ?? _selectedStatus,
+        city: city ?? _selectedCity,
+        country: country ?? _selectedCountry,
+        verified: verified ?? _verificationFilter,
+        sortBy: _sortBy,
+        sortOrder: _sortAscending ? 'asc' : 'desc',
+      );
+
+      final response = await _customerService.getCustomers(params: params);
+
+      if (response.success && response.data != null) {
+        final customersData = response.data!;
+
+        // Convert CustomerModel to Customer for UI compatibility
+        _customers = customersData.customers
+            .map((customerModel) => Customer.fromCustomerModel(customerModel))
+            .toList();
+
+        _filteredCustomers = List.from(_customers);
+        _paginationInfo = customersData.pagination;
+
+        // Update pagination state
+        _currentPage = params.page;
+        _pageSize = params.pageSize;
+        _searchQuery = params.search ?? '';
+        _showInactive = params.showInactive;
+        _selectedStatus = params.status;
+        _selectedType = params.customerType;
+        _selectedCity = params.city;
+        _selectedCountry = params.country;
+        _verificationFilter = params.verified;
+
+        _hasError = false;
+        _errorMessage = null;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to load customers: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  void _updateCustomersList() {
-    _customers = _showInactive
-        ? _allCustomers
-        : _allCustomers.where((customer) => customer.isActive).toList();
-    searchCustomers(_searchQuery);
+  /// Load customer statistics
+  Future<void> loadCustomerStatistics() async {
+    try {
+      final response = await _customerService.getCustomerStatistics();
+
+      if (response.success && response.data != null) {
+        _customerStatistics = response.data!;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load customer statistics: ${e.toString()}');
+    }
+  }
+
+  /// Refresh customers (pull-to-refresh)
+  Future<void> refreshCustomers() async {
+    _currentPage = 1; // Reset to first page
+    await loadCustomers(page: 1, showLoadingIndicator: false);
+    await loadCustomerStatistics();
+  }
+
+  /// Load next page
+  Future<void> loadNextPage() async {
+    if (_paginationInfo?.hasNext == true) {
+      await loadCustomers(page: _currentPage + 1, showLoadingIndicator: false);
+    }
+  }
+
+  /// Load previous page
+  Future<void> loadPreviousPage() async {
+    if (_paginationInfo?.hasPrevious == true) {
+      await loadCustomers(page: _currentPage - 1, showLoadingIndicator: false);
+    }
+  }
+
+  /// Search customers
+  Future<void> searchCustomers(String query) async {
+    _searchQuery = query.toLowerCase();
+    _currentPage = 1; // Reset to first page when searching
+    await loadCustomers(search: _searchQuery, page: 1);
+  }
+
+  /// Clear search
+  Future<void> clearSearch() async {
+    _searchQuery = '';
+    _currentPage = 1;
+    await loadCustomers(search: '', page: 1);
   }
 
   /// Toggle show inactive customers
-  void toggleShowInactive() {
+  Future<void> toggleShowInactive() async {
     _showInactive = !_showInactive;
-    _updateCustomersList();
-    notifyListeners();
+    _currentPage = 1;
+    await loadCustomers(showInactive: _showInactive, page: 1);
   }
 
-  void searchCustomers(String query) {
-    _searchQuery = query;
+  /// Set status filter
+  Future<void> setStatusFilter(String? status) async {
+    _selectedStatus = status;
+    _currentPage = 1;
+    await loadCustomers(status: _selectedStatus, page: 1);
+  }
 
-    if (query.isEmpty) {
-      _filteredCustomers = List.from(_customers);
+  /// Set customer type filter
+  Future<void> setTypeFilter(String? customerType) async {
+    _selectedType = customerType;
+    _currentPage = 1;
+    await loadCustomers(customerType: _selectedType, page: 1);
+  }
+
+  /// Set city filter
+  Future<void> setCityFilter(String? city) async {
+    _selectedCity = city;
+    _currentPage = 1;
+    await loadCustomers(city: _selectedCity, page: 1);
+  }
+
+  /// Set country filter
+  Future<void> setCountryFilter(String? country) async {
+    _selectedCountry = country;
+    _currentPage = 1;
+    await loadCustomers(country: _selectedCountry, page: 1);
+  }
+
+  /// Set verification filter
+  Future<void> setVerificationFilter(String? verified) async {
+    _verificationFilter = verified;
+    _currentPage = 1;
+    await loadCustomers(verified: _verificationFilter, page: 1);
+  }
+
+  /// Clear all filters
+  Future<void> clearAllFilters() async {
+    _selectedStatus = null;
+    _selectedType = null;
+    _selectedCity = null;
+    _selectedCountry = null;
+    _verificationFilter = null;
+    _searchQuery = '';
+    _currentPage = 1;
+    await loadCustomers(
+      status: null,
+      customerType: null,
+      city: null,
+      country: null,
+      verified: null,
+      search: '',
+      page: 1,
+    );
+  }
+
+  /// Sort customers
+  void setSortBy(String sortBy, {bool? ascending}) {
+    _sortBy = sortBy;
+    if (ascending != null) {
+      _sortAscending = ascending;
     } else {
-      _filteredCustomers = _customers
-          .where((customer) =>
-      customer.name.toLowerCase().contains(query.toLowerCase()) ||
-          customer.phone.toLowerCase().contains(query.toLowerCase()) ||
-          customer.email.toLowerCase().contains(query.toLowerCase()) ||
-          customer.id.toLowerCase().contains(query.toLowerCase()) ||
-          customer.description.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      // Toggle if same field, otherwise default to descending for dates, ascending for text
+      if (_sortBy == sortBy) {
+        _sortAscending = !_sortAscending;
+      } else {
+        _sortAscending = (sortBy == 'name' || sortBy == 'phone' || sortBy == 'email');
+      }
     }
 
-    notifyListeners();
+    // Reload with new sorting
+    loadCustomers(showLoadingIndicator: false);
   }
 
+  /// Add new customer
   Future<bool> addCustomer({
     required String name,
     required String phone,
     required String email,
-    required String description,
+    String? address,
+    String? city,
+    String? country,
+    String? customerType,
+    String? businessName,
+    String? taxNumber,
+    String? notes,
   }) async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      final newCustomer = Customer(
-        id: 'CUS${(_allCustomers.length + 1).toString().padLeft(3, '0')}',
+      final response = await _customerService.createCustomer(
         name: name,
         phone: phone,
         email: email,
-        description: description,
-        lastPurchase: null,
-        lastPurchaseDate: null,
-        createdAt: DateTime.now(),
-        isActive: true,
+        address: address,
+        city: city,
+        country: country,
+        customerType: customerType,
+        businessName: businessName,
+        taxNumber: taxNumber,
+        notes: notes,
       );
 
-      _allCustomers.add(newCustomer);
-      _updateCustomersList();
+      if (response.success && response.data != null) {
+        // Add the new customer to local list immediately
+        final newCustomer = Customer.fromCustomerModel(response.data!);
+        _customers.add(newCustomer);
+        _filteredCustomers.add(newCustomer);
 
-      _isLoading = false;
-      notifyListeners();
-      return true;
+        // Also refresh from server to ensure consistency
+        await loadCustomers(showLoadingIndicator: false);
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Failed to add customer: ${e.toString()}';
+      _errorMessage = 'Failed to create customer: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
+  /// Update existing customer
   Future<bool> updateCustomer({
     required String id,
     required String name,
     required String phone,
     required String email,
-    required String description,
+    String? address,
+    String? city,
+    String? country,
+    String? customerType,
+    String? status,
+    String? businessName,
+    String? taxNumber,
+    String? notes,
+    bool? phoneVerified,
+    bool? emailVerified,
   }) async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _customerService.updateCustomer(
+        id: id,
+        name: name,
+        phone: phone,
+        email: email,
+        address: address,
+        city: city,
+        country: country,
+        customerType: customerType,
+        status: status,
+        businessName: businessName,
+        taxNumber: taxNumber,
+        notes: notes,
+        phoneVerified: phoneVerified,
+        emailVerified: emailVerified,
+      );
 
-      final index = _allCustomers.indexWhere((customer) => customer.id == id);
-      if (index != -1) {
-        _allCustomers[index] = _allCustomers[index].copyWith(
-          name: name,
-          phone: phone,
-          email: email,
-          description: description,
-        );
-        _updateCustomersList();
+      if (response.success && response.data != null) {
+        // Update the customer in local list
+        final updatedCustomer = Customer.fromCustomerModel(response.data!);
+        final index = _customers.indexWhere((customer) => customer.id == id);
+        if (index != -1) {
+          _customers[index] = updatedCustomer;
+        }
+
+        final filteredIndex = _filteredCustomers.indexWhere((customer) => customer.id == id);
+        if (filteredIndex != -1) {
+          _filteredCustomers[filteredIndex] = updatedCustomer;
+        }
+
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to update customer: ${e.toString()}';
@@ -346,22 +512,31 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  /// Hard delete - permanently removes customer
+  /// Delete customer permanently (hard delete)
   Future<bool> deleteCustomer(String id) async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
+      final response = await _customerService.deleteCustomer(id);
 
-      _allCustomers.removeWhere((customer) => customer.id == id);
-      _updateCustomersList();
+      if (response.success) {
+        // Remove customer from local list permanently
+        _customers.removeWhere((customer) => customer.id == id);
+        _filteredCustomers.removeWhere((customer) => customer.id == id);
 
-      _isLoading = false;
-      notifyListeners();
-      return true;
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to delete customer: ${e.toString()}';
@@ -371,53 +546,79 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  /// Soft delete - marks customer as inactive
+  /// Soft delete customer (set as inactive)
   Future<bool> softDeleteCustomer(String id) async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
+      final response = await _customerService.softDeleteCustomer(id);
 
-      final index = _allCustomers.indexWhere((customer) => customer.id == id);
-      if (index != -1) {
-        _allCustomers[index] = _allCustomers[index].copyWith(isActive: false);
-        _updateCustomersList();
+      if (response.success) {
+        // Update customer in local list to mark as inactive or remove from list
+        if (!_showInactive) {
+          _customers.removeWhere((customer) => customer.id == id);
+          _filteredCustomers.removeWhere((customer) => customer.id == id);
+        }
+
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Failed to deactivate customer: ${e.toString()}';
+      _errorMessage = 'Failed to soft delete customer: ${e.toString()}';
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  /// Restore customer - reactivates a soft-deleted customer
+  /// Restore customer
   Future<bool> restoreCustomer(String id) async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
+      final response = await _customerService.restoreCustomer(id);
 
-      final index = _allCustomers.indexWhere((customer) => customer.id == id);
-      if (index != -1) {
-        _allCustomers[index] = _allCustomers[index].copyWith(isActive: true);
-        _updateCustomersList();
+      if (response.success && response.data != null) {
+        // Update the customer in local list
+        final restoredCustomer = Customer.fromCustomerModel(response.data!);
+        final index = _customers.indexWhere((customer) => customer.id == id);
+        if (index != -1) {
+          _customers[index] = restoredCustomer;
+        } else {
+          _customers.add(restoredCustomer);
+        }
+
+        final filteredIndex = _filteredCustomers.indexWhere((customer) => customer.id == id);
+        if (filteredIndex != -1) {
+          _filteredCustomers[filteredIndex] = restoredCustomer;
+        } else {
+          _filteredCustomers.add(restoredCustomer);
+        }
+
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to restore customer: ${e.toString()}';
@@ -427,24 +628,161 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Customer? getCustomerById(String id) {
+  /// Verify customer contact
+  Future<bool> verifyCustomerContact({
+    required String id,
+    required String verificationType,
+    bool verified = true,
+  }) async {
     try {
-      return _allCustomers.firstWhere((customer) => customer.id == id);
+      final response = await _customerService.verifyCustomerContact(
+        id: id,
+        verificationType: verificationType,
+        verified: verified,
+      );
+
+      if (response.success) {
+        // Refresh customer data to get updated verification status
+        await loadCustomers(showLoadingIndicator: false);
+        await loadCustomerStatistics();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-      return null;
+      _hasError = true;
+      _errorMessage = 'Failed to verify customer contact: ${e.toString()}';
+      notifyListeners();
+      return false;
     }
   }
 
-  /// Update customer's last purchase
-  Future<void> updateLastPurchase(String customerId, double amount) async {
-    final index = _allCustomers.indexWhere((customer) => customer.id == customerId);
-    if (index != -1) {
-      _allCustomers[index] = _allCustomers[index].copyWith(
-        lastPurchase: amount,
-        lastPurchaseDate: DateTime.now(),
+  /// Update customer activity
+  Future<bool> updateCustomerActivity({
+    required String id,
+    required String activityType,
+    String? activityDate,
+  }) async {
+    try {
+      final response = await _customerService.updateCustomerActivity(
+        id: id,
+        activityType: activityType,
+        activityDate: activityDate,
       );
-      _updateCustomersList();
+
+      if (response.success) {
+        // Refresh customer data to get updated activity
+        await loadCustomers(showLoadingIndicator: false);
+        await loadCustomerStatistics();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to update customer activity: ${e.toString()}';
       notifyListeners();
+      return false;
+    }
+  }
+
+  /// Bulk customer actions
+  Future<bool> bulkCustomerActions({
+    required List<String> customerIds,
+    required String action,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _customerService.bulkCustomerActions(
+        customerIds: customerIds,
+        action: action,
+      );
+
+      if (response.success) {
+        // Refresh customer data to get updated information
+        await loadCustomers(showLoadingIndicator: false);
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to perform bulk action: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Duplicate customer
+  Future<bool> duplicateCustomer({
+    required String id,
+    required String name,
+    required String phone,
+    String? email,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _customerService.duplicateCustomer(
+        id: id,
+        name: name,
+        phone: phone,
+        email: email,
+      );
+
+      if (response.success && response.data != null) {
+        // Add the new customer to local list immediately
+        final duplicatedCustomer = Customer.fromCustomerModel(response.data!);
+        _customers.add(duplicatedCustomer);
+        _filteredCustomers.add(duplicatedCustomer);
+
+        // Also refresh from server to ensure consistency
+        await loadCustomers(showLoadingIndicator: false);
+        await loadCustomerStatistics();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _hasError = true;
+        _errorMessage = response.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to duplicate customer: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Get customer by ID
+  Customer? getCustomerById(String id) {
+    try {
+      return _customers.firstWhere((customer) => customer.id == id);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -455,338 +793,152 @@ class CustomerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Enhanced statistics for dashboard
   Map<String, dynamic> get customerStats {
-    final activeCustomers = _allCustomers.where((customer) => customer.isActive).toList();
-    final totalCustomers = activeCustomers.length;
-
-    final newThisMonth = activeCustomers
-        .where((customer) =>
-    DateTime.now().difference(customer.createdAt).inDays <= 30)
-        .length;
-
-    final customersWithPurchases = activeCustomers.where((customer) => customer.lastPurchase != null).toList();
-    final averagePurchase = customersWithPurchases.isNotEmpty
-        ? (customersWithPurchases.fold<double>(0, (sum, customer) => sum + (customer.lastPurchase ?? 0)) / customersWithPurchases.length).toStringAsFixed(0)
-        : '0';
-
-    final recentBuyers = activeCustomers
-        .where((customer) =>
-    customer.lastPurchaseDate != null &&
-        DateTime.now().difference(customer.lastPurchaseDate!).inDays <= 30)
-        .length;
+    if (_customerStatistics == null) {
+      return {
+        'total': 0,
+        'newThisMonth': 0,
+        'averagePurchase': 0,
+        'recentBuyers': 0,
+      };
+    }
 
     return {
-      'total': totalCustomers,
-      'newThisMonth': newThisMonth,
-      'averagePurchase': averagePurchase,
-      'recentBuyers': recentBuyers,
-      'inactive': _allCustomers.where((customer) => !customer.isActive).length,
+      'total': _customerStatistics!.totalCustomers,
+      'newThisMonth': _customerStatistics!.newCustomersThisMonth,
+      'averagePurchase': 0, // This would come from order integration
+      'recentBuyers': _customerStatistics!.recentCustomersThisWeek,
     };
   }
 
-  /// Get top customers by purchase amount
-  List<Customer> get topCustomers {
-    final activeCustomersWithPurchases = _allCustomers
-        .where((customer) => customer.isActive && customer.lastPurchase != null)
-        .toList();
-
-    activeCustomersWithPurchases.sort((a, b) => (b.lastPurchase ?? 0).compareTo(a.lastPurchase ?? 0));
-
-    return activeCustomersWithPurchases.take(5).toList();
+  /// Get customers by status
+  List<Customer> getCustomersByStatus(String status) {
+    return _customers.where((customer) {
+      // This would need to be implemented with actual status from CustomerModel
+      return true; // Placeholder
+    }).toList();
   }
 
-  /// Get recent customers (last 30 days)
-  List<Customer> get recentCustomers {
-    return _allCustomers
-        .where((customer) =>
-    customer.isActive &&
-        DateTime.now().difference(customer.createdAt).inDays <= 30)
+  /// Get customers by type
+  List<Customer> getCustomersByType(String customerType) {
+    return _customers.where((customer) {
+      // This would need to be implemented with actual type from CustomerModel
+      return true; // Placeholder
+    }).toList();
+  }
+
+  /// Get recently created customers
+  List<Customer> getRecentlyCreated({int days = 7}) {
+    final cutoffDate = DateTime.now().subtract(Duration(days: days));
+    return _customers
+        .where((customer) => customer.createdAt.isAfter(cutoffDate))
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  /// Get customers by purchase activity
-  Map<String, List<Customer>> get customersByActivity {
-    final now = DateTime.now();
-    final activeCustomers = <Customer>[];
-    final inactiveCustomers = <Customer>[];
-    final newCustomers = <Customer>[];
+  /// Export data (placeholder for future implementation)
+  Future<void> exportData() async {
+    // Implementation for exporting customer data
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
 
-    for (final customer in _allCustomers.where((c) => c.isActive)) {
-      final daysSinceCreated = now.difference(customer.createdAt).inDays;
-      final daysSinceLastPurchase = customer.lastPurchaseDate != null
-          ? now.difference(customer.lastPurchaseDate!).inDays
-          : null;
+  /// Clear all customers cache
+  Future<void> clearCache() async {
+    await _customerService.clearCache();
+  }
 
-      if (daysSinceCreated <= 30) {
-        newCustomers.add(customer);
-      } else if (daysSinceLastPurchase != null && daysSinceLastPurchase <= 60) {
-        activeCustomers.add(customer);
-      } else {
-        inactiveCustomers.add(customer);
-      }
+  /// Check if has cached data
+  Future<bool> hasCachedData() async {
+    return await _customerService.hasCachedCustomers();
+  }
+
+  /// Set page size
+  Future<void> setPageSize(int pageSize) async {
+    if (_pageSize != pageSize) {
+      _pageSize = pageSize;
+      _currentPage = 1; // Reset to first page
+      await loadCustomers(pageSize: _pageSize, page: 1);
     }
-
-    return {
-      'active': activeCustomers,
-      'inactive': inactiveCustomers,
-      'new': newCustomers,
-    };
   }
 
-  /// Get customer analytics
-  Map<String, dynamic> get customerAnalytics {
-    final activeCustomers = _allCustomers.where((customer) => customer.isActive).toList();
-
-    final totalRevenue = activeCustomers
-        .where((customer) => customer.lastPurchase != null)
-        .fold<double>(0, (sum, customer) => sum + (customer.lastPurchase ?? 0));
-
-    final averageOrderValue = activeCustomers.where((customer) => customer.lastPurchase != null).isNotEmpty
-        ? totalRevenue / activeCustomers.where((customer) => customer.lastPurchase != null).length
-        : 0.0;
-
-    final conversionRate = activeCustomers.isNotEmpty
-        ? (activeCustomers.where((customer) => customer.lastPurchase != null).length / activeCustomers.length) * 100
-        : 0.0;
-
-    return {
-      'totalRevenue': totalRevenue,
-      'averageOrderValue': averageOrderValue,
-      'conversionRate': conversionRate,
-      'totalCustomers': activeCustomers.length,
-      'payingCustomers': activeCustomers.where((customer) => customer.lastPurchase != null).length,
-      'inactiveCustomers': _allCustomers.where((customer) => !customer.isActive).length,
-    };
-  }
-
-  /// Filter customers by various criteria
-  List<Customer> filterCustomers({
-    String? searchTerm,
-    double? minPurchase,
-    double? maxPurchase,
-    DateTime? createdAfter,
-    DateTime? createdBefore,
-    bool? hasPurchased,
-    bool? includeInactive,
-  }) {
-    final customersToFilter = (includeInactive ?? false) ? _allCustomers : _allCustomers.where((c) => c.isActive).toList();
-
-    return customersToFilter.where((customer) {
-      // Search term filter
-      if (searchTerm != null && searchTerm.isNotEmpty) {
-        final query = searchTerm.toLowerCase();
-        if (!customer.name.toLowerCase().contains(query) &&
-            !customer.email.toLowerCase().contains(query) &&
-            !customer.phone.toLowerCase().contains(query) &&
-            !customer.description.toLowerCase().contains(query)) {
-          return false;
-        }
-      }
-
-      // Purchase amount filters
-      if (minPurchase != null && (customer.lastPurchase ?? 0) < minPurchase) {
-        return false;
-      }
-      if (maxPurchase != null && (customer.lastPurchase ?? 0) > maxPurchase) {
-        return false;
-      }
-
-      // Creation date filters
-      if (createdAfter != null && customer.createdAt.isBefore(createdAfter)) {
-        return false;
-      }
-      if (createdBefore != null && customer.createdAt.isAfter(createdBefore)) {
-        return false;
-      }
-
-      // Purchase status filter
-      if (hasPurchased != null) {
-        if (hasPurchased && customer.lastPurchase == null) {
-          return false;
-        }
-        if (!hasPurchased && customer.lastPurchase != null) {
-          return false;
-        }
-      }
-
-      return true;
-    }).toList();
-  }
-
-  /// Export customer data (returns formatted data for export)
-  List<Map<String, dynamic>> exportCustomerData() {
-    final customersToExport = _showInactive ? _allCustomers : _allCustomers.where((c) => c.isActive).toList();
-
-    return customersToExport.map((customer) => {
-      'ID': customer.id,
-      'Name': customer.name,
-      'Phone': customer.phone,
-      'Email': customer.email,
-      'Description': customer.description,
-      'Last Purchase': customer.lastPurchase?.toStringAsFixed(2) ?? 'N/A',
-      'Last Purchase Date': customer.lastPurchaseDate?.toString().split(' ')[0] ?? 'N/A',
-      'Customer Since': customer.createdAt.toString().split(' ')[0],
-      'Status': customer.isActive ? 'Active' : 'Inactive',
-    }).toList();
-  }
-
-  /// Get inactive customers
-  List<Customer> get inactiveCustomers {
-    return _allCustomers.where((customer) => !customer.isActive).toList();
-  }
-
-  /// Get active customers
-  List<Customer> get activeCustomers {
-    return _allCustomers.where((customer) => customer.isActive).toList();
-  }
-
-  /// Bulk operations
-  Future<bool> deleteMultipleCustomers(List<String> ids, {bool permanent = true}) async {
+  /// Load customers by specific segments
+  Future<void> loadPakistaniCustomers() async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _customerService.getPakistaniCustomers(
+        page: 1,
+        pageSize: _pageSize,
+      );
 
-      for (String id in ids) {
-        if (permanent) {
-          _allCustomers.removeWhere((customer) => customer.id == id);
-        } else {
-          final index = _allCustomers.indexWhere((customer) => customer.id == id);
-          if (index != -1) {
-            _allCustomers[index] = _allCustomers[index].copyWith(isActive: false);
-          }
-        }
+      if (response.success && response.data != null) {
+        _customers = response.data!.customers
+            .map((customerModel) => Customer.fromCustomerModel(customerModel))
+            .toList();
+        _filteredCustomers = List.from(_customers);
+        _paginationInfo = response.data!.pagination;
       }
-
-      _updateCustomersList();
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Failed to delete customers: ${e.toString()}';
+      _errorMessage = 'Failed to load Pakistani customers: ${e.toString()}';
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
-  /// Restore multiple customers
-  Future<bool> restoreMultipleCustomers(List<String> ids) async {
+  Future<void> loadInternationalCustomers() async {
     _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _customerService.getInternationalCustomers(
+        page: 1,
+        pageSize: _pageSize,
+      );
 
-      for (String id in ids) {
-        final index = _allCustomers.indexWhere((customer) => customer.id == id);
-        if (index != -1) {
-          _allCustomers[index] = _allCustomers[index].copyWith(isActive: true);
-        }
+      if (response.success && response.data != null) {
+        _customers = response.data!.customers
+            .map((customerModel) => Customer.fromCustomerModel(customerModel))
+            .toList();
+        _filteredCustomers = List.from(_customers);
+        _paginationInfo = response.data!.pagination;
       }
-
-      _updateCustomersList();
-      _isLoading = false;
-      notifyListeners();
-      return true;
     } catch (e) {
       _hasError = true;
-      _errorMessage = 'Failed to restore customers: ${e.toString()}';
+      _errorMessage = 'Failed to load international customers: ${e.toString()}';
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
-  /// Duplicate customer
-  Future<bool> duplicateCustomer(String id) async {
-    final originalCustomer = getCustomerById(id);
-    if (originalCustomer == null) return false;
-
-    return await addCustomer(
-      name: '${originalCustomer.name} (Copy)',
-      phone: originalCustomer.phone,
-      email: 'copy.${originalCustomer.email}',
-      description: originalCustomer.description,
-    );
-  }
-
-  /// Search customers with advanced filters
-  Future<void> searchCustomersAdvanced({
-    String? query,
-    bool? hasOrders,
-    DateTime? createdAfter,
-    DateTime? createdBefore,
-    double? minPurchase,
-    double? maxPurchase,
-  }) async {
-    _searchQuery = query ?? '';
-
-    List<Customer> filteredList = _customers;
-
-    // Apply text search
-    if (query != null && query.isNotEmpty) {
-      filteredList = filteredList.where((customer) =>
-      customer.name.toLowerCase().contains(query.toLowerCase()) ||
-          customer.phone.toLowerCase().contains(query.toLowerCase()) ||
-          customer.email.toLowerCase().contains(query.toLowerCase()) ||
-          customer.id.toLowerCase().contains(query.toLowerCase()) ||
-          customer.description.toLowerCase().contains(query.toLowerCase())).toList();
-    }
-
-    // Apply purchase filter
-    if (hasOrders != null) {
-      filteredList = filteredList.where((customer) =>
-      hasOrders ? customer.lastPurchase != null : customer.lastPurchase == null).toList();
-    }
-
-    // Apply date filters
-    if (createdAfter != null) {
-      filteredList = filteredList.where((customer) =>
-          customer.createdAt.isAfter(createdAfter)).toList();
-    }
-
-    if (createdBefore != null) {
-      filteredList = filteredList.where((customer) =>
-          customer.createdAt.isBefore(createdBefore)).toList();
-    }
-
-    // Apply purchase amount filters
-    if (minPurchase != null) {
-      filteredList = filteredList.where((customer) =>
-      (customer.lastPurchase ?? 0) >= minPurchase).toList();
-    }
-
-    if (maxPurchase != null) {
-      filteredList = filteredList.where((customer) =>
-      (customer.lastPurchase ?? 0) <= maxPurchase).toList();
-    }
-
-    _filteredCustomers = filteredList;
+  Future<void> loadNewCustomers({int days = 30}) async {
+    _isLoading = true;
     notifyListeners();
-  }
 
-  /// Get customers created in a specific time period
-  List<Customer> getCustomersByDateRange(DateTime startDate, DateTime endDate) {
-    return _allCustomers.where((customer) =>
-    customer.isActive &&
-        customer.createdAt.isAfter(startDate) &&
-        customer.createdAt.isBefore(endDate)).toList();
-  }
+    try {
+      final response = await _customerService.getNewCustomers(
+        days: days,
+        page: 1,
+        pageSize: _pageSize,
+      );
 
-  /// Get customers with purchases in a specific time period
-  List<Customer> getCustomersByPurchaseDate(DateTime startDate, DateTime endDate) {
-    return _allCustomers.where((customer) =>
-    customer.isActive &&
-        customer.lastPurchaseDate != null &&
-        customer.lastPurchaseDate!.isAfter(startDate) &&
-        customer.lastPurchaseDate!.isBefore(endDate)).toList();
+      if (response.success && response.data != null) {
+        _customers = response.data!.customers
+            .map((customerModel) => Customer.fromCustomerModel(customerModel))
+            .toList();
+        _filteredCustomers = List.from(_customers);
+        _paginationInfo = response.data!.pagination;
+      }
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Failed to load new customers: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }
