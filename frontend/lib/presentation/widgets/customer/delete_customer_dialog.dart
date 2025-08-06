@@ -28,6 +28,9 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
 
   bool _isPermanentDelete = true; // Toggle between permanent and soft delete
   bool _confirmationChecked = false; // Requires user to check confirmation
+  String _confirmationText = ''; // User must type confirmation text
+
+  final TextEditingController _confirmationController = TextEditingController();
 
   @override
   void initState() {
@@ -67,12 +70,13 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
   @override
   void dispose() {
     _animationController.dispose();
+    _confirmationController.dispose();
     super.dispose();
   }
 
   void _handleDelete() async {
-    if (!_confirmationChecked) {
-      _showValidationSnackbar();
+    if (!_validateDeletion()) {
+      _showValidationError();
       return;
     }
 
@@ -95,77 +99,56 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
     }
   }
 
-  void _showValidationSnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.warning_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Please confirm that you understand this action',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.orange,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
-      ),
-    );
+  bool _validateDeletion() {
+    if (!_confirmationChecked) {
+      return false;
+    }
+
+    if (_isPermanentDelete) {
+      // For permanent deletion, require typing customer name
+      return _confirmationText.toLowerCase().trim() ==
+          widget.customer.name.toLowerCase().trim();
+    } else {
+      // For soft deletion, just require checkbox
+      return true;
+    }
+  }
+
+  void _showValidationError() {
+    String message;
+    if (!_confirmationChecked) {
+      message = 'Please confirm that you understand this action';
+    } else if (_isPermanentDelete && _confirmationText.toLowerCase().trim() !=
+        widget.customer.name.toLowerCase().trim()) {
+      message = 'Please type the customer name exactly to confirm permanent deletion';
+    } else {
+      message = 'Please complete all confirmation steps';
+    }
+
+    _showSnackbar(message, Colors.orange, Icons.warning_outlined);
   }
 
   void _showSuccessSnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
-            SizedBox(width: context.smallPadding),
-            Text(
-              _isPermanentDelete
-                  ? 'Customer deleted permanently!'
-                  : 'Customer deactivated successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
-      ),
+    _showSnackbar(
+      _isPermanentDelete
+          ? 'Customer deleted permanently!'
+          : 'Customer deactivated successfully!',
+      Colors.green,
+      Icons.check_circle_rounded,
     );
   }
 
   void _showErrorSnackbar(String message) {
+    _showSnackbar(message, Colors.red, Icons.error_outline);
+  }
+
+  void _showSnackbar(String message, Color color, IconData icon) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
-              Icons.error_outline,
+              icon,
               color: AppTheme.pureWhite,
               size: context.iconSize('medium'),
             ),
@@ -182,8 +165,8 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             ),
           ],
         ),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 4),
+        backgroundColor: color,
+        duration: Duration(seconds: color == Colors.red ? 4 : 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -346,162 +329,262 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Delete Type Toggle
-              Container(
-                padding: EdgeInsets.all(context.smallPadding),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.blue,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding),
-                    Expanded(
-                      child: Text(
-                        'Choose deletion type:',
-                        style: GoogleFonts.inter(
-                          fontSize: context.subtitleFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.charcoalGray,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Warning Message
+              _buildWarningMessage(),
 
               SizedBox(height: context.cardPadding),
 
-              // Delete Options
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isPermanentDelete = true;
-                          _confirmationChecked = false; // Reset confirmation
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(context.cardPadding),
-                        decoration: BoxDecoration(
-                          color: _isPermanentDelete
-                              ? Colors.red.withOpacity(0.1)
-                              : Colors.grey.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: Border.all(
-                            color: _isPermanentDelete ? Colors.red : Colors.grey.shade300,
-                            width: _isPermanentDelete ? 2 : 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.delete_forever_rounded,
-                              color: _isPermanentDelete ? Colors.red : Colors.grey,
-                              size: context.iconSize('medium'),
-                            ),
-                            SizedBox(height: context.smallPadding),
-                            Text(
-                              'Permanent Delete',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w600,
-                                color: _isPermanentDelete ? Colors.red : Colors.grey,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: context.smallPadding / 2),
-                            Text(
-                              'Completely removes from database',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize * 0.9,
-                                color: _isPermanentDelete ? Colors.red[600] : Colors.grey[600],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+              // Delete Type Toggle
+              _buildDeleteTypeToggle(),
 
-                  SizedBox(width: context.cardPadding),
+              SizedBox(height: context.cardPadding),
 
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isPermanentDelete = false;
-                          _confirmationChecked = false; // Reset confirmation
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(context.cardPadding),
-                        decoration: BoxDecoration(
-                          color: !_isPermanentDelete
-                              ? Colors.orange.withOpacity(0.1)
-                              : Colors.grey.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: Border.all(
-                            color: !_isPermanentDelete ? Colors.orange : Colors.grey.shade300,
-                            width: !_isPermanentDelete ? 2 : 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.visibility_off_rounded,
-                              color: !_isPermanentDelete ? Colors.orange : Colors.grey,
-                              size: context.iconSize('medium'),
-                            ),
-                            SizedBox(height: context.smallPadding),
-                            Text(
-                              'Deactivate',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w600,
-                                color: !_isPermanentDelete ? Colors.orange : Colors.grey,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: context.smallPadding / 2),
-                            Text(
-                              'Hides but can be restored',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize * 0.9,
-                                color: !_isPermanentDelete ? Colors.orange[600] : Colors.grey[600],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // Customer Details Card
+              _buildCustomerDetailsCard(),
+
+              SizedBox(height: context.cardPadding),
+
+              // Impact Warning
+              _buildImpactWarning(),
+
+              SizedBox(height: context.cardPadding),
+
+              // Confirmation Section
+              _buildConfirmationSection(),
 
               SizedBox(height: context.mainPadding),
 
-              // Customer Details Card
-              Container(
-                padding: EdgeInsets.all(context.cardPadding),
-                decoration: BoxDecoration(
-                  color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.2),
-                    width: 1,
+              // Action Buttons
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildCompactButtons(),
+                small: _buildCompactButtons(),
+                medium: _buildDesktopButtons(),
+                large: _buildDesktopButtons(),
+                ultrawide: _buildDesktopButtons(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWarningMessage() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.warning_rounded,
+            color: _isPermanentDelete ? Colors.red : Colors.orange,
+            size: context.iconSize('large'),
+          ),
+          SizedBox(width: context.cardPadding),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isPermanentDelete ? 'Permanent Deletion Warning' : 'Deactivation Notice',
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: _isPermanentDelete ? Colors.red[700] : Colors.orange[700],
                   ),
                 ),
+                SizedBox(height: context.smallPadding / 2),
+                Text(
+                  _isPermanentDelete
+                      ? 'This will permanently remove all customer data from the database. This action cannot be reversed.'
+                      : 'This will deactivate the customer but preserve all data. The customer can be restored later.',
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    color: AppTheme.charcoalGray,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteTypeToggle() {
+    return Container(
+      padding: EdgeInsets.all(context.smallPadding),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: Colors.blue,
+                size: context.iconSize('small'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Choose deletion type:',
+                style: GoogleFonts.inter(
+                  fontSize: context.subtitleFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.cardPadding),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDeleteOption(
+                  title: 'Permanent Delete',
+                  subtitle: 'Removes from database permanently',
+                  icon: Icons.delete_forever_rounded,
+                  color: Colors.red,
+                  isSelected: _isPermanentDelete,
+                  onTap: () {
+                    setState(() {
+                      _isPermanentDelete = true;
+                      _confirmationChecked = false;
+                      _confirmationText = '';
+                      _confirmationController.clear();
+                    });
+                  },
+                ),
+              ),
+              SizedBox(width: context.cardPadding),
+              Expanded(
+                child: _buildDeleteOption(
+                  title: 'Deactivate',
+                  subtitle: 'Hide but can be restored',
+                  icon: Icons.visibility_off_rounded,
+                  color: Colors.orange,
+                  isSelected: !_isPermanentDelete,
+                  onTap: () {
+                    setState(() {
+                      _isPermanentDelete = false;
+                      _confirmationChecked = false;
+                      _confirmationText = '';
+                      _confirmationController.clear();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteOption({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.cardPadding),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? color.withOpacity(0.1)
+              : Colors.grey.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? color : Colors.grey,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(height: context.smallPadding),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? color : Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.smallPadding / 2),
+            Text(
+              subtitle,
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize * 0.9,
+                color: isSelected ? color : Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomerDetailsCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    _getCustomerInitials(),
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: _isPermanentDelete ? Colors.red[700] : Colors.orange[700],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: context.cardPadding),
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -523,9 +606,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                             ),
                           ),
                         ),
-
                         SizedBox(width: context.smallPadding),
-
                         Expanded(
                           child: Text(
                             widget.customer.name,
@@ -539,102 +620,180 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                         ),
                       ],
                     ),
-
                     if (!context.isTablet) ...[
                       SizedBox(height: context.smallPadding),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '${widget.customer.phone} | ${widget.customer.email}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        '${widget.customer.phone} • ${widget.customer.email}',
+                        style: GoogleFonts.inter(
+                          fontSize: context.subtitleFontSize,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey[600],
                         ),
-                      ),
-                    ],
-
-                    if (widget.customer.lastPurchase != null) ...[
-                      SizedBox(height: context.smallPadding),
-                      Container(
-                        padding: EdgeInsets.all(context.smallPadding),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.shopping_cart,
-                              color: Colors.blue,
-                              size: context.iconSize('small'),
-                            ),
-                            SizedBox(width: context.smallPadding),
-                            Text(
-                              'Last Purchase: PKR ${widget.customer.lastPurchase!.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.blue[700],
-                              ),
-                            ),
-                          ],
-                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
                 ),
               ),
-
-              SizedBox(height: context.cardPadding),
-
-              // Confirmation Checkbox
-              Container(
-                padding: EdgeInsets.all(context.smallPadding),
-                decoration: BoxDecoration(
-                  color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: CheckboxListTile(
-                  value: _confirmationChecked,
-                  onChanged: (value) {
-                    setState(() {
-                      _confirmationChecked = value ?? false;
-                    });
-                  },
-                  title: Text(
-                    _isPermanentDelete
-                        ? 'I understand this will permanently delete the customer and cannot be undone'
-                        : 'I understand this will deactivate the customer',
+            ],
+          ),
+          if (widget.customer.lastPurchase != null) ...[
+            SizedBox(height: context.cardPadding),
+            Container(
+              padding: EdgeInsets.all(context.smallPadding),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.shopping_cart,
+                    color: Colors.blue,
+                    size: context.iconSize('small'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Customer since: ${_formatDate(widget.customer.createdAt)}',
                     style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
+                      fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
-                      color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],
+                      color: Colors.blue[700],
                     ),
                   ),
-                  activeColor: _isPermanentDelete ? Colors.red : Colors.orange,
-                  dense: true,
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
+                ],
               ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-              SizedBox(height: context.mainPadding),
-
-              // Action Buttons
-              ResponsiveBreakpoints.responsive(
-                context,
-                tablet: _buildCompactButtons(),
-                small: _buildCompactButtons(),
-                medium: _buildDesktopButtons(),
-                large: _buildDesktopButtons(),
-                ultrawide: _buildDesktopButtons(),
+  Widget _buildImpactWarning() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.yellow.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.yellow.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_rounded,
+                color: Colors.amber[700],
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Impact Assessment',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
-        ),
+          SizedBox(height: context.smallPadding),
+          Text(
+            _isPermanentDelete
+                ? '• All customer data will be permanently removed\n• Order history will be anonymized\n• Contact information will be deleted\n• This action cannot be undone'
+                : '• Customer will be hidden from active lists\n• All data will be preserved\n• Customer can be restored later\n• Order history remains intact',
+            style: GoogleFonts.inter(
+              fontSize: context.subtitleFontSize,
+              color: AppTheme.charcoalGray,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConfirmationSection() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: (_isPermanentDelete ? Colors.red : Colors.orange).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CheckboxListTile(
+            value: _confirmationChecked,
+            onChanged: (value) {
+              setState(() {
+                _confirmationChecked = value ?? false;
+              });
+            },
+            title: Text(
+              _isPermanentDelete
+                  ? 'I understand this will permanently delete the customer and cannot be undone'
+                  : 'I understand this will deactivate the customer',
+              style: GoogleFonts.inter(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],
+              ),
+            ),
+            activeColor: _isPermanentDelete ? Colors.red : Colors.orange,
+            dense: true,
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+
+          if (_isPermanentDelete) ...[
+            SizedBox(height: context.cardPadding),
+            Text(
+              'Type the customer name to confirm permanent deletion:',
+              style: GoogleFonts.inter(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.red[700],
+              ),
+            ),
+            SizedBox(height: context.smallPadding),
+            Container(
+
+              child: TextFormField(
+                controller: _confirmationController,
+                onChanged: (value) {
+                  setState(() {
+                    _confirmationText = value;
+                  });
+                },
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  color: AppTheme.charcoalGray,
+                ),
+                decoration: InputDecoration(
+                  hintText: widget.customer.name,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    color: Colors.grey[400],
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(context.cardPadding / 2),
+                ),
+              ),
+            ),
+            SizedBox(height: context.smallPadding),
+            Text(
+              'Expected: ${widget.customer.name}',
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -643,7 +802,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Cancel Button (full width, primary action)
+        // Cancel Button (safe action)
         PremiumButton(
           text: 'Cancel',
           onPressed: _handleCancel,
@@ -654,7 +813,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
 
         SizedBox(height: context.cardPadding),
 
-        // Delete Button (full width, destructive action)
+        // Delete Button (destructive action)
         Consumer<CustomerProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
@@ -706,5 +865,19 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
         ),
       ],
     );
+  }
+
+  String _getCustomerInitials() {
+    final words = widget.customer.name.split(' ');
+    if (words.length >= 2) {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    } else if (words.length == 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+    return 'CU';
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }

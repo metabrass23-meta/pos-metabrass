@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
+import '../../../src/services/customer_service.dart';
+import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:provider/provider.dart';
 
 class ViewCustomerDetailsDialog extends StatefulWidget {
   final Customer customer;
@@ -20,6 +23,10 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+
+  final CustomerService _customerService = CustomerService();
+  CustomerModel? _fullCustomerDetails;
+  bool _isLoadingDetails = true;
 
   @override
   void initState() {
@@ -46,6 +53,98 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     ));
 
     _animationController.forward();
+    _loadFullCustomerDetails();
+  }
+
+  Future<void> _loadFullCustomerDetails() async {
+    try {
+      setState(() {
+        _isLoadingDetails = true;
+      });
+
+      final response = await _customerService.getCustomerById(widget.customer.id);
+
+      if (response.success && response.data != null) {
+        setState(() {
+          _fullCustomerDetails = response.data!;
+          _isLoadingDetails = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingDetails = false;
+        });
+        _showErrorSnackbar(response.message ?? 'Failed to load customer details');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingDetails = false;
+      });
+      _showErrorSnackbar('Error loading customer details: ${e.toString()}');
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Text(
+              message,
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
   }
 
   @override
@@ -58,6 +157,50 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
     });
+  }
+
+  void _handleVerifyContact(String type) async {
+    try {
+      final response = await _customerService.verifyCustomerContact(
+        id: widget.customer.id,
+        verificationType: type,
+        verified: true,
+      );
+
+      if (response.success) {
+        _showSuccessSnackbar('${type.capitalize()} verified successfully!');
+        _loadFullCustomerDetails();
+        if (mounted) {
+          context.read<CustomerProvider>().loadCustomers(showLoadingIndicator: false);
+        }
+      } else {
+        _showErrorSnackbar(response.message ?? 'Failed to verify $type');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Error verifying $type: ${e.toString()}');
+    }
+  }
+
+  void _handleUpdateActivity(String activityType) async {
+    try {
+      final response = await _customerService.updateCustomerActivity(
+        id: widget.customer.id,
+        activityType: activityType,
+        activityDate: DateTime.now().toIso8601String(),
+      );
+
+      if (response.success) {
+        _showSuccessSnackbar('Customer ${activityType} updated successfully!');
+        _loadFullCustomerDetails();
+        if (mounted) {
+          context.read<CustomerProvider>().loadCustomers(showLoadingIndicator: false);
+        }
+      } else {
+        _showErrorSnackbar(response.message ?? 'Failed to update customer $activityType');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Error updating customer $activityType: ${e.toString()}');
+    }
   }
 
   @override
@@ -95,13 +238,16 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                     ),
                   ],
                 ),
-                child: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: _buildTabletLayout(),
-                  small: _buildMobileLayout(),
-                  medium: _buildDesktopLayout(),
-                  large: _buildDesktopLayout(),
-                  ultrawide: _buildDesktopLayout(),
+                child: _isLoadingDetails
+                    ? _buildLoadingState()
+                    : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(
+                      child: _buildContent(),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -111,45 +257,27 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     );
   }
 
-  Widget _buildTabletLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
+  Widget _buildLoadingState() {
+    return Container(
+      height: 400,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: AppTheme.primaryMaroon,
+            strokeWidth: 3,
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
+          SizedBox(height: context.cardPadding),
+          Text(
+            'Loading customer details...',
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDesktopLayout() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: false),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -196,7 +324,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete customer information',
+                    'Complete customer information',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -217,7 +345,9 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
             child: Text(
-              widget.customer.id,
+              widget.customer.id.length > 10
+                  ? '${widget.customer.id.substring(0, 10)}...'
+                  : widget.customer.id,
               style: GoogleFonts.inter(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
@@ -246,39 +376,81 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     );
   }
 
-  Widget _buildContent({required bool isCompact}) {
-    return Padding(
-      padding: EdgeInsets.all(context.cardPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildCustomerNameCard(isCompact),
-          SizedBox(height: context.cardPadding),
-          _buildContactInfoCard(isCompact),
-          SizedBox(height: context.cardPadding),
-          _buildDescriptionCard(isCompact),
-          SizedBox(height: context.cardPadding),
-          _buildPurchaseInfoCard(isCompact),
-          SizedBox(height: context.cardPadding),
-          _buildCustomerStatsCard(isCompact),
-          SizedBox(height: context.mainPadding),
-          Align(
-            alignment: Alignment.centerRight,
-            child: PremiumButton(
-              text: 'Close',
-              onPressed: _handleClose,
-              height: context.buttonHeight / (isCompact ? 1 : 1.5),
-              isOutlined: true,
-              backgroundColor: Colors.grey[600],
-              textColor: Colors.grey[600],
-            ),
+  Widget _buildContent() {
+    if (_fullCustomerDetails == null) {
+      return Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: context.iconSize('xl'),
+                color: Colors.grey[400],
+              ),
+              SizedBox(height: context.cardPadding),
+              Text(
+                'Failed to load customer details',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: context.smallPadding),
+              TextButton(
+                onPressed: _loadFullCustomerDetails,
+                child: Text(
+                  'Retry',
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCustomerProfileCard(),
+            SizedBox(height: context.cardPadding),
+            _buildContactInfoCard(),
+            SizedBox(height: context.cardPadding),
+            _buildLocationCard(),
+            SizedBox(height: context.cardPadding),
+            _buildStatusAndTypeCard(),
+            SizedBox(height: context.cardPadding),
+            _buildVerificationCard(),
+            if (_fullCustomerDetails!.businessName != null || _fullCustomerDetails!.taxNumber != null) ...[
+              SizedBox(height: context.cardPadding),
+              _buildBusinessInfoCard(),
+            ],
+            if (_fullCustomerDetails!.notes != null && _fullCustomerDetails!.notes!.isNotEmpty) ...[
+              SizedBox(height: context.cardPadding),
+              _buildNotesCard(),
+            ],
+            SizedBox(height: context.cardPadding),
+            _buildActivityCard(),
+            SizedBox(height: context.cardPadding),
+            _buildQuickActionsCard(),
+            SizedBox(height: context.mainPadding),
+            _buildCloseButton(),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCustomerNameCard(bool isCompact) {
+  Widget _buildCustomerProfileCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -286,59 +458,74 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.person_outline,
-                color: Colors.blue,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Customer Name',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
           Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(context.cardPadding),
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              color: Colors.blue,
+              shape: BoxShape.circle,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Center(
+              child: Text(
+                _fullCustomerDetails!.initials,
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.cardPadding),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    color: AppTheme.pureWhite,
-                    size: context.iconSize('small'),
+                Text(
+                  _fullCustomerDetails!.displayName,
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: context.headerFontSize * 0.8,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoalGray,
                   ),
                 ),
-                SizedBox(width: context.cardPadding),
-                Text(
-                  widget.customer.name,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize * 1.1,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.blue[700],
-                  ),
+                SizedBox(height: context.smallPadding / 2),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: context.iconSize('small'),
+                      color: Colors.grey[600],
+                    ),
+                    SizedBox(width: context.smallPadding / 2),
+                    Text(
+                      'Customer since ${_fullCustomerDetails!.formattedCreatedAt}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: context.iconSize('small'),
+                      color: Colors.grey[600],
+                    ),
+                    SizedBox(width: context.smallPadding / 2),
+                    Text(
+                      '${_fullCustomerDetails!.customerAgeDays} days old (${_fullCustomerDetails!.relativeCreatedAt})',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -348,7 +535,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     );
   }
 
-  Widget _buildContactInfoCard(bool isCompact) {
+  Widget _buildContactInfoCard() {
     return ResponsiveBreakpoints.responsive(
       context,
       tablet: _buildContactInfoCompact(),
@@ -362,78 +549,24 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
   Widget _buildContactInfoCompact() {
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.phone, size: context.iconSize('small'), color: Colors.orange),
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    'Phone Number',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: context.smallPadding / 2),
-              Text(
-                widget.customer.phone,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
+        _buildInfoCard(
+          title: 'Phone Number',
+          value: _fullCustomerDetails!.phone,
+          icon: Icons.phone,
+          color: Colors.orange,
+          trailing: _fullCustomerDetails!.phoneVerified
+              ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
+              : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
         ),
         SizedBox(height: context.cardPadding),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.email, size: context.iconSize('small'), color: Colors.purple),
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    'Email Address',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: context.smallPadding / 2),
-              Text(
-                widget.customer.email,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
+        _buildInfoCard(
+          title: 'Email Address',
+          value: _fullCustomerDetails!.email,
+          icon: Icons.email,
+          color: Colors.purple,
+          trailing: _fullCustomerDetails!.emailVerified
+              ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
+              : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
         ),
       ],
     );
@@ -443,90 +576,78 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     return Row(
       children: [
         Expanded(
-          child: Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.phone, size: context.iconSize('small'), color: Colors.orange),
-                    SizedBox(width: context.smallPadding),
-                    Text(
-                      'Phone Number',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  widget.customer.phone,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-              ],
-            ),
+          child: _buildInfoCard(
+            title: 'Phone Number',
+            value: _fullCustomerDetails!.phone,
+            icon: Icons.phone,
+            color: Colors.orange,
+            trailing: _fullCustomerDetails!.phoneVerified
+                ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
+                : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
           ),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
-          child: Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.email, size: context.iconSize('small'), color: Colors.purple),
-                    SizedBox(width: context.smallPadding),
-                    Text(
-                      'Email Address',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  widget.customer.email,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-              ],
-            ),
+          child: _buildInfoCard(
+            title: 'Email Address',
+            value: _fullCustomerDetails!.email,
+            icon: Icons.email,
+            color: Colors.purple,
+            trailing: _fullCustomerDetails!.emailVerified
+                ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
+                : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDescriptionCard(bool isCompact) {
+  Widget _buildLocationCard() {
+    final locationText = [
+      _fullCustomerDetails!.address,
+      _fullCustomerDetails!.city,
+      _fullCustomerDetails!.country,
+    ].where((item) => item != null && item.isNotEmpty).join(', ');
+
+    return _buildInfoCard(
+      title: 'Location',
+      value: locationText.isNotEmpty ? locationText : 'Not provided',
+      icon: Icons.location_on,
+      color: Colors.teal,
+    );
+  }
+
+  Widget _buildStatusAndTypeCard() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildInfoCard(
+            title: 'Status',
+            value: _fullCustomerDetails!.statusDisplayName,
+            icon: Icons.flag,
+            color: _getStatusColor(_fullCustomerDetails!.status),
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: _buildInfoCard(
+            title: 'Type',
+            value: _fullCustomerDetails!.customerTypeDisplayName,
+            icon: _fullCustomerDetails!.customerType == 'BUSINESS' ? Icons.business : Icons.person,
+            color: Colors.indigo,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVerificationCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.green.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.green.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,13 +655,13 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
           Row(
             children: [
               Icon(
-                Icons.description_outlined,
-                color: Colors.grey[700],
+                Icons.verified_user,
+                color: Colors.green,
                 size: context.iconSize('medium'),
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Description',
+                'Verification Status',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -550,238 +671,77 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             ],
           ),
           SizedBox(height: context.cardPadding),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite,
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Text(
-              widget.customer.description.isEmpty
-                  ? 'No description provided'
-                  : widget.customer.description,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: widget.customer.description.isEmpty
-                    ? Colors.grey[500]
-                    : AppTheme.charcoalGray,
-                height: 1.5,
-                fontStyle: widget.customer.description.isEmpty
-                    ? FontStyle.italic
-                    : FontStyle.normal,
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      _fullCustomerDetails!.phoneVerified ? Icons.check_circle : Icons.cancel,
+                      color: _fullCustomerDetails!.phoneVerified ? Colors.green : Colors.red,
+                      size: context.iconSize('small'),
+                    ),
+                    SizedBox(width: context.smallPadding / 2),
+                    Text(
+                      'Phone ${_fullCustomerDetails!.phoneVerified ? 'Verified' : 'Unverified'}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: _fullCustomerDetails!.phoneVerified ? Colors.green[700] : Colors.red[700],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      _fullCustomerDetails!.emailVerified ? Icons.check_circle : Icons.cancel,
+                      color: _fullCustomerDetails!.emailVerified ? Colors.green : Colors.red,
+                      size: context.iconSize('small'),
+                    ),
+                    SizedBox(width: context.smallPadding / 2),
+                    Text(
+                      'Email ${_fullCustomerDetails!.emailVerified ? 'Verified' : 'Unverified'}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: _fullCustomerDetails!.emailVerified ? Colors.green[700] : Colors.red[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPurchaseInfoCard(bool isCompact) {
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: _buildPurchaseInfoCompact(),
-      small: _buildPurchaseInfoCompact(),
-      medium: _buildPurchaseInfoExpanded(),
-      large: _buildPurchaseInfoExpanded(),
-      ultrawide: _buildPurchaseInfoExpanded(),
+  Widget _buildBusinessInfoCard() {
+    return _buildInfoCard(
+      title: 'Business Information',
+      value: [
+        if (_fullCustomerDetails!.businessName != null) 'Name: ${_fullCustomerDetails!.businessName}',
+        if (_fullCustomerDetails!.taxNumber != null) 'Tax Number: ${_fullCustomerDetails!.taxNumber}',
+      ].join('\n'),
+      icon: Icons.business,
+      color: Colors.indigo,
     );
   }
 
-  Widget _buildPurchaseInfoCompact() {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.shopping_cart, size: context.iconSize('small'), color: Colors.green),
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    'Last Purchase Amount',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: context.smallPadding / 2),
-              Text(
-                widget.customer.lastPurchase != null
-                    ? 'PKR ${widget.customer.lastPurchase!.toStringAsFixed(0)}'
-                    : 'No purchases yet',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: widget.customer.lastPurchase != null ? AppTheme.charcoalGray : Colors.grey[500],
-                  fontStyle: widget.customer.lastPurchase == null ? FontStyle.italic : FontStyle.normal,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (widget.customer.lastPurchase != null) ...[
-          SizedBox(height: context.cardPadding),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.teal),
-                    SizedBox(width: context.smallPadding),
-                    Text(
-                      'Last Purchase Date',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  _formatDate(widget.customer.lastPurchaseDate!),
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  _getRelativeDate(widget.customer.lastPurchaseDate!),
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
+  Widget _buildNotesCard() {
+    return _buildInfoCard(
+      title: 'Notes',
+      value: _fullCustomerDetails!.notes!,
+      icon: Icons.note,
+      color: Colors.amber,
     );
   }
 
-  Widget _buildPurchaseInfoExpanded() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.shopping_cart, size: context.iconSize('small'), color: Colors.green),
-                    SizedBox(width: context.smallPadding),
-                    Text(
-                      'Last Purchase Amount',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  widget.customer.lastPurchase != null
-                      ? 'PKR ${widget.customer.lastPurchase!.toStringAsFixed(0)}'
-                      : 'No purchases yet',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: widget.customer.lastPurchase != null ? AppTheme.charcoalGray : Colors.grey[500],
-                    fontStyle: widget.customer.lastPurchase == null ? FontStyle.italic : FontStyle.normal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (widget.customer.lastPurchase != null) ...[
-          SizedBox(width: context.cardPadding),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.teal),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        'Last Purchase Date',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: context.smallPadding / 2),
-                  Text(
-                    _formatDate(widget.customer.lastPurchaseDate!),
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.charcoalGray,
-                    ),
-                  ),
-                  SizedBox(height: context.smallPadding / 2),
-                  Text(
-                    _getRelativeDate(widget.customer.lastPurchaseDate!),
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildCustomerStatsCard(bool isCompact) {
+  Widget _buildActivityCard() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -795,13 +755,13 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
           Row(
             children: [
               Icon(
-                Icons.analytics_outlined,
+                Icons.timeline,
                 color: AppTheme.primaryMaroon,
                 size: context.iconSize('medium'),
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customer Information',
+                'Activity Timeline',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -811,40 +771,179 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             ],
           ),
           SizedBox(height: context.cardPadding),
-          ResponsiveBreakpoints.responsive(
-            context,
-            tablet: _buildCustomerStatsCompact(),
-            small: _buildCustomerStatsCompact(),
-            medium: _buildCustomerStatsExpanded(),
-            large: _buildCustomerStatsExpanded(),
-            ultrawide: _buildCustomerStatsExpanded(),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Last Order',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    SizedBox(height: context.smallPadding / 2),
+                    Text(
+                      _fullCustomerDetails!.lastOrderDate != null
+                          ? _fullCustomerDetails!.formattedLastOrderDate
+                          : 'No orders yet',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: _fullCustomerDetails!.lastOrderDate != null
+                            ? AppTheme.charcoalGray
+                            : Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Last Contact',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    SizedBox(height: context.smallPadding / 2),
+                    Text(
+                      _fullCustomerDetails!.lastContactDate != null
+                          ? _fullCustomerDetails!.formattedLastContactDate
+                          : 'No contact yet',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: _fullCustomerDetails!.lastContactDate != null
+                            ? AppTheme.charcoalGray
+                            : Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.flash_on,
+                color: Colors.orange,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Quick Actions',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: context.cardPadding),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.verified_outlined,
-                  color: Colors.green[700],
-                  size: context.iconSize('small'),
+          Wrap(
+            spacing: context.smallPadding,
+            runSpacing: context.smallPadding / 2,
+            children: [
+              if (!_fullCustomerDetails!.phoneVerified)
+                _buildActionChip(
+                  label: 'Verify Phone',
+                  icon: Icons.phone_android,
+                  color: Colors.green,
+                  onTap: () => _handleVerifyContact('phone'),
                 ),
-                SizedBox(width: context.smallPadding),
-                Text(
-                  'Customer Active',
+              if (!_fullCustomerDetails!.emailVerified)
+                _buildActionChip(
+                  label: 'Verify Email',
+                  icon: Icons.email,
+                  color: Colors.blue,
+                  onTap: () => _handleVerifyContact('email'),
+                ),
+              _buildActionChip(
+                label: 'Update Order',
+                icon: Icons.shopping_cart,
+                color: Colors.purple,
+                onTap: () => _handleUpdateActivity('order'),
+              ),
+              _buildActionChip(
+                label: 'Update Contact',
+                icon: Icons.contact_phone,
+                color: Colors.teal,
+                onTap: () => _handleUpdateActivity('contact'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    Widget? trailing,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: context.iconSize('medium')),
+              SizedBox(width: context.smallPadding),
+              Expanded(
+                child: Text(
+                  title,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green[700],
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
                   ),
                 ),
-              ],
+              ),
+              if (trailing != null) trailing,
+            ],
+          ),
+          SizedBox(height: context.smallPadding),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
             ),
           ),
         ],
@@ -852,175 +951,77 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
     );
   }
 
-  Widget _buildCustomerStatsCompact() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildActionChip({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.cardPadding / 2,
+          vertical: context.smallPadding,
+        ),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(icon, color: color, size: context.iconSize('small')),
+            SizedBox(width: context.smallPadding / 2),
             Text(
-              'Customer Since:',
+              label,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
-                color: Colors.grey[700],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                _formatDate(widget.customer.createdAt),
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
+                fontWeight: FontWeight.w500,
+                color: color,
               ),
             ),
           ],
         ),
-        SizedBox(height: context.cardPadding),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Status:',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                color: Colors.grey[700],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: widget.customer.lastPurchase != null ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                widget.customer.lastPurchase != null ? 'Active Buyer' : 'New Customer',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: widget.customer.lastPurchase != null ? Colors.green[700] : Colors.orange[700],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildCustomerStatsExpanded() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Customer Since:',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              SizedBox(height: context.smallPadding / 2),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryMaroon.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
-                child: Text(
-                  _formatDate(widget.customer.createdAt),
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primaryMaroon,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: context.cardPadding),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Status:',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              SizedBox(height: context.smallPadding / 2),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: widget.customer.lastPurchase != null ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
-                child: Text(
-                  widget.customer.lastPurchase != null ? 'Active Buyer' : 'New Customer',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: widget.customer.lastPurchase != null ? Colors.green[700] : Colors.orange[700],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+  Widget _buildCloseButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: PremiumButton(
+        text: 'Close',
+        onPressed: _handleClose,
+        height: context.buttonHeight / 1.5,
+        isOutlined: true,
+        backgroundColor: Colors.grey[600],
+        textColor: Colors.grey[600],
+      ),
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  String _getRelativeDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final targetDate = DateTime(date.year, date.month, date.day);
-    final difference = today.difference(targetDate).inDays;
-
-    if (difference == 0) {
-      return 'Today';
-    } else if (difference == 1) {
-      return 'Yesterday';
-    } else if (difference < 7) {
-      return '$difference days ago';
-    } else if (difference < 30) {
-      final weeks = (difference / 7).floor();
-      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
-    } else if (difference < 365) {
-      final months = (difference / 30).floor();
-      return months == 1 ? '1 month ago' : '$months months ago';
-    } else {
-      final years = (difference / 365).floor();
-      return years == 1 ? '1 year ago' : '$years years ago';
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'NEW':
+        return Colors.blue;
+      case 'REGULAR':
+        return Colors.green;
+      case 'VIP':
+        return Colors.purple;
+      case 'INACTIVE':
+        return Colors.grey;
+      default:
+        return Colors.blue;
     }
+  }
+}
+
+// Extension to capitalize strings
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }
