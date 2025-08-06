@@ -392,8 +392,8 @@ class PremiumSidebar extends StatelessWidget {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: EdgeInsets.symmetric(
-                    horizontal: isExpanded ? context.cardPadding : context.smallPadding,
-                    vertical: context.smallPadding / 2.5,
+                    horizontal: isExpanded ? context.cardPadding / 4 : context.smallPadding,
+                    vertical: context.smallPadding / 3,
                   ),
                   child: Material(
                     color: Colors.transparent,

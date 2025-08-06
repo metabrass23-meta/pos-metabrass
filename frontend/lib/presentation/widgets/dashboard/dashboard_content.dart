@@ -72,7 +72,7 @@ class DashboardContent extends StatelessWidget {
 
   Widget _buildDashboard(BuildContext context) {
     return Container(
-      padding: context.pagePadding / 1.5,
+      padding: context.pagePadding / 2.5,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
