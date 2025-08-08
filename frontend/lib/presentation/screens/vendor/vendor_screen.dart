@@ -8,7 +8,9 @@ import '../../../src/theme/app_theme.dart';
 import '../../widgets/vendor/add_vendor_dialog.dart';
 import '../../widgets/vendor/delete_vendor_dialog.dart';
 import '../../widgets/vendor/edit_vendor_dialog.dart';
+import '../../widgets/vendor/vendor_filter_dialog.dart';
 import '../../widgets/vendor/vendor_table.dart';
+import '../../widgets/vendor/view_vendor_dialog.dart';
 
 class VendorPage extends StatefulWidget {
   const VendorPage({super.key});
@@ -21,6 +23,15 @@ class _VendorPageState extends State<VendorPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Load initial data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<VendorProvider>().refreshVendors();
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -30,7 +41,7 @@ class _VendorPageState extends State<VendorPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AddVendorDialog(),
+      builder: (context) => const EnhancedAddVendorDialog(),
     );
   }
 
@@ -38,7 +49,7 @@ class _VendorPageState extends State<VendorPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => EditVendorDialog(vendor: vendor),
+      builder: (context) => EnhancedEditVendorDialog(vendor: vendor),
     );
   }
 
@@ -46,8 +57,104 @@ class _VendorPageState extends State<VendorPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => DeleteVendorDialog(vendor: vendor),
+      builder: (context) => EnhancedDeleteVendorDialog(vendor: vendor),
     );
+  }
+
+  void _showViewVendorDialog(Vendor vendor) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => ViewVendorDetailsDialog(vendor: vendor),
+    );
+  }
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const VendorFilterDialog(),
+    );
+  }
+
+  Future<void> _handleRefresh() async {
+    final provider = context.read<VendorProvider>();
+    await provider.refreshVendors();
+
+    if (provider.hasError) {
+      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh vendors');
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  void _handleExport() async {
+    try {
+      final provider = context.read<VendorProvider>();
+      await provider.exportData();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppTheme.pureWhite,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Vendor data exported successfully',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackbar('Failed to export data: ${e.toString()}');
+    }
   }
 
   @override
@@ -58,38 +165,56 @@ class _VendorPageState extends State<VendorPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<VendorProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: VendorTable(
-                onEdit: _showEditVendorDialog,
-                onDelete: _showDeleteVendorDialog,
+      body: Consumer<VendorProvider>(
+        builder: (context, provider, child) {
+          return RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: AppTheme.primaryMaroon,
+            child: Padding(
+              padding: EdgeInsets.all(context.mainPadding / 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Responsive Header Section
+                  ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: _buildTabletHeader(),
+                    small: _buildMobileHeader(),
+                    medium: _buildDesktopHeader(),
+                    large: _buildDesktopHeader(),
+                    ultrawide: _buildDesktopHeader(),
+                  ),
+
+                  SizedBox(height: context.mainPadding),
+
+                  // Responsive Stats Cards
+                  context.statsCardColumns == 2
+                      ? _buildMobileStatsGrid(provider)
+                      : _buildDesktopStatsRow(provider),
+
+                  SizedBox(height: context.cardPadding * 0.5),
+
+                  // Responsive Search Section
+                  _buildSearchSection(provider),
+
+                  SizedBox(height: context.cardPadding * 0.5),
+
+                  // Active Filters Display
+                  _buildActiveFilters(provider),
+
+                  // Enhanced Vendor Table with View functionality
+                  Expanded(
+                    child: EnhancedVendorTable(
+                      onEdit: _showEditVendorDialog,
+                      onDelete: _showDeleteVendorDialog,
+                      onView: _showViewVendorDialog,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -138,6 +263,7 @@ class _VendorPageState extends State<VendorPage> {
   Widget _buildDesktopHeader() {
     return Row(
       children: [
+        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +271,7 @@ class _VendorPageState extends State<VendorPage> {
               Text(
                 'Vendor Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -153,7 +279,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Manage your suppliers efficiently',
+                'Organize and manage your supplier relationships with comprehensive tools',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -163,6 +289,8 @@ class _VendorPageState extends State<VendorPage> {
             ],
           ),
         ),
+
+        // Add Vendor Button
         _buildAddButton(),
       ],
     );
@@ -172,10 +300,11 @@ class _VendorPageState extends State<VendorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Page Title
         Text(
           'Vendor Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -183,7 +312,7 @@ class _VendorPageState extends State<VendorPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage your suppliers',
+          'Organize and manage supplier relationships',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -191,6 +320,8 @@ class _VendorPageState extends State<VendorPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Vendor Button (full width on tablet)
         SizedBox(
           width: double.infinity,
           child: _buildAddButton(),
@@ -203,6 +334,7 @@ class _VendorPageState extends State<VendorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Compact Page Title
         Text(
           'Vendors',
           style: GoogleFonts.playfairDisplay(
@@ -214,7 +346,7 @@ class _VendorPageState extends State<VendorPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage suppliers',
+          'Manage supplier relationships',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -222,6 +354,8 @@ class _VendorPageState extends State<VendorPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Vendor Button (full width)
         SizedBox(
           width: double.infinity,
           child: _buildAddButton(),
@@ -279,20 +413,40 @@ class _VendorPageState extends State<VendorPage> {
     return Row(
       children: [
         Expanded(
-            child: _buildStatsCard('Total Vendors', stats['total'].toString(),
-                Icons.store_rounded, Colors.blue)),
+          child: _buildStatsCard(
+              'Total Vendors',
+              stats['total'].toString(),
+              Icons.store_rounded,
+              Colors.blue
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Recently Added',
-                stats['recentlyAdded'].toString(), Icons.person_add_rounded, Colors.green)),
+          child: _buildStatsCard(
+              'Active Vendors',
+              stats['active'].toString(),
+              Icons.check_circle_rounded,
+              Colors.green
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Cities', stats['uniqueCities'].toString(),
-                Icons.location_city_rounded, Colors.purple)),
+          child: _buildStatsCard(
+              'Avg Order Value',
+              'PKR ${stats['averageOrderValue']?.toStringAsFixed(0) ?? '0'}',
+              Icons.trending_up_rounded,
+              Colors.purple
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Areas', stats['uniqueAreas'].toString(),
-                Icons.map_rounded, Colors.orange)),
+          child: _buildStatsCard(
+              'Cities Covered',
+              stats['uniqueCities'].toString(),
+              Icons.location_city_rounded,
+              Colors.orange
+          ),
+        ),
       ],
     );
   }
@@ -304,31 +458,51 @@ class _VendorPageState extends State<VendorPage> {
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.store_rounded, Colors.blue)),
+              child: _buildStatsCard(
+                  'Total',
+                  stats['total'].toString(),
+                  Icons.store_rounded,
+                  Colors.blue
+              ),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('Recent', stats['recentlyAdded'].toString(),
-                    Icons.person_add_rounded, Colors.green)),
+              child: _buildStatsCard(
+                  'Active',
+                  stats['active'].toString(),
+                  Icons.check_circle_rounded,
+                  Colors.green
+              ),
+            ),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Cities', stats['uniqueCities'].toString(),
-                    Icons.location_city_rounded, Colors.purple)),
+              child: _buildStatsCard(
+                  'Avg Order',
+                  'PKR ${stats['averageOrderValue']?.toStringAsFixed(0) ?? '0'}',
+                  Icons.trending_up_rounded,
+                  Colors.purple
+              ),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('Areas', stats['uniqueAreas'].toString(),
-                    Icons.map_rounded, Colors.orange)),
+              child: _buildStatsCard(
+                  'Cities',
+                  stats['uniqueCities'].toString(),
+                  Icons.location_city_rounded,
+                  Colors.orange
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildSearchSection() {
+  Widget _buildSearchSection(VendorProvider provider) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 2),
       decoration: BoxDecoration(
@@ -344,28 +518,43 @@ class _VendorPageState extends State<VendorPage> {
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
-        tablet: _buildTabletSearchLayout(),
-        small: _buildMobileSearchLayout(),
-        medium: _buildDesktopSearchLayout(),
-        large: _buildDesktopSearchLayout(),
-        ultrawide: _buildDesktopSearchLayout(),
+        tablet: _buildTabletSearchLayout(provider),
+        small: _buildMobileSearchLayout(provider),
+        medium: _buildDesktopSearchLayout(provider),
+        large: _buildDesktopSearchLayout(provider),
+        ultrawide: _buildDesktopSearchLayout(provider),
       ),
     );
   }
 
-  Widget _buildDesktopSearchLayout() {
+  Widget _buildDesktopSearchLayout(VendorProvider provider) {
     return Row(
       children: [
+        // Search Bar
         Expanded(
           flex: 3,
-          child: _buildSearchBar(),
+          child: _buildSearchBar(provider),
         ),
+
         SizedBox(width: context.cardPadding),
+
+        // Show Inactive Toggle
         Expanded(
           flex: 1,
-          child: _buildFilterButton(),
+          child: _buildShowInactiveToggle(provider),
         ),
+
         SizedBox(width: context.smallPadding),
+
+        // Filter Button
+        Expanded(
+          flex: 1,
+          child: _buildFilterButton(provider),
+        ),
+
+        SizedBox(width: context.smallPadding),
+
+        // Export Button
         Expanded(
           flex: 1,
           child: _buildExportButton(),
@@ -374,14 +563,16 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  Widget _buildTabletSearchLayout() {
+  Widget _buildTabletSearchLayout(VendorProvider provider) {
     return Column(
       children: [
-        _buildSearchBar(),
+        _buildSearchBar(provider),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildFilterButton()),
+            Expanded(child: _buildShowInactiveToggle(provider)),
+            SizedBox(width: context.cardPadding),
+            Expanded(child: _buildFilterButton(provider)),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -390,14 +581,16 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  Widget _buildMobileSearchLayout() {
+  Widget _buildMobileSearchLayout(VendorProvider provider) {
     return Column(
       children: [
-        _buildSearchBar(),
+        _buildSearchBar(provider),
         SizedBox(height: context.smallPadding),
         Row(
           children: [
-            Expanded(child: _buildFilterButton()),
+            Expanded(child: _buildShowInactiveToggle(provider)),
+            SizedBox(width: context.smallPadding),
+            Expanded(child: _buildFilterButton(provider)),
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -406,88 +599,135 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(VendorProvider provider) {
     return SizedBox(
       height: context.buttonHeight / 1.5,
-      child: Consumer<VendorProvider>(
-        builder: (context, provider, child) {
-          return TextField(
-            controller: _searchController,
-            onChanged: provider.searchVendors,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
+      child: TextField(
+        controller: _searchController,
+        onChanged: provider.searchVendors,
+        style: GoogleFonts.inter(
+          fontSize: context.bodyFontSize,
+          color: AppTheme.charcoalGray,
+        ),
+        decoration: InputDecoration(
+          hintText: context.isTablet
+              ? 'Search vendors...'
+              : 'Search vendors by name, business, CNIC, or phone...',
+          hintStyle: GoogleFonts.inter(
+            fontSize: context.bodyFontSize * 0.9,
+            color: Colors.grey[500],
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Colors.grey[500],
+            size: context.iconSize('medium'),
+          ),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+            onPressed: () {
+              _searchController.clear();
+              provider.clearSearch();
+            },
+            icon: Icon(
+              Icons.clear_rounded,
+              color: Colors.grey[500],
+              size: context.iconSize('small'),
             ),
-            decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search vendors...'
-                  : 'Search vendors by name, ID, CNIC, or business name...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchVendors('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
-            ),
-          );
-        },
+          )
+              : null,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: context.cardPadding / 2,
+            vertical: context.cardPadding / 2,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildFilterButton() {
+  Widget _buildShowInactiveToggle(VendorProvider provider) {
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
       decoration: BoxDecoration(
-        color: AppTheme.lightGray,
+        color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.lightGray,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.3) : Colors.grey.shade300,
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
-              ),
+      child: InkWell(
+        onTap: provider.toggleShowInactive,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              provider.showInactive ? Icons.visibility : Icons.visibility_off,
+              color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+              size: context.iconSize('medium'),
             ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(VendorProvider provider) {
+    final hasActiveFilters = provider.selectedStatus != null ||
+        provider.selectedType != null ||
+        provider.selectedCity != null ||
+        provider.selectedArea != null ||
+        provider.selectedCountry != null ||
+        provider.verificationFilter != null;
+
+    return Container(
+      height: context.buttonHeight / 1.5,
+      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+      decoration: BoxDecoration(
+        color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.1) : AppTheme.lightGray,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.3) : Colors.grey.shade300,
+          width: 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: _showFilterDialog,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              hasActiveFilters ? Icons.filter_alt : Icons.filter_list_rounded,
+              color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+              size: context.iconSize('medium'),
+            ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                hasActiveFilters ? 'Filters (${_getActiveFilterCount(provider)})' : 'Filter',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -504,28 +744,159 @@ class _VendorPageState extends State<VendorPage> {
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: InkWell(
+        onTap: _handleExport,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.download_rounded,
+              color: AppTheme.accentGold,
+              size: context.iconSize('medium'),
+            ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Export',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.accentGold,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveFilters(VendorProvider provider) {
+    final activeFilters = <String>[];
+
+    if (provider.selectedStatus != null) {
+      activeFilters.add('Status: ${provider.selectedStatus}');
+    }
+    if (provider.selectedType != null) {
+      activeFilters.add('Type: ${provider.selectedType}');
+    }
+    if (provider.selectedCity != null) {
+      activeFilters.add('City: ${provider.selectedCity}');
+    }
+    if (provider.selectedArea != null) {
+      activeFilters.add('Area: ${provider.selectedArea}');
+    }
+    if (provider.selectedCountry != null) {
+      activeFilters.add('Country: ${provider.selectedCountry}');
+    }
+    if (provider.verificationFilter != null) {
+      activeFilters.add('Verified: ${provider.verificationFilter}');
+    }
+
+    if (activeFilters.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: context.cardPadding * 0.5),
+      child: Wrap(
+        spacing: context.smallPadding,
+        runSpacing: context.smallPadding / 2,
         children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
+          ...activeFilters.map((filter) => Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryMaroon.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              border: Border.all(
+                color: AppTheme.primaryMaroon.withOpacity(0.3),
+                width: 1,
               ),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  filter,
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+                SizedBox(width: context.smallPadding / 2),
+                InkWell(
+                  onTap: () => _clearSpecificFilter(filter, provider),
+                  child: Icon(
+                    Icons.close,
+                    size: context.iconSize('small'),
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+              ],
+            ),
+          )),
+
+          // Clear All Filters Button
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              border: Border.all(
+                color: Colors.red.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: InkWell(
+              onTap: provider.clearAllFilters,
+              child: Text(
+                'Clear All',
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red[700],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _clearSpecificFilter(String filterText, VendorProvider provider) {
+    if (filterText.startsWith('Status:')) {
+      provider.setStatusFilter(null);
+    } else if (filterText.startsWith('Type:')) {
+      provider.setTypeFilter(null);
+    } else if (filterText.startsWith('City:')) {
+      provider.setCityFilter(null);
+    } else if (filterText.startsWith('Area:')) {
+      provider.setAreaFilter(null);
+    } else if (filterText.startsWith('Country:')) {
+      provider.setCountryFilter(null);
+    } else if (filterText.startsWith('Verified:')) {
+      provider.setVerificationFilter(null);
+    }
+  }
+
+  int _getActiveFilterCount(VendorProvider provider) {
+    int count = 0;
+    if (provider.selectedStatus != null) count++;
+    if (provider.selectedType != null) count++;
+    if (provider.selectedCity != null) count++;
+    if (provider.selectedArea != null) count++;
+    if (provider.selectedCountry != null) count++;
+    if (provider.verificationFilter != null) count++;
+    return count;
   }
 
   Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
@@ -557,7 +928,9 @@ class _VendorPageState extends State<VendorPage> {
               size: context.iconSize('medium'),
             ),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

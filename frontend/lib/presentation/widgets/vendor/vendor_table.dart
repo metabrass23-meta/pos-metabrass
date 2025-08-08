@@ -6,15 +6,32 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
-class VendorTable extends StatelessWidget {
+class EnhancedVendorTable extends StatefulWidget {
   final Function(Vendor) onEdit;
   final Function(Vendor) onDelete;
+  final Function(Vendor) onView;
 
-  const VendorTable({
+  const EnhancedVendorTable({
     super.key,
     required this.onEdit,
     required this.onDelete,
+    required this.onView,
   });
+
+  @override
+  State<EnhancedVendorTable> createState() => _EnhancedVendorTableState();
+}
+
+class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
+  final ScrollController _horizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    _verticalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,125 +47,191 @@ class VendorTable extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          // Responsive Table Header
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.borderRadius('large')),
-                topRight: Radius.circular(context.borderRadius('large')),
+      child: Consumer<VendorProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return Center(
+              child: SizedBox(
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 3.w,
+                  small: 6.w,
+                  medium: 3.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                height: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 3.w,
+                  small: 6.w,
+                  medium: 3.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                child: const CircularProgressIndicator(
+                  color: AppTheme.primaryMaroon,
+                  strokeWidth: 3,
+                ),
               ),
-            ),
-            child: _buildResponsiveHeaderRow(context),
-          ),
+            );
+          }
 
-          // Table Content
-          Expanded(
-            child: Consumer<VendorProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      child: const CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
-                        strokeWidth: 3,
+          if (provider.vendors.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          return Scrollbar(
+            controller: _horizontalController,
+            thumbVisibility: true,
+            child: Column(
+              children: [
+                // Table Header with Horizontal Scroll
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray.withOpacity(0.5),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(context.borderRadius('large')),
+                      topRight: Radius.circular(context.borderRadius('large')),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    controller: _horizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: Container(
+                      width: _getTableWidth(context),
+                      padding: EdgeInsets.symmetric(
+                          vertical: context.cardPadding * 0.85,
+                          horizontal: context.cardPadding / 2),
+                      child: _buildTableHeader(context),
+                    ),
+                  ),
+                ),
+
+                // Table Content with Synchronized Scroll
+                Expanded(
+                  child: Scrollbar(
+                    controller: _verticalController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _horizontalController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: Container(
+                        width: _getTableWidth(context),
+                        child: ListView.builder(
+                          controller: _verticalController,
+                          itemCount: provider.vendors.length,
+                          itemBuilder: (context, index) {
+                            final vendor = provider.vendors[index];
+                            return _buildTableRow(context, vendor, index);
+                          },
+                        ),
                       ),
                     ),
-                  );
-                }
+                  ),
+                ),
 
-                if (provider.vendors.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-
-                return ListView.builder(
-                  itemCount: provider.vendors.length,
-                  itemBuilder: (context, index) {
-                    final vendor = provider.vendors[index];
-                    return _buildResponsiveTableRow(context, vendor, index);
-                  },
-                );
-              },
+                // Pagination Controls
+                if (provider.paginationInfo != null &&
+                    provider.paginationInfo!.totalPages > 1)
+                  _buildPaginationControls(context, provider),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildResponsiveHeaderRow(BuildContext context) {
-    final columnFlexes = context.tableColumnFlexes;
+  double _getTableWidth(BuildContext context) {
+    return ResponsiveBreakpoints.responsive(
+      context,
+      tablet: 1480.0, // Adjusted for vendor table columns
+      small: 1580.0,
+      medium: 1680.0,
+      large: 1780.0,
+      ultrawide: 1880.0,
+    );
+  }
+
+  Widget _buildTableHeader(BuildContext context) {
+    final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // ID Column
-        Expanded(
-          flex: columnFlexes[0],
-          child: _buildHeaderCell(context, 'ID'),
+        // Name
+        Container(
+          width: columnWidths[0],
+          child: _buildSortableHeaderCell(context, 'Name', 'name'),
         ),
 
-        // Name Column
-        Expanded(
-          flex: columnFlexes[1],
-          child: _buildHeaderCell(context, context.isTablet ? 'Name' : 'Vendor Name'),
+        // Business Name
+        Container(
+          width: columnWidths[1],
+          child: _buildSortableHeaderCell(context, 'Business Name', 'business_name'),
         ),
 
-        // Business Name and CNIC Columns (hidden on tablets and small screens)
+        // Phone & City (responsive)
         if (!context.shouldShowCompactLayout) ...[
-          Expanded(
-            flex: columnFlexes[2],
-            child: _buildHeaderCell(context, 'Business Name'),
-          ),
-          Expanded(
-            flex: columnFlexes[3],
-            child: _buildHeaderCell(context, 'CNIC'),
-          ),
-        ],
-
-        // Phone and City Columns (responsive visibility)
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: columnFlexes[4],
+          Container(
+            width: columnWidths[2],
             child: _buildHeaderCell(context, 'Phone'),
           ),
-          Expanded(
-            flex: columnFlexes[5],
+          Container(
+            width: columnWidths[3],
             child: _buildHeaderCell(context, 'City'),
           ),
         ],
 
-        // Area Column (always visible)
-        Expanded(
-          flex: columnFlexes[context.shouldShowFullLayout ? 6 : context.isMediumDesktop ? 6 : context.shouldShowCompactLayout ? 2 : 6],
-          child: _buildHeaderCell(context, 'Area'),
+        // Status & Type
+        Container(
+          width: columnWidths[context.shouldShowCompactLayout ? 2 : 4],
+          child: _buildHeaderCell(context, 'Status'),
         ),
 
-        // Actions Column (always visible)
-        Expanded(
-          flex: columnFlexes[context.shouldShowFullLayout ? 7 : context.isMediumDesktop ? 7 : context.shouldShowCompactLayout ? 3 : 7],
+        Container(
+          width: columnWidths[context.shouldShowCompactLayout ? 3 : 5],
+          child: _buildHeaderCell(context, 'Type'),
+        ),
+
+        // Vendor Since
+        Container(
+          width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
+          child: _buildSortableHeaderCell(context, 'Vendor Since', 'created_at'),
+        ),
+
+        // Actions
+        Container(
+          width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
           child: _buildHeaderCell(context, 'Actions'),
         ),
       ],
     );
+  }
+
+  List<double> _getColumnWidths(BuildContext context) {
+    if (context.shouldShowCompactLayout) {
+      return [
+        180.0, // Name
+        200.0, // Business Name
+        120.0, // Status
+        140.0, // Type
+        150.0, // Vendor Since
+        350.0, // Actions
+      ];
+    } else {
+      return [
+        180.0, // Name
+        200.0, // Business Name
+        160.0, // Phone
+        140.0, // City
+        120.0, // Status
+        140.0, // Type
+        150.0, // Vendor Since
+        350.0, // Actions
+      ];
+    }
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
@@ -163,11 +246,48 @@ class VendorTable extends StatelessWidget {
     );
   }
 
-  Widget _buildResponsiveTableRow(BuildContext context, Vendor vendor, int index) {
-    final columnFlexes = context.tableColumnFlexes;
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+    return Consumer<VendorProvider>(
+      builder: (context, provider, child) {
+        final isCurrentSort = provider.sortBy == sortKey;
+
+        return InkWell(
+          onTap: () => provider.setSortBy(sortKey),
+          borderRadius: BorderRadius.circular(4),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Icon(
+                  isCurrentSort
+                      ? (provider.sortAscending ? Icons.arrow_upward : Icons.arrow_downward)
+                      : Icons.sort,
+                  size: 16,
+                  color: isCurrentSort ? AppTheme.primaryMaroon : Colors.grey[500],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTableRow(BuildContext context, Vendor vendor, int index) {
+    final columnWidths = _getColumnWidths(context);
 
     return Container(
-      padding: EdgeInsets.all(context.cardPadding / 2.5),
       decoration: BoxDecoration(
         color: index.isEven
             ? AppTheme.pureWhite
@@ -179,37 +299,13 @@ class VendorTable extends StatelessWidget {
           ),
         ),
       ),
+      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // ID Column with responsive styling
-          Expanded(
-            flex: columnFlexes[0],
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                vendor.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Name Column with responsive layout
-          Expanded(
-            flex: columnFlexes[1],
+          // Name
+          Container(
+            width: columnWidths[0],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -223,21 +319,11 @@ class VendorTable extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show business name and CNIC here on compact layouts
+                // Show additional info on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    '${vendor.businessName}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    vendor.cnic,
+                    vendor.phone,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -251,103 +337,28 @@ class VendorTable extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Business Name and CNIC Columns (hidden on compact layouts)
-          if (!context.shouldShowCompactLayout) ...[
-            Expanded(
-              flex: columnFlexes[2],
-              child: Text(
-                vendor.businessName,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-            Expanded(
-              flex: columnFlexes[3],
-              child: Text(
-                vendor.cnic,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-          ],
-
-          // Phone and City Columns (responsive visibility)
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: columnFlexes[4],
-              child: Text(
-                vendor.phone,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoalGray,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-            Expanded(
-              flex: columnFlexes[5],
-              child: Text(
-                vendor.city,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoalGray,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-          ],
-
-          // Area Column (always visible)
-          Expanded(
-            flex: columnFlexes[context.shouldShowFullLayout ? 6 : context.isMediumDesktop ? 6 : context.shouldShowCompactLayout ? 2 : 6],
+          // Business Name
+          Container(
+            width: columnWidths[1],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  vendor.area,
+                  vendor.businessName,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show phone and city here on compact layouts
+                // Show city info on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    '${vendor.phone}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    vendor.city,
+                    '${vendor.area}, ${vendor.city}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -361,102 +372,195 @@ class VendorTable extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Actions Column with responsive button sizing
-          Expanded(
-            flex: columnFlexes[context.shouldShowFullLayout ? 7 : context.isMediumDesktop ? 7 : context.shouldShowCompactLayout ? 3 : 7],
-            child: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactActions(context, vendor),
-              small: _buildCompactActions(context, vendor),
-              medium: _buildStandardActions(context, vendor),
-              large: _buildExpandedActions(context, vendor),
-              ultrawide: _buildExpandedActions(context, vendor),
+          // Phone and City (hidden on compact layouts)
+          if (!context.shouldShowCompactLayout) ...[
+            Container(
+              width: columnWidths[2],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: Row(
+                children: [
+                  if (vendor.phoneVerified)
+                    Container(
+                      margin: EdgeInsets.only(right: context.smallPadding / 2),
+                      child: Icon(
+                        Icons.verified,
+                        color: Colors.green,
+                        size: context.iconSize('small'),
+                      ),
+                    ),
+                  Expanded(
+                    child: Text(
+                      vendor.phone,
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.charcoalGray,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
+
+            Container(
+              width: columnWidths[3],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    vendor.city,
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.charcoalGray,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    vendor.area,
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Status
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 2 : 4],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding,
+                vertical: context.smallPadding / 2,
+              ),
+              decoration: BoxDecoration(
+                color: _getStatusColor(vendor.status).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                border: Border.all(
+                  color: _getStatusColor(vendor.status).withOpacity(0.3),
+                ),
+              ),
+              child: Text(
+                vendor.statusDisplayName,
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: _getStatusColor(vendor.status),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
+          // Type
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 3 : 5],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Row(
+              children: [
+                Icon(
+                  _getVendorTypeIcon(vendor.vendorType),
+                  color: Colors.indigo,
+                  size: context.iconSize('small'),
+                ),
+                SizedBox(width: context.smallPadding / 2),
+                Expanded(
+                  child: Text(
+                    vendor.vendorTypeDisplayName,
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.indigo,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Vendor Since
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatDate(vendor.createdAt),
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
+                ),
+                Text(
+                  vendor.relativeCreatedAt,
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Actions
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: _buildActions(context, vendor),
           ),
         ],
       ),
     );
   }
 
-  // Compact actions for tablets and small screens
-  Widget _buildCompactActions(BuildContext context, Vendor vendor) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'edit') {
-          onEdit(vendor);
-        } else if (value == 'delete') {
-          onDelete(vendor);
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Edit',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Delete',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        padding: EdgeInsets.all(context.smallPadding),
-        decoration: BoxDecoration(
-          color: AppTheme.lightGray,
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        ),
-        child: Icon(
-          Icons.more_vert,
-          size: context.iconSize('small'),
-          color: AppTheme.charcoalGray,
-        ),
-      ),
-    );
-  }
-
-  // Standard actions for medium screens
-  Widget _buildStandardActions(BuildContext context, Vendor vendor) {
+  Widget _buildActions(BuildContext context, Vendor vendor) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // View Button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => widget.onView(vendor),
+            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            child: Container(
+              padding: EdgeInsets.all(context.smallPadding * 0.5),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Icon(
+                Icons.visibility_outlined,
+                color: Colors.purple,
+                size: context.iconSize('small'),
+              ),
+            ),
+          ),
+        ),
+
+        SizedBox(width: context.smallPadding / 2),
+
         // Edit Button
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onEdit(vendor),
+            onTap: () => widget.onEdit(vendor),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
@@ -473,13 +577,13 @@ class VendorTable extends StatelessWidget {
           ),
         ),
 
-        SizedBox(width: context.smallPadding),
+        SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onDelete(vendor),
+            onTap: () => widget.onDelete(vendor),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
@@ -495,98 +599,218 @@ class VendorTable extends StatelessWidget {
             ),
           ),
         ),
+
+        SizedBox(width: context.smallPadding / 2),
+
+        // Quick Actions Dropdown
+        PopupMenuButton<String>(
+          onSelected: (value) => _handleQuickAction(context, vendor, value),
+          itemBuilder: (context) => [
+            if (!vendor.phoneVerified)
+              PopupMenuItem(
+                value: 'verify_phone',
+                child: Row(
+                  children: [
+                    Icon(Icons.phone_android, color: Colors.green, size: context.iconSize('small')),
+                    SizedBox(width: context.smallPadding),
+                    Text('Verify Phone', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  ],
+                ),
+              ),
+            if (vendor.email != null && vendor.email!.isNotEmpty && !vendor.emailVerified)
+              PopupMenuItem(
+                value: 'verify_email',
+                child: Row(
+                  children: [
+                    Icon(Icons.email, color: Colors.blue, size: context.iconSize('small')),
+                    SizedBox(width: context.smallPadding),
+                    Text('Verify Email', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  ],
+                ),
+              ),
+            PopupMenuItem(
+              value: 'update_order',
+              child: Row(
+                children: [
+                  Icon(Icons.shopping_cart, color: Colors.purple, size: context.iconSize('small')),
+                  SizedBox(width: context.smallPadding),
+                  Text('Update Order', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'update_contact',
+              child: Row(
+                children: [
+                  Icon(Icons.contact_phone, color: Colors.teal, size: context.iconSize('small')),
+                  SizedBox(width: context.smallPadding),
+                  Text('Update Contact', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                ],
+              ),
+            ),
+            if (vendor.status == 'ACTIVE')
+              PopupMenuItem(
+                value: 'deactivate',
+                child: Row(
+                  children: [
+                    Icon(Icons.power_off, color: Colors.orange, size: context.iconSize('small')),
+                    SizedBox(width: context.smallPadding),
+                    Text('Deactivate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  ],
+                ),
+              ),
+            if (vendor.status == 'INACTIVE')
+              PopupMenuItem(
+                value: 'activate',
+                child: Row(
+                  children: [
+                    Icon(Icons.power_settings_new, color: Colors.green, size: context.iconSize('small')),
+                    SizedBox(width: context.smallPadding),
+                    Text('Activate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  ],
+                ),
+              ),
+          ],
+          child: Container(
+            padding: EdgeInsets.all(context.smallPadding * 0.5),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            ),
+            child: Icon(
+              Icons.more_vert,
+              color: Colors.grey[600],
+              size: context.iconSize('small'),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  // Expanded actions for large screens
-  Widget _buildExpandedActions(BuildContext context, Vendor vendor) {
-    return Row(
-      children: [
-        // Edit Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onEdit(vendor),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      color: Colors.blue,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Edit',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+  void _handleQuickAction(BuildContext context, Vendor vendor, String action) async {
+    final provider = context.read<VendorProvider>();
+
+    switch (action) {
+      case 'verify_phone':
+        await provider.verifyVendorContact(
+          id: vendor.id,
+          verificationType: 'phone',
+          verified: true,
+        );
+        break;
+      case 'verify_email':
+        await provider.verifyVendorContact(
+          id: vendor.id,
+          verificationType: 'email',
+          verified: true,
+        );
+        break;
+      case 'update_order':
+        await provider.updateVendorActivity(
+          id: vendor.id,
+          activityType: 'order',
+        );
+        break;
+      case 'update_contact':
+        await provider.updateVendorActivity(
+          id: vendor.id,
+          activityType: 'contact',
+        );
+        break;
+      case 'activate':
+      case 'deactivate':
+        await provider.updateVendor(
+          id: vendor.id,
+          name: vendor.name,
+          businessName: vendor.businessName,
+          cnic: vendor.cnic,
+          phone: vendor.phone,
+          email: vendor.email,
+          address: vendor.address,
+          city: vendor.city,
+          area: vendor.area,
+          country: vendor.country,
+          vendorType: vendor.vendorType,
+          status: action == 'activate' ? 'ACTIVE' : 'INACTIVE',
+          taxNumber: vendor.taxNumber,
+          notes: vendor.notes,
+          phoneVerified: vendor.phoneVerified,
+          emailVerified: vendor.emailVerified,
+        );
+        break;
+    }
+  }
+
+  Widget _buildPaginationControls(BuildContext context, VendorProvider provider) {
+    final pagination = provider.paginationInfo!;
+
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.lightGray.withOpacity(0.3),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(context.borderRadius('large')),
+          bottomRight: Radius.circular(context.borderRadius('large')),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Results info
+          Text(
+            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} vendors',
+            style: GoogleFonts.inter(
+              fontSize: context.subtitleFontSize,
+              color: Colors.grey[600],
             ),
           ),
-        ),
 
-        SizedBox(width: context.smallPadding),
+          const Spacer(),
 
-        // Delete Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onDelete(vendor),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Delete',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
+          // Pagination controls
+          Row(
+            children: [
+              // Previous button
+              IconButton(
+                onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
+                icon: Icon(
+                  Icons.chevron_left,
+                  color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400],
                 ),
               ),
-            ),
+
+              // Page info
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.cardPadding,
+                  vertical: context.smallPadding,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
+              ),
+
+              // Next button
+              IconButton(
+                onPressed: pagination.hasNext ? provider.loadNextPage : null,
+                icon: Icon(
+                  Icons.chevron_right,
+                  color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400],
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -598,19 +822,19 @@ class VendorTable extends StatelessWidget {
           Container(
             width: ResponsiveBreakpoints.responsive(
               context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
+              tablet: 15.w,
+              small: 20.w,
+              medium: 12.w,
+              large: 10.w,
+              ultrawide: 8.w,
             ),
             height: ResponsiveBreakpoints.responsive(
               context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
+              tablet: 15.w,
+              small: 20.w,
+              medium: 12.w,
+              large: 10.w,
+              ultrawide: 8.w,
             ),
             decoration: BoxDecoration(
               color: AppTheme.lightGray,
@@ -626,7 +850,7 @@ class VendorTable extends StatelessWidget {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Vendor Records Found',
+            'No Vendors Found',
             style: GoogleFonts.inter(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -706,5 +930,36 @@ class VendorTable extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Helper methods
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'ACTIVE':
+        return Colors.green;
+      case 'INACTIVE':
+        return Colors.orange;
+      case 'SUSPENDED':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData _getVendorTypeIcon(String vendorType) {
+    switch (vendorType.toUpperCase()) {
+      case 'SUPPLIER':
+        return Icons.local_shipping;
+      case 'DISTRIBUTOR':
+        return Icons.store;
+      case 'MANUFACTURER':
+        return Icons.factory;
+      default:
+        return Icons.business;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
