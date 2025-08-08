@@ -6,6 +6,9 @@ django-cors-headers
 # Database
 psycopg2-binary
 
+# Data handling
+pandas
+
 # Authentication & Security
 djangorestframework-simplejwt
 django-oauth-toolkit
