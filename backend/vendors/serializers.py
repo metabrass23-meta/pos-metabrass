@@ -1,47 +1,64 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import Vendor, VendorNote
-
-# Get the custom user model
-User = get_user_model()
+from django.db.models import Q
+from .models import Vendor
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """Serializer for User model"""
+class VendorSerializer(serializers.ModelSerializer):
+    """Complete serializer for Vendor model"""
     
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email']
-
-
-class VendorNoteSerializer(serializers.ModelSerializer):
-    """Serializer for VendorNote model"""
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True, source='created_by.id')
     
-    created_by = UserSerializer(read_only=True)
+    # Computed fields
+    display_name = serializers.CharField(read_only=True)
+    is_new_vendor = serializers.BooleanField(read_only=True)
+    is_recent_vendor = serializers.BooleanField(read_only=True)
+    vendor_age_days = serializers.IntegerField(read_only=True)
+    initials = serializers.CharField(source='get_initials', read_only=True)
     
-    class Meta:
-        model = VendorNote
-        fields = ['id', 'note', 'created_by', 'created_at']
-        read_only_fields = ['id', 'created_at']
-
-
-class VendorListSerializer(serializers.ModelSerializer):
-    """Serializer for Vendor list view"""
+    # Phone and location properties
+    phone_country_code = serializers.CharField(read_only=True)
+    formatted_phone = serializers.CharField(read_only=True)
+    full_address = serializers.CharField(read_only=True)
     
+    # Payment-related fields (placeholders for future integration)
     payments_count = serializers.SerializerMethodField()
     total_payments_amount = serializers.SerializerMethodField()
     last_payment_date = serializers.SerializerMethodField()
-    full_address = serializers.ReadOnlyField()
-    initials = serializers.ReadOnlyField()
     
     class Meta:
         model = Vendor
-        fields = [
-            'id', 'name', 'business_name', 'cnic', 'phone',
-            'city', 'area', 'full_address', 'is_active',
-            'created_at', 'updated_at', 'initials',
-            'payments_count', 'total_payments_amount', 'last_payment_date'
-        ]
+        fields = (
+            'id',
+            'name',
+            'business_name',
+            'cnic',
+            'phone',
+            'city',
+            'area',
+            'display_name',
+            'initials',
+            'is_new_vendor',
+            'is_recent_vendor',
+            'vendor_age_days',
+            'phone_country_code',
+            'formatted_phone',
+            'full_address',
+            'payments_count',
+            'total_payments_amount',
+            'last_payment_date',
+            'is_active',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'created_by_id'
+        )
+        read_only_fields = (
+            'id', 'created_at', 'updated_at', 'created_by', 'created_by_id',
+            'display_name', 'initials', 'is_new_vendor', 'is_recent_vendor',
+            'vendor_age_days', 'phone_country_code', 'formatted_phone',
+            'full_address', 'payments_count', 'total_payments_amount', 'last_payment_date'
+        )
     
     def get_payments_count(self, obj):
         """Get total payments count for vendor"""
@@ -55,101 +72,337 @@ class VendorListSerializer(serializers.ModelSerializer):
         """Get last payment date for vendor"""
         return obj.get_last_payment_date()
 
-
-class VendorDetailSerializer(serializers.ModelSerializer):
-    """Serializer for Vendor detail view"""
-    
-    created_by = UserSerializer(read_only=True)
-    notes = VendorNoteSerializer(many=True, read_only=True)
-    full_address = serializers.ReadOnlyField()
-    initials = serializers.ReadOnlyField()
-    display_phone = serializers.ReadOnlyField()
-    
-    # Payment statistics
-    statistics = serializers.SerializerMethodField()
-    recent_payments = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Vendor
-        fields = [
-            'id', 'name', 'business_name', 'cnic', 'phone', 'display_phone',
-            'city', 'area', 'full_address', 'is_active',
-            'created_at', 'updated_at', 'created_by', 'initials',
-            'notes', 'statistics', 'recent_payments'
-        ]
-    
-    def get_statistics(self, obj):
-        """Get payment statistics for vendor"""
-        return {
-            'total_payments': obj.get_payments_count(),
-            'total_payments_amount': obj.get_total_payments_amount(),
-            'first_payment_date': None,  # To be implemented with Payment model
-            'last_payment_date': obj.get_last_payment_date(),
-            'average_payment_amount': obj.get_average_payment_amount()
-        }
-    
-    def get_recent_payments(self, obj):
-        """Get recent payments for vendor"""
-        # This will be implemented when Payment model is available
-        return []
-
-
-class VendorCreateUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for creating and updating vendors"""
-    
-    class Meta:
-        model = Vendor
-        fields = [
-            'name', 'business_name', 'cnic', 'phone',
-            'city', 'area', 'is_active'
-        ]
-        extra_kwargs = {
-            'cnic': {'required': True},
-            'name': {'required': True},
-            'business_name': {'required': True},
-            'phone': {'required': True},
-            'city': {'required': True},
-            'area': {'required': True},
-        }
-    
-    def validate_cnic(self, value):
-        """Validate CNIC uniqueness among active vendors"""
-        # Get the instance if we're updating
-        instance = getattr(self, 'instance', None)
+    def validate_name(self, value):
+        """Clean and validate vendor name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Vendor name is required.")
         
-        # Check if CNIC already exists for active vendors
-        queryset = Vendor.objects.filter(cnic=value, is_active=True)
-        if instance:
-            queryset = queryset.exclude(pk=instance.pk)
+        name = value.strip()
+        if len(name) < 2:
+            raise serializers.ValidationError("Vendor name must be at least 2 characters long.")
+        
+        return name
+
+    def validate_business_name(self, value):
+        """Clean and validate business name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Business name is required.")
+        
+        business_name = value.strip()
+        if len(business_name) < 2:
+            raise serializers.ValidationError("Business name must be at least 2 characters long.")
+        
+        return business_name
+
+    def validate_cnic(self, value):
+        """Clean CNIC and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("CNIC is required.")
+        
+        cnic = value.strip()
+        
+        # Check if another vendor has this CNIC (for create) or different vendor (for update)
+        queryset = Vendor.objects.filter(cnic=cnic)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
         
         if queryset.exists():
-            raise serializers.ValidationError(
-                "An active vendor with this CNIC already exists."
-            )
+            raise serializers.ValidationError("A vendor with this CNIC already exists.")
         
-        return value
-    
+        return cnic
+
     def validate_phone(self, value):
-        """Additional phone validation"""
-        # The model's validate_pakistani_phone will handle the format validation
-        return value
-    
-    def create(self, validated_data):
-        """Create a new vendor"""
-        # Set created_by if user is provided in context
-        request = self.context.get('request')
-        if request and hasattr(request, 'user'):
-            validated_data['created_by'] = request.user
+        """Clean phone number and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Phone number is required.")
         
+        phone = value.strip()
+        
+        # Check if another vendor has this phone (for create) or different vendor (for update)
+        queryset = Vendor.objects.filter(phone=phone)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        
+        if queryset.exists():
+            raise serializers.ValidationError("A vendor with this phone number already exists.")
+        
+        return phone
+
+    def validate_city(self, value):
+        """Clean city field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("City is required.")
+        return value.strip().title()
+
+    def validate_area(self, value):
+        """Clean area field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Area is required.")
+        return value.strip().title()
+
+
+class VendorCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating vendors"""
+    
+    class Meta:
+        model = Vendor
+        fields = (
+            'name',
+            'business_name',
+            'cnic',
+            'phone',
+            'city',
+            'area'
+        )
+
+    def validate_name(self, value):
+        """Clean and validate vendor name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Vendor name is required.")
+        
+        name = value.strip()
+        if len(name) < 2:
+            raise serializers.ValidationError("Vendor name must be at least 2 characters long.")
+        
+        return name
+
+    def validate_business_name(self, value):
+        """Clean and validate business name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Business name is required.")
+        
+        business_name = value.strip()
+        if len(business_name) < 2:
+            raise serializers.ValidationError("Business name must be at least 2 characters long.")
+        
+        return business_name
+
+    def validate_cnic(self, value):
+        """Clean CNIC and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("CNIC is required.")
+        
+        cnic = value.strip()
+        
+        # Check uniqueness
+        if Vendor.objects.filter(cnic=cnic).exists():
+            raise serializers.ValidationError("A vendor with this CNIC already exists.")
+        
+        return cnic
+
+    def validate_phone(self, value):
+        """Clean phone number and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Phone number is required.")
+        
+        phone = value.strip()
+        
+        # Check uniqueness
+        if Vendor.objects.filter(phone=phone).exists():
+            raise serializers.ValidationError("A vendor with this phone number already exists.")
+        
+        return phone
+
+    def validate_city(self, value):
+        """Clean city field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("City is required.")
+        return value.strip().title()
+
+    def validate_area(self, value):
+        """Clean area field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Area is required.")
+        return value.strip().title()
+
+    def create(self, validated_data):
+        """Create vendor with the requesting user as creator"""
+        user = self.context['request'].user
+        validated_data['created_by'] = user
         return super().create(validated_data)
+
+
+class VendorUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating vendors"""
+    
+    class Meta:
+        model = Vendor
+        fields = (
+            'name',
+            'business_name',
+            'cnic',
+            'phone',
+            'city',
+            'area'
+        )
+
+    def validate_name(self, value):
+        """Clean and validate vendor name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Vendor name is required.")
+        
+        name = value.strip()
+        if len(name) < 2:
+            raise serializers.ValidationError("Vendor name must be at least 2 characters long.")
+        
+        return name
+
+    def validate_business_name(self, value):
+        """Clean and validate business name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Business name is required.")
+        
+        business_name = value.strip()
+        if len(business_name) < 2:
+            raise serializers.ValidationError("Business name must be at least 2 characters long.")
+        
+        return business_name
+
+    def validate_cnic(self, value):
+        """Clean CNIC and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("CNIC is required.")
+        
+        cnic = value.strip()
+        
+        # Check uniqueness excluding current instance
+        queryset = Vendor.objects.filter(cnic=cnic)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        
+        if queryset.exists():
+            raise serializers.ValidationError("A vendor with this CNIC already exists.")
+        
+        return cnic
+
+    def validate_phone(self, value):
+        """Clean phone number and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Phone number is required.")
+        
+        phone = value.strip()
+        
+        # Check uniqueness excluding current instance
+        queryset = Vendor.objects.filter(phone=phone)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        
+        if queryset.exists():
+            raise serializers.ValidationError("A vendor with this phone number already exists.")
+        
+        return phone
+
+    def validate_city(self, value):
+        """Clean city field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("City is required.")
+        return value.strip().title()
+
+    def validate_area(self, value):
+        """Clean area field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Area is required.")
+        return value.strip().title()
+
+
+class VendorListSerializer(serializers.ModelSerializer):
+    """Minimal serializer for listing vendors"""
+    
+    created_by_email = serializers.CharField(source='created_by.email', read_only=True)
+    display_name = serializers.CharField(read_only=True)
+    initials = serializers.CharField(source='get_initials', read_only=True)
+    is_new_vendor = serializers.BooleanField(read_only=True)
+    full_address = serializers.CharField(read_only=True)
+    payments_count = serializers.SerializerMethodField()
+    total_payments_amount = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Vendor
+        fields = (
+            'id',
+            'name',
+            'business_name',
+            'display_name',
+            'initials',
+            'cnic',
+            'phone',
+            'city',
+            'area',
+            'full_address',
+            'is_new_vendor',
+            'payments_count',
+            'total_payments_amount',
+            'is_active',
+            'created_at',
+            'created_by_email'
+        )
+    
+    def get_payments_count(self, obj):
+        """Get total payments count for vendor"""
+        return obj.get_payments_count()
+    
+    def get_total_payments_amount(self, obj):
+        """Get total payments amount for vendor"""
+        return obj.get_total_payments_amount()
+
+
+class VendorDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for single vendor view"""
+    
+    created_by = serializers.StringRelatedField(read_only=True)
+    display_name = serializers.CharField(read_only=True)
+    initials = serializers.CharField(source='get_initials', read_only=True)
+    is_new_vendor = serializers.BooleanField(read_only=True)
+    is_recent_vendor = serializers.BooleanField(read_only=True)
+    vendor_age_days = serializers.IntegerField(read_only=True)
+    phone_country_code = serializers.CharField(read_only=True)
+    formatted_phone = serializers.CharField(read_only=True)
+    full_address = serializers.CharField(read_only=True)
+    
+    class Meta:
+        model = Vendor
+        fields = (
+            'id',
+            'name',
+            'business_name',
+            'display_name',
+            'initials',
+            'cnic',
+            'phone',
+            'city',
+            'area',
+            'is_new_vendor',
+            'is_recent_vendor',
+            'vendor_age_days',
+            'phone_country_code',
+            'formatted_phone',
+            'full_address',
+            'is_active',
+            'created_at',
+            'updated_at',
+            'created_by'
+        )
+
+
+class VendorStatsSerializer(serializers.Serializer):
+    """Serializer for vendor statistics"""
+    
+    total_vendors = serializers.IntegerField()
+    active_vendors = serializers.IntegerField()
+    inactive_vendors = serializers.IntegerField()
+    new_vendors_this_month = serializers.IntegerField()
+    recent_vendors_this_week = serializers.IntegerField()
+    top_cities = serializers.ListField()
+    top_areas = serializers.ListField()
 
 
 class VendorSearchSerializer(serializers.Serializer):
     """Serializer for vendor search parameters"""
     
     q = serializers.CharField(
-        required=False,
-        help_text="Search query for name, business name, phone, or CNIC"
+        required=True,
+        min_length=1,
+        help_text="Search query for name, business name, phone, CNIC, city, or area"
     )
     city = serializers.CharField(
         required=False,
@@ -159,51 +412,47 @@ class VendorSearchSerializer(serializers.Serializer):
         required=False,
         help_text="Filter by area"
     )
-    is_active = serializers.BooleanField(
-        required=False,
-        help_text="Filter by active status"
-    )
-    created_after = serializers.DateField(
-        required=False,
-        help_text="Filter vendors created after this date"
-    )
-    created_before = serializers.DateField(
-        required=False,
-        help_text="Filter vendors created before this date"
-    )
-    ordering = serializers.ChoiceField(
-        choices=[
-            'name', '-name',
-            'business_name', '-business_name',
-            'created_at', '-created_at',
-            'updated_at', '-updated_at',
-            'city', '-city'
-        ],
-        required=False,
-        default='-created_at',
-        help_text="Order results by field"
-    )
 
 
-class VendorStatisticsSerializer(serializers.Serializer):
-    """Serializer for vendor statistics"""
+class VendorContactUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating vendor contact information"""
     
-    total_vendors = serializers.IntegerField()
-    active_vendors = serializers.IntegerField()
-    inactive_vendors = serializers.IntegerField()
-    new_vendors_this_month = serializers.IntegerField()
-    new_vendors_this_week = serializers.IntegerField()
-    new_vendors_today = serializers.IntegerField()
-    top_cities = serializers.ListField(
-        child=serializers.DictField()
-    )
-    vendors_by_month = serializers.ListField(
-        child=serializers.DictField()
-    )
+    class Meta:
+        model = Vendor
+        fields = ('phone', 'city', 'area')
+
+    def validate_phone(self, value):
+        """Clean phone number and check uniqueness"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Phone number is required.")
+        
+        phone = value.strip()
+        
+        # Check uniqueness excluding current instance
+        queryset = Vendor.objects.filter(phone=phone)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        
+        if queryset.exists():
+            raise serializers.ValidationError("A vendor with this phone number already exists.")
+        
+        return phone
+
+    def validate_city(self, value):
+        """Clean city field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("City is required.")
+        return value.strip().title()
+
+    def validate_area(self, value):
+        """Clean area field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Area is required.")
+        return value.strip().title()
 
 
 class VendorBulkActionSerializer(serializers.Serializer):
-    """Serializer for bulk actions on vendors"""
+    """Serializer for bulk vendor actions"""
     
     vendor_ids = serializers.ListField(
         child=serializers.UUIDField(),
@@ -211,77 +460,25 @@ class VendorBulkActionSerializer(serializers.Serializer):
         help_text="List of vendor IDs to perform action on"
     )
     action = serializers.ChoiceField(
-        choices=['soft_delete', 'restore', 'export'],
+        choices=[
+            ('activate', 'Activate'),
+            ('deactivate', 'Deactivate'),
+        ],
+        required=True,
         help_text="Action to perform on selected vendors"
     )
-    
+
     def validate_vendor_ids(self, value):
         """Validate that all vendor IDs exist"""
-        existing_vendors = Vendor.objects.filter(id__in=value)
-        if existing_vendors.count() != len(value):
-            missing_ids = set(value) - set(existing_vendors.values_list('id', flat=True))
-            raise serializers.ValidationError(
-                f"The following vendor IDs do not exist: {list(missing_ids)}"
-            )
-        return value
-
-
-class VendorImportSerializer(serializers.Serializer):
-    """Serializer for importing vendors from CSV/Excel"""
-    
-    file = serializers.FileField(
-        help_text="CSV or Excel file containing vendor data"
-    )
-    skip_duplicates = serializers.BooleanField(
-        default=True,
-        help_text="Skip vendors with duplicate CNIC"
-    )
-    update_existing = serializers.BooleanField(
-        default=False,
-        help_text="Update existing vendors with same CNIC"
-    )
-    
-    def validate_file(self, value):
-        """Validate uploaded file"""
-        allowed_extensions = ['.csv', '.xlsx', '.xls']
-        file_extension = value.name.lower().split('.')[-1]
+        existing_ids = Vendor.objects.filter(id__in=value).values_list('id', flat=True)
+        existing_ids = [str(id) for id in existing_ids]
         
-        if f'.{file_extension}' not in allowed_extensions:
-            raise serializers.ValidationError(
-                f"Unsupported file format. Allowed formats: {', '.join(allowed_extensions)}"
-            )
+        missing_ids = [str(id) for id in value if str(id) not in existing_ids]
         
-        # Check file size (limit to 10MB)
-        if value.size > 10 * 1024 * 1024:
+        if missing_ids:
             raise serializers.ValidationError(
-                "File too large. Maximum size is 10MB."
+                f"Vendors not found: {', '.join(missing_ids)}"
             )
         
         return value
-
-
-class VendorExportSerializer(serializers.Serializer):
-    """Serializer for exporting vendor data"""
-    
-    format = serializers.ChoiceField(
-        choices=['csv', 'excel', 'pdf'],
-        default='csv',
-        help_text="Export format"
-    )
-    include_inactive = serializers.BooleanField(
-        default=False,
-        help_text="Include inactive vendors in export"
-    )
-    fields = serializers.MultipleChoiceField(
-        choices=[
-            'name', 'business_name', 'cnic', 'phone',
-            'city', 'area', 'created_at', 'updated_at'
-        ],
-        required=False,
-        help_text="Fields to include in export (all fields if not specified)"
-    )
-    date_range = serializers.CharField(
-        required=False,
-        help_text="Date range filter (e.g., '2024-01-01,2024-12-31')"
-    )
     

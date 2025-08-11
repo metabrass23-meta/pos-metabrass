@@ -1,211 +1,180 @@
 from django.db.models.signals import post_save, pre_save, post_delete
-from django.dispatch import receiver
-from django.core.mail import send_mail
-from django.conf import settings
+from django.dispatch import receiver, Signal
+from django.core.cache import cache
 from django.utils import timezone
-from django.contrib.auth.models import User
-from .models import Vendor, VendorNote
+from .models import Vendor
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Custom signals for bulk operations
+vendor_bulk_updated = Signal()
+vendor_bulk_created = Signal()
+vendor_bulk_deleted = Signal()
+
 
 @receiver(pre_save, sender=Vendor)
 def vendor_pre_save(sender, instance, **kwargs):
-    """Signal handler for before vendor save"""
-    # Clean and format phone number
-    if instance.phone:
-        instance.phone = instance.format_phone_number(instance.phone)
-    
-    # Normalize city and area names
-    if instance.city:
-        instance.city = instance.city.title().strip()
-    
-    if instance.area:
-        instance.area = instance.area.title().strip()
-    
-    # Log vendor creation/update
-    if instance.pk:
-        logger.info(f"Vendor {instance.name} is being updated")
-    else:
-        logger.info(f"New vendor {instance.name} is being created")
+    """Handle vendor pre-save operations"""
+    if instance.pk:  # Existing vendor
+        try:
+            old_instance = Vendor.objects.get(pk=instance.pk)
+            
+            # Track phone changes
+            if old_instance.phone != instance.phone:
+                instance._phone_changed = True
+            
+            # Track location changes
+            if old_instance.city != instance.city or old_instance.area != instance.area:
+                instance._location_changed = True
+                
+        except Vendor.DoesNotExist:
+            pass
 
 
 @receiver(post_save, sender=Vendor)
 def vendor_post_save(sender, instance, created, **kwargs):
-    """Signal handler for after vendor save"""
+    """Handle vendor post-save operations"""
+    # Clear related caches
+    cache_keys_to_clear = [
+        'vendor_statistics',
+        'new_vendors',
+        'recent_vendors',
+        'inactive_vendors',
+        f'vendors_by_city_{instance.city}' if instance.city else None,
+        f'vendors_by_area_{instance.area}' if instance.area else None,
+    ]
+    
+    # Remove None values and clear caches
+    for key in filter(None, cache_keys_to_clear):
+        cache.delete(key)
+    
+    # Log vendor creation
     if created:
-        # Log successful creation
-        logger.info(f"Vendor {instance.name} (ID: {instance.id}) has been created successfully")
-        
-        # Send notification email to admin (if configured)
-        if hasattr(settings, 'VENDOR_NOTIFICATION_EMAIL') and settings.VENDOR_NOTIFICATION_EMAIL:
-            try:
-                send_notification_email_new_vendor(instance)
-            except Exception as e:
-                logger.error(f"Failed to send notification email for new vendor {instance.name}: {str(e)}")
-        
-        # Create welcome note (optional)
-        if hasattr(settings, 'AUTO_CREATE_WELCOME_NOTE') and settings.AUTO_CREATE_WELCOME_NOTE:
-            try:
-                VendorNote.objects.create(
-                    vendor=instance,
-                    note=f"Welcome to our vendor network! Vendor {instance.name} was added on {timezone.now().strftime('%Y-%m-%d')}.",
-                    created_by=instance.created_by
-                )
-            except Exception as e:
-                logger.error(f"Failed to create welcome note for vendor {instance.name}: {str(e)}")
+        logger.info(
+            f"New vendor created: {instance.name} (ID: {instance.id}) "
+            f"Business: {instance.business_name}, Phone: {instance.phone}, "
+            f"Location: {instance.city}, {instance.area} by user {instance.created_by}"
+        )
     
-    else:
-        # Log update
-        logger.info(f"Vendor {instance.name} has been updated")
-        
-        # Check if vendor was reactivated
-        if instance.is_active:
-            original = Vendor.objects.get(pk=instance.pk)
-            # Note: This is a simplified check - in production you might want to track field changes
-            logger.info(f"Vendor {instance.name} status checked - currently active")
+    # Log phone changes
+    elif hasattr(instance, '_phone_changed'):
+        logger.info(
+            f"Vendor phone updated: {instance.name} (ID: {instance.id}) "
+            f"New phone: {instance.phone}"
+        )
+        delattr(instance, '_phone_changed')
+    
+    # Log location changes
+    if hasattr(instance, '_location_changed'):
+        logger.info(
+            f"Vendor location updated: {instance.name} (ID: {instance.id}) "
+            f"New location: {instance.city}, {instance.area}"
+        )
+        delattr(instance, '_location_changed')
 
 
-@receiver(post_save, sender=VendorNote)
-def vendor_note_post_save(sender, instance, created, **kwargs):
-    """Signal handler for after vendor note save"""
-    if created:
-        logger.info(f"New note added for vendor {instance.vendor.name} by {instance.created_by}")
-
-
-# Utility functions for signal handlers
-
-def send_notification_email_new_vendor(vendor):
-    """Send notification email when a new vendor is created"""
-    subject = f'New Vendor Added: {vendor.name}'
-    message = f"""
-    A new vendor has been added to the system:
+@receiver(post_delete, sender=Vendor)
+def vendor_post_delete(sender, instance, **kwargs):
+    """Handle vendor deletion"""
+    # Clear related caches
+    cache_keys_to_clear = [
+        'vendor_statistics',
+        'new_vendors',
+        'recent_vendors',
+        'inactive_vendors',
+        f'vendors_by_city_{instance.city}' if instance.city else None,
+        f'vendors_by_area_{instance.area}' if instance.area else None,
+    ]
     
-    Name: {vendor.name}
-    Business: {vendor.business_name}
-    CNIC: {vendor.cnic}
-    Phone: {vendor.phone}
-    Location: {vendor.full_address}
-    Created by: {vendor.created_by.get_full_name() if vendor.created_by else 'System'}
-    Created at: {vendor.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+    # Remove None values and clear caches
+    for key in filter(None, cache_keys_to_clear):
+        cache.delete(key)
     
-    You can view the vendor details in the admin panel.
-    """
-    
-    recipient_list = [settings.VENDOR_NOTIFICATION_EMAIL]
-    if isinstance(recipient_list, str):
-        recipient_list = [recipient_list]
-    
-    send_mail(
-        subject=subject,
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=recipient_list,
-        fail_silently=True
+    # Log vendor deletion
+    logger.info(
+        f"Vendor deleted: {instance.name} (ID: {instance.id}) "
+        f"Business: {instance.business_name}, Phone: {instance.phone}, "
+        f"Location: {instance.city}, {instance.area}"
     )
 
 
-def send_vendor_reactivation_email(vendor):
-    """Send notification when a vendor is reactivated"""
-    subject = f'Vendor Reactivated: {vendor.name}'
-    message = f"""
-    The following vendor has been reactivated:
+@receiver(vendor_bulk_updated)
+def handle_bulk_vendor_update(sender, vendors, action, **kwargs):
+    """Handle bulk vendor updates"""
+    # Clear caches
+    cache.delete('vendor_statistics')
+    cache.delete('new_vendors')
+    cache.delete('recent_vendors')
+    cache.delete('inactive_vendors')
     
-    Name: {vendor.name}
-    Business: {vendor.business_name}
-    Phone: {vendor.phone}
-    Location: {vendor.full_address}
-    Reactivated at: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
-    """
+    # Clear location specific caches
+    for vendor in vendors:
+        if vendor.city:
+            cache.delete(f'vendors_by_city_{vendor.city}')
+        if vendor.area:
+            cache.delete(f'vendors_by_area_{vendor.area}')
     
-    if hasattr(settings, 'VENDOR_NOTIFICATION_EMAIL') and settings.VENDOR_NOTIFICATION_EMAIL:
-        recipient_list = [settings.VENDOR_NOTIFICATION_EMAIL]
-        if isinstance(recipient_list, str):
-            recipient_list = [recipient_list]
-        
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=recipient_list,
-            fail_silently=True
-        )
-
-
-# Custom signal for vendor status changes
-from django.dispatch import Signal
-
-vendor_status_changed = Signal()
-vendor_bulk_action_completed = Signal()
-
-
-@receiver(vendor_status_changed)
-def handle_vendor_status_change(sender, vendor, old_status, new_status, **kwargs):
-    """Handle vendor status changes"""
-    logger.info(f"Vendor {vendor.name} status changed from {old_status} to {new_status}")
+    # Log bulk update
+    vendor_count = len(vendors)
+    logger.info(f"Bulk vendor update completed: {action} applied to {vendor_count} vendors")
     
-    if old_status == False and new_status == True:
-        # Vendor was reactivated
-        send_vendor_reactivation_email(vendor)
-    elif old_status == True and new_status == False:
-        # Vendor was deactivated
-        logger.warning(f"Vendor {vendor.name} has been deactivated")
-
-
-@receiver(vendor_bulk_action_completed)
-def handle_bulk_action_completed(sender, action, count, **kwargs):
-    """Handle completion of bulk actions"""
-    logger.info(f"Bulk action '{action}' completed on {count} vendors")
+    # Specific logging for different actions
+    if action == 'activate':
+        logger.info(f"Vendor activation: {vendor_count} vendors activated")
     
-    # Send notification for bulk actions if configured
-    if hasattr(settings, 'NOTIFY_BULK_ACTIONS') and settings.NOTIFY_BULK_ACTIONS:
-        if hasattr(settings, 'VENDOR_NOTIFICATION_EMAIL') and settings.VENDOR_NOTIFICATION_EMAIL:
-            subject = f'Bulk Action Completed: {action}'
-            message = f'Bulk action "{action}" has been completed on {count} vendors.'
-            
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.VENDOR_NOTIFICATION_EMAIL],
-                fail_silently=True
-            )
+    elif action == 'deactivate':
+        logger.info(f"Vendor deactivation: {vendor_count} vendors deactivated")
 
 
-# Database cleanup signals
-@receiver(post_delete, sender=Vendor)
-def vendor_post_delete(sender, instance, **kwargs):
-    """Signal handler for after vendor deletion"""
-    logger.warning(f"Vendor {instance.name} (ID: {instance.id}) has been permanently deleted")
+@receiver(vendor_bulk_created)
+def handle_bulk_vendor_creation(sender, vendors, **kwargs):
+    """Handle bulk vendor creation"""
+    # Clear caches
+    cache.delete('vendor_statistics')
+    cache.delete('new_vendors')
+    
+    # Log bulk creation
+    vendor_count = len(vendors)
+    logger.info(f"Bulk vendor creation completed: {vendor_count} vendors created")
+    
+    # Log location breakdown
+    cities = {}
+    areas = {}
+    for vendor in vendors:
+        city = vendor.city or 'Unknown'
+        area = vendor.area or 'Unknown'
+        cities[city] = cities.get(city, 0) + 1
+        areas[area] = areas.get(area, 0) + 1
+    
+    logger.info(f"New vendors by city: {', '.join([f'{k}: {v}' for k, v in cities.items()])}")
+    logger.info(f"New vendors by area: {', '.join([f'{k}: {v}' for k, v in areas.items()])}")
 
 
-# Performance monitoring signals
+@receiver(vendor_bulk_deleted)
+def handle_bulk_vendor_deletion(sender, vendor_ids, **kwargs):
+    """Handle bulk vendor deletion"""
+    # Clear all vendor-related caches
+    cache_keys_to_clear = [
+        'vendor_statistics',
+        'new_vendors',
+        'recent_vendors',
+        'inactive_vendors',
+    ]
+    
+    for key in cache_keys_to_clear:
+        cache.delete(key)
+    
+    # Log bulk deletion
+    vendor_count = len(vendor_ids)
+    logger.info(f"Bulk vendor deletion completed: {vendor_count} vendors deleted")
+
+
 @receiver(post_save, sender=Vendor)
-def monitor_vendor_creation_rate(sender, instance, created, **kwargs):
-    """Monitor vendor creation rate for analytics"""
-    if created:
-        # This could be used to track vendor creation metrics
-        # You might want to implement rate limiting or alerts here
-        
-        from datetime import timedelta
-        today = timezone.now().date()
-        recent_count = Vendor.objects.filter(
-            created_at__date=today
-        ).count()
-        
-        # Alert if too many vendors created in one day (configurable threshold)
-        threshold = getattr(settings, 'DAILY_VENDOR_CREATION_THRESHOLD', 100)
-        if recent_count >= threshold:
-            logger.warning(
-                f"High vendor creation rate detected: {recent_count} vendors created today"
-            )
-
-
-# Data validation signals
-@receiver(pre_save, sender=Vendor)
-def validate_vendor_data_integrity(sender, instance, **kwargs):
-    """Additional data integrity validation"""
+def vendor_data_quality_check(sender, instance, created, **kwargs):
+    """Perform data quality checks on vendor information"""
+    issues = []
+    
     # Check for potential duplicate business names in same city
     if instance.business_name and instance.city:
         similar_vendors = Vendor.objects.filter(
@@ -215,11 +184,69 @@ def validate_vendor_data_integrity(sender, instance, **kwargs):
         ).exclude(pk=instance.pk)
         
         if similar_vendors.exists():
+            issues.append("Similar business name exists in same city")
+    
+    # Check for missing area information
+    if not instance.area:
+        issues.append("Missing area information")
+    
+    # Check phone number format
+    if instance.phone and not instance.phone.startswith('+'):
+        issues.append("Phone number missing country code")
+    
+    # Log data quality issues
+    if issues:
+        logger.warning(
+            f"Vendor data quality issues for {instance.name} (ID: {instance.id}): "
+            f"{', '.join(issues)}"
+        )
+
+
+@receiver(post_save, sender=Vendor)
+def vendor_location_analytics(sender, instance, created, **kwargs):
+    """Track vendor location analytics"""
+    if created:
+        # This could be used to track vendor distribution metrics
+        # You might want to implement location-based alerts here
+        
+        from datetime import timedelta
+        today = timezone.now().date()
+        
+        # Count vendors in same city today
+        city_count = Vendor.objects.filter(
+            city__iexact=instance.city,
+            created_at__date=today
+        ).count()
+        
+        # Count vendors in same area today  
+        area_count = Vendor.objects.filter(
+            area__iexact=instance.area,
+            created_at__date=today
+        ).count()
+        
+        # Log location analytics
+        logger.info(
+            f"Vendor location analytics: {instance.city} now has {city_count} vendors added today, "
+            f"{instance.area} has {area_count} vendors added today"
+        )
+
+
+@receiver(pre_save, sender=Vendor)
+def validate_vendor_data_integrity(sender, instance, **kwargs):
+    """Additional data integrity validation"""
+    # Check for potential duplicate CNIC (soft warning)
+    if instance.cnic:
+        duplicate_cnic = Vendor.objects.filter(
+            cnic=instance.cnic,
+            is_active=True
+        ).exclude(pk=instance.pk)
+        
+        if duplicate_cnic.exists():
             logger.warning(
-                f"Potential duplicate business detected: {instance.business_name} in {instance.city}"
+                f"Duplicate CNIC detected for vendor {instance.name}: {instance.cnic}"
             )
     
-    # Validate phone number uniqueness (soft warning)
+    # Check for potential duplicate phone numbers (soft warning)
     if instance.phone:
         duplicate_phones = Vendor.objects.filter(
             phone=instance.phone,
@@ -230,4 +257,10 @@ def validate_vendor_data_integrity(sender, instance, **kwargs):
             logger.warning(
                 f"Duplicate phone number detected for vendor {instance.name}: {instance.phone}"
             )
-            
+    
+    # Validate business name consistency
+    if instance.business_name and len(instance.business_name.strip()) < 2:
+        logger.warning(
+            f"Short business name detected for vendor {instance.name}: '{instance.business_name}'"
+        )
+        

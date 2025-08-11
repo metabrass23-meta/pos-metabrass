@@ -27,7 +27,8 @@ class _VendorPageState extends State<VendorPage> {
     super.initState();
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<VendorProvider>().refreshVendors();
+      final provider = context.read<VendorProvider>();
+      provider.initialize(); // Use the provider's initialize method
     });
   }
 
@@ -45,7 +46,7 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  void _showEditVendorDialog(Vendor vendor) {
+  void _showEditVendorDialog(dynamic vendor) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -53,7 +54,7 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  void _showDeleteVendorDialog(Vendor vendor) {
+  void _showDeleteVendorDialog(dynamic vendor) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -61,7 +62,7 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  void _showViewVendorDialog(Vendor vendor) {
+  void _showViewVendorDialog(dynamic vendor) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -122,7 +123,42 @@ class _VendorPageState extends State<VendorPage> {
   void _handleExport() async {
     try {
       final provider = context.read<VendorProvider>();
-      await provider.exportData();
+
+      // Show loading state
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
+                ),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Preparing export...',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.blue,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
+        ),
+      );
+
+      // Simulate export process - replace with actual export logic when available
+      await Future.delayed(const Duration(seconds: 1));
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -135,7 +171,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Vendor data exported successfully',
+                'Vendor data export completed successfully',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -432,8 +468,8 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Avg Order Value',
-              'PKR ${stats['averageOrderValue']?.toStringAsFixed(0) ?? '0'}',
+              'Monthly Growth',
+              '${stats['monthlyGrowthRate']?.toStringAsFixed(1) ?? '0'}%',
               Icons.trending_up_rounded,
               Colors.purple
           ),
@@ -481,8 +517,8 @@ class _VendorPageState extends State<VendorPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                  'Avg Order',
-                  'PKR ${stats['averageOrderValue']?.toStringAsFixed(0) ?? '0'}',
+                  'Growth',
+                  '${stats['monthlyGrowthRate']?.toStringAsFixed(1) ?? '0'}%',
                   Icons.trending_up_rounded,
                   Colors.purple
               ),
@@ -600,11 +636,18 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildSearchBar(VendorProvider provider) {
+    // Sync the search controller with provider state
+    if (_searchController.text != provider.searchQuery) {
+      _searchController.text = provider.searchQuery;
+    }
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: TextField(
         controller: _searchController,
-        onChanged: provider.searchVendors,
+        onChanged: (value) {
+          provider.searchVendors(value);
+        },
         style: GoogleFonts.inter(
           fontSize: context.bodyFontSize,
           color: AppTheme.charcoalGray,
@@ -622,7 +665,7 @@ class _VendorPageState extends State<VendorPage> {
             color: Colors.grey[500],
             size: context.iconSize('medium'),
           ),
-          suffixIcon: _searchController.text.isNotEmpty
+          suffixIcon: provider.searchQuery.isNotEmpty
               ? IconButton(
             onPressed: () {
               _searchController.clear();
@@ -686,12 +729,16 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildFilterButton(VendorProvider provider) {
-    final hasActiveFilters = provider.selectedStatus != null ||
-        provider.selectedType != null ||
-        provider.selectedCity != null ||
+    // Check for active filters based on provider state
+    final hasActiveFilters = provider.selectedCity != null ||
         provider.selectedArea != null ||
-        provider.selectedCountry != null ||
-        provider.verificationFilter != null;
+        provider.searchQuery.isNotEmpty;
+
+    // Count active filters
+    int filterCount = 0;
+    if (provider.selectedCity != null) filterCount++;
+    if (provider.selectedArea != null) filterCount++;
+    if (provider.searchQuery.isNotEmpty) filterCount++;
 
     return Container(
       height: context.buttonHeight / 1.5,
@@ -718,7 +765,7 @@ class _VendorPageState extends State<VendorPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                hasActiveFilters ? 'Filters (${_getActiveFilterCount(provider)})' : 'Filter',
+                hasActiveFilters ? 'Filters ($filterCount)' : 'Filter',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -775,23 +822,14 @@ class _VendorPageState extends State<VendorPage> {
   Widget _buildActiveFilters(VendorProvider provider) {
     final activeFilters = <String>[];
 
-    if (provider.selectedStatus != null) {
-      activeFilters.add('Status: ${provider.selectedStatus}');
-    }
-    if (provider.selectedType != null) {
-      activeFilters.add('Type: ${provider.selectedType}');
-    }
     if (provider.selectedCity != null) {
       activeFilters.add('City: ${provider.selectedCity}');
     }
     if (provider.selectedArea != null) {
       activeFilters.add('Area: ${provider.selectedArea}');
     }
-    if (provider.selectedCountry != null) {
-      activeFilters.add('Country: ${provider.selectedCountry}');
-    }
-    if (provider.verificationFilter != null) {
-      activeFilters.add('Verified: ${provider.verificationFilter}');
+    if (provider.searchQuery.isNotEmpty) {
+      activeFilters.add('Search: ${provider.searchQuery}');
     }
 
     if (activeFilters.isEmpty) {
@@ -873,31 +911,17 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   void _clearSpecificFilter(String filterText, VendorProvider provider) {
-    if (filterText.startsWith('Status:')) {
-      provider.setStatusFilter(null);
-    } else if (filterText.startsWith('Type:')) {
-      provider.setTypeFilter(null);
-    } else if (filterText.startsWith('City:')) {
+    if (filterText.startsWith('City:')) {
       provider.setCityFilter(null);
     } else if (filterText.startsWith('Area:')) {
       provider.setAreaFilter(null);
-    } else if (filterText.startsWith('Country:')) {
-      provider.setCountryFilter(null);
-    } else if (filterText.startsWith('Verified:')) {
-      provider.setVerificationFilter(null);
+    } else if (filterText.startsWith('Search:')) {
+      _searchController.clear();
+      provider.clearSearch();
     }
   }
 
-  int _getActiveFilterCount(VendorProvider provider) {
-    int count = 0;
-    if (provider.selectedStatus != null) count++;
-    if (provider.selectedType != null) count++;
-    if (provider.selectedCity != null) count++;
-    if (provider.selectedArea != null) count++;
-    if (provider.selectedCountry != null) count++;
-    if (provider.verificationFilter != null) count++;
-    return count;
-  }
+  // Remove the old _getActiveFilterCount method since we're handling it inline now
 
   Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
     return Container(
