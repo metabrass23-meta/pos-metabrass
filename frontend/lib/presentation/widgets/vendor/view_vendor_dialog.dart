@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
@@ -8,7 +9,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 
 class ViewVendorDetailsDialog extends StatefulWidget {
-  final Vendor vendor;
+  final VendorModel vendor;
 
   const ViewVendorDetailsDialog({super.key, required this.vendor});
 
@@ -127,60 +128,6 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
     });
   }
 
-  void _handleVerifyContact(String type) async {
-    try {
-      setState(() {
-        _isLoadingDetails = true;
-      });
-
-      final provider = context.read<VendorProvider>();
-      final success = await provider.verifyVendorContact(
-        id: widget.vendor.id,
-        verificationType: type,
-        verified: true,
-      );
-
-      if (success) {
-        _showSuccessSnackbar('${type.capitalize()} verified successfully!');
-      } else {
-        _showErrorSnackbar('Failed to verify $type');
-      }
-    } catch (e) {
-      _showErrorSnackbar('Error verifying $type: ${e.toString()}');
-    } finally {
-      setState(() {
-        _isLoadingDetails = false;
-      });
-    }
-  }
-
-  void _handleUpdateActivity(String activityType) async {
-    try {
-      setState(() {
-        _isLoadingDetails = true;
-      });
-
-      final provider = context.read<VendorProvider>();
-      final success = await provider.updateVendorActivity(
-        id: widget.vendor.id,
-        activityType: activityType,
-        activityDate: DateTime.now().toIso8601String(),
-      );
-
-      if (success) {
-        _showSuccessSnackbar('Vendor ${activityType} updated successfully!');
-      } else {
-        _showErrorSnackbar('Failed to update vendor $activityType');
-      }
-    } catch (e) {
-      _showErrorSnackbar('Error updating vendor $activityType: ${e.toString()}');
-    } finally {
-      setState(() {
-        _isLoadingDetails = false;
-      });
-    }
-  }
-
   void _handleStatusChange(String newStatus) async {
     try {
       setState(() {
@@ -194,17 +141,8 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
         businessName: widget.vendor.businessName,
         cnic: widget.vendor.cnic,
         phone: widget.vendor.phone,
-        email: widget.vendor.email,
-        address: widget.vendor.address,
         city: widget.vendor.city,
         area: widget.vendor.area,
-        country: widget.vendor.country,
-        vendorType: widget.vendor.vendorType,
-        status: newStatus,
-        taxNumber: widget.vendor.taxNumber,
-        notes: widget.vendor.notes,
-        phoneVerified: widget.vendor.phoneVerified,
-        emailVerified: widget.vendor.emailVerified,
       );
 
       if (success) {
@@ -408,21 +346,9 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
             SizedBox(height: context.cardPadding),
             _buildLocationCard(),
             SizedBox(height: context.cardPadding),
-            _buildStatusAndTypeCard(),
-            SizedBox(height: context.cardPadding),
-            _buildVerificationCard(),
-            if (widget.vendor.taxNumber != null && widget.vendor.taxNumber!.isNotEmpty) ...[
-              SizedBox(height: context.cardPadding),
-              _buildBusinessInfoCard(),
-            ],
-            if (widget.vendor.notes != null && widget.vendor.notes!.isNotEmpty) ...[
-              SizedBox(height: context.cardPadding),
-              _buildNotesCard(),
-            ],
+            _buildStatusCard(),
             SizedBox(height: context.cardPadding),
             _buildActivityCard(),
-            SizedBox(height: context.cardPadding),
-            _buildQuickActionsCard(),
             SizedBox(height: context.mainPadding),
             _buildCloseButton(),
           ],
@@ -517,222 +443,52 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildContactInfoCard() {
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: _buildContactInfoCompact(),
-      small: _buildContactInfoCompact(),
-      medium: _buildContactInfoExpanded(),
-      large: _buildContactInfoExpanded(),
-      ultrawide: _buildContactInfoExpanded(),
-    );
-  }
-
-  Widget _buildContactInfoCompact() {
-    return Column(
-      children: [
-        _buildInfoCard(
-          title: 'Phone Number',
-          value: widget.vendor.phone,
-          icon: Icons.phone,
-          color: Colors.orange,
-          trailing: widget.vendor.phoneVerified
-              ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
-              : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
-        ),
-        if (widget.vendor.email != null && widget.vendor.email!.isNotEmpty) ...[
-          SizedBox(height: context.cardPadding),
-          _buildInfoCard(
-            title: 'Email Address',
-            value: widget.vendor.email!,
-            icon: Icons.email,
-            color: Colors.purple,
-            trailing: widget.vendor.emailVerified
-                ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
-                : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
-          ),
+    return _buildInfoCard(
+      title: 'Contact Information',
+      icon: Icons.contact_phone,
+      color: Colors.orange,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoRow('Phone', widget.vendor.formattedPhone, Icons.phone),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('CNIC', widget.vendor.cnic, Icons.credit_card),
         ],
-      ],
-    );
-  }
-
-  Widget _buildContactInfoExpanded() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildInfoCard(
-            title: 'Phone Number',
-            value: widget.vendor.phone,
-            icon: Icons.phone,
-            color: Colors.orange,
-            trailing: widget.vendor.phoneVerified
-                ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
-                : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
-          ),
-        ),
-        if (widget.vendor.email != null && widget.vendor.email!.isNotEmpty) ...[
-          SizedBox(width: context.cardPadding),
-          Expanded(
-            child: _buildInfoCard(
-              title: 'Email Address',
-              value: widget.vendor.email!,
-              icon: Icons.email,
-              color: Colors.purple,
-              trailing: widget.vendor.emailVerified
-                  ? Icon(Icons.verified, color: Colors.green, size: context.iconSize('small'))
-                  : Icon(Icons.error, color: Colors.red, size: context.iconSize('small')),
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 
   Widget _buildLocationCard() {
-    final locationParts = <String>[];
-    if (widget.vendor.address != null && widget.vendor.address!.isNotEmpty) {
-      locationParts.add(widget.vendor.address!);
-    }
-    locationParts.add(widget.vendor.area);
-    locationParts.add(widget.vendor.city);
-    if (widget.vendor.country != null && widget.vendor.country!.isNotEmpty) {
-      locationParts.add(widget.vendor.country!);
-    }
-
-    final locationText = locationParts.join(', ');
-
     return _buildInfoCard(
       title: 'Location',
-      value: locationText,
       icon: Icons.location_on,
       color: Colors.teal,
-    );
-  }
-
-  Widget _buildStatusAndTypeCard() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildInfoCard(
-            title: 'Status',
-            value: widget.vendor.statusDisplayName,
-            icon: Icons.flag,
-            color: _getStatusColor(widget.vendor.status),
-          ),
-        ),
-        SizedBox(width: context.cardPadding),
-        Expanded(
-          child: _buildInfoCard(
-            title: 'Type',
-            value: widget.vendor.vendorTypeDisplayName,
-            icon: _getTypeIcon(widget.vendor.vendorType),
-            color: Colors.indigo,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVerificationCard() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.green.withOpacity(0.2), width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.verified_user,
-                color: Colors.green,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Verification Status',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      widget.vendor.phoneVerified ? Icons.check_circle : Icons.cancel,
-                      color: widget.vendor.phoneVerified ? Colors.green : Colors.red,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Phone ${widget.vendor.phoneVerified ? 'Verified' : 'Unverified'}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: widget.vendor.phoneVerified ? Colors.green[700] : Colors.red[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (widget.vendor.email != null && widget.vendor.email!.isNotEmpty)
-                Expanded(
-                  child: Row(
-                    children: [
-                      Icon(
-                        widget.vendor.emailVerified ? Icons.check_circle : Icons.cancel,
-                        color: widget.vendor.emailVerified ? Colors.green : Colors.red,
-                        size: context.iconSize('small'),
-                      ),
-                      SizedBox(width: context.smallPadding / 2),
-                      Text(
-                        'Email ${widget.vendor.emailVerified ? 'Verified' : 'Unverified'}',
-                        style: GoogleFonts.inter(
-                          fontSize: context.subtitleFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: widget.vendor.emailVerified ? Colors.green[700] : Colors.red[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+          _buildInfoRow('City', widget.vendor.city, Icons.location_city),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('Area', widget.vendor.area, Icons.map),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('Full Address', widget.vendor.fullAddress, Icons.home),
         ],
       ),
     );
   }
 
-  Widget _buildBusinessInfoCard() {
-    final businessInfo = <String>[];
-    if (widget.vendor.taxNumber != null && widget.vendor.taxNumber!.isNotEmpty) {
-      businessInfo.add('Tax Number: ${widget.vendor.taxNumber}');
-    }
-    businessInfo.add('CNIC: ${widget.vendor.cnic}');
-
+  Widget _buildStatusCard() {
     return _buildInfoCard(
-      title: 'Business Information',
-      value: businessInfo.join('\n'),
-      icon: Icons.business,
-      color: Colors.indigo,
-    );
-  }
-
-  Widget _buildNotesCard() {
-    return _buildInfoCard(
-      title: 'Notes',
-      value: widget.vendor.notes!,
-      icon: Icons.note,
-      color: Colors.amber,
+      title: 'Status Information',
+      icon: Icons.info,
+      color: _getStatusColor(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoRow('Status', widget.vendor.statusDisplayName, Icons.flag),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('Active Since', widget.vendor.formattedCreatedAt, Icons.schedule),
+        ],
+      ),
     );
   }
 
@@ -756,7 +512,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Activity Timeline',
+                'Activity Summary',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -773,7 +529,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Last Order',
+                      'Total Orders',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
@@ -782,15 +538,11 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
-                      widget.vendor.lastOrderDate != null
-                          ? widget.vendor.formattedLastOrderDate!
-                          : 'No orders yet',
+                      '${widget.vendor.paymentsCount}',
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: widget.vendor.lastOrderDate != null
-                            ? AppTheme.charcoalGray
-                            : Colors.grey[500],
+                        color: AppTheme.charcoalGray,
                       ),
                     ),
                   ],
@@ -801,7 +553,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Last Contact',
+                      'Total Amount',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
@@ -810,131 +562,16 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
-                      widget.vendor.lastContactDate != null
-                          ? widget.vendor.formattedLastContactDate!
-                          : 'No contact yet',
+                      'PKR ${widget.vendor.totalPaymentsAmount.toStringAsFixed(2)}',
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: widget.vendor.lastContactDate != null
-                            ? AppTheme.charcoalGray
-                            : Colors.grey[500],
+                        color: AppTheme.charcoalGray,
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          if (widget.vendor.totalOrders != null) ...[
-            SizedBox(height: context.cardPadding),
-            Container(
-              padding: EdgeInsets.all(context.smallPadding),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.trending_up,
-                    color: Colors.blue,
-                    size: context.iconSize('small'),
-                  ),
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    'Total Order Value: PKR ${widget.vendor.totalOrders!.toStringAsFixed(2)}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue[700],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsCard() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.flash_on,
-                color: Colors.orange,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Quick Actions',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-          Wrap(
-            spacing: context.smallPadding,
-            runSpacing: context.smallPadding / 2,
-            children: [
-              if (!widget.vendor.phoneVerified)
-                _buildActionChip(
-                  label: 'Verify Phone',
-                  icon: Icons.phone_android,
-                  color: Colors.green,
-                  onTap: () => _handleVerifyContact('phone'),
-                ),
-              if (widget.vendor.email != null &&
-                  widget.vendor.email!.isNotEmpty &&
-                  !widget.vendor.emailVerified)
-                _buildActionChip(
-                  label: 'Verify Email',
-                  icon: Icons.email,
-                  color: Colors.blue,
-                  onTap: () => _handleVerifyContact('email'),
-                ),
-              _buildActionChip(
-                label: 'Update Order',
-                icon: Icons.shopping_cart,
-                color: Colors.purple,
-                onTap: () => _handleUpdateActivity('order'),
-              ),
-              _buildActionChip(
-                label: 'Update Contact',
-                icon: Icons.contact_phone,
-                color: Colors.teal,
-                onTap: () => _handleUpdateActivity('contact'),
-              ),
-              if (widget.vendor.status == 'INACTIVE')
-                _buildActionChip(
-                  label: 'Activate Vendor',
-                  icon: Icons.power_settings_new,
-                  color: Colors.green,
-                  onTap: () => _handleStatusChange('ACTIVE'),
-                ),
-              if (widget.vendor.status == 'ACTIVE')
-                _buildActionChip(
-                  label: 'Deactivate',
-                  icon: Icons.power_off,
-                  color: Colors.orange,
-                  onTap: () => _handleStatusChange('INACTIVE'),
-                ),
             ],
           ),
         ],
@@ -944,10 +581,9 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
 
   Widget _buildInfoCard({
     required String title,
-    required String value,
     required IconData icon,
     required Color color,
-    Widget? trailing,
+    required Widget child,
   }) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
@@ -963,68 +599,47 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
             children: [
               Icon(icon, color: color, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
                 ),
               ),
-              if (trailing != null) trailing,
             ],
           ),
-          SizedBox(height: context.smallPadding),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
-          ),
+          SizedBox(height: context.cardPadding),
+          child,
         ],
       ),
     );
   }
 
-  Widget _buildActionChip({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.cardPadding / 2,
-          vertical: context.smallPadding,
+  Widget _buildInfoRow(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: context.iconSize('small'), color: Colors.grey[600]),
+        SizedBox(width: context.smallPadding),
+        Text(
+          '$label: ',
+          style: GoogleFonts.inter(
+            fontSize: context.subtitleFontSize,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[600],
+          ),
         ),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: context.iconSize('small')),
-            SizedBox(width: context.smallPadding / 2),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: color,
-              ),
+        Expanded(
+          child: Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: context.subtitleFontSize,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -1042,36 +657,11 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return Colors.green;
-      case 'INACTIVE':
-        return Colors.orange;
-      case 'SUSPENDED':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  Color _getStatusColor() {
+    if (widget.vendor.isActive) {
+      return Colors.green;
+    } else {
+      return Colors.orange;
     }
-  }
-
-  IconData _getTypeIcon(String vendorType) {
-    switch (vendorType.toUpperCase()) {
-      case 'SUPPLIER':
-        return Icons.local_shipping;
-      case 'DISTRIBUTOR':
-        return Icons.store;
-      case 'MANUFACTURER':
-        return Icons.factory;
-      default:
-        return Icons.business;
-    }
-  }
-}
-
-// Extension to capitalize strings
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }

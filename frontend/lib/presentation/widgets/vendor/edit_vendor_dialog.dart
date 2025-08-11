@@ -5,11 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/models/vendor/vendor_model.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class EnhancedEditVendorDialog extends StatefulWidget {
-  final Vendor vendor;
+  final VendorModel vendor;
 
   const EnhancedEditVendorDialog({super.key, required this.vendor});
 
@@ -26,28 +27,19 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   late TextEditingController _businessNameController;
   late TextEditingController _cnicController;
   late TextEditingController _phoneController;
-  late TextEditingController _emailController;
-  late TextEditingController _addressController;
   late TextEditingController _cityController;
   late TextEditingController _areaController;
-  late TextEditingController _countryController;
-  late TextEditingController _taxNumberController;
-  late TextEditingController _notesController;
-
-  // Form state
-  String _selectedVendorType = 'SUPPLIER';
-  String _selectedStatus = 'ACTIVE';
-  bool _phoneVerified = false;
-  bool _emailVerified = false;
 
   // Animation controllers
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
+  // Track changes
+  bool _hasChanges = false;
+  Map<String, dynamic> _originalData = {};
+
   // Options
-  final List<String> _vendorTypes = ['SUPPLIER', 'DISTRIBUTOR', 'MANUFACTURER'];
-  final List<String> _statusOptions = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
   final List<String> _commonCities = [
     'Karachi',
     'Lahore',
@@ -68,15 +60,6 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     'Blue Area',
     'Saddar',
   ];
-  final List<String> _commonCountries = [
-    'Pakistan',
-    'UAE',
-    'Saudi Arabia',
-    'India',
-    'China',
-    'Turkey',
-    'Bangladesh',
-  ];
 
   @override
   void initState() {
@@ -87,19 +70,26 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     _businessNameController = TextEditingController(text: widget.vendor.businessName);
     _cnicController = TextEditingController(text: widget.vendor.cnic);
     _phoneController = TextEditingController(text: widget.vendor.phone);
-    _emailController = TextEditingController(text: widget.vendor.email ?? '');
-    _addressController = TextEditingController(text: widget.vendor.address ?? '');
     _cityController = TextEditingController(text: widget.vendor.city);
     _areaController = TextEditingController(text: widget.vendor.area);
-    _countryController = TextEditingController(text: widget.vendor.country ?? 'Pakistan');
-    _taxNumberController = TextEditingController(text: widget.vendor.taxNumber ?? '');
-    _notesController = TextEditingController(text: widget.vendor.notes ?? '');
 
-    // Initialize form state with existing vendor data
-    _selectedVendorType = widget.vendor.vendorType;
-    _selectedStatus = widget.vendor.status;
-    _phoneVerified = widget.vendor.phoneVerified;
-    _emailVerified = widget.vendor.emailVerified;
+    // Store original data for change tracking
+    _originalData = {
+      'name': widget.vendor.name,
+      'businessName': widget.vendor.businessName,
+      'cnic': widget.vendor.cnic,
+      'phone': widget.vendor.phone,
+      'city': widget.vendor.city,
+      'area': widget.vendor.area,
+    };
+
+    // Add listeners to track changes
+    _nameController.addListener(_checkForChanges);
+    _businessNameController.addListener(_checkForChanges);
+    _cnicController.addListener(_checkForChanges);
+    _phoneController.addListener(_checkForChanges);
+    _cityController.addListener(_checkForChanges);
+    _areaController.addListener(_checkForChanges);
 
     // Initialize animations
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
@@ -124,34 +114,43 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     _businessNameController.dispose();
     _cnicController.dispose();
     _phoneController.dispose();
-    _emailController.dispose();
-    _addressController.dispose();
     _cityController.dispose();
     _areaController.dispose();
-    _countryController.dispose();
-    _taxNumberController.dispose();
-    _notesController.dispose();
     super.dispose();
   }
 
-  void _handleVendorTypeChange(String? newType) {
-    if (newType != null && newType != _selectedVendorType) {
-      setState(() {
-        _selectedVendorType = newType;
-      });
-    }
-  }
+  void _checkForChanges() {
+    final currentData = {
+      'name': _nameController.text,
+      'businessName': _businessNameController.text,
+      'cnic': _cnicController.text,
+      'phone': _phoneController.text,
+      'city': _cityController.text,
+      'area': _areaController.text,
+    };
 
-  void _handleStatusChange(String? newStatus) {
-    if (newStatus != null && newStatus != _selectedStatus) {
+    bool hasChanges = false;
+    for (String key in _originalData.keys) {
+      if (_originalData[key] != currentData[key]) {
+        hasChanges = true;
+        break;
+      }
+    }
+
+    if (_hasChanges != hasChanges) {
       setState(() {
-        _selectedStatus = newStatus;
+        _hasChanges = hasChanges;
       });
     }
   }
 
   void _handleUpdate() async {
     if (_formKey.currentState?.validate() ?? false) {
+      if (!_hasChanges) {
+        _showInfoSnackbar('No changes detected');
+        return;
+      }
+
       final provider = Provider.of<VendorProvider>(context, listen: false);
 
       final success = await provider.updateVendor(
@@ -160,17 +159,8 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         businessName: _businessNameController.text.trim(),
         cnic: _cnicController.text.trim(),
         phone: _phoneController.text.trim(),
-        email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-        address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
         city: _cityController.text.trim(),
         area: _areaController.text.trim(),
-        country: _countryController.text.trim().isEmpty ? null : _countryController.text.trim(),
-        vendorType: _selectedVendorType,
-        status: _selectedStatus,
-        taxNumber: _taxNumberController.text.trim().isEmpty ? null : _taxNumberController.text.trim(),
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-        phoneVerified: _phoneVerified,
-        emailVerified: _emailVerified,
       );
 
       if (mounted) {
@@ -236,10 +226,57 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     );
   }
 
+  void _showInfoSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            SizedBox(width: context.smallPadding),
+            Text(
+              message,
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blue,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+      ),
+    );
+  }
+
   void _handleCancel() {
-    _animationController.reverse().then((_) {
-      Navigator.of(context).pop();
-    });
+    if (_hasChanges) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Discard Changes?'),
+          content: Text('You have unsaved changes. Are you sure you want to discard them?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text('Continue Editing')),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close confirmation dialog
+                _animationController.reverse().then((_) {
+                  Navigator.of(context).pop(); // Close edit dialog
+                });
+              },
+              child: Text('Discard', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      _animationController.reverse().then((_) {
+        Navigator.of(context).pop();
+      });
+    }
   }
 
   @override
@@ -296,7 +333,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
+        gradient: LinearGradient(
+          colors: _hasChanges ? [Colors.orange, Colors.orangeAccent] : [Colors.blue, Colors.blueAccent],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -310,7 +349,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            child: Icon(
+              _hasChanges ? Icons.edit : Icons.edit_outlined,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -329,7 +372,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update vendor information',
+                    _hasChanges ? 'You have unsaved changes' : 'Update vendor information',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -340,6 +383,32 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               ],
             ),
           ),
+          if (_hasChanges)
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding,
+                vertical: context.smallPadding / 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.pureWhite.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.circle, color: Colors.orange, size: 8),
+                  SizedBox(width: context.smallPadding / 2),
+                  Text(
+                    'Modified',
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.pureWhite,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.smallPadding,
@@ -350,7 +419,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
             child: Text(
-              widget.vendor.id,
+              widget.vendor.id.length > 8 ? '${widget.vendor.id.substring(0, 8)}...' : widget.vendor.id,
               style: GoogleFonts.inter(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
@@ -384,39 +453,16 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Vendor Type and Status Section
-              _buildTypeAndStatusSection(),
-
-              SizedBox(height: context.cardPadding),
-
               // Basic Information Section
               _buildBasicInfoSection(),
-
               SizedBox(height: context.cardPadding),
 
               // Contact Information Section
               _buildContactInfoSection(),
-
-              SizedBox(height: context.cardPadding),
-
-              // Verification Section
-              _buildVerificationSection(),
-
               SizedBox(height: context.cardPadding),
 
               // Location Information Section
               _buildLocationInfoSection(),
-
-              SizedBox(height: context.cardPadding),
-
-              // Business Information Section
-              _buildBusinessInfoSection(),
-
-              SizedBox(height: context.cardPadding),
-
-              // Additional Information Section
-              _buildAdditionalInfoSection(),
-
               SizedBox(height: context.mainPadding),
 
               // Action Buttons
@@ -431,144 +477,6 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTypeAndStatusSection() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.settings_outlined, color: Colors.blue, size: context.iconSize('medium')),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Vendor Type & Status',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-
-          // Vendor Type Selection
-          Text(
-            'Vendor Type',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.charcoalGray,
-            ),
-          ),
-          SizedBox(height: context.smallPadding),
-          Wrap(
-            spacing: context.smallPadding,
-            runSpacing: context.smallPadding / 2,
-            children: _vendorTypes
-                .map(
-                  (type) => InkWell(
-                    onTap: () => _handleVendorTypeChange(type),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.cardPadding / 2,
-                        vertical: context.smallPadding,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _selectedVendorType == type
-                            ? Colors.blue.withOpacity(0.1)
-                            : Colors.grey.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                        border: Border.all(
-                          color: _selectedVendorType == type ? Colors.blue : Colors.grey.shade300,
-                          width: _selectedVendorType == type ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _getVendorTypeIcon(type),
-                            color: _selectedVendorType == type ? Colors.blue : Colors.grey[600],
-                            size: context.iconSize('small'),
-                          ),
-                          SizedBox(width: context.smallPadding / 2),
-                          Text(
-                            _getVendorTypeDisplayName(type),
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedVendorType == type ? Colors.blue : Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-
-          SizedBox(height: context.cardPadding),
-
-          // Status Selection
-          Text(
-            'Vendor Status',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.charcoalGray,
-            ),
-          ),
-          SizedBox(height: context.smallPadding),
-          Wrap(
-            spacing: context.smallPadding,
-            runSpacing: context.smallPadding / 2,
-            children: _statusOptions
-                .map(
-                  (status) => InkWell(
-                    onTap: () => _handleStatusChange(status),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.cardPadding / 2,
-                        vertical: context.smallPadding,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _selectedStatus == status
-                            ? _getStatusColor(status).withOpacity(0.1)
-                            : Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                        border: Border.all(
-                          color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey.shade300,
-                          width: _selectedStatus == status ? 2 : 1,
-                        ),
-                      ),
-                      child: Text(
-                        _getStatusDisplayName(status),
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: _selectedStatus == status ? FontWeight.w600 : FontWeight.w500,
-                          color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey[700],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
       ),
     );
   }
@@ -629,10 +537,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           validator: (value) {
-            if (value?.isEmpty ?? true) {
+            if (value == null || value.isEmpty) {
               return 'Please enter CNIC';
             }
-            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
+            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
               return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
             }
             return null;
@@ -666,95 +574,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             return null;
           },
         ),
-        SizedBox(height: context.cardPadding),
-
-        // Email
-        PremiumTextField(
-          label: 'Email Address',
-          hint: context.shouldShowCompactLayout ? 'Enter email' : 'Enter email address',
-          controller: _emailController,
-          prefixIcon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-          validator: (value) {
-            if (value != null && value.isNotEmpty) {
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                return 'Please enter a valid email address';
-              }
-            }
-            return null;
-          },
-        ),
       ],
-    );
-  }
-
-  Widget _buildVerificationSection() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.green.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.verified_user_outlined, color: Colors.green, size: context.iconSize('medium')),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Verification Status',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-
-          Row(
-            children: [
-              Expanded(
-                child: CheckboxListTile(
-                  value: _phoneVerified,
-                  onChanged: (value) => setState(() => _phoneVerified = value ?? false),
-                  title: Text(
-                    'Phone Verified',
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
-                    ),
-                  ),
-                  activeColor: Colors.green,
-                  dense: true,
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              ),
-              Expanded(
-                child: CheckboxListTile(
-                  value: _emailVerified,
-                  onChanged: (value) => setState(() => _emailVerified = value ?? false),
-                  title: Text(
-                    'Email Verified',
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
-                    ),
-                  ),
-                  activeColor: Colors.green,
-                  dense: true,
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -763,16 +583,6 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Location Information', Icons.location_on_outlined),
-        SizedBox(height: context.cardPadding),
-
-        // Address
-        PremiumTextField(
-          label: 'Address',
-          hint: context.shouldShowCompactLayout ? 'Enter address' : 'Enter complete address (optional)',
-          controller: _addressController,
-          prefixIcon: Icons.home_outlined,
-          maxLines: 2,
-        ),
         SizedBox(height: context.cardPadding),
 
         // City and Area Row/Column
@@ -784,10 +594,6 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           large: _buildLocationFieldsRow(),
           ultrawide: _buildLocationFieldsRow(),
         ),
-        SizedBox(height: context.cardPadding),
-
-        // Country Field
-        _buildCountryField(),
       ],
     );
   }
@@ -832,6 +638,40 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         Wrap(
           spacing: context.smallPadding / 2,
           runSpacing: context.smallPadding / 4,
+          children: _commonCities
+              .take(4)
+              .map(
+                (city) => _buildQuickSelectChip(
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAreaField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PremiumTextField(
+          label: 'Area *',
+          hint: 'Enter area',
+          controller: _areaController,
+          prefixIcon: Icons.map_outlined,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter area';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding / 2,
+          runSpacing: context.smallPadding / 4,
           children: _commonAreas
               .take(4)
               .map(
@@ -841,83 +681,6 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                 ),
               )
               .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCountryField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PremiumTextField(
-          label: 'Country',
-          hint: 'Enter country',
-          controller: _countryController,
-          prefixIcon: Icons.public_outlined,
-        ),
-        SizedBox(height: context.smallPadding),
-        Wrap(
-          spacing: context.smallPadding / 2,
-          runSpacing: context.smallPadding / 4,
-          children: _commonCountries
-              .take(4)
-              .map(
-                (country) => _buildQuickSelectChip(
-                  label: country,
-                  onTap: () => setState(() => _countryController.text = country),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBusinessInfoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Business Information', Icons.business_center_outlined),
-        SizedBox(height: context.cardPadding),
-
-        // Tax Number
-        PremiumTextField(
-          label: 'Tax/NTN Number',
-          hint: context.shouldShowCompactLayout ? 'Enter tax number' : 'Enter tax or NTN number (optional)',
-          controller: _taxNumberController,
-          prefixIcon: Icons.receipt_outlined,
-          validator: (value) {
-            if (value != null && value.isNotEmpty && value.length > 50) {
-              return 'Tax number must be less than 50 characters';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdditionalInfoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Additional Information', Icons.note_outlined),
-        SizedBox(height: context.cardPadding),
-        PremiumTextField(
-          label: 'Notes',
-          hint: context.shouldShowCompactLayout
-              ? 'Enter notes'
-              : 'Enter any additional notes about the vendor (optional)',
-          controller: _notesController,
-          prefixIcon: Icons.description_outlined,
-          maxLines: 3,
-          validator: (value) {
-            if (value != null && value.isNotEmpty && value.length > 500) {
-              return 'Notes must be less than 500 characters';
-            }
-            return null;
-          },
         ),
       ],
     );
@@ -971,11 +734,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           builder: (context, provider, child) {
             return PremiumButton(
               text: 'Update Vendor',
-              onPressed: provider.isLoading ? null : _handleUpdate,
+              onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.save_rounded,
-              backgroundColor: Colors.blue,
+              backgroundColor: _hasChanges ? Colors.orange : Colors.blue,
             );
           },
         ),
@@ -1012,103 +775,16 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             builder: (context, provider, child) {
               return PremiumButton(
                 text: 'Update Vendor',
-                onPressed: provider.isLoading ? null : _handleUpdate,
+                onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.save_rounded,
-                backgroundColor: Colors.blue,
+                backgroundColor: _hasChanges ? Colors.orange : Colors.blue,
               );
             },
           ),
         ),
       ],
     );
-  }
-
-  Widget _buildAreaField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PremiumTextField(
-          label: 'Area *',
-          hint: 'Enter area',
-          controller: _areaController,
-          prefixIcon: Icons.map_outlined,
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter area';
-            }
-            return null;
-          },
-        ),
-        SizedBox(height: context.smallPadding),
-        Wrap(
-          spacing: context.smallPadding / 2,
-          runSpacing: context.smallPadding / 4,
-          children: _commonCities
-              .take(4)
-              .map(
-                (city) => _buildQuickSelectChip(
-                  label: city,
-                  onTap: () => setState(() => _cityController.text = city),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  // Helper methods for display names and icons
-  String _getVendorTypeDisplayName(String type) {
-    switch (type.toUpperCase()) {
-      case 'SUPPLIER':
-        return 'Supplier';
-      case 'DISTRIBUTOR':
-        return 'Distributor';
-      case 'MANUFACTURER':
-        return 'Manufacturer';
-      default:
-        return type;
-    }
-  }
-
-  IconData _getVendorTypeIcon(String type) {
-    switch (type.toUpperCase()) {
-      case 'SUPPLIER':
-        return Icons.local_shipping;
-      case 'DISTRIBUTOR':
-        return Icons.store;
-      case 'MANUFACTURER':
-        return Icons.factory;
-      default:
-        return Icons.business;
-    }
-  }
-
-  String _getStatusDisplayName(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return 'Active';
-      case 'INACTIVE':
-        return 'Inactive';
-      case 'SUSPENDED':
-        return 'Suspended';
-      default:
-        return status;
-    }
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return Colors.green;
-      case 'INACTIVE':
-        return Colors.orange;
-      case 'SUSPENDED':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 }
