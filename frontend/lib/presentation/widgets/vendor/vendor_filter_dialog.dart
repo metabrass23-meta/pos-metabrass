@@ -14,69 +14,69 @@ class VendorFilterDialog extends StatefulWidget {
   State<VendorFilterDialog> createState() => _VendorFilterDialogState();
 }
 
-class _VendorFilterDialogState extends State<VendorFilterDialog>
-    with SingleTickerProviderStateMixin {
+class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
   // Filter state variables
-  String? _selectedStatus;
-  String? _selectedType;
   String? _selectedCity;
   String? _selectedArea;
-  String? _selectedCountry;
-  String? _selectedVerification;
+  bool _showInactiveOnly = false;
+  String _searchQuery = '';
 
   // Text controllers for custom inputs
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _areaController = TextEditingController();
-  final TextEditingController _countryController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   // Predefined options
-  final List<String> _statusOptions = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
-  final List<String> _typeOptions = ['SUPPLIER', 'DISTRIBUTOR', 'MANUFACTURER'];
-  final List<String> _verificationOptions = ['any', 'phone', 'email', 'both', 'none'];
-  final List<String> _commonCities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
-  final List<String> _commonAreas = ['Gulshan', 'Clifton', 'DHA', 'Johar Town', 'Model Town', 'F-7', 'Blue Area', 'Saddar'];
-  final List<String> _commonCountries = ['Pakistan', 'UAE', 'Saudi Arabia', 'India', 'China', 'Turkey', 'Bangladesh'];
+  final List<String> _commonCities = [
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+  ];
+  final List<String> _commonAreas = [
+    'Gulshan',
+    'Clifton',
+    'DHA',
+    'Johar Town',
+    'Model Town',
+    'F-7',
+    'Blue Area',
+    'Saddar',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
     _scaleAnimation = Tween<double>(
       begin: 0.8,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     // Initialize with current filter values
     final provider = context.read<VendorProvider>();
-    _selectedStatus = provider.selectedStatus;
-    _selectedType = provider.selectedType;
     _selectedCity = provider.selectedCity;
     _selectedArea = provider.selectedArea;
-    _selectedCountry = provider.selectedCountry;
-    _selectedVerification = provider.verificationFilter;
+    _showInactiveOnly = provider.showInactive;
+    _searchQuery = provider.searchQuery;
 
     _cityController.text = _selectedCity ?? '';
     _areaController.text = _selectedArea ?? '';
-    _countryController.text = _selectedCountry ?? '';
+    _searchController.text = _searchQuery;
 
     _animationController.forward();
   }
@@ -86,33 +86,31 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
     _animationController.dispose();
     _cityController.dispose();
     _areaController.dispose();
-    _countryController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   void _handleApplyFilters() async {
     final provider = context.read<VendorProvider>();
 
-    // Update city, area, and country from text controllers
+    // Update city, area, and search from text controllers
     final city = _cityController.text.trim().isEmpty ? null : _cityController.text.trim();
     final area = _areaController.text.trim().isEmpty ? null : _areaController.text.trim();
-    final country = _countryController.text.trim().isEmpty ? null : _countryController.text.trim();
+    final search = _searchController.text.trim();
 
-    // Apply all filters
-    await Future.wait([
-      if (_selectedStatus != provider.selectedStatus)
-        provider.setStatusFilter(_selectedStatus),
-      if (_selectedType != provider.selectedType)
-        provider.setTypeFilter(_selectedType),
-      if (city != provider.selectedCity)
-        provider.setCityFilter(city),
-      if (area != provider.selectedArea)
-        provider.setAreaFilter(area),
-      if (country != provider.selectedCountry)
-        provider.setCountryFilter(country),
-      if (_selectedVerification != provider.verificationFilter)
-        provider.setVerificationFilter(_selectedVerification),
-    ]);
+    // Apply filters using existing provider methods
+    if (city != provider.selectedCity) {
+      await provider.setCityFilter(city);
+    }
+    if (area != provider.selectedArea) {
+      await provider.setAreaFilter(area);
+    }
+    if (_showInactiveOnly != provider.showInactive) {
+      await provider.toggleShowInactive();
+    }
+    if (search != provider.searchQuery) {
+      await provider.searchVendors(search);
+    }
 
     _handleClose();
   }
@@ -148,10 +146,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
                   large: 60.w,
                   ultrawide: 50.w,
                 ),
-                constraints: BoxConstraints(
-                  maxWidth: 600,
-                  maxHeight: 85.h,
-                ),
+                constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
@@ -168,9 +163,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildHeader(),
-                    Flexible(
-                      child: _buildContent(),
-                    ),
+                    Flexible(child: _buildContent()),
                   ],
                 ),
               ),
@@ -185,9 +178,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.accentGold, Color(0xFFD4AF37)],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.accentGold, Color(0xFFD4AF37)]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -201,11 +192,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.filter_alt_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.filter_alt_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
 
           SizedBox(width: context.cardPadding),
@@ -226,7 +213,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your vendor list with advanced filters',
+                    'Refine your vendor list with filters',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -245,11 +232,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -265,20 +248,20 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Vendor Status Filter
+            // Search Filter
             _buildFilterSection(
-              title: 'Vendor Status',
-              icon: Icons.flag_outlined,
-              child: _buildStatusFilter(),
+              title: 'Search Vendors',
+              icon: Icons.search_outlined,
+              child: _buildSearchFilter(),
             ),
 
             SizedBox(height: context.cardPadding),
 
-            // Vendor Type Filter
+            // Status Filter
             _buildFilterSection(
-              title: 'Vendor Type',
-              icon: Icons.business_outlined,
-              child: _buildTypeFilter(),
+              title: 'Vendor Status',
+              icon: Icons.flag_outlined,
+              child: _buildStatusFilter(),
             ),
 
             SizedBox(height: context.cardPadding),
@@ -288,15 +271,6 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
               title: 'Location',
               icon: Icons.location_on_outlined,
               child: _buildLocationFilters(),
-            ),
-
-            SizedBox(height: context.cardPadding),
-
-            // Verification Filter
-            _buildFilterSection(
-              title: 'Verification Status',
-              icon: Icons.verified_user_outlined,
-              child: _buildVerificationFilter(),
             ),
 
             SizedBox(height: context.mainPadding),
@@ -316,31 +290,20 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
     );
   }
 
-  Widget _buildFilterSection({
-    required String title,
-    required IconData icon,
-    required Widget child,
-  }) {
+  Widget _buildFilterSection({required String title, required IconData icon, required Widget child}) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 title,
@@ -359,40 +322,77 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
     );
   }
 
-  Widget _buildStatusFilter() {
-    return Wrap(
-      spacing: context.smallPadding,
-      runSpacing: context.smallPadding / 2,
-      children: [
-        _buildFilterChip(
-          label: 'All Status',
-          isSelected: _selectedStatus == null,
-          onTap: () => setState(() => _selectedStatus = null),
+  Widget _buildSearchFilter() {
+    return TextFormField(
+      controller: _searchController,
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      decoration: InputDecoration(
+        hintText: 'Search by name, business name, phone, or CNIC',
+        hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+        prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        ..._statusOptions.map((status) => _buildFilterChip(
-          label: _getStatusDisplayName(status),
-          isSelected: _selectedStatus == status,
-          onTap: () => setState(() => _selectedStatus = status),
-        )),
-      ],
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: context.cardPadding,
+          vertical: context.cardPadding / 2,
+        ),
+      ),
+      onChanged: (value) {
+        setState(() {
+          _searchQuery = value;
+        });
+      },
     );
   }
 
-  Widget _buildTypeFilter() {
-    return Wrap(
-      spacing: context.smallPadding,
-      runSpacing: context.smallPadding / 2,
+  Widget _buildStatusFilter() {
+    return Column(
       children: [
-        _buildFilterChip(
-          label: 'All Types',
-          isSelected: _selectedType == null,
-          onTap: () => setState(() => _selectedType = null),
+        CheckboxListTile(
+          value: _showInactiveOnly,
+          onChanged: (value) {
+            setState(() {
+              _showInactiveOnly = value ?? false;
+            });
+          },
+          title: Text(
+            'Show inactive vendors only',
+            style: GoogleFonts.inter(
+              fontSize: context.subtitleFontSize,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoalGray,
+            ),
+          ),
+          activeColor: AppTheme.primaryMaroon,
+          dense: true,
+          controlAffinity: ListTileControlAffinity.leading,
         ),
-        ..._typeOptions.map((type) => _buildFilterChip(
-          label: _getTypeDisplayName(type),
-          isSelected: _selectedType == type,
-          onTap: () => setState(() => _selectedType = type),
-        )),
+        if (_showInactiveOnly)
+          Container(
+            padding: EdgeInsets.all(context.smallPadding),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.orange, size: context.iconSize('small')),
+                SizedBox(width: context.smallPadding),
+                Expanded(
+                  child: Text(
+                    'Only deactivated vendors will be shown',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.orange[700]),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -415,16 +415,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _cityController,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: 'Enter city name',
-                hintStyle: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  color: Colors.grey[500],
-                ),
+                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.location_city_outlined,
                   color: Colors.grey[500],
@@ -443,15 +437,24 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
                   vertical: context.cardPadding / 2,
                 ),
               ),
+              onChanged: (value) {
+                setState(() {
+                  _selectedCity = value.isEmpty ? null : value;
+                });
+              },
             ),
             SizedBox(height: context.smallPadding),
             Wrap(
               spacing: context.smallPadding / 2,
               runSpacing: context.smallPadding / 4,
-              children: _commonCities.map((city) => _buildQuickSelectChip(
-                label: city,
-                onTap: () => setState(() => _cityController.text = city),
-              )).toList(),
+              children: _commonCities
+                  .map(
+                    (city) => _buildQuickSelectChip(
+                      label: city,
+                      onTap: () => setState(() => _cityController.text = city),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),
@@ -473,16 +476,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _areaController,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: 'Enter area name',
-                hintStyle: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  color: Colors.grey[500],
-                ),
+                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.map_outlined,
                   color: Colors.grey[500],
@@ -501,73 +498,24 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
                   vertical: context.cardPadding / 2,
                 ),
               ),
+              onChanged: (value) {
+                setState(() {
+                  _selectedArea = value.isEmpty ? null : value;
+                });
+              },
             ),
             SizedBox(height: context.smallPadding),
             Wrap(
               spacing: context.smallPadding / 2,
               runSpacing: context.smallPadding / 4,
-              children: _commonAreas.map((area) => _buildQuickSelectChip(
-                label: area,
-                onTap: () => setState(() => _areaController.text = area),
-              )).toList(),
-            ),
-          ],
-        ),
-
-        SizedBox(height: context.cardPadding),
-
-        // Country Filter
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Country',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
-              ),
-            ),
-            SizedBox(height: context.smallPadding),
-            TextFormField(
-              controller: _countryController,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: AppTheme.charcoalGray,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Enter country name',
-                hintStyle: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  color: Colors.grey[500],
-                ),
-                prefixIcon: Icon(
-                  Icons.public_outlined,
-                  color: Colors.grey[500],
-                  size: context.iconSize('medium'),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.cardPadding / 2,
-                ),
-              ),
-            ),
-            SizedBox(height: context.smallPadding),
-            Wrap(
-              spacing: context.smallPadding / 2,
-              runSpacing: context.smallPadding / 4,
-              children: _commonCountries.map((country) => _buildQuickSelectChip(
-                label: country,
-                onTap: () => setState(() => _countryController.text = country),
-              )).toList(),
+              children: _commonAreas
+                  .map(
+                    (area) => _buildQuickSelectChip(
+                      label: area,
+                      onTap: () => setState(() => _areaController.text = area),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ),
@@ -575,70 +523,16 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
     );
   }
 
-  Widget _buildVerificationFilter() {
-    return Wrap(
-      spacing: context.smallPadding,
-      runSpacing: context.smallPadding / 2,
-      children: _verificationOptions.map((verification) => _buildFilterChip(
-        label: _getVerificationDisplayName(verification),
-        isSelected: _selectedVerification == verification,
-        onTap: () => setState(() => _selectedVerification = verification),
-      )).toList(),
-    );
-  }
-
-  Widget _buildFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.cardPadding / 2,
-          vertical: context.smallPadding,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryMaroon.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: context.subtitleFontSize,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected ? AppTheme.primaryMaroon : Colors.grey[700],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickSelectChip({
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.smallPadding,
-          vertical: context.smallPadding / 2,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
         decoration: BoxDecoration(
           color: AppTheme.accentGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(
-            color: AppTheme.accentGold.withOpacity(0.3),
-            width: 1,
-          ),
+          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
         ),
         child: Text(
           label,
@@ -724,48 +618,5 @@ class _VendorFilterDialogState extends State<VendorFilterDialog>
         ),
       ],
     );
-  }
-
-  String _getStatusDisplayName(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return 'Active';
-      case 'INACTIVE':
-        return 'Inactive';
-      case 'SUSPENDED':
-        return 'Suspended';
-      default:
-        return status;
-    }
-  }
-
-  String _getTypeDisplayName(String type) {
-    switch (type.toUpperCase()) {
-      case 'SUPPLIER':
-        return 'Supplier';
-      case 'DISTRIBUTOR':
-        return 'Distributor';
-      case 'MANUFACTURER':
-        return 'Manufacturer';
-      default:
-        return type;
-    }
-  }
-
-  String _getVerificationDisplayName(String verification) {
-    switch (verification.toLowerCase()) {
-      case 'any':
-        return 'Any Verification';
-      case 'phone':
-        return 'Phone Verified';
-      case 'email':
-        return 'Email Verified';
-      case 'both':
-        return 'Both Verified';
-      case 'none':
-        return 'Not Verified';
-      default:
-        return verification;
-    }
   }
 }
