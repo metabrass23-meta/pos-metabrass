@@ -4,23 +4,22 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
+import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
-class EditLaborDialog extends StatefulWidget {
-  final Labor labor;
+class EnhancedEditLaborDialog extends StatefulWidget {
+  final LaborModel labor;
 
-  const EditLaborDialog({
-    super.key,
-    required this.labor,
-  });
+  const EnhancedEditLaborDialog({super.key, required this.labor});
 
   @override
-  State<EditLaborDialog> createState() => _EditLaborDialogState();
+  State<EnhancedEditLaborDialog> createState() => _EnhancedEditLaborDialogState();
 }
 
-class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProviderStateMixin {
+class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _cnicController;
@@ -31,13 +30,14 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
   late TextEditingController _areaController;
   late TextEditingController _cityController;
   late TextEditingController _ageController;
-  late TextEditingController _advanceController;
   late String _selectedGender;
   late DateTime _selectedJoiningDate;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+
+  bool _isUpdating = false;
 
   @override
   void initState() {
@@ -51,22 +51,20 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
     _areaController = TextEditingController(text: widget.labor.area);
     _cityController = TextEditingController(text: widget.labor.city);
     _ageController = TextEditingController(text: widget.labor.age.toString());
-    _advanceController = TextEditingController(text: widget.labor.advancePayment.toString());
     _selectedGender = widget.labor.gender;
     _selectedJoiningDate = widget.labor.joiningDate;
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -83,50 +81,66 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
     _areaController.dispose();
     _cityController.dispose();
     _ageController.dispose();
-    _advanceController.dispose();
     super.dispose();
   }
 
   void _handleUpdate() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final provider = Provider.of<LaborProvider>(context, listen: false);
+      if (_isUpdating) return;
 
-      await provider.updateLabor(
-        id: widget.labor.id,
-        name: _nameController.text.trim(),
-        cnic: _cnicController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
-        caste: _casteController.text.trim(),
-        designation: _designationController.text.trim(),
-        joiningDate: _selectedJoiningDate,
-        salary: double.parse(_salaryController.text.trim()),
-        area: _areaController.text.trim(),
-        city: _cityController.text.trim(),
-        gender: _selectedGender,
-        age: int.parse(_ageController.text.trim()),
-        advancePayment: double.parse(_advanceController.text.trim()),
-      );
+      setState(() {
+        _isUpdating = true;
+      });
 
-      if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+      try {
+        final provider = Provider.of<LaborProvider>(context, listen: false);
+
+        final success = await provider.updateLabor(
+          id: widget.labor.id,
+          name: _nameController.text.trim(),
+          cnic: _cnicController.text.trim(),
+          phoneNumber: _phoneController.text.trim(),
+          caste: _casteController.text.trim(),
+          designation: _designationController.text.trim(),
+          joiningDate: _selectedJoiningDate,
+          salary: double.parse(_salaryController.text.trim()),
+          area: _areaController.text.trim(),
+          city: _cityController.text.trim(),
+          gender: _selectedGender,
+          age: int.parse(_ageController.text.trim()),
+        );
+
+        if (mounted) {
+          if (success) {
+            _showSuccessSnackbar('Labor updated successfully!');
+            Navigator.of(context).pop();
+          } else {
+            _showErrorSnackbar(provider.errorMessage ?? 'Failed to update labor');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          _showErrorSnackbar('Error updating labor: ${e.toString()}');
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isUpdating = false;
+          });
+        }
       }
     }
   }
 
-  void _showSuccessSnackbar() {
+  void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Labor updated successfully!',
+              message,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -138,20 +152,49 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
         ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
 
   void _handleCancel() {
+    if (_isUpdating) return;
+
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
     });
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    if (_isUpdating) return;
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedJoiningDate,
@@ -203,10 +246,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildHeader(),
-                      _buildFormContent(),
-                    ],
+                    children: [_buildHeader(), _buildFormContent()],
                   ),
                 ),
               ),
@@ -221,9 +261,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.blue, Colors.blueAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -237,11 +275,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(
-              Icons.edit_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -293,15 +327,11 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: _handleCancel,
+              onTap: _isUpdating ? null : _handleCancel,
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -323,6 +353,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter full name',
               controller: _nameController,
               prefixIcon: Icons.person_outline,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a name';
@@ -339,11 +370,10 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'CNIC',
-              hint: context.shouldShowCompactLayout
-                  ? 'Enter CNIC'
-                  : 'Enter CNIC (e.g., 42101-1234567-1)',
+              hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
               controller: _cnicController,
               prefixIcon: Icons.credit_card,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a CNIC';
@@ -362,12 +392,13 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
                   : 'Enter phone number (e.g., +923001234567)',
               controller: _phoneController,
               prefixIcon: Icons.phone_outlined,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a phone number';
                 }
-                if (!RegExp(r'^\+92\d{9}$').hasMatch(value!)) {
-                  return 'Please enter a valid phone number (+92XXXXXXXXX)';
+                if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
+                  return 'Please enter a valid phone number (+92XXXXXXXXXX)';
                 }
                 return null;
               },
@@ -378,6 +409,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
               controller: _casteController,
               prefixIcon: Icons.group_outlined,
+              enabled: !_isUpdating,
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
@@ -387,6 +419,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
                   : 'Enter designation (e.g., Tailor)',
               controller: _designationController,
               prefixIcon: Icons.work_outline,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a designation';
@@ -396,26 +429,28 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
             ),
             SizedBox(height: context.cardPadding),
             GestureDetector(
-              onTap: () => _selectDate(context),
-              child: PremiumTextField(
-                label: 'Joining Date',
-                hint: 'Select joining date',
-                controller: TextEditingController(
+              onTap: _isUpdating ? null : () => _selectDate(context),
+              child: AbsorbPointer(
+                child: PremiumTextField(
+                  label: 'Joining Date',
+                  hint: 'Select joining date',
+                  controller: TextEditingController(
                     text:
-                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}'),
-                prefixIcon: Icons.calendar_today,
-                enabled: false,
+                        '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
+                  ),
+                  prefixIcon: Icons.calendar_today,
+                  enabled: !_isUpdating,
+                ),
               ),
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Salary',
-              hint: context.shouldShowCompactLayout
-                  ? 'Enter salary'
-                  : 'Enter monthly salary (PKR)',
+              hint: context.shouldShowCompactLayout ? 'Enter salary' : 'Enter monthly salary (PKR)',
               controller: _salaryController,
               prefixIcon: Icons.account_balance_wallet_outlined,
               keyboardType: TextInputType.number,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a salary';
@@ -432,6 +467,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               hint: context.shouldShowCompactLayout ? 'Enter area' : 'Enter area (e.g., Gulshan)',
               controller: _areaController,
               prefixIcon: Icons.location_on_outlined,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter an area';
@@ -445,6 +481,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               hint: context.shouldShowCompactLayout ? 'Enter city' : 'Enter city (e.g., Karachi)',
               controller: _cityController,
               prefixIcon: Icons.location_city_outlined,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a city';
@@ -458,21 +495,21 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               decoration: InputDecoration(
                 labelText: 'Gender',
                 prefixIcon: Icon(Icons.person_pin_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                enabled: !_isUpdating,
               ),
-              items: ['Male', 'Female', 'Other']
-                  .map((gender) => DropdownMenuItem(
-                value: gender,
-                child: Text(gender),
-              ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedGender = value!;
-                });
-              },
+              items: [
+                'Male',
+                'Female',
+                'Other',
+              ].map((gender) => DropdownMenuItem(value: gender, child: Text(gender))).toList(),
+              onChanged: _isUpdating
+                  ? null
+                  : (value) {
+                      setState(() {
+                        _selectedGender = value!;
+                      });
+                    },
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
@@ -481,31 +518,13 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
               controller: _ageController,
               prefixIcon: Icons.cake_outlined,
               keyboardType: TextInputType.number,
+              enabled: !_isUpdating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter an age';
                 }
                 if (int.tryParse(value!) == null || int.parse(value) < 18) {
                   return 'Age must be at least 18';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Advance Payment',
-              hint: context.shouldShowCompactLayout
-                  ? 'Enter advance'
-                  : 'Enter advance payment (PKR, optional)',
-              controller: _advanceController,
-              prefixIcon: Icons.payment_rounded,
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return null;
-                }
-                if (double.tryParse(value!) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid amount';
                 }
                 return null;
               },
@@ -533,8 +552,8 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
           builder: (context, provider, child) {
             return PremiumButton(
               text: 'Update Labor',
-              onPressed: provider.isLoading ? null : _handleUpdate,
-              isLoading: provider.isLoading,
+              onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
+              isLoading: _isUpdating || provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.save_rounded,
               backgroundColor: Colors.blue,
@@ -544,7 +563,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
         SizedBox(height: context.cardPadding),
         PremiumButton(
           text: 'Cancel',
-          onPressed: _handleCancel,
+          onPressed: _isUpdating ? null : _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -560,7 +579,7 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
         Expanded(
           child: PremiumButton(
             text: 'Cancel',
-            onPressed: _handleCancel,
+            onPressed: _isUpdating ? null : _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -573,8 +592,8 @@ class _EditLaborDialogState extends State<EditLaborDialog> with SingleTickerProv
             builder: (context, provider, child) {
               return PremiumButton(
                 text: 'Update Labor',
-                onPressed: provider.isLoading ? null : _handleUpdate,
-                isLoading: provider.isLoading,
+                onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
+                isLoading: _isUpdating || provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.save_rounded,
                 backgroundColor: Colors.blue,

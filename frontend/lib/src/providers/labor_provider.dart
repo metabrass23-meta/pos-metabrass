@@ -1,139 +1,178 @@
-import 'package:flutter/material.dart';
-
-class Labor {
-  final String id;
-  final String name;
-  final String cnic;
-  final String phoneNumber;
-  final String caste;
-  final String designation;
-  final DateTime joiningDate;
-  final double salary;
-  final String area;
-  final String city;
-  final String gender;
-  final int age;
-  final double advancePayment;
-
-  Labor({
-    required this.id,
-    required this.name,
-    required this.cnic,
-    required this.phoneNumber,
-    required this.caste,
-    required this.designation,
-    required this.joiningDate,
-    required this.salary,
-    required this.area,
-    required this.city,
-    required this.gender,
-    required this.age,
-    required this.advancePayment,
-  });
-
-  Labor copyWith({
-    String? id,
-    String? name,
-    String? cnic,
-    String? phoneNumber,
-    String? caste,
-    String? designation,
-    DateTime? joiningDate,
-    double? salary,
-    String? area,
-    String? city,
-    String? gender,
-    int? age,
-    double? advancePayment,
-  }) {
-    return Labor(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      cnic: cnic ?? this.cnic,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      caste: caste ?? this.caste,
-      designation: designation ?? this.designation,
-      joiningDate: joiningDate ?? this.joiningDate,
-      salary: salary ?? this.salary,
-      area: area ?? this.area,
-      city: city ?? this.city,
-      gender: gender ?? this.gender,
-      age: age ?? this.age,
-      advancePayment: advancePayment ?? this.advancePayment,
-    );
-  }
-}
+import 'package:flutter/foundation.dart';
+import '../models/api_response.dart';
+import '../models/labor/labor_model.dart';
+import '../models/labor/labor_api_responses.dart';
+import '../services/labor/labor_service.dart';
 
 class LaborProvider extends ChangeNotifier {
-  List<Labor> _labors = [];
-  List<Labor> _filteredLabors = [];
-  String _searchQuery = '';
-  bool _isLoading = false;
+  final LaborService _laborService = LaborService();
 
-  List<Labor> get labors => _filteredLabors;
-  String get searchQuery => _searchQuery;
+  // State variables
+  List<LaborModel> _labors = [];
+  List<LaborModel> _filteredLabors = [];
+  bool _isLoading = false;
+  bool _hasError = false;
+  String? _errorMessage;
+  PaginationInfo? _paginationInfo;
+  LaborStatisticsResponse? _statistics;
+  LaborSalaryReportResponse? _salaryReport;
+  LaborDemographicsReportResponse? _demographicsReport;
+
+  // Filter state
+  String? _searchQuery;
+  String? _selectedCity;
+  String? _selectedArea;
+  String? _selectedDesignation;
+  String? _selectedCaste;
+  String? _selectedGender;
+  String? _minSalary;
+  String? _maxSalary;
+  String? _minAge;
+  String? _maxAge;
+  DateTime? _joinedAfter;
+  DateTime? _joinedBefore;
+  bool _showInactive = false;
+
+  // Sorting state
+  String _sortBy = 'name';
+  String _sortOrder = 'asc';
+  bool _sortAscending = true;
+
+  // Pagination state
+  int _currentPage = 1;
+  int _pageSize = 20;
+
+  // Getters
+  List<LaborModel> get labors => _filteredLabors;
+  List<LaborModel> get allLabors => _labors;
   bool get isLoading => _isLoading;
+  bool get hasError => _hasError;
+  String? get errorMessage => _errorMessage;
+  PaginationInfo? get paginationInfo => _paginationInfo;
+  LaborStatisticsResponse? get statistics => _statistics;
+  LaborSalaryReportResponse? get salaryReport => _salaryReport;
+  LaborDemographicsReportResponse? get demographicsReport => _demographicsReport;
+
+  // Filter getters
+  String? get searchQuery => _searchQuery;
+  String? get selectedCity => _selectedCity;
+  String? get selectedArea => _selectedArea;
+  String? get selectedDesignation => _selectedDesignation;
+  String? get selectedCaste => _selectedCaste;
+  String? get selectedGender => _selectedGender;
+  String? get minSalary => _minSalary;
+  String? get maxSalary => _maxSalary;
+  String? get minAge => _minAge;
+  String? get maxAge => _maxAge;
+  DateTime? get joinedAfter => _joinedAfter;
+  DateTime? get joinedBefore => _joinedBefore;
+  bool get showInactive => _showInactive;
+
+  // Sorting getters
+  String get sortBy => _sortBy;
+  String get sortOrder => _sortOrder;
+  bool get sortAscending => _sortAscending;
+
+  // Pagination getters
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+
+  // Computed properties
+  bool get hasActiveFilters =>
+      _searchQuery?.isNotEmpty == true ||
+          _selectedCity?.isNotEmpty == true ||
+          _selectedArea?.isNotEmpty == true ||
+          _selectedDesignation?.isNotEmpty == true ||
+          _selectedCaste?.isNotEmpty == true ||
+          _selectedGender?.isNotEmpty == true ||
+          _minSalary?.isNotEmpty == true ||
+          _maxSalary?.isNotEmpty == true ||
+          _minAge?.isNotEmpty == true ||
+          _maxAge?.isNotEmpty == true ||
+          _joinedAfter != null ||
+          _joinedBefore != null ||
+          _showInactive;
+
+  int get totalActiveLabors => _labors.where((labor) => labor.isActive).length;
+  int get totalInactiveLabors => _labors.where((labor) => !labor.isActive).length;
+  int get totalLabors => _labors.length;
 
   LaborProvider() {
-    _initializeLabors();
+    loadLabors();
   }
 
-  void _initializeLabors() {
-    _labors = [
-      Labor(
-        id: 'LAB001',
-        name: 'Ahmed Khan',
-        cnic: '42101-1234567-1',
-        phoneNumber: '+923001234567',
-        caste: 'Pathan',
-        designation: 'Tailor',
-        joiningDate: DateTime.now().subtract(const Duration(days: 30)),
-        salary: 35000.0,
-        area: 'Gulshan',
-        city: 'Karachi',
-        gender: 'Male',
-        age: 30,
-        advancePayment: 5000.0,
-      ),
-      Labor(
-        id: 'LAB002',
-        name: 'Fatima Ali',
-        cnic: '42101-7654321-2',
-        phoneNumber: '+923009876543',
-        caste: 'Siddiqui',
-        designation: 'Embroiderer',
-        joiningDate: DateTime.now().subtract(const Duration(days: 25)),
-        salary: 28000.0,
-        area: 'Clifton',
-        city: 'Karachi',
-        gender: 'Female',
-        age: 28,
-        advancePayment: 0.0,
-      ),
-    ];
-
-    _filteredLabors = List.from(_labors);
-  }
-
-  void searchLabors(String query) {
-    _searchQuery = query;
-
-    if (query.isEmpty) {
-      _filteredLabors = List.from(_labors);
-    } else {
-      _filteredLabors = _labors
-          .where((labor) =>
-      labor.name.toLowerCase().contains(query.toLowerCase()) ||
-          labor.cnic.toLowerCase().contains(query.toLowerCase()) ||
-          labor.id.toLowerCase().contains(query.toLowerCase()) ||
-          labor.designation.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    }
-
+  // Error handling
+  void clearError() {
+    _hasError = false;
+    _errorMessage = null;
     notifyListeners();
   }
 
-  Future<void> addLabor({
+  void _setError(String message) {
+    _hasError = true;
+    _errorMessage = message;
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    if (loading) {
+      _hasError = false;
+      _errorMessage = null;
+    }
+    notifyListeners();
+  }
+
+  // Load labors with current filters
+  Future<void> loadLabors() async {
+    _setLoading(true);
+
+    try {
+      final params = LaborListParams(
+        page: _currentPage,
+        pageSize: _pageSize,
+        showInactive: _showInactive,
+        search: _searchQuery,
+        city: _selectedCity,
+        area: _selectedArea,
+        designation: _selectedDesignation,
+        caste: _selectedCaste,
+        gender: _selectedGender,
+        minSalary: _minSalary,
+        maxSalary: _maxSalary,
+        minAge: _minAge,
+        maxAge: _maxAge,
+        joinedAfter: _joinedAfter?.toIso8601String().split('T')[0],
+        joinedBefore: _joinedBefore?.toIso8601String().split('T')[0],
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
+      );
+
+      final response = await _laborService.getLabors(params: params);
+
+      if (response.success && response.data != null) {
+        _labors = response.data!.labors;
+        _filteredLabors = List.from(_labors);
+        _paginationInfo = response.data!.pagination;
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Failed to load labors: ${e.toString()}');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Refresh labors (reset to first page)
+  Future<void> refreshLabors() async {
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  // Create new labor
+  Future<bool> createLabor({
     required String name,
     required String cnic,
     required String phoneNumber,
@@ -145,37 +184,41 @@ class LaborProvider extends ChangeNotifier {
     required String city,
     required String gender,
     required int age,
-    required double advancePayment,
   }) async {
-    _isLoading = true;
-    notifyListeners();
+    _setLoading(true);
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final response = await _laborService.createLabor(
+        name: name,
+        cnic: cnic,
+        phoneNumber: phoneNumber,
+        caste: caste,
+        designation: designation,
+        joiningDate: joiningDate,
+        salary: salary,
+        area: area,
+        city: city,
+        gender: gender,
+        age: age,
+      );
 
-    final newLabor = Labor(
-      id: 'LAB${(_labors.length + 1).toString().padLeft(3, '0')}',
-      name: name,
-      cnic: cnic,
-      phoneNumber: phoneNumber,
-      caste: caste,
-      designation: designation,
-      joiningDate: joiningDate,
-      salary: salary,
-      area: area,
-      city: city,
-      gender: gender,
-      age: age,
-      advancePayment: advancePayment,
-    );
-
-    _labors.add(newLabor);
-    searchLabors(_searchQuery);
-
-    _isLoading = false;
-    notifyListeners();
+      if (response.success && response.data != null) {
+        await refreshLabors(); // Reload the list
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to create labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  Future<void> updateLabor({
+  // Update labor
+  Future<bool> updateLabor({
     required String id,
     required String name,
     required String cnic,
@@ -188,16 +231,12 @@ class LaborProvider extends ChangeNotifier {
     required String city,
     required String gender,
     required int age,
-    required double advancePayment,
   }) async {
-    _isLoading = true;
-    notifyListeners();
+    _setLoading(true);
 
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final index = _labors.indexWhere((labor) => labor.id == id);
-    if (index != -1) {
-      _labors[index] = _labors[index].copyWith(
+    try {
+      final response = await _laborService.updateLabor(
+        id: id,
         name: name,
         cnic: cnic,
         phoneNumber: phoneNumber,
@@ -209,49 +248,528 @@ class LaborProvider extends ChangeNotifier {
         city: city,
         gender: gender,
         age: age,
-        advancePayment: advancePayment,
       );
-      searchLabors(_searchQuery);
-    }
 
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> deleteLabor(String id) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    _labors.removeWhere((labor) => labor.id == id);
-    searchLabors(_searchQuery);
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Labor? getLaborById(String id) {
-    try {
-      return _labors.firstWhere((labor) => labor.id == id);
+      if (response.success && response.data != null) {
+        await refreshLabors(); // Reload the list
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
     } catch (e) {
+      _setError('Failed to update labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Delete labor (hard delete)
+  Future<bool> deleteLabor(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.deleteLabor(id);
+
+      if (response.success) {
+        await refreshLabors(); // Reload the list
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to delete labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Soft delete labor
+  Future<bool> softDeleteLabor(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.softDeleteLabor(id);
+
+      if (response.success) {
+        await refreshLabors(); // Reload the list
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to soft delete labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Restore labor
+  Future<bool> restoreLabor(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.restoreLabor(id);
+
+      if (response.success) {
+        await refreshLabors(); // Reload the list
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to restore labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Get labor by ID
+  Future<LaborModel?> getLaborById(String id) async {
+    try {
+      final response = await _laborService.getLaborById(id);
+      if (response.success && response.data != null) {
+        return response.data;
+      } else {
+        _setError(response.message);
+        return null;
+      }
+    } catch (e) {
+      _setError('Failed to get labor: ${e.toString()}');
       return null;
     }
   }
 
-  Map<String, dynamic> get laborStats => {
-    'total': _labors.length,
-    'recentlyJoined': _labors
-        .where((labor) =>
-    DateTime.now().difference(labor.joiningDate).inDays <= 30)
-        .length,
-    'withAdvance': _labors.where((labor) => labor.advancePayment > 0).length,
-    'averageSalary':
-    _labors.isNotEmpty
-        ? (_labors.fold<double>(
-        0, (sum, labor) => sum + labor.salary) /
-        _labors.length)
-        .toStringAsFixed(2)
-        : '0.00',
-  };
+  // Search functionality
+  Future<void> searchLabors(String query) async {
+    _searchQuery = query;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  void clearSearch() {
+    _searchQuery = null;
+    _currentPage = 1;
+    loadLabors();
+  }
+
+  // Filter methods
+  Future<void> setCityFilter(String? city) async {
+    _selectedCity = city;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setAreaFilter(String? area) async {
+    _selectedArea = area;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setDesignationFilter(String? designation) async {
+    _selectedDesignation = designation;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setCasteFilter(String? caste) async {
+    _selectedCaste = caste;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setGenderFilter(String? gender) async {
+    _selectedGender = gender;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setSalaryRangeFilter(String? minSalary, String? maxSalary) async {
+    _minSalary = minSalary;
+    _maxSalary = maxSalary;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setAgeRangeFilter(String? minAge, String? maxAge) async {
+    _minAge = minAge;
+    _maxAge = maxAge;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setDateRangeFilter(DateTime? joinedAfter, DateTime? joinedBefore) async {
+    _joinedAfter = joinedAfter;
+    _joinedBefore = joinedBefore;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> setShowInactive(bool showInactive) async {
+    _showInactive = showInactive;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  Future<void> toggleShowInactive() async {
+    _showInactive = !_showInactive;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  // Apply multiple filters at once
+  Future<void> applyFilters({
+    String? search,
+    String? city,
+    String? area,
+    String? designation,
+    String? caste,
+    String? gender,
+    String? minSalary,
+    String? maxSalary,
+    String? minAge,
+    String? maxAge,
+    DateTime? joinedAfter,
+    DateTime? joinedBefore,
+    bool? showInactive,
+  }) async {
+    _searchQuery = search;
+    _selectedCity = city;
+    _selectedArea = area;
+    _selectedDesignation = designation;
+    _selectedCaste = caste;
+    _selectedGender = gender;
+    _minSalary = minSalary;
+    _maxSalary = maxSalary;
+    _minAge = minAge;
+    _maxAge = maxAge;
+    _joinedAfter = joinedAfter;
+    _joinedBefore = joinedBefore;
+    if (showInactive != null) _showInactive = showInactive;
+
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  // Clear all filters
+  Future<void> clearAllFilters() async {
+    _searchQuery = null;
+    _selectedCity = null;
+    _selectedArea = null;
+    _selectedDesignation = null;
+    _selectedCaste = null;
+    _selectedGender = null;
+    _minSalary = null;
+    _maxSalary = null;
+    _minAge = null;
+    _maxAge = null;
+    _joinedAfter = null;
+    _joinedBefore = null;
+    _showInactive = false;
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  // Sorting
+  Future<void> setSortBy(String sortBy) async {
+    if (_sortBy == sortBy) {
+      // Toggle sort order if same field
+      _sortAscending = !_sortAscending;
+      _sortOrder = _sortAscending ? 'asc' : 'desc';
+    } else {
+      // New field, default to ascending
+      _sortBy = sortBy;
+      _sortAscending = true;
+      _sortOrder = 'asc';
+    }
+
+    _currentPage = 1;
+    await loadLabors();
+  }
+
+  // Pagination
+  Future<void> loadNextPage() async {
+    if (_paginationInfo?.hasNext == true) {
+      _currentPage++;
+      await loadLabors();
+    }
+  }
+
+  Future<void> loadPreviousPage() async {
+    if (_paginationInfo?.hasPrevious == true && _currentPage > 1) {
+      _currentPage--;
+      await loadLabors();
+    }
+  }
+
+  Future<void> goToPage(int page) async {
+    if (page >= 1 && page <= (_paginationInfo?.totalPages ?? 1)) {
+      _currentPage = page;
+      await loadLabors();
+    }
+  }
+
+  void setPageSize(int size) {
+    _pageSize = size;
+    _currentPage = 1;
+    loadLabors();
+  }
+
+  // Statistics
+  Future<void> loadStatistics() async {
+    try {
+      final response = await _laborService.getLaborStatistics();
+      if (response.success && response.data != null) {
+        _statistics = response.data;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load statistics: ${e.toString()}');
+    }
+  }
+
+  // Salary Report
+  Future<void> loadSalaryReport() async {
+    try {
+      final response = await _laborService.getSalaryReport();
+      if (response.success && response.data != null) {
+        _salaryReport = response.data;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load salary report: ${e.toString()}');
+    }
+  }
+
+  // Demographics Report
+  Future<void> loadDemographicsReport() async {
+    try {
+      final response = await _laborService.getDemographicsReport();
+      if (response.success && response.data != null) {
+        _demographicsReport = response.data;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load demographics report: ${e.toString()}');
+    }
+  }
+
+  // Bulk operations
+  Future<bool> bulkActivateLabors(List<String> laborIds) async {
+    return await _performBulkAction(laborIds, 'activate');
+  }
+
+  Future<bool> bulkDeactivateLabors(List<String> laborIds) async {
+    return await _performBulkAction(laborIds, 'deactivate');
+  }
+
+  Future<bool> bulkUpdateSalary(List<String> laborIds, {double? amount, double? percentage}) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.bulkLaborActions(
+        laborIds: laborIds,
+        action: 'update_salary',
+        salaryAmount: amount,
+        salaryPercentage: percentage,
+      );
+
+      if (response.success) {
+        await refreshLabors();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to update salaries: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> _performBulkAction(List<String> laborIds, String action) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.bulkLaborActions(
+        laborIds: laborIds,
+        action: action,
+      );
+
+      if (response.success) {
+        await refreshLabors();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to perform bulk action: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Duplicate labor
+  Future<bool> duplicateLabor({
+    required String id,
+    required String newName,
+    required String newPhone,
+    required String newCnic,
+    int? newAge,
+  }) async {
+    _setLoading(true);
+
+    try {
+      final response = await _laborService.duplicateLabor(
+        id: id,
+        newName: newName,
+        newPhone: newPhone,
+        newCnic: newCnic,
+        newAge: newAge,
+      );
+
+      if (response.success) {
+        await refreshLabors();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to duplicate labor: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Update labor contact
+  Future<bool> updateLaborContact({
+    required String id,
+    String? phoneNumber,
+    String? city,
+    String? area,
+  }) async {
+    try {
+      final response = await _laborService.updateLaborContact(
+        id: id,
+        phoneNumber: phoneNumber,
+        city: city,
+        area: area,
+      );
+
+      if (response.success) {
+        await refreshLabors();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to update labor contact: ${e.toString()}');
+      return false;
+    }
+  }
+
+  // Update labor salary
+  Future<bool> updateLaborSalary({
+    required String id,
+    double? salary,
+    String? designation,
+  }) async {
+    try {
+      final response = await _laborService.updateLaborSalary(
+        id: id,
+        salary: salary,
+        designation: designation,
+      );
+
+      if (response.success) {
+        await refreshLabors();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to update labor salary: ${e.toString()}');
+      return false;
+    }
+  }
+
+  // Export functionality (placeholder)
+  Future<void> exportData() async {
+    // Implement export functionality
+    // This could export to CSV, Excel, PDF, etc.
+    try {
+      // For now, just simulate export
+      await Future.delayed(Duration(seconds: 1));
+      // In real implementation, you might use packages like csv, excel, pdf, etc.
+    } catch (e) {
+      _setError('Failed to export data: ${e.toString()}');
+    }
+  }
+
+  // Get unique values for filters (from current data)
+  List<String> get availableCities {
+    return _labors
+        .map((labor) => labor.city)
+        .where((city) => city.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  List<String> get availableAreas {
+    return _labors
+        .map((labor) => labor.area)
+        .where((area) => area.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  List<String> get availableDesignations {
+    return _labors
+        .map((labor) => labor.designation)
+        .where((designation) => designation.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  List<String> get availableCastes {
+    return _labors
+        .map((labor) => labor.caste)
+        .where((caste) => caste.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  List<String> get availableGenders {
+    return _labors
+        .map((labor) => labor.genderDisplay)
+        .where((gender) => gender.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  @override
+  void dispose() {
+    // Clean up resources if needed
+    super.dispose();
+  }
 }
