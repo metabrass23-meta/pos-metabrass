@@ -6,17 +6,14 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../globals/confirmation_dialog.dart';
 
 class LaborTableHelpers {
   final Function(LaborModel) onEdit;
   final Function(LaborModel) onDelete;
   final Function(LaborModel) onView;
 
-  LaborTableHelpers({
-    required this.onEdit,
-    required this.onDelete,
-    required this.onView,
-  });
+  LaborTableHelpers({required this.onEdit, required this.onDelete, required this.onView});
 
   /// Build the actions row for each labor in the table
   Widget buildActionsRow(BuildContext context, LaborModel labor) {
@@ -35,11 +32,7 @@ class LaborTableHelpers {
                 color: Colors.purple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.visibility_outlined,
-                color: Colors.purple,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -58,11 +51,7 @@ class LaborTableHelpers {
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -81,11 +70,7 @@ class LaborTableHelpers {
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
+              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -102,11 +87,7 @@ class LaborTableHelpers {
               color: Colors.grey.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
-            child: Icon(
-              Icons.more_vert,
-              color: Colors.grey[600],
-              size: context.iconSize('small'),
-            ),
+            child: Icon(Icons.more_vert, color: Colors.grey[600], size: context.iconSize('small')),
           ),
         ),
       ],
@@ -164,18 +145,19 @@ class LaborTableHelpers {
   }
 
   /// Handle soft delete (deactivate)
-  Future<void> _handleSoftDelete(
-      BuildContext context,
-      LaborProvider provider,
-      LaborModel labor,
-      ) async {
-    final confirmed = await _showConfirmationDialog(
-      context,
-      'Deactivate Labor',
-      'Are you sure you want to deactivate ${labor.name}? This action can be reversed.',
-      'Deactivate',
-      Colors.orange,
-    );
+  Future<void> _handleSoftDelete(BuildContext context, LaborProvider provider, LaborModel labor) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => ConfirmationDialog(
+            title: 'Deactivate Labor',
+            message: 'Are you sure you want to deactivate ${labor.name}? This action can be reversed.',
+            actionText: 'Deactivate',
+            actionColor: Colors.orange,
+          ),
+        ) ??
+        false;
 
     if (confirmed) {
       final success = await provider.softDeleteLabor(labor.id);
@@ -188,18 +170,19 @@ class LaborTableHelpers {
   }
 
   /// Handle restore labor
-  Future<void> _handleRestore(
-      BuildContext context,
-      LaborProvider provider,
-      LaborModel labor,
-      ) async {
-    final confirmed = await _showConfirmationDialog(
-      context,
-      'Restore Labor',
-      'Are you sure you want to restore ${labor.name}?',
-      'Restore',
-      Colors.green,
-    );
+  Future<void> _handleRestore(BuildContext context, LaborProvider provider, LaborModel labor) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => ConfirmationDialog(
+            title: 'Restore Labor',
+            message: 'Are you sure you want to restore ${labor.name}?',
+            actionText: 'Restore',
+            actionColor: Colors.green,
+          ),
+        ) ??
+        false;
 
     if (confirmed) {
       final success = await provider.restoreLabor(labor.id);
@@ -211,48 +194,13 @@ class LaborTableHelpers {
     }
   }
 
-  /// Show confirmation dialog
-  Future<bool> _showConfirmationDialog(
-      BuildContext context,
-      String title,
-      String message,
-      String actionText,
-      Color actionColor,
-      ) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: actionColor,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(actionText),
-          ),
-        ],
-      ),
-    ) ?? false;
-  }
-
   /// Show success snackbar
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
@@ -267,9 +215,7 @@ class LaborTableHelpers {
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -280,11 +226,7 @@ class LaborTableHelpers {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_outline,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -301,9 +243,7 @@ class LaborTableHelpers {
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -335,11 +275,7 @@ class LaborTableHelpers {
               color: Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('xl')),
             ),
-            child: Icon(
-              Icons.error_outline,
-              size: context.iconSize('xl'),
-              color: Colors.red[400],
-            ),
+            child: Icon(Icons.error_outline, size: context.iconSize('xl'), color: Colors.red[400]),
           ),
 
           SizedBox(height: context.mainPadding),
@@ -453,11 +389,7 @@ class LaborTableHelpers {
               color: AppTheme.lightGray,
               borderRadius: BorderRadius.circular(context.borderRadius('xl')),
             ),
-            child: Icon(
-              Icons.engineering_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            child: Icon(Icons.engineering_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
@@ -499,9 +431,7 @@ class LaborTableHelpers {
 
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
+              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Material(
@@ -519,11 +449,7 @@ class LaborTableHelpers {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
+                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
                         'Add First Labor',
