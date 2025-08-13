@@ -135,6 +135,11 @@ class AdvancePaymentCreateSerializer(serializers.ModelSerializer):
         amount = data.get('amount')
         payment_date = data.get('date', date.today())
         
+        # Set default time if not provided
+        if 'time' not in data or not data.get('time'):
+            from datetime import datetime
+            data['time'] = datetime.now().time()
+        
         if labor and amount:
             # Check if advance exceeds monthly salary
             if amount > labor.salary:
@@ -205,6 +210,12 @@ class AdvancePaymentUpdateSerializer(serializers.ModelSerializer):
             labor = self.instance.labor
             amount = data.get('amount', self.instance.amount)
             payment_date = data.get('date', self.instance.date)
+            
+            # Set default time if not provided
+            if 'time' not in data or not data.get('time'):
+                from datetime import datetime
+                if not self.instance.time:
+                    data['time'] = datetime.now().time()
             
             # Check if advance exceeds monthly salary
             if amount > labor.salary:

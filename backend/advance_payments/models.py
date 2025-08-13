@@ -140,7 +140,6 @@ class AdvancePayment(models.Model):
         help_text="Date when advance payment was made"
     )
     time = models.TimeField(
-        default=timezone.now,
         help_text="Time when advance payment was made"
     )
     
@@ -220,6 +219,14 @@ class AdvancePayment(models.Model):
             self.description = self.description.strip()
     
     def save(self, *args, **kwargs):
+        # Set default time if not provided
+        if not self.time:
+            self.time = timezone.now().time()
+        
+        # Set default date if not provided
+        if not self.date:
+            self.date = date.today()
+        
         # Cache labor data if labor is provided
         if self.labor_id and not self.labor_name:
             self.labor_name = self.labor.name
@@ -252,7 +259,11 @@ class AdvancePayment(models.Model):
     @property
     def payment_datetime(self):
         """Combine date and time"""
-        return datetime.combine(self.date, self.time)
+        if self.date and self.time:
+            return datetime.combine(self.date, self.time)
+        elif self.date:
+            return datetime.combine(self.date, timezone.now().time())
+        return None
     
     @property
     def is_recent(self):
@@ -281,18 +292,21 @@ class AdvancePayment(models.Model):
     def advance_percentage(self):
         """Get advance as percentage of total salary"""
         if self.total_salary and self.total_salary > 0:
-            return round((self.amount / self.total_salary) * 100, 2)
+            percentage = (self.amount / self.total_salary) * Decimal('100')
+            return float(round(percentage, 2))
         return 0
     
     # Helper methods
     def get_total_advances_for_labor(self):
         """Get total advance amount for the same labor in current month"""
-        return AdvancePayment.objects.filter(
+        from django.db import models
+        total = AdvancePayment.objects.filter(
             labor=self.labor,
             date__year=self.date.year,
             date__month=self.date.month,
             is_active=True
-        ).aggregate(total=models.Sum('amount'))['total'] or Decimal('0.00')
+        ).aggregate(total=models.Sum('amount'))['total']
+        return total or Decimal('0.00')
     
     def soft_delete(self):
         """Soft delete the advance payment"""
