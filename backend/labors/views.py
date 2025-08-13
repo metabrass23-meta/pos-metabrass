@@ -21,6 +21,7 @@ from .serializers import (
     LaborSalaryUpdateSerializer,
 )
 from .signals import labor_bulk_updated
+from . import models
 
 
 # ==================== BASIC CRUD OPERATIONS ====================
@@ -1331,4 +1332,456 @@ def labor_payments(request, labor_id):
             'message': 'Labor not found.',
             'errors': {'detail': 'Labor with this ID does not exist.'}
         }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Add these functions to your views.py file
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def labors_by_caste(request, caste_name):
+    """
+    Get labors by caste
+    """
+    try:
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Get labors by caste (case-insensitive)
+        labors = Labor.active_labors().filter(caste__iexact=caste_name)
+        labors = labors.select_related('created_by')
+        
+        # Calculate pagination
+        total_count = labors.count()
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        labors = labors[start_index:end_index]
+        
+        serializer = LaborListSerializer(labors, many=True)
+        
+        return Response({
+            'success': True,
+            'data': {
+                'labors': serializer.data,
+                'pagination': {
+                    'current_page': page,
+                    'page_size': page_size,
+                    'total_count': total_count,
+                    'total_pages': (total_count + page_size - 1) // page_size,
+                    'has_next': end_index < total_count,
+                    'has_previous': page > 1
+                },
+                'caste': caste_name,
+                'total_labors_with_caste': total_count
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError:
+        return Response({
+            'success': False,
+            'message': 'Invalid pagination parameters.',
+            'errors': {'detail': 'Page and page_size must be valid integers.'}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to retrieve labors by caste.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def labors_by_gender(request, gender):
+    """
+    Get labors by gender
+    """
+    try:
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Validate gender
+        valid_genders = ['M', 'F', 'O', 'Male', 'Female', 'Other']
+        if gender not in valid_genders:
+            return Response({
+                'success': False,
+                'message': 'Invalid gender parameter.',
+                'errors': {'detail': 'Gender must be M, F, O, Male, Female, or Other.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Convert full gender names to single letter codes
+        gender_map = {'Male': 'M', 'Female': 'F', 'Other': 'O'}
+        gender_code = gender_map.get(gender, gender)
+        
+        # Get labors by gender
+        labors = Labor.active_labors().filter(gender=gender_code)
+        labors = labors.select_related('created_by')
+        
+        # Calculate pagination
+        total_count = labors.count()
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        labors = labors[start_index:end_index]
+        
+        serializer = LaborListSerializer(labors, many=True)
+        
+        return Response({
+            'success': True,
+            'data': {
+                'labors': serializer.data,
+                'pagination': {
+                    'current_page': page,
+                    'page_size': page_size,
+                    'total_count': total_count,
+                    'total_pages': (total_count + page_size - 1) // page_size,
+                    'has_next': end_index < total_count,
+                    'has_previous': page > 1
+                },
+                'gender': gender,
+                'gender_code': gender_code,
+                'total_labors_with_gender': total_count
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError:
+        return Response({
+            'success': False,
+            'message': 'Invalid pagination parameters.',
+            'errors': {'detail': 'Page and page_size must be valid integers.'}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to retrieve labors by gender.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def labors_by_salary_range(request):
+    """
+    Get labors by salary range
+    """
+    try:
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Get salary range parameters
+        min_salary = request.GET.get('min_salary', '').strip()
+        max_salary = request.GET.get('max_salary', '').strip()
+        
+        if not min_salary and not max_salary:
+            return Response({
+                'success': False,
+                'message': 'At least one salary parameter is required.',
+                'errors': {'detail': 'Please provide min_salary and/or max_salary parameters.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Start with active labors
+        labors = Labor.active_labors()
+        
+        # Apply salary filters
+        if min_salary:
+            try:
+                labors = labors.filter(salary__gte=Decimal(min_salary))
+            except (ValueError, TypeError):
+                return Response({
+                    'success': False,
+                    'message': 'Invalid min_salary value.',
+                    'errors': {'min_salary': 'Must be a valid number'}
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if max_salary:
+            try:
+                labors = labors.filter(salary__lte=Decimal(max_salary))
+            except (ValueError, TypeError):
+                return Response({
+                    'success': False,
+                    'message': 'Invalid max_salary value.',
+                    'errors': {'max_salary': 'Must be a valid number'}
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        labors = labors.select_related('created_by')
+        
+        # Calculate pagination
+        total_count = labors.count()
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        labors = labors[start_index:end_index]
+        
+        serializer = LaborListSerializer(labors, many=True)
+        
+        return Response({
+            'success': True,
+            'data': {
+                'labors': serializer.data,
+                'pagination': {
+                    'current_page': page,
+                    'page_size': page_size,
+                    'total_count': total_count,
+                    'total_pages': (total_count + page_size - 1) // page_size,
+                    'has_next': end_index < total_count,
+                    'has_previous': page > 1
+                },
+                'salary_range': {
+                    'min_salary': min_salary or 'No minimum',
+                    'max_salary': max_salary or 'No maximum'
+                },
+                'total_labors_in_range': total_count
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError:
+        return Response({
+            'success': False,
+            'message': 'Invalid pagination parameters.',
+            'errors': {'detail': 'Page and page_size must be valid integers.'}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to retrieve labors by salary range.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def labors_by_age_range(request):
+    """
+    Get labors by age range
+    """
+    try:
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Get age range parameters
+        min_age = request.GET.get('min_age', '').strip()
+        max_age = request.GET.get('max_age', '').strip()
+        
+        if not min_age and not max_age:
+            return Response({
+                'success': False,
+                'message': 'At least one age parameter is required.',
+                'errors': {'detail': 'Please provide min_age and/or max_age parameters.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Start with active labors
+        labors = Labor.active_labors()
+        
+        # Apply age filters
+        if min_age:
+            try:
+                labors = labors.filter(age__gte=int(min_age))
+            except (ValueError, TypeError):
+                return Response({
+                    'success': False,
+                    'message': 'Invalid min_age value.',
+                    'errors': {'min_age': 'Must be a valid integer'}
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if max_age:
+            try:
+                labors = labors.filter(age__lte=int(max_age))
+            except (ValueError, TypeError):
+                return Response({
+                    'success': False,
+                    'message': 'Invalid max_age value.',
+                    'errors': {'max_age': 'Must be a valid integer'}
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        labors = labors.select_related('created_by')
+        
+        # Calculate pagination
+        total_count = labors.count()
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        labors = labors[start_index:end_index]
+        
+        serializer = LaborListSerializer(labors, many=True)
+        
+        return Response({
+            'success': True,
+            'data': {
+                'labors': serializer.data,
+                'pagination': {
+                    'current_page': page,
+                    'page_size': page_size,
+                    'total_count': total_count,
+                    'total_pages': (total_count + page_size - 1) // page_size,
+                    'has_next': end_index < total_count,
+                    'has_previous': page > 1
+                },
+                'age_range': {
+                    'min_age': min_age or 'No minimum',
+                    'max_age': max_age or 'No maximum'
+                },
+                'total_labors_in_range': total_count
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError:
+        return Response({
+            'success': False,
+            'message': 'Invalid pagination parameters.',
+            'errors': {'detail': 'Page and page_size must be valid integers.'}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to retrieve labors by age range.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def experience_report(request):
+    """
+    Get work experience report and analytics
+    """
+    try:
+        # Get active labors
+        labors = Labor.active_labors()
+        
+        # Work experience statistics (in years)
+        experience_stats = {}
+        total_experience_days = 0
+        labor_count = 0
+        
+        experience_data = []
+        for labor in labors:
+            exp_years = labor.work_experience_years
+            exp_days = labor.work_experience_days
+            total_experience_days += exp_days
+            labor_count += 1
+            
+            experience_data.append({
+                'labor_id': str(labor.id),
+                'name': labor.name,
+                'designation': labor.designation,
+                'joining_date': labor.joining_date.strftime('%Y-%m-%d'),
+                'experience_years': exp_years,
+                'experience_days': exp_days
+            })
+        
+        if labor_count > 0:
+            avg_experience_days = total_experience_days / labor_count
+            avg_experience_years = round(avg_experience_days / 365.25, 1)
+        else:
+            avg_experience_days = 0
+            avg_experience_years = 0
+        
+        # Experience groups
+        experience_groups = {
+            'less_than_1_year': labors.filter(joining_date__gt=date.today() - timedelta(days=365)).count(),
+            '1_to_2_years': labors.filter(
+                joining_date__lte=date.today() - timedelta(days=365),
+                joining_date__gt=date.today() - timedelta(days=730)
+            ).count(),
+            '2_to_5_years': labors.filter(
+                joining_date__lte=date.today() - timedelta(days=730),
+                joining_date__gt=date.today() - timedelta(days=1825)
+            ).count(),
+            '5_to_10_years': labors.filter(
+                joining_date__lte=date.today() - timedelta(days=1825),
+                joining_date__gt=date.today() - timedelta(days=3650)
+            ).count(),
+            'more_than_10_years': labors.filter(
+                joining_date__lte=date.today() - timedelta(days=3650)
+            ).count(),
+        }
+        
+        # Experience by designation
+        designation_experience = list(
+            labors.values('designation')
+            .annotate(
+                count=Count('id'),
+                avg_days=Avg(models.F('joining_date') - date.today()) * -1,  # Convert to positive
+            )
+            .order_by('-count')[:10]
+        )
+        
+        # Process designation experience to add years
+        for item in designation_experience:
+            if item['avg_days']:
+                item['avg_experience_years'] = round(item['avg_days'] / 365.25, 1)
+            else:
+                item['avg_experience_years'] = 0
+        
+        # Experience by city
+        city_experience = list(
+            labors.values('city')
+            .annotate(
+                count=Count('id'),
+                avg_days=Avg(models.F('joining_date') - date.today()) * -1,
+            )
+            .order_by('-count')[:10]
+        )
+        
+        # Process city experience to add years
+        for item in city_experience:
+            if item['avg_days']:
+                item['avg_experience_years'] = round(item['avg_days'] / 365.25, 1)
+            else:
+                item['avg_experience_years'] = 0
+        
+        # Long-tenure labors (more than 5 years)
+        long_tenure_labors = list(
+            labors.filter(joining_date__lte=date.today() - timedelta(days=1825))
+            .values('id', 'name', 'designation', 'joining_date', 'salary')
+            .order_by('joining_date')[:20]
+        )
+        
+        # Convert joining_date to string and add experience years
+        for labor in long_tenure_labors:
+            joining_date = labor['joining_date']
+            exp_days = (date.today() - joining_date).days
+            labor['joining_date'] = joining_date.strftime('%Y-%m-%d')
+            labor['experience_years'] = round(exp_days / 365.25, 1)
+            labor['id'] = str(labor['id'])  # Convert UUID to string
+        
+        # Retention rate calculation
+        one_year_ago = date.today() - timedelta(days=365)
+        labors_joined_before_one_year = labors.filter(joining_date__lte=one_year_ago).count()
+        still_active_after_one_year = labors.filter(
+            joining_date__lte=one_year_ago,
+            is_active=True
+        ).count()
+        
+        retention_rate = (
+            (still_active_after_one_year / labors_joined_before_one_year * 100)
+            if labors_joined_before_one_year > 0 else 0
+        )
+        
+        return Response({
+            'success': True,
+            'data': {
+                'overall_statistics': {
+                    'total_labors': labor_count,
+                    'average_experience_years': avg_experience_years,
+                    'average_experience_days': round(avg_experience_days, 1),
+                    'retention_rate_percentage': round(retention_rate, 1)
+                },
+                'experience_groups': experience_groups,
+                'designation_experience': designation_experience,
+                'city_experience': city_experience,
+                'long_tenure_labors': long_tenure_labors,
+                'generated_at': timezone.now().isoformat()
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to generate experience report.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
