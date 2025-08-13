@@ -26,7 +26,9 @@ INSTALLED_APPS = [
     'customers',
     'vendors',
     'labors',
-    'advance_payments',  # Changed from 'advance_payment' to 'advance_payments'
+    'advance_payments', 
+    'orders',
+    'order_items',
 ]
 
 MIDDLEWARE = [

@@ -11,7 +11,9 @@ urlpatterns = [
     path('api/v1/customers/', include('customers.urls')),
     path('api/v1/vendors/', include('vendors.urls')),
     path('api/v1/labors/', include('labors.urls')),
-    path('api/v1/advance-payments/', include('advance_payments.urls')),  # Added this line
+    path('api/v1/advance-payments/', include('advance_payments.urls')),
+    path('api/v1/orders/', include('orders.urls')),
+    path('api/v1/order-items/', include('order_items.urls')),
 ]
 
 # Serve media files during development
