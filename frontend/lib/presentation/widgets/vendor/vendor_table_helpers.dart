@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../globals/confirmation_dialog.dart';
 
 class VendorTableHelpers {
   final Function(VendorModel) onEdit;
@@ -169,13 +170,16 @@ class VendorTableHelpers {
       VendorProvider provider,
       VendorModel vendor,
       ) async {
-    final confirmed = await _showConfirmationDialog(
-      context,
-      'Deactivate Vendor',
-      'Are you sure you want to deactivate ${vendor.name}? This action can be reversed.',
-      'Deactivate',
-      Colors.orange,
-    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ConfirmationDialog(
+        title: 'Deactivate Vendor',
+        message: 'Are you sure you want to deactivate ${vendor.name}? This action can be reversed.',
+        actionText: 'Deactivate',
+        actionColor: Colors.orange,
+      ),
+    ) ?? false;
 
     if (confirmed) {
       final success = await provider.softDeleteVendor(vendor.id);
@@ -193,13 +197,16 @@ class VendorTableHelpers {
       VendorProvider provider,
       VendorModel vendor,
       ) async {
-    final confirmed = await _showConfirmationDialog(
-      context,
-      'Restore Vendor',
-      'Are you sure you want to restore ${vendor.name}?',
-      'Restore',
-      Colors.green,
-    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ConfirmationDialog(
+        title: 'Restore Vendor',
+        message: 'Are you sure you want to restore ${vendor.name}?',
+        actionText: 'Restore',
+        actionColor: Colors.green,
+      ),
+    ) ?? false;
 
     if (confirmed) {
       final success = await provider.restoreVendor(vendor.id);
@@ -209,37 +216,6 @@ class VendorTableHelpers {
         _showSuccessSnackbar(context, 'Vendor restored successfully');
       }
     }
-  }
-
-  /// Show confirmation dialog
-  Future<bool> _showConfirmationDialog(
-      BuildContext context,
-      String title,
-      String message,
-      String actionText,
-      Color actionColor,
-      ) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: actionColor,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(actionText),
-          ),
-        ],
-      ),
-    ) ?? false;
   }
 
   /// Show success snackbar
