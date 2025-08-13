@@ -17,22 +17,24 @@ class AddLaborDialog extends StatefulWidget {
 
 class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _cnicController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _casteController = TextEditingController();
-  final _designationController = TextEditingController();
-  final _salaryController = TextEditingController();
-  final _areaController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _advanceController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _cnicController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _casteController = TextEditingController();
+  final TextEditingController _designationController = TextEditingController();
+  final TextEditingController _salaryController = TextEditingController();
+  final TextEditingController _areaController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+
   String _selectedGender = 'Male';
   DateTime _selectedJoiningDate = DateTime.now();
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+
+  bool _isCreating = false;
 
   @override
   void initState() {
@@ -65,37 +67,57 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     _areaController.dispose();
     _cityController.dispose();
     _ageController.dispose();
-    _advanceController.dispose();
     super.dispose();
   }
 
-  void _handleSubmit() async {
+  void _handleCreate() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final provider = Provider.of<LaborProvider>(context, listen: false);
+      if (_isCreating) return;
 
-      await provider.addLabor(
-        name: _nameController.text.trim(),
-        cnic: _cnicController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
-        caste: _casteController.text.trim(),
-        designation: _designationController.text.trim(),
-        joiningDate: _selectedJoiningDate,
-        salary: double.parse(_salaryController.text.trim()),
-        area: _areaController.text.trim(),
-        city: _cityController.text.trim(),
-        gender: _selectedGender,
-        age: int.parse(_ageController.text.trim()),
-        advancePayment: double.parse(_advanceController.text.trim()),
-      );
+      setState(() {
+        _isCreating = true;
+      });
 
-      if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+      try {
+        final provider = Provider.of<LaborProvider>(context, listen: false);
+
+        final success = await provider.createLabor(
+          name: _nameController.text.trim(),
+          cnic: _cnicController.text.trim(),
+          phoneNumber: _phoneController.text.trim(),
+          caste: _casteController.text.trim(),
+          designation: _designationController.text.trim(),
+          joiningDate: _selectedJoiningDate,
+          salary: double.parse(_salaryController.text.trim()),
+          area: _areaController.text.trim(),
+          city: _cityController.text.trim(),
+          gender: _selectedGender,
+          age: int.parse(_ageController.text.trim()),
+        );
+
+        if (mounted) {
+          if (success) {
+            _showSuccessSnackbar('Labor created successfully!');
+            Navigator.of(context).pop();
+          } else {
+            _showErrorSnackbar(provider.errorMessage ?? 'Failed to create labor');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          _showErrorSnackbar('Error creating labor: ${e.toString()}');
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isCreating = false;
+          });
+        }
       }
     }
   }
 
-  void _showSuccessSnackbar() {
+  void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -107,7 +129,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Labor added successfully!',
+              message,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -126,13 +148,50 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     );
   }
 
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
   void _handleCancel() {
+    if (_isCreating) return;
+
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
     });
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    if (_isCreating) return;
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedJoiningDate,
@@ -144,6 +203,22 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         _selectedJoiningDate = picked;
       });
     }
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _cnicController.clear();
+    _phoneController.clear();
+    _casteController.clear();
+    _designationController.clear();
+    _salaryController.clear();
+    _areaController.clear();
+    _cityController.clear();
+    _ageController.clear();
+    setState(() {
+      _selectedGender = 'Male';
+      _selectedJoiningDate = DateTime.now();
+    });
   }
 
   @override
@@ -161,11 +236,11 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 constraints: BoxConstraints(
                   maxWidth: ResponsiveBreakpoints.responsive(
                     context,
-                    tablet: 85.w,
-                    small: 80.w,
-                    medium: 70.w,
-                    large: 60.w,
-                    ultrawide: 50.w,
+                    tablet: 95.w,
+                    small: 90.w,
+                    medium: 80.w,
+                    large: 70.w,
+                    ultrawide: 60.w,
                   ),
                   maxHeight: 90.h,
                 ),
@@ -181,55 +256,20 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                     ),
                   ],
                 ),
-                child: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: _buildTabletLayout(),
-                  small: _buildMobileLayout(),
-                  medium: _buildDesktopLayout(),
-                  large: _buildDesktopLayout(),
-                  ultrawide: _buildDesktopLayout(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildHeader(),
+                      _buildFormContent(),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTabletLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDesktopLayout() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: false),
-        ],
-      ),
     );
   }
 
@@ -254,7 +294,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Icon(
-              Icons.person_add_rounded,
+              Icons.person_add_alt_1_rounded,
               color: AppTheme.pureWhite,
               size: context.iconSize('large'),
             ),
@@ -276,7 +316,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Register a new worker',
+                    'Create a new labor record',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -287,10 +327,23 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               ],
             ),
           ),
+          if (!context.isTablet)
+            TextButton(
+              onPressed: _isCreating ? null : _clearForm,
+              child: Text(
+                'Clear',
+                style: GoogleFonts.inter(
+                  fontSize: context.subtitleFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.pureWhite.withOpacity(0.8),
+                ),
+              ),
+            ),
+          SizedBox(width: context.smallPadding),
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: _handleCancel,
+              onTap: _isCreating ? null : _handleCancel,
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
@@ -307,7 +360,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     );
   }
 
-  Widget _buildFormContent({required bool isCompact}) {
+  Widget _buildFormContent() {
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -316,10 +369,11 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Name',
-              hint: isCompact ? 'Enter name' : 'Enter full name',
+              label: 'Full Name',
+              hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter worker\'s full name',
               controller: _nameController,
               prefixIcon: Icons.person_outline,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a name';
@@ -336,9 +390,12 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'CNIC',
-              hint: isCompact ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter CNIC'
+                  : 'Enter CNIC (e.g., 42101-1234567-1)',
               controller: _cnicController,
               prefixIcon: Icons.credit_card,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a CNIC';
@@ -352,15 +409,18 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Phone Number',
-              hint: isCompact ? 'Enter phone' : 'Enter phone number (e.g., +923001234567)',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter phone'
+                  : 'Enter phone number (e.g., +923001234567)',
               controller: _phoneController,
               prefixIcon: Icons.phone_outlined,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a phone number';
                 }
-                if (!RegExp(r'^\+92\d{9}$').hasMatch(value!)) {
-                  return 'Please enter a valid phone number (+92XXXXXXXXX)';
+                if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
+                  return 'Please enter a valid phone number (+92XXXXXXXXXX)';
                 }
                 return null;
               },
@@ -368,16 +428,20 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Caste',
-              hint: isCompact ? 'Enter caste' : 'Enter caste (optional)',
+              hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
               controller: _casteController,
               prefixIcon: Icons.group_outlined,
+              enabled: !_isCreating,
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Designation',
-              hint: isCompact ? 'Enter designation' : 'Enter designation (e.g., Tailor)',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter designation'
+                  : 'Enter job designation (e.g., Tailor, Operator)',
               controller: _designationController,
               prefixIcon: Icons.work_outline,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a designation';
@@ -387,24 +451,29 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             ),
             SizedBox(height: context.cardPadding),
             GestureDetector(
-              onTap: () => _selectDate(context),
-              child: PremiumTextField(
-                label: 'Joining Date',
-                hint: 'Select joining date',
-                controller: TextEditingController(
-                    text:
-                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}'),
-                prefixIcon: Icons.calendar_today,
-                enabled: false,
+              onTap: _isCreating ? null : () => _selectDate(context),
+              child: AbsorbPointer(
+                child: PremiumTextField(
+                  label: 'Joining Date',
+                  hint: 'Select joining date',
+                  controller: TextEditingController(
+                      text:
+                      '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}'),
+                  prefixIcon: Icons.calendar_today,
+                  enabled: !_isCreating,
+                ),
               ),
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
-              label: 'Salary',
-              hint: isCompact ? 'Enter salary' : 'Enter monthly salary (PKR)',
+              label: 'Monthly Salary',
+              hint: context.shouldShowCompactLayout
+                  ? 'Enter salary'
+                  : 'Enter monthly salary in PKR',
               controller: _salaryController,
               prefixIcon: Icons.account_balance_wallet_outlined,
               keyboardType: TextInputType.number,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a salary';
@@ -418,9 +487,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Area',
-              hint: isCompact ? 'Enter area' : 'Enter area (e.g., Gulshan)',
+              hint: context.shouldShowCompactLayout ? 'Enter area' : 'Enter area (e.g., Gulshan, Clifton)',
               controller: _areaController,
               prefixIcon: Icons.location_on_outlined,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter an area';
@@ -431,9 +501,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'City',
-              hint: isCompact ? 'Enter city' : 'Enter city (e.g., Karachi)',
+              hint: context.shouldShowCompactLayout ? 'Enter city' : 'Enter city (e.g., Karachi, Lahore)',
               controller: _cityController,
               prefixIcon: Icons.location_city_outlined,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter a city';
@@ -450,6 +521,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(context.borderRadius()),
                 ),
+                enabled: !_isCreating,
               ),
               items: ['Male', 'Female', 'Other']
                   .map((gender) => DropdownMenuItem(
@@ -457,7 +529,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 child: Text(gender),
               ))
                   .toList(),
-              onChanged: (value) {
+              onChanged: _isCreating ? null : (value) {
                 setState(() {
                   _selectedGender = value!;
                 });
@@ -466,10 +538,11 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
             PremiumTextField(
               label: 'Age',
-              hint: isCompact ? 'Enter age' : 'Enter age (e.g., 30)',
+              hint: context.shouldShowCompactLayout ? 'Enter age' : 'Enter age (minimum 18 years)',
               controller: _ageController,
               prefixIcon: Icons.cake_outlined,
               keyboardType: TextInputType.number,
+              enabled: !_isCreating,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return 'Please enter an age';
@@ -477,22 +550,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 if (int.tryParse(value!) == null || int.parse(value) < 18) {
                   return 'Age must be at least 18';
                 }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Advance Payment',
-              hint: isCompact ? 'Enter advance' : 'Enter advance payment (PKR, optional)',
-              controller: _advanceController,
-              prefixIcon: Icons.payment_rounded,
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return null;
-                }
-                if (double.tryParse(value!) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid amount';
+                if (int.parse(value) > 65) {
+                  return 'Age must be less than 65';
                 }
                 return null;
               },
@@ -519,22 +578,41 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         Consumer<LaborProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Labor',
-              onPressed: provider.isLoading ? null : _handleSubmit,
-              isLoading: provider.isLoading,
+              text: 'Create Labor',
+              onPressed: (_isCreating || provider.isLoading) ? null : _handleCreate,
+              isLoading: _isCreating || provider.isLoading,
               height: context.buttonHeight,
-              icon: Icons.add_rounded,
+              icon: Icons.person_add_alt_1_rounded,
+              backgroundColor: AppTheme.primaryMaroon,
             );
           },
         ),
         SizedBox(height: context.cardPadding),
-        PremiumButton(
-          text: 'Cancel',
-          onPressed: _handleCancel,
-          isOutlined: true,
-          height: context.buttonHeight,
-          backgroundColor: Colors.grey[600],
-          textColor: Colors.grey[600],
+        Row(
+          children: [
+            Expanded(
+              child: PremiumButton(
+                text: 'Clear Form',
+                onPressed: _isCreating ? null : _clearForm,
+                height: context.buttonHeight,
+                icon: Icons.clear_all,
+                isOutlined: true,
+                backgroundColor: Colors.orange[600],
+                textColor: Colors.orange[600],
+              ),
+            ),
+            SizedBox(width: context.cardPadding),
+            Expanded(
+              child: PremiumButton(
+                text: 'Cancel',
+                onPressed: _isCreating ? null : _handleCancel,
+                height: context.buttonHeight,
+                isOutlined: true,
+                backgroundColor: Colors.grey[600],
+                textColor: Colors.grey[600],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -545,24 +623,38 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
-            onPressed: _handleCancel,
-            isOutlined: true,
+            text: 'Clear Form',
+            onPressed: _isCreating ? null : _clearForm,
             height: context.buttonHeight / 1.5,
+            icon: Icons.clear_all,
+            isOutlined: true,
+            backgroundColor: Colors.orange[600],
+            textColor: Colors.orange[600],
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: PremiumButton(
+            text: 'Cancel',
+            onPressed: _isCreating ? null : _handleCancel,
+            height: context.buttonHeight / 1.5,
+            isOutlined: true,
             backgroundColor: Colors.grey[600],
             textColor: Colors.grey[600],
           ),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
+          flex: 2,
           child: Consumer<LaborProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Labor',
-                onPressed: provider.isLoading ? null : _handleSubmit,
-                isLoading: provider.isLoading,
+                text: 'Create Labor',
+                onPressed: (_isCreating || provider.isLoading) ? null : _handleCreate,
+                isLoading: _isCreating || provider.isLoading,
                 height: context.buttonHeight / 1.5,
-                icon: Icons.add_rounded,
+                icon: Icons.person_add_alt_1_rounded,
+                backgroundColor: AppTheme.primaryMaroon,
               );
             },
           ),
