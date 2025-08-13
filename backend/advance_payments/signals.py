@@ -1,12 +1,10 @@
-from datetime import date
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver, Signal
 from django.core.cache import cache
 from django.utils import timezone
+from decimal import Decimal
 from .models import AdvancePayment
 import logging
-
-from . import models
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +71,7 @@ def advance_payment_post_save(sender, instance, created, **kwargs):
         )
         
         # Log if amount is significant (more than 50% of salary)
-        if instance.total_salary and instance.amount > (instance.total_salary * 0.5):
+        if instance.total_salary and instance.amount > (instance.total_salary * Decimal('0.5')):
             logger.warning(
                 f"Large advance payment: {instance.labor_name} received {instance.amount} PKR "
                 f"which is {instance.advance_percentage}% of monthly salary"
@@ -242,7 +240,7 @@ def advance_payment_data_quality_check(sender, instance, created, **kwargs):
         issues.append(f"High advance percentage: {instance.advance_percentage}%")
     
     # Check for missing receipt on large amounts
-    if instance.amount > 50000 and not instance.receipt_image_path:
+    if instance.amount > Decimal('50000') and not instance.receipt_image_path:
         issues.append("Large advance payment without receipt")
     
     # Check for multiple advances on same day
@@ -281,6 +279,7 @@ def advance_payment_analytics(sender, instance, created, **kwargs):
     """Track advance payment analytics and insights"""
     if created:
         from datetime import date
+        from django.db import models
         today = date.today()
         
         # Count advances by labor today
@@ -300,7 +299,7 @@ def advance_payment_analytics(sender, instance, created, **kwargs):
         today_amount = AdvancePayment.objects.filter(
             date=today,
             is_active=True
-        ).aggregate(total=models.Sum('amount'))['total'] or 0
+        ).aggregate(total=models.Sum('amount'))['total'] or Decimal('0')
         
         # Log analytics
         logger.info(
@@ -330,7 +329,9 @@ def validate_advance_payment_data_integrity(sender, instance, **kwargs):
     
     # Validate amount vs labor salary consistency
     if instance.labor_id and instance.amount and instance.total_salary:
-        if instance.amount > instance.total_salary * 1.5:  # More than 150% of salary
+        # Convert to Decimal for proper calculation
+        salary_limit = instance.total_salary * Decimal('1.5')  # More than 150% of salary
+        if instance.amount > salary_limit:
             logger.warning(
                 f"Extremely high advance amount for {instance.labor_name}: "
                 f"{instance.amount} PKR (Salary: {instance.total_salary} PKR)"
@@ -338,7 +339,7 @@ def validate_advance_payment_data_integrity(sender, instance, **kwargs):
     
     # Check for backdated payments (more than 30 days old)
     if instance.date:
-        from datetime import timedelta
+        from datetime import timedelta, date
         thirty_days_ago = date.today() - timedelta(days=30)
         if instance.date < thirty_days_ago:
             logger.warning(
