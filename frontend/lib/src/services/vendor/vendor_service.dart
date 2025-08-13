@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../config/api_config.dart';
-import '../models/api_response.dart';
-import '../models/vendor/vendor_api_responses.dart';
-import '../models/vendor/vendor_model.dart';
-import '../utils/storage_service.dart';
-import '../utils/debug_helper.dart';
-import 'api_client.dart';
+import '../../config/api_config.dart';
+import '../../models/api_response.dart';
+import '../../models/vendor/vendor_api_responses.dart';
+import '../../models/vendor/vendor_model.dart';
+import '../../utils/storage_service.dart';
+import '../../utils/debug_helper.dart';
+import '../api_client.dart';
 import 'vendor_service_extended.dart';
 
 class VendorService {
