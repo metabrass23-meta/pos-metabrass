@@ -7,7 +7,8 @@ import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
-import '../globals/drop_down.dart'; // Added import for PremiumDropdownField
+import '../globals/drop_down.dart';
+import '../globals/custom_date_picker.dart';
 
 class AddLaborDialog extends StatefulWidget {
   const AddLaborDialog({super.key});
@@ -28,7 +29,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
 
-  String _selectedGender = 'Male';
+  // FIXED: Use backend's expected gender code instead of 'Male'
+  String _selectedGender = 'M';
   DateTime _selectedJoiningDate = DateTime.now();
 
   late AnimationController _animationController;
@@ -198,6 +200,21 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         double salary = double.parse(_salaryController.text.trim());
         int age = int.parse(_ageController.text.trim());
 
+        // DEBUG: Print the gender value being sent
+        print('🔍 DEBUG: Sending gender value: "$_selectedGender"');
+        print('🔍 DEBUG: All form data: {');
+        print('  name: "${_nameController.text.trim()}"');
+        print('  cnic: "${_cnicController.text.trim()}"');
+        print('  phone: "${_phoneController.text.trim()}"');
+        print('  caste: "${_casteController.text.trim()}"');
+        print('  designation: "${_designationController.text.trim()}"');
+        print('  salary: $salary');
+        print('  area: "${_areaController.text.trim()}"');
+        print('  city: "${_cityController.text.trim()}"');
+        print('  gender: "$_selectedGender"');
+        print('  age: $age');
+        print('}');
+
         final success = await provider.createLabor(
           name: _nameController.text.trim(),
           cnic: _cnicController.text.trim(),
@@ -341,6 +358,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     });
   }
 
+  // FIXED: Update _clearForm to use 'M' instead of 'Male'
   void _clearForm() {
     _nameController.clear();
     _cnicController.clear();
@@ -352,7 +370,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     _cityController.clear();
     _ageController.clear();
     setState(() {
-      _selectedGender = 'Male';
+      _selectedGender = 'M'; // Use 'M' instead of 'Male'
       _selectedJoiningDate = DateTime.now();
       _validationErrors = {};
     });
@@ -361,17 +379,19 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   Future<void> _selectDate(BuildContext context) async {
     if (_isCreating) return;
 
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _selectedJoiningDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      initialTime: TimeOfDay.fromDateTime(_selectedJoiningDate),
+      title: 'Select Joining Date',
+      minDate: DateTime(2000),
+      maxDate: DateTime.now(),
+      showTimeInline: false, // Disable time selection as only date is needed
+      onDateTimeSelected: (date, time) {
+        setState(() {
+          _selectedJoiningDate = date;
+        });
+      },
     );
-    if (picked != null && picked != _selectedJoiningDate) {
-      setState(() {
-        _selectedJoiningDate = picked;
-      });
-    }
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
@@ -730,13 +750,17 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           },
         ),
         SizedBox(height: context.cardPadding),
+        // FIXED: Use correct gender codes for the dropdown
         PremiumDropdownField<String>(
           label: 'Gender *',
           hint: context.shouldShowCompactLayout ? 'Select gender' : 'Select gender',
           prefixIcon: Icons.person_pin_rounded,
-          items: ['Male', 'Female', 'Other']
-              .map((gender) => DropdownItem<String>(value: gender, label: gender))
-              .toList(),
+          // Use the backend's expected gender codes with display labels
+          items: [
+            DropdownItem<String>(value: 'M', label: 'Male'),
+            DropdownItem<String>(value: 'F', label: 'Female'),
+            DropdownItem<String>(value: 'O', label: 'Other'),
+          ],
           value: _selectedGender,
           onChanged: _isCreating
               ? null
