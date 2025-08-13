@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/src/services/vendor/vendor_service_extended.dart';
-import '../models/vendor/vendor_model.dart' hide VendorListParams;
+
 import '../models/vendor/vendor_api_responses.dart';
+import '../models/vendor/vendor_model.dart' hide VendorListParams;
 import '../services/vendor/vendor_service.dart';
 
 class VendorProvider extends ChangeNotifier {

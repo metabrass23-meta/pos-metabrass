@@ -365,7 +365,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                           child: Text(
                             'NEW',
                             style: GoogleFonts.inter(
-                              fontSize: 10,
+                              fontSize: 8,
                               fontWeight: FontWeight.w600,
                               color: Colors.green,
                             ),

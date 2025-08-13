@@ -44,57 +44,82 @@ class LaborProvider extends ChangeNotifier {
 
   // Getters
   List<LaborModel> get labors => _filteredLabors;
+
   List<LaborModel> get allLabors => _labors;
+
   bool get isLoading => _isLoading;
+
   bool get hasError => _hasError;
+
   String? get errorMessage => _errorMessage;
+
   PaginationInfo? get paginationInfo => _paginationInfo;
+
   LaborStatisticsResponse? get statistics => _statistics;
+
   LaborSalaryReportResponse? get salaryReport => _salaryReport;
+
   LaborDemographicsReportResponse? get demographicsReport => _demographicsReport;
 
   // Filter getters
   String? get searchQuery => _searchQuery;
+
   String? get selectedCity => _selectedCity;
+
   String? get selectedArea => _selectedArea;
+
   String? get selectedDesignation => _selectedDesignation;
+
   String? get selectedCaste => _selectedCaste;
+
   String? get selectedGender => _selectedGender;
+
   String? get minSalary => _minSalary;
+
   String? get maxSalary => _maxSalary;
+
   String? get minAge => _minAge;
+
   String? get maxAge => _maxAge;
+
   DateTime? get joinedAfter => _joinedAfter;
+
   DateTime? get joinedBefore => _joinedBefore;
+
   bool get showInactive => _showInactive;
 
   // Sorting getters
   String get sortBy => _sortBy;
+
   String get sortOrder => _sortOrder;
+
   bool get sortAscending => _sortAscending;
 
   // Pagination getters
   int get currentPage => _currentPage;
+
   int get pageSize => _pageSize;
 
   // Computed properties
   bool get hasActiveFilters =>
       _searchQuery?.isNotEmpty == true ||
-          _selectedCity?.isNotEmpty == true ||
-          _selectedArea?.isNotEmpty == true ||
-          _selectedDesignation?.isNotEmpty == true ||
-          _selectedCaste?.isNotEmpty == true ||
-          _selectedGender?.isNotEmpty == true ||
-          _minSalary?.isNotEmpty == true ||
-          _maxSalary?.isNotEmpty == true ||
-          _minAge?.isNotEmpty == true ||
-          _maxAge?.isNotEmpty == true ||
-          _joinedAfter != null ||
-          _joinedBefore != null ||
-          _showInactive;
+      _selectedCity?.isNotEmpty == true ||
+      _selectedArea?.isNotEmpty == true ||
+      _selectedDesignation?.isNotEmpty == true ||
+      _selectedCaste?.isNotEmpty == true ||
+      _selectedGender?.isNotEmpty == true ||
+      _minSalary?.isNotEmpty == true ||
+      _maxSalary?.isNotEmpty == true ||
+      _minAge?.isNotEmpty == true ||
+      _maxAge?.isNotEmpty == true ||
+      _joinedAfter != null ||
+      _joinedBefore != null ||
+      _showInactive;
 
   int get totalActiveLabors => _labors.where((labor) => labor.isActive).length;
+
   int get totalInactiveLabors => _labors.where((labor) => !labor.isActive).length;
+
   int get totalLabors => _labors.length;
 
   LaborProvider() {
@@ -600,10 +625,7 @@ class LaborProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final response = await _laborService.bulkLaborActions(
-        laborIds: laborIds,
-        action: action,
-      );
+      final response = await _laborService.bulkLaborActions(laborIds: laborIds, action: action);
 
       if (response.success) {
         await refreshLabors();
@@ -683,11 +705,7 @@ class LaborProvider extends ChangeNotifier {
   }
 
   // Update labor salary
-  Future<bool> updateLaborSalary({
-    required String id,
-    double? salary,
-    String? designation,
-  }) async {
+  Future<bool> updateLaborSalary({required String id, double? salary, String? designation}) async {
     try {
       final response = await _laborService.updateLaborSalary(
         id: id,
@@ -708,6 +726,135 @@ class LaborProvider extends ChangeNotifier {
     }
   }
 
+  // Validate labor data before submission
+  Map<String, String> validateLaborData({
+    required String name,
+    required String cnic,
+    required String phoneNumber,
+    required String caste,
+    required String designation,
+    required DateTime joiningDate,
+    required double salary,
+    required String area,
+    required String city,
+    required String gender,
+    required int age,
+  }) {
+    final errors = <String, String>{};
+
+    // Name validation
+    if (name.trim().isEmpty) {
+      errors['name'] = 'Labor name is required';
+    } else if (name.trim().length < 2) {
+      errors['name'] = 'Labor name must be at least 2 characters';
+    }
+
+    // CNIC validation
+    if (cnic.trim().isEmpty) {
+      errors['cnic'] = 'CNIC is required';
+    } else if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
+      errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
+    } else if (_labors.any((labor) => labor.cnic == cnic.trim())) {
+      errors['cnic'] = 'A labor with this CNIC already exists';
+    }
+
+    // Phone validation
+    if (phoneNumber.trim().isEmpty) {
+      errors['phoneNumber'] = 'Phone number is required';
+    } else if (phoneNumber.trim().length < 10) {
+      errors['phoneNumber'] = 'Phone number must be at least 10 digits';
+    } else if (_labors.any((labor) => labor.phoneNumber == phoneNumber.trim())) {
+      errors['phoneNumber'] = 'A labor with this phone number already exists';
+    }
+
+    // Caste validation
+    if (caste.trim().isEmpty) {
+      errors['caste'] = 'Caste is required';
+    }
+
+    // Designation validation
+    if (designation.trim().isEmpty) {
+      errors['designation'] = 'Designation is required';
+    }
+
+    // Joining date validation
+    if (joiningDate.isAfter(DateTime.now())) {
+      errors['joiningDate'] = 'Joining date cannot be in the future';
+    }
+
+    // Salary validation
+    if (salary <= 0) {
+      errors['salary'] = 'Salary must be greater than zero';
+    }
+
+    // Area validation
+    if (area.trim().isEmpty) {
+      errors['area'] = 'Area is required';
+    }
+
+    // City validation
+    if (city.trim().isEmpty) {
+      errors['city'] = 'City is required';
+    }
+
+    // FIXED: Gender validation using backend's expected codes
+    if (gender.trim().isEmpty) {
+      errors['gender'] = 'Gender is required';
+    } else {
+      // Validate that gender is one of the expected codes
+      final validGenders = ['M', 'F', 'O'];
+      if (!validGenders.contains(gender.trim())) {
+        errors['gender'] = 'Gender must be M, F, or O';
+      }
+    }
+
+    // Age validation
+    if (age <= 0) {
+      errors['age'] = 'Age must be greater than zero';
+    } else if (age < 18) {
+      errors['age'] = 'Age must be at least 18';
+    }
+
+    return errors;
+  }
+
+  // Add helper methods for gender display/conversion
+  String getGenderDisplayName(String genderCode) {
+    switch (genderCode) {
+      case 'M':
+        return 'Male';
+      case 'F':
+        return 'Female';
+      case 'O':
+        return 'Other';
+      default:
+        return genderCode;
+    }
+  }
+
+  String getGenderCode(String displayName) {
+    switch (displayName) {
+      case 'Male':
+        return 'M';
+      case 'Female':
+        return 'F';
+      case 'Other':
+        return 'O';
+      default:
+        return displayName;
+    }
+  }
+
+  // Update availableGenders getter to return display names
+  List<String> get availableGenders {
+    return _labors
+        .map((labor) => getGenderDisplayName(labor.gender))
+        .where((gender) => gender.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
   // Export functionality (placeholder)
   Future<void> exportData() async {
     // Implement export functionality
@@ -723,21 +870,11 @@ class LaborProvider extends ChangeNotifier {
 
   // Get unique values for filters (from current data)
   List<String> get availableCities {
-    return _labors
-        .map((labor) => labor.city)
-        .where((city) => city.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    return _labors.map((labor) => labor.city).where((city) => city.isNotEmpty).toSet().toList()..sort();
   }
 
   List<String> get availableAreas {
-    return _labors
-        .map((labor) => labor.area)
-        .where((area) => area.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    return _labors.map((labor) => labor.area).where((area) => area.isNotEmpty).toSet().toList()..sort();
   }
 
   List<String> get availableDesignations {
@@ -750,21 +887,7 @@ class LaborProvider extends ChangeNotifier {
   }
 
   List<String> get availableCastes {
-    return _labors
-        .map((labor) => labor.caste)
-        .where((caste) => caste.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
-  }
-
-  List<String> get availableGenders {
-    return _labors
-        .map((labor) => labor.genderDisplay)
-        .where((gender) => gender.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    return _labors.map((labor) => labor.caste).where((caste) => caste.isNotEmpty).toSet().toList()..sort();
   }
 
   @override

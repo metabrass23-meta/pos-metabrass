@@ -8,6 +8,8 @@ import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import '../globals/drop_down.dart';
+import '../globals/custom_date_picker.dart';
 
 class EnhancedEditLaborDialog extends StatefulWidget {
   final LaborModel labor;
@@ -38,6 +40,27 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   late Animation<double> _fadeAnimation;
 
   bool _isUpdating = false;
+
+  final List<String> _commonCities = [
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+  ];
+  final List<String> _commonAreas = [
+    'Gulshan',
+    'Clifton',
+    'DHA',
+    'Johar Town',
+    'Model Town',
+    'F-7',
+    'Blue Area',
+    'Saddar',
+  ];
 
   @override
   void initState() {
@@ -195,17 +218,59 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   Future<void> _selectDate(BuildContext context) async {
     if (_isUpdating) return;
 
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _selectedJoiningDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      initialTime: TimeOfDay.fromDateTime(_selectedJoiningDate),
+      title: 'Select Joining Date',
+      minDate: DateTime(2000),
+      maxDate: DateTime.now(),
+      showTimeInline: false,
+      onDateTimeSelected: (date, time) {
+        setState(() {
+          _selectedJoiningDate = date;
+        });
+      },
     );
-    if (picked != null && picked != _selectedJoiningDate) {
-      setState(() {
-        _selectedJoiningDate = picked;
-      });
-    }
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+        SizedBox(width: context.smallPadding),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.charcoalGray,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        decoration: BoxDecoration(
+          color: AppTheme.accentGold.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: context.captionFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.accentGold,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -243,11 +308,12 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
                     ),
                   ],
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [_buildHeader(), _buildFormContent()],
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(child: _buildFormContent()),
+                  ],
                 ),
               ),
             ),
@@ -261,7 +327,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -341,206 +407,328 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildFormContent() {
-    return Padding(
-      padding: EdgeInsets.all(context.cardPadding),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            PremiumTextField(
-              label: 'Name',
-              hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter full name',
-              controller: _nameController,
-              prefixIcon: Icons.person_outline,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a name';
-                }
-                if (value!.length < 2) {
-                  return 'Name must be at least 2 characters';
-                }
-                if (value.length > 50) {
-                  return 'Name must be less than 50 characters';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'CNIC',
-              hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
-              controller: _cnicController,
-              prefixIcon: Icons.credit_card,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a CNIC';
-                }
-                if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
-                  return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Phone Number',
-              hint: context.shouldShowCompactLayout
-                  ? 'Enter phone'
-                  : 'Enter phone number (e.g., +923001234567)',
-              controller: _phoneController,
-              prefixIcon: Icons.phone_outlined,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a phone number';
-                }
-                if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
-                  return 'Please enter a valid phone number (+92XXXXXXXXXX)';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Caste',
-              hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
-              controller: _casteController,
-              prefixIcon: Icons.group_outlined,
-              enabled: !_isUpdating,
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Designation',
-              hint: context.shouldShowCompactLayout
-                  ? 'Enter designation'
-                  : 'Enter designation (e.g., Tailor)',
-              controller: _designationController,
-              prefixIcon: Icons.work_outline,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a designation';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            GestureDetector(
-              onTap: _isUpdating ? null : () => _selectDate(context),
-              child: AbsorbPointer(
-                child: PremiumTextField(
-                  label: 'Joining Date',
-                  hint: 'Select joining date',
-                  controller: TextEditingController(
-                    text:
-                        '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
-                  ),
-                  prefixIcon: Icons.calendar_today,
-                  enabled: !_isUpdating,
-                ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildBasicInfoSection(),
+              SizedBox(height: context.cardPadding),
+              _buildContactInfoSection(),
+              SizedBox(height: context.cardPadding),
+              _buildLocationInfoSection(),
+              SizedBox(height: context.cardPadding),
+              _buildEmploymentInfoSection(),
+              SizedBox(height: context.mainPadding),
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildCompactButtons(),
+                small: _buildCompactButtons(),
+                medium: _buildDesktopButtons(),
+                large: _buildDesktopButtons(),
+                ultrawide: _buildDesktopButtons(),
               ),
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Salary',
-              hint: context.shouldShowCompactLayout ? 'Enter salary' : 'Enter monthly salary (PKR)',
-              controller: _salaryController,
-              prefixIcon: Icons.account_balance_wallet_outlined,
-              keyboardType: TextInputType.number,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a salary';
-                }
-                if (double.tryParse(value!) == null || double.parse(value) <= 0) {
-                  return 'Please enter a valid salary';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Area',
-              hint: context.shouldShowCompactLayout ? 'Enter area' : 'Enter area (e.g., Gulshan)',
-              controller: _areaController,
-              prefixIcon: Icons.location_on_outlined,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter an area';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'City',
-              hint: context.shouldShowCompactLayout ? 'Enter city' : 'Enter city (e.g., Karachi)',
-              controller: _cityController,
-              prefixIcon: Icons.location_city_outlined,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a city';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.cardPadding),
-            DropdownButtonFormField<String>(
-              value: _selectedGender,
-              decoration: InputDecoration(
-                labelText: 'Gender',
-                prefixIcon: Icon(Icons.person_pin_rounded),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
-                enabled: !_isUpdating,
-              ),
-              items: [
-                'Male',
-                'Female',
-                'Other',
-              ].map((gender) => DropdownMenuItem(value: gender, child: Text(gender))).toList(),
-              onChanged: _isUpdating
-                  ? null
-                  : (value) {
-                      setState(() {
-                        _selectedGender = value!;
-                      });
-                    },
-            ),
-            SizedBox(height: context.cardPadding),
-            PremiumTextField(
-              label: 'Age',
-              hint: context.shouldShowCompactLayout ? 'Enter age' : 'Enter age (e.g., 30)',
-              controller: _ageController,
-              prefixIcon: Icons.cake_outlined,
-              keyboardType: TextInputType.number,
-              enabled: !_isUpdating,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter an age';
-                }
-                if (int.tryParse(value!) == null || int.parse(value) < 18) {
-                  return 'Age must be at least 18';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.mainPadding),
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactButtons(),
-              small: _buildCompactButtons(),
-              medium: _buildDesktopButtons(),
-              large: _buildDesktopButtons(),
-              ultrawide: _buildDesktopButtons(),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBasicInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Basic Information', Icons.info_outline),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Full Name *',
+          hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter worker\'s full name',
+          controller: _nameController,
+          prefixIcon: Icons.person_outline,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter a name';
+            }
+            if (value!.length < 2) {
+              return 'Name must be at least 2 characters';
+            }
+            if (value.length > 50) {
+              return 'Name must be less than 50 characters';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'CNIC *',
+          hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
+          controller: _cnicController,
+          prefixIcon: Icons.credit_card,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter a CNIC';
+            }
+            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
+              return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Caste',
+          hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
+          controller: _casteController,
+          prefixIcon: Icons.group_outlined,
+          enabled: !_isUpdating,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Phone Number *',
+          hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (e.g., +923001234567)',
+          controller: _phoneController,
+          prefixIcon: Icons.phone_outlined,
+          keyboardType: TextInputType.phone,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter a phone number';
+            }
+            if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
+              return 'Please enter a valid phone number (+92XXXXXXXXXX)';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Location Information', Icons.location_on_outlined),
+        SizedBox(height: context.cardPadding),
+        ResponsiveBreakpoints.responsive(
+          context,
+          tablet: _buildCityAreaColumn(),
+          small: _buildCityAreaColumn(),
+          medium: _buildCityAreaRow(),
+          large: _buildCityAreaRow(),
+          ultrawide: _buildCityAreaRow(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmploymentInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Employment Information', Icons.work_outline),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Designation *',
+          hint: context.shouldShowCompactLayout
+              ? 'Enter designation'
+              : 'Enter job designation (e.g., Tailor, Operator)',
+          controller: _designationController,
+          prefixIcon: Icons.work_outline,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter a designation';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+        GestureDetector(
+          onTap: _isUpdating ? null : () => _selectDate(context),
+          child: AbsorbPointer(
+            child: PremiumTextField(
+              label: 'Joining Date *',
+              hint: 'Select joining date',
+              controller: TextEditingController(
+                text:
+                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
+              ),
+              prefixIcon: Icons.calendar_today,
+              enabled: !_isUpdating,
+            ),
+          ),
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Monthly Salary *',
+          hint: context.shouldShowCompactLayout ? 'Enter salary' : 'Enter monthly salary in PKR',
+          controller: _salaryController,
+          prefixIcon: Icons.account_balance_wallet_outlined,
+          keyboardType: TextInputType.number,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter a salary';
+            }
+            if (double.tryParse(value!) == null || double.parse(value) <= 0) {
+              return 'Please enter a valid salary';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumDropdownField<String>(
+          label: 'Gender *',
+          hint: context.shouldShowCompactLayout ? 'Select gender' : 'Select gender',
+          prefixIcon: Icons.person_pin_rounded,
+          items: [
+            DropdownItem<String>(value: 'M', label: 'Male'),
+            DropdownItem<String>(value: 'F', label: 'Female'),
+            DropdownItem<String>(value: 'O', label: 'Other'),
+          ],
+          value: _selectedGender,
+          onChanged: _isUpdating
+              ? null
+              : (value) {
+                  setState(() {
+                    _selectedGender = value!;
+                  });
+                },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select a gender';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumTextField(
+          label: 'Age *',
+          hint: context.shouldShowCompactLayout ? 'Enter age' : 'Enter age (minimum 18 years)',
+          controller: _ageController,
+          prefixIcon: Icons.cake_outlined,
+          keyboardType: TextInputType.number,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter an age';
+            }
+            if (int.tryParse(value!) == null || int.parse(value) < 18) {
+              return 'Age must be at least 18';
+            }
+            if (int.parse(value) > 65) {
+              return 'Age must be less than 65';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCityAreaRow() {
+    return Row(
+      children: [
+        Expanded(child: _buildCityField()),
+        SizedBox(width: context.cardPadding),
+        Expanded(child: _buildAreaField()),
+      ],
+    );
+  }
+
+  Widget _buildCityAreaColumn() {
+    return Column(
+      children: [
+        _buildCityField(),
+        SizedBox(height: context.cardPadding),
+        _buildAreaField(),
+      ],
+    );
+  }
+
+  Widget _buildCityField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PremiumTextField(
+          label: 'City *',
+          hint: 'Enter city',
+          controller: _cityController,
+          prefixIcon: Icons.location_city_outlined,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter city';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding / 2,
+          runSpacing: context.smallPadding / 4,
+          children: _commonCities
+              .take(4)
+              .map(
+                (city) => _buildQuickSelectChip(
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAreaField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PremiumTextField(
+          label: 'Area *',
+          hint: 'Enter area',
+          controller: _areaController,
+          prefixIcon: Icons.map_outlined,
+          enabled: !_isUpdating,
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Please enter area';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding / 2,
+          runSpacing: context.smallPadding / 4,
+          children: _commonAreas
+              .take(4)
+              .map(
+                (area) => _buildQuickSelectChip(
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
+              .toList(),
+        ),
+      ],
     );
   }
 
@@ -556,7 +744,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               isLoading: _isUpdating || provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.save_rounded,
-              backgroundColor: Colors.blue,
+              backgroundColor: AppTheme.primaryMaroon,
             );
           },
         ),
@@ -588,6 +776,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
+          flex: 2,
           child: Consumer<LaborProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
@@ -596,7 +785,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
                 isLoading: _isUpdating || provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.save_rounded,
-                backgroundColor: Colors.blue,
+                backgroundColor: AppTheme.primaryMaroon,
               );
             },
           ),
