@@ -8,6 +8,7 @@ import '../../../src/utils/responsive_breakpoints.dart';
 
 class LogoutDialogWidget extends StatefulWidget {
   final bool isExpanded;
+
   const LogoutDialogWidget({super.key, required this.isExpanded});
 
   @override
@@ -21,17 +22,11 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
           backgroundColor: AppTheme.creamWhite,
           title: Row(
             children: [
-              Icon(
-                Icons.logout_rounded,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.logout_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Confirm Logout',
@@ -45,11 +40,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           content: Text(
             'Are you sure you want to logout from your account?',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: Colors.grey[600],
-              height: 1.4,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600], height: 1.4),
           ),
           actions: [
             TextButton(
@@ -69,103 +60,83 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   onPressed: authProvider.isLoading
                       ? null
                       : () async {
-                    debugPrint('Logout button pressed');
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppTheme.pureWhite,
+                          debugPrint('Logout button pressed');
+                          Navigator.of(dialogContext).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
+                                    ),
+                                  ),
+                                  SizedBox(width: context.smallPadding),
+                                  Text(
+                                    'Logging out...',
+                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: AppTheme.primaryMaroon,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                              ),
+                              margin: EdgeInsets.all(context.mainPadding),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          try {
+                            await authProvider.logout();
+                            debugPrint('Logout completed successfully');
+                            if (mounted) {
+                              debugPrint('Navigating to /login');
+                              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Successfully logged out. See you soon!',
+                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                  ),
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                  ),
+                                  margin: EdgeInsets.all(context.mainPadding),
                                 ),
-                              ),
-                            ),
-                            SizedBox(width: context.smallPadding),
-                            Text(
-                              'Logging out...',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: AppTheme.primaryMaroon,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius('medium'),
-                          ),
-                        ),
-                        margin: EdgeInsets.all(context.mainPadding),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                    try {
-                      await authProvider.logout();
-                      debugPrint('Logout completed successfully');
-                      if (mounted) {
-                        debugPrint('Navigating to /login');
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/login',
-                              (route) => false,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Successfully logged out. See you soon!',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                              ),
-                            ),
-                            backgroundColor: Colors.green,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius('medium'),
-                              ),
-                            ),
-                            margin: EdgeInsets.all(context.mainPadding),
-                          ),
-                        );
-                      } else {
-                        debugPrint('Context not mounted, skipping navigation');
-                      }
-                    } catch (e) {
-                      debugPrint('Logout error: $e');
-                      if (mounted) {
-                        debugPrint('Navigating to /login after error');
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/login',
-                              (route) => false,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Logged out locally due to an error.',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                              ),
-                            ),
-                            backgroundColor: Colors.green,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius('medium'),
-                              ),
-                            ),
-                            margin: EdgeInsets.all(context.mainPadding),
-                          ),
-                        );
-                      } else {
-                        debugPrint('Context not mounted after error, skipping navigation');
-                      }
-                    }
-                  },
+                              );
+                            } else {
+                              debugPrint('Context not mounted, skipping navigation');
+                            }
+                          } catch (e) {
+                            debugPrint('Logout error: $e');
+                            if (mounted) {
+                              debugPrint('Navigating to /login after error');
+                              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Logged out locally due to an error.',
+                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                  ),
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                  ),
+                                  margin: EdgeInsets.all(context.mainPadding),
+                                ),
+                              );
+                            } else {
+                              debugPrint('Context not mounted after error, skipping navigation');
+                            }
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryMaroon,
                     foregroundColor: AppTheme.pureWhite,
@@ -176,22 +147,20 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   ),
                   child: authProvider.isLoading
                       ? SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.pureWhite,
-                      ),
-                    ),
-                  )
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
+                          ),
+                        )
                       : Text(
-                    'Logout',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                          'Logout',
+                          style: GoogleFonts.inter(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 );
               },
             ),
@@ -217,28 +186,20 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           child: widget.isExpanded
               ? Row(
-            children: [
-              Icon(
-                Icons.logout_rounded,
-                color: Colors.red.shade300,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Logout',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
-              ),
-            ],
-          )
-              : Icon(
-            Icons.logout_rounded,
-            color: Colors.red.shade300,
-            size: context.iconSize('medium'),
-          ),
+                  children: [
+                    Icon(Icons.logout_rounded, color: Colors.red.shade300, size: context.iconSize('small')),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'Logout',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.pureWhite,
+                      ),
+                    ),
+                  ],
+                )
+              : Icon(Icons.logout_rounded, color: Colors.red.shade300, size: context.iconSize('medium')),
         ),
       ),
     );
@@ -471,8 +432,8 @@ class PremiumSidebar extends StatelessWidget {
                                         : item['badge'] == '4'
                                         ? Colors.pink.withOpacity(0.9)
                                         : (item['badge'] == '5' ||
-                                        item['badge'] == '12' ||
-                                        item['badge'] == '23')
+                                              item['badge'] == '12' ||
+                                              item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
