@@ -9,4 +9,4 @@ urlpatterns = [
     path('api/v1/customers/', include('customers.urls')),
     path('api/v1/vendors/', include('vendors.urls')),
     path('api/v1/labors/', include('labors.urls')),
-]
+]   
