@@ -432,13 +432,13 @@ class DashboardContent extends StatelessWidget {
   }
 
   Widget _buildActivityItem(
-      BuildContext context,
-      String title,
-      String subtitle,
-      String time,
-      IconData icon,
-      Color color,
-      ) {
+    BuildContext context,
+    String title,
+    String subtitle,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       padding: EdgeInsets.all(context.cardPadding),
