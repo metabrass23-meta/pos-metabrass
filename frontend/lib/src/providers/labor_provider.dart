@@ -708,6 +708,92 @@ class LaborProvider extends ChangeNotifier {
     }
   }
 
+  // Validate labor data before submission
+  Map<String, String> validateLaborData({
+    required String name,
+    required String cnic,
+    required String phoneNumber,
+    required String caste,
+    required String designation,
+    required DateTime joiningDate,
+    required double salary,
+    required String area,
+    required String city,
+    required String gender,
+    required int age,
+  }) {
+    final errors = <String, String>{};
+
+    // Name validation
+    if (name.trim().isEmpty) {
+      errors['name'] = 'Labor name is required';
+    } else if (name.trim().length < 2) {
+      errors['name'] = 'Labor name must be at least 2 characters';
+    }
+
+    // CNIC validation
+    if (cnic.trim().isEmpty) {
+      errors['cnic'] = 'CNIC is required';
+    } else if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
+      errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
+    } else if (_labors.any((labor) => labor.cnic == cnic.trim())) {
+      errors['cnic'] = 'A labor with this CNIC already exists';
+    }
+
+    // Phone validation
+    if (phoneNumber.trim().isEmpty) {
+      errors['phoneNumber'] = 'Phone number is required';
+    } else if (phoneNumber.trim().length < 10) {
+      errors['phoneNumber'] = 'Phone number must be at least 10 digits';
+    } else if (_labors.any((labor) => labor.phoneNumber == phoneNumber.trim())) {
+      errors['phoneNumber'] = 'A labor with this phone number already exists';
+    }
+
+    // Caste validation
+    if (caste.trim().isEmpty) {
+      errors['caste'] = 'Caste is required';
+    }
+
+    // Designation validation
+    if (designation.trim().isEmpty) {
+      errors['designation'] = 'Designation is required';
+    }
+
+    // Joining date validation
+    if (joiningDate.isAfter(DateTime.now())) {
+      errors['joiningDate'] = 'Joining date cannot be in the future';
+    }
+
+    // Salary validation
+    if (salary <= 0) {
+      errors['salary'] = 'Salary must be greater than zero';
+    }
+
+    // Area validation
+    if (area.trim().isEmpty) {
+      errors['area'] = 'Area is required';
+    }
+
+    // City validation
+    if (city.trim().isEmpty) {
+      errors['city'] = 'City is required';
+    }
+
+    // Gender validation
+    if (gender.trim().isEmpty) {
+      errors['gender'] = 'Gender is required';
+    }
+
+    // Age validation
+    if (age <= 0) {
+      errors['age'] = 'Age must be greater than zero';
+    } else if (age < 18) {
+      errors['age'] = 'Age must be at least 18';
+    }
+
+    return errors;
+  }
+
   // Export functionality (placeholder)
   Future<void> exportData() async {
     // Implement export functionality
