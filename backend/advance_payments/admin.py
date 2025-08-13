@@ -44,7 +44,6 @@ class AdvancePaymentAdmin(admin.ModelAdmin):
         'total_salary',
         'remaining_salary',
         'advance_percentage_display',
-        'payment_datetime',
         'created_at',
         'updated_at',
         'created_by'
@@ -65,8 +64,7 @@ class AdvancePaymentAdmin(admin.ModelAdmin):
         ('Date & Time', {
             'fields': (
                 'date',
-                'time',
-                'payment_datetime'
+                'time'
             )
         }),
         ('Salary Context', {
@@ -101,52 +99,74 @@ class AdvancePaymentAdmin(admin.ModelAdmin):
     
     def labor_name_link(self, obj):
         """Display labor name with link to labor admin"""
-        if obj.labor:
-            url = reverse('admin:labors_labor_change', args=[obj.labor.pk])
-            return format_html('<a href="{}">{}</a>', url, obj.labor_name)
-        return obj.labor_name
+        try:
+            if obj.labor:
+                url = reverse('admin:labors_labor_change', args=[obj.labor.pk])
+                return format_html('<a href="{}">{}</a>', url, obj.labor_name)
+            return obj.labor_name or 'Unknown Labor'
+        except (AttributeError, TypeError):
+            return obj.labor_name or 'Unknown Labor'
     labor_name_link.short_description = 'Labor'
     labor_name_link.admin_order_field = 'labor_name'
     
     def formatted_amount_display(self, obj):
         """Display formatted amount with currency"""
-        return f"PKR {obj.amount:,.2f}"
+        try:
+            return f"PKR {obj.amount:,.2f}"
+        except (AttributeError, TypeError, ValueError):
+            return "PKR 0.00"
     formatted_amount_display.short_description = 'Amount'
     formatted_amount_display.admin_order_field = 'amount'
     
     def advance_percentage_display(self, obj):
         """Display advance as percentage of salary"""
-        percentage = obj.advance_percentage
-        if percentage > 80:
-            color = 'red'
-        elif percentage > 50:
-            color = 'orange'
-        else:
-            color = 'green'
-        
-        return format_html(
-            '<span style="color: {};">{:.1f}%</span>',
-            color,
-            percentage
-        )
+        try:
+            percentage = obj.advance_percentage
+            if percentage > 80:
+                color = 'red'
+            elif percentage > 50:
+                color = 'orange'
+            else:
+                color = 'green'
+            
+            return format_html(
+                '<span style="color: {};">{:.1f}%</span>',
+                color,
+                percentage
+            )
+        except (AttributeError, TypeError, ValueError):
+            return format_html('<span style="color: gray;">N/A</span>')
     advance_percentage_display.short_description = 'Advance %'
     advance_percentage_display.admin_order_field = 'amount'
     
     def receipt_status(self, obj):
         """Display receipt status with icon"""
-        if obj.receipt_image_path:
+        try:
+            if obj.receipt_image_path:
+                return format_html(
+                    '<span style="color: green;">✓ Has Receipt</span>'
+                )
+            else:
+                return format_html(
+                    '<span style="color: red;">✗ No Receipt</span>'
+                )
+        except (AttributeError, TypeError):
             return format_html(
-                '<span style="color: green;">✓ Has Receipt</span>'
-            )
-        else:
-            return format_html(
-                '<span style="color: red;">✗ No Receipt</span>'
+                '<span style="color: gray;">Unknown</span>'
             )
     receipt_status.short_description = 'Receipt'
     
     def payment_datetime(self, obj):
         """Display combined date and time"""
-        return obj.payment_datetime.strftime('%Y-%m-%d %H:%M:%S')
+        try:
+            if obj.date and obj.time:
+                return obj.payment_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            elif obj.date:
+                return obj.date.strftime('%Y-%m-%d')
+            return 'Not set'
+        except (AttributeError, TypeError, ValueError):
+            return 'Invalid date/time'
+    payment_datetime.short_description = 'Payment Date/Time'
     payment_datetime.short_description = 'Payment Date/Time'
     
     actions = ['make_active', 'make_inactive', 'export_to_csv']
@@ -179,21 +199,29 @@ class AdvancePaymentAdmin(admin.ModelAdmin):
         ])
         
         for payment in queryset:
-            writer.writerow([
-                str(payment.id),
-                payment.labor_name,
-                payment.labor_phone,
-                payment.labor_role,
-                float(payment.amount),
-                payment.date,
-                payment.time,
-                payment.description,
-                'Yes' if payment.receipt_image_path else 'No',
-                float(payment.total_salary),
-                payment.advance_percentage,
-                payment.is_active,
-                payment.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            ])
+            try:
+                writer.writerow([
+                    str(payment.id),
+                    payment.labor_name or '',
+                    payment.labor_phone or '',
+                    payment.labor_role or '',
+                    float(payment.amount) if payment.amount else 0,
+                    payment.date.strftime('%Y-%m-%d') if payment.date else '',
+                    payment.time.strftime('%H:%M:%S') if payment.time else '',
+                    payment.description or '',
+                    'Yes' if payment.receipt_image_path else 'No',
+                    float(payment.total_salary) if payment.total_salary else 0,
+                    payment.advance_percentage if hasattr(payment, 'advance_percentage') else 0,
+                    payment.is_active,
+                    payment.created_at.strftime('%Y-%m-%d %H:%M:%S') if payment.created_at else ''
+                ])
+            except (AttributeError, TypeError, ValueError) as e:
+                # Skip problematic rows or use default values
+                writer.writerow([
+                    str(payment.id),
+                    'Error reading data',
+                    '', '', 0, '', '', '', 'No', 0, 0, False, ''
+                ])
         
         return response
     export_to_csv.short_description = 'Export selected payments to CSV'
