@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'orders',
     'order_items',
     'payables',
+    'expenses',
 ]
 
 MIDDLEWARE = [
@@ -198,6 +199,12 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'logs', 'advance_payments.log'),
             'formatter': 'verbose',
         },
+        'expenses_file': {  
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'expenses.log'),
+            'formatter': 'verbose',
+        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -207,6 +214,11 @@ LOGGING = {
     'loggers': {
         'advance_payments': {
             'handlers': ['advance_payments_file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'expenses': {
+            'handlers': ['expenses_file', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
