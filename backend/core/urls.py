@@ -14,10 +14,10 @@ urlpatterns = [
     path('api/v1/advance-payments/', include('advance_payments.urls')),
     path('api/v1/orders/', include('orders.urls')),
     path('api/v1/order-items/', include('order_items.urls')),
+    path('api/v1/payables/', include('payables.urls')),
 ]
 
 # Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    

@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'advance_payments', 
     'orders',
     'order_items',
+    'payables',
 ]
 
 MIDDLEWARE = [
