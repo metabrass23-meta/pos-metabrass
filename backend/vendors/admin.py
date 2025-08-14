@@ -210,7 +210,7 @@ class VendorAdmin(admin.ModelAdmin):
             'inactive_vendors': stats['inactive_vendors'],
             'new_vendors_count': stats['new_vendors_this_month'],
             'recent_vendors_count': stats['recent_vendors_this_week'],
-            'top_cities': stats['top_cities'][:5],  # Show top 5 cities
+            'top_cities': stats['top_cities'][:5],
         })
         
         return super().changelist_view(request, extra_context)
