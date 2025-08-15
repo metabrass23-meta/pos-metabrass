@@ -1,3 +1,4 @@
+from decimal import Decimal
 import uuid
 import re
 from django.db import models
@@ -296,6 +297,26 @@ class Customer(models.Model):
             else:
                 self.status = 'INACTIVE'
         self.save(update_fields=['status', 'updated_at'])
+
+    @property
+    def total_sales_amount(self):
+        """Get total sales amount for this customer"""
+        from django.db.models import Sum
+        return self.sales.aggregate(
+            total=Sum('grand_total')
+        )['total'] or Decimal('0.00')
+
+    @property  
+    def total_sales_count(self):
+        """Get total number of sales for this customer"""
+        return self.sales.filter(is_active=True).count()
+
+    def update_last_sale_date(self, sale_date=None):
+        """Update last order date when sale is created"""
+        if sale_date is None:
+            sale_date = timezone.now()
+        self.last_order_date = sale_date  # Reuse existing field
+        self.save(update_fields=['last_order_date', 'updated_at'])
 
     # Class methods
     @classmethod
