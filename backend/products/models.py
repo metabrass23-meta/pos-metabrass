@@ -115,6 +115,30 @@ class Product(models.Model):
             return 'MEDIUM_STOCK'
         else:
             return 'HIGH_STOCK'
+        
+    def get_total_sales_quantity(self):
+        """Get total quantity sold through sales"""
+        from django.db.models import Sum
+        return self.sale_items.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+    def get_sales_revenue(self):
+        """Get total revenue from sales of this product"""
+        from django.db.models import Sum
+        return self.sale_items.aggregate(
+            total=Sum('line_total')
+        )['total'] or Decimal('0.00')
+
+    def reduce_stock_for_sale(self, quantity_sold, user=None):
+        """Reduce stock when product is sold"""
+        if not self.can_fulfill_quantity(quantity_sold):
+            raise ValidationError("Insufficient stock for sale")
+        
+        return self.update_quantity(
+            self.quantity - quantity_sold,
+            user=user
+        )
 
     @property
     def stock_status_display(self):
