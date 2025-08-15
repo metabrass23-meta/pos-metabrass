@@ -136,6 +136,28 @@ class Order(models.Model):
             raise ValidationError({
                 'expected_delivery_date': 'Expected delivery date cannot be before order date.'
             })
+        
+    def can_be_converted_to_sale(self):
+        """Check if order can be converted to sale"""
+        return self.status in ['CONFIRMED', 'READY', 'DELIVERED'] and self.is_active
+
+    def get_related_sales(self):
+        """Get sales created from this order"""
+        return self.sales.filter(is_active=True)
+
+    def has_been_converted_to_sale(self):
+        """Check if order has been converted to any sales"""
+        return self.sales.exists()
+
+    @property
+    def conversion_status(self):
+        """Get conversion status for this order"""
+        if not self.can_be_converted_to_sale():
+            return 'Cannot Convert'
+        elif self.has_been_converted_to_sale():
+            return 'Converted'
+        else:
+            return 'Ready to Convert'
 
     def save(self, *args, **kwargs):
         # Auto-populate customer information if not set
