@@ -202,6 +202,8 @@ class OrderItemListSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source='product.id', read_only=True)
     product_color = serializers.CharField(source='product.color', read_only=True)
     product_fabric = serializers.CharField(source='product.fabric', read_only=True)
+    remaining_to_sell = serializers.IntegerField(source='remaining_quantity_to_sell', read_only=True)
+    has_been_sold = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = OrderItem
@@ -216,7 +218,8 @@ class OrderItemListSerializer(serializers.ModelSerializer):
             'unit_price',
             'line_total',
             'is_active',
-            'created_at'
+            'created_at',
+            'remaining_to_sell', 'has_been_sold'
         )
 
 
@@ -226,6 +229,9 @@ class OrderItemDetailSerializer(serializers.ModelSerializer):
     order = serializers.SerializerMethodField()
     product = serializers.SerializerMethodField()
     product_display_info = serializers.JSONField(read_only=True)
+    remaining_quantity_to_sell = serializers.ReadOnlyField()
+    has_been_sold = serializers.BooleanField(read_only=True)
+    related_sale_items = serializers.SerializerMethodField()
     
     class Meta:
         model = OrderItem
@@ -241,8 +247,23 @@ class OrderItemDetailSerializer(serializers.ModelSerializer):
             'product_display_info',
             'is_active',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'remaining_quantity_to_sell', 'has_been_sold', 'related_sale_items'
         )
+
+    def get_related_sale_items(self, obj):
+        """Get sale items created from this order item"""
+        sale_items = obj.get_related_sale_items()
+        return [
+            {
+                'id': str(item.id),
+                'sale_id': str(item.sale.id),
+                'quantity': item.quantity,
+                'unit_price': float(item.unit_price),
+                'line_total': float(item.line_total)
+            }
+            for item in sale_items
+        ]
 
     def get_order(self, obj):
         """Get order details"""

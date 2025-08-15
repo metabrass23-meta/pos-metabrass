@@ -98,6 +98,27 @@ class OrderItem(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    def get_related_sale_items(self):
+        """Get sale items created from this order item"""
+        return self.sale_items.filter(is_active=True)
+
+    def has_been_sold(self):
+        """Check if this order item has been converted to sales"""
+        return self.sale_items.exists()
+
+    @property
+    def remaining_quantity_to_sell(self):
+        """Get quantity not yet converted to sales"""
+        from django.db.models import Sum
+        sold_quantity = self.sale_items.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+        return max(0, self.quantity - sold_quantity)
+
+    def can_create_sale_item(self, requested_quantity):
+        """Check if we can create sale item with requested quantity"""
+        return requested_quantity <= self.remaining_quantity_to_sell
+
     # Properties
     @property
     def total_value(self):
