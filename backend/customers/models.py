@@ -318,6 +318,124 @@ class Customer(models.Model):
         self.last_order_date = sale_date  # Reuse existing field
         self.save(update_fields=['last_order_date', 'updated_at'])
 
+    # Enhanced Sales Integration Properties and Methods
+    @property
+    def average_sale_amount(self):
+        """Get average sale amount for this customer"""
+        if self.total_sales_count == 0:
+            return Decimal('0.00')
+        return self.total_sales_amount / self.total_sales_count
+
+    @property
+    def last_sale_date(self):
+        """Get date of last sale"""
+        last_sale = self.sales.filter(is_active=True).order_by('-created_at').first()
+        return last_sale.created_at.date() if last_sale else None
+
+    @property
+    def sales_frequency_days(self):
+        """Get average days between sales"""
+        if self.total_sales_count < 2:
+            return None
+        
+        sales_dates = list(self.sales.filter(is_active=True).order_by('created_at').values_list('created_at', flat=True))
+        if len(sales_dates) < 2:
+            return None
+        
+        total_days = 0
+        for i in range(1, len(sales_dates)):
+            days_between = (sales_dates[i] - sales_dates[i-1]).days
+            total_days += days_between
+        
+        return round(total_days / (len(sales_dates) - 1), 1)
+
+    @property
+    def customer_lifetime_value(self):
+        """Calculate customer lifetime value (CLV)"""
+        return self.total_sales_amount
+
+    @property
+    def sales_trend(self):
+        """Get sales trend (increasing, decreasing, stable)"""
+        if self.total_sales_count < 3:
+            return 'insufficient_data'
+        
+        recent_sales = self.sales.filter(is_active=True).order_by('-created_at')[:3]
+        if len(recent_sales) < 3:
+            return 'insufficient_data'
+        
+        amounts = [sale.grand_total for sale in recent_sales]
+        if amounts[0] > amounts[1] > amounts[2]:
+            return 'increasing'
+        elif amounts[0] < amounts[1] < amounts[2]:
+            return 'decreasing'
+        else:
+            return 'stable'
+
+    def get_sales_by_period(self, days=30):
+        """Get sales within specified period"""
+        from django.utils import timezone
+        cutoff_date = timezone.now() - timedelta(days=days)
+        return self.sales.filter(
+            is_active=True,
+            created_at__gte=cutoff_date
+        )
+
+    def get_sales_statistics(self):
+        """Get comprehensive sales statistics for this customer"""
+        from django.db.models import Sum
+        active_sales = self.sales.filter(is_active=True)
+        
+        # Payment status breakdown
+        payment_status = {
+            'fully_paid': active_sales.filter(is_fully_paid=True).count(),
+            'partially_paid': active_sales.filter(is_fully_paid=False).count(),
+        }
+        
+        # Sales by status
+        status_breakdown = {}
+        for sale in active_sales:
+            status = sale.status
+            status_breakdown[status] = status_breakdown.get(status, 0) + 1
+        
+        # Recent activity
+        recent_sales = self.get_sales_by_period(30)
+        recent_sales_count = recent_sales.count()
+        recent_sales_amount = recent_sales.aggregate(
+            total=Sum('grand_total')
+        )['total'] or Decimal('0.00')
+        
+        return {
+            'total_sales': self.total_sales_count,
+            'total_amount': float(self.total_sales_amount),
+            'average_amount': float(self.average_sale_amount),
+            'payment_status': payment_status,
+            'status_breakdown': status_breakdown,
+            'recent_activity': {
+                'sales_last_30_days': recent_sales_count,
+                'amount_last_30_days': float(recent_sales_amount),
+            },
+            'lifetime_value': float(self.customer_lifetime_value),
+            'sales_trend': self.sales_trend,
+            'last_sale_date': self.last_sale_date,
+        }
+
+    def update_customer_status_based_on_sales(self):
+        """Update customer status based on sales activity"""
+        if self.total_sales_count == 0:
+            if self.is_new_customer:
+                self.status = 'NEW'
+            else:
+                self.status = 'INACTIVE'
+        elif self.total_sales_count >= 10 and self.average_sale_amount >= 50000:
+            self.status = 'VIP'
+        elif self.total_sales_count >= 3 or self.is_recent_customer:
+            self.status = 'REGULAR'
+        else:
+            self.status = 'INACTIVE'
+        
+        self.save(update_fields=['status', 'updated_at'])
+
     # Class methods
     @classmethod
     def active_customers(cls):
