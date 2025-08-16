@@ -130,6 +130,118 @@ class Product(models.Model):
             total=Sum('line_total')
         )['total'] or Decimal('0.00')
 
+    # Enhanced Sales Integration Properties and Methods
+    @property
+    def total_sales_quantity(self):
+        """Get total quantity sold through sales"""
+        from django.db.models import Sum
+        return self.sale_items.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+    @property
+    def total_sales_revenue(self):
+        """Get total revenue from sales of this product"""
+        from django.db.models import Sum
+        return self.sale_items.aggregate(
+            total=Sum('line_total')
+        )['total'] or Decimal('0.00')
+
+    @property
+    def average_sale_price(self):
+        """Get average sale price for this product"""
+        if self.total_sales_quantity == 0:
+            return Decimal('0.00')
+        return self.total_sales_revenue / self.total_sales_quantity
+
+    @property
+    def sales_velocity(self):
+        """Get sales velocity (units sold per day)"""
+        if self.total_sales_quantity == 0:
+            return 0.0
+        
+        # Calculate days since first sale
+        first_sale = self.sale_items.filter(is_active=True).order_by('created_at').first()
+        if not first_sale:
+            return 0.0
+        
+        from django.utils import timezone
+        days_since_first_sale = (timezone.now() - first_sale.created_at).days
+        if days_since_first_sale == 0:
+            return float(self.total_sales_quantity)
+        
+        return round(self.total_sales_quantity / days_since_first_sale, 2)
+
+    @property
+    def stock_turnover_ratio(self):
+        """Get stock turnover ratio (sales / average inventory)"""
+        if self.quantity == 0:
+            return 0.0
+        
+        # Simple calculation: total sales / current stock
+        return round(self.total_sales_quantity / self.quantity, 2)
+
+    @property
+    def profit_margin_percentage(self):
+        """Get profit margin percentage from sales"""
+        if self.total_sales_revenue == 0:
+            return 0.0
+        
+        # This is a simplified calculation - you might want to add cost field to Product
+        # For now, assuming 20% profit margin
+        estimated_cost = self.total_sales_revenue * Decimal('0.8')
+        profit = self.total_sales_revenue - estimated_cost
+        
+        return round((profit / self.total_sales_revenue) * 100, 2)
+
+    def get_sales_by_period(self, days=30):
+        """Get sales within specified period"""
+        from django.utils import timezone
+        from datetime import timedelta
+        cutoff_date = timezone.now() - timedelta(days=days)
+        return self.sale_items.filter(
+            is_active=True,
+            created_at__gte=cutoff_date
+        )
+
+    def get_sales_statistics(self):
+        """Get comprehensive sales statistics for this product"""
+        from django.db.models import Sum
+        active_sale_items = self.sale_items.filter(is_active=True)
+        
+        # Sales by period
+        recent_sales = self.get_sales_by_period(30)
+        recent_sales_quantity = recent_sales.aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+        recent_sales_revenue = recent_sales.aggregate(
+            total=Sum('line_total')
+        )['total'] or Decimal('0.00')
+        
+        # Top customers
+        top_customers = active_sale_items.values(
+            'sale__customer__name'
+        ).annotate(
+            total_quantity=Sum('quantity'),
+            total_amount=Sum('line_total')
+        ).order_by('-total_amount')[:5]
+        
+        return {
+            'total_sales_quantity': self.total_sales_quantity,
+            'total_sales_revenue': float(self.total_sales_revenue),
+            'average_sale_price': float(self.average_sale_price),
+            'sales_velocity': self.sales_velocity,
+            'stock_turnover_ratio': self.stock_turnover_ratio,
+            'profit_margin_percentage': self.profit_margin_percentage,
+            'recent_activity': {
+                'quantity_last_30_days': recent_sales_quantity,
+                'revenue_last_30_days': float(recent_sales_revenue),
+            },
+            'top_customers': list(top_customers),
+            'current_stock': self.quantity,
+            'stock_status': self.stock_status,
+        }
+
     def reduce_stock_for_sale(self, quantity_sold, user=None):
         """Reduce stock when product is sold"""
         if not self.can_fulfill_quantity(quantity_sold):
