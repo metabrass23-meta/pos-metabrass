@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/v1/payables/', include('payables.urls')),
     path('api/v1/zakats/', include('zakats.urls')),
     path('api/v1/payments/', include('payments.urls')),
+    path('api/v1/receivables/', include('receivables.urls')),
 ]
 
 # Serve media files during development

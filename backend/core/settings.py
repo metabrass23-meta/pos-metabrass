@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'sales',
     'sale_items',
     'payments',
+    'receivables',
 ]
 
 MIDDLEWARE = [
