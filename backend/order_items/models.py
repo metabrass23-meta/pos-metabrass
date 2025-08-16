@@ -119,6 +119,39 @@ class OrderItem(models.Model):
         """Check if we can create sale item with requested quantity"""
         return requested_quantity <= self.remaining_quantity_to_sell
 
+    # Enhanced Sales Integration Properties and Methods
+    @property
+    def conversion_status(self):
+        """Get conversion status for this order item"""
+        if self.remaining_quantity_to_sell == 0:
+            return 'Fully Converted'
+        elif self.has_been_sold():
+            return 'Partially Converted'
+        else:
+            return 'Not Converted'
+
+    @property
+    def conversion_percentage(self):
+        """Get percentage of order item converted to sales"""
+        if self.quantity == 0:
+            return 100.0
+        sold_quantity = self.quantity - self.remaining_quantity_to_sell
+        return float((sold_quantity / self.quantity) * 100)
+
+    def get_conversion_summary(self):
+        """Get summary of order item conversion to sales"""
+        related_sale_items = self.get_related_sale_items()
+        
+        return {
+            'conversion_status': self.conversion_status,
+            'conversion_percentage': self.conversion_percentage,
+            'original_quantity': self.quantity,
+            'sold_quantity': self.quantity - self.remaining_quantity_to_sell,
+            'remaining_quantity': self.remaining_quantity_to_sell,
+            'related_sale_items_count': related_sale_items.count(),
+            'can_convert_more': self.remaining_quantity_to_sell > 0,
+        }
+
     # Properties
     @property
     def total_value(self):
