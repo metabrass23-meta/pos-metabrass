@@ -281,6 +281,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     stock_status = serializers.CharField(read_only=True)
     stock_status_display = serializers.CharField(read_only=True)
     total_value = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    total_sold = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
@@ -299,8 +300,13 @@ class ProductListSerializer(serializers.ModelSerializer):
             'total_value',
             'is_active',
             'created_at',
-            'created_by_email'
+            'created_by_email',
+            'total_sold'
         )
+
+    def get_total_sold(self, obj):
+        """Get total quantity sold"""
+        return obj.get_total_sales_quantity()
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -311,6 +317,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     stock_status = serializers.CharField(read_only=True)
     stock_status_display = serializers.CharField(read_only=True)
     total_value = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    total_sales_quantity = serializers.SerializerMethodField()
+    total_sales_revenue = serializers.SerializerMethodField()
+    sales_performance = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
@@ -330,7 +339,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'created_at',
             'updated_at',
-            'created_by'
+            'created_by',
+            'total_sales_quantity', 'total_sales_revenue', 'sales_performance'
         )
 
     def get_category(self, obj):
@@ -339,6 +349,26 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'id': str(obj.category.id),
             'name': obj.category.name,
             'description': obj.category.description
+        }
+    
+    def get_total_sales_quantity(self, obj):
+        """Get total quantity sold"""
+        return obj.get_total_sales_quantity()
+    
+    def get_total_sales_revenue(self, obj):
+        """Get total sales revenue"""
+        revenue = obj.get_sales_revenue()
+        return float(revenue)
+    
+    def get_sales_performance(self, obj):
+        """Get sales performance summary"""
+        total_quantity = obj.get_total_sales_quantity()
+        total_revenue = obj.get_sales_revenue()
+        return {
+            'total_sold': total_quantity,
+            'total_revenue': float(total_revenue),
+            'formatted_revenue': f"PKR {total_revenue:,.2f}",
+            'has_sales': total_quantity > 0
         }
 
 

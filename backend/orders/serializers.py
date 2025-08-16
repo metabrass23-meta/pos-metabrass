@@ -216,6 +216,8 @@ class OrderListSerializer(serializers.ModelSerializer):
     is_overdue = serializers.BooleanField(read_only=True)
     days_until_delivery = serializers.IntegerField(read_only=True)
     created_by_email = serializers.CharField(source='created_by.email', read_only=True)
+    can_convert_to_sale = serializers.BooleanField(source='can_be_converted_to_sale', read_only=True)
+    has_sales = serializers.BooleanField(source='has_been_converted_to_sale', read_only=True)
     
     class Meta:
         model = Order
@@ -237,7 +239,8 @@ class OrderListSerializer(serializers.ModelSerializer):
             'days_until_delivery',
             'is_active',
             'created_at',
-            'created_by_email'
+            'created_by_email',
+            'can_convert_to_sale', 'has_sales'
         )
 
 
@@ -254,6 +257,10 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     order_summary = serializers.JSONField(read_only=True)
     delivery_status = serializers.CharField(source='get_delivery_status', read_only=True)
     order_items = serializers.SerializerMethodField()
+    conversion_status = serializers.ReadOnlyField()
+    can_convert_to_sale = serializers.BooleanField(source='can_be_converted_to_sale', read_only=True)
+    has_sales = serializers.BooleanField(source='has_been_converted_to_sale', read_only=True)
+    related_sales = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
@@ -282,8 +289,23 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'created_at',
             'updated_at',
-            'created_by'
+            'created_by',
+            'conversion_status', 'can_convert_to_sale', 'has_sales', 'related_sales'
         )
+
+    def get_related_sales(self, obj):
+        """Get sales created from this order"""
+        sales = obj.get_related_sales()
+        return [
+            {
+                'id': str(sale.id),
+                'invoice_number': sale.invoice_number,
+                'grand_total': float(sale.grand_total),
+                'date_of_sale': sale.date_of_sale,
+                'status': sale.status
+            }
+            for sale in sales
+        ]
 
     def get_customer(self, obj):
         """Get customer details"""

@@ -100,6 +100,31 @@ class Order(models.Model):
         help_text="User who created this order"
     )
 
+    # Enhanced Sales Integration Fields
+    conversion_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('NOT_CONVERTED', 'Not Converted'),
+            ('PARTIALLY_CONVERTED', 'Partially Converted'),
+            ('FULLY_CONVERTED', 'Fully Converted'),
+        ],
+        default='NOT_CONVERTED',
+        help_text="Status of order conversion to sales"
+    )
+    
+    converted_sales_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Total amount converted to sales"
+    )
+    
+    conversion_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Date when order was first converted to sale"
+    )
+
     class Meta:
         db_table = 'order'
         verbose_name = 'Order'
@@ -113,6 +138,8 @@ class Order(models.Model):
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
             models.Index(fields=['is_fully_paid']),
+            models.Index(fields=['conversion_status']),
+            models.Index(fields=['conversion_date']),
         ]
 
     def __str__(self):
@@ -136,6 +163,75 @@ class Order(models.Model):
             raise ValidationError({
                 'expected_delivery_date': 'Expected delivery date cannot be before order date.'
             })
+        
+    def can_be_converted_to_sale(self):
+        """Check if order can be converted to sale"""
+        return self.status in ['CONFIRMED', 'READY', 'DELIVERED'] and self.is_active
+
+    def get_related_sales(self):
+        """Get sales created from this order"""
+        return self.sales.filter(is_active=True)
+
+    def has_been_converted_to_sale(self):
+        """Check if order has been converted to any sales"""
+        return self.sales.exists()
+
+    # Enhanced Sales Integration Methods
+    @property
+    def conversion_percentage(self):
+        """Get percentage of order converted to sales"""
+        if self.total_amount == 0:
+            return 100.0
+        return float((self.converted_sales_amount / self.total_amount) * 100)
+
+    def update_conversion_status(self):
+        """Update conversion status based on related sales"""
+        from django.db.models import Sum
+        
+        if not self.has_been_converted_to_sale():
+            self.conversion_status = 'NOT_CONVERTED'
+            self.converted_sales_amount = Decimal('0.00')
+            self.conversion_date = None
+        else:
+            # Calculate total converted amount
+            total_converted = self.sales.filter(is_active=True).aggregate(
+                total=Sum('grand_total')
+            )['total'] or Decimal('0.00')
+            
+            self.converted_sales_amount = total_converted
+            
+            if total_converted >= self.total_amount:
+                self.conversion_status = 'FULLY_CONVERTED'
+            else:
+                self.conversion_status = 'PARTIALLY_CONVERTED'
+            
+            # Set conversion date if not set
+            if not self.conversion_date:
+                first_sale = self.sales.filter(is_active=True).order_by('created_at').first()
+                if first_sale:
+                    self.conversion_date = first_sale.created_at
+        
+        self.save(update_fields=[
+            'conversion_status', 'converted_sales_amount', 
+            'conversion_date', 'updated_at'
+        ])
+
+    def get_conversion_summary(self):
+        """Get summary of order conversion to sales"""
+        related_sales = self.get_related_sales()
+        
+        # Get the actual conversion status from the field
+        actual_status = self.conversion_status
+        
+        return {
+            'conversion_status': actual_status,
+            'conversion_percentage': self.conversion_percentage,
+            'converted_amount': float(self.converted_sales_amount),
+            'remaining_amount': float(self.total_amount - self.converted_sales_amount),
+            'related_sales_count': related_sales.count(),
+            'conversion_date': self.conversion_date,
+            'can_convert_more': self.can_be_converted_to_sale() and actual_status != 'FULLY_CONVERTED',
+        }
 
     def save(self, *args, **kwargs):
         # Auto-populate customer information if not set
@@ -155,6 +251,9 @@ class Order(models.Model):
         
         self.full_clean()
         super().save(*args, **kwargs)
+        
+        # Update conversion status after save
+        self.update_conversion_status()
 
     # Properties
     @property

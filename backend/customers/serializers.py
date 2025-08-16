@@ -24,6 +24,11 @@ class CustomerSerializer(serializers.ModelSerializer):
     # Status display
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     customer_type_display = serializers.CharField(source='get_customer_type_display', read_only=True)
+
+    total_sales_amount = serializers.ReadOnlyField()
+    total_sales_count = serializers.ReadOnlyField()
+    latest_sale_date = serializers.SerializerMethodField()
+    sales_summary = serializers.SerializerMethodField()
     
     class Meta:
         model = Customer
@@ -58,7 +63,11 @@ class CustomerSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'created_by',
-            'created_by_id'
+            'created_by_id',
+            'total_sales_amount',
+            'total_sales_count', 
+            'latest_sale_date',
+            'sales_summary'
         )
         read_only_fields = (
             'id', 'created_at', 'updated_at', 'created_by', 'created_by_id',
@@ -66,6 +75,20 @@ class CustomerSerializer(serializers.ModelSerializer):
             'customer_age_days', 'status_display', 'customer_type_display',
             'is_pakistani_customer', 'phone_country_code', 'formatted_country_phone'
         )
+
+    def get_latest_sale_date(self, obj):
+        """Get customer's latest sale date"""
+        latest_sale = obj.sales.filter(is_active=True).order_by('-date_of_sale').first()
+        return latest_sale.date_of_sale if latest_sale else None
+        
+    def get_sales_summary(self, obj):
+        """Get customer sales summary"""
+        return {
+            'total_sales': obj.total_sales_count,
+            'total_amount': float(obj.total_sales_amount),
+            'formatted_amount': f"PKR {obj.total_sales_amount:,.2f}",
+            'has_sales': obj.total_sales_count > 0
+        }
 
     def validate_name(self, value):
         """Clean and validate customer name"""
@@ -382,6 +405,8 @@ class CustomerListSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(read_only=True)
     initials = serializers.CharField(source='get_initials', read_only=True)
     is_new_customer = serializers.BooleanField(read_only=True)
+    total_sales_count = serializers.ReadOnlyField()
+    has_recent_sales = serializers.SerializerMethodField()
     
     class Meta:
         model = Customer
@@ -404,7 +429,9 @@ class CustomerListSerializer(serializers.ModelSerializer):
             'last_order_date',
             'is_active',
             'created_at',
-            'created_by_email'
+            'created_by_email',
+            'total_sales_count',
+            'has_recent_sales'
         )
 
 
@@ -457,6 +484,13 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
             'updated_at',
             'created_by'
         )
+    
+    def get_has_recent_sales(self, obj):
+        """Check if customer has sales in last 90 days"""
+        from django.utils import timezone
+        from datetime import timedelta
+        cutoff_date = timezone.now() - timedelta(days=90)
+        return obj.sales.filter(date_of_sale__gte=cutoff_date, is_active=True).exists()
 
 
 class CustomerStatsSerializer(serializers.Serializer):
