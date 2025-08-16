@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'zakats',
     'sales',
     'sale_items',
+    'payments',
 ]
 
 MIDDLEWARE = [
