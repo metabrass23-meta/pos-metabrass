@@ -1,10 +1,15 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django.db import transaction
 from decimal import Decimal
 from .models import Sales, SaleItem
 from customers.models import Customer
 from products.models import Product
 from orders.models import Order
+from order_items.models import OrderItem
 
 
 class SaleItemSerializer(serializers.ModelSerializer):

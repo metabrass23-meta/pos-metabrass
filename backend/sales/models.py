@@ -453,7 +453,7 @@ class SaleItemQuerySet(models.QuerySet):
     
     def by_order_item(self, order_item_id):
         """Get sale items created from a specific order item"""
-        return self.filter(order_item_id=order_item_id)
+        return self.filter(order_item=order_item_id)
     
     def search(self, query):
         """Search sale items by product name or customization notes"""
@@ -477,13 +477,19 @@ class SaleItem(models.Model):
         related_name='sale_items',
         help_text="Parent sale transaction"
     )
-    order_item = models.ForeignKey(
-        'order_items.OrderItem',
-        on_delete=models.SET_NULL,
+    # order_item = models.ForeignKey(
+    #     'order_items.OrderItem',
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name='sale_items',
+    #     help_text="Optional: Order item this sale item was created from",
+    #     to_field='id'
+    # )
+    order_item = models.UUIDField(
         null=True,
         blank=True,
-        related_name='sale_items',
-        help_text="Optional: Order item this sale item was created from"
+        help_text="Optional: Order item ID this sale item was created from"
     )
     product = models.ForeignKey(
         'products.Product',

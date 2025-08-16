@@ -15,7 +15,8 @@ from .serializers import (
 )
 from customers.models import Customer
 from products.models import Product
-from orders.models import Order, OrderItem
+from orders.models import Order
+from order_items.models import OrderItem
 
 
 # Function-based views for Sales

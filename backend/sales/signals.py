@@ -1,10 +1,9 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django.db import transaction
+from django.db.models import Sum
 from .models import Sales, SaleItem
-from products.models import Product
-from customers.models import Customer
-from orders.models import Order, OrderItem
+from orders.models import Order
+from order_items.models import OrderItem
 import logging
 
 logger = logging.getLogger(__name__)
