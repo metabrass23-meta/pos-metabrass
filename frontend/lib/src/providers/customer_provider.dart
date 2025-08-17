@@ -14,6 +14,28 @@ class Customer {
   final DateTime? lastPurchaseDate;
   final double? lastPurchase;
 
+  // Additional fields from backend
+  final String? address;
+  final String? city;
+  final String country;
+  final String customerType;
+  final String status;
+  final bool phoneVerified;
+  final bool emailVerified;
+  final String? businessName;
+  final String? taxNumber;
+  final bool isActive;
+  final String displayName;
+  final String initials;
+  final bool isNewCustomer;
+  final bool isRecentCustomer;
+  final int totalSalesCount;
+  final bool hasRecentSales;
+  final String customerTypeDisplay;
+  final String statusDisplay;
+  final String? createdByEmail;
+  final DateTime? lastOrderDate;
+
   Customer({
     required this.id,
     required this.name,
@@ -23,6 +45,26 @@ class Customer {
     required this.createdAt,
     this.lastPurchaseDate,
     this.lastPurchase,
+    this.address,
+    this.city,
+    required this.country,
+    required this.customerType,
+    required this.status,
+    required this.phoneVerified,
+    required this.emailVerified,
+    this.businessName,
+    this.taxNumber,
+    required this.isActive,
+    required this.displayName,
+    required this.initials,
+    required this.isNewCustomer,
+    required this.isRecentCustomer,
+    required this.totalSalesCount,
+    required this.hasRecentSales,
+    required this.customerTypeDisplay,
+    required this.statusDisplay,
+    this.createdByEmail,
+    this.lastOrderDate,
   });
 
   // Convert from CustomerModel (API) to Customer (UI)
@@ -36,6 +78,26 @@ class Customer {
       createdAt: model.createdAt,
       lastPurchaseDate: model.lastOrderDate,
       lastPurchase: null, // This would come from order integration
+      address: model.address,
+      city: model.city,
+      country: model.country,
+      customerType: model.customerType,
+      status: model.status,
+      phoneVerified: model.phoneVerified,
+      emailVerified: model.emailVerified,
+      businessName: model.businessName,
+      taxNumber: model.taxNumber,
+      isActive: model.isActive,
+      displayName: model.displayName,
+      initials: model.initials,
+      isNewCustomer: model.isNewCustomer,
+      isRecentCustomer: model.isRecentCustomer,
+      totalSalesCount: model.totalSalesCount,
+      hasRecentSales: model.hasRecentSales,
+      customerTypeDisplay: model.customerTypeDisplay,
+      statusDisplay: model.statusDisplay,
+      createdByEmail: model.createdByEmail,
+      lastOrderDate: model.lastOrderDate,
     );
   }
 
@@ -82,6 +144,26 @@ class Customer {
     DateTime? createdAt,
     DateTime? lastPurchaseDate,
     double? lastPurchase,
+    String? address,
+    String? city,
+    String? country,
+    String? customerType,
+    String? status,
+    bool? phoneVerified,
+    bool? emailVerified,
+    String? businessName,
+    String? taxNumber,
+    bool? isActive,
+    String? displayName,
+    String? initials,
+    bool? isNewCustomer,
+    bool? isRecentCustomer,
+    int? totalSalesCount,
+    bool? hasRecentSales,
+    String? customerTypeDisplay,
+    String? statusDisplay,
+    String? createdByEmail,
+    DateTime? lastOrderDate,
   }) {
     return Customer(
       id: id ?? this.id,
@@ -92,6 +174,26 @@ class Customer {
       createdAt: createdAt ?? this.createdAt,
       lastPurchaseDate: lastPurchaseDate ?? this.lastPurchaseDate,
       lastPurchase: lastPurchase ?? this.lastPurchase,
+      address: address ?? this.address,
+      city: city ?? this.city,
+      country: country ?? this.country,
+      customerType: customerType ?? this.customerType,
+      status: status ?? this.status,
+      phoneVerified: phoneVerified ?? this.phoneVerified,
+      emailVerified: emailVerified ?? this.emailVerified,
+      businessName: businessName ?? this.businessName,
+      taxNumber: taxNumber ?? this.taxNumber,
+      isActive: isActive ?? this.isActive,
+      displayName: displayName ?? this.displayName,
+      initials: initials ?? this.initials,
+      isNewCustomer: isNewCustomer ?? this.isNewCustomer,
+      isRecentCustomer: isRecentCustomer ?? this.isRecentCustomer,
+      totalSalesCount: totalSalesCount ?? this.totalSalesCount,
+      hasRecentSales: hasRecentSales ?? this.hasRecentSales,
+      customerTypeDisplay: customerTypeDisplay ?? this.customerTypeDisplay,
+      statusDisplay: statusDisplay ?? this.statusDisplay,
+      createdByEmail: createdByEmail ?? this.createdByEmail,
+      lastOrderDate: lastOrderDate ?? this.lastOrderDate,
     );
   }
 
@@ -105,6 +207,26 @@ class Customer {
       'createdAt': createdAt.toIso8601String(),
       'lastPurchaseDate': lastPurchaseDate?.toIso8601String(),
       'lastPurchase': lastPurchase,
+      'address': address,
+      'city': city,
+      'country': country,
+      'customerType': customerType,
+      'status': status,
+      'phoneVerified': phoneVerified,
+      'emailVerified': emailVerified,
+      'businessName': businessName,
+      'taxNumber': taxNumber,
+      'isActive': isActive,
+      'displayName': displayName,
+      'initials': initials,
+      'isNewCustomer': isNewCustomer,
+      'isRecentCustomer': isRecentCustomer,
+      'totalSalesCount': totalSalesCount,
+      'hasRecentSales': hasRecentSales,
+      'customerTypeDisplay': customerTypeDisplay,
+      'statusDisplay': statusDisplay,
+      'createdByEmail': createdByEmail,
+      'lastOrderDate': lastOrderDate?.toIso8601String(),
     };
   }
 
@@ -116,10 +238,28 @@ class Customer {
       email: json['email'],
       description: json['description'],
       createdAt: DateTime.parse(json['createdAt']),
-      lastPurchaseDate: json['lastPurchaseDate'] != null
-          ? DateTime.parse(json['lastPurchaseDate'])
-          : null,
+      lastPurchaseDate: json['lastPurchaseDate'] != null ? DateTime.parse(json['lastPurchaseDate']) : null,
       lastPurchase: json['lastPurchase']?.toDouble(),
+      address: json['address'],
+      city: json['city'],
+      country: json['country'],
+      customerType: json['customerType'],
+      status: json['status'],
+      phoneVerified: json['phoneVerified'],
+      emailVerified: json['emailVerified'],
+      businessName: json['businessName'],
+      taxNumber: json['taxNumber'],
+      isActive: json['isActive'],
+      displayName: json['displayName'],
+      initials: json['initials'],
+      isNewCustomer: json['isNewCustomer'],
+      isRecentCustomer: json['isRecentCustomer'],
+      totalSalesCount: json['totalSalesCount'],
+      hasRecentSales: json['hasRecentSales'],
+      customerTypeDisplay: json['customerTypeDisplay'],
+      statusDisplay: json['statusDisplay'],
+      createdByEmail: json['createdByEmail'],
+      lastOrderDate: json['lastOrderDate'] != null ? DateTime.parse(json['lastOrderDate']) : null,
     );
   }
 }
@@ -153,6 +293,9 @@ class CustomerProvider extends ChangeNotifier {
 
   // Statistics
   CustomerStatisticsResponse? _customerStatistics;
+
+  // Selected customer for detailed view
+  Customer? _selectedCustomer;
 
   // Getters
   List<Customer> get customers => _filteredCustomers;
@@ -219,9 +362,7 @@ class CustomerProvider extends ChangeNotifier {
         final customersData = response.data!;
 
         // Convert CustomerModel to Customer for UI compatibility
-        _customers = customersData.customers
-            .map((customerModel) => Customer.fromCustomerModel(customerModel))
-            .toList();
+        _customers = customersData.customers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
 
         _filteredCustomers = List.from(_customers);
         _paginationInfo = customersData.pagination;
@@ -352,15 +493,7 @@ class CustomerProvider extends ChangeNotifier {
     _verificationFilter = null;
     _searchQuery = '';
     _currentPage = 1;
-    await loadCustomers(
-      status: null,
-      customerType: null,
-      city: null,
-      country: null,
-      verified: null,
-      search: '',
-      page: 1,
-    );
+    await loadCustomers(status: null, customerType: null, city: null, country: null, verified: null, search: '', page: 1);
   }
 
   /// Sort customers
@@ -629,17 +762,9 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   /// Verify customer contact
-  Future<bool> verifyCustomerContact({
-    required String id,
-    required String verificationType,
-    bool verified = true,
-  }) async {
+  Future<bool> verifyCustomerContact({required String id, required String verificationType, bool verified = true}) async {
     try {
-      final response = await _customerService.verifyCustomerContact(
-        id: id,
-        verificationType: verificationType,
-        verified: verified,
-      );
+      final response = await _customerService.verifyCustomerContact(id: id, verificationType: verificationType, verified: verified);
 
       if (response.success) {
         // Refresh customer data to get updated verification status
@@ -661,17 +786,9 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   /// Update customer activity
-  Future<bool> updateCustomerActivity({
-    required String id,
-    required String activityType,
-    String? activityDate,
-  }) async {
+  Future<bool> updateCustomerActivity({required String id, required String activityType, String? activityDate}) async {
     try {
-      final response = await _customerService.updateCustomerActivity(
-        id: id,
-        activityType: activityType,
-        activityDate: activityDate,
-      );
+      final response = await _customerService.updateCustomerActivity(id: id, activityType: activityType, activityDate: activityDate);
 
       if (response.success) {
         // Refresh customer data to get updated activity
@@ -693,18 +810,12 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   /// Bulk customer actions
-  Future<bool> bulkCustomerActions({
-    required List<String> customerIds,
-    required String action,
-  }) async {
+  Future<bool> bulkCustomerActions({required List<String> customerIds, required String action}) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _customerService.bulkCustomerActions(
-        customerIds: customerIds,
-        action: action,
-      );
+      final response = await _customerService.bulkCustomerActions(customerIds: customerIds, action: action);
 
       if (response.success) {
         // Refresh customer data to get updated information
@@ -731,22 +842,12 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   /// Duplicate customer
-  Future<bool> duplicateCustomer({
-    required String id,
-    required String name,
-    required String phone,
-    String? email,
-  }) async {
+  Future<bool> duplicateCustomer({required String id, required String name, required String phone, String? email}) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _customerService.duplicateCustomer(
-        id: id,
-        name: name,
-        phone: phone,
-        email: email,
-      );
+      final response = await _customerService.duplicateCustomer(id: id, name: name, phone: phone, email: email);
 
       if (response.success && response.data != null) {
         // Add the new customer to local list immediately
@@ -786,6 +887,32 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
+  /// Fetch customer details by ID from API
+  Future<bool> fetchCustomerById(String id) async {
+    try {
+      final response = await _customerService.getCustomerById(id);
+
+      if (response.success && response.data != null) {
+        _selectedCustomer = Customer.fromCustomerModel(response.data!);
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.message;
+        _hasError = true;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to fetch customer details: ${e.toString()}';
+      _hasError = true;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Get the currently selected customer (from API fetch)
+  Customer? get selectedCustomer => _selectedCustomer;
+
   /// Clear error state
   void clearError() {
     _hasError = false;
@@ -796,18 +923,16 @@ class CustomerProvider extends ChangeNotifier {
   /// Enhanced statistics for dashboard
   Map<String, dynamic> get customerStats {
     if (_customerStatistics == null) {
-      return {
-        'total': 0,
-        'newThisMonth': 0,
-        'averagePurchase': 0,
-        'recentBuyers': 0,
-      };
+      return {'total': 0, 'newThisMonth': 0, 'totalSales': 0, 'recentBuyers': 0};
     }
+
+    // Calculate total sales count from customer data
+    final totalSales = _customers.fold<int>(0, (sum, customer) => sum + customer.totalSalesCount);
 
     return {
       'total': _customerStatistics!.totalCustomers,
       'newThisMonth': _customerStatistics!.newCustomersThisMonth,
-      'averagePurchase': 0, // This would come from order integration
+      'totalSales': totalSales,
       'recentBuyers': _customerStatistics!.recentCustomersThisWeek,
     };
   }
@@ -831,10 +956,7 @@ class CustomerProvider extends ChangeNotifier {
   /// Get recently created customers
   List<Customer> getRecentlyCreated({int days = 7}) {
     final cutoffDate = DateTime.now().subtract(Duration(days: days));
-    return _customers
-        .where((customer) => customer.createdAt.isAfter(cutoffDate))
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return _customers.where((customer) => customer.createdAt.isAfter(cutoffDate)).toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   /// Export data (placeholder for future implementation)
@@ -862,21 +984,22 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
+  // Initialize the provider
+  Future<void> initialize() async {
+    await loadCustomers();
+    await loadCustomerStatistics();
+  }
+
   /// Load customers by specific segments
   Future<void> loadPakistaniCustomers() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _customerService.getPakistaniCustomers(
-        page: 1,
-        pageSize: _pageSize,
-      );
+      final response = await _customerService.getPakistaniCustomers(page: 1, pageSize: _pageSize);
 
       if (response.success && response.data != null) {
-        _customers = response.data!.customers
-            .map((customerModel) => Customer.fromCustomerModel(customerModel))
-            .toList();
+        _customers = response.data!.customers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
         _filteredCustomers = List.from(_customers);
         _paginationInfo = response.data!.pagination;
       }
@@ -894,15 +1017,10 @@ class CustomerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _customerService.getInternationalCustomers(
-        page: 1,
-        pageSize: _pageSize,
-      );
+      final response = await _customerService.getInternationalCustomers(page: 1, pageSize: _pageSize);
 
       if (response.success && response.data != null) {
-        _customers = response.data!.customers
-            .map((customerModel) => Customer.fromCustomerModel(customerModel))
-            .toList();
+        _customers = response.data!.customers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
         _filteredCustomers = List.from(_customers);
         _paginationInfo = response.data!.pagination;
       }
@@ -920,16 +1038,10 @@ class CustomerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _customerService.getNewCustomers(
-        days: days,
-        page: 1,
-        pageSize: _pageSize,
-      );
+      final response = await _customerService.getNewCustomers(days: days, page: 1, pageSize: _pageSize);
 
       if (response.success && response.data != null) {
-        _customers = response.data!.customers
-            .map((customerModel) => Customer.fromCustomerModel(customerModel))
-            .toList();
+        _customers = response.data!.customers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
         _filteredCustomers = List.from(_customers);
         _paginationInfo = response.data!.pagination;
       }

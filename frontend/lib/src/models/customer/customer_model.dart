@@ -31,6 +31,14 @@ class CustomerModel {
   final String? phoneCountryCode;
   final String formattedCountryPhone;
 
+  // Sales-related fields from backend
+  final int totalSalesCount;
+  final bool hasRecentSales;
+
+  // Display fields from backend
+  final String customerTypeDisplay;
+  final String statusDisplay;
+
   CustomerModel({
     required this.id,
     required this.name,
@@ -61,6 +69,10 @@ class CustomerModel {
     required this.isPakistaniCustomer,
     this.phoneCountryCode,
     required this.formattedCountryPhone,
+    required this.totalSalesCount,
+    required this.hasRecentSales,
+    required this.customerTypeDisplay,
+    required this.statusDisplay,
   });
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) {
@@ -81,17 +93,11 @@ class CustomerModel {
       taxNumber: json['tax_number'] as String?,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : DateTime.parse(json['created_at'] as String),
       createdByEmail: json['created_by_email'] as String?,
       createdById: json['created_by_id'] as int?,
-      lastOrderDate: json['last_order_date'] != null
-          ? DateTime.parse(json['last_order_date'] as String)
-          : null,
-      lastContactDate: json['last_contact_date'] != null
-          ? DateTime.parse(json['last_contact_date'] as String)
-          : null,
+      lastOrderDate: json['last_order_date'] != null ? DateTime.parse(json['last_order_date'] as String) : null,
+      lastContactDate: json['last_contact_date'] != null ? DateTime.parse(json['last_contact_date'] as String) : null,
       displayName: json['display_name'] as String? ?? json['name'] as String,
       isNewCustomer: json['is_new_customer'] as bool? ?? false,
       isRecentCustomer: json['is_recent_customer'] as bool? ?? false,
@@ -100,6 +106,10 @@ class CustomerModel {
       isPakistaniCustomer: json['is_pakistani_customer'] as bool? ?? false,
       phoneCountryCode: json['phone_country_code'] as String?,
       formattedCountryPhone: json['formatted_country_phone'] as String? ?? '',
+      totalSalesCount: json['total_sales_count'] as int? ?? 0,
+      hasRecentSales: json['has_recent_sales'] as bool? ?? false,
+      customerTypeDisplay: json['customer_type_display'] as String? ?? json['customer_type'] as String,
+      statusDisplay: json['status_display'] as String? ?? json['status'] as String,
     );
   }
 
@@ -134,6 +144,10 @@ class CustomerModel {
       'is_pakistani_customer': isPakistaniCustomer,
       'phone_country_code': phoneCountryCode,
       'formatted_country_phone': formattedCountryPhone,
+      'total_sales_count': totalSalesCount,
+      'has_recent_sales': hasRecentSales,
+      'customer_type_display': customerTypeDisplay,
+      'status_display': statusDisplay,
     };
   }
 
@@ -167,6 +181,10 @@ class CustomerModel {
     bool? isPakistaniCustomer,
     String? phoneCountryCode,
     String? formattedCountryPhone,
+    int? totalSalesCount,
+    bool? hasRecentSales,
+    String? customerTypeDisplay,
+    String? statusDisplay,
   }) {
     return CustomerModel(
       id: id ?? this.id,
@@ -198,6 +216,10 @@ class CustomerModel {
       isPakistaniCustomer: isPakistaniCustomer ?? this.isPakistaniCustomer,
       phoneCountryCode: phoneCountryCode ?? this.phoneCountryCode,
       formattedCountryPhone: formattedCountryPhone ?? this.formattedCountryPhone,
+      totalSalesCount: totalSalesCount ?? this.totalSalesCount,
+      hasRecentSales: hasRecentSales ?? this.hasRecentSales,
+      customerTypeDisplay: customerTypeDisplay ?? this.customerTypeDisplay,
+      statusDisplay: statusDisplay ?? this.statusDisplay,
     );
   }
 
@@ -324,14 +346,6 @@ class CustomerModel {
 
   @override
   int get hashCode {
-    return Object.hash(
-      id,
-      name,
-      phone,
-      email,
-      status,
-      customerType,
-      isActive,
-    );
+    return Object.hash(id, name, phone, email, status, customerType, isActive);
   }
 }
