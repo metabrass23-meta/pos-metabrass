@@ -24,7 +24,14 @@ class Product(models.Model):
     price = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        help_text="Product price in PKR"
+        help_text="Product selling price in PKR"
+    )
+    cost_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Production/purchase cost price in PKR"
     )
     color = models.CharField(
         max_length=50,
@@ -84,6 +91,12 @@ class Product(models.Model):
         """Validate model data"""
         if self.price and self.price < 0:
             raise ValidationError({'price': 'Price cannot be negative.'})
+        
+        if self.cost_price and self.cost_price < 0:
+            raise ValidationError({'cost_price': 'Cost price cannot be negative.'})
+        
+        if self.cost_price and self.price and self.cost_price > self.price:
+            raise ValidationError({'cost_price': 'Cost price cannot exceed selling price.'})
         
         if self.quantity < 0:
             raise ValidationError({'quantity': 'Quantity cannot be negative.'})
@@ -182,17 +195,39 @@ class Product(models.Model):
         return round(self.total_sales_quantity / self.quantity, 2)
 
     @property
+    def profit_margin(self):
+        """Calculate profit margin if cost price is available"""
+        if not self.cost_price or not self.price:
+            return None
+        
+        if self.cost_price == 0:
+            return None
+            
+        profit = self.price - self.cost_price
+        margin_percentage = (profit / self.price) * 100
+        return {
+            'profit_amount': profit,
+            'margin_percentage': margin_percentage,
+            'cost_price': self.cost_price,
+            'selling_price': self.price
+        }
+    
+    @property
     def profit_margin_percentage(self):
         """Get profit margin percentage from sales"""
         if self.total_sales_revenue == 0:
             return 0.0
         
-        # This is a simplified calculation - you might want to add cost field to Product
-        # For now, assuming 20% profit margin
-        estimated_cost = self.total_sales_revenue * Decimal('0.8')
-        profit = self.total_sales_revenue - estimated_cost
-        
-        return round((profit / self.total_sales_revenue) * 100, 2)
+        if self.cost_price:
+            # Calculate actual profit margin based on cost price
+            total_cost = self.cost_price * self.total_sales_quantity
+            profit = self.total_sales_revenue - total_cost
+            return round((profit / self.total_sales_revenue) * 100, 2)
+        else:
+            # Fallback to estimated calculation
+            estimated_cost = self.total_sales_revenue * Decimal('0.8')
+            profit = self.total_sales_revenue - estimated_cost
+            return round((profit / self.total_sales_revenue) * 100, 2)
 
     def get_sales_by_period(self, days=30):
         """Get sales within specified period"""
