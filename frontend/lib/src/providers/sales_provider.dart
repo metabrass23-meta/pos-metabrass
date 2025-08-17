@@ -182,14 +182,7 @@ class AuditLog {
   final String details;
   final DateTime timestamp;
 
-  AuditLog({
-    required this.id,
-    required this.saleId,
-    required this.action,
-    required this.performedBy,
-    required this.details,
-    required this.timestamp,
-  });
+  AuditLog({required this.id, required this.saleId, required this.action, required this.performedBy, required this.details, required this.timestamp});
 }
 
 // Additional helper extension for existing Product model
@@ -282,6 +275,20 @@ class SalesProvider extends ChangeNotifier {
         lastPurchase: 85000.0,
         lastPurchaseDate: DateTime.now().subtract(const Duration(days: 15)),
         createdAt: DateTime.now().subtract(const Duration(days: 120)),
+        country: 'Pakistan',
+        customerType: 'INDIVIDUAL',
+        status: 'VIP',
+        phoneVerified: true,
+        emailVerified: true,
+        isActive: true,
+        displayName: 'Aisha Khan',
+        initials: 'AK',
+        isNewCustomer: false,
+        isRecentCustomer: false,
+        totalSalesCount: 15,
+        hasRecentSales: true,
+        customerTypeDisplay: 'Individual',
+        statusDisplay: 'VIP Customer',
       ),
       Customer(
         id: 'CUS002',
@@ -292,6 +299,20 @@ class SalesProvider extends ChangeNotifier {
         lastPurchase: 45000.0,
         lastPurchaseDate: DateTime.now().subtract(const Duration(days: 8)),
         createdAt: DateTime.now().subtract(const Duration(days: 80)),
+        country: 'Pakistan',
+        customerType: 'INDIVIDUAL',
+        status: 'REGULAR',
+        phoneVerified: true,
+        emailVerified: true,
+        isActive: true,
+        displayName: 'Fatima Ali',
+        initials: 'FA',
+        isNewCustomer: false,
+        isRecentCustomer: false,
+        totalSalesCount: 8,
+        hasRecentSales: true,
+        customerTypeDisplay: 'Individual',
+        statusDisplay: 'Regular Customer',
       ),
       Customer(
         id: 'CUS003',
@@ -302,6 +323,20 @@ class SalesProvider extends ChangeNotifier {
         lastPurchase: 25000.0,
         lastPurchaseDate: DateTime.now().subtract(const Duration(days: 45)),
         createdAt: DateTime.now().subtract(const Duration(days: 200)),
+        country: 'Pakistan',
+        customerType: 'INDIVIDUAL',
+        status: 'REGULAR',
+        phoneVerified: true,
+        emailVerified: false,
+        isActive: true,
+        displayName: 'Sarah Ahmed',
+        initials: 'SA',
+        isNewCustomer: false,
+        isRecentCustomer: false,
+        totalSalesCount: 3,
+        hasRecentSales: false,
+        customerTypeDisplay: 'Individual',
+        statusDisplay: 'Regular Customer',
       ),
       Customer(
         id: 'CUS004',
@@ -312,6 +347,20 @@ class SalesProvider extends ChangeNotifier {
         lastPurchase: 120000.0,
         lastPurchaseDate: DateTime.now().subtract(const Duration(days: 3)),
         createdAt: DateTime.now().subtract(const Duration(days: 60)),
+        country: 'Pakistan',
+        customerType: 'INDIVIDUAL',
+        status: 'VIP',
+        phoneVerified: true,
+        emailVerified: true,
+        isActive: true,
+        displayName: 'Zara Sheikh',
+        initials: 'ZS',
+        isNewCustomer: false,
+        isRecentCustomer: false,
+        totalSalesCount: 25,
+        hasRecentSales: true,
+        customerTypeDisplay: 'Individual',
+        statusDisplay: 'VIP Customer',
       ),
       Customer(
         id: 'CUS005',
@@ -322,6 +371,20 @@ class SalesProvider extends ChangeNotifier {
         lastPurchase: null,
         lastPurchaseDate: null,
         createdAt: DateTime.now().subtract(const Duration(days: 10)),
+        country: 'Pakistan',
+        customerType: 'INDIVIDUAL',
+        status: 'NEW',
+        phoneVerified: false,
+        emailVerified: false,
+        isActive: true,
+        displayName: 'Mehwish Qureshi',
+        initials: 'MQ',
+        isNewCustomer: true,
+        isRecentCustomer: true,
+        totalSalesCount: 0,
+        hasRecentSales: false,
+        customerTypeDisplay: 'Individual',
+        statusDisplay: 'New Customer',
       ),
     ];
   }
@@ -425,22 +488,8 @@ class SalesProvider extends ChangeNotifier {
         customerName: 'Ahmed Hassan',
         customerPhone: '+923001234567',
         items: [
-          SaleItem(
-            productId: 'PRD001',
-            productName: 'Lawn Suit - Floral',
-            unitPrice: 4500.0,
-            quantity: 2,
-            itemDiscount: 200.0,
-            lineTotal: 8800.0,
-          ),
-          SaleItem(
-            productId: 'PRD002',
-            productName: 'Chiffon Dupatta',
-            unitPrice: 1200.0,
-            quantity: 1,
-            itemDiscount: 0.0,
-            lineTotal: 1200.0,
-          ),
+          SaleItem(productId: 'PRD001', productName: 'Lawn Suit - Floral', unitPrice: 4500.0, quantity: 2, itemDiscount: 200.0, lineTotal: 8800.0),
+          SaleItem(productId: 'PRD002', productName: 'Chiffon Dupatta', unitPrice: 1200.0, quantity: 1, itemDiscount: 0.0, lineTotal: 1200.0),
         ],
         subtotal: 10000.0,
         overallDiscount: 500.0,
@@ -464,14 +513,7 @@ class SalesProvider extends ChangeNotifier {
         customerName: 'Fatima Ali',
         customerPhone: '+923009876543',
         items: [
-          SaleItem(
-            productId: 'PRD006',
-            productName: 'Wedding Dress',
-            unitPrice: 25000.0,
-            quantity: 1,
-            itemDiscount: 2000.0,
-            lineTotal: 23000.0,
-          ),
+          SaleItem(productId: 'PRD006', productName: 'Wedding Dress', unitPrice: 25000.0, quantity: 1, itemDiscount: 2000.0, lineTotal: 23000.0),
         ],
         subtotal: 25000.0,
         overallDiscount: 2000.0,
@@ -496,22 +538,8 @@ class SalesProvider extends ChangeNotifier {
         customerName: 'Muhammad Usman',
         customerPhone: '+923005555555',
         items: [
-          SaleItem(
-            productId: 'PRD003',
-            productName: 'Embroidered Shirt',
-            unitPrice: 3200.0,
-            quantity: 3,
-            itemDiscount: 300.0,
-            lineTotal: 9300.0,
-          ),
-          SaleItem(
-            productId: 'PRD004',
-            productName: 'Cotton Trouser',
-            unitPrice: 2800.0,
-            quantity: 2,
-            itemDiscount: 0.0,
-            lineTotal: 5600.0,
-          ),
+          SaleItem(productId: 'PRD003', productName: 'Embroidered Shirt', unitPrice: 3200.0, quantity: 3, itemDiscount: 300.0, lineTotal: 9300.0),
+          SaleItem(productId: 'PRD004', productName: 'Cotton Trouser', unitPrice: 2800.0, quantity: 2, itemDiscount: 0.0, lineTotal: 5600.0),
         ],
         subtotal: 14900.0,
         overallDiscount: 900.0,
@@ -558,9 +586,7 @@ class SalesProvider extends ChangeNotifier {
 
   // Enhanced cart management with discount support
   void addToCartWithDiscount(Product product, int quantity, double discount, {String? customizationNotes}) {
-    final existingItemIndex = _currentCart.indexWhere(
-      (item) => item.productId == product.id && item.customizationNotes == customizationNotes,
-    );
+    final existingItemIndex = _currentCart.indexWhere((item) => item.productId == product.id && item.customizationNotes == customizationNotes);
 
     if (existingItemIndex != -1) {
       // Update existing item with new discount
@@ -568,11 +594,7 @@ class SalesProvider extends ChangeNotifier {
       final newQuantity = existingItem.quantity + quantity;
       final lineTotal = (product.price * newQuantity) - discount;
 
-      _currentCart[existingItemIndex] = existingItem.copyWith(
-        quantity: newQuantity,
-        itemDiscount: discount,
-        lineTotal: lineTotal,
-      );
+      _currentCart[existingItemIndex] = existingItem.copyWith(quantity: newQuantity, itemDiscount: discount, lineTotal: lineTotal);
     } else {
       // Add new item with discount
       final lineTotal = (product.price * quantity) - discount;
@@ -670,9 +692,7 @@ class SalesProvider extends ChangeNotifier {
     final lineTotal = (product.price * quantity) - itemDiscount;
 
     // Check if similar item exists (same product + customization)
-    final existingIndex = _currentCart.indexWhere(
-      (item) => item.productId == product.id && item.customizationNotes == customizationNotes,
-    );
+    final existingIndex = _currentCart.indexWhere((item) => item.productId == product.id && item.customizationNotes == customizationNotes);
 
     if (existingIndex != -1) {
       // Update existing item
@@ -680,11 +700,7 @@ class SalesProvider extends ChangeNotifier {
       final newQuantity = existing.quantity + quantity;
       final newLineTotal = (product.price * newQuantity) - itemDiscount;
 
-      _currentCart[existingIndex] = existing.copyWith(
-        quantity: newQuantity,
-        itemDiscount: itemDiscount,
-        lineTotal: newLineTotal,
-      );
+      _currentCart[existingIndex] = existing.copyWith(quantity: newQuantity, itemDiscount: itemDiscount, lineTotal: newLineTotal);
     } else {
       // Add new item
       _currentCart.add(
@@ -788,10 +804,7 @@ class SalesProvider extends ChangeNotifier {
 
   // Customer management integration
   void selectCustomerById(String customerId) {
-    final customer = _customers.firstWhere(
-      (c) => c.id == customerId,
-      orElse: () => throw Exception('Customer not found'),
-    );
+    final customer = _customers.firstWhere((c) => c.id == customerId, orElse: () => throw Exception('Customer not found'));
     setSelectedCustomer(customer);
   }
 
@@ -801,10 +814,7 @@ class SalesProvider extends ChangeNotifier {
 
   // Product availability checks
   bool isProductAvailable(String productId, int requestedQuantity) {
-    final product = _products.firstWhere(
-      (p) => p.id == productId,
-      orElse: () => throw Exception('Product not found'),
-    );
+    final product = _products.firstWhere((p) => p.id == productId, orElse: () => throw Exception('Product not found'));
     return product.quantity >= requestedQuantity;
   }
 
@@ -885,13 +895,7 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateSale(
-    Sale sale, {
-    double? amountPaid,
-    String? paymentMethod,
-    String? status,
-    String? notes,
-  }) async {
+  Future<void> updateSale(Sale sale, {double? amountPaid, String? paymentMethod, String? status, String? notes}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -965,12 +969,7 @@ class SalesProvider extends ChangeNotifier {
     final orderId = 'ORD${DateTime.now().millisecondsSinceEpoch}';
 
     // Add audit log
-    _addAuditLog(
-      orderId,
-      'Custom Order Created',
-      'Admin',
-      'Custom order created for ${customer.name} - ${product.name}',
-    );
+    _addAuditLog(orderId, 'Custom Order Created', 'Admin', 'Custom order created for ${customer.name} - ${product.name}');
 
     _isLoading = false;
     notifyListeners();
@@ -979,11 +978,7 @@ class SalesProvider extends ChangeNotifier {
   }
 
   // Enhanced sale creation with custom order support
-  Future<String?> createSaleFromOrder({
-    required String orderId,
-    required double finalPayment,
-    String? additionalNotes,
-  }) async {
+  Future<String?> createSaleFromOrder({required String orderId, required double finalPayment, String? additionalNotes}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -1035,11 +1030,7 @@ class SalesProvider extends ChangeNotifier {
   }
 
   void clearCartItem(String productId, {String? customizationNotes}) {
-    _currentCart.removeWhere(
-      (item) =>
-          item.productId == productId &&
-          (customizationNotes == null || item.customizationNotes == customizationNotes),
-    );
+    _currentCart.removeWhere((item) => item.productId == productId && (customizationNotes == null || item.customizationNotes == customizationNotes));
     notifyListeners();
   }
 
@@ -1080,9 +1071,7 @@ class SalesProvider extends ChangeNotifier {
 
     final todaySales = _sales.where((sale) {
       final today = DateTime.now();
-      return sale.dateOfSale.day == today.day &&
-          sale.dateOfSale.month == today.month &&
-          sale.dateOfSale.year == today.year;
+      return sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year;
     }).length;
 
     final paidSales = _sales.where((sale) => sale.status == 'Paid').length;
@@ -1105,9 +1094,7 @@ class SalesProvider extends ChangeNotifier {
   Map<String, dynamic> get todayStats {
     final today = DateTime.now();
     final todaySales = _sales.where((sale) {
-      return sale.dateOfSale.day == today.day &&
-          sale.dateOfSale.month == today.month &&
-          sale.dateOfSale.year == today.year;
+      return sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year;
     }).toList();
 
     final todayRevenue = todaySales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
@@ -1130,11 +1117,7 @@ class SalesProvider extends ChangeNotifier {
 
     final weekRevenue = weekSales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
 
-    return {
-      'salesCount': weekSales.length,
-      'revenue': weekRevenue,
-      'averageDaily': weekSales.isNotEmpty ? weekRevenue / 7 : 0.0,
-    };
+    return {'salesCount': weekSales.length, 'revenue': weekRevenue, 'averageDaily': weekSales.isNotEmpty ? weekRevenue / 7 : 0.0};
   }
 
   List<Map<String, dynamic>> getTopSellingProducts({int limit = 5}) {
@@ -1195,19 +1178,13 @@ class SalesProvider extends ChangeNotifier {
         paymentStats[sale.paymentMethod]!['count'] += 1;
         paymentStats[sale.paymentMethod]!['amount'] += sale.grandTotal;
       } else {
-        paymentStats[sale.paymentMethod] = {
-          'method': sale.paymentMethod,
-          'count': 1,
-          'amount': sale.grandTotal,
-        };
+        paymentStats[sale.paymentMethod] = {'method': sale.paymentMethod, 'count': 1, 'amount': sale.grandTotal};
       }
     }
 
     return {
       'breakdown': paymentStats,
-      'mostUsed': paymentStats.values.isNotEmpty
-          ? paymentStats.values.reduce((a, b) => a['count'] > b['count'] ? a : b)['method']
-          : 'Cash',
+      'mostUsed': paymentStats.values.isNotEmpty ? paymentStats.values.reduce((a, b) => a['count'] > b['count'] ? a : b)['method'] : 'Cash',
     };
   }
 
@@ -1257,12 +1234,7 @@ class SalesProvider extends ChangeNotifier {
   }
 
   // Export functionality
-  List<Map<String, dynamic>> exportSalesData({
-    DateTime? fromDate,
-    DateTime? toDate,
-    String? customerId,
-    String? paymentMethod,
-  }) {
+  List<Map<String, dynamic>> exportSalesData({DateTime? fromDate, DateTime? toDate, String? customerId, String? paymentMethod}) {
     var salesToExport = _sales.where((sale) {
       if (fromDate != null && sale.dateOfSale.isBefore(fromDate)) return false;
       if (toDate != null && sale.dateOfSale.isAfter(toDate)) return false;
@@ -1329,8 +1301,7 @@ class SalesProvider extends ChangeNotifier {
     return _sales
         .where(
           (sale) =>
-              sale.dateOfSale.isAfter(fromDate.subtract(const Duration(days: 1))) &&
-              sale.dateOfSale.isBefore(toDate.add(const Duration(days: 1))),
+              sale.dateOfSale.isAfter(fromDate.subtract(const Duration(days: 1))) && sale.dateOfSale.isBefore(toDate.add(const Duration(days: 1))),
         )
         .toList();
   }
@@ -1361,8 +1332,7 @@ class SalesProvider extends ChangeNotifier {
 
   // Cart validation
   bool get canCheckout {
-    return _currentCart.isNotEmpty &&
-        _currentCart.every((item) => isProductAvailable(item.productId, item.quantity));
+    return _currentCart.isNotEmpty && _currentCart.every((item) => isProductAvailable(item.productId, item.quantity));
   }
 
   String? getCheckoutValidationError() {
@@ -1387,12 +1357,7 @@ class SalesProvider extends ChangeNotifier {
   Map<String, dynamic> get quickStats {
     final today = DateTime.now();
     final todaySales = _sales
-        .where(
-          (sale) =>
-              sale.dateOfSale.day == today.day &&
-              sale.dateOfSale.month == today.month &&
-              sale.dateOfSale.year == today.year,
-        )
+        .where((sale) => sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year)
         .length;
 
     final totalRevenue = _sales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);

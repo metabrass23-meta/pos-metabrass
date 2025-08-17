@@ -529,6 +529,14 @@ class Customer(models.Model):
             'top_countries': country_breakdown,
         }
 
+    def get_has_recent_sales(self):
+        """Check if customer has sales in last 90 days"""
+        try:
+            cutoff_date = timezone.now() - timedelta(days=90)
+            return self.sales.filter(date_of_sale__gte=cutoff_date, is_active=True).exists()
+        except Exception:
+            return False
+
 
 class CustomerQuerySet(models.QuerySet):
     """Custom QuerySet for Customer model"""

@@ -17,24 +17,24 @@ class CustomerService {
   final StorageService _storageService = StorageService();
 
   /// Get list of customers with pagination and filtering
-  Future<ApiResponse<CustomersListResponse>> getCustomers({
-    CustomerListParams? params,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getCustomers({CustomerListParams? params}) async {
     try {
       final queryParams = params?.toQueryParameters() ?? CustomerListParams().toQueryParameters();
 
-      final response = await _apiClient.get(
-        ApiConfig.customers,
-        queryParameters: queryParams,
-      );
+      // Debug: Log the API call
+      debugPrint('🚀 Calling API: ${ApiConfig.customers}');
+      debugPrint('🌐 Query params: $queryParams');
+
+      final response = await _apiClient.get(ApiConfig.customers, queryParameters: queryParams);
+
+      // Debug: Log the response
+      debugPrint('🌐 Response status: ${response.statusCode}');
+      debugPrint('🌐 Response data: ${response.data}');
 
       DebugHelper.printApiResponse('GET Customers', response.data);
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
 
         // Cache customers if successful
         if (apiResponse.success && apiResponse.data != null) {
@@ -75,17 +75,10 @@ class CustomerService {
         }
       }
 
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Get customers', e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customers',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers');
     }
   }
 
@@ -97,10 +90,7 @@ class CustomerService {
       DebugHelper.printApiResponse('GET Customer by ID', response.data);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        return ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
       } else {
         return ApiResponse<CustomerModel>(
           success: false,
@@ -111,17 +101,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get customer by ID DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customer by ID error: ${e.toString()}');
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while getting customer',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while getting customer');
     }
   }
 
@@ -154,18 +137,12 @@ class CustomerService {
 
       DebugHelper.printJson('Create Customer Request', request.toJson());
 
-      final response = await _apiClient.post(
-        ApiConfig.createCustomer,
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.createCustomer, data: request.toJson());
 
       DebugHelper.printApiResponse('POST Create Customer', response.data);
 
       if (response.statusCode == 201) {
-        final apiResponse = ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
 
         // Update cache with new customer
         if (apiResponse.success && apiResponse.data != null) {
@@ -183,17 +160,10 @@ class CustomerService {
     } on DioException catch (e) {
       DebugHelper.printError('Create customer DioException', e);
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Create customer', e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while creating customer: ${e.toString()}',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while creating customer: ${e.toString()}');
     }
   }
 
@@ -233,18 +203,12 @@ class CustomerService {
 
       DebugHelper.printJson('Update Customer Request', request.toJson());
 
-      final response = await _apiClient.put(
-        ApiConfig.updateCustomer(id),
-        data: request.toJson(),
-      );
+      final response = await _apiClient.put(ApiConfig.updateCustomer(id), data: request.toJson());
 
       DebugHelper.printApiResponse('PUT Update Customer', response.data);
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
 
         // Update cache with updated customer
         if (apiResponse.success && apiResponse.data != null) {
@@ -262,17 +226,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Update customer DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update customer error: ${e.toString()}');
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while updating customer',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while updating customer');
     }
   }
 
@@ -287,10 +244,7 @@ class CustomerService {
         // Remove from cache
         await _removeCustomerFromCache(id);
 
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Customer deleted permanently',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Customer deleted permanently');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -301,17 +255,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Delete customer DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<void>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Delete customer error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while deleting customer',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while deleting customer');
     }
   }
 
@@ -332,10 +279,7 @@ class CustomerService {
           await _cacheCustomers(cachedCustomers);
         }
 
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Customer soft deleted successfully',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Customer soft deleted successfully');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -346,17 +290,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Soft delete customer DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<void>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Soft delete customer error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while soft deleting customer',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while soft deleting customer');
     }
   }
 
@@ -368,10 +305,7 @@ class CustomerService {
       DebugHelper.printApiResponse('POST Restore Customer', response.data);
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
 
         // Update cache with restored customer
         if (apiResponse.success && apiResponse.data != null) {
@@ -389,17 +323,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Restore customer DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Restore customer error: ${e.toString()}');
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while restoring customer',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while restoring customer');
     }
   }
 
@@ -429,29 +356,16 @@ class CustomerService {
   }
 
   /// Get customers by status
-  Future<ApiResponse<CustomersListResponse>> getCustomersByStatus({
-    required String status,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getCustomersByStatus({required String status, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.customersByStatus(status),
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.customersByStatus(status), queryParameters: queryParams);
 
       DebugHelper.printApiResponse('GET Customers by Status', response.data);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -462,17 +376,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get customers by status DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customers by status error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customers by status',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers by status');
     }
   }
 
@@ -484,10 +391,7 @@ class CustomerService {
       DebugHelper.printApiResponse('GET Customer Statistics', response.data);
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomerStatisticsResponse>.fromJson(
-          response.data,
-              (data) => CustomerStatisticsResponse.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerStatisticsResponse>.fromJson(response.data, (data) => CustomerStatisticsResponse.fromJson(data));
 
         // Cache statistics if successful
         if (apiResponse.success && apiResponse.data != null) {
@@ -510,25 +414,14 @@ class CustomerService {
       if (apiError.type == 'network_error') {
         final cachedStats = await _getCachedCustomerStatistics();
         if (cachedStats != null) {
-          return ApiResponse<CustomerStatisticsResponse>(
-            success: true,
-            message: 'Showing cached statistics',
-            data: cachedStats,
-          );
+          return ApiResponse<CustomerStatisticsResponse>(success: true, message: 'Showing cached statistics', data: cachedStats);
         }
       }
 
-      return ApiResponse<CustomerStatisticsResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerStatisticsResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customer statistics error: ${e.toString()}');
-      return ApiResponse<CustomerStatisticsResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customer statistics',
-      );
+      return ApiResponse<CustomerStatisticsResponse>(success: false, message: 'An unexpected error occurred while getting customer statistics');
     }
   }
 
@@ -542,24 +435,12 @@ class CustomerService {
     String? country,
   }) async {
     try {
-      final request = CustomerContactUpdateRequest(
-        phone: phone,
-        email: email,
-        address: address,
-        city: city,
-        country: country,
-      );
+      final request = CustomerContactUpdateRequest(phone: phone, email: email, address: address, city: city, country: country);
 
-      final response = await _apiClient.put(
-        ApiConfig.updateCustomerContact(id),
-        data: request.toJson(),
-      );
+      final response = await _apiClient.put(ApiConfig.updateCustomerContact(id), data: request.toJson());
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
 
         // Update cache with updated customer
         if (apiResponse.success && apiResponse.data != null) {
@@ -577,17 +458,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Update customer contact DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update customer contact error: ${e.toString()}');
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while updating customer contact',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while updating customer contact');
     }
   }
 
@@ -598,21 +472,12 @@ class CustomerService {
     bool verified = true,
   }) async {
     try {
-      final request = CustomerVerificationRequest(
-        verificationType: verificationType,
-        verified: verified,
-      );
+      final request = CustomerVerificationRequest(verificationType: verificationType, verified: verified);
 
-      final response = await _apiClient.post(
-        ApiConfig.verifyCustomerContact(id),
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.verifyCustomerContact(id), data: request.toJson());
 
       if (response.statusCode == 200) {
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Customer contact verified successfully',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Customer contact verified successfully');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -623,17 +488,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Verify customer contact DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<void>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Verify customer contact error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while verifying customer contact',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while verifying customer contact');
     }
   }
 
@@ -644,21 +502,12 @@ class CustomerService {
     String? activityDate, // ISO format datetime string
   }) async {
     try {
-      final request = CustomerActivityUpdateRequest(
-        activityType: activityType,
-        activityDate: activityDate,
-      );
+      final request = CustomerActivityUpdateRequest(activityType: activityType, activityDate: activityDate);
 
-      final response = await _apiClient.post(
-        ApiConfig.updateCustomerActivity(id),
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.updateCustomerActivity(id), data: request.toJson());
 
       if (response.statusCode == 200) {
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Customer activity updated successfully',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Customer activity updated successfully');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -669,35 +518,19 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Update customer activity DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<void>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update customer activity error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while updating customer activity',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while updating customer activity');
     }
   }
 
   /// Bulk customer actions
-  Future<ApiResponse<Map<String, dynamic>>> bulkCustomerActions({
-    required List<String> customerIds,
-    required String action,
-  }) async {
+  Future<ApiResponse<Map<String, dynamic>>> bulkCustomerActions({required List<String> customerIds, required String action}) async {
     try {
-      final request = CustomerBulkActionRequest(
-        customerIds: customerIds,
-        action: action,
-      );
+      final request = CustomerBulkActionRequest(customerIds: customerIds, action: action);
 
-      final response = await _apiClient.post(
-        ApiConfig.bulkCustomerActions,
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.bulkCustomerActions, data: request.toJson());
 
       if (response.statusCode == 200) {
         return ApiResponse<Map<String, dynamic>>(
@@ -715,44 +548,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Bulk customer actions DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Bulk customer actions error: ${e.toString()}');
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'An unexpected error occurred while performing bulk action',
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while performing bulk action');
     }
   }
 
   /// Duplicate customer
-  Future<ApiResponse<CustomerModel>> duplicateCustomer({
-    required String id,
-    required String name,
-    required String phone,
-    String? email,
-  }) async {
+  Future<ApiResponse<CustomerModel>> duplicateCustomer({required String id, required String name, required String phone, String? email}) async {
     try {
-      final request = CustomerDuplicateRequest(
-        name: name,
-        phone: phone,
-        email: email,
-      );
+      final request = CustomerDuplicateRequest(name: name, phone: phone, email: email);
 
-      final response = await _apiClient.post(
-        ApiConfig.duplicateCustomer(id),
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.duplicateCustomer(id), data: request.toJson());
 
       if (response.statusCode == 201) {
-        final apiResponse = ApiResponse<CustomerModel>.fromJson(
-          response.data,
-              (data) => CustomerModel.fromJson(data),
-        );
+        final apiResponse = ApiResponse<CustomerModel>.fromJson(response.data, (data) => CustomerModel.fromJson(data));
 
         // Update cache with new customer
         if (apiResponse.success && apiResponse.data != null) {
@@ -770,17 +581,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Duplicate customer DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomerModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Duplicate customer error: ${e.toString()}');
-      return ApiResponse<CustomerModel>(
-        success: false,
-        message: 'An unexpected error occurred while duplicating customer',
-      );
+      return ApiResponse<CustomerModel>(success: false, message: 'An unexpected error occurred while duplicating customer');
     }
   }
 
@@ -798,9 +602,7 @@ class CustomerService {
     try {
       final cachedData = await _storageService.getData(ApiConfig.customersCacheKey);
       if (cachedData != null && cachedData is List) {
-        return cachedData
-            .map((json) => CustomerModel.fromJson(json as Map<String, dynamic>))
-            .toList();
+        return cachedData.map((json) => CustomerModel.fromJson(json as Map<String, dynamic>)).toList();
       }
     } catch (e) {
       debugPrint('Error getting cached customers: $e');
@@ -890,27 +692,14 @@ class CustomerService {
   }
 
   /// Get customers by type
-  Future<ApiResponse<CustomersListResponse>> getCustomersByType({
-    required String type,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getCustomersByType({required String type, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.customersByType(type),
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.customersByType(type), queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -921,42 +710,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get customers by type DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customers by type error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customers by type',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers by type');
     }
   }
 
   /// Get customers by city
-  Future<ApiResponse<CustomersListResponse>> getCustomersByCity({
-    required String city,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getCustomersByCity({required String city, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.customersByCity(city),
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.customersByCity(city), queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -967,42 +736,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get customers by city DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customers by city error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customers by city',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers by city');
     }
   }
 
   /// Get customers by country
-  Future<ApiResponse<CustomersListResponse>> getCustomersByCountry({
-    required String country,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getCustomersByCountry({required String country, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.customersByCountry(country),
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.customersByCountry(country), queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -1013,41 +762,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get customers by country DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get customers by country error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting customers by country',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers by country');
     }
   }
 
   /// Get Pakistani customers
-  Future<ApiResponse<CustomersListResponse>> getPakistaniCustomers({
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getPakistaniCustomers({int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.pakistaniCustomers,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.pakistaniCustomers, queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -1058,41 +788,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get Pakistani customers DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get Pakistani customers error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting Pakistani customers',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting Pakistani customers');
     }
   }
 
   /// Get international customers
-  Future<ApiResponse<CustomersListResponse>> getInternationalCustomers({
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getInternationalCustomers({int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.internationalCustomers,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.internationalCustomers, queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -1103,43 +814,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get international customers DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get international customers error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting international customers',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting international customers');
     }
   }
 
   /// Get new customers
-  Future<ApiResponse<CustomersListResponse>> getNewCustomers({
-    int days = 30,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getNewCustomers({int days = 30, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'days': days.toString(),
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'days': days.toString(), 'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.newCustomers,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.newCustomers, queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -1150,43 +840,22 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get new customers DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get new customers error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting new customers',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting new customers');
     }
   }
 
   /// Get recent customers
-  Future<ApiResponse<CustomersListResponse>> getRecentCustomers({
-    int days = 7,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<CustomersListResponse>> getRecentCustomers({int days = 7, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'days': days.toString(),
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'days': days.toString(), 'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.recentCustomers,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.recentCustomers, queryParameters: queryParams);
 
       if (response.statusCode == 200) {
-        return ApiResponse<CustomersListResponse>.fromJson(
-          response.data,
-              (data) => CustomersListResponse.fromJson(data),
-        );
+        return ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
@@ -1197,17 +866,10 @@ class CustomerService {
     } on DioException catch (e) {
       debugPrint('Get recent customers DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get recent customers error: ${e.toString()}');
-      return ApiResponse<CustomersListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting recent customers',
-      );
+      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting recent customers');
     }
   }
 }
