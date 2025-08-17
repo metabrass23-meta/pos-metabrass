@@ -405,7 +405,9 @@ class CustomerListSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(read_only=True)
     initials = serializers.CharField(source='get_initials', read_only=True)
     is_new_customer = serializers.BooleanField(read_only=True)
-    total_sales_count = serializers.ReadOnlyField()
+    
+    # Fix: Add proper source for computed fields
+    total_sales_count = serializers.IntegerField(read_only=True)
     has_recent_sales = serializers.SerializerMethodField()
     
     class Meta:
@@ -433,6 +435,13 @@ class CustomerListSerializer(serializers.ModelSerializer):
             'total_sales_count',
             'has_recent_sales'
         )
+    
+    def get_has_recent_sales(self, obj):
+        """Check if customer has sales in last 90 days"""
+        try:
+            return obj.get_has_recent_sales()
+        except Exception:
+            return False
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
@@ -485,12 +494,7 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
             'created_by'
         )
     
-    def get_has_recent_sales(self, obj):
-        """Check if customer has sales in last 90 days"""
-        from django.utils import timezone
-        from datetime import timedelta
-        cutoff_date = timezone.now() - timedelta(days=90)
-        return obj.sales.filter(date_of_sale__gte=cutoff_date, is_active=True).exists()
+    # Remove duplicate method - not needed for CustomerDetailSerializer
 
 
 class CustomerStatsSerializer(serializers.Serializer):
