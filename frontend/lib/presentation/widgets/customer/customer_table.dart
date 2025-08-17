@@ -115,11 +115,11 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
   double _getTableWidth(BuildContext context) {
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 1680.0, // Adjusted for new columns
-      small: 1780.0, // Adjusted for new columns
-      medium: 1880.0, // Adjusted for new columns
-      large: 1980.0, // Adjusted for new columns
-      ultrawide: 2080.0, // Adjusted for new columns
+      tablet: 1680.0, // Adjusted for 10 columns
+      small: 1780.0, // Adjusted for 10 columns
+      medium: 1880.0, // Adjusted for 10 columns
+      large: 1980.0, // Adjusted for 10 columns
+      ultrawide: 2080.0, // Adjusted for 10 columns
     );
   }
 
@@ -163,16 +163,16 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      200.0, // Name
-      180.0, // Phone
-      250.0, // Email
-      120.0, // Customer Type
-      120.0, // Status
-      150.0, // City
-      120.0, // Total Sales
-      150.0, // Last Purchase
-      150.0, // Customer Since
-      320.0, // Actions
+      180.0, // Name
+      160.0, // Phone
+      220.0, // Email
+      110.0, // Customer Type
+      110.0, // Status
+      130.0, // City
+      110.0, // Total Sales
+      130.0, // Last Purchase
+      130.0, // Customer Since
+      250.0, // Actions
     ];
   }
 
