@@ -35,6 +35,7 @@ dependencies:
   dio:
   shared_preferences:
   json_annotation:
+  intl:
 
 dev_dependencies:
   flutter_test:
