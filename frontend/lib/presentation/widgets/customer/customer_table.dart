@@ -11,12 +11,7 @@ class EnhancedCustomerTable extends StatefulWidget {
   final Function(Customer) onDelete;
   final Function(Customer) onView;
 
-  const EnhancedCustomerTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onView,
-  });
+  const EnhancedCustomerTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
 
   @override
   State<EnhancedCustomerTable> createState() => _EnhancedCustomerTableState();
@@ -39,39 +34,16 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Consumer<CustomerProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
             return Center(
               child: SizedBox(
-                width: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 3.w,
-                  small: 6.w,
-                  medium: 3.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
-                height: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 3.w,
-                  small: 6.w,
-                  medium: 3.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
-                child: const CircularProgressIndicator(
-                  color: AppTheme.primaryMaroon,
-                  strokeWidth: 3,
-                ),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+                height: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+                child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
           }
@@ -100,9 +72,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                     physics: const ClampingScrollPhysics(),
                     child: Container(
                       width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(
-                          vertical: context.cardPadding * 0.85,
-                          horizontal: context.cardPadding / 2),
+                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
                       child: _buildTableHeader(context),
                     ),
                   ),
@@ -133,9 +103,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                 ),
 
                 // Pagination Controls
-                if (provider.paginationInfo != null &&
-                    provider.paginationInfo!.totalPages > 1)
-                  _buildPaginationControls(context, provider),
+                if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
               ],
             ),
           );
@@ -147,11 +115,11 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
   double _getTableWidth(BuildContext context) {
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 1480.0, // Adjusted: 1600 - 120 (Customer ID column width)
-      small: 1580.0, // Adjusted: 1700 - 120
-      medium: 1680.0, // Adjusted: 1800 - 120
-      large: 1780.0, // Adjusted: 1900 - 120
-      ultrawide: 1880.0, // Adjusted: 2000 - 120
+      tablet: 1680.0, // Adjusted for new columns
+      small: 1780.0, // Adjusted for new columns
+      medium: 1880.0, // Adjusted for new columns
+      large: 1980.0, // Adjusted for new columns
+      ultrawide: 2080.0, // Adjusted for new columns
     );
   }
 
@@ -161,64 +129,57 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
     return Row(
       children: [
         // Name
-        Container(
-          width: columnWidths[0],
-          child: _buildSortableHeaderCell(context, 'Name', 'name'),
-        ),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Name', 'name')),
 
         // Phone
-        Container(
-          width: columnWidths[1],
-          child: _buildHeaderCell(context, 'Phone'),
-        ),
+        Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Phone')),
 
         // Email
-        Container(
-          width: columnWidths[2],
-          child: _buildHeaderCell(context, 'Email'),
-        ),
+        Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Email')),
+
+        // Customer Type
+        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Type')),
+
+        // Status
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Status')),
+
+        // City
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'City')),
+
+        // Total Sales
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Total Sales')),
 
         // Last Purchase
-        Container(
-          width: columnWidths[3],
-          child: _buildSortableHeaderCell(context, 'Last Purchase', 'last_order_date'),
-        ),
+        Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, 'Last Purchase', 'last_order_date')),
 
         // Customer Since
-        Container(
-          width: columnWidths[4],
-          child: _buildSortableHeaderCell(context, 'Customer Since', 'created_at'),
-        ),
+        Container(width: columnWidths[8], child: _buildSortableHeaderCell(context, 'Customer Since', 'created_at')),
 
         // Actions
-        Container(
-          width: columnWidths[5],
-          child: _buildHeaderCell(context, 'Actions'),
-        ),
+        Container(width: columnWidths[9], child: _buildHeaderCell(context, 'Actions')),
       ],
     );
   }
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      200.0, // Name (previously columnWidths[1])
-      180.0, // Phone (previously columnWidths[2])
-      250.0, // Email (previously columnWidths[3])
-      150.0, // Last Purchase (previously columnWidths[4])
-      150.0, // Customer Since (previously columnWidths[5])
-      320.0, // Actions (previously columnWidths[6])
+      200.0, // Name
+      180.0, // Phone
+      250.0, // Email
+      120.0, // Customer Type
+      120.0, // Status
+      150.0, // City
+      120.0, // Total Sales
+      150.0, // Last Purchase
+      150.0, // Customer Since
+      320.0, // Actions
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -246,9 +207,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                 ),
                 SizedBox(width: 4),
                 Icon(
-                  isCurrentSort
-                      ? (provider.sortAscending ? Icons.arrow_upward : Icons.arrow_downward)
-                      : Icons.sort,
+                  isCurrentSort ? (provider.sortAscending ? Icons.arrow_upward : Icons.arrow_downward) : Icons.sort,
                   size: 16,
                   color: isCurrentSort ? AppTheme.primaryMaroon : Colors.grey[500],
                 ),
@@ -265,15 +224,8 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
     return Container(
       decoration: BoxDecoration(
-        color: index.isEven
-            ? AppTheme.pureWhite
-            : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.5,
-          ),
-        ),
+        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
@@ -284,11 +236,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               customer.name,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -300,11 +248,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               customer.phone,
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -316,46 +260,117 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               customer.email,
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+          // Customer Type
+          Container(
+            width: columnWidths[3],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: customer.customerType == 'BUSINESS' ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.accentGold.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: customer.customerType == 'BUSINESS' ? AppTheme.primaryMaroon.withOpacity(0.3) : AppTheme.accentGold.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                customer.customerTypeDisplay,
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: customer.customerType == 'BUSINESS' ? AppTheme.primaryMaroon : AppTheme.accentGold,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          // Status
+          Container(
+            width: columnWidths[4],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: _getStatusColor(customer.status).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _getStatusColor(customer.status).withOpacity(0.3), width: 1),
+              ),
+              child: Text(
+                customer.statusDisplay,
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: _getStatusColor(customer.status)),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          // City
+          Container(
+            width: columnWidths[5],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Text(
+              customer.city ?? 'N/A',
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
+                color: customer.city != null ? AppTheme.charcoalGray : Colors.grey[500],
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
 
+          // Total Sales
+          Container(
+            width: columnWidths[6],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Row(
+              children: [
+                Icon(Icons.shopping_cart, size: 16, color: customer.totalSalesCount > 0 ? AppTheme.primaryMaroon : Colors.grey[400]),
+                SizedBox(width: 4),
+                Text(
+                  '${customer.totalSalesCount}',
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: customer.totalSalesCount > 0 ? AppTheme.primaryMaroon : Colors.grey[500],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Last Purchase
           Container(
-            width: columnWidths[3],
+            width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  customer.lastPurchase != null
-                      ? 'PKR ${customer.lastPurchase!.toStringAsFixed(0)}'
-                      : 'No purchases',
+                  customer.lastPurchase != null ? 'PKR ${customer.lastPurchase!.toStringAsFixed(0)}' : 'No purchases',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
-                    color: customer.lastPurchase != null
-                        ? AppTheme.charcoalGray
-                        : Colors.grey[500],
-                    fontStyle: customer.lastPurchase == null
-                        ? FontStyle.italic
-                        : FontStyle.normal,
+                    color: customer.lastPurchase != null ? AppTheme.charcoalGray : Colors.grey[500],
+                    fontStyle: customer.lastPurchase == null ? FontStyle.italic : FontStyle.normal,
                   ),
                 ),
                 if (customer.lastPurchaseDate != null) ...[
                   Text(
                     _formatDate(customer.lastPurchaseDate!),
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   ),
                 ],
               ],
@@ -364,26 +379,18 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
           // Customer Since
           Container(
-            width: columnWidths[4],
+            width: columnWidths[8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _formatDate(customer.createdAt),
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   customer.relativeCreatedAt,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -391,7 +398,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
           // Actions
           Container(
-            width: columnWidths[5],
+            width: columnWidths[9],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: _buildActions(context, customer),
           ),
@@ -412,15 +419,8 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.visibility_outlined,
-                color: Colors.purple,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -435,15 +435,8 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -458,15 +451,8 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -491,10 +477,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
           // Results info
           Text(
             'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} customers',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -505,39 +488,26 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
               // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
-                icon: Icon(
-                  Icons.chevron_left,
-                  color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400],
-                ),
+                icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
 
               // Page info
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.smallPadding,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryMaroon.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
                   '${pagination.currentPage} of ${pagination.totalPages}',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primaryMaroon,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 
               // Next button
               IconButton(
                 onPressed: pagination.hasNext ? provider.loadNextPage : null,
-                icon: Icon(
-                  Icons.chevron_right,
-                  color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400],
-                ),
+                icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
             ],
           ),
@@ -552,64 +522,28 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
-            child: Icon(
-              Icons.people_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
+            child: Icon(Icons.people_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
 
           Text(
             'No Customers Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
 
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
-              ),
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
               'Start by adding your first customer to manage your client relationships effectively',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -618,8 +552,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Material(
@@ -630,17 +563,11 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                          Icons.add_rounded,
-                          color: AppTheme.pureWhite,
-                          size: context.iconSize('medium')),
+                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
                         'Add First Customer',
@@ -664,5 +591,20 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'NEW':
+        return AppTheme.accentGold;
+      case 'REGULAR':
+        return AppTheme.primaryMaroon;
+      case 'VIP':
+        return AppTheme.secondaryMaroon;
+      case 'INACTIVE':
+        return Colors.grey[600]!;
+      default:
+        return AppTheme.charcoalGray;
+    }
   }
 }
