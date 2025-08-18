@@ -5,6 +5,7 @@ class Product {
   final String name;
   final String detail;
   final double price;
+  final double? costPrice; // Added cost price field
   final String color;
   final String fabric;
   final List<String> pieces;
@@ -26,6 +27,7 @@ class Product {
     required this.name,
     required this.detail,
     required this.price,
+    this.costPrice, // Added cost price parameter
     required this.color,
     required this.fabric,
     required this.pieces,
@@ -50,6 +52,7 @@ class Product {
       detail: json['detail'] as String? ?? '',
       // Handle price as string or number
       price: _parseDouble(json['price']),
+      costPrice: json['cost_price'] != null ? _parseDouble(json['cost_price']) : null, // Parse cost price
       color: json['color'] as String,
       fabric: json['fabric'] as String,
       pieces: _parsePieces(json['pieces']),
@@ -62,9 +65,7 @@ class Product {
       totalValue: _parseDouble(json['total_value']),
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
       createdBy: json['created_by'] as String?,
       createdById: json['created_by_id'] as int?,
       createdByEmail: json['created_by_email'] as String?,
@@ -102,6 +103,7 @@ class Product {
       'name': name,
       'detail': detail,
       'price': price,
+      'cost_price': costPrice, // Include cost price in JSON
       'color': color,
       'fabric': fabric,
       'pieces': pieces,
@@ -122,7 +124,34 @@ class Product {
 
   // Helper getters
   String get formattedPrice => 'PKR ${price.toStringAsFixed(0)}';
+  String get formattedCostPrice => costPrice != null ? 'PKR ${costPrice!.toStringAsFixed(0)}' : 'Not Set';
   String get formattedTotalValue => 'PKR ${totalValue.toStringAsFixed(0)}';
+
+  // Check if cost price is set
+  bool get hasCostPrice => costPrice != null && costPrice! > 0;
+
+  // Profit margin calculations
+  double? get profitMargin {
+    if (costPrice == null || costPrice == 0) return null;
+    return ((price - costPrice!) / price) * 100;
+  }
+
+  String get formattedProfitMargin {
+    final margin = profitMargin;
+    if (margin == null) return 'N/A';
+    return '${margin.toStringAsFixed(1)}%';
+  }
+
+  double? get profitAmount {
+    if (costPrice == null) return null;
+    return price - costPrice!;
+  }
+
+  String get formattedProfitAmount {
+    final profit = profitAmount;
+    if (profit == null) return 'N/A';
+    return 'PKR ${profit.toStringAsFixed(0)}';
+  }
 
   bool get isOutOfStock => stockStatus == 'OUT_OF_STOCK';
   bool get isLowStock => stockStatus == 'LOW_STOCK';
@@ -153,6 +182,7 @@ class Product {
     String? name,
     String? detail,
     double? price,
+    double? costPrice, // Added cost price parameter
     String? color,
     String? fabric,
     List<String>? pieces,
@@ -174,6 +204,7 @@ class Product {
       name: name ?? this.name,
       detail: detail ?? this.detail,
       price: price ?? this.price,
+      costPrice: costPrice ?? this.costPrice, // Include cost price
       color: color ?? this.color,
       fabric: fabric ?? this.fabric,
       pieces: pieces ?? this.pieces,
@@ -193,9 +224,7 @@ class Product {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is Product && runtimeType == other.runtimeType && id == other.id;
+  bool operator ==(Object other) => identical(this, other) || other is Product && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -210,28 +239,18 @@ class ProductsListResponse {
   final PaginationInfo pagination;
   final Map<String, dynamic>? filtersApplied;
 
-  ProductsListResponse({
-    required this.products,
-    required this.pagination,
-    this.filtersApplied,
-  });
+  ProductsListResponse({required this.products, required this.pagination, this.filtersApplied});
 
   factory ProductsListResponse.fromJson(Map<String, dynamic> json) {
     return ProductsListResponse(
-      products: (json['products'] as List? ?? [])
-          .map((productJson) => Product.fromJson(productJson))
-          .toList(),
+      products: (json['products'] as List? ?? []).map((productJson) => Product.fromJson(productJson)).toList(),
       pagination: PaginationInfo.fromJson(json['pagination'] ?? {}),
       filtersApplied: json['filters_applied'] as Map<String, dynamic>?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'products': products.map((product) => product.toJson()).toList(),
-      'pagination': pagination.toJson(),
-      'filters_applied': filtersApplied,
-    };
+    return {'products': products.map((product) => product.toJson()).toList(), 'pagination': pagination.toJson(), 'filters_applied': filtersApplied};
   }
 }
 
@@ -279,6 +298,7 @@ class ProductCreateRequest {
   final String name;
   final String detail;
   final double price;
+  final double? costPrice; // Added cost price field
   final String color;
   final String fabric;
   final List<String> pieces;
@@ -289,6 +309,7 @@ class ProductCreateRequest {
     required this.name,
     required this.detail,
     required this.price,
+    this.costPrice, // Made optional
     required this.color,
     required this.fabric,
     required this.pieces,
@@ -297,7 +318,7 @@ class ProductCreateRequest {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       'name': name,
       'detail': detail,
       'price': price,
@@ -307,6 +328,13 @@ class ProductCreateRequest {
       'quantity': quantity,
       'category': category,
     };
+
+    // Only include cost_price if it's not null
+    if (costPrice != null) {
+      data['cost_price'] = costPrice;
+    }
+
+    return data;
   }
 }
 
@@ -314,6 +342,7 @@ class ProductUpdateRequest {
   final String? name;
   final String? detail;
   final double? price;
+  final double? costPrice; // Added cost price field
   final String? color;
   final String? fabric;
   final List<String>? pieces;
@@ -324,6 +353,7 @@ class ProductUpdateRequest {
     this.name,
     this.detail,
     this.price,
+    this.costPrice, // Added cost price parameter
     this.color,
     this.fabric,
     this.pieces,
@@ -336,6 +366,7 @@ class ProductUpdateRequest {
     if (name != null) data['name'] = name;
     if (detail != null) data['detail'] = detail;
     if (price != null) data['price'] = price;
+    if (costPrice != null) data['cost_price'] = costPrice; // Include cost price
     if (color != null) data['color'] = color;
     if (fabric != null) data['fabric'] = fabric;
     if (pieces != null) data['pieces'] = pieces;
@@ -432,11 +463,8 @@ class ProductStatistics {
       totalInventoryValue: Product._parseDouble(json['total_inventory_value']),
       lowStockCount: json['low_stock_count'] as int? ?? 0,
       outOfStockCount: json['out_of_stock_count'] as int? ?? 0,
-      categoryBreakdown: (json['category_breakdown'] as List? ?? [])
-          .map((item) => CategoryStats.fromJson(item))
-          .toList(),
-      stockStatusSummary: StockStatusSummary.fromJson(
-          json['stock_status_summary'] as Map<String, dynamic>? ?? {}),
+      categoryBreakdown: (json['category_breakdown'] as List? ?? []).map((item) => CategoryStats.fromJson(item)).toList(),
+      stockStatusSummary: StockStatusSummary.fromJson(json['stock_status_summary'] as Map<String, dynamic>? ?? {}),
     );
   }
 
@@ -458,12 +486,7 @@ class CategoryStats {
   final int totalQuantity;
   final double? totalValue;
 
-  const CategoryStats({
-    required this.categoryName,
-    required this.count,
-    required this.totalQuantity,
-    this.totalValue,
-  });
+  const CategoryStats({required this.categoryName, required this.count, required this.totalQuantity, this.totalValue});
 
   factory CategoryStats.fromJson(Map<String, dynamic> json) {
     return CategoryStats(
@@ -475,12 +498,7 @@ class CategoryStats {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'category__name': categoryName,
-      'count': count,
-      'total_quantity': totalQuantity,
-      'total_value': totalValue,
-    };
+    return {'category__name': categoryName, 'count': count, 'total_quantity': totalQuantity, 'total_value': totalValue};
   }
 }
 
@@ -490,12 +508,7 @@ class StockStatusSummary {
   final int lowStock;
   final int outOfStock;
 
-  const StockStatusSummary({
-    required this.inStock,
-    required this.mediumStock,
-    required this.lowStock,
-    required this.outOfStock,
-  });
+  const StockStatusSummary({required this.inStock, required this.mediumStock, required this.lowStock, required this.outOfStock});
 
   factory StockStatusSummary.fromJson(Map<String, dynamic> json) {
     return StockStatusSummary(
@@ -507,40 +520,6 @@ class StockStatusSummary {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'in_stock': inStock,
-      'medium_stock': mediumStock,
-      'low_stock': lowStock,
-      'out_of_stock': outOfStock,
-    };
-  }
-}
-
-class BulkQuantityUpdate {
-  final List<QuantityUpdateItem> updates;
-
-  BulkQuantityUpdate({required this.updates});
-
-  Map<String, dynamic> toJson() {
-    return {
-      'updates': updates.map((item) => item.toJson()).toList(),
-    };
-  }
-}
-
-class QuantityUpdateItem {
-  final String productId;
-  final int quantity;
-
-  QuantityUpdateItem({
-    required this.productId,
-    required this.quantity,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'product_id': productId,
-      'quantity': quantity.toString(),
-    };
+    return {'in_stock': inStock, 'medium_stock': mediumStock, 'low_stock': lowStock, 'out_of_stock': outOfStock};
   }
 }

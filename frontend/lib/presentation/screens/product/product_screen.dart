@@ -7,6 +7,7 @@ import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/product/add_product_dialog.dart';
+
 import '../../widgets/product/delete_product_dialog.dart';
 import '../../widgets/product/edit_product_dialog.dart';
 import '../../widgets/product/filter_product_dialog.dart';
@@ -39,11 +40,7 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   void _showAddProductDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AddProductDialog(),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const AddProductDialog());
   }
 
   void _showEditProductDialog(Product product) {
@@ -71,11 +68,7 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   void _showFilterDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => const FilterProductsDialog(),
-    );
+    showDialog(context: context, barrierDismissible: true, builder: (context) => const FilterProductsDialog());
   }
 
   void _exportProducts() {
@@ -87,28 +80,18 @@ class _ProductPageState extends State<ProductPage> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.download_done,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.download_done, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Export completed! ${data.length} products exported.',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -148,20 +131,14 @@ class _ProductPageState extends State<ProductPage> {
                     return _buildErrorWidget(provider.errorMessage!);
                   }
 
-                  return context.statsCardColumns == 2
-                      ? _buildMobileStatsGrid(provider)
-                      : _buildDesktopStatsRow(provider);
+                  return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
                 },
               ),
               SizedBox(height: context.cardPadding * 0.5),
               _buildSearchSection(),
               SizedBox(height: context.cardPadding * 0.5),
               Expanded(
-                child: EnhancedProductTable(
-                  onEdit: _showEditProductDialog,
-                  onDelete: _showDeleteProductDialog,
-                  onView: _showViewProductDialog,
-                ),
+                child: EnhancedProductTable(onEdit: _showEditProductDialog, onDelete: _showDeleteProductDialog, onView: _showViewProductDialog),
               ),
             ],
           ),
@@ -180,19 +157,12 @@ class _ProductPageState extends State<ProductPage> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: context.iconSize('medium'),
-          ),
+          Icon(Icons.error_outline, color: Colors.red, size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: Colors.red[700],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red[700]),
             ),
           ),
           TextButton(
@@ -202,11 +172,7 @@ class _ProductPageState extends State<ProductPage> {
             },
             child: Text(
               'Retry',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.red[700],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
             ),
           ),
         ],
@@ -223,29 +189,17 @@ class _ProductPageState extends State<ProductPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 6.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(
-                  fontSize: 3.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -274,11 +228,7 @@ class _ProductPageState extends State<ProductPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 'Manage product inventory and details with comprehensive tools',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -304,17 +254,10 @@ class _ProductPageState extends State<ProductPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Manage product inventory',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -335,17 +278,10 @@ class _ProductPageState extends State<ProductPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Manage inventory',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -353,9 +289,7 @@ class _ProductPageState extends State<ProductPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -364,18 +298,11 @@ class _ProductPageState extends State<ProductPage> {
           onTap: _showAddProductDialog,
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding * 0.5,
-              vertical: context.cardPadding / 2,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.5, vertical: context.cardPadding / 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add' : 'Add Product',
@@ -398,21 +325,13 @@ class _ProductPageState extends State<ProductPage> {
     final stats = provider.productStats;
     return Row(
       children: [
-        Expanded(
-            child: _buildStatsCard('Total Products', stats['total'].toString(),
-                Icons.inventory_rounded, Colors.blue)),
+        Expanded(child: _buildStatsCard('Total Products', stats['total'].toString(), Icons.inventory_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('In Stock', stats['inStock'].toString(),
-                Icons.check_circle_rounded, Colors.green)),
+        Expanded(child: _buildStatsCard('In Stock', stats['inStock'].toString(), Icons.check_circle_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('Total Value', 'PKR ${stats['totalValue']}',
-                Icons.attach_money_rounded, Colors.purple)),
+        Expanded(child: _buildStatsCard('Total Value', 'PKR ${stats['totalValue']}', Icons.attach_money_rounded, Colors.purple)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('Low Stock', stats['lowStock'].toString(),
-                Icons.warning_rounded, Colors.orange)),
+        Expanded(child: _buildStatsCard('Low Stock', stats['lowStock'].toString(), Icons.warning_rounded, Colors.orange)),
       ],
     );
   }
@@ -423,25 +342,17 @@ class _ProductPageState extends State<ProductPage> {
       children: [
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.inventory_rounded, Colors.blue)),
+            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.inventory_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('In Stock', stats['inStock'].toString(),
-                    Icons.check_circle_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard('In Stock', stats['inStock'].toString(), Icons.check_circle_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Value', 'PKR ${stats['totalValue']}',
-                    Icons.attach_money_rounded, Colors.purple)),
+            Expanded(child: _buildStatsCard('Value', 'PKR ${stats['totalValue']}', Icons.attach_money_rounded, Colors.purple)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('Low Stock', stats['lowStock'].toString(),
-                    Icons.warning_rounded, Colors.orange)),
+            Expanded(child: _buildStatsCard('Low Stock', stats['lowStock'].toString(), Icons.warning_rounded, Colors.orange)),
           ],
         ),
       ],
@@ -454,13 +365,7 @@ class _ProductPageState extends State<ProductPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
@@ -476,20 +381,13 @@ class _ProductPageState extends State<ProductPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
+        Expanded(flex: 3, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
+        Expanded(flex: 1, child: _buildFilterButton()),
         SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+
+        SizedBox(width: context.smallPadding),
+        Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
   }
@@ -534,41 +432,22 @@ class _ProductPageState extends State<ProductPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchProducts,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search products...'
-                  : 'Search products by ID, name, color, fabric, or pieces...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
+              hintText: context.isTablet ? 'Search products...' : 'Search products by ID, name, color, fabric, or pieces...',
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchProducts('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        provider.searchProducts('');
+                      },
+                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                    )
                   : null,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
             ),
           );
         },
@@ -589,28 +468,17 @@ class _ProductPageState extends State<ProductPage> {
             decoration: BoxDecoration(
               color: AppTheme.lightGray,
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: Colors.grey.shade300,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.filter_list_rounded,
-                  color: AppTheme.primaryMaroon,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.filter_list_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                 if (!context.isTablet) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
                     'Filter',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.primaryMaroon,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                   ),
                 ],
               ],
@@ -634,28 +502,17 @@ class _ProductPageState extends State<ProductPage> {
             decoration: BoxDecoration(
               color: AppTheme.accentGold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: AppTheme.accentGold.withOpacity(0.3),
-                width: 1,
-              ),
+              border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.download_rounded,
-                  color: AppTheme.accentGold,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.download_rounded, color: AppTheme.accentGold, size: context.iconSize('medium')),
                 if (!context.isTablet) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
                     'Export',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.accentGold,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
                   ),
                 ],
               ],
@@ -673,27 +530,14 @@ class _ProductPageState extends State<ProductPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -720,11 +564,7 @@ class _ProductPageState extends State<ProductPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

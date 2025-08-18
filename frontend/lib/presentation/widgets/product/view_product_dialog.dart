@@ -16,8 +16,7 @@ class ViewProductDetailsDialog extends StatefulWidget {
   State<ViewProductDetailsDialog> createState() => _ViewProductDetailsDialogState();
 }
 
-class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
-    with SingleTickerProviderStateMixin {
+class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -27,15 +26,9 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
     super.initState();
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -58,21 +51,14 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.7 * _fadeAnimation.value),
+          backgroundColor: Colors.black.withOpacity(0.7 * (_fadeAnimation.value.clamp(0.0, 1.0))),
           body: Center(
             child: Transform.scale(
-              scale: _scaleAnimation.value,
+              scale: _scaleAnimation.value.clamp(0.1, 2.0),
               child: Container(
-                width: context.dialogWidth,
+                width: context.dialogWidth ?? 600,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -80,11 +66,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -147,10 +129,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Icon(Icons.inventory_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
@@ -183,17 +162,10 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.product.id ?? 'N/A',
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -262,11 +234,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Name',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -274,10 +242,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -290,11 +255,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                 SizedBox(width: context.cardPadding),
                 Text(
                   widget.product.name ?? 'Unnamed Product',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize * 1.1,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.blue[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w700, color: Colors.blue[700]),
                 ),
               ],
             ),
@@ -307,10 +268,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
   Widget _buildDescriptionCard(bool isCompact) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-      ),
+      decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -320,11 +278,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Details',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -370,10 +324,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
+          decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -383,23 +334,81 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     'Price',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 'PKR ${widget.product.price?.toStringAsFixed(0) ?? 'N/A'}',
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.2, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: context.cardPadding),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(context.cardPadding),
+          decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.shopping_cart_outlined, size: context.iconSize('small'), color: Colors.orange),
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Cost Price',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.smallPadding / 2),
+              Text(
+                widget.product.formattedCostPrice,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize * 1.2,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
+                  color: widget.product.hasCostPrice ? AppTheme.charcoalGray : Colors.grey[500],
                 ),
               ),
+              if (widget.product.hasCostPrice) ...[
+                SizedBox(height: context.smallPadding / 2),
+                Row(
+                  children: [
+                    Icon(Icons.trending_up, size: context.iconSize('small'), color: Colors.green),
+                    SizedBox(width: context.smallPadding / 2),
+                    Text(
+                      'Profit: ${widget.product.formattedProfitAmount} (${widget.product.formattedProfitMargin})',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                SizedBox(height: context.smallPadding / 2),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.info_outline, size: context.iconSize('small'), color: Colors.orange[700]),
+                      SizedBox(width: context.smallPadding / 2),
+                      Flexible(
+                        child: Text(
+                          'Set cost price to calculate profit margin',
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.orange[700]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -416,37 +425,22 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.inventory_2,
-                    size: context.iconSize('small'),
-                    color: widget.product.stockStatusColor ?? Colors.grey,
-                  ),
+                  Icon(Icons.inventory_2, size: context.iconSize('small'), color: widget.product.stockStatusColor ?? Colors.grey),
                   SizedBox(width: context.smallPadding),
                   Text(
                     'Stock Status',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 '${widget.product.quantity ?? 0} units',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.smallPadding / 2),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 3,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                 decoration: BoxDecoration(
                   color: (widget.product.stockStatusColor ?? Colors.grey).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -473,10 +467,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
         Expanded(
           child: Container(
             padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -486,23 +477,53 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Price',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   'PKR ${widget.product.price?.toStringAsFixed(0) ?? 'N/A'}',
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.2, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(context.cardPadding),
+            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.shopping_cart_outlined, size: context.iconSize('small'), color: Colors.orange),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'Cost Price',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 2),
+                Text(
+                  widget.product.formattedCostPrice,
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize * 1.2,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.charcoalGray,
+                    color: widget.product.costPrice != null ? AppTheme.charcoalGray : Colors.grey[500],
                   ),
                 ),
+                if (widget.product.costPrice != null) ...[
+                  SizedBox(height: context.smallPadding / 2),
+                  Text(
+                    'Profit: ${widget.product.formattedProfitAmount} (${widget.product.formattedProfitMargin})',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                  ),
+                ],
               ],
             ),
           ),
@@ -520,37 +541,22 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.inventory_2,
-                      size: context.iconSize('small'),
-                      color: widget.product.stockStatusColor ?? Colors.grey,
-                    ),
+                    Icon(Icons.inventory_2, size: context.iconSize('small'), color: widget.product.stockStatusColor ?? Colors.grey),
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Stock Status',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   '${widget.product.quantity ?? 0} units',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding,
-                    vertical: context.smallPadding / 3,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                   decoration: BoxDecoration(
                     color: (widget.product.stockStatusColor ?? Colors.grey).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -589,11 +595,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Attributes',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -625,21 +627,11 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
                   widget.product.color ?? 'N/A',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
               ),
             ),
@@ -657,21 +649,11 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
                   widget.product.fabric ?? 'N/A',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
               ),
             ),
@@ -690,22 +672,12 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             children: [
               Text(
                 'Color:',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               SizedBox(height: context.smallPadding / 2),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -713,11 +685,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       widget.product.color ?? 'N/A',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -732,22 +700,12 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
             children: [
               Text(
                 'Fabric:',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               SizedBox(height: context.smallPadding / 2),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -755,11 +713,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       widget.product.fabric ?? 'N/A',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -788,11 +742,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Pieces',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -811,10 +761,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                     runSpacing: context.smallPadding,
                     children: widget.product.pieces!.map((piece) {
                       return Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.smallPadding,
-                          vertical: context.smallPadding / 2,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                         decoration: BoxDecoration(
                           color: Colors.orange.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -822,11 +769,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                         ),
                         child: Text(
                           piece,
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.orange[700],
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.orange[700]),
                         ),
                       );
                     }).toList(),
@@ -845,10 +788,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -856,11 +796,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog>
                 SizedBox(width: context.smallPadding),
                 Text(
                   'Product Active',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
                 ),
               ],
             ),

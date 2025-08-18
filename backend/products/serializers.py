@@ -26,6 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'name',
             'detail',
             'price',
+            'cost_price',
             'color',
             'fabric',
             'pieces',
@@ -114,6 +115,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             'name',
             'detail',
             'price',
+            'cost_price',
             'color',
             'fabric',
             'pieces',
@@ -190,6 +192,15 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         validated_data['created_by'] = user
         return super().create(validated_data)
 
+    def validate_cost_price(self, value):
+        """Validate cost price field"""
+        if value is not None:
+            if value < 0:
+                raise serializers.ValidationError("Cost price cannot be negative.")
+            if value > 9999999999.99:
+                raise serializers.ValidationError("Cost price is too large.")
+        return value
+
 
 class ProductUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating products"""
@@ -202,6 +213,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             'name',
             'detail',
             'price',
+            'cost_price',
             'color',
             'fabric',
             'pieces',
@@ -272,6 +284,15 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Product detail/description is required.")
         return value.strip()
 
+    def validate_cost_price(self, value):
+        """Validate cost price field"""
+        if value is not None:
+            if value < 0:
+                raise serializers.ValidationError("Cost price cannot be negative.")
+            if value > 9999999999.99:
+                raise serializers.ValidationError("Cost price is too large.")
+        return value
+
 
 class ProductListSerializer(serializers.ModelSerializer):
     """Minimal serializer for listing products"""
@@ -290,6 +311,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             'name',
             'detail',  # Added
             'price',
+            'cost_price',
             'color',
             'fabric',
             'pieces',  # Added
@@ -328,6 +350,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'name',
             'detail',
             'price',
+            'cost_price',
             'color',
             'fabric',
             'pieces',

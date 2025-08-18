@@ -18,18 +18,9 @@ class ProductService {
   final StorageService _storageService = StorageService();
 
   /// Get list of products with pagination and filtering - FIXED
-  Future<ApiResponse<ProductsListResponse>> getProducts({
-    int page = 1,
-    int pageSize = 20,
-    ProductFilters? filters,
-    bool showInactive = false,
-  }) async {
+  Future<ApiResponse<ProductsListResponse>> getProducts({int page = 1, int pageSize = 20, ProductFilters? filters, bool showInactive = false}) async {
     try {
-      final queryParams = <String, dynamic>{
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-        'show_inactive': showInactive.toString(),
-      };
+      final queryParams = <String, dynamic>{'page': page.toString(), 'page_size': pageSize.toString(), 'show_inactive': showInactive.toString()};
 
       // Add filters if provided
       if (filters != null) {
@@ -44,11 +35,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] instead of response.data
         final ProductsListResponse productsResponse = ProductsListResponse.fromJson(response.data['data']);
 
-        final apiResponse = ApiResponse<ProductsListResponse>(
-          success: true,
-          message: 'Products loaded successfully',
-          data: productsResponse,
-        );
+        final apiResponse = ApiResponse<ProductsListResponse>(success: true, message: 'Products loaded successfully', data: productsResponse);
 
         // Cache products if successful
         if (apiResponse.data != null) {
@@ -89,17 +76,10 @@ class ProductService {
         }
       }
 
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Get products', e);
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting products',
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: 'An unexpected error occurred while getting products');
     }
   }
 
@@ -112,11 +92,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] or response.data['product']
         final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
 
-        return ApiResponse<Product>(
-          success: true,
-          message: 'Product loaded successfully',
-          data: product,
-        );
+        return ApiResponse<Product>(success: true, message: 'Product loaded successfully', data: product);
       } else {
         return ApiResponse<Product>(
           success: false,
@@ -130,10 +106,7 @@ class ProductService {
       return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get product by ID error: ${e.toString()}');
-      return ApiResponse<Product>(
-        success: false,
-        message: 'An unexpected error occurred while getting product',
-      );
+      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while getting product');
     }
   }
 
@@ -142,6 +115,7 @@ class ProductService {
     required String name,
     required String detail,
     required double price,
+    double? costPrice, // Added cost price parameter
     required String color,
     required String fabric,
     required List<String> pieces,
@@ -153,6 +127,7 @@ class ProductService {
         name: name,
         detail: detail,
         price: price,
+        costPrice: costPrice, // Include cost price
         color: color,
         fabric: fabric,
         pieces: pieces,
@@ -170,11 +145,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] or response.data['product']
         final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(
-          success: true,
-          message: response.data['message'] ?? 'Product created successfully',
-          data: product,
-        );
+        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product created successfully', data: product);
 
         // Update cache with new product
         if (apiResponse.data != null) {
@@ -195,10 +166,7 @@ class ProductService {
       return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Create product', e);
-      return ApiResponse<Product>(
-        success: false,
-        message: 'An unexpected error occurred while creating product: ${e.toString()}',
-      );
+      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while creating product: ${e.toString()}');
     }
   }
 
@@ -208,6 +176,7 @@ class ProductService {
     String? name,
     String? detail,
     double? price,
+    double? costPrice, // Added cost price parameter
     String? color,
     String? fabric,
     List<String>? pieces,
@@ -219,6 +188,7 @@ class ProductService {
         name: name,
         detail: detail,
         price: price,
+        costPrice: costPrice, // Include cost price
         color: color,
         fabric: fabric,
         pieces: pieces,
@@ -232,11 +202,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] or response.data['product']
         final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(
-          success: true,
-          message: response.data['message'] ?? 'Product updated successfully',
-          data: product,
-        );
+        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product updated successfully', data: product);
 
         // Update cache with updated product
         if (apiResponse.data != null) {
@@ -257,10 +223,7 @@ class ProductService {
       return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update product error: ${e.toString()}');
-      return ApiResponse<Product>(
-        success: false,
-        message: 'An unexpected error occurred while updating product',
-      );
+      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while updating product');
     }
   }
 
@@ -273,10 +236,7 @@ class ProductService {
         // Remove from cache
         await _removeProductFromCache(id);
 
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Product deleted permanently',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Product deleted permanently');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -290,10 +250,7 @@ class ProductService {
       return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Delete product error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while deleting product',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while deleting product');
     }
   }
 
@@ -306,10 +263,7 @@ class ProductService {
         // Remove from cache since it's now inactive
         await _removeProductFromCache(id);
 
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Product deactivated successfully',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Product deactivated successfully');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -323,10 +277,7 @@ class ProductService {
       return ApiResponse<void>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Soft delete product error: ${e.toString()}');
-      return ApiResponse<void>(
-        success: false,
-        message: 'An unexpected error occurred while deactivating product',
-      );
+      return ApiResponse<void>(success: false, message: 'An unexpected error occurred while deactivating product');
     }
   }
 
@@ -339,11 +290,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] or response.data['product']
         final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(
-          success: true,
-          message: response.data['message'] ?? 'Product restored successfully',
-          data: product,
-        );
+        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product restored successfully', data: product);
 
         // Add restored product back to cache
         if (apiResponse.data != null) {
@@ -364,19 +311,12 @@ class ProductService {
       return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Restore product error: ${e.toString()}');
-      return ApiResponse<Product>(
-        success: false,
-        message: 'An unexpected error occurred while restoring product',
-      );
+      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while restoring product');
     }
   }
 
   /// Search products - FIXED
-  Future<ApiResponse<ProductsListResponse>> searchProducts({
-    required String query,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<ProductsListResponse>> searchProducts({required String query, int page = 1, int pageSize = 20}) async {
     try {
       final queryParams = {'q': query, 'page': page.toString(), 'page_size': pageSize.toString()};
 
@@ -386,11 +326,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] instead of response.data
         final ProductsListResponse productsResponse = ProductsListResponse.fromJson(response.data['data']);
 
-        return ApiResponse<ProductsListResponse>(
-          success: true,
-          message: 'Search completed successfully',
-          data: productsResponse,
-        );
+        return ApiResponse<ProductsListResponse>(success: true, message: 'Search completed successfully', data: productsResponse);
       } else {
         return ApiResponse<ProductsListResponse>(
           success: false,
@@ -401,43 +337,25 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Search products DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Search products error: ${e.toString()}');
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while searching products',
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: 'An unexpected error occurred while searching products');
     }
   }
 
   /// Get products by category - FIXED
-  Future<ApiResponse<ProductsListResponse>> getProductsByCategory({
-    required String categoryId,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<ProductsListResponse>> getProductsByCategory({required String categoryId, int page = 1, int pageSize = 20}) async {
     try {
       final queryParams = {'page': page.toString(), 'page_size': pageSize.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.productsByCategory(categoryId),
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.productsByCategory(categoryId), queryParameters: queryParams);
 
       if (response.statusCode == 200) {
         // FIXED: Parse from response.data['data'] instead of response.data
         final ProductsListResponse productsResponse = ProductsListResponse.fromJson(response.data['data']);
 
-        return ApiResponse<ProductsListResponse>(
-          success: true,
-          message: 'Products loaded successfully',
-          data: productsResponse,
-        );
+        return ApiResponse<ProductsListResponse>(success: true, message: 'Products loaded successfully', data: productsResponse);
       } else {
         return ApiResponse<ProductsListResponse>(
           success: false,
@@ -448,32 +366,17 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Get products by category DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get products by category error: ${e.toString()}');
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting products by category',
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: 'An unexpected error occurred while getting products by category');
     }
   }
 
   /// Get low stock products - FIXED
-  Future<ApiResponse<ProductsListResponse>> getLowStockProducts({
-    int threshold = 5,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<ApiResponse<ProductsListResponse>> getLowStockProducts({int threshold = 5, int page = 1, int pageSize = 20}) async {
     try {
-      final queryParams = {
-        'threshold': threshold.toString(),
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'threshold': threshold.toString(), 'page': page.toString(), 'page_size': pageSize.toString()};
 
       final response = await _apiClient.get(ApiConfig.lowStockProducts, queryParameters: queryParams);
 
@@ -481,11 +384,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] instead of response.data
         final ProductsListResponse productsResponse = ProductsListResponse.fromJson(response.data['data']);
 
-        return ApiResponse<ProductsListResponse>(
-          success: true,
-          message: 'Low stock products loaded successfully',
-          data: productsResponse,
-        );
+        return ApiResponse<ProductsListResponse>(success: true, message: 'Low stock products loaded successfully', data: productsResponse);
       } else {
         return ApiResponse<ProductsListResponse>(
           success: false,
@@ -496,17 +395,10 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Get low stock products DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get low stock products error: ${e.toString()}');
-      return ApiResponse<ProductsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting low stock products',
-      );
+      return ApiResponse<ProductsListResponse>(success: false, message: 'An unexpected error occurred while getting low stock products');
     }
   }
 
@@ -519,11 +411,7 @@ class ProductService {
         // FIXED: Parse from response.data['data'] instead of response.data
         final ProductStatistics statistics = ProductStatistics.fromJson(response.data['data']);
 
-        final apiResponse = ApiResponse<ProductStatistics>(
-          success: true,
-          message: 'Statistics loaded successfully',
-          data: statistics,
-        );
+        final apiResponse = ApiResponse<ProductStatistics>(success: true, message: 'Statistics loaded successfully', data: statistics);
 
         // Cache statistics
         if (apiResponse.data != null) {
@@ -546,33 +434,19 @@ class ProductService {
       if (apiError.type == 'network_error') {
         final cachedStats = await _getCachedProductStats();
         if (cachedStats != null) {
-          return ApiResponse<ProductStatistics>(
-            success: true,
-            message: 'Showing cached data',
-            data: cachedStats,
-          );
+          return ApiResponse<ProductStatistics>(success: true, message: 'Showing cached data', data: cachedStats);
         }
       }
 
-      return ApiResponse<ProductStatistics>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ProductStatistics>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get product statistics error: ${e.toString()}');
-      return ApiResponse<ProductStatistics>(
-        success: false,
-        message: 'An unexpected error occurred while getting product statistics',
-      );
+      return ApiResponse<ProductStatistics>(success: false, message: 'An unexpected error occurred while getting product statistics');
     }
   }
 
   /// Update product quantity
-  Future<ApiResponse<Map<String, dynamic>>> updateProductQuantity({
-    required String productId,
-    required int newQuantity,
-  }) async {
+  Future<ApiResponse<Map<String, dynamic>>> updateProductQuantity({required String productId, required int newQuantity}) async {
     try {
       final data = {'quantity': newQuantity};
 
@@ -597,104 +471,10 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Update product quantity DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update product quantity error: ${e.toString()}');
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'An unexpected error occurred while updating quantity',
-      );
-    }
-  }
-
-  /// Bulk update product quantities
-  Future<ApiResponse<Map<String, dynamic>>> bulkUpdateQuantities({
-    required List<QuantityUpdateItem> updates,
-  }) async {
-    try {
-      final request = BulkQuantityUpdate(updates: updates);
-
-      final response = await _apiClient.post(ApiConfig.bulkUpdateQuantities, data: request.toJson());
-
-      if (response.statusCode == 200) {
-        // Update cache for each product
-        for (final update in updates) {
-          await _updateProductQuantityInCache(update.productId, update.quantity);
-        }
-
-        return ApiResponse<Map<String, dynamic>>(
-          success: true,
-          message: response.data['message'] ?? 'Bulk update completed successfully',
-          data: response.data['data'] as Map<String, dynamic>?,
-        );
-      } else {
-        return ApiResponse<Map<String, dynamic>>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to perform bulk update',
-          errors: response.data['errors'] as Map<String, dynamic>?,
-        );
-      }
-    } on DioException catch (e) {
-      debugPrint('Bulk update quantities DioException: ${e.toString()}');
-      final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
-    } catch (e) {
-      debugPrint('Bulk update quantities error: ${e.toString()}');
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'An unexpected error occurred during bulk update',
-      );
-    }
-  }
-
-  /// Duplicate a product - FIXED
-  Future<ApiResponse<Product>> duplicateProduct({required String productId, String? newName}) async {
-    try {
-      final data = newName != null ? {'name': newName} : <String, dynamic>{};
-
-      final response = await _apiClient.post(ApiConfig.duplicateProduct(productId), data: data);
-
-      if (response.statusCode == 201) {
-        // FIXED: Parse from response.data['data'] or response.data['product']
-        final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
-
-        final apiResponse = ApiResponse<Product>(
-          success: true,
-          message: response.data['message'] ?? 'Product duplicated successfully',
-          data: product,
-        );
-
-        // Add duplicated product to cache
-        if (apiResponse.data != null) {
-          await _addProductToCache(apiResponse.data!);
-        }
-
-        return apiResponse;
-      } else {
-        return ApiResponse<Product>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to duplicate product',
-          errors: response.data['errors'] as Map<String, dynamic>?,
-        );
-      }
-    } on DioException catch (e) {
-      debugPrint('Duplicate product DioException: ${e.toString()}');
-      final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
-    } catch (e) {
-      debugPrint('Duplicate product error: ${e.toString()}');
-      return ApiResponse<Product>(
-        success: false,
-        message: 'An unexpected error occurred while duplicating product',
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while updating quantity');
     }
   }
 
@@ -758,10 +538,7 @@ class ProductService {
       final cachedProducts = await _getCachedProducts();
       final index = cachedProducts.indexWhere((product) => product.id == productId);
       if (index != -1) {
-        final updatedProduct = cachedProducts[index].copyWith(
-          quantity: newQuantity,
-          updatedAt: DateTime.now(),
-        );
+        final updatedProduct = cachedProducts[index].copyWith(quantity: newQuantity, updatedAt: DateTime.now());
         cachedProducts[index] = updatedProduct;
         await _cacheProducts(cachedProducts);
       }
