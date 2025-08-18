@@ -47,27 +47,60 @@ class ProductProvider extends ChangeNotifier {
 
   // Available options for dropdowns
   final List<String> availableColors = [
-    'Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Pink', 'Black',
-    'White', 'Brown', 'Gray', 'Navy', 'Maroon', 'Gold', 'Silver', 'Beige'
+    'Red',
+    'Blue',
+    'Green',
+    'Yellow',
+    'Orange',
+    'Purple',
+    'Pink',
+    'Black',
+    'White',
+    'Brown',
+    'Gray',
+    'Navy',
+    'Maroon',
+    'Gold',
+    'Silver',
+    'Beige',
   ];
 
   final List<String> availableFabrics = [
-    'Cotton', 'Silk', 'Chiffon', 'Georgette', 'Net', 'Velvet', 'Satin',
-    'Organza', 'Crepe', 'Linen', 'Jacquard', 'Brocade', 'Lawn', 'Khaddar'
+    'Cotton',
+    'Silk',
+    'Chiffon',
+    'Georgette',
+    'Net',
+    'Velvet',
+    'Satin',
+    'Organza',
+    'Crepe',
+    'Linen',
+    'Jacquard',
+    'Brocade',
+    'Lawn',
+    'Khaddar',
   ];
 
   final List<String> availablePieces = [
-    'Blouse', 'Lehenga', 'Dupatta', 'Shirt', 'Trouser', 'Kurta', 'Palazzo',
-    'Scarf', 'Veil', 'Jacket', 'Waistcoat', 'Sharara', 'Gharara'
+    'Blouse',
+    'Lehenga',
+    'Dupatta',
+    'Shirt',
+    'Trouser',
+    'Kurta',
+    'Palazzo',
+    'Scarf',
+    'Veil',
+    'Jacket',
+    'Waistcoat',
+    'Sharara',
+    'Gharara',
   ];
 
-  final List<String> stockLevels = [
-    'HIGH_STOCK', 'MEDIUM_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'
-  ];
+  final List<String> stockLevels = ['HIGH_STOCK', 'MEDIUM_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'];
 
-  final List<String> sortOptions = [
-    'name', 'price', 'quantity', 'created_at', 'updated_at'
-  ];
+  final List<String> sortOptions = ['name', 'price', 'quantity', 'created_at', 'updated_at'];
 
   /// Initialize provider - load data
   Future<void> initialize() async {
@@ -90,11 +123,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Load products with pagination and filters
-  Future<void> loadProducts({
-    int page = 1,
-    bool append = false,
-    bool showInactive = false,
-  }) async {
+  Future<void> loadProducts({int page = 1, bool append = false, bool showInactive = false}) async {
     if (!append) {
       _isLoading = true;
       _errorMessage = null;
@@ -102,12 +131,7 @@ class ProductProvider extends ChangeNotifier {
     }
 
     try {
-      final response = await _productService.getProducts(
-        page: page,
-        pageSize: 20,
-        filters: _currentFilters,
-        showInactive: showInactive,
-      );
+      final response = await _productService.getProducts(page: page, pageSize: 20, filters: _currentFilters, showInactive: showInactive);
 
       if (response.success && response.data != null) {
         final data = response.data!;
@@ -228,6 +252,7 @@ class ProductProvider extends ChangeNotifier {
     required String name,
     required String detail,
     required double price,
+    double? costPrice, // Added cost price parameter
     required String color,
     required String fabric,
     required List<String> pieces,
@@ -243,6 +268,7 @@ class ProductProvider extends ChangeNotifier {
         name: name,
         detail: detail,
         price: price,
+        costPrice: costPrice, // Include cost price
         color: color,
         fabric: fabric,
         pieces: pieces,
@@ -276,6 +302,7 @@ class ProductProvider extends ChangeNotifier {
     String? name,
     String? detail,
     double? price,
+    double? costPrice, // Added cost price parameter
     String? color,
     String? fabric,
     List<String>? pieces,
@@ -292,6 +319,7 @@ class ProductProvider extends ChangeNotifier {
         name: name,
         detail: detail,
         price: price,
+        costPrice: costPrice, // Include cost price
         color: color,
         fabric: fabric,
         pieces: pieces,
@@ -436,28 +464,19 @@ class ProductProvider extends ChangeNotifier {
     _errorMessage = null;
 
     try {
-      final response = await _productService.updateProductQuantity(
-        productId: id,
-        newQuantity: newQuantity,
-      );
+      final response = await _productService.updateProductQuantity(productId: id, newQuantity: newQuantity);
 
       if (response.success) {
         // Update the product in local lists
         final index = _products.indexWhere((product) => product.id == id);
         if (index != -1) {
-          final updatedProduct = _products[index].copyWith(
-            quantity: newQuantity,
-            updatedAt: DateTime.now(),
-          );
+          final updatedProduct = _products[index].copyWith(quantity: newQuantity, updatedAt: DateTime.now());
           _products[index] = updatedProduct;
         }
 
         final filteredIndex = _filteredProducts.indexWhere((product) => product.id == id);
         if (filteredIndex != -1) {
-          final updatedProduct = _filteredProducts[filteredIndex].copyWith(
-            quantity: newQuantity,
-            updatedAt: DateTime.now(),
-          );
+          final updatedProduct = _filteredProducts[filteredIndex].copyWith(quantity: newQuantity, updatedAt: DateTime.now());
           _filteredProducts[filteredIndex] = updatedProduct;
         }
 
@@ -483,9 +502,7 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updateItems = updates.entries.map((entry) =>
-          QuantityUpdateItem(productId: entry.key, quantity: entry.value)
-      ).toList();
+      final updateItems = updates.entries.map((entry) => QuantityUpdateItem(productId: entry.key, quantity: entry.value)).toList();
 
       final response = await _productService.bulkUpdateQuantities(updates: updateItems);
 
@@ -494,18 +511,12 @@ class ProductProvider extends ChangeNotifier {
         for (final entry in updates.entries) {
           final index = _products.indexWhere((product) => product.id == entry.key);
           if (index != -1) {
-            _products[index] = _products[index].copyWith(
-              quantity: entry.value,
-              updatedAt: DateTime.now(),
-            );
+            _products[index] = _products[index].copyWith(quantity: entry.value, updatedAt: DateTime.now());
           }
 
           final filteredIndex = _filteredProducts.indexWhere((product) => product.id == entry.key);
           if (filteredIndex != -1) {
-            _filteredProducts[filteredIndex] = _filteredProducts[filteredIndex].copyWith(
-              quantity: entry.value,
-              updatedAt: DateTime.now(),
-            );
+            _filteredProducts[filteredIndex] = _filteredProducts[filteredIndex].copyWith(quantity: entry.value, updatedAt: DateTime.now());
           }
         }
 
@@ -569,10 +580,7 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _productService.duplicateProduct(
-        productId: id,
-        newName: newName,
-      );
+      final response = await _productService.duplicateProduct(productId: id, newName: newName);
 
       if (response.success && response.data != null) {
         _products.insert(0, response.data!); // Add to beginning
@@ -604,21 +612,12 @@ class ProductProvider extends ChangeNotifier {
   /// Get product statistics as map (for compatibility with existing UI)
   Map<String, dynamic> get productStats {
     if (_statistics == null) {
-      return {
-        'total': 0,
-        'inStock': 0,
-        'lowStock': 0,
-        'outOfStock': 0,
-        'totalValue': '0',
-        'averagePrice': '0',
-      };
+      return {'total': 0, 'inStock': 0, 'lowStock': 0, 'outOfStock': 0, 'totalValue': '0', 'averagePrice': '0'};
     }
 
     final stats = _statistics!;
     final inStockCount = stats.stockStatusSummary.inStock + stats.stockStatusSummary.mediumStock;
-    final averagePrice = stats.totalProducts > 0
-        ? stats.totalInventoryValue / stats.totalProducts
-        : 0.0;
+    final averagePrice = stats.totalProducts > 0 ? stats.totalInventoryValue / stats.totalProducts : 0.0;
 
     return {
       'total': stats.totalProducts,
@@ -632,28 +631,33 @@ class ProductProvider extends ChangeNotifier {
 
   /// Export product data
   List<Map<String, dynamic>> exportProductData() {
-    return _products.map((product) => {
-      'Product ID': product.id,
-      'Name': product.name,
-      'Detail': product.detail,
-      'Price': product.price.toStringAsFixed(2),
-      'Color': product.color,
-      'Fabric': product.fabric,
-      'Pieces': product.piecesText,
-      'Quantity': product.quantity.toString(),
-      'Stock Status': product.stockStatusText,
-      'Category': product.categoryName ?? '',
-      'Created Date': product.createdAt.toString().split(' ')[0],
-      'Updated Date': product.updatedAt?.toString().split(' ')[0] ?? '',
-      'Total Value': product.totalValue.toStringAsFixed(2),
-    }).toList();
+    return _products
+        .map(
+          (product) => {
+            'Product ID': product.id,
+            'Name': product.name,
+            'Detail': product.detail,
+            'Price': product.price.toStringAsFixed(2),
+            'Cost Price': product.costPrice?.toStringAsFixed(2) ?? 'Not Set', // Added cost price
+            'Profit Margin': product.formattedProfitMargin, // Added profit margin
+            'Profit Amount': product.formattedProfitAmount, // Added profit amount
+            'Color': product.color,
+            'Fabric': product.fabric,
+            'Pieces': product.piecesText,
+            'Quantity': product.quantity.toString(),
+            'Stock Status': product.stockStatusText,
+            'Category': product.categoryName ?? '',
+            'Created Date': product.createdAt.toString().split(' ')[0],
+            'Updated Date': product.updatedAt?.toString().split(' ')[0] ?? '',
+            'Total Value': product.totalValue.toStringAsFixed(2),
+          },
+        )
+        .toList();
   }
 
   /// Get products that need attention (low/out of stock)
   List<Product> get productsNeedingAttention {
-    return _products.where((product) =>
-    product.isLowStock || product.isOutOfStock
-    ).toList();
+    return _products.where((product) => product.isLowStock || product.isOutOfStock).toList();
   }
 
   /// Get inventory summary
@@ -690,12 +694,7 @@ class ProductProvider extends ChangeNotifier {
       fabricValue[product.fabric] = (fabricValue[product.fabric] ?? 0) + product.totalValue;
     }
 
-    return {
-      'colorStats': colorStats,
-      'fabricStats': fabricStats,
-      'colorValue': colorValue,
-      'fabricValue': fabricValue,
-    };
+    return {'colorStats': colorStats, 'fabricStats': fabricStats, 'colorValue': colorValue, 'fabricValue': fabricValue};
   }
 
   /// Filter products locally
@@ -782,19 +781,13 @@ class ProductProvider extends ChangeNotifier {
   /// Get product analytics
   Map<String, dynamic> get productAnalytics {
     final totalInventoryValue = _products.fold<double>(0, (sum, product) => sum + product.totalValue);
-    final averageQuantity = _products.isNotEmpty
-        ? _products.fold<int>(0, (sum, product) => sum + product.quantity) / _products.length
-        : 0.0;
+    final averageQuantity = _products.isNotEmpty ? _products.fold<int>(0, (sum, product) => sum + product.quantity) / _products.length : 0.0;
 
     final inStockProducts = _products.where((p) => !p.isOutOfStock).toList();
-    final stockTurnoverRate = _products.isNotEmpty
-        ? (inStockProducts.length / _products.length * 100)
-        : 0.0;
+    final stockTurnoverRate = _products.isNotEmpty ? (inStockProducts.length / _products.length * 100) : 0.0;
 
     final outOfStockProducts = _products.where((p) => p.isOutOfStock).toList();
-    final outOfStockRate = _products.isNotEmpty
-        ? (outOfStockProducts.length / _products.length * 100)
-        : 0.0;
+    final outOfStockRate = _products.isNotEmpty ? (outOfStockProducts.length / _products.length * 100) : 0.0;
 
     return {
       'totalInventoryValue': totalInventoryValue,
