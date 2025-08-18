@@ -7,7 +7,7 @@ import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/product/add_product_dialog.dart';
-import '../../widgets/product/bulk_operations_dialog.dart';
+
 import '../../widgets/product/delete_product_dialog.dart';
 import '../../widgets/product/edit_product_dialog.dart';
 import '../../widgets/product/filter_product_dialog.dart';
@@ -69,10 +69,6 @@ class _ProductPageState extends State<ProductPage> {
 
   void _showFilterDialog() {
     showDialog(context: context, barrierDismissible: true, builder: (context) => const FilterProductsDialog());
-  }
-
-  void _showBulkOperationsDialog() {
-    showDialog(context: context, barrierDismissible: false, builder: (context) => const BulkOperationsDialog());
   }
 
   void _exportProducts() {
@@ -389,7 +385,7 @@ class _ProductPageState extends State<ProductPage> {
         SizedBox(width: context.cardPadding),
         Expanded(flex: 1, child: _buildFilterButton()),
         SizedBox(width: context.smallPadding),
-        Expanded(flex: 1, child: _buildBulkOperationsButton()),
+
         SizedBox(width: context.smallPadding),
         Expanded(flex: 1, child: _buildExportButton()),
       ],
@@ -404,8 +400,6 @@ class _ProductPageState extends State<ProductPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildBulkOperationsButton()),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -422,8 +416,6 @@ class _ProductPageState extends State<ProductPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildBulkOperationsButton()),
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildExportButton()),
           ],
@@ -487,40 +479,6 @@ class _ProductPageState extends State<ProductPage> {
                   Text(
                     'Filter',
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBulkOperationsButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _showBulkOperationsDialog,
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-            decoration: BoxDecoration(
-              color: Colors.blue[600]?.withOpacity(0.1) ?? Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(color: Colors.blue[600]?.withOpacity(0.3) ?? Colors.blue.withOpacity(0.3), width: 1),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.batch_prediction_rounded, color: Colors.blue[600] ?? Colors.blue, size: context.iconSize('medium')),
-                if (!context.isTablet) ...[
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    'Bulk Ops',
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.blue[600] ?? Colors.blue),
                   ),
                 ],
               ],

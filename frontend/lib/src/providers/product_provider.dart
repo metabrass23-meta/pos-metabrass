@@ -495,49 +495,6 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  /// Bulk update quantities
-  Future<bool> bulkUpdateQuantities(Map<String, int> updates) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final updateItems = updates.entries.map((entry) => QuantityUpdateItem(productId: entry.key, quantity: entry.value)).toList();
-
-      final response = await _productService.bulkUpdateQuantities(updates: updateItems);
-
-      if (response.success) {
-        // Update local products with new quantities
-        for (final entry in updates.entries) {
-          final index = _products.indexWhere((product) => product.id == entry.key);
-          if (index != -1) {
-            _products[index] = _products[index].copyWith(quantity: entry.value, updatedAt: DateTime.now());
-          }
-
-          final filteredIndex = _filteredProducts.indexWhere((product) => product.id == entry.key);
-          if (filteredIndex != -1) {
-            _filteredProducts[filteredIndex] = _filteredProducts[filteredIndex].copyWith(quantity: entry.value, updatedAt: DateTime.now());
-          }
-        }
-
-        await loadStatistics(); // Refresh stats
-        _errorMessage = null;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = response.message;
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Failed to bulk update: $e';
-      debugPrint('Error bulk updating: $e');
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
   /// Get product by ID
   Product? getProductById(String id) {
     try {
@@ -571,36 +528,6 @@ class ProductProvider extends ChangeNotifier {
       debugPrint('Error getting products by category: $e');
     }
     return [];
-  }
-
-  /// Duplicate product
-  Future<bool> duplicateProduct(String id, {String? newName}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final response = await _productService.duplicateProduct(productId: id, newName: newName);
-
-      if (response.success && response.data != null) {
-        _products.insert(0, response.data!); // Add to beginning
-        _applyLocalFilters();
-        await loadStatistics(); // Refresh stats
-        _errorMessage = null;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = response.message;
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Failed to duplicate product: $e';
-      debugPrint('Error duplicating product: $e');
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   /// Clear error message

@@ -6,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
-import 'duplicate_product_dialog.dart';
 
 class EnhancedProductTable extends StatefulWidget {
   final Function(Product) onEdit;
@@ -496,22 +495,6 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Duplicate Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _showDuplicateDialog(context, product),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.copy_outlined, color: Colors.green, size: context.iconSize('small')),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
-
         // Edit Button
         Material(
           color: Colors.transparent,
@@ -542,14 +525,6 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
           ),
         ),
       ],
-    );
-  }
-
-  void _showDuplicateDialog(BuildContext context, Product product) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => DuplicateProductDialog(product: product),
     );
   }
 

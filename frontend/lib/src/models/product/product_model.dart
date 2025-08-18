@@ -523,24 +523,3 @@ class StockStatusSummary {
     return {'in_stock': inStock, 'medium_stock': mediumStock, 'low_stock': lowStock, 'out_of_stock': outOfStock};
   }
 }
-
-class BulkQuantityUpdate {
-  final List<QuantityUpdateItem> updates;
-
-  BulkQuantityUpdate({required this.updates});
-
-  Map<String, dynamic> toJson() {
-    return {'updates': updates.map((item) => item.toJson()).toList()};
-  }
-}
-
-class QuantityUpdateItem {
-  final String productId;
-  final int quantity;
-
-  QuantityUpdateItem({required this.productId, required this.quantity});
-
-  Map<String, dynamic> toJson() {
-    return {'product_id': productId, 'quantity': quantity.toString()};
-  }
-}
