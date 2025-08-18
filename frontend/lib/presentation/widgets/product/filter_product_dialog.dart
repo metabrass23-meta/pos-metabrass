@@ -32,6 +32,11 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   String _selectedSortBy = 'name';
   String _selectedSortOrder = 'asc';
 
+  // Predefined options
+  final List<String> _sortByOptions = ['name', 'price', 'quantity', 'created_at', 'updated_at'];
+  final List<String> _sortOrderOptions = ['asc', 'desc'];
+  final List<String> _stockLevelOptions = ['HIGH_STOCK', 'MEDIUM_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'];
+
   @override
   void initState() {
     super.initState();
@@ -52,19 +57,9 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       _maxPriceController.text = currentFilters.maxPrice.toString();
     }
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
-
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
     _animationController.forward();
   }
 
@@ -80,12 +75,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     final provider = context.read<ProductProvider>();
 
     // Validate price range
-    final minPrice = _minPriceController.text.isNotEmpty
-        ? double.tryParse(_minPriceController.text)
-        : null;
-    final maxPrice = _maxPriceController.text.isNotEmpty
-        ? double.tryParse(_maxPriceController.text)
-        : null;
+    final minPrice = _minPriceController.text.isNotEmpty ? double.tryParse(_minPriceController.text) : null;
+    final maxPrice = _maxPriceController.text.isNotEmpty ? double.tryParse(_maxPriceController.text) : null;
 
     if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
       _showErrorSnackbar('Minimum price cannot be greater than maximum price');
@@ -104,7 +95,6 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     );
 
     provider.applyFilters(filters);
-
     _showSuccessSnackbar('Filters applied successfully');
     Navigator.of(context).pop();
   }
@@ -122,7 +112,6 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     });
 
     context.read<ProductProvider>().clearFilters();
-
     _showSuccessSnackbar('Filters cleared');
     Navigator.of(context).pop();
   }
@@ -132,28 +121,18 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -163,20 +142,12 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -184,9 +155,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -203,43 +172,27 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.5 * _fadeAnimation.value),
+          backgroundColor: Colors.black.withOpacity(0.6 * _fadeAnimation.value),
           body: Center(
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 90.w,
-                  small: 85.w,
-                  medium: 75.w,
-                  large: 65.w,
-                  ultrawide: 55.w,
-                ),
-                constraints: BoxConstraints(
-                  maxWidth: 600,
-                  maxHeight: 90.h,
-                ),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 90.w, medium: 70.w, large: 60.w, ultrawide: 50.w),
+                constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildHeader(),
-                      _buildFilterContent(),
-                    ],
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(child: _buildContent()),
+                  ],
                 ),
               ),
             ),
@@ -253,9 +206,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.accentGold, Color(0xFFD4AF37)]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -265,15 +216,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.filter_list_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.filter_alt_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -292,7 +236,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Customize your product view',
+                    'Refine your product list with advanced filters',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -310,11 +254,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -323,351 +263,284 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     );
   }
 
-  Widget _buildFilterContent() {
-    return Padding(
+  Widget _buildContent() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Category Filter
+            _buildFilterSection(title: 'Product Category', icon: Icons.category_outlined, child: _buildCategoryFilter()),
+
+            SizedBox(height: context.cardPadding),
+
+            // Color and Fabric Filters
+            _buildFilterSection(title: 'Product Attributes', icon: Icons.palette_outlined, child: _buildAttributeFilters()),
+
+            SizedBox(height: context.cardPadding),
+
+            // Stock Level Filter
+            _buildFilterSection(title: 'Stock Level', icon: Icons.inventory_rounded, child: _buildStockLevelFilter()),
+
+            SizedBox(height: context.cardPadding),
+
+            // Price Range Filter
+            _buildFilterSection(title: 'Price Range (PKR)', icon: Icons.attach_money_rounded, child: _buildPriceRangeFilter()),
+
+            SizedBox(height: context.cardPadding),
+
+            // Sort Options
+            _buildFilterSection(title: 'Sort Options', icon: Icons.sort_rounded, child: _buildSortOptionsFilter()),
+
+            SizedBox(height: context.mainPadding),
+
+            // Action Buttons
+            ResponsiveBreakpoints.responsive(
+              context,
+              tablet: _buildCompactButtons(),
+              small: _buildCompactButtons(),
+              medium: _buildDesktopButtons(),
+              large: _buildDesktopButtons(),
+              ultrawide: _buildDesktopButtons(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterSection({required String title, required IconData icon, required Widget child}) {
+    return Container(
       padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Category Filter
-          Consumer<ProductProvider>(
-            builder: (context, provider, child) {
-              return DropdownButtonFormField<String>(
-                value: _selectedCategoryId,
-                decoration: InputDecoration(
-                  labelText: 'Category',
-                  prefixIcon: Icon(Icons.category_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                  ),
-                ),
-                items: [
-                  DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('All Categories'),
-                  ),
-                  ...provider.categories
-                      .where((category) => category.isActive)
-                      .map((category) => DropdownMenuItem<String>(
-                    value: category.id,
-                    child: Text(category.name),
-                  )),
-                ],
-                onChanged: (categoryId) {
-                  setState(() {
-                    _selectedCategoryId = categoryId;
-                  });
-                },
-              );
-            },
-          ),
-          SizedBox(height: context.cardPadding),
-
-          // Color and Fabric Row
           Row(
             children: [
-              Expanded(
-                child: Consumer<ProductProvider>(
-                  builder: (context, provider, child) {
-                    return DropdownButtonFormField<String>(
-                      value: _selectedColor,
-                      decoration: InputDecoration(
-                        labelText: 'Color',
-                        prefixIcon: Icon(Icons.color_lens_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                        ),
-                      ),
-                      items: [
-                        DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('All Colors'),
-                        ),
-                        ...provider.availableColors.map((color) => DropdownMenuItem<String>(
-                          value: color,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: _getColorFromName(color),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.grey.shade300),
-                                ),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Expanded(child: Text(color)),
-                            ],
-                          ),
-                        )),
-                      ],
-                      onChanged: (color) {
-                        setState(() {
-                          _selectedColor = color;
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
-              SizedBox(width: context.cardPadding),
-              Expanded(
-                child: Consumer<ProductProvider>(
-                  builder: (context, provider, child) {
-                    return DropdownButtonFormField<String>(
-                      value: _selectedFabric,
-                      decoration: InputDecoration(
-                        labelText: 'Fabric',
-                        prefixIcon: Icon(Icons.texture_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                        ),
-                      ),
-                      items: [
-                        DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('All Fabrics'),
-                        ),
-                        ...provider.availableFabrics.map((fabric) => DropdownMenuItem<String>(
-                          value: fabric,
-                          child: Text(fabric),
-                        )),
-                      ],
-                      onChanged: (fabric) {
-                        setState(() {
-                          _selectedFabric = fabric;
-                        });
-                      },
-                    );
-                  },
-                ),
+              Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              SizedBox(width: context.smallPadding),
+              Text(
+                title,
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Stock Level Filter
-          Consumer<ProductProvider>(
-            builder: (context, provider, child) {
-              return DropdownButtonFormField<String>(
-                value: _selectedStockLevel,
-                decoration: InputDecoration(
-                  labelText: 'Stock Level',
-                  prefixIcon: Icon(Icons.inventory_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                  ),
-                ),
-                items: [
-                  DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('All Stock Levels'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'HIGH_STOCK',
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text('In Stock (High)'),
-                      ],
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'MEDIUM_STOCK',
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow[700],
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text('Medium Stock'),
-                      ],
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'LOW_STOCK',
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text('Low Stock'),
-                      ],
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'OUT_OF_STOCK',
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text('Out of Stock'),
-                      ],
-                    ),
-                  ),
-                ],
-                onChanged: (stockLevel) {
-                  setState(() {
-                    _selectedStockLevel = stockLevel;
-                  });
-                },
-              );
-            },
-          ),
-          SizedBox(height: context.cardPadding),
-
-          // Price Range
-          Text(
-            'Price Range (PKR)',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
-          ),
-          SizedBox(height: context.smallPadding),
-          Row(
-            children: [
-              Expanded(
-                child: PremiumTextField(
-                  label: 'Min Price',
-                  hint: '0',
-                  controller: _minPriceController,
-                  prefixIcon: Icons.attach_money_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(width: context.cardPadding),
-              Expanded(
-                child: PremiumTextField(
-                  label: 'Max Price',
-                  hint: 'No limit',
-                  controller: _maxPriceController,
-                  prefixIcon: Icons.attach_money_rounded,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-
-          // Sort Options
-          Text(
-            'Sort Options',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
-          ),
-          SizedBox(height: context.smallPadding),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedSortBy,
-                  decoration: InputDecoration(
-                    labelText: 'Sort By',
-                    prefixIcon: Icon(Icons.sort_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
-                  items: [
-                    DropdownMenuItem(value: 'name', child: Text('Name')),
-                    DropdownMenuItem(value: 'price', child: Text('Price')),
-                    DropdownMenuItem(value: 'quantity', child: Text('Quantity')),
-                    DropdownMenuItem(value: 'created_at', child: Text('Date Created')),
-                    DropdownMenuItem(value: 'updated_at', child: Text('Date Updated')),
-                  ],
-                  onChanged: (sortBy) {
-                    setState(() {
-                      _selectedSortBy = sortBy!;
-                    });
-                  },
-                ),
-              ),
-              SizedBox(width: context.cardPadding),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedSortOrder,
-                  decoration: InputDecoration(
-                    labelText: 'Order',
-                    prefixIcon: Icon(Icons.swap_vert_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
-                  items: [
-                    DropdownMenuItem(
-                      value: 'asc',
-                      child: Row(
-                        children: [
-                          Icon(Icons.arrow_upward, size: 16),
-                          SizedBox(width: context.smallPadding / 2),
-                          Text('Ascending'),
-                        ],
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'desc',
-                      child: Row(
-                        children: [
-                          Icon(Icons.arrow_downward, size: 16),
-                          SizedBox(width: context.smallPadding / 2),
-                          Text('Descending'),
-                        ],
-                      ),
-                    ),
-                  ],
-                  onChanged: (sortOrder) {
-                    setState(() {
-                      _selectedSortOrder = sortOrder!;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.mainPadding),
-
-          // Action Buttons
-          ResponsiveBreakpoints.responsive(
-            context,
-            tablet: _buildCompactButtons(),
-            small: _buildCompactButtons(),
-            medium: _buildDesktopButtons(),
-            large: _buildDesktopButtons(),
-            ultrawide: _buildDesktopButtons(),
-          ),
+          child,
         ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryFilter() {
+    return Consumer<ProductProvider>(
+      builder: (context, provider, child) {
+        return Wrap(
+          spacing: context.smallPadding,
+          runSpacing: context.smallPadding / 2,
+          children: [
+            _buildFilterChip(
+              label: 'All Categories',
+              isSelected: _selectedCategoryId == null,
+              onTap: () => setState(() => _selectedCategoryId = null),
+            ),
+            ...provider.categories
+                .where((category) => category.isActive)
+                .map(
+                  (category) => _buildFilterChip(
+                    label: category.name,
+                    isSelected: _selectedCategoryId == category.id,
+                    onTap: () => setState(() => _selectedCategoryId = category.id),
+                  ),
+                ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAttributeFilters() {
+    return Consumer<ProductProvider>(
+      builder: (context, provider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Color Filter
+            Text(
+              'Color',
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            ),
+            SizedBox(height: context.smallPadding),
+            Wrap(
+              spacing: context.smallPadding,
+              runSpacing: context.smallPadding / 2,
+              children: [
+                _buildFilterChip(label: 'All Colors', isSelected: _selectedColor == null, onTap: () => setState(() => _selectedColor = null)),
+                ...provider.availableColors.map(
+                  (color) => _buildFilterChip(label: color, isSelected: _selectedColor == color, onTap: () => setState(() => _selectedColor = color)),
+                ),
+              ],
+            ),
+            SizedBox(height: context.cardPadding),
+
+            // Fabric Filter
+            Text(
+              'Fabric',
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            ),
+            SizedBox(height: context.smallPadding),
+            Wrap(
+              spacing: context.smallPadding,
+              runSpacing: context.smallPadding / 2,
+              children: [
+                _buildFilterChip(label: 'All Fabrics', isSelected: _selectedFabric == null, onTap: () => setState(() => _selectedFabric = null)),
+                ...provider.availableFabrics.map(
+                  (fabric) =>
+                      _buildFilterChip(label: fabric, isSelected: _selectedFabric == fabric, onTap: () => setState(() => _selectedFabric = fabric)),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStockLevelFilter() {
+    return Wrap(
+      spacing: context.smallPadding,
+      runSpacing: context.smallPadding / 2,
+      children: [
+        _buildFilterChip(label: 'All Stock Levels', isSelected: _selectedStockLevel == null, onTap: () => setState(() => _selectedStockLevel = null)),
+        _buildFilterChip(
+          label: 'In Stock (High)',
+          isSelected: _selectedStockLevel == 'HIGH_STOCK',
+          onTap: () => setState(() => _selectedStockLevel = 'HIGH_STOCK'),
+        ),
+        _buildFilterChip(
+          label: 'Medium Stock',
+          isSelected: _selectedStockLevel == 'MEDIUM_STOCK',
+          onTap: () => setState(() => _selectedStockLevel = 'MEDIUM_STOCK'),
+        ),
+        _buildFilterChip(
+          label: 'Low Stock',
+          isSelected: _selectedStockLevel == 'LOW_STOCK',
+          onTap: () => setState(() => _selectedStockLevel = 'LOW_STOCK'),
+        ),
+        _buildFilterChip(
+          label: 'Out of Stock',
+          isSelected: _selectedStockLevel == 'OUT_OF_STOCK',
+          onTap: () => setState(() => _selectedStockLevel = 'OUT_OF_STOCK'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceRangeFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: PremiumTextField(
+                label: 'Min Price',
+                hint: '0',
+                controller: _minPriceController,
+                prefixIcon: Icons.attach_money_rounded,
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            SizedBox(width: context.cardPadding),
+            Expanded(
+              child: PremiumTextField(
+                label: 'Max Price',
+                hint: 'No limit',
+                controller: _maxPriceController,
+                prefixIcon: Icons.attach_money_rounded,
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSortOptionsFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Sort By
+        Text(
+          'Sort By',
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding,
+          runSpacing: context.smallPadding / 2,
+          children: [
+            _buildFilterChip(label: 'Name', isSelected: _selectedSortBy == 'name', onTap: () => setState(() => _selectedSortBy = 'name')),
+            _buildFilterChip(label: 'Price', isSelected: _selectedSortBy == 'price', onTap: () => setState(() => _selectedSortBy = 'price')),
+            _buildFilterChip(label: 'Quantity', isSelected: _selectedSortBy == 'quantity', onTap: () => setState(() => _selectedSortBy = 'quantity')),
+            _buildFilterChip(
+              label: 'Date Created',
+              isSelected: _selectedSortBy == 'created_at',
+              onTap: () => setState(() => _selectedSortBy = 'created_at'),
+            ),
+            _buildFilterChip(
+              label: 'Date Updated',
+              isSelected: _selectedSortBy == 'updated_at',
+              onTap: () => setState(() => _selectedSortBy = 'updated_at'),
+            ),
+          ],
+        ),
+        SizedBox(height: context.cardPadding),
+
+        // Sort Order
+        Text(
+          'Sort Order',
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        ),
+        SizedBox(height: context.smallPadding),
+        Wrap(
+          spacing: context.smallPadding,
+          runSpacing: context.smallPadding / 2,
+          children: [
+            _buildFilterChip(label: 'Ascending', isSelected: _selectedSortOrder == 'asc', onTap: () => setState(() => _selectedSortOrder = 'asc')),
+            _buildFilterChip(label: 'Descending', isSelected: _selectedSortOrder == 'desc', onTap: () => setState(() => _selectedSortOrder = 'desc')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip({required String label, required bool isSelected, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.smallPadding),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryMaroon.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          border: Border.all(color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300, width: isSelected ? 2 : 1),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: context.subtitleFontSize,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? AppTheme.primaryMaroon : Colors.grey[700],
+          ),
+        ),
       ),
     );
   }
@@ -681,33 +554,26 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
+          backgroundColor: AppTheme.accentGold,
         ),
         SizedBox(height: context.cardPadding),
-        Row(
-          children: [
-            Expanded(
-              child: PremiumButton(
-                text: 'Clear All',
-                onPressed: _handleClearFilters,
-                isOutlined: true,
-                height: context.buttonHeight,
-                backgroundColor: Colors.orange,
-                textColor: Colors.orange,
-                icon: Icons.clear_all_rounded,
-              ),
-            ),
-            SizedBox(width: context.cardPadding),
-            Expanded(
-              child: PremiumButton(
-                text: 'Cancel',
-                onPressed: _handleCancel,
-                isOutlined: true,
-                height: context.buttonHeight,
-                backgroundColor: Colors.grey[600],
-                textColor: Colors.grey[600],
-              ),
-            ),
-          ],
+        PremiumButton(
+          text: 'Clear All Filters',
+          onPressed: _handleClearFilters,
+          height: context.buttonHeight,
+          icon: Icons.clear_all_rounded,
+          isOutlined: true,
+          backgroundColor: Colors.red[600],
+          textColor: Colors.red[600],
+        ),
+        SizedBox(height: context.smallPadding),
+        PremiumButton(
+          text: 'Cancel',
+          onPressed: _handleCancel,
+          height: context.buttonHeight,
+          isOutlined: true,
+          backgroundColor: Colors.grey[600],
+          textColor: Colors.grey[600],
         ),
       ],
     );
@@ -718,22 +584,10 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
-            onPressed: _handleClearFilters,
-            isOutlined: true,
-            height: context.buttonHeight / 1.5,
-            backgroundColor: Colors.orange,
-            textColor: Colors.orange,
-            icon: Icons.clear_all_rounded,
-          ),
-        ),
-        SizedBox(width: context.cardPadding),
-        Expanded(
-          child: PremiumButton(
             text: 'Cancel',
             onPressed: _handleCancel,
-            isOutlined: true,
             height: context.buttonHeight / 1.5,
+            isOutlined: true,
             backgroundColor: Colors.grey[600],
             textColor: Colors.grey[600],
           ),
@@ -741,52 +595,27 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
+            text: 'Clear All',
+            onPressed: _handleClearFilters,
+            height: context.buttonHeight / 1.5,
+            icon: Icons.clear_all_rounded,
+            isOutlined: true,
+            backgroundColor: Colors.red[600],
+            textColor: Colors.red[600],
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          flex: 2,
+          child: PremiumButton(
             text: 'Apply Filters',
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,
+            backgroundColor: AppTheme.accentGold,
           ),
         ),
       ],
     );
-  }
-
-  Color _getColorFromName(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'red':
-        return Colors.red;
-      case 'blue':
-        return Colors.blue;
-      case 'green':
-        return Colors.green;
-      case 'yellow':
-        return Colors.yellow;
-      case 'orange':
-        return Colors.orange;
-      case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
-      case 'black':
-        return Colors.black;
-      case 'white':
-        return Colors.grey;
-      case 'brown':
-        return Colors.brown;
-      case 'gray':
-        return Colors.grey;
-      case 'navy':
-        return Colors.indigo;
-      case 'maroon':
-        return const Color(0xFF800000);
-      case 'gold':
-        return const Color(0xFFFFD700);
-      case 'silver':
-        return Colors.grey[400]!;
-      case 'beige':
-        return const Color(0xFFF5F5DC);
-      default:
-        return Colors.grey;
-    }
   }
 }

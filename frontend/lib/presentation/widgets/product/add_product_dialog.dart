@@ -21,6 +21,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   final _nameController = TextEditingController();
   final _detailController = TextEditingController();
   final _priceController = TextEditingController();
+  final _costPriceController = TextEditingController(); // Added cost price controller
   final _quantityController = TextEditingController();
   final _colorController = TextEditingController();
   final _fabricController = TextEditingController();
@@ -37,15 +38,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     super.initState();
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -56,6 +51,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     _nameController.dispose();
     _detailController.dispose();
     _priceController.dispose();
+    _costPriceController.dispose(); // Dispose cost price controller
     _quantityController.dispose();
     _colorController.dispose();
     _fabricController.dispose();
@@ -87,6 +83,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         name: _nameController.text.trim(),
         detail: _detailController.text.trim(),
         price: double.parse(_priceController.text.trim()),
+        costPrice: _costPriceController.text.trim().isNotEmpty
+            ? double.parse(_costPriceController.text.trim())
+            : null, // Parse cost price if provided
         color: _colorController.text.trim(),
         fabric: _fabricController.text.trim(),
         pieces: _selectedPieces,
@@ -114,11 +113,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               'Product added successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -140,11 +135,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -169,21 +160,14 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.5 * _fadeAnimation.value),
+          backgroundColor: Colors.black.withOpacity(0.5 * (_fadeAnimation.value.clamp(0.0, 1.0))),
           body: Center(
             child: Transform.scale(
-              scale: _scaleAnimation.value,
+              scale: _scaleAnimation.value.clamp(0.1, 2.0),
               child: Container(
-                width: context.dialogWidth,
+                width: context.dialogWidth ?? 600,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -191,11 +175,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -216,28 +196,19 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildHeader(), _buildFormContent(isCompact: true)],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildHeader(), _buildFormContent(isCompact: true)],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildDesktopLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildHeader(), _buildFormContent(isCompact: false)],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: false)]),
     );
   }
 
@@ -255,10 +226,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Icon(Icons.inventory_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
@@ -372,6 +340,57 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumTextField(
+                    label: 'Cost Price',
+                    hint: isCompact ? 'Enter cost' : 'Enter cost price (PKR) - Optional',
+                    controller: _costPriceController,
+                    prefixIcon: Icons.shopping_cart_outlined,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value?.isNotEmpty ?? false) {
+                        final costPrice = double.tryParse(value!);
+                        if (costPrice == null || costPrice < 0) {
+                          return 'Please enter a valid cost price';
+                        }
+                        final price = double.tryParse(_priceController.text);
+                        if (price != null && costPrice > price) {
+                          return 'Cost price cannot exceed selling price';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.smallPadding / 2),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                border: Border.all(color: Colors.blue.withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.info_outline, size: context.iconSize('small'), color: Colors.blue[700]),
+                  SizedBox(width: context.smallPadding / 2),
+                  Flexible(
+                    child: Text(
+                      'Setting cost price enables profit margin calculations and better financial analysis',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: context.cardPadding),
+
+            Row(
+              children: [
+                Expanded(
+                  child: PremiumTextField(
                     label: 'Quantity',
                     hint: isCompact ? 'Enter qty' : 'Enter quantity',
                     controller: _quantityController,
@@ -389,6 +408,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                     },
                   ),
                 ),
+                SizedBox(width: context.cardPadding),
+                Expanded(child: Container()), // Empty container for spacing
               ],
             ),
             SizedBox(height: context.cardPadding),
@@ -465,11 +486,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   children: [
                     Text(
                       'Pieces',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding),
                     Container(
