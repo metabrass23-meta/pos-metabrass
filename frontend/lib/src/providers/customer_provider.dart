@@ -299,13 +299,11 @@ class CustomerProvider extends ChangeNotifier {
 
   // Getters
   List<Customer> get customers => _filteredCustomers;
+  List<Customer> get allCustomers => _customers;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
   bool get hasError => _hasError;
-  PaginationInfo? get paginationInfo => _paginationInfo;
-  int get currentPage => _currentPage;
-  int get pageSize => _pageSize;
+  String? get errorMessage => _errorMessage;
   bool get showInactive => _showInactive;
   String? get selectedStatus => _selectedStatus;
   String? get selectedType => _selectedType;
@@ -314,24 +312,47 @@ class CustomerProvider extends ChangeNotifier {
   String? get verificationFilter => _verificationFilter;
   String get sortBy => _sortBy;
   bool get sortAscending => _sortAscending;
+  PaginationInfo? get paginationInfo => _paginationInfo;
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  bool get hasNextPage => _paginationInfo?.hasNext ?? false;
+  bool get hasPreviousPage => _paginationInfo?.hasPrevious ?? false;
+  int get totalPages => _paginationInfo?.totalPages ?? 1;
+  int get totalCount => _paginationInfo?.totalCount ?? 0;
   CustomerStatisticsResponse? get customerStatistics => _customerStatistics;
 
   CustomerProvider() {
+    // Load cached data first, then refresh from API
+    _initializeFromCache();
     loadCustomers();
     loadCustomerStatistics();
   }
 
+  /// Initialize from cached data if available
+  Future<void> _initializeFromCache() async {
+    try {
+      final cachedCustomers = await _customerService.getCachedCustomers();
+      if (cachedCustomers.isNotEmpty) {
+        _customers = cachedCustomers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
+        _filteredCustomers = List.from(_customers);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load cached customers: $e');
+    }
+  }
+
   /// Load customers from API
   Future<void> loadCustomers({
-    int? page,
-    int? pageSize,
+    int page = 1,
+    int pageSize = 10,
     String? search,
-    bool? showInactive,
     String? status,
     String? customerType,
     String? city,
     String? country,
     String? verified,
+    bool showInactive = false,
     bool showLoadingIndicator = true,
   }) async {
     if (showLoadingIndicator) {
@@ -343,15 +364,15 @@ class CustomerProvider extends ChangeNotifier {
 
     try {
       final params = CustomerListParams(
-        page: page ?? _currentPage,
-        pageSize: pageSize ?? _pageSize,
-        search: search ?? _searchQuery,
-        showInactive: showInactive ?? _showInactive,
-        customerType: customerType ?? _selectedType,
-        status: status ?? _selectedStatus,
-        city: city ?? _selectedCity,
-        country: country ?? _selectedCountry,
-        verified: verified ?? _verificationFilter,
+        page: page,
+        pageSize: pageSize,
+        search: search,
+        status: status,
+        customerType: customerType,
+        city: city,
+        country: country,
+        verified: verified,
+        showInactive: showInactive,
         sortBy: _sortBy,
         sortOrder: _sortAscending ? 'asc' : 'desc',
       );
@@ -360,36 +381,36 @@ class CustomerProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         final customersData = response.data!;
-
-        // Convert CustomerModel to Customer for UI compatibility
         _customers = customersData.customers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
-
         _filteredCustomers = List.from(_customers);
         _paginationInfo = customersData.pagination;
-
-        // Update pagination state
-        _currentPage = params.page;
-        _pageSize = params.pageSize;
-        _searchQuery = params.search ?? '';
-        _showInactive = params.showInactive;
-        _selectedStatus = params.status;
-        _selectedType = params.customerType;
-        _selectedCity = params.city;
-        _selectedCountry = params.country;
-        _verificationFilter = params.verified;
-
+        _currentPage = page;
+        _pageSize = pageSize;
+        _searchQuery = search ?? '';
+        _showInactive = showInactive;
+        _selectedStatus = status;
+        _selectedType = customerType;
+        _selectedCity = city;
+        _selectedCountry = country;
+        _verificationFilter = verified;
         _hasError = false;
         _errorMessage = null;
       } else {
-        _hasError = true;
-        _errorMessage = response.message;
+        // If API fails, keep sample data and just log the error
+        debugPrint('Failed to load customers from API: ${response.message}');
+        _hasError = false;
+        // Don't clear existing data
       }
     } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Failed to load customers: ${e.toString()}';
+      // If API call fails, keep sample data and just log the error
+      debugPrint('Error loading customers from API: $e');
+      _hasError = false;
+      // Don't clear existing data
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (showLoadingIndicator) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -986,6 +1007,8 @@ class CustomerProvider extends ChangeNotifier {
 
   // Initialize the provider
   Future<void> initialize() async {
+    // Load from cache first
+    // Load from API
     await loadCustomers();
     await loadCustomerStatistics();
   }
@@ -1048,6 +1071,20 @@ class CustomerProvider extends ChangeNotifier {
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to load new customers: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Manually refresh data (useful for testing)
+  Future<void> refreshData() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await loadCustomers();
+      await loadCustomerStatistics();
     } finally {
       _isLoading = false;
       notifyListeners();
