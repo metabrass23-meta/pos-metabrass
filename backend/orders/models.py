@@ -188,33 +188,48 @@ class Order(models.Model):
         """Update conversion status based on related sales"""
         from django.db.models import Sum
         
-        if not self.has_been_converted_to_sale():
-            self.conversion_status = 'NOT_CONVERTED'
-            self.converted_sales_amount = Decimal('0.00')
-            self.conversion_date = None
-        else:
-            # Calculate total converted amount
-            total_converted = self.sales.filter(is_active=True).aggregate(
-                total=Sum('grand_total')
-            )['total'] or Decimal('0.00')
-            
-            self.converted_sales_amount = total_converted
-            
-            if total_converted >= self.total_amount:
-                self.conversion_status = 'FULLY_CONVERTED'
-            else:
-                self.conversion_status = 'PARTIALLY_CONVERTED'
-            
-            # Set conversion date if not set
-            if not self.conversion_date:
-                first_sale = self.sales.filter(is_active=True).order_by('created_at').first()
-                if first_sale:
-                    self.conversion_date = first_sale.created_at
+        # Prevent recursion by checking if we're already updating conversion status
+        if hasattr(self, '_updating_conversion_status'):
+            return
         
-        self.save(update_fields=[
-            'conversion_status', 'converted_sales_amount', 
-            'conversion_date', 'updated_at'
-        ])
+        # Mark that we're updating conversion status
+        self._updating_conversion_status = True
+        
+        try:
+            if not self.has_been_converted_to_sale():
+                self.conversion_status = 'NOT_CONVERTED'
+                self.converted_sales_amount = Decimal('0.00')
+                self.conversion_date = None
+            else:
+                # Calculate total converted amount
+                total_converted = self.sales.filter(is_active=True).aggregate(
+                    total=Sum('grand_total')
+                )['total'] or Decimal('0.00')
+                
+                self.converted_sales_amount = total_converted
+                
+                if total_converted >= self.total_amount:
+                    self.conversion_status = 'FULLY_CONVERTED'
+                else:
+                    self.conversion_status = 'PARTIALLY_CONVERTED'
+                
+                # Set conversion date if not set
+                if not self.conversion_date:
+                    first_sale = self.sales.filter(is_active=True).order_by('created_at').first()
+                    if first_sale:
+                        self.conversion_date = first_sale.created_at
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                conversion_status=self.conversion_status,
+                converted_sales_amount=self.converted_sales_amount,
+                conversion_date=self.conversion_date,
+                updated_at=timezone.now()
+            )
+        finally:
+            # Always remove the updating flag
+            if hasattr(self, '_updating_conversion_status'):
+                delattr(self, '_updating_conversion_status')
 
     def get_conversion_summary(self):
         """Get summary of order conversion to sales"""
@@ -234,26 +249,40 @@ class Order(models.Model):
         }
 
     def save(self, *args, **kwargs):
-        # Auto-populate customer information if not set
-        if self.customer and not self.customer_name:
-            self.customer_name = self.customer.name
-            self.customer_phone = self.customer.phone
-            self.customer_email = self.customer.email or ''
+        # Prevent recursion by checking if we're already saving
+        if hasattr(self, '_saving_order'):
+            super().save(*args, **kwargs)
+            return
         
-        # Ensure date_ordered is set and is a date object
-        if not self.date_ordered:
-            self.date_ordered = timezone.now().date()
-        elif hasattr(self.date_ordered, 'date'):
-            self.date_ordered = self.date_ordered.date()
+        # Mark that we're saving
+        self._saving_order = True
         
-        # Calculate remaining amount and payment status
-        self.calculate_payment_status()
-        
-        self.full_clean()
-        super().save(*args, **kwargs)
-        
-        # Update conversion status after save
-        self.update_conversion_status()
+        try:
+            # Auto-populate customer information if not set
+            if self.customer and not self.customer_name:
+                self.customer_name = self.customer.name
+                self.customer_phone = self.customer.phone
+                self.customer_email = self.customer.email or ''
+            
+            # Ensure date_ordered is set and is a date object
+            if not self.date_ordered:
+                self.date_ordered = timezone.now().date()
+            elif hasattr(self.date_ordered, 'date'):
+                self.date_ordered = self.date_ordered.date()
+            
+            # Calculate remaining amount and payment status
+            self.calculate_payment_status()
+            
+            self.full_clean()
+            super().save(*args, **kwargs)
+            
+            # Update conversion status after save (but only if not already updating)
+            if not hasattr(self, '_updating_conversion_status'):
+                self.update_conversion_status()
+        finally:
+            # Always remove the saving flag
+            if hasattr(self, '_saving_order'):
+                delattr(self, '_saving_order')
 
     # Properties
     @property
@@ -341,18 +370,37 @@ class Order(models.Model):
         """Calculate and update order totals from order items"""
         from order_items.models import OrderItem
         
-        total = OrderItem.objects.filter(
-            order=self,
-            is_active=True
-        ).aggregate(
-            total=models.Sum('line_total')
-        )['total'] or Decimal('0.00')
+        # Prevent recursion by checking if we're already calculating
+        if hasattr(self, '_calculating_totals'):
+            return self.total_amount
         
-        self.total_amount = total
-        self.calculate_payment_status()
-        self.save(update_fields=['total_amount', 'remaining_amount', 'is_fully_paid', 'updated_at'])
+        # Mark that we're calculating totals
+        self._calculating_totals = True
         
-        return total
+        try:
+            total = OrderItem.objects.filter(
+                order=self,
+                is_active=True
+            ).aggregate(
+                total=models.Sum('line_total')
+            )['total'] or Decimal('0.00')
+            
+            self.total_amount = total
+            self.calculate_payment_status()
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                total_amount=self.total_amount,
+                remaining_amount=self.remaining_amount,
+                is_fully_paid=self.is_fully_paid,
+                updated_at=timezone.now()
+            )
+            
+            return total
+        finally:
+            # Always remove the calculating flag
+            if hasattr(self, '_calculating_totals'):
+                delattr(self, '_calculating_totals')
 
     def calculate_payment_status(self):
         """Calculate remaining amount and payment status"""
@@ -364,52 +412,130 @@ class Order(models.Model):
         if amount <= 0:
             raise ValidationError("Payment amount must be positive.")
         
-        new_advance = self.advance_payment + amount
-        if new_advance > self.total_amount:
-            raise ValidationError("Payment exceeds remaining amount.")
+        # Prevent recursion by checking if we're already processing payment
+        if hasattr(self, '_processing_payment'):
+            return {
+                'new_advance_payment': self.advance_payment,
+                'remaining_amount': self.remaining_amount,
+                'is_fully_paid': self.is_fully_paid
+            }
         
-        self.advance_payment = new_advance
-        self.calculate_payment_status()
-        self.save(update_fields=['advance_payment', 'remaining_amount', 'is_fully_paid', 'updated_at'])
+        # Mark that we're processing payment
+        self._processing_payment = True
         
-        return {
-            'new_advance_payment': self.advance_payment,
-            'remaining_amount': self.remaining_amount,
-            'is_fully_paid': self.is_fully_paid
-        }
+        try:
+            new_advance = self.advance_payment + amount
+            if new_advance > self.total_amount:
+                raise ValidationError("Payment exceeds remaining amount.")
+            
+            self.advance_payment = new_advance
+            self.calculate_payment_status()
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                advance_payment=self.advance_payment,
+                remaining_amount=self.remaining_amount,
+                is_fully_paid=self.is_fully_paid,
+                updated_at=timezone.now()
+            )
+            
+            return {
+                'new_advance_payment': self.advance_payment,
+                'remaining_amount': self.remaining_amount,
+                'is_fully_paid': self.is_fully_paid
+            }
+        finally:
+            # Always remove the processing flag
+            if hasattr(self, '_processing_payment'):
+                delattr(self, '_processing_payment')
 
     def update_status(self, new_status, notes=None):
         """Update order status with optional notes"""
         if new_status not in dict(self.STATUS_CHOICES):
             raise ValidationError("Invalid status.")
         
-        old_status = self.status
-        self.status = new_status
+        # Prevent recursion by checking if we're already updating status
+        if hasattr(self, '_updating_status'):
+            return {
+                'old_status': self.status,
+                'new_status': new_status
+            }
         
-        # Auto-update delivery date if status changes to delivered
-        if new_status == 'DELIVERED' and old_status != 'DELIVERED':
-            if not self.expected_delivery_date:
-                self.expected_delivery_date = timezone.now().date()
+        # Mark that we're updating status
+        self._updating_status = True
         
-        if notes:
-            self.description += f"\nStatus updated to {self.get_status_display()}: {notes}"
-        
-        self.save(update_fields=['status', 'description', 'expected_delivery_date', 'updated_at'])
-        
-        return {
-            'old_status': old_status,
-            'new_status': new_status
-        }
+        try:
+            old_status = self.status
+            self.status = new_status
+            
+            # Auto-update delivery date if status changes to delivered
+            if new_status == 'DELIVERED' and old_status != 'DELIVERED':
+                if not self.expected_delivery_date:
+                    self.expected_delivery_date = timezone.now().date()
+            
+            if notes:
+                self.description += f"\nStatus updated to {self.get_status_display()}: {notes}"
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                status=self.status,
+                description=self.description,
+                expected_delivery_date=self.expected_delivery_date,
+                updated_at=timezone.now()
+            )
+            
+            return {
+                'old_status': old_status,
+                'new_status': new_status
+            }
+        finally:
+            # Always remove the updating flag
+            if hasattr(self, '_updating_status'):
+                delattr(self, '_updating_status')
 
     def soft_delete(self):
         """Soft delete the order"""
-        self.is_active = False
-        self.save(update_fields=['is_active', 'updated_at'])
+        # Prevent recursion by checking if we're already processing
+        if hasattr(self, '_processing_soft_delete'):
+            return
+        
+        # Mark that we're processing soft delete
+        self._processing_soft_delete = True
+        
+        try:
+            self.is_active = False
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                is_active=False,
+                updated_at=timezone.now()
+            )
+        finally:
+            # Always remove the processing flag
+            if hasattr(self, '_processing_soft_delete'):
+                delattr(self, '_processing_soft_delete')
 
     def restore(self):
         """Restore a soft-deleted order"""
-        self.is_active = True
-        self.save(update_fields=['is_active', 'updated_at'])
+        # Prevent recursion by checking if we're already processing
+        if hasattr(self, '_processing_restore'):
+            return
+        
+        # Mark that we're processing restore
+        self._processing_restore = True
+        
+        try:
+            self.is_active = True
+            
+            # Use update() instead of save() to avoid triggering signals
+            Order.objects.filter(id=self.id).update(
+                is_active=True,
+                updated_at=timezone.now()
+            )
+        finally:
+            # Always remove the processing flag
+            if hasattr(self, '_processing_restore'):
+                delattr(self, '_processing_restore')
 
     def get_order_items(self):
         """Get active order items"""
