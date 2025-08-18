@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import 'duplicate_product_dialog.dart';
 
 class EnhancedProductTable extends StatefulWidget {
   final Function(Product) onEdit;
@@ -35,35 +36,15 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Consumer<ProductProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
             return Center(
               child: SizedBox(
-                width: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 3.w,
-                  small: 6.w,
-                  medium: 3.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
-                height: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 3.w,
-                  small: 6.w,
-                  medium: 3.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+                height: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
                 child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
@@ -134,12 +115,12 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     // Fixed table width to ensure all columns are visible, adjusted for removed Product ID column
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 1800.0 - 120.0,
-      // Removed 120.0 for Product ID
-      small: 1900.0 - 120.0,
-      medium: 2000.0 - 120.0,
-      large: 2100.0 - 120.0,
-      ultrawide: 2200.0 - 120.0,
+      tablet: 1800.0 + 120.0, // Added 120.0 for Cost Price column
+      // Added 120.0 for Cost Price column
+      small: 1900.0 + 120.0,
+      medium: 2000.0 + 120.0,
+      large: 2100.0 + 120.0,
+      ultrawide: 2200.0 + 120.0,
     );
   }
 
@@ -166,26 +147,29 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
         // Price
         Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Price')),
 
+        // Cost Price
+        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Cost Price')),
+
         // Color
-        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Color')),
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Color')),
 
         // Fabric
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Fabric')),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'Fabric')),
 
         // Quantity
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'Quantity')),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Quantity')),
 
         // Stock Status
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Stock Status')),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, 'Stock Status')),
 
         // Pieces
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, 'Pieces')),
+        Container(width: columnWidths[8], child: _buildHeaderCell(context, 'Pieces')),
 
         // Created Date
-        Container(width: columnWidths[8], child: _buildHeaderCell(context, 'Created Date')),
+        Container(width: columnWidths[9], child: _buildHeaderCell(context, 'Created Date')),
 
         // Actions
-        Container(width: columnWidths[9], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[10], child: _buildHeaderCell(context, 'Actions')),
       ],
     );
   }
@@ -196,6 +180,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
       200.0, // Product Name
       250.0, // Details
       120.0, // Price
+      120.0, // Cost Price
       120.0, // Color
       120.0, // Fabric
       100.0, // Quantity
@@ -209,12 +194,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -260,11 +240,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.name,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -277,19 +253,12 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             child: product.detail.isNotEmpty
                 ? Text(
                     product.detail,
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   )
                 : Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.smallPadding / 2,
-                      vertical: context.smallPadding / 4,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                     decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -312,23 +281,30 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.formattedPrice,
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+            ),
+          ),
+
+          // Cost Price
+          Container(
+            width: columnWidths[3],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Text(
+              product.formattedCostPrice,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.charcoalGray,
+                fontWeight: FontWeight.w600,
+                color: product.costPrice != null ? AppTheme.charcoalGray : Colors.grey[500],
               ),
             ),
           ),
 
           // Color
           Container(
-            width: columnWidths[3],
+            width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: _getColorFromName(product.color).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -340,10 +316,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
-                      color: _getColorFromName(product.color),
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: _getColorFromName(product.color), shape: BoxShape.circle),
                   ),
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
@@ -365,24 +338,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Fabric
           Container(
-            width: columnWidths[4],
+            width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.brown.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(color: Colors.brown.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 product.fabric,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.brown[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.brown[600]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -391,38 +354,27 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Quantity
           Container(
-            width: columnWidths[5],
+            width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${product.quantity}',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
 
           // Stock Status
           Container(
-            width: columnWidths[6],
+            width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: product.stockStatusColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
                 product.stockStatusText,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: product.stockStatusColor,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: product.stockStatusColor),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -430,7 +382,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Pieces
           Container(
-            width: columnWidths[7],
+            width: columnWidths[8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: product.pieces.isNotEmpty
                 ? Wrap(
@@ -439,10 +391,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                     children:
                         product.pieces.take(2).map((piece) {
                           return Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding / 2,
-                              vertical: context.smallPadding / 4,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                             decoration: BoxDecoration(
                               color: AppTheme.primaryMaroon.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -461,10 +410,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                           product.pieces.length > 2
                               ? [
                                   Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: context.smallPadding / 2,
-                                      vertical: context.smallPadding / 4,
-                                    ),
+                                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                                     decoration: BoxDecoration(
                                       color: Colors.grey.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -483,10 +429,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                         ),
                   )
                 : Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.smallPadding / 2,
-                      vertical: context.smallPadding / 4,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                     decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -505,26 +448,18 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Created Date
           Container(
-            width: columnWidths[8],
+            width: columnWidths[9],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _formatDate(product.createdAt),
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   _getRelativeDate(product.createdAt),
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -532,7 +467,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Actions
           Container(
-            width: columnWidths[9],
+            width: columnWidths[10],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: _buildActions(context, product),
           ),
@@ -553,11 +488,24 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
+            ),
+          ),
+        ),
+
+        SizedBox(width: context.smallPadding / 2),
+
+        // Duplicate Button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _showDuplicateDialog(context, product),
+            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            child: Container(
+              padding: EdgeInsets.all(context.smallPadding * 0.5),
+              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.copy_outlined, color: Colors.green, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -572,10 +520,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
@@ -591,15 +536,20 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _showDuplicateDialog(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => DuplicateProductDialog(product: product),
     );
   }
 
@@ -609,26 +559,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
             child: Icon(Icons.inventory_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
@@ -636,33 +569,18 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           Text(
             'No Product Records Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
 
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
-              ),
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
               'Start by adding your first product to manage inventory efficiently',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -682,10 +600,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
