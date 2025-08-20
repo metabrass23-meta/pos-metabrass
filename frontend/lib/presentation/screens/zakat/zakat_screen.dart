@@ -89,7 +89,7 @@ class _ZakatPageState extends State<ZakatPage> {
         onRefresh: _handleRefresh,
         color: AppTheme.primaryMaroon,
         child: Padding(
-          padding: EdgeInsets.all(context.mainPadding),
+          padding: EdgeInsets.all(context.mainPadding / 2),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -152,6 +152,7 @@ class _ZakatPageState extends State<ZakatPage> {
   Widget _buildDesktopHeader() {
     return Row(
       children: [
+        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +160,7 @@ class _ZakatPageState extends State<ZakatPage> {
               Text(
                 'Zakat Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -173,6 +174,8 @@ class _ZakatPageState extends State<ZakatPage> {
             ],
           ),
         ),
+
+        // Add Zakat Button
         _buildAddButton(),
       ],
     );
@@ -182,10 +185,11 @@ class _ZakatPageState extends State<ZakatPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Page Title
         Text(
           'Zakat Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -197,6 +201,8 @@ class _ZakatPageState extends State<ZakatPage> {
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Zakat Button (full width on tablet)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
@@ -206,6 +212,7 @@ class _ZakatPageState extends State<ZakatPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Compact Page Title
         Text(
           'Zakat',
           style: GoogleFonts.playfairDisplay(
@@ -221,6 +228,8 @@ class _ZakatPageState extends State<ZakatPage> {
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
+
+        // Add Zakat Button (full width)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
@@ -424,7 +433,9 @@ class _ZakatPageState extends State<ZakatPage> {
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
