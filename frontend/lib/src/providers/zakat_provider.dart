@@ -23,6 +23,7 @@ class ZakatProvider extends ChangeNotifier {
   String? _selectedAuthority;
   DateTime? _dateFrom;
   DateTime? _dateTo;
+  bool _showInactive = false;
 
   // Getters
   List<Zakat> get zakatRecords => _filteredRecords;
@@ -38,17 +39,14 @@ class ZakatProvider extends ChangeNotifier {
   String? get selectedAuthority => _selectedAuthority;
   DateTime? get dateFrom => _dateFrom;
   DateTime? get dateTo => _dateTo;
+  bool get showInactive => _showInactive;
 
   ZakatProvider() {
     loadZakatRecords();
   }
 
   /// Load zakat records from API
-  Future<void> loadZakatRecords({
-    int page = 1,
-    int pageSize = 20,
-    bool showLoading = true,
-  }) async {
+  Future<void> loadZakatRecords({int page = 1, int pageSize = 20, bool showLoading = true}) async {
     if (showLoading) {
       _setLoading(true);
     }
@@ -64,6 +62,7 @@ class ZakatProvider extends ChangeNotifier {
         dateTo: _dateTo,
         sortBy: _sortBy,
         sortOrder: _sortAscending ? 'asc' : 'desc',
+        showInactive: _showInactive,
       );
 
       final response = await _zakatService.getZakats(params: params);
@@ -256,6 +255,12 @@ class ZakatProvider extends ChangeNotifier {
     await loadZakatRecords();
   }
 
+  /// Set inactive records filter
+  Future<void> setShowInactiveFilter(bool showInactive) async {
+    _showInactive = showInactive;
+    await loadZakatRecords();
+  }
+
   /// Clear all filters
   Future<void> clearFilters() async {
     _selectedBeneficiary = null;
@@ -263,6 +268,7 @@ class ZakatProvider extends ChangeNotifier {
     _dateFrom = null;
     _dateTo = null;
     _searchQuery = '';
+    _showInactive = false;
     await loadZakatRecords();
   }
 
@@ -418,17 +424,11 @@ class ZakatProvider extends ChangeNotifier {
   }
 
   /// Bulk actions on zakat records
-  Future<bool> bulkZakatActions({
-    required List<String> zakatIds,
-    required String action,
-  }) async {
+  Future<bool> bulkZakatActions({required List<String> zakatIds, required String action}) async {
     _setLoading(true);
 
     try {
-      final response = await _zakatService.bulkZakatActions(
-        zakatIds: zakatIds,
-        action: action,
-      );
+      final response = await _zakatService.bulkZakatActions(zakatIds: zakatIds, action: action);
 
       if (response.success) {
         // Refresh the list to reflect bulk changes
@@ -449,17 +449,9 @@ class ZakatProvider extends ChangeNotifier {
   }
 
   /// Get zakats by beneficiary
-  Future<List<Zakat>?> getZakatsByBeneficiary({
-    required String beneficiaryName,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-  }) async {
+  Future<List<Zakat>?> getZakatsByBeneficiary({required String beneficiaryName, DateTime? dateFrom, DateTime? dateTo}) async {
     try {
-      final response = await _zakatService.getZakatsByBeneficiary(
-        beneficiaryName: beneficiaryName,
-        dateFrom: dateFrom,
-        dateTo: dateTo,
-      );
+      final response = await _zakatService.getZakatsByBeneficiary(beneficiaryName: beneficiaryName, dateFrom: dateFrom, dateTo: dateTo);
 
       if (response.success && response.data != null) {
         return response.data!.zakats;
@@ -474,17 +466,9 @@ class ZakatProvider extends ChangeNotifier {
   }
 
   /// Get zakats by authority
-  Future<List<Zakat>?> getZakatsByAuthority({
-    required String authority,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-  }) async {
+  Future<List<Zakat>?> getZakatsByAuthority({required String authority, DateTime? dateFrom, DateTime? dateTo}) async {
     try {
-      final response = await _zakatService.getZakatsByAuthority(
-        authority: authority,
-        dateFrom: dateFrom,
-        dateTo: dateTo,
-      );
+      final response = await _zakatService.getZakatsByAuthority(authority: authority, dateFrom: dateFrom, dateTo: dateTo);
 
       if (response.success && response.data != null) {
         return response.data!.zakats;
@@ -499,15 +483,9 @@ class ZakatProvider extends ChangeNotifier {
   }
 
   /// Get zakats by date range
-  Future<List<Zakat>?> getZakatsByDateRange({
-    required DateTime startDate,
-    required DateTime endDate,
-  }) async {
+  Future<List<Zakat>?> getZakatsByDateRange({required DateTime startDate, required DateTime endDate}) async {
     try {
-      final response = await _zakatService.getZakatsByDateRange(
-        startDate: startDate,
-        endDate: endDate,
-      );
+      final response = await _zakatService.getZakatsByDateRange(startDate: startDate, endDate: endDate);
 
       if (response.success && response.data != null) {
         return response.data!.zakats;
@@ -522,13 +500,9 @@ class ZakatProvider extends ChangeNotifier {
   }
 
   /// Get beneficiary report
-  Future<ZakatBeneficiaryReportResponse?> getBeneficiaryReport({
-    required String beneficiaryName,
-  }) async {
+  Future<ZakatBeneficiaryReportResponse?> getBeneficiaryReport({required String beneficiaryName}) async {
     try {
-      final response = await _zakatService.getBeneficiaryReport(
-        beneficiaryName: beneficiaryName,
-      );
+      final response = await _zakatService.getBeneficiaryReport(beneficiaryName: beneficiaryName);
 
       if (response.success && response.data != null) {
         return response.data!;
@@ -575,23 +549,17 @@ class ZakatProvider extends ChangeNotifier {
 
   /// Get records by month
   List<Zakat> getRecordsByMonth(int year, int month) {
-    return _zakatRecords
-        .where((zakat) => zakat.date.year == year && zakat.date.month == month)
-        .toList();
+    return _zakatRecords.where((zakat) => zakat.date.year == year && zakat.date.month == month).toList();
   }
 
   /// Get total amount by year
   double getTotalAmountByYear(int year) {
-    return _zakatRecords
-        .where((zakat) => zakat.date.year == year)
-        .fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
+    return _zakatRecords.where((zakat) => zakat.date.year == year).fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
   }
 
   /// Get total amount by month
   double getTotalAmountByMonth(int year, int month) {
-    return _zakatRecords
-        .where((zakat) => zakat.date.year == year && zakat.date.month == month)
-        .fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
+    return _zakatRecords.where((zakat) => zakat.date.year == year && zakat.date.month == month).fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
   }
 
   /// Private helper methods
@@ -619,9 +587,7 @@ class ZakatProvider extends ChangeNotifier {
 
   int _getThisMonthCount() {
     final now = DateTime.now();
-    return _zakatRecords
-        .where((zakat) => zakat.date.year == now.year && zakat.date.month == now.month)
-        .length;
+    return _zakatRecords.where((zakat) => zakat.date.year == now.year && zakat.date.month == now.month).length;
   }
 
   /// Clear all records (for testing purposes)

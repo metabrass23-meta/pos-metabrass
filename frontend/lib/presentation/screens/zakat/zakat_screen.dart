@@ -11,6 +11,7 @@ import '../../widgets/zakat/delete_zakat_dialog.dart';
 import '../../widgets/zakat/edit_zakat_dialog.dart';
 import '../../widgets/zakat/view_zakat_dialog.dart';
 import '../../widgets/zakat/zakat_table.dart';
+import '../../widgets/zakat/zakat_filter_dialog.dart';
 
 class ZakatPage extends StatefulWidget {
   const ZakatPage({super.key});
@@ -73,26 +74,7 @@ class _ZakatPageState extends State<ZakatPage> {
   }
 
   void _handleFilterTap() {
-    // TODO: Implement filter dialog
-    // You can create a FilterZakatDialog similar to other dialogs
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.info_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter functionality will be implemented soon',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
-      ),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const ZakatFilterDialog());
   }
 
   @override

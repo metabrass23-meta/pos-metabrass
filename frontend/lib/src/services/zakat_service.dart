@@ -35,9 +35,7 @@ class ZakatService {
 
           // Handle the API response structure from Django views
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo.fromJson(zakatListData['pagination']),
             filtersApplied: zakatListData['filters_applied'] as Map<String, dynamic>?,
           );
@@ -90,17 +88,10 @@ class ZakatService {
         }
       }
 
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Get zakats', e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakats',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while getting zakats');
     }
   }
 
@@ -118,11 +109,7 @@ class ZakatService {
           final zakatData = responseData['data'] as Map<String, dynamic>;
           final zakat = Zakat.fromJson(zakatData);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat retrieved successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat retrieved successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -140,17 +127,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get zakat by ID DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get zakat by ID error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while getting zakat');
     }
   }
 
@@ -195,11 +175,7 @@ class ZakatService {
           // Update cache with new zakat
           await _addZakatToCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat created successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat created successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -217,17 +193,10 @@ class ZakatService {
     } on DioException catch (e) {
       DebugHelper.printError('Create zakat DioException', e);
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Create zakat', e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while creating zakat: ${e.toString()}',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while creating zakat: ${e.toString()}');
     }
   }
 
@@ -273,11 +242,7 @@ class ZakatService {
           // Update cache with updated zakat
           await _updateZakatInCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat updated successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat updated successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -295,17 +260,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Update zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while updating zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while updating zakat');
     }
   }
 
@@ -320,10 +278,7 @@ class ZakatService {
         // Remove from cache
         await _removeZakatFromCache(id);
 
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Zakat deleted successfully',
-        );
+        return ApiResponse<void>(success: true, message: response.data['message'] ?? 'Zakat deleted successfully');
       } else {
         return ApiResponse<void>(
           success: false,
@@ -349,10 +304,7 @@ class ZakatService {
       DebugHelper.printApiResponse('GET Zakat Statistics', response.data);
 
       if (response.statusCode == 200) {
-        return ApiResponse<ZakatStatisticsResponse>.fromJson(
-          response.data,
-              (data) => ZakatStatisticsResponse.fromJson(data as Map<String, dynamic>),
-        );
+        return ApiResponse<ZakatStatisticsResponse>.fromJson(response.data, (data) => ZakatStatisticsResponse.fromJson(data as Map<String, dynamic>));
       } else {
         return ApiResponse<ZakatStatisticsResponse>(
           success: false,
@@ -363,17 +315,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get zakat statistics DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatStatisticsResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatStatisticsResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get zakat statistics error: ${e.toString()}');
-      return ApiResponse<ZakatStatisticsResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakat statistics',
-      );
+      return ApiResponse<ZakatStatisticsResponse>(success: false, message: 'An unexpected error occurred while getting zakat statistics');
     }
   }
 
@@ -388,11 +333,7 @@ class ZakatService {
     int pageSize = 20,
   }) async {
     try {
-      final queryParams = {
-        'search': query,
-        'page': page.toString(),
-        'page_size': pageSize.toString(),
-      };
+      final queryParams = {'search': query, 'page': page.toString(), 'page_size': pageSize.toString()};
 
       if (beneficiaryName != null && beneficiaryName.isNotEmpty) {
         queryParams['beneficiary'] = beneficiaryName;
@@ -407,10 +348,7 @@ class ZakatService {
         queryParams['date_to'] = dateTo.toIso8601String().split('T')[0];
       }
 
-      final response = await _apiClient.get(
-        ApiConfig.searchZakats,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.searchZakats, queryParameters: queryParams);
 
       DebugHelper.printApiResponse('GET Search Zakats', response.data);
 
@@ -421,9 +359,7 @@ class ZakatService {
           final zakatListData = responseData['data'] as Map<String, dynamic>;
 
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo.fromJson(zakatListData['pagination']),
           );
 
@@ -449,17 +385,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Search zakats DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Search zakats error: ${e.toString()}');
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while searching zakats',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while searching zakats');
     }
   }
 
@@ -478,10 +407,7 @@ class ZakatService {
         'page_size': pageSize.toString(),
       };
 
-      final response = await _apiClient.get(
-        ApiConfig.zakatsByDateRange,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.zakatsByDateRange, queryParameters: queryParams);
 
       DebugHelper.printApiResponse('GET Zakats by Date Range', response.data);
 
@@ -492,9 +418,7 @@ class ZakatService {
           final zakatListData = responseData['data'] as Map<String, dynamic>;
 
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo(
               currentPage: page,
               pageSize: pageSize,
@@ -527,37 +451,21 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get zakats by date range DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get zakats by date range error: ${e.toString()}');
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakats by date range',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while getting zakats by date range');
     }
   }
 
   /// Bulk actions on zakats
-  Future<ApiResponse<Map<String, dynamic>>> bulkZakatActions({
-    required List<String> zakatIds,
-    required String action,
-  }) async {
+  Future<ApiResponse<Map<String, dynamic>>> bulkZakatActions({required List<String> zakatIds, required String action}) async {
     try {
-      final request = ZakatBulkActionRequest(
-        zakatIds: zakatIds,
-        action: action,
-      );
+      final request = ZakatBulkActionRequest(zakatIds: zakatIds, action: action);
 
       DebugHelper.printJson('Bulk Zakat Actions Request', request.toJson());
 
-      final response = await _apiClient.post(
-        ApiConfig.bulkZakatActions,
-        data: request.toJson(),
-      );
+      final response = await _apiClient.post(ApiConfig.bulkZakatActions, data: request.toJson());
 
       DebugHelper.printApiResponse('POST Bulk Zakat Actions', response.data);
 
@@ -577,33 +485,19 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Bulk zakat actions DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Bulk zakat actions error: ${e.toString()}');
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'An unexpected error occurred while performing bulk action',
-      );
+      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while performing bulk action');
     }
   }
 
   /// Get recent zakats
-  Future<ApiResponse<ZakatsListResponse>> getRecentZakats({
-    int limit = 10,
-  }) async {
+  Future<ApiResponse<ZakatsListResponse>> getRecentZakats({int limit = 10}) async {
     try {
-      final queryParams = {
-        'limit': limit.toString(),
-      };
+      final queryParams = {'limit': limit.toString()};
 
-      final response = await _apiClient.get(
-        ApiConfig.recentZakats,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.recentZakats, queryParameters: queryParams);
 
       DebugHelper.printApiResponse('GET Recent Zakats', response.data);
 
@@ -614,9 +508,7 @@ class ZakatService {
           final zakatListData = responseData['data'] as Map<String, dynamic>;
 
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo(
               currentPage: 1,
               pageSize: limit,
@@ -649,26 +541,15 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get recent zakats DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get recent zakats error: ${e.toString()}');
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting recent zakats',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while getting recent zakats');
     }
   }
 
   /// Get zakats by beneficiary
-  Future<ApiResponse<ZakatsListResponse>> getZakatsByBeneficiary({
-    required String beneficiaryName,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-  }) async {
+  Future<ApiResponse<ZakatsListResponse>> getZakatsByBeneficiary({required String beneficiaryName, DateTime? dateFrom, DateTime? dateTo}) async {
     try {
       final queryParams = <String, String>{};
 
@@ -693,9 +574,7 @@ class ZakatService {
           final zakatListData = responseData['data'] as Map<String, dynamic>;
 
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo(
               currentPage: 1,
               pageSize: zakatListData['count'] as int,
@@ -728,26 +607,15 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get zakats by beneficiary DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get zakats by beneficiary error: ${e.toString()}');
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakats by beneficiary',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while getting zakats by beneficiary');
     }
   }
 
   /// Get zakats by authority
-  Future<ApiResponse<ZakatsListResponse>> getZakatsByAuthority({
-    required String authority,
-    DateTime? dateFrom,
-    DateTime? dateTo,
-  }) async {
+  Future<ApiResponse<ZakatsListResponse>> getZakatsByAuthority({required String authority, DateTime? dateFrom, DateTime? dateTo}) async {
     try {
       final queryParams = <String, String>{};
 
@@ -758,10 +626,7 @@ class ZakatService {
         queryParams['date_to'] = dateTo.toIso8601String().split('T')[0];
       }
 
-      final response = await _apiClient.get(
-        ApiConfig.zakatsByAuthority(authority),
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      );
+      final response = await _apiClient.get(ApiConfig.zakatsByAuthority(authority), queryParameters: queryParams.isNotEmpty ? queryParams : null);
 
       DebugHelper.printApiResponse('GET Zakats by Authority', response.data);
 
@@ -772,9 +637,7 @@ class ZakatService {
           final zakatListData = responseData['data'] as Map<String, dynamic>;
 
           final zakatsListResponse = ZakatsListResponse(
-            zakats: (zakatListData['zakat_entries'] as List)
-                .map((zakatJson) => Zakat.fromJson(zakatJson))
-                .toList(),
+            zakats: (zakatListData['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
             pagination: PaginationInfo(
               currentPage: 1,
               pageSize: zakatListData['count'] as int,
@@ -807,40 +670,26 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get zakats by authority DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get zakats by authority error: ${e.toString()}');
-      return ApiResponse<ZakatsListResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting zakats by authority',
-      );
+      return ApiResponse<ZakatsListResponse>(success: false, message: 'An unexpected error occurred while getting zakats by authority');
     }
   }
 
   /// Get beneficiary report
-  Future<ApiResponse<ZakatBeneficiaryReportResponse>> getBeneficiaryReport({
-    required String beneficiaryName,
-  }) async {
+  Future<ApiResponse<ZakatBeneficiaryReportResponse>> getBeneficiaryReport({required String beneficiaryName}) async {
     try {
-      final queryParams = {
-        'beneficiary_name': beneficiaryName,
-      };
+      final queryParams = {'beneficiary_name': beneficiaryName};
 
-      final response = await _apiClient.get(
-        ApiConfig.zakatBeneficiaryReport,
-        queryParameters: queryParams,
-      );
+      final response = await _apiClient.get(ApiConfig.zakatBeneficiaryReport, queryParameters: queryParams);
 
       DebugHelper.printApiResponse('GET Beneficiary Report', response.data);
 
       if (response.statusCode == 200) {
         return ApiResponse<ZakatBeneficiaryReportResponse>.fromJson(
           response.data,
-              (data) => ZakatBeneficiaryReportResponse.fromJson(data as Map<String, dynamic>),
+          (data) => ZakatBeneficiaryReportResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<ZakatBeneficiaryReportResponse>(
@@ -852,17 +701,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Get beneficiary report DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<ZakatBeneficiaryReportResponse>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<ZakatBeneficiaryReportResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get beneficiary report error: ${e.toString()}');
-      return ApiResponse<ZakatBeneficiaryReportResponse>(
-        success: false,
-        message: 'An unexpected error occurred while getting beneficiary report',
-      );
+      return ApiResponse<ZakatBeneficiaryReportResponse>(success: false, message: 'An unexpected error occurred while getting beneficiary report');
     }
   }
 
@@ -883,11 +725,7 @@ class ZakatService {
           // Add duplicated zakat to cache
           await _addZakatToCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat duplicated successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat duplicated successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -905,17 +743,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Duplicate zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Duplicate zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while duplicating zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while duplicating zakat');
     }
   }
 
@@ -936,11 +767,7 @@ class ZakatService {
           // Update cache with verified zakat
           await _updateZakatInCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat verified successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat verified successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -958,17 +785,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Verify zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Verify zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while verifying zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while verifying zakat');
     }
   }
 
@@ -989,11 +809,7 @@ class ZakatService {
           // Update cache with unverified zakat
           await _updateZakatInCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat unverified successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat unverified successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -1011,17 +827,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Unverify zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Unverify zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while unverifying zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while unverifying zakat');
     }
   }
 
@@ -1042,11 +851,7 @@ class ZakatService {
           // Update cache with archived zakat
           await _updateZakatInCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat archived successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat archived successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -1064,17 +869,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Archive zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Archive zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while archiving zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while archiving zakat');
     }
   }
 
@@ -1095,11 +893,7 @@ class ZakatService {
           // Update cache with unarchived zakat
           await _updateZakatInCache(zakat);
 
-          return ApiResponse<Zakat>(
-            success: true,
-            message: responseData['message'] as String? ?? 'Zakat unarchived successfully',
-            data: zakat,
-          );
+          return ApiResponse<Zakat>(success: true, message: responseData['message'] as String? ?? 'Zakat unarchived successfully', data: zakat);
         } else {
           return ApiResponse<Zakat>(
             success: false,
@@ -1117,17 +911,10 @@ class ZakatService {
     } on DioException catch (e) {
       debugPrint('Unarchive zakat DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Zakat>(
-        success: false,
-        message: apiError.displayMessage,
-        errors: apiError.errors,
-      );
+      return ApiResponse<Zakat>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Unarchive zakat error: ${e.toString()}');
-      return ApiResponse<Zakat>(
-        success: false,
-        message: 'An unexpected error occurred while unarchiving zakat',
-      );
+      return ApiResponse<Zakat>(success: false, message: 'An unexpected error occurred while unarchiving zakat');
     }
   }
 

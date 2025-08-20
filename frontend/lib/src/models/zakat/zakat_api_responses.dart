@@ -9,7 +9,7 @@ class ZakatsListResponse {
 
   factory ZakatsListResponse.fromJson(Map<String, dynamic> json) {
     return ZakatsListResponse(
-      zakats: (json['zakats'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
+      zakats: (json['zakat_entries'] as List).map((zakatJson) => Zakat.fromJson(zakatJson)).toList(),
       pagination: PaginationInfo.fromJson(json['pagination']),
       filtersApplied: json['filters_applied'] as Map<String, dynamic>?,
     );
