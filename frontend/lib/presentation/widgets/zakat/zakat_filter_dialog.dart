@@ -3,9 +3,11 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'dart:async';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../globals/custom_date_picker.dart';
 
 class ZakatFilterDialog extends StatefulWidget {
   const ZakatFilterDialog({super.key});
@@ -108,47 +110,23 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Future<void> _selectDateRange() async {
-    // Select start date
-    final startDate = await showDatePicker(
+    // Select start date using custom date picker
+    final startDate = await _selectCustomDate(
       context: context,
       initialDate: _dateFrom ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryMaroon,
-              onPrimary: AppTheme.pureWhite,
-              surface: AppTheme.pureWhite,
-              onSurface: AppTheme.charcoalGray,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      title: 'Select Start Date',
+      minDate: DateTime(2000),
+      maxDate: DateTime.now(),
     );
 
     if (startDate != null) {
-      // Select end date
-      final endDate = await showDatePicker(
+      // Select end date using custom date picker
+      final endDate = await _selectCustomDate(
         context: context,
         initialDate: _dateTo ?? startDate,
-        firstDate: startDate,
-        lastDate: DateTime.now(),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: AppTheme.primaryMaroon,
-                onPrimary: AppTheme.pureWhite,
-                surface: AppTheme.pureWhite,
-                onSurface: AppTheme.charcoalGray,
-              ),
-            ),
-            child: child!,
-          );
-        },
+        title: 'Select End Date',
+        minDate: startDate,
+        maxDate: DateTime.now(),
       );
 
       if (endDate != null) {
@@ -158,6 +136,36 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         });
       }
     }
+  }
+
+  Future<DateTime?> _selectCustomDate({
+    required BuildContext context,
+    required DateTime initialDate,
+    required String title,
+    DateTime? minDate,
+    DateTime? maxDate,
+  }) async {
+    final completer = Completer<DateTime?>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SyncfusionDateTimePicker(
+          initialDate: initialDate,
+          initialTime: TimeOfDay.now(),
+          onDateTimeSelected: (date, time) {
+            completer.complete(date);
+          },
+          title: title,
+          minDate: minDate,
+          maxDate: maxDate,
+          showTimeInline: false, // Only show date picker for range selection
+        );
+      },
+    );
+
+    return completer.future;
   }
 
   @override
