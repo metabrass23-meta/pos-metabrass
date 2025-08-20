@@ -100,17 +100,30 @@ class OrderItem(models.Model):
 
     def get_related_sale_items(self):
         """Get sale items created from this order item"""
-        return self.sale_items.filter(is_active=True)
+        from sales.models import SaleItem
+        return SaleItem.objects.filter(
+            order_item=self.id,
+            is_active=True
+        )
 
     def has_been_sold(self):
         """Check if this order item has been converted to sales"""
-        return self.sale_items.exists()
+        from sales.models import SaleItem
+        return SaleItem.objects.filter(
+            order_item=self.id,
+            is_active=True
+        ).exists()
 
     @property
     def remaining_quantity_to_sell(self):
         """Get quantity not yet converted to sales"""
         from django.db.models import Sum
-        sold_quantity = self.sale_items.aggregate(
+        from sales.models import SaleItem
+        
+        sold_quantity = SaleItem.objects.filter(
+            order_item=self.id,
+            is_active=True
+        ).aggregate(
             total=Sum('quantity')
         )['total'] or 0
         return max(0, self.quantity - sold_quantity)
