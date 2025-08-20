@@ -1,382 +1,637 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-class Zakat {
-  final String id;
-  final String? name;
-  final String description;
-  final DateTime date;
-  final TimeOfDay time;
-  final double amount;
-
-  Zakat({
-    required this.id,
-    this.name,
-    required this.description,
-    required this.date,
-    required this.time,
-    required this.amount,
-  });
-
-  // Formatted date for display
-  String get formattedDate {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  // Formatted time for display
-  String get formattedTime {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-
-  // Relative date (e.g., "Today", "Yesterday", "2 days ago")
-  String get relativeDate {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final recordDate = DateTime(date.year, date.month, date.day);
-    final difference = today.difference(recordDate).inDays;
-
-    if (difference == 0) {
-      return 'Today';
-    } else if (difference == 1) {
-      return 'Yesterday';
-    } else if (difference < 7) {
-      return '$difference days ago';
-    } else if (difference < 30) {
-      final weeks = (difference / 7).floor();
-      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
-    } else if (difference < 365) {
-      final months = (difference / 30).floor();
-      return months == 1 ? '1 month ago' : '$months months ago';
-    } else {
-      final years = (difference / 365).floor();
-      return years == 1 ? '1 year ago' : '$years years ago';
-    }
-  }
-
-  // Combined date and time for sorting
-  DateTime get dateTime {
-    return DateTime(
-      date.year,
-      date.month,
-      date.day,
-      time.hour,
-      time.minute,
-    );
-  }
-
-  // Copy method for updates
-  Zakat copyWith({
-    String? id,
-    String? name,
-    String? description,
-    DateTime? date,
-    TimeOfDay? time,
-    double? amount,
-  }) {
-    return Zakat(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      date: date ?? this.date,
-      time: time ?? this.time,
-      amount: amount ?? this.amount,
-    );
-  }
-
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'date': date.toIso8601String(),
-      'time': '${time.hour}:${time.minute}',
-      'amount': amount,
-    };
-  }
-
-  // Create from JSON
-  factory Zakat.fromJson(Map<String, dynamic> json) {
-    final timeParts = json['time'].split(':');
-    return Zakat(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      date: DateTime.parse(json['date']),
-      time: TimeOfDay(
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-      ),
-      amount: json['amount'].toDouble(),
-    );
-  }
-}
+import '../models/zakat/zakat_model.dart';
+import '../models/zakat/zakat_api_responses.dart';
+import '../services/zakat_service.dart';
 
 class ZakatProvider extends ChangeNotifier {
+  final ZakatService _zakatService = ZakatService();
+
   List<Zakat> _zakatRecords = [];
   List<Zakat> _filteredRecords = [];
   bool _isLoading = false;
+  bool _hasError = false;
+  String? _errorMessage;
   String _searchQuery = '';
+  PaginationInfo? _paginationInfo;
+  ZakatStatisticsResponse? _statistics;
+
+  // Sorting and filtering
+  String _sortBy = 'date';
+  bool _sortAscending = false;
+  String? _selectedBeneficiary;
+  String? _selectedAuthority;
+  DateTime? _dateFrom;
+  DateTime? _dateTo;
 
   // Getters
   List<Zakat> get zakatRecords => _filteredRecords;
   bool get isLoading => _isLoading;
+  bool get hasError => _hasError;
+  String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
+  PaginationInfo? get paginationInfo => _paginationInfo;
+  ZakatStatisticsResponse? get statistics => _statistics;
+  String get sortBy => _sortBy;
+  bool get sortAscending => _sortAscending;
+  String? get selectedBeneficiary => _selectedBeneficiary;
+  String? get selectedAuthority => _selectedAuthority;
+  DateTime? get dateFrom => _dateFrom;
+  DateTime? get dateTo => _dateTo;
 
-  // Initialize with sample data
   ZakatProvider() {
-    _initializeSampleData();
+    loadZakatRecords();
   }
 
-  void _initializeSampleData() {
-    _zakatRecords = [
-      Zakat(
-        id: 'ZKT001',
-        name: 'Muhammad Ali',
-        description: 'Annual zakat for wealth',
-        date: DateTime.now().subtract(const Duration(days: 30)),
-        time: const TimeOfDay(hour: 14, minute: 30),
-        amount: 25000.0,
-      ),
-      Zakat(
-        id: 'ZKT002',
-        name: null,
-        description: 'Zakat al-Fitr for family',
-        date: DateTime.now().subtract(const Duration(days: 60)),
-        time: const TimeOfDay(hour: 9, minute: 15),
-        amount: 5000.0,
-      ),
-      Zakat(
-        id: 'ZKT003',
-        name: 'Fatima Khan',
-        description: 'Zakat on gold jewelry',
-        date: DateTime.now().subtract(const Duration(days: 90)),
-        time: const TimeOfDay(hour: 16, minute: 45),
-        amount: 15000.0,
-      ),
-      Zakat(
-        id: 'ZKT004',
-        name: 'Ahmed Hassan',
-        description: 'Business income zakat',
-        date: DateTime.now().subtract(const Duration(days: 120)),
-        time: const TimeOfDay(hour: 11, minute: 20),
-        amount: 35000.0,
-      ),
-      Zakat(
-        id: 'ZKT005',
-        name: null,
-        description: 'Sadaqah contribution',
-        date: DateTime.now().subtract(const Duration(days: 10)),
-        time: const TimeOfDay(hour: 18, minute: 30),
-        amount: 8000.0,
-      ),
-    ];
-    _filteredRecords = List.from(_zakatRecords);
-    _sortRecords();
+  /// Load zakat records from API
+  Future<void> loadZakatRecords({
+    int page = 1,
+    int pageSize = 20,
+    bool showLoading = true,
+  }) async {
+    if (showLoading) {
+      _setLoading(true);
+    }
+
+    try {
+      final params = ZakatListParams(
+        page: page,
+        pageSize: pageSize,
+        search: _searchQuery.isEmpty ? null : _searchQuery,
+        beneficiaryName: _selectedBeneficiary,
+        authorizedBy: _selectedAuthority,
+        dateFrom: _dateFrom,
+        dateTo: _dateTo,
+        sortBy: _sortBy,
+        sortOrder: _sortAscending ? 'asc' : 'desc',
+      );
+
+      final response = await _zakatService.getZakats(params: params);
+
+      if (response.success && response.data != null) {
+        _zakatRecords = response.data!.zakats;
+        _filteredRecords = List.from(_zakatRecords);
+        _paginationInfo = response.data!.pagination;
+        _clearError();
+      } else {
+        _setError(response.message ?? 'Failed to load zakat records');
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Sort records by date and time (newest first)
-  void _sortRecords() {
-    _filteredRecords.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  /// Load statistics
+  Future<void> loadStatistics() async {
+    try {
+      final response = await _zakatService.getZakatStatistics();
+
+      if (response.success && response.data != null) {
+        _statistics = response.data!;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error loading statistics: $e');
+    }
   }
 
-  // Generate new ID
-  String _generateId() {
-    final maxId = _zakatRecords.isEmpty
-        ? 0
-        : _zakatRecords
-        .map((z) => int.tryParse(z.id.replaceAll('ZKT', '')) ?? 0)
-        .reduce((a, b) => a > b ? a : b);
-    return 'ZKT${(maxId + 1).toString().padLeft(3, '0')}';
-  }
-
-  // Add new zakat record
-  Future<void> addZakat({
-    String? name,
+  /// Add new zakat record
+  Future<bool> addZakat({
+    required String name,
     required String description,
     required DateTime date,
     required TimeOfDay time,
     required double amount,
+    required String beneficiaryName,
+    String? beneficiaryContact,
+    String? notes,
+    required String authorizedBy,
   }) async {
-    _isLoading = true;
-    notifyListeners();
+    _setLoading(true);
 
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
-    final newZakat = Zakat(
-      id: _generateId(),
-      name: name,
-      description: description,
-      date: date,
-      time: time,
-      amount: amount,
-    );
-
-    _zakatRecords.add(newZakat);
-    _applyFilters();
-    _sortRecords();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  // Update existing zakat record
-  Future<void> updateZakat({
-    required String id,
-    String? name,
-    required String description,
-    required DateTime date,
-    required TimeOfDay time,
-    required double amount,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final index = _zakatRecords.indexWhere((z) => z.id == id);
-    if (index != -1) {
-      _zakatRecords[index] = _zakatRecords[index].copyWith(
+      final response = await _zakatService.createZakat(
         name: name,
         description: description,
         date: date,
-        time: time,
+        time: timeString,
         amount: amount,
+        beneficiaryName: beneficiaryName,
+        beneficiaryContact: beneficiaryContact,
+        notes: notes,
+        authorizedBy: authorizedBy,
       );
-      _applyFilters();
-      _sortRecords();
+
+      if (response.success && response.data != null) {
+        // Refresh the list to include the new record
+        await loadZakatRecords(showLoading: false);
+        await loadStatistics(); // Refresh statistics
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to add zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
-  // Delete zakat record
-  Future<void> deleteZakat(String id) async {
-    _isLoading = true;
-    notifyListeners();
+  /// Update existing zakat record
+  Future<bool> updateZakat({
+    required String id,
+    required String name,
+    required String description,
+    required DateTime date,
+    required TimeOfDay time,
+    required double amount,
+    required String beneficiaryName,
+    String? beneficiaryContact,
+    String? notes,
+    required String authorizedBy,
+  }) async {
+    _setLoading(true);
 
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
-    _zakatRecords.removeWhere((z) => z.id == id);
-    _applyFilters();
+      final response = await _zakatService.updateZakat(
+        id: id,
+        name: name,
+        description: description,
+        date: date,
+        time: timeString,
+        amount: amount,
+        beneficiaryName: beneficiaryName,
+        beneficiaryContact: beneficiaryContact,
+        notes: notes,
+        authorizedBy: authorizedBy,
+      );
 
-    _isLoading = false;
-    notifyListeners();
+      if (response.success && response.data != null) {
+        // Refresh the list to include the updated record
+        await loadZakatRecords(showLoading: false);
+        await loadStatistics(); // Refresh statistics
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to update zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Search zakat records
-  void searchZakat(String query) {
-    _searchQuery = query.toLowerCase();
-    _applyFilters();
-    notifyListeners();
+  /// Delete zakat record
+  Future<bool> deleteZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.deleteZakat(id);
+
+      if (response.success) {
+        // Refresh the list to remove the deleted record
+        await loadZakatRecords(showLoading: false);
+        await loadStatistics(); // Refresh statistics
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to delete zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Apply search filters
-  void _applyFilters() {
-    if (_searchQuery.isEmpty) {
-      _filteredRecords = List.from(_zakatRecords);
+  /// Search zakat records
+  Future<void> searchZakat(String query) async {
+    _searchQuery = query;
+    // Reload records with search query
+    await loadZakatRecords();
+  }
+
+  /// Set sorting
+  Future<void> setSortBy(String sortBy) async {
+    if (_sortBy == sortBy) {
+      _sortAscending = !_sortAscending;
     } else {
-      _filteredRecords = _zakatRecords.where((zakat) {
-        return zakat.id.toLowerCase().contains(_searchQuery) ||
-            (zakat.name?.toLowerCase().contains(_searchQuery) ?? false) ||
-            zakat.description.toLowerCase().contains(_searchQuery) ||
-            zakat.amount.toString().contains(_searchQuery);
-      }).toList();
+      _sortBy = sortBy;
+      _sortAscending = false;
     }
-    _sortRecords();
+    // Reload records with new sorting
+    await loadZakatRecords();
   }
 
-  // Get statistics
+  /// Set beneficiary filter
+  Future<void> setBeneficiaryFilter(String? beneficiary) async {
+    _selectedBeneficiary = beneficiary;
+    await loadZakatRecords();
+  }
+
+  /// Set authority filter
+  Future<void> setAuthorityFilter(String? authority) async {
+    _selectedAuthority = authority;
+    await loadZakatRecords();
+  }
+
+  /// Set date range filter
+  Future<void> setDateRangeFilter(DateTime? from, DateTime? to) async {
+    _dateFrom = from;
+    _dateTo = to;
+    await loadZakatRecords();
+  }
+
+  /// Clear all filters
+  Future<void> clearFilters() async {
+    _selectedBeneficiary = null;
+    _selectedAuthority = null;
+    _dateFrom = null;
+    _dateTo = null;
+    _searchQuery = '';
+    await loadZakatRecords();
+  }
+
+  /// Load next page
+  Future<void> loadNextPage() async {
+    if (_paginationInfo?.hasNext == true) {
+      await loadZakatRecords(page: _paginationInfo!.currentPage + 1);
+    }
+  }
+
+  /// Load previous page
+  Future<void> loadPreviousPage() async {
+    if (_paginationInfo?.hasPrevious == true) {
+      await loadZakatRecords(page: _paginationInfo!.currentPage - 1);
+    }
+  }
+
+  /// Duplicate zakat record
+  Future<bool> duplicateZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.duplicateZakat(id);
+
+      if (response.success && response.data != null) {
+        // Refresh the list to include the duplicated record
+        await loadZakatRecords(showLoading: false);
+        await loadStatistics(); // Refresh statistics
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to duplicate zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Verify zakat record
+  Future<bool> verifyZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.verifyZakat(id);
+
+      if (response.success && response.data != null) {
+        // Update the record in the local list
+        final index = _zakatRecords.indexWhere((zakat) => zakat.id == id);
+        if (index != -1) {
+          _zakatRecords[index] = response.data!;
+          _filteredRecords = List.from(_zakatRecords);
+        }
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to verify zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Unverify zakat record
+  Future<bool> unverifyZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.unverifyZakat(id);
+
+      if (response.success && response.data != null) {
+        // Update the record in the local list
+        final index = _zakatRecords.indexWhere((zakat) => zakat.id == id);
+        if (index != -1) {
+          _zakatRecords[index] = response.data!;
+          _filteredRecords = List.from(_zakatRecords);
+        }
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to unverify zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Archive zakat record
+  Future<bool> archiveZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.archiveZakat(id);
+
+      if (response.success && response.data != null) {
+        // Update the record in the local list
+        final index = _zakatRecords.indexWhere((zakat) => zakat.id == id);
+        if (index != -1) {
+          _zakatRecords[index] = response.data!;
+          _filteredRecords = List.from(_zakatRecords);
+        }
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to archive zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Unarchive zakat record
+  Future<bool> unarchiveZakat(String id) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.unarchiveZakat(id);
+
+      if (response.success && response.data != null) {
+        // Update the record in the local list
+        final index = _zakatRecords.indexWhere((zakat) => zakat.id == id);
+        if (index != -1) {
+          _zakatRecords[index] = response.data!;
+          _filteredRecords = List.from(_zakatRecords);
+        }
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to unarchive zakat record');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Bulk actions on zakat records
+  Future<bool> bulkZakatActions({
+    required List<String> zakatIds,
+    required String action,
+  }) async {
+    _setLoading(true);
+
+    try {
+      final response = await _zakatService.bulkZakatActions(
+        zakatIds: zakatIds,
+        action: action,
+      );
+
+      if (response.success) {
+        // Refresh the list to reflect bulk changes
+        await loadZakatRecords(showLoading: false);
+        await loadStatistics(); // Refresh statistics
+        _clearError();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to perform bulk action');
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Get zakats by beneficiary
+  Future<List<Zakat>?> getZakatsByBeneficiary({
+    required String beneficiaryName,
+    DateTime? dateFrom,
+    DateTime? dateTo,
+  }) async {
+    try {
+      final response = await _zakatService.getZakatsByBeneficiary(
+        beneficiaryName: beneficiaryName,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+      );
+
+      if (response.success && response.data != null) {
+        return response.data!.zakats;
+      } else {
+        _setError(response.message ?? 'Failed to get zakats by beneficiary');
+        return null;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// Get zakats by authority
+  Future<List<Zakat>?> getZakatsByAuthority({
+    required String authority,
+    DateTime? dateFrom,
+    DateTime? dateTo,
+  }) async {
+    try {
+      final response = await _zakatService.getZakatsByAuthority(
+        authority: authority,
+        dateFrom: dateFrom,
+        dateTo: dateTo,
+      );
+
+      if (response.success && response.data != null) {
+        return response.data!.zakats;
+      } else {
+        _setError(response.message ?? 'Failed to get zakats by authority');
+        return null;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// Get zakats by date range
+  Future<List<Zakat>?> getZakatsByDateRange({
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final response = await _zakatService.getZakatsByDateRange(
+        startDate: startDate,
+        endDate: endDate,
+      );
+
+      if (response.success && response.data != null) {
+        return response.data!.zakats;
+      } else {
+        _setError(response.message ?? 'Failed to get zakats by date range');
+        return null;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// Get beneficiary report
+  Future<ZakatBeneficiaryReportResponse?> getBeneficiaryReport({
+    required String beneficiaryName,
+  }) async {
+    try {
+      final response = await _zakatService.getBeneficiaryReport(
+        beneficiaryName: beneficiaryName,
+      );
+
+      if (response.success && response.data != null) {
+        return response.data!;
+      } else {
+        _setError(response.message ?? 'Failed to get beneficiary report');
+        return null;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// Refresh data (for pull-to-refresh functionality)
+  Future<void> refreshZakatRecords() async {
+    await loadZakatRecords();
+    await loadStatistics();
+  }
+
+  /// Get statistics
   Map<String, dynamic> get zakatStats {
-    final now = DateTime.now();
-    final currentYear = now.year;
-    final currentMonth = now.month;
-
-    final totalRecords = _zakatRecords.length;
-    final totalAmount = _zakatRecords.fold<double>(
-      0.0,
-          (sum, zakat) => sum + zakat.amount,
-    );
-
-    final thisYearRecords = _zakatRecords.where((zakat) {
-      return zakat.date.year == currentYear;
-    }).length;
-
-    final thisMonthRecords = _zakatRecords.where((zakat) {
-      return zakat.date.year == currentYear && zakat.date.month == currentMonth;
-    }).length;
+    if (_statistics == null) {
+      // Return default stats if statistics not loaded
+      return {
+        'total': _zakatRecords.length,
+        'totalAmount': _zakatRecords.fold<double>(0.0, (sum, zakat) => sum + zakat.amount).toStringAsFixed(0),
+        'thisYear': _getThisYearCount(),
+        'thisMonth': _getThisMonthCount(),
+      };
+    }
 
     return {
-      'total': totalRecords,
-      'totalAmount': totalAmount.toStringAsFixed(0),
-      'thisYear': thisYearRecords,
-      'thisMonth': thisMonthRecords,
+      'total': _statistics!.totalZakats,
+      'totalAmount': _statistics!.totalAmount.toStringAsFixed(0),
+      'thisYear': _statistics!.thisYearCount,
+      'thisMonth': _statistics!.thisMonthCount,
     };
   }
 
-  // Get records by year
+  /// Get records by year
   List<Zakat> getRecordsByYear(int year) {
     return _zakatRecords.where((zakat) => zakat.date.year == year).toList();
   }
 
-  // Get records by month
+  /// Get records by month
   List<Zakat> getRecordsByMonth(int year, int month) {
     return _zakatRecords
         .where((zakat) => zakat.date.year == year && zakat.date.month == month)
         .toList();
   }
 
-  // Get total amount by year
+  /// Get total amount by year
   double getTotalAmountByYear(int year) {
     return _zakatRecords
         .where((zakat) => zakat.date.year == year)
         .fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
   }
 
-  // Get total amount by month
+  /// Get total amount by month
   double getTotalAmountByMonth(int year, int month) {
     return _zakatRecords
         .where((zakat) => zakat.date.year == year && zakat.date.month == month)
         .fold<double>(0.0, (sum, zakat) => sum + zakat.amount);
   }
 
-  // Export data (placeholder for future implementation)
-  Future<void> exportData() async {
-    // Implementation for exporting zakat records
-    // This could export to CSV, PDF, etc.
+  /// Private helper methods
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
   }
 
-  // Import data (placeholder for future implementation)
-  Future<void> importData(List<Map<String, dynamic>> data) async {
-    // Implementation for importing zakat records
-    // This could import from CSV, JSON, etc.
+  void _setError(String error) {
+    _hasError = true;
+    _errorMessage = error;
+    notifyListeners();
   }
 
-  // Clear all records (for testing purposes)
+  void _clearError() {
+    _hasError = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  int _getThisYearCount() {
+    final currentYear = DateTime.now().year;
+    return _zakatRecords.where((zakat) => zakat.date.year == currentYear).length;
+  }
+
+  int _getThisMonthCount() {
+    final now = DateTime.now();
+    return _zakatRecords
+        .where((zakat) => zakat.date.year == now.year && zakat.date.month == now.month)
+        .length;
+  }
+
+  /// Clear all records (for testing purposes)
   void clearAllRecords() {
     _zakatRecords.clear();
     _filteredRecords.clear();
     notifyListeners();
   }
 
-  // Refresh data (for pull-to-refresh functionality)
-  Future<void> refreshData() async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    // In a real app, this would fetch data from an API
-    _applyFilters();
-    _sortRecords();
-
-    _isLoading = false;
-    notifyListeners();
+  void clearError() {
+    _clearError();
   }
 }
