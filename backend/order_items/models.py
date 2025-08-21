@@ -5,6 +5,91 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal
 
 
+class OrderItemQuerySet(models.QuerySet):
+    """Custom QuerySet for OrderItem model"""
+    
+    def active(self):
+        return self.filter(is_active=True)
+    
+    def by_order(self, order_id):
+        return self.filter(order_id=order_id)
+    
+    def by_product(self, product_id):
+        return self.filter(product_id=product_id)
+    
+    def search(self, query):
+        """Search order items by product name or customization notes"""
+        return self.filter(
+            models.Q(product_name__icontains=query) |
+            models.Q(customization_notes__icontains=query) |
+            models.Q(product__name__icontains=query) |
+            models.Q(product__color__icontains=query) |
+            models.Q(product__fabric__icontains=query)
+        )
+    
+    def quantity_range(self, min_quantity=None, max_quantity=None):
+        """Filter by quantity range"""
+        queryset = self
+        if min_quantity is not None:
+            queryset = queryset.filter(quantity__gte=min_quantity)
+        if max_quantity is not None:
+            queryset = queryset.filter(quantity__lte=max_quantity)
+        return queryset
+    
+    def price_range(self, min_price=None, max_price=None):
+        """Filter by unit price range"""
+        queryset = self
+        if min_price is not None:
+            queryset = queryset.filter(unit_price__gte=min_price)
+        if max_price is not None:
+            queryset = queryset.filter(unit_price__lte=max_price)
+        return queryset
+    
+    def with_customization(self):
+        """Filter items that have customization notes"""
+        return self.exclude(customization_notes='')
+    
+    def without_customization(self):
+        """Filter items that don't have customization notes"""
+        return self.filter(customization_notes='')
+
+
+class OrderItemManager(models.Manager):
+    """Custom manager for OrderItem model"""
+    
+    def get_queryset(self):
+        return OrderItemQuerySet(self.model, using=self._db)
+    
+    def active(self):
+        return self.get_queryset().active()
+    
+    def by_order(self, order_id):
+        return self.get_queryset().by_order(order_id)
+    
+    def by_product(self, product_id):
+        return self.get_queryset().by_product(product_id)
+    
+    def search(self, query):
+        """Search order items by product name or customization notes"""
+        return self.get_queryset().search(query)
+    
+    def quantity_range(self, min_quantity=None, max_quantity=None):
+        """Filter by quantity range"""
+        return self.get_queryset().quantity_range(min_quantity, max_quantity)
+    
+    def price_range(self, min_price=None, max_price=None):
+        """Filter by unit price range"""
+        return self.get_queryset().price_range(min_price, max_price)
+    
+    def with_customization(self):
+        """Filter items that have customization notes"""
+        return self.get_queryset().with_customization()
+    
+    def without_customization(self):
+        """Filter items that don't have customization notes"""
+        return self.get_queryset().without_customization()
+
+
 class OrderItem(models.Model):
     """Order Item model for managing individual products within orders"""
     
@@ -65,6 +150,9 @@ class OrderItem(models.Model):
             models.Index(fields=['created_at']),
         ]
         unique_together = [('order', 'product')]  # Prevent duplicate products in same order
+
+    # Custom manager
+    objects = OrderItemManager()
 
     def __str__(self):
         return f"{self.product_name} x{self.quantity} in Order #{self.order.id}"
@@ -280,54 +368,4 @@ class OrderItem(models.Model):
         }
 
 
-class OrderItemQuerySet(models.QuerySet):
-    """Custom QuerySet for OrderItem model"""
-    
-    def active(self):
-        return self.filter(is_active=True)
-    
-    def by_order(self, order_id):
-        return self.filter(order_id=order_id)
-    
-    def by_product(self, product_id):
-        return self.filter(product_id=product_id)
-    
-    def search(self, query):
-        """Search order items by product name or customization notes"""
-        return self.filter(
-            models.Q(product_name__icontains=query) |
-            models.Q(customization_notes__icontains=query) |
-            models.Q(product__name__icontains=query) |
-            models.Q(product__color__icontains=query) |
-            models.Q(product__fabric__icontains=query)
-        )
-    
-    def quantity_range(self, min_quantity=None, max_quantity=None):
-        """Filter by quantity range"""
-        queryset = self
-        if min_quantity is not None:
-            queryset = queryset.filter(quantity__gte=min_quantity)
-        if max_quantity is not None:
-            queryset = queryset.filter(quantity__lte=max_quantity)
-        return queryset
-    
-    def price_range(self, min_price=None, max_price=None):
-        """Filter by unit price range"""
-        queryset = self
-        if min_price is not None:
-            queryset = queryset.filter(unit_price__gte=min_price)
-        if max_price is not None:
-            queryset = queryset.filter(unit_price__lte=max_price)
-        return queryset
-    
-    def with_customization(self):
-        """Filter items that have customization notes"""
-        return self.exclude(customization_notes='')
-    
-    def without_customization(self):
-        """Filter items that don't have customization notes"""
-        return self.filter(customization_notes='')
 
-
-# Add the custom manager to the OrderItem model
-OrderItem.add_to_class('objects', models.Manager.from_queryset(OrderItemQuerySet)())
