@@ -211,6 +211,27 @@ class ApiConfig {
   static String orderItemsByOrder(String orderId) => '/order-items/order/$orderId/';
   static String orderItemsByProduct(String productId) => '/order-items/product/$productId/';
 
+  static const String expenses = '/expenses/';
+  static const String createExpense = '/expenses/';
+
+  static String getExpenseById(String id) => '/expenses/$id/';
+  static String updateExpense(String id) => '/expenses/$id/update/';
+  static String deleteExpense(String id) => '/expenses/$id/delete/';
+
+  static String expensesByAuthority(String authority) => '/expenses/by-authority/$authority/';
+  static String expensesByCategory(String category) => '/expenses/by-category/$category/';
+  static const String expensesByDateRange = '/expenses/by-date-range/';
+
+  static const String expenseStatistics = '/expenses/statistics/';
+  static const String expenseMonthlySummary = '/expenses/monthly-summary/';
+  static const String recentExpenses = '/expenses/recent/';
+
+  static const String bulkExpenseActions = '/expenses/bulk-actions/';
+
+  // Cache keys for expenses
+  static const String expensesCacheKey = 'cached_expenses';
+  static const String expenseStatsCacheKey = 'cached_expense_stats';
+
   static const String itemsWithCustomization = '/order-items/customized/';
 
   static const String orderItemStatistics = '/order-items/statistics/';
