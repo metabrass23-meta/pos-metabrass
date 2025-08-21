@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/expenses/add_expense_dialog.dart';
@@ -20,6 +21,15 @@ class ExpensesPage extends StatefulWidget {
 
 class _ExpensesPageState extends State<ExpensesPage> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Refresh data when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ExpensesProvider>().refreshData();
+    });
+  }
 
   @override
   void dispose() {
@@ -59,6 +69,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
     );
   }
 
+  Future<void> _handleRefresh() async {
+    await context.read<ExpensesProvider>().refreshData();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -67,38 +81,77 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<ExpensesProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: ExpensesTable(
-                onEdit: _showEditExpenseDialog,
-                onDelete: _showDeleteExpenseDialog,
-                onView: _showViewExpenseDialog,
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppTheme.primaryMaroon,
+        child: Padding(
+          padding: EdgeInsets.all(context.mainPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildTabletHeader(),
+                small: _buildMobileHeader(),
+                medium: _buildDesktopHeader(),
+                large: _buildDesktopHeader(),
+                ultrawide: _buildDesktopHeader(),
               ),
-            ),
-          ],
+              SizedBox(height: context.mainPadding),
+              Consumer<ExpensesProvider>(
+                builder: (context, provider, child) {
+                  // Show error message if there's an error
+                  if (provider.hasError) {
+                    return Container(
+                      padding: EdgeInsets.all(context.cardPadding),
+                      margin: EdgeInsets.only(bottom: context.cardPadding),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(context.borderRadius()),
+                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline, color: Colors.red),
+                          SizedBox(width: context.smallPadding),
+                          Expanded(
+                            child: Text(
+                              provider.errorMessage ?? 'An error occurred',
+                              style: GoogleFonts.inter(
+                                fontSize: context.bodyFontSize,
+                                color: Colors.red[700],
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              provider.clearError();
+                              provider.refreshData();
+                            },
+                            child: Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return context.statsCardColumns == 2
+                      ? _buildMobileStatsGrid(provider)
+                      : _buildDesktopStatsRow(provider);
+                },
+              ),
+              SizedBox(height: context.cardPadding * 0.5),
+              _buildSearchSection(),
+              SizedBox(height: context.cardPadding * 0.5),
+              Expanded(
+                child: ExpensesTable(
+                  onEdit: _showEditExpenseDialog,
+                  onDelete: _showDeleteExpenseDialog,
+                  onView: _showViewExpenseDialog,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
