@@ -3,18 +3,49 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import 'order_table_helpers.dart';
 
-class OrderTable extends StatelessWidget {
-  final Function(Order) onEdit;
-  final Function(Order) onDelete;
+class EnhancedOrderTable extends StatefulWidget {
+  final Function(OrderModel) onEdit;
+  final Function(OrderModel) onDelete;
+  final Function(OrderModel) onView;
+  final Function(OrderModel) onOrderItems;
 
-  const OrderTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-  });
+  const EnhancedOrderTable({super.key, required this.onEdit, required this.onDelete, required this.onView, required this.onOrderItems});
+
+  @override
+  State<EnhancedOrderTable> createState() => _EnhancedOrderTableState();
+}
+
+class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
+  final ScrollController _headerHorizontalController = ScrollController();
+  final ScrollController _contentHorizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+  late OrderTableHelpers _helpers;
+
+  @override
+  void initState() {
+    super.initState();
+    _helpers = OrderTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView, onOrderItems: widget.onOrderItems);
+
+    // Synchronize horizontal scrolling between header and content
+    _headerHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
+        _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _headerHorizontalController.dispose();
+    _contentHorizontalController.dispose();
+    _verticalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,125 +53,181 @@ class OrderTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
-      child: Column(
-        children: [
-          // Responsive Table Header
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.borderRadius('large')),
-                topRight: Radius.circular(context.borderRadius('large')),
-              ),
-            ),
-            child: _buildResponsiveHeaderRow(context),
-          ),
+      child: Consumer<OrderProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return _buildLoadingState(context);
+          }
 
-          // Table Content
-          Expanded(
-            child: Consumer<OrderProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      child: const CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
-                        strokeWidth: 3,
+          if (provider.errorMessage != null) {
+            return _helpers.buildErrorState(context, provider);
+          }
+
+          if (provider.orders.isEmpty) {
+            return _helpers.buildEmptyState(context);
+          }
+
+          return Scrollbar(
+            controller: _headerHorizontalController,
+            thumbVisibility: true,
+            child: Column(
+              children: [
+                // Table Header with Horizontal Scroll
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray.withOpacity(0.5),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(context.borderRadius('large')),
+                      topRight: Radius.circular(context.borderRadius('large')),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    controller: _headerHorizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: Container(
+                      width: _getTableWidth(context),
+                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
+                      child: _buildTableHeader(context),
+                    ),
+                  ),
+                ),
+
+                // Table Content with Synchronized Scroll
+                Expanded(
+                  child: Scrollbar(
+                    controller: _verticalController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _contentHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: Container(
+                        width: _getTableWidth(context),
+                        child: ListView.builder(
+                          controller: _verticalController,
+                          itemCount: provider.orders.length,
+                          itemBuilder: (context, index) {
+                            final order = provider.orders[index];
+                            return _buildTableRow(context, order, index);
+                          },
+                        ),
                       ),
                     ),
-                  );
-                }
+                  ),
+                ),
 
-                if (provider.orders.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-
-                return ListView.builder(
-                  itemCount: provider.orders.length,
-                  itemBuilder: (context, index) {
-                    final order = provider.orders[index];
-                    return _buildResponsiveTableRow(context, order, index);
-                  },
-                );
-              },
+                // Pagination Controls
+                if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildResponsiveHeaderRow(BuildContext context) {
+  Widget _buildLoadingState(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+        height: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+        child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
+      ),
+    );
+  }
+
+  // Fixed: Table width to match vendor table dimensions with proper calculation
+  double _getTableWidth(BuildContext context) {
+    final columnWidths = _getColumnWidths(context);
+    final totalWidth = columnWidths.reduce((a, b) => a + b);
+
+    // Ensure minimum width for proper display
+    final minWidth = ResponsiveBreakpoints.responsive(context, tablet: 1280.0, small: 1380.0, medium: 1480.0, large: 1580.0, ultrawide: 1680.0);
+
+    // Return the larger of calculated width or minimum width
+    return totalWidth > minWidth ? totalWidth : minWidth;
+  }
+
+  // Fixed: Column widths that properly handle all columns including Actions
+  List<double> _getColumnWidths(BuildContext context) {
+    if (context.shouldShowCompactLayout) {
+      return [
+        100.0, // Order ID
+        180.0, // Customer Name
+        200.0, // Description
+        150.0, // Total Amount
+        120.0, // Status
+        140.0, // Delivery Date
+        280.0, // Actions
+      ];
+    } else {
+      return [
+        120.0, // Order ID
+        200.0, // Customer Name
+        250.0, // Description
+        180.0, // Total Amount
+        140.0, // Status
+        160.0, // Delivery Date
+        320.0, // Actions
+      ];
+    }
+  }
+
+  // Fixed: Show all columns in table header with consistent widths and constraints
+  Widget _buildTableHeader(BuildContext context) {
+    final columnWidths = _getColumnWidths(context);
+
     return Row(
       children: [
-        // Order ID Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 2 : 1,
-          child: _buildHeaderCell(context, 'Order ID'),
+        // Order ID
+        Container(
+          width: columnWidths[0],
+          constraints: BoxConstraints(maxWidth: columnWidths[0]),
+          child: _buildSortableHeaderCell(context, 'Order ID', 'id'),
         ),
 
-        // Customer/Product Column (responsive)
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 3 : 2,
-          child: _buildHeaderCell(context, context.shouldShowCompactLayout ? 'Customer' : 'Customer Name'),
+        // Customer Name
+        Container(
+          width: columnWidths[1],
+          constraints: BoxConstraints(maxWidth: columnWidths[1]),
+          child: _buildSortableHeaderCell(context, 'Customer', 'customer_name'),
         ),
 
-        // Product Column (hidden on compact)
-        if (!context.shouldShowCompactLayout) ...[
-          Expanded(
-            flex: 2,
-            child: _buildHeaderCell(context, 'Product'),
-          ),
-        ],
-
-        // Amount Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 2 : 1,
-          child: _buildHeaderCell(context, context.shouldShowCompactLayout ? 'Amount' : 'Total Amount'),
+        // Description
+        Container(
+          width: columnWidths[2],
+          constraints: BoxConstraints(maxWidth: columnWidths[2]),
+          child: _buildHeaderCell(context, 'Description'),
         ),
 
-        // Status Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 2 : 1,
+        // Total Amount
+        Container(
+          width: columnWidths[3],
+          constraints: BoxConstraints(maxWidth: columnWidths[3]),
+          child: _buildSortableHeaderCell(context, 'Amount', 'total_amount'),
+        ),
+
+        // Status
+        Container(
+          width: columnWidths[4],
+          constraints: BoxConstraints(maxWidth: columnWidths[4]),
           child: _buildHeaderCell(context, 'Status'),
         ),
 
-        // Delivery Date Column (hidden on tablets and small)
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: 1,
-            child: _buildHeaderCell(context, 'Delivery Date'),
-          ),
-        ],
+        // Delivery Date
+        Container(
+          width: columnWidths[5],
+          constraints: BoxConstraints(maxWidth: columnWidths[5]),
+          child: _buildSortableHeaderCell(context, 'Delivery', 'expected_delivery_date'),
+        ),
 
-        // Actions Column
-        Expanded(
-          flex: context.shouldShowCompactLayout ? 1 : 2,
+        // Actions - Consistent width with row and constraints
+        Container(
+          width: columnWidths[6],
+          constraints: BoxConstraints(maxWidth: columnWidths[6]),
           child: _buildHeaderCell(context, 'Actions'),
         ),
       ],
@@ -150,589 +237,284 @@ class OrderTable extends StatelessWidget {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
-  Widget _buildResponsiveTableRow(BuildContext context, Order order, int index) {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding / 2.5),
-      decoration: BoxDecoration(
-        color: index.isEven
-            ? AppTheme.pureWhite
-            : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.5,
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+    return Consumer<OrderProvider>(
+      builder: (context, provider, child) {
+        final isCurrentSort = provider.sortBy == sortKey;
+
+        return InkWell(
+          onTap: () => provider.setSortBy(sortKey),
+          borderRadius: BorderRadius.circular(4),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Icon(
+                  isCurrentSort ? (provider.sortAscending ? Icons.arrow_upward : Icons.arrow_downward) : Icons.sort,
+                  size: 16,
+                  color: isCurrentSort ? AppTheme.primaryMaroon : Colors.grey[500],
+                ),
+              ],
+            ),
           ),
+        );
+      },
+    );
+  }
+
+  // Fixed: Show all columns in table rows with proper constraints and error handling
+  Widget _buildTableRow(BuildContext context, OrderModel order, int index) {
+    try {
+      final columnWidths = _getColumnWidths(context);
+
+      return Container(
+        decoration: BoxDecoration(
+          color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
+          border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
         ),
-      ),
-      child: Row(
-        children: [
-          // Order ID Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                order.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
+        padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
+        child: Row(
+          children: [
+            // Order ID Column
+            Container(
+              width: columnWidths[0],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[0]),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Customer Name Column with responsive layout
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 3 : 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  order.customerName,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                child: Text(
+                  '#${order.id.length >= 8 ? order.id.substring(0, 8) : order.id}',
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show product and phone here on compact layouts
-                if (context.shouldShowCompactLayout) ...[
-                  SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    order.product,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    order.customerPhone,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Product Column (hidden on compact layouts)
-          if (!context.shouldShowCompactLayout) ...[
-            Expanded(
-              flex: 2,
-              child: Text(
-                order.product,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
 
-          // Amount Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'PKR ${order.totalAmount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (order.remainingAmount > 0) ...[
-                  SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    'Due: PKR ${order.remainingAmount.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Status Column
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 2 : 1,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: order.statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(
-                  color: order.statusColor.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: order.statusColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  SizedBox(width: context.smallPadding / 2),
-                  Expanded(
-                    child: Text(
-                      order.statusText,
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: order.statusColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          // Delivery Date Column (responsive visibility)
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: 1,
+            // Customer Name Column
+            Container(
+              width: columnWidths[1],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[1]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _formatDate(order.expectedDeliveryDate),
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: order.isOverdue ? Colors.red : AppTheme.charcoalGray,
-                    ),
+                    order.customerName.isNotEmpty ? order.customerName : 'N/A',
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (order.isOverdue) ...[
+                  SizedBox(height: context.smallPadding / 4),
+                  Text(
+                    order.customerPhone.isNotEmpty ? order.customerPhone : 'No phone',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            // Description Column
+            Container(
+              width: columnWidths[2],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[2]),
+              child: Text(
+                order.description.isNotEmpty ? order.description : 'No description',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+
+            // Total Amount Column
+            Container(
+              width: columnWidths[3],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[3]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'PKR ${order.totalAmount.toStringAsFixed(0)}',
+                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (order.remainingAmount > 0) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'OVERDUE',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ] else if (order.daysUntilDelivery <= 3 && order.daysUntilDelivery >= 0) ...[
-                    SizedBox(height: context.smallPadding / 4),
-                    Text(
-                      '${order.daysUntilDelivery} days',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.orange,
-                      ),
+                      'Due: ${order.remainingAmount.toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ],
               ),
             ),
-            SizedBox(width: context.smallPadding),
+
+            // Status Column
+            Container(
+              width: columnWidths[4],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[4]),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(
+                  color: _helpers.getStatusColor(order.status).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(color: _helpers.getStatusColor(order.status).withOpacity(0.3)),
+                ),
+                child: Text(
+                  _helpers.getStatusText(order.status),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: _helpers.getStatusColor(order.status),
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+
+            // Delivery Date Column
+            Container(
+              width: columnWidths[5],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[5]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    order.expectedDeliveryDate != null ? _helpers.formatDate(order.expectedDeliveryDate!) : 'No date',
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: order.isOverdue ? Colors.red : AppTheme.charcoalGray,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (order.isOverdue) ...[
+                    Text(
+                      'OVERDUE',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ] else if (order.daysUntilDelivery != null && order.daysUntilDelivery! <= 3 && order.daysUntilDelivery! >= 0) ...[
+                    Text(
+                      '${order.daysUntilDelivery} days',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            // Actions Column - Ensure it gets proper width with constraints
+            Container(
+              width: columnWidths[6],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              constraints: BoxConstraints(maxWidth: columnWidths[6]),
+              child: _helpers.buildActionsRow(context, order),
+            ),
           ],
-
-          // Actions Column with responsive button sizing
-          Expanded(
-            flex: context.shouldShowCompactLayout ? 1 : 2,
-            child: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactActions(context, order),
-              small: _buildCompactActions(context, order),
-              medium: _buildStandardActions(context, order),
-              large: _buildExpandedActions(context, order),
-              ultrawide: _buildExpandedActions(context, order),
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+    } catch (e) {
+      // Fallback row in case of error
+      return Container(
+        padding: EdgeInsets.all(context.cardPadding),
+        child: Text(
+          'Error displaying order: ${e.toString()}',
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red),
+        ),
+      );
+    }
   }
 
-  // Compact actions for tablets and small screens
-  Widget _buildCompactActions(BuildContext context, Order order) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'edit') {
-          onEdit(order);
-        } else if (value == 'delete') {
-          onDelete(order);
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Edit',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Delete',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        padding: EdgeInsets.all(context.smallPadding),
-        decoration: BoxDecoration(
-          color: AppTheme.lightGray,
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        ),
-        child: Icon(
-          Icons.more_vert,
-          size: context.iconSize('small'),
-          color: AppTheme.charcoalGray,
+  Widget _buildPaginationControls(BuildContext context, OrderProvider provider) {
+    final pagination = provider.paginationInfo!;
+
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.lightGray.withOpacity(0.3),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(context.borderRadius('large')),
+          bottomRight: Radius.circular(context.borderRadius('large')),
         ),
       ),
-    );
-  }
-
-  // Standard actions for medium screens
-  Widget _buildStandardActions(BuildContext context, Order order) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onEdit(order),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onDelete(order),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Expanded actions for large screens
-  Widget _buildExpandedActions(BuildContext context, Order order) {
-    return Row(
-      children: [
-        // Edit Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onEdit(order),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      color: Colors.blue,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Edit',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Delete Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onDelete(order),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Delete',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
-            child: Icon(
-              Icons.shopping_bag_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
-          ),
-
-          SizedBox(height: context.mainPadding),
-
+          // Results info
           Text(
-            'No Order Records Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} orders',
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
-          SizedBox(height: context.smallPadding),
+          const Spacer(),
 
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
+          // Pagination controls
+          Row(
+            children: [
+              // Previous button
+              IconButton(
+                onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
+                icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
-            ),
-            child: Text(
-              'Start by adding your first order to manage customer orders efficiently',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        'Add First Order',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
+              // Page info
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
-            ),
+
+              // Next button
+              IconButton(
+                onPressed: pagination.hasNext ? provider.loadNextPage : null,
+                icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),
+              ),
+            ],
           ),
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
