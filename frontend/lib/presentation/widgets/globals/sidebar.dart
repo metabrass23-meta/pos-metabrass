@@ -180,23 +180,36 @@ class PremiumSidebar extends StatelessWidget {
   const PremiumSidebar({super.key, required this.isExpanded, required this.selectedIndex, required this.onMenuSelected, required this.onToggle});
 
   final List<Map<String, dynamic>> menuItems = const [
+    // Main Overview
     {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
-    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
+
+    // Core Business Operations
+    {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
     {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
     {'icon': Icons.list_alt_rounded, 'title': 'Order Items', 'badge': '24'},
+
+    // Inventory & Products
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
-    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
-    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
+    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
+
+    // People & Relationships
     {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
-    {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
-    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
+    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
+    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
+
+    // Financial Management
     {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
     {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
-    {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
+    {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
+    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
     {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
-    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
+
+    // Special Accounts & Reports
     {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
+    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
     {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
+
+    // System
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
   ];
 
