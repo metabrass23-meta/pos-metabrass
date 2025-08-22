@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
+import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/zakat/add_zakat_dialog.dart';
 import '../../widgets/zakat/delete_zakat_dialog.dart';
 import '../../widgets/zakat/edit_zakat_dialog.dart';
 import '../../widgets/zakat/view_zakat_dialog.dart';
 import '../../widgets/zakat/zakat_table.dart';
+import '../../widgets/zakat/zakat_filter_dialog.dart';
 
 class ZakatPage extends StatefulWidget {
   const ZakatPage({super.key});
@@ -22,17 +24,24 @@ class _ZakatPageState extends State<ZakatPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Load zakat records and statistics when page initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<ZakatProvider>();
+      provider.loadZakatRecords();
+      provider.loadStatistics();
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
   void _showAddZakatDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AddZakatDialog(),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const AddZakatDialog());
   }
 
   void _showEditZakatDialog(Zakat zakat) {
@@ -59,6 +68,15 @@ class _ZakatPageState extends State<ZakatPage> {
     );
   }
 
+  Future<void> _handleRefresh() async {
+    final provider = context.read<ZakatProvider>();
+    await provider.refreshZakatRecords();
+  }
+
+  void _handleFilterTap() {
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const ZakatFilterDialog());
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -67,38 +85,36 @@ class _ZakatPageState extends State<ZakatPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<ZakatProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: ZakatTable(
-                onEdit: _showEditZakatDialog,
-                onDelete: _showDeleteZakatDialog,
-                onView: _showViewZakatDialog,
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppTheme.primaryMaroon,
+        child: Padding(
+          padding: EdgeInsets.all(context.mainPadding / 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildTabletHeader(),
+                small: _buildMobileHeader(),
+                medium: _buildDesktopHeader(),
+                large: _buildDesktopHeader(),
+                ultrawide: _buildDesktopHeader(),
               ),
-            ),
-          ],
+              SizedBox(height: context.mainPadding),
+              Consumer<ZakatProvider>(
+                builder: (context, provider, child) {
+                  return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
+                },
+              ),
+              SizedBox(height: context.cardPadding * 0.5),
+              _buildSearchSection(),
+              SizedBox(height: context.cardPadding * 0.5),
+              Expanded(
+                child: EnhancedZakatTable(onEdit: _showEditZakatDialog, onDelete: _showDeleteZakatDialog, onView: _showViewZakatDialog),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -113,29 +129,17 @@ class _ZakatPageState extends State<ZakatPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 6.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(
-                  fontSize: 3.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -148,6 +152,7 @@ class _ZakatPageState extends State<ZakatPage> {
   Widget _buildDesktopHeader() {
     return Row(
       children: [
+        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +160,7 @@ class _ZakatPageState extends State<ZakatPage> {
               Text(
                 'Zakat Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -164,15 +169,13 @@ class _ZakatPageState extends State<ZakatPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 'Track and manage zakat contributions efficiently',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
         ),
+
+        // Add Zakat Button
         _buildAddButton(),
       ],
     );
@@ -182,10 +185,11 @@ class _ZakatPageState extends State<ZakatPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Page Title
         Text(
           'Zakat Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -194,17 +198,12 @@ class _ZakatPageState extends State<ZakatPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track zakat contributions',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+
+        // Add Zakat Button (full width on tablet)
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -213,6 +212,7 @@ class _ZakatPageState extends State<ZakatPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Compact Page Title
         Text(
           'Zakat',
           style: GoogleFonts.playfairDisplay(
@@ -225,17 +225,12 @@ class _ZakatPageState extends State<ZakatPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track contributions',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+
+        // Add Zakat Button (full width)
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -243,9 +238,7 @@ class _ZakatPageState extends State<ZakatPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -254,18 +247,11 @@ class _ZakatPageState extends State<ZakatPage> {
           onTap: _showAddZakatDialog,
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding * 0.5,
-              vertical: context.cardPadding / 2,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.5, vertical: context.cardPadding / 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add' : 'Add Zakat',
@@ -288,21 +274,13 @@ class _ZakatPageState extends State<ZakatPage> {
     final stats = provider.zakatStats;
     return Row(
       children: [
-        Expanded(
-            child: _buildStatsCard('Total Records', stats['total'].toString(),
-                Icons.account_balance_wallet_rounded, Colors.blue)),
+        Expanded(child: _buildStatsCard('Total Records', stats['total'].toString(), Icons.account_balance_wallet_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('This Year', stats['thisYear'].toString(),
-                Icons.calendar_today_rounded, Colors.green)),
+        Expanded(child: _buildStatsCard('This Year', stats['thisYear'].toString(), Icons.calendar_today_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}',
-                Icons.attach_money_rounded, Colors.purple)),
+        Expanded(child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                Icons.date_range_rounded, Colors.orange)),
+        Expanded(child: _buildStatsCard('This Month', stats['thisMonth'].toString(), Icons.date_range_rounded, Colors.orange)),
       ],
     );
   }
@@ -313,25 +291,17 @@ class _ZakatPageState extends State<ZakatPage> {
       children: [
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.account_balance_wallet_rounded, Colors.blue)),
+            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.account_balance_wallet_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('This Year', stats['thisYear'].toString(),
-                    Icons.calendar_today_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard('This Year', stats['thisYear'].toString(), Icons.calendar_today_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}',
-                    Icons.attach_money_rounded, Colors.purple)),
+            Expanded(child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                    Icons.date_range_rounded, Colors.orange)),
+            Expanded(child: _buildStatsCard('This Month', stats['thisMonth'].toString(), Icons.date_range_rounded, Colors.orange)),
           ],
         ),
       ],
@@ -344,13 +314,7 @@ class _ZakatPageState extends State<ZakatPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
@@ -366,20 +330,9 @@ class _ZakatPageState extends State<ZakatPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
+        Expanded(flex: 4, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
-        SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+        Expanded(flex: 1, child: _buildFilterButton()),
       ],
     );
   }
@@ -389,13 +342,7 @@ class _ZakatPageState extends State<ZakatPage> {
       children: [
         _buildSearchBar(),
         SizedBox(height: context.cardPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
+        Row(children: [Expanded(child: _buildFilterButton())]),
       ],
     );
   }
@@ -405,13 +352,7 @@ class _ZakatPageState extends State<ZakatPage> {
       children: [
         _buildSearchBar(),
         SizedBox(height: context.smallPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
+        Row(children: [Expanded(child: _buildFilterButton())]),
       ],
     );
   }
@@ -424,41 +365,22 @@ class _ZakatPageState extends State<ZakatPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchZakat,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search zakat...'
-                  : 'Search zakat by ID, name, description, or amount...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
+              hintText: context.isTablet ? 'Search zakat...' : 'Search zakat by ID, title, beneficiary, or amount...',
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
+              suffixIcon: provider.searchQuery.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchZakat('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        provider.searchZakat('');
+                      },
+                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                    )
                   : null,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
             ),
           );
         },
@@ -467,73 +389,30 @@ class _ZakatPageState extends State<ZakatPage> {
   }
 
   Widget _buildFilterButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
+    return InkWell(
+      onTap: _handleFilterTap,
+      borderRadius: BorderRadius.circular(context.borderRadius()),
+      child: Container(
+        height: context.buttonHeight / 1.5,
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+        decoration: BoxDecoration(
+          color: AppTheme.lightGray,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: Colors.green,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: Colors.green,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.filter_list_rounded, color: Colors.green, size: context.iconSize('medium')),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Filter',
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
               ),
-            ),
+            ],
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExportButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -545,29 +424,18 @@ class _ZakatPageState extends State<ZakatPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -592,11 +460,7 @@ class _ZakatPageState extends State<ZakatPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

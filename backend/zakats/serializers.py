@@ -108,29 +108,30 @@ class ZakatListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Zakat
         fields = [
-            'id', 'zakat_summary', 'formatted_amount', 'authorized_by',
-            'authorized_initials', 'date', 'time', 'beneficiary_name',
-            'beneficiary_summary', 'created_by_name', 'created_at'
+            'id', 'name', 'zakat_summary', 'description', 'amount', 'formatted_amount', 
+            'authorized_by', 'authorized_initials', 'date', 'time', 'beneficiary_name',
+            'beneficiary_contact', 'beneficiary_summary', 'notes', 'created_by_name', 
+            'created_at', 'updated_at', 'is_active'
         ]
 
 
 class ZakatStatisticsSerializer(serializers.Serializer):
     """Serializer for Zakat statistics"""
     
-    total_zakat = serializers.DecimalField(max_digits=12, decimal_places=2)
-    zakat_count = serializers.IntegerField()
-    average_zakat = serializers.DecimalField(max_digits=12, decimal_places=2)
-    formatted_total = serializers.CharField()
-    formatted_average = serializers.CharField()
+    total_zakat = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    zakat_count = serializers.IntegerField(required=False)
+    average_zakat = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    formatted_total = serializers.CharField(required=False)
+    formatted_average = serializers.CharField(required=False)
     
     # By authority statistics
-    by_authority = serializers.DictField()
+    by_authority = serializers.DictField(required=False)
     
     # By beneficiary statistics
-    top_beneficiaries = serializers.ListField()
+    top_beneficiaries = serializers.ListField(required=False)
     
     # Recent trends
-    monthly_trend = serializers.ListField()
+    monthly_trend = serializers.ListField(required=False)
     
     def to_representation(self, instance):
         """Custom representation for statistics"""
@@ -155,7 +156,6 @@ class ZakatStatisticsSerializer(serializers.Serializer):
             }
         
         # Top beneficiaries
-        from django.db.models import Count, Sum
         top_beneficiaries = []
         beneficiary_stats = zakat_entries.values('beneficiary_name').annotate(
             total_amount=Sum('amount'),
@@ -232,16 +232,16 @@ class BulkZakatActionSerializer(serializers.Serializer):
 class MonthlySummarySerializer(serializers.Serializer):
     """Serializer for monthly Zakat summary"""
     
-    month = serializers.CharField()
-    year = serializers.IntegerField()
-    total_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
-    formatted_amount = serializers.CharField()
-    zakat_count = serializers.IntegerField()
-    average_zakat = serializers.DecimalField(max_digits=12, decimal_places=2)
-    formatted_average = serializers.CharField()
-    beneficiaries = serializers.DictField()
-    authorities = serializers.DictField()
-    daily_breakdown = serializers.ListField()
+    month = serializers.CharField(required=False)
+    year = serializers.IntegerField(required=False)
+    total_amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    formatted_amount = serializers.CharField(required=False)
+    zakat_count = serializers.IntegerField(required=False)
+    average_zakat = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    formatted_average = serializers.CharField(required=False)
+    beneficiaries = serializers.DictField(required=False)
+    authorities = serializers.DictField(required=False)
+    daily_breakdown = serializers.ListField(required=False)
     
     def to_representation(self, instance):
         """Custom representation for monthly summary"""
@@ -259,7 +259,6 @@ class MonthlySummarySerializer(serializers.Serializer):
         average = zakat_entries.aggregate(avg=Avg('amount'))['avg'] or Decimal('0')
         
         # Beneficiary breakdown
-        from django.db.models import Count, Sum
         beneficiaries = {}
         beneficiary_stats = zakat_entries.values('beneficiary_name').annotate(
             total_amount=Sum('amount'),
@@ -323,13 +322,13 @@ class MonthlySummarySerializer(serializers.Serializer):
 class BeneficiaryReportSerializer(serializers.Serializer):
     """Serializer for beneficiary distribution report"""
     
-    beneficiary_name = serializers.CharField()
-    total_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
-    formatted_amount = serializers.CharField()
-    distribution_count = serializers.IntegerField()
-    last_distribution_date = serializers.DateField()
-    contact_info = serializers.CharField()
-    recent_distributions = serializers.ListField()
+    beneficiary_name = serializers.CharField(required=False)
+    total_amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
+    formatted_amount = serializers.CharField(required=False)
+    distribution_count = serializers.IntegerField(required=False)
+    last_distribution_date = serializers.DateField(required=False)
+    contact_info = serializers.CharField(required=False)
+    recent_distributions = serializers.ListField(required=False)
     
     def to_representation(self, instance):
         """Custom representation for beneficiary report"""

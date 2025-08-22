@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/models/zakat/zakat_model.dart';
 import '../globals/text_button.dart';
 
 class DeleteZakatDialog extends StatefulWidget {
@@ -57,11 +58,15 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   void _handleDelete() async {
     final provider = Provider.of<ZakatProvider>(context, listen: false);
 
-    await provider.deleteZakat(widget.zakat.id);
+    final success = await provider.deleteZakat(widget.zakat.id);
 
     if (mounted) {
-      _showSuccessSnackbar();
-      Navigator.of(context).pop();
+      if (success) {
+        _showSuccessSnackbar();
+        Navigator.of(context).pop();
+      } else {
+        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete zakat record');
+      }
     }
   }
 
@@ -87,6 +92,39 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
           ],
         ),
         backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
+            SizedBox(width: context.smallPadding),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -296,7 +334,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             ),
             child: Column(
               children: [
-                // Zakat ID and Name Row
+                // Zakat ID and Title Row
                 Row(
                   children: [
                     Container(
@@ -320,14 +358,107 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        widget.zakat.name ?? 'No Name',
+                        widget.zakat.name,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
-                          color: widget.zakat.name != null ? AppTheme.charcoalGray : Colors.grey[500]!,
-                          fontStyle: widget.zakat.name != null ? FontStyle.normal : FontStyle.italic,
+                          color: AppTheme.charcoalGray,
                         ),
                         overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: context.smallPadding),
+
+                // Beneficiary and Amount Row
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Beneficiary:',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: context.smallPadding / 4),
+                          Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    _getBeneficiaryInitials(widget.zakat.beneficiaryName),
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.captionFontSize,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: context.smallPadding / 2),
+                              Expanded(
+                                child: Text(
+                                  widget.zakat.beneficiaryName,
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.subtitleFontSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppTheme.charcoalGray,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: context.cardPadding),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Amount:',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: context.smallPadding / 4),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.smallPadding,
+                              vertical: context.smallPadding / 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryMaroon.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                            ),
+                            child: Text(
+                              widget.zakat.formattedAmount,
+                              style: GoogleFonts.inter(
+                                fontSize: context.bodyFontSize,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.primaryMaroon,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -355,7 +486,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         fontWeight: FontWeight.w500,
                         color: AppTheme.charcoalGray,
                       ),
-                      maxLines: 3,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -363,48 +494,12 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
 
                 SizedBox(height: context.smallPadding),
 
-                // Amount and Date Row
+                // Date, Time and Authority Row
                 Row(
                   children: [
                     Expanded(
-                      flex: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Amount:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding,
-                              vertical: context.smallPadding / 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryMaroon.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                            ),
-                            child: Text(
-                              'PKR ${widget.zakat.amount.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.primaryMaroon,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: context.cardPadding),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             'Date & Time:',
@@ -414,6 +509,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                               color: Colors.grey[600],
                             ),
                           ),
+                          SizedBox(height: context.smallPadding / 4),
                           Text(
                             widget.zakat.formattedDate,
                             style: GoogleFonts.inter(
@@ -429,6 +525,53 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: context.cardPadding),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Authorized By:',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: context.smallPadding / 4),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.smallPadding / 2,
+                              vertical: context.smallPadding / 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.indigo.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                            ),
+                            child: Text(
+                              widget.zakat.authorizedInitials,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.indigo,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: context.smallPadding / 4),
+                          Text(
+                            widget.zakat.authorizedBy,
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey[600],
+                            ),
+                            textAlign: TextAlign.end,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -546,5 +689,12 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
         ),
       ],
     );
+  }
+
+  String _getBeneficiaryInitials(String beneficiaryName) {
+    final words = beneficiaryName.trim().split(' ');
+    if (words.isEmpty) return 'B';
+    if (words.length == 1) return words[0].substring(0, 1).toUpperCase();
+    return '${words[0].substring(0, 1)}${words[words.length - 1].substring(0, 1)}'.toUpperCase();
   }
 }

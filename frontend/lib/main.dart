@@ -15,6 +15,7 @@ import 'package:frontend/src/providers/dashboard_provider.dart';
 import 'package:frontend/src/providers/expenses_provider.dart';
 import 'package:frontend/src/providers/labor_provider.dart';
 import 'package:frontend/src/providers/order_provider.dart';
+import 'package:frontend/src/providers/order_item_provider.dart';
 import 'package:frontend/src/providers/payables_provider.dart';
 import 'package:frontend/src/providers/payment_provider.dart';
 import 'package:frontend/src/providers/prinicipal_acc_provider.dart';
@@ -70,6 +71,7 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => OrderItemProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()..initialize()),
@@ -79,7 +81,7 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AdvancePaymentProvider()),
         ChangeNotifierProvider(create: (_) => ReceivablesProvider()),
         ChangeNotifierProvider(create: (_) => PayablesProvider()),
-        ChangeNotifierProvider(create: (_) => ExpensesProvider()),
+        ChangeNotifierProvider(create: (_) => ExpensesProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => ZakatProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
         ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
@@ -92,6 +94,7 @@ class MaqboolFabricApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.light,
+            navigatorKey: navigatorKey,
             initialRoute: '/',
             routes: {
               '/': (context) => const SplashScreen(),

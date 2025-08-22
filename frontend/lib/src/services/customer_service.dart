@@ -55,7 +55,7 @@ class CustomerService {
 
       // Try to return cached data if network error
       if (apiError.type == 'network_error') {
-        final cachedCustomers = await _getCachedCustomers();
+        final cachedCustomers = await getCachedCustomers();
         if (cachedCustomers.isNotEmpty) {
           return ApiResponse<CustomersListResponse>(
             success: true,
@@ -271,7 +271,7 @@ class CustomerService {
 
       if (response.statusCode == 200) {
         // Update cache to mark as inactive
-        final cachedCustomers = await _getCachedCustomers();
+        final cachedCustomers = await getCachedCustomers();
         final index = cachedCustomers.indexWhere((customer) => customer.id == id);
         if (index != -1) {
           final updatedCustomer = cachedCustomers[index].copyWith(isActive: false);
@@ -598,7 +598,8 @@ class CustomerService {
     }
   }
 
-  Future<List<CustomerModel>> _getCachedCustomers() async {
+  /// Get cached customers from local storage
+  Future<List<CustomerModel>> getCachedCustomers() async {
     try {
       final cachedData = await _storageService.getData(ApiConfig.customersCacheKey);
       if (cachedData != null && cachedData is List) {
@@ -612,7 +613,7 @@ class CustomerService {
 
   Future<void> _addCustomerToCache(CustomerModel customer) async {
     try {
-      final cachedCustomers = await _getCachedCustomers();
+      final cachedCustomers = await getCachedCustomers();
       cachedCustomers.add(customer);
       await _cacheCustomers(cachedCustomers);
     } catch (e) {
@@ -622,7 +623,7 @@ class CustomerService {
 
   Future<void> _updateCustomerInCache(CustomerModel updatedCustomer) async {
     try {
-      final cachedCustomers = await _getCachedCustomers();
+      final cachedCustomers = await getCachedCustomers();
       final index = cachedCustomers.indexWhere((customer) => customer.id == updatedCustomer.id);
       if (index != -1) {
         cachedCustomers[index] = updatedCustomer;
@@ -635,7 +636,7 @@ class CustomerService {
 
   Future<void> _removeCustomerFromCache(String customerId) async {
     try {
-      final cachedCustomers = await _getCachedCustomers();
+      final cachedCustomers = await getCachedCustomers();
       cachedCustomers.removeWhere((customer) => customer.id == customerId);
       await _cacheCustomers(cachedCustomers);
     } catch (e) {
@@ -675,7 +676,7 @@ class CustomerService {
 
   /// Get cached customers count
   Future<int> getCachedCustomersCount() async {
-    final cachedCustomers = await _getCachedCustomers();
+    final cachedCustomers = await getCachedCustomers();
     return cachedCustomers.length;
   }
 

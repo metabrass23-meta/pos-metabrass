@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/models/zakat/zakat_model.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -20,9 +22,13 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
+  final _beneficiaryNameController = TextEditingController();
+  final _beneficiaryContactController = TextEditingController();
+  final _notesController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
+  String? _selectedAuthority;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -31,20 +37,18 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
+
+    // Set default authority
+    if (ZakatAuthorities.authorities.isNotEmpty) {
+      _selectedAuthority = ZakatAuthorities.authorities.first;
+    }
   }
 
   @override
@@ -53,24 +57,40 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
     _nameController.dispose();
     _descriptionController.dispose();
     _amountController.dispose();
+    _beneficiaryNameController.dispose();
+    _beneficiaryContactController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
+      if (_selectedAuthority == null) {
+        _showErrorSnackbar('Please select an authorized person');
+        return;
+      }
+
       final zakatProvider = Provider.of<ZakatProvider>(context, listen: false);
 
-      await zakatProvider.addZakat(
-        name: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
+      final success = await zakatProvider.addZakat(
+        name: _nameController.text.trim().isEmpty ? 'Zakat Contribution' : _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         date: _selectedDate,
         time: _selectedTime,
         amount: double.parse(_amountController.text.trim()),
+        beneficiaryName: _beneficiaryNameController.text.trim(),
+        beneficiaryContact: _beneficiaryContactController.text.trim().isEmpty ? null : _beneficiaryContactController.text.trim(),
+        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        authorizedBy: _selectedAuthority!,
       );
 
       if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+        if (success) {
+          _showSuccessSnackbar();
+          Navigator.of(context).pop();
+        } else {
+          _showErrorSnackbar(zakatProvider.errorMessage ?? 'Failed to add zakat record');
+        }
       }
     }
   }
@@ -80,28 +100,18 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Zakat record added successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -111,18 +121,12 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
-            Text(
-              message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -130,9 +134,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -143,56 +145,19 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
     });
   }
 
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
+  Future<void> _selectDateTime() async {
+    await context.showSyncfusionDateTimePicker(
       initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryMaroon,
-              onPrimary: AppTheme.pureWhite,
-              surface: AppTheme.pureWhite,
-              onSurface: AppTheme.charcoalGray,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
       initialTime: _selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryMaroon,
-              onPrimary: AppTheme.pureWhite,
-              surface: AppTheme.pureWhite,
-              onSurface: AppTheme.charcoalGray,
-            ),
-          ),
-          child: child!,
-        );
+      minDate: DateTime(2000),
+      maxDate: DateTime.now(), // Can't select future dates
+      onDateTimeSelected: (date, time) {
+        setState(() {
+          _selectedDate = date;
+          _selectedTime = time;
+        });
       },
     );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
   }
 
   @override
@@ -208,14 +173,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -223,11 +181,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -248,37 +202,19 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
 
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildDesktopLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: false),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: false)]),
     );
   }
 
@@ -286,9 +222,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -298,15 +232,8 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -343,11 +270,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -365,10 +288,10 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Name (Optional)',
-              hint: isCompact ? 'Enter name' : 'Enter name or leave empty',
+              label: 'Title (Optional)',
+              hint: isCompact ? 'Enter title' : 'Enter zakat contribution title',
               controller: _nameController,
-              prefixIcon: Icons.person_outline,
+              prefixIcon: Icons.title_outlined,
               // No validator since this field is optional
             ),
             SizedBox(height: context.cardPadding),
@@ -392,8 +315,8 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Amount',
-              hint: isCompact ? 'Enter amount' : 'Enter amount (PKR)',
+              label: 'Amount (PKR)',
+              hint: isCompact ? 'Enter amount' : 'Enter zakat amount in PKR',
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
@@ -403,106 +326,136 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                 }
                 final amount = double.tryParse(value!);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount';
+                  return 'Please enter a valid amount greater than zero';
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
+            PremiumTextField(
+              label: 'Beneficiary Name',
+              hint: isCompact ? 'Enter beneficiary name' : 'Enter name of recipient/beneficiary',
+              controller: _beneficiaryNameController,
+              prefixIcon: Icons.person_outline,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter beneficiary name';
+                }
+                if (value!.length < 2) {
+                  return 'Beneficiary name must be at least 2 characters';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: context.cardPadding),
+
+            PremiumTextField(
+              label: 'Beneficiary Contact (Optional)',
+              hint: isCompact ? 'Enter contact' : 'Enter beneficiary contact number',
+              controller: _beneficiaryContactController,
+              prefixIcon: Icons.phone_outlined,
+              keyboardType: TextInputType.phone,
+              // No validator since this field is optional
+            ),
+            SizedBox(height: context.cardPadding),
+
+            // Authority Selection Dropdown
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: context.cardPadding),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: context.smallPadding),
+                  Row(
+                    children: [
+                      Icon(Icons.verified_user_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                      SizedBox(width: context.smallPadding),
+                      Text(
+                        'Authorized By',
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      ),
+                      Text(
+                        ' *',
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.smallPadding),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedAuthority,
+                      isExpanded: true,
+                      hint: Text(
+                        'Select authorizing person',
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                      ),
+                      items: ZakatAuthorities.authorities.map((String authority) {
+                        return DropdownMenuItem<String>(
+                          value: authority,
+                          child: Text(
+                            authority,
+                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedAuthority = newValue;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: context.smallPadding),
+                ],
+              ),
+            ),
+            SizedBox(height: context.cardPadding),
+
             // Date and Time Selection
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: _selectDate,
-                    child: Container(
-                      padding: EdgeInsets.all(context.cardPadding),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                color: AppTheme.primaryMaroon,
-                                size: context.iconSize('medium'),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Text(
-                                'Date',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: context.smallPadding / 2),
-                          Text(
-                            '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                            style: GoogleFonts.inter(
-                              fontSize: context.subtitleFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.charcoalGray,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+            InkWell(
+              onTap: _selectDateTime,
+              child: Container(
+                padding: EdgeInsets.all(context.cardPadding),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
                 ),
-                SizedBox(width: context.cardPadding),
-                Expanded(
-                  child: InkWell(
-                    onTap: _selectTime,
-                    child: Container(
-                      padding: EdgeInsets.all(context.cardPadding),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_outlined,
-                                color: AppTheme.primaryMaroon,
-                                size: context.iconSize('medium'),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Text(
-                                'Time',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: context.smallPadding / 2),
-                          Text(
-                            _selectedTime.format(context),
-                            style: GoogleFonts.inter(
-                              fontSize: context.subtitleFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.charcoalGray,
-                            ),
-                          ),
-                        ],
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                        SizedBox(width: context.smallPadding),
+                        Text(
+                          'Date & Time',
+                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        ),
+                      ],
                     ),
-                  ),
+                    SizedBox(height: context.smallPadding / 2),
+                    Text(
+                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} at ${_selectedTime.format(context)}',
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+            SizedBox(height: context.cardPadding),
+
+            PremiumTextField(
+              label: 'Additional Notes (Optional)',
+              hint: isCompact ? 'Enter notes' : 'Enter additional notes or religious considerations',
+              controller: _notesController,
+              prefixIcon: Icons.notes_outlined,
+              maxLines: 2,
+              // No validator since this field is optional
             ),
 
             SizedBox(height: context.mainPadding),
@@ -528,7 +481,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
         Consumer<ZakatProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Zakat',
+              text: 'Add Zakat Record',
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -567,7 +520,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
           child: Consumer<ZakatProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Zakat',
+                text: 'Add Zakat Record',
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

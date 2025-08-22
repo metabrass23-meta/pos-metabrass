@@ -212,44 +212,6 @@ class OrderListSerializer(serializers.ModelSerializer):
     
     customer_id = serializers.UUIDField(source='customer.id', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
-    payment_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    is_overdue = serializers.BooleanField(read_only=True)
-    days_until_delivery = serializers.IntegerField(read_only=True)
-    created_by_email = serializers.CharField(source='created_by.email', read_only=True)
-    can_convert_to_sale = serializers.BooleanField(source='can_be_converted_to_sale', read_only=True)
-    has_sales = serializers.BooleanField(source='has_been_converted_to_sale', read_only=True)
-    
-    class Meta:
-        model = Order
-        fields = (
-            'id',
-            'customer_id',
-            'customer_name',
-            'customer_phone',
-            'advance_payment',
-            'total_amount',
-            'remaining_amount',
-            'is_fully_paid',
-            'payment_percentage',
-            'date_ordered',
-            'expected_delivery_date',
-            'status',
-            'status_display',
-            'is_overdue',
-            'days_until_delivery',
-            'is_active',
-            'created_at',
-            'created_by_email',
-            'can_convert_to_sale', 'has_sales'
-        )
-
-
-class OrderDetailSerializer(serializers.ModelSerializer):
-    """Detailed serializer for single order view"""
-    
-    customer = serializers.SerializerMethodField()
-    created_by = serializers.StringRelatedField(read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
     days_since_ordered = serializers.IntegerField(read_only=True)
     days_until_delivery = serializers.IntegerField(read_only=True)
     is_overdue = serializers.BooleanField(read_only=True)
@@ -258,15 +220,59 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     delivery_status = serializers.CharField(source='get_delivery_status', read_only=True)
     order_items = serializers.SerializerMethodField()
     conversion_status = serializers.ReadOnlyField()
+    converted_sales_amount = serializers.ReadOnlyField()
+    conversion_date = serializers.ReadOnlyField()
     can_convert_to_sale = serializers.BooleanField(source='can_be_converted_to_sale', read_only=True)
     has_sales = serializers.BooleanField(source='has_been_converted_to_sale', read_only=True)
     related_sales = serializers.SerializerMethodField()
+    created_by = serializers.StringRelatedField(read_only=True)
+    
+    def get_related_sales(self, obj):
+        """Get sales created from this order"""
+        sales = obj.get_related_sales()
+        return [
+            {
+                'id': str(sale.id),
+                'invoice_number': sale.invoice_number,
+                'grand_total': float(sale.grand_total),
+                'date_of_sale': sale.date_of_sale,
+                'status': sale.status
+            }
+            for sale in sales
+        ]
+
+    def get_customer(self, obj):
+        """Get customer details"""
+        return {
+            'id': str(obj.customer.id),
+            'name': obj.customer.name,
+            'phone': obj.customer.phone,
+            'email': obj.customer.email,
+            'status': obj.customer.status,
+            'customer_type': obj.customer.customer_type
+        }
+
+    def get_order_items(self, obj):
+        """Get order items summary"""
+        items = obj.get_order_items()
+        return [
+            {
+                'id': str(item.id),
+                'product_name': item.product_name,
+                'quantity': item.quantity,
+                'unit_price': item.unit_price,
+                'line_total': item.line_total,
+                'has_customization': bool(item.customization_notes)
+            }
+            for item in items
+        ]
     
     class Meta:
         model = Order
         fields = (
             'id',
             'customer',
+            'customer_id',
             'customer_name',
             'customer_phone',
             'customer_email',
@@ -290,7 +296,61 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'created_by',
-            'conversion_status', 'can_convert_to_sale', 'has_sales', 'related_sales'
+            'conversion_status', 'converted_sales_amount', 'conversion_date', 'can_convert_to_sale', 'has_sales', 'related_sales'
+        )
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for single order view"""
+    
+    customer = serializers.SerializerMethodField()
+    created_by = serializers.StringRelatedField(read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    days_since_ordered = serializers.IntegerField(read_only=True)
+    days_until_delivery = serializers.IntegerField(read_only=True)
+    is_overdue = serializers.BooleanField(read_only=True)
+    payment_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    order_summary = serializers.JSONField(read_only=True)
+    delivery_status = serializers.CharField(source='get_delivery_status', read_only=True)
+    order_items = serializers.SerializerMethodField()
+    customer_id = serializers.UUIDField(source='customer.id', read_only=True)
+    conversion_status = serializers.ReadOnlyField()
+    converted_sales_amount = serializers.ReadOnlyField()
+    conversion_date = serializers.ReadOnlyField()
+    can_convert_to_sale = serializers.BooleanField(source='can_be_converted_to_sale', read_only=True)
+    has_sales = serializers.BooleanField(source='has_been_converted_to_sale', read_only=True)
+    related_sales = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'customer',
+            'customer_id',
+            'customer_name',
+            'customer_phone',
+            'customer_email',
+            'advance_payment',
+            'total_amount',
+            'remaining_amount',
+            'is_fully_paid',
+            'payment_percentage',
+            'date_ordered',
+            'expected_delivery_date',
+            'description',
+            'status',
+            'status_display',
+            'days_since_ordered',
+            'days_until_delivery',
+            'is_overdue',
+            'order_summary',
+            'delivery_status',
+            'order_items',
+            'is_active',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'conversion_status', 'converted_sales_amount', 'conversion_date', 'can_convert_to_sale', 'has_sales', 'related_sales'
         )
 
     def get_related_sales(self, obj):

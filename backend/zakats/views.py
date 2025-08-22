@@ -28,11 +28,17 @@ def zakat_list_create(request):
     POST: Create new Zakat entry
     """
     if request.method == 'GET':
-        zakat_entries = Zakat.objects.active()
+        # Check if we should show inactive records
+        show_inactive = request.GET.get('show_inactive', 'false').lower() == 'true'
+        
+        if show_inactive:
+            zakat_entries = Zakat.objects.all()  # Include inactive records
+        else:
+            zakat_entries = Zakat.objects.active()  # Only active records
         
         # Apply filters
         authorized_by = request.GET.get('authorized_by')
-        beneficiary = request.GET.get('beneficiary')
+        beneficiary_name = request.GET.get('beneficiary_name')  # Match frontend parameter name
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
         search = request.GET.get('search')
@@ -40,8 +46,8 @@ def zakat_list_create(request):
         if authorized_by:
             zakat_entries = zakat_entries.filter(authorized_by=authorized_by)
         
-        if beneficiary:
-            zakat_entries = zakat_entries.filter(beneficiary_name__icontains=beneficiary)
+        if beneficiary_name:
+            zakat_entries = zakat_entries.filter(beneficiary_name__icontains=beneficiary_name)
         
         if date_from:
             try:
@@ -66,7 +72,23 @@ def zakat_list_create(request):
             )
         
         # Ordering
-        ordering = request.GET.get('ordering', '-date')
+        sort_by = request.GET.get('sort_by', 'date')
+        sort_order = request.GET.get('sort_order', 'desc')
+        
+        # Map sort_by to actual field names
+        sort_field_mapping = {
+            'date': 'date',
+            'amount': 'amount',
+            'created_at': 'created_at',
+            'beneficiary_name': 'beneficiary_name',
+        }
+        
+        sort_field = sort_field_mapping.get(sort_by, 'date')
+        if sort_order == 'asc':
+            ordering = sort_field
+        else:
+            ordering = f'-{sort_field}'
+            
         zakat_entries = zakat_entries.order_by(ordering)
         
         # Pagination

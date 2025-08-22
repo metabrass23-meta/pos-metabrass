@@ -61,7 +61,15 @@ def list_order_items(request):
         
         # Apply search filter
         if search:
-            order_items = order_items.search(search)
+            # Use Q objects for complex search across multiple fields
+            search_query = Q()
+            search_query |= Q(product__name__icontains=search)  # Search in product name
+            search_query |= Q(customization_notes__icontains=search)  # Search in customization notes
+            search_query |= Q(id__icontains=search)  # Search in order item ID
+            search_query |= Q(order__id__icontains=search)  # Search in order ID
+            search_query |= Q(product__id__icontains=search)  # Search in product ID
+            
+            order_items = order_items.filter(search_query)
         
         # Apply order filter
         if order_id:
@@ -291,13 +299,21 @@ def delete_order_item(request, order_item_id):
         product_name = order_item.product_name
         quantity = order_item.quantity
         
+        # Check if order item can be deleted (no related sales, etc.)
+        if hasattr(order_item, 'has_been_sold') and order_item.has_been_sold():
+            return Response({
+                'success': False,
+                'message': 'Cannot delete order item that has been sold.',
+                'errors': {'detail': 'This order item has been converted to sales and cannot be deleted.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Permanently delete the order item
         order_item.delete()
         
         return Response({
             'success': True,
             'message': f'Order item "{product_name} x{quantity}" deleted permanently.'
-        }, status=status.HTTP_200_OK)
+        }, status=status.HTTP_204_NO_CONTENT)
         
     except OrderItem.DoesNotExist:
         return Response({
@@ -334,7 +350,8 @@ def soft_delete_order_item(request, order_item_id):
         
         return Response({
             'success': True,
-            'message': 'Order item soft deleted successfully.'
+            'message': 'Order item soft deleted successfully.',
+            'data': OrderItemDetailSerializer(order_item).data
         }, status=status.HTTP_200_OK)
         
     except OrderItem.DoesNotExist:

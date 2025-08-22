@@ -41,102 +41,115 @@ def order_pre_save(sender, instance, **kwargs):
 @receiver(post_save, sender=Order)
 def order_post_save(sender, instance, created, **kwargs):
     """Handle order post-save operations"""
-    # Clear related caches
-    cache_keys_to_clear = [
-        'order_statistics',
-        f'orders_by_customer_{instance.customer_id}',
-        f'orders_by_status_{instance.status}',
-        'pending_orders',
-        'overdue_orders',
-        'recent_orders',
-        'unpaid_orders',
-    ]
+    # Prevent recursion by checking if we're already processing this instance
+    if hasattr(instance, '_processing_signal'):
+        return
     
-    # Remove None values and clear caches
-    for key in filter(None, cache_keys_to_clear):
-        cache.delete(key)
+    # Mark this instance as being processed
+    instance._processing_signal = True
     
-    # Log order creation
-    if created:
-        logger.info(
-            f"New order created: Order #{instance.id} for {instance.customer_name} "
-            f"(Phone: {instance.customer_phone}) "
-            f"Total: PKR {instance.total_amount}, Advance: PKR {instance.advance_payment} "
-            f"Status: {instance.get_status_display()} by user {instance.created_by}"
-        )
+    try:
+        # Clear related caches
+        cache_keys_to_clear = [
+            'order_statistics',
+            f'orders_by_customer_{instance.customer_id}',
+            f'orders_by_status_{instance.status}',
+            'pending_orders',
+            'overdue_orders',
+            'recent_orders',
+            'unpaid_orders',
+        ]
         
-        # Log delivery date if set
-        if instance.expected_delivery_date:
+        # Remove None values and clear caches
+        for key in filter(None, cache_keys_to_clear):
+            cache.delete(key)
+        
+        # Log order creation
+        if created:
             logger.info(
-                f"Order delivery scheduled: Order #{instance.id} "
-                f"expected delivery on {instance.expected_delivery_date}"
+                f"New order created: Order #{instance.id} for {instance.customer_name} "
+                f"(Phone: {instance.customer_phone}) "
+                f"Total: PKR {instance.total_amount}, Advance: PKR {instance.advance_payment} "
+                f"Status: {instance.get_status_display()} by user {instance.created_by}"
             )
-    
-    # Log status changes
-    elif hasattr(instance, '_old_status'):
-        old_status = instance._old_status
-        new_status = instance.status
+            
+            # Log delivery date if set
+            if instance.expected_delivery_date:
+                logger.info(
+                    f"Order delivery scheduled: Order #{instance.id} "
+                    f"expected delivery on {instance.expected_delivery_date}"
+                )
         
-        logger.info(
-            f"Order status updated: Order #{instance.id} ({instance.customer_name}) "
-            f"from {old_status} to {new_status}"
-        )
-        
-        # Send custom signal for status change
-        order_status_changed.send(
-            sender=Order,
-            order=instance,
-            old_status=old_status,
-            new_status=new_status
-        )
-        
-        delattr(instance, '_old_status')
-    
-    # Log payment changes
-    elif hasattr(instance, '_old_advance_payment'):
-        old_payment = instance._old_advance_payment
-        new_payment = instance.advance_payment
-        payment_difference = new_payment - old_payment
-        
-        logger.info(
-            f"Order payment updated: Order #{instance.id} ({instance.customer_name}) "
-            f"payment from PKR {old_payment} to PKR {new_payment} "
-            f"(difference: PKR {payment_difference:+.2f}) "
-            f"Remaining: PKR {instance.remaining_amount}"
-        )
-        
-        # Send custom signal for payment addition
-        if payment_difference > 0:
-            order_payment_added.send(
+        # Log status changes
+        elif hasattr(instance, '_old_status'):
+            old_status = instance._old_status
+            new_status = instance.status
+            
+            logger.info(
+                f"Order status updated: Order #{instance.id} ({instance.customer_name}) "
+                f"from {old_status} to {new_status}"
+            )
+            
+            # Send custom signal for status change
+            order_status_changed.send(
                 sender=Order,
                 order=instance,
-                payment_amount=payment_difference,
-                is_fully_paid=instance.is_fully_paid
+                old_status=old_status,
+                new_status=new_status
             )
+            
+            delattr(instance, '_old_status')
         
-        delattr(instance, '_old_advance_payment')
+        # Log payment changes
+        elif hasattr(instance, '_old_advance_payment'):
+            old_payment = instance._old_advance_payment
+            new_payment = instance.advance_payment
+            payment_difference = new_payment - old_payment
+            
+            logger.info(
+                f"Order payment updated: Order #{instance.id} ({instance.customer_name}) "
+                f"payment from PKR {old_payment} to PKR {new_payment} "
+                f"(difference: PKR {payment_difference:+.2f}) "
+                f"Remaining: PKR {instance.remaining_amount}"
+            )
+            
+            # Send custom signal for payment addition
+            if payment_difference > 0:
+                order_payment_added.send(
+                    sender=Order,
+                    order=instance,
+                    payment_amount=payment_difference,
+                    is_fully_paid=instance.is_fully_paid
+                )
+            
+            delattr(instance, '_old_advance_payment')
+        
+        # Log delivery date changes
+        elif hasattr(instance, '_old_delivery_date'):
+            old_date = instance._old_delivery_date
+            new_date = instance.expected_delivery_date
+            
+            if old_date and new_date:
+                logger.info(
+                    f"Order delivery date updated: Order #{instance.id} ({instance.customer_name}) "
+                    f"from {old_date} to {new_date}"
+                )
+            elif new_date:
+                logger.info(
+                    f"Order delivery date set: Order #{instance.id} ({instance.customer_name}) "
+                    f"delivery scheduled for {new_date}"
+                )
+            else:
+                logger.info(
+                    f"Order delivery date removed: Order #{instance.id} ({instance.customer_name})"
+                )
+            
+            delattr(instance, '_old_delivery_date')
     
-    # Log delivery date changes
-    elif hasattr(instance, '_old_delivery_date'):
-        old_date = instance._old_delivery_date
-        new_date = instance.expected_delivery_date
-        
-        if old_date and new_date:
-            logger.info(
-                f"Order delivery date updated: Order #{instance.id} ({instance.customer_name}) "
-                f"from {old_date} to {new_date}"
-            )
-        elif new_date:
-            logger.info(
-                f"Order delivery date set: Order #{instance.id} ({instance.customer_name}) "
-                f"delivery scheduled for {new_date}"
-            )
-        else:
-            logger.info(
-                f"Order delivery date removed: Order #{instance.id} ({instance.customer_name})"
-            )
-        
-        delattr(instance, '_old_delivery_date')
+    finally:
+        # Always remove the processing flag
+        if hasattr(instance, '_processing_signal'):
+            delattr(instance, '_processing_signal')
 
 
 @receiver(post_delete, sender=Order)
@@ -338,23 +351,35 @@ def handle_order_payment_addition(sender, order, payment_amount, is_fully_paid, 
 @receiver(post_save, sender=Order)
 def update_customer_last_order_date(sender, instance, created, **kwargs):
     """Update customer's last order date when order is created"""
-    if created and instance.customer:
-        try:
-            customer = instance.customer
-            customer.update_last_order_date(instance.date_ordered)
-            logger.info(
-                f"Customer activity updated: {customer.name} last order date "
-                f"updated to {instance.date_ordered}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Failed to update customer last order date for "
-                f"customer {instance.customer_id}: {str(e)}"
-            )
+    # Prevent recursion by checking if we're already processing this instance
+    if hasattr(instance, '_processing_customer_update'):
+        return
+    
+    # Mark this instance as being processed for customer update
+    instance._processing_customer_update = True
+    
+    try:
+        if created and instance.customer:
+            try:
+                customer = instance.customer
+                customer.update_last_order_date(instance.date_ordered)
+                logger.info(
+                    f"Customer activity updated: {customer.name} last order date "
+                    f"updated to {instance.date_ordered}"
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to update customer last order date for "
+                    f"customer {instance.customer_id}: {str(e)}"
+                )
+    finally:
+        # Always remove the processing flag
+        if hasattr(instance, '_processing_customer_update'):
+            delattr(instance, '_processing_customer_update')
 
 
 # Signal for overdue order notifications
-@receiver(post_save, sender=Order)
+# @receiver(post_save, sender=Order)  # TEMPORARILY DISABLED - CAUSING RECURSION
 def check_overdue_orders(sender, instance, **kwargs):
     """Check and log overdue order warnings"""
     if instance.is_overdue and instance.status not in ['DELIVERED', 'CANCELLED']:
