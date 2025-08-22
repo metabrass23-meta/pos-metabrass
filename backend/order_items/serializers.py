@@ -205,6 +205,12 @@ class OrderItemListSerializer(serializers.ModelSerializer):
     remaining_to_sell = serializers.IntegerField(source='remaining_quantity_to_sell', read_only=True)
     has_been_sold = serializers.BooleanField(read_only=True)
     
+    # Alternative field names for customization_notes for backward compatibility
+    notes = serializers.CharField(source='customization_notes', read_only=True)
+    description = serializers.CharField(source='customization_notes', read_only=True)
+    comment = serializers.CharField(source='customization_notes', read_only=True)
+    remarks = serializers.CharField(source='customization_notes', read_only=True)
+    
     class Meta:
         model = OrderItem
         fields = (
@@ -216,9 +222,15 @@ class OrderItemListSerializer(serializers.ModelSerializer):
             'product_fabric',
             'quantity',
             'unit_price',
+            'customization_notes',
+            'notes',
+            'description',
+            'comment',
+            'remarks',
             'line_total',
             'is_active',
             'created_at',
+            'updated_at',
             'remaining_to_sell', 'has_been_sold'
         )
 
