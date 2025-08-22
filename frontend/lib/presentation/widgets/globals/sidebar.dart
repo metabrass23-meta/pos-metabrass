@@ -30,11 +30,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               SizedBox(width: context.smallPadding),
               Text(
                 'Confirm Logout',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -47,11 +43,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600], fontWeight: FontWeight.w500),
               ),
             ),
             Consumer<AuthProvider>(
@@ -69,23 +61,15 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                                   SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
-                                    ),
+                                    child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite)),
                                   ),
                                   SizedBox(width: context.smallPadding),
-                                  Text(
-                                    'Logging out...',
-                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                                  ),
+                                  Text('Logging out...', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                                 ],
                               ),
                               backgroundColor: AppTheme.primaryMaroon,
                               behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
                               margin: EdgeInsets.all(context.mainPadding),
                               duration: const Duration(seconds: 2),
                             ),
@@ -104,9 +88,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                                   ),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
                                   margin: EdgeInsets.all(context.mainPadding),
                                 ),
                               );
@@ -120,15 +102,10 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                               Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                    'Logged out locally due to an error.',
-                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                                  ),
+                                  content: Text('Logged out locally due to an error.', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
                                   margin: EdgeInsets.all(context.mainPadding),
                                 ),
                               );
@@ -140,26 +117,18 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryMaroon,
                     foregroundColor: AppTheme.pureWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                     elevation: 2,
                   ),
                   child: authProvider.isLoading
                       ? SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite)),
                         )
                       : Text(
                           'Logout',
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
                         ),
                 );
               },
@@ -191,11 +160,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Logout',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.pureWhite,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
                     ),
                   ],
                 )
@@ -212,18 +177,13 @@ class PremiumSidebar extends StatelessWidget {
   final Function(int) onMenuSelected;
   final VoidCallback onToggle;
 
-  const PremiumSidebar({
-    super.key,
-    required this.isExpanded,
-    required this.selectedIndex,
-    required this.onMenuSelected,
-    required this.onToggle,
-  });
+  const PremiumSidebar({super.key, required this.isExpanded, required this.selectedIndex, required this.onMenuSelected, required this.onToggle});
 
   final List<Map<String, dynamic>> menuItems = const [
     {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
     {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
     {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
+    {'icon': Icons.list_alt_rounded, 'title': 'Order Items', 'badge': '24'},
     {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
     {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
     {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
@@ -251,13 +211,7 @@ class PremiumSidebar extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(context.smallPadding / 2, 0),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: context.shadowBlur(), offset: Offset(context.smallPadding / 2, 0))],
       ),
       child: Column(
         children: [
@@ -286,11 +240,7 @@ class PremiumSidebar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.diamond_sharp,
-                    size: context.iconSize('medium'),
-                    color: AppTheme.primaryMaroon,
-                  ),
+                  child: Icon(Icons.diamond_sharp, size: context.iconSize('medium'), color: AppTheme.primaryMaroon),
                 ),
 
                 if (isExpanded) ...[
@@ -370,9 +320,7 @@ class PremiumSidebar extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected ? AppTheme.pureWhite.withOpacity(0.15) : Colors.transparent,
                           borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: isSelected
-                              ? Border.all(color: AppTheme.pureWhite.withOpacity(0.3), width: 0.05.w)
-                              : null,
+                          border: isSelected ? Border.all(color: AppTheme.pureWhite.withOpacity(0.3), width: 0.05.w) : null,
                         ),
                         child: Row(
                           children: [
@@ -401,9 +349,7 @@ class PremiumSidebar extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                                    color: isSelected
-                                        ? AppTheme.pureWhite
-                                        : AppTheme.pureWhite.withOpacity(0.85),
+                                    color: isSelected ? AppTheme.pureWhite : AppTheme.pureWhite.withOpacity(0.85),
                                     letterSpacing: 0.2,
                                   ),
                                 ),
@@ -412,10 +358,7 @@ class PremiumSidebar extends StatelessWidget {
                               // Badge
                               if (item['badge'] != null) ...[
                                 Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.smallPadding,
-                                    vertical: context.smallPadding / 2,
-                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                                   decoration: BoxDecoration(
                                     color: item['badge'] == '156'
                                         ? Colors.blue.withOpacity(0.9)
@@ -431,9 +374,7 @@ class PremiumSidebar extends StatelessWidget {
                                         ? Colors.yellow.withOpacity(0.9)
                                         : item['badge'] == '4'
                                         ? Colors.pink.withOpacity(0.9)
-                                        : (item['badge'] == '5' ||
-                                              item['badge'] == '12' ||
-                                              item['badge'] == '23')
+                                        : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
                                         ? Colors.orange.withOpacity(0.9)
                                         : AppTheme.accentGold.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -481,11 +422,7 @@ class PremiumSidebar extends StatelessWidget {
                             backgroundColor: AppTheme.accentGold,
                             child: Text(
                               user?.fullName.isNotEmpty == true ? user!.fullName[0].toUpperCase() : 'U',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.primaryMaroon,
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                             ),
                           ),
                           SizedBox(width: context.smallPadding),
@@ -495,11 +432,7 @@ class PremiumSidebar extends StatelessWidget {
                               children: [
                                 Text(
                                   user?.fullName ?? 'User',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppTheme.pureWhite,
-                                  ),
+                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
