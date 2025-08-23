@@ -64,7 +64,13 @@ def list_orders(request):
         
         # Apply search filter
         if search:
-            orders = orders.search(search)
+            orders = orders.filter(
+                Q(customer_name__icontains=search) |
+                Q(customer_phone__icontains=search) |
+                Q(customer_email__icontains=search) |
+                Q(description__icontains=search) |
+                Q(id__icontains=search)
+            )
         
         # Apply customer filter
         if customer_id:
@@ -447,7 +453,13 @@ def search_orders(request):
         page = int(request.GET.get('page', 1))
         
         # Search orders
-        orders = Order.active_orders().search(query)
+        orders = Order.active_orders().filter(
+            Q(customer_name__icontains=query) |
+            Q(customer_phone__icontains=query) |
+            Q(customer_email__icontains=query) |
+            Q(description__icontains=query) |
+            Q(id__icontains=query)
+        )
         orders = orders.select_related('customer', 'created_by')
         
         # Calculate pagination

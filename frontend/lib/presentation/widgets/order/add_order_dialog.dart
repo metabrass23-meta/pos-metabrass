@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
@@ -7,10 +6,15 @@ import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/models/customer/customer_model.dart';
 import '../../../src/models/order/order_model.dart';
+import '../../../src/models/order/order_item_model.dart';
+import '../../../src/models/product/product_model.dart';
 import '../../../src/theme/app_theme.dart';
-import '../globals/text_button.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 import '../globals/text_field.dart';
 import '../globals/drop_down.dart';
+import '../globals/text_button.dart';
+import '../globals/custom_date_picker.dart';
+import 'product_selection_dialog.dart';
 
 class AddOrderDialog extends StatefulWidget {
   const AddOrderDialog({super.key});
@@ -21,6 +25,7 @@ class AddOrderDialog extends StatefulWidget {
 
 class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
 
   // Controllers
   final _customerController = TextEditingController();
@@ -31,25 +36,64 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
 
   // Form state
   Customer? _selectedCustomer;
-  OrderStatus _selectedStatus = OrderStatus.pending;
+  OrderStatus _selectedStatus = OrderStatus.PENDING;
   DateTime? _selectedDeliveryDate;
+
+  // Product selection state
+  List<OrderItemModel> _orderItems = [];
+  double _totalAmount = 0.0;
 
   // Animation
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  // Form progress tracking
+  int _currentStep = 0;
+  final PageController _pageController = PageController();
 
   // Options
-  final List<OrderStatus> _orderStatuses = OrderStatus.values;
+  final List<OrderStatus> _orderStatuses = [
+    OrderStatus.PENDING,
+    OrderStatus.CONFIRMED,
+    OrderStatus.IN_PRODUCTION,
+    OrderStatus.READY,
+    OrderStatus.DELIVERED,
+    OrderStatus.CANCELLED,
+  ];
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+        duration: const Duration(milliseconds: 400),
+        vsync: this
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(
+        begin: 0.8,
+        end: 1.0
+    ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut
+    ));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(
+        begin: 0.0,
+        end: 1.0
+    ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutBack
+    ));
 
     _animationController.forward();
   }
@@ -57,6 +101,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.dispose();
+    _pageController.dispose();
     _customerController.dispose();
     _descriptionController.dispose();
     _totalAmountController.dispose();
@@ -91,10 +137,54 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     });
   }
 
+  void _nextStep() {
+    if (_currentStep < 2) {
+      setState(() {
+        _currentStep++;
+      });
+      _pageController.animateToPage(
+        _currentStep,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+      _pageController.animateToPage(
+        _currentStep,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  bool _canProceedToNextStep() {
+    switch (_currentStep) {
+      case 0:
+        return _selectedCustomer != null && _descriptionController.text.isNotEmpty;
+      case 1:
+        return _orderItems.isNotEmpty && _totalAmountController.text.isNotEmpty;
+      case 2:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedCustomer == null) {
         _showErrorSnackbar('Please select a customer');
+        return;
+      }
+
+      if (_orderItems.isEmpty) {
+        _showErrorSnackbar('Please add at least one product to the order');
         return;
       }
 
@@ -106,12 +196,13 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
         advancePayment: double.tryParse(_advancePaymentController.text.trim()) ?? 0.0,
         dateOrdered: DateTime.now(),
         expectedDeliveryDate: _selectedDeliveryDate ?? DateTime.now().add(const Duration(days: 14)),
-        status: _selectedStatus.name.toUpperCase(), // Send status in uppercase
+        status: _selectedStatus.name.toUpperCase(),
       );
 
       if (mounted) {
         if (success) {
           _showSuccessSnackbar();
+          await _animationController.reverse();
           Navigator.of(context).pop();
         } else {
           _showErrorSnackbar(_getUserFriendlyErrorMessage(provider.errorMessage ?? 'Failed to create order'));
@@ -120,7 +211,6 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     }
   }
 
-  // Get user-friendly error message
   String _getUserFriendlyErrorMessage(String errorMessage) {
     if (errorMessage.contains('Invalid customer')) {
       return 'Please select a valid customer for this order.';
@@ -182,10 +272,11 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     );
   }
 
-  void _handleCancel() {
-    _animationController.reverse().then((_) {
+  void _handleCancel() async {
+    await _animationController.reverse();
+    if (mounted) {
       Navigator.of(context).pop();
-    });
+    }
   }
 
   @override
@@ -194,30 +285,39 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.5 * _fadeAnimation.value),
+          backgroundColor: Colors.black.withOpacity(0.6 * _fadeAnimation.value),
           body: Center(
-            child: Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Container(
-                width: context.dialogWidth,
-                constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
-                  maxHeight: 90.h,
-                ),
-                margin: EdgeInsets.all(context.mainPadding),
-                decoration: BoxDecoration(
-                  color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildHeader(),
-                    Flexible(child: _buildFormContent()),
-                  ],
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Container(
+                  width: context.shouldShowCompactLayout ? 95.w : context.dialogWidth,
+                  constraints: BoxConstraints(
+                    maxWidth: context.maxContentWidth,
+                    maxHeight: context.shouldShowCompactLayout ? 95.h : 90.h,
+                  ),
+                  margin: context.pagePadding,
+                  decoration: BoxDecoration(
+                    color: AppTheme.pureWhite,
+                    borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: context.shadowBlur('heavy'),
+                        offset: const Offset(0, 8),
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildEnhancedHeader(),
+                      if (context.shouldShowCompactLayout) _buildProgressIndicator(),
+                      Flexible(child: _buildFormContent()),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -227,7 +327,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildEnhancedHeader() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -241,8 +341,15 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.shopping_cart_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.shopping_cart_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -250,7 +357,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Order' : 'Create New Order',
+                  context.shouldShowCompactLayout ? 'Add Order' : 'Add New Order',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -279,7 +386,11 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -288,328 +399,533 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     );
   }
 
-  Widget _buildFormContent() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(context.cardPadding),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Customer Selection Section
-              _buildCustomerSelectionSection(),
-              SizedBox(height: context.cardPadding),
-
-              // Order Details Section
-              _buildOrderDetailsSection(),
-              SizedBox(height: context.cardPadding),
-
-              // Financial Information Section
-              _buildFinancialInfoSection(),
-              SizedBox(height: context.cardPadding),
-
-              // Delivery Information Section
-              _buildDeliveryInfoSection(),
-              SizedBox(height: context.mainPadding),
-
-              // Action Buttons
-              ResponsiveBreakpoints.responsive(
-                context,
-                tablet: _buildCompactButtons(),
-                small: _buildCompactButtons(),
-                medium: _buildDesktopButtons(),
-                large: _buildDesktopButtons(),
-                ultrawide: _buildDesktopButtons(),
-              ),
-            ],
+  Widget _buildProgressIndicator() {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.cardPadding,
+        vertical: context.cardPadding,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryMaroon.withOpacity(0.05),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.primaryMaroon.withOpacity(0.1),
+            width: 1,
           ),
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildStepIndicator(0, 'Details', Icons.info_outline),
+          _buildStepConnector(0),
+          _buildStepIndicator(1, 'Products', Icons.shopping_bag_outlined),
+          _buildStepConnector(1),
+          _buildStepIndicator(2, 'Review', Icons.check_circle_outline),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator(int step, String label, IconData icon) {
+    final isActive = _currentStep == step;
+    final isCompleted = _currentStep > step;
+
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isCompleted
+                  ? Colors.green
+                  : isActive
+                  ? AppTheme.primaryMaroon
+                  : AppTheme.lightGray.withOpacity(0.3),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isActive
+                    ? AppTheme.primaryMaroon
+                    : AppTheme.lightGray,
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              isCompleted ? Icons.check : icon,
+              color: isCompleted || isActive
+                  ? AppTheme.pureWhite
+                  : AppTheme.lightGray,
+              size: context.iconSize('medium'),
+            ),
+          ),
+          SizedBox(height: context.smallPadding),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              color: isActive
+                  ? AppTheme.primaryMaroon
+                  : AppTheme.lightGray,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepConnector(int step) {
+    final isCompleted = _currentStep > step;
+
+    return Expanded(
+      child: Container(
+        height: 2,
+        margin: EdgeInsets.symmetric(horizontal: context.smallPadding),
+        decoration: BoxDecoration(
+          color: isCompleted
+              ? Colors.green
+              : AppTheme.lightGray.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(1),
         ),
       ),
     );
   }
 
-  Widget _buildCustomerSelectionSection() {
-    return Container(
+  Widget _buildFormContent() {
+    return Column(
+      children: [
+        Expanded(
+          child: Form(
+            key: _formKey,
+            child: PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _buildStep1CustomerDetails(),
+                _buildStep2ProductSelection(),
+                _buildStep3ReviewOrder(),
+              ],
+            ),
+          ),
+        ),
+        _buildNavigationButtons(),
+      ],
+    );
+  }
+
+  Widget _buildStep1CustomerDetails() {
+    return SingleChildScrollView(
+      controller: _scrollController,
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryMaroon.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2), width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Customer Selection', Icons.person_outline),
+          _buildStepTitle('Customer & Order Details', Icons.person_outline),
           SizedBox(height: context.cardPadding),
-          Consumer<CustomerProvider>(
-            builder: (context, customerProvider, child) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PremiumDropdownField<Customer>(
-                    label: 'Select Customer *',
-                    hint: context.shouldShowCompactLayout ? 'Choose a customer' : 'Choose a customer for this order',
-                    items: customerProvider.customers
-                        .map((customer) => DropdownItem<Customer>(value: customer, label: '${customer.name} (${customer.phone})'))
-                        .toList(),
-                    value: _selectedCustomer,
-                    onChanged: _handleCustomerChange,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a customer';
-                      }
-                      return null;
-                    },
-                    prefixIcon: Icons.person_search_rounded,
-                  ),
-                  if (_selectedCustomer != null) ...[
-                    SizedBox(height: context.cardPadding),
-                    Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(color: AppTheme.primaryMaroon.withOpacity(0.2), shape: BoxShape.circle),
-                          child: Center(
-                            child: Text(
-                              _selectedCustomer!.initials,
-                              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: context.cardPadding),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.primaryMaroon.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                                    ),
-                                    child: Text(
-                                      _selectedCustomer!.id,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.captionFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.primaryMaroon,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: context.smallPadding),
-                                  Expanded(
-                                    child: Text(
-                                      _selectedCustomer!.name,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.charcoalGray,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (!context.isTablet) ...[
-                                SizedBox(height: context.smallPadding),
-                                Text(
-                                  '${_selectedCustomer!.phone} • ${_selectedCustomer!.email}',
-                                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+
+          // Customer Selection Card
+          _buildFormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Select Customer', Icons.person_search_rounded),
+                SizedBox(height: context.cardPadding),
+                Consumer<CustomerProvider>(
+                  builder: (context, customerProvider, child) {
+                    return PremiumDropdownField<Customer>(
+                      label: 'Customer *',
+                      hint: 'Choose a customer for this order',
+                      items: customerProvider.customers
+                          .map((customer) => DropdownItem<Customer>(
+                          value: customer,
+                          label: '${customer.name} (${customer.phone})'
+                      ))
+                          .toList(),
+                      value: _selectedCustomer,
+                      onChanged: _handleCustomerChange,
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select a customer';
+                        }
+                        return null;
+                      },
+                      prefixIcon: Icons.person_search_rounded,
+                    );
+                  },
+                ),
+
+                if (_selectedCustomer != null) ...[
+                  SizedBox(height: context.cardPadding),
+                  _buildCustomerInfo(),
                 ],
-              );
-            },
+              ],
+            ),
           ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildOrderDetailsSection() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryMaroon.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Order Details', Icons.shopping_bag_outlined),
           SizedBox(height: context.cardPadding),
-          PremiumTextField(
-            label: 'Order Description *',
-            hint: context.shouldShowCompactLayout ? 'Enter description' : 'Describe the order details (e.g., products, specifications)',
-            controller: _descriptionController,
-            prefixIcon: Icons.description_outlined,
-            maxLines: 3,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter order description';
-              }
-              if (value!.length < 10) {
-                return 'Description must be at least 10 characters';
-              }
-              if (value.length > 500) {
-                return 'Description must be less than 500 characters';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: context.cardPadding),
-          Text(
-            'Order Status',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-          ),
-          SizedBox(height: context.smallPadding),
-          Wrap(
-            spacing: context.smallPadding / 2,
-            runSpacing: context.smallPadding / 4,
-            children: _orderStatuses
-                .map(
-                  (status) => _buildQuickSelectChip(
-                    label: _getStatusText(status),
-                    onTap: () => _handleStatusChange(status),
-                    isSelected: _selectedStatus == status,
-                    selectedColor: _getStatusColor(status),
+
+          // Order Details Card
+          _buildFormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Order Information', Icons.description_outlined),
+                SizedBox(height: context.cardPadding),
+                PremiumTextField(
+                  label: 'Order Description *',
+                  hint: 'Describe the order details, specifications, or requirements',
+                  controller: _descriptionController,
+                  prefixIcon: Icons.description_outlined,
+                  maxLines: context.shouldShowCompactLayout ? 3 : 4,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Please enter order description';
+                    }
+                    if (value!.length < 10) {
+                      return 'Description must be at least 10 characters';
+                    }
+                    if (value.length > 500) {
+                      return 'Description must be less than 500 characters';
+                    }
+                    return null;
+                  },
+                ),
+
+                SizedBox(height: context.cardPadding),
+
+                Text(
+                  'Order Status',
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFinancialInfoSection() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryMaroon.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Financial Information', Icons.account_balance_wallet_outlined),
-          SizedBox(height: context.cardPadding),
-          PremiumTextField(
-            label: 'Total Amount (PKR) *',
-            hint: context.shouldShowCompactLayout ? 'Enter total amount' : 'Enter total order amount',
-            controller: _totalAmountController,
-            prefixIcon: Icons.attach_money_rounded,
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Please enter total amount';
-              }
-              if (double.tryParse(value!) == null) {
-                return 'Please enter a valid amount';
-              }
-              if (double.parse(value) <= 0) {
-                return 'Amount must be greater than 0';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: context.cardPadding),
-          PremiumTextField(
-            label: 'Advance Payment (PKR)',
-            hint: context.shouldShowCompactLayout ? 'Enter advance payment' : 'Enter advance payment amount (optional)',
-            controller: _advancePaymentController,
-            prefixIcon: Icons.payment_rounded,
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value != null && value.isNotEmpty) {
-                if (double.tryParse(value) == null) {
-                  return 'Please enter a valid amount';
-                }
-                final advance = double.parse(value);
-                final total = double.tryParse(_totalAmountController.text) ?? 0;
-                if (advance < 0) {
-                  return 'Advance payment cannot be negative';
-                }
-                if (advance > total) {
-                  return 'Advance payment cannot exceed total amount';
-                }
-              }
-              return null;
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeliveryInfoSection() {
-    return Container(
-      padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryMaroon.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Delivery Information', Icons.local_shipping_outlined),
-          SizedBox(height: context.cardPadding),
-          InkWell(
-            onTap: () async {
-              final date = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now().add(const Duration(days: 1)),
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 365)),
-              );
-              if (date != null) {
-                _handleDeliveryDateChange(date);
-              }
-            },
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-            child: Container(
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_today_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
-                  SizedBox(width: context.smallPadding),
-                  Expanded(
-                    child: Text(
-                      _selectedDeliveryDate != null
-                          ? 'Expected Delivery: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
-                          : 'Select Expected Delivery Date',
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        color: _selectedDeliveryDate != null ? AppTheme.charcoalGray : Colors.grey[500],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(height: context.smallPadding),
+                Wrap(
+                  spacing: context.smallPadding,
+                  runSpacing: context.smallPadding,
+                  children: _orderStatuses.map((status) => _buildStatusChip(status)).toList(),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStep2ProductSelection() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(context.cardPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStepTitle('Product Selection', Icons.shopping_cart_outlined),
+          SizedBox(height: context.cardPadding),
+
+          _buildFormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Add Products', Icons.add_shopping_cart),
+                SizedBox(height: context.cardPadding),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _showProductSelectionDialog,
+                    icon: Icon(
+                        Icons.add_shopping_cart,
+                        color: AppTheme.pureWhite,
+                        size: context.iconSize('medium')
+                    ),
+                    label: Text(
+                      'Add Products to Order',
+                      style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryMaroon,
+                      foregroundColor: AppTheme.pureWhite,
+                      padding: EdgeInsets.symmetric(
+                        vertical: context.cardPadding,
+                        horizontal: context.cardPadding * 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(context.borderRadius())
+                      ),
+                      elevation: 2,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: context.cardPadding),
+
+                if (_orderItems.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                          Icons.shopping_bag,
+                          color: AppTheme.primaryMaroon,
+                          size: context.iconSize('medium')
+                      ),
+                      SizedBox(width: context.smallPadding),
+                      Text(
+                        'Selected Products (${_orderItems.length})',
+                        style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoalGray,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.cardPadding),
+
+                  ..._orderItems.map((item) => _buildProductCard(item)).toList(),
+
+                  SizedBox(height: context.cardPadding),
+                  _buildTotalAmountCard(),
+                ] else ...[
+                  _buildEmptyProductsState(),
+                ],
+              ],
+            ),
+          ),
+
+          if (_orderItems.isNotEmpty) ...[
+            SizedBox(height: context.cardPadding),
+            _buildFormCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle('Financial Details', Icons.account_balance_wallet_outlined),
+                  SizedBox(height: context.cardPadding),
+
+                  PremiumTextField(
+                    label: 'Total Amount (PKR) *',
+                    hint: 'Total order amount',
+                    controller: _totalAmountController,
+                    prefixIcon: Icons.attach_money_rounded,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Please enter total amount';
+                      }
+                      if (double.tryParse(value!) == null) {
+                        return 'Please enter a valid amount';
+                      }
+                      if (double.parse(value) <= 0) {
+                        return 'Amount must be greater than 0';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  SizedBox(height: context.cardPadding),
+
+                  PremiumTextField(
+                    label: 'Advance Payment (PKR)',
+                    hint: 'Enter advance payment (optional)',
+                    controller: _advancePaymentController,
+                    prefixIcon: Icons.payment_rounded,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty) {
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid amount';
+                        }
+                        final advance = double.parse(value);
+                        final total = double.tryParse(_totalAmountController.text) ?? 0;
+                        if (advance < 0) {
+                          return 'Advance payment cannot be negative';
+                        }
+                        if (advance > total) {
+                          return 'Advance payment cannot exceed total amount';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep3ReviewOrder() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(context.cardPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStepTitle('Review & Confirm', Icons.check_circle_outline),
+          SizedBox(height: context.cardPadding),
+
+          // Order Summary Card
+          _buildFormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Order Summary', Icons.summarize_outlined),
+                SizedBox(height: context.cardPadding),
+
+                if (_selectedCustomer != null) ...[
+                  _buildSummaryRow('Customer', _selectedCustomer!.name, Icons.person),
+                  _buildSummaryRow('Phone', _selectedCustomer!.phone, Icons.phone),
+                  _buildSummaryRow('Email', _selectedCustomer!.email, Icons.email),
+                  Divider(height: context.cardPadding * 2),
+                ],
+
+                _buildSummaryRow('Description', _descriptionController.text, Icons.description),
+                _buildSummaryRow('Status', _getStatusText(_selectedStatus), Icons.info,
+                    valueColor: _getStatusColor(_selectedStatus)),
+                _buildSummaryRow('Products', '${_orderItems.length} items', Icons.shopping_bag),
+                _buildSummaryRow('Total Amount', 'PKR ${_totalAmount.toStringAsFixed(2)}', Icons.attach_money,
+                    valueColor: AppTheme.primaryMaroon, isBold: true),
+
+                if (_advancePaymentController.text.isNotEmpty) ...[
+                  _buildSummaryRow('Advance Payment',
+                      'PKR ${double.tryParse(_advancePaymentController.text)?.toStringAsFixed(2) ?? '0.00'}',
+                      Icons.payment),
+                ],
+
+                if (_selectedDeliveryDate != null) ...[
+                  _buildSummaryRow('Expected Delivery',
+                      '${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}',
+                      Icons.calendar_today),
+                ],
+              ],
+            ),
+          ),
+
+          SizedBox(height: context.cardPadding),
+
+          // Delivery Information
+          _buildFormCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Delivery Information', Icons.local_shipping_outlined),
+                SizedBox(height: context.cardPadding),
+
+                InkWell(
+                  onTap: () async {
+                    await context.showSyncfusionDateTimePicker(
+                      initialDate: _selectedDeliveryDate ?? DateTime.now().add(const Duration(days: 1)),
+                      initialTime: TimeOfDay.now(),
+                      title: 'Select Expected Delivery Date',
+                      minDate: DateTime.now(),
+                      maxDate: DateTime.now().add(const Duration(days: 365)),
+                      showTimeInline: false,
+                      onDateTimeSelected: (date, time) {
+                        _handleDeliveryDateChange(date);
+                      },
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                  child: Container(
+                    padding: EdgeInsets.all(context.cardPadding),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryMaroon.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          color: AppTheme.primaryMaroon,
+                          size: context.iconSize('medium'),
+                        ),
+                        SizedBox(width: context.smallPadding),
+                        Expanded(
+                          child: Text(
+                            _selectedDeliveryDate != null
+                                ? 'Expected Delivery: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
+                                : 'Select Expected Delivery Date (Optional)',
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              color: _selectedDeliveryDate != null
+                                  ? Colors.black87
+                                  : Colors.grey[600],
+                              fontWeight: _selectedDeliveryDate != null
+                                  ? FontWeight.w500
+                                  : FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppTheme.primaryMaroon,
+                          size: context.iconSize('small'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(context.smallPadding),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryMaroon.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
+          child: Icon(
+            icon,
+            color: AppTheme.primaryMaroon,
+            size: context.iconSize('medium'),
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFormCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.pureWhite,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: AppTheme.primaryMaroon.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryMaroon.withOpacity(0.05),
+            blurRadius: context.shadowBlur('light'),
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 
@@ -620,150 +936,620 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildQuickSelectChip({
-    required String label,
-    required VoidCallback onTap,
-    bool isSelected = false,
-    Color selectedColor = AppTheme.primaryMaroon,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedColor.withOpacity(0.1) : AppTheme.accentGold.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: isSelected ? selectedColor : AppTheme.accentGold.withOpacity(0.3), width: isSelected ? 2 : 1),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? selectedColor : AppTheme.accentGold,
+  Widget _buildCustomerInfo() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryMaroon.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: context.shouldShowCompactLayout ? 50 : 60,
+            height: context.shouldShowCompactLayout ? 50 : 60,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                _selectedCustomer!.initials,
+                style: GoogleFonts.inter(
+                  fontSize: context.shouldShowCompactLayout ? 16 : 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+            ),
           ),
+          SizedBox(width: context.cardPadding),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.smallPadding,
+                        vertical: context.smallPadding / 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryMaroon.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                      ),
+                      child: Text(
+                        _selectedCustomer!.id,
+                        style: GoogleFonts.inter(
+                          fontSize: context.captionFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryMaroon,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: context.smallPadding),
+                    Expanded(
+                      child: Text(
+                        _selectedCustomer!.name,
+                        style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoalGray,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                if (!context.shouldShowCompactLayout) ...[
+                  SizedBox(height: context.smallPadding),
+                  Row(
+                    children: [
+                      Icon(Icons.phone, size: 14, color: AppTheme.lightGray),
+                      SizedBox(width: context.smallPadding / 2),
+                      Text(
+                        _selectedCustomer!.phone,
+                        style: GoogleFonts.inter(
+                          fontSize: context.subtitleFontSize,
+                          color: AppTheme.charcoalGray,
+                        ),
+                      ),
+                      SizedBox(width: context.cardPadding),
+                      Icon(Icons.email, size: 14, color: AppTheme.charcoalGray),
+                      SizedBox(width: context.smallPadding / 2),
+                      Expanded(
+                        child: Text(
+                          _selectedCustomer!.email,
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            color: AppTheme.charcoalGray,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(OrderStatus status) {
+    final isSelected = _selectedStatus == status;
+    final color = _getStatusColor(status);
+
+    return InkWell(
+      onTap: () => _handleStatusChange(status),
+      borderRadius: BorderRadius.circular(context.borderRadius()),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.cardPadding,
+          vertical: context.smallPadding,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.15) : AppTheme.lightGray.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(
+            color: isSelected ? color : AppTheme.lightGray.withOpacity(0.3),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _getStatusIcon(status),
+              size: context.iconSize('medium'),
+              color: isSelected ? color : AppTheme.lightGray,
+            ),
+            SizedBox(width: context.smallPadding),
+            Text(
+              _getStatusText(status),
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? color : AppTheme.lightGray,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCompactButtons() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Consumer<OrderProvider>(
-          builder: (context, provider, child) {
-            return PremiumButton(
-              text: 'Create Order',
-              onPressed: provider.isLoading ? null : _handleSubmit,
-              isLoading: provider.isLoading,
+  Widget _buildProductCard(OrderItemModel item) {
+    return Container(
+      margin: EdgeInsets.only(bottom: context.smallPadding),
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.pureWhite,
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: AppTheme.lightGray.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryMaroon.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+            ),
+            child: Icon(
+              Icons.inventory_2_outlined,
+              color: AppTheme.primaryMaroon,
+              size: context.iconSize('medium'),
+            ),
+          ),
+          SizedBox(width: context.cardPadding),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.productName,
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: context.smallPadding / 2),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.smallPadding,
+                        vertical: context.smallPadding / 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryMaroon.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                      ),
+                      child: Text(
+                        'Qty: ${item.quantity}',
+                        style: GoogleFonts.inter(
+                          fontSize: context.captionFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryMaroon,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'PKR ${item.unitPrice.toStringAsFixed(2)} each',
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+                if (item.customizationNotes.isNotEmpty) ...[
+                  SizedBox(height: context.smallPadding / 2),
+                  Text(
+                    'Notes: ${item.customizationNotes}',
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'PKR ${item.lineTotal.toStringAsFixed(2)}',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.primaryMaroon,
+                ),
+              ),
+              SizedBox(height: context.smallPadding),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _orderItems.removeWhere((orderItem) => orderItem.productId == item.productId);
+                      _calculateTotalAmount();
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  child: Container(
+                    padding: EdgeInsets.all(context.smallPadding / 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    ),
+                    child: Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                      size: context.iconSize('medium'),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTotalAmountCard() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primaryMaroon.withOpacity(0.1),
+            AppTheme.secondaryMaroon.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.account_balance_wallet,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Total Amount:',
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            'PKR ${_totalAmount.toStringAsFixed(2)}',
+            style: GoogleFonts.inter(
+              fontSize: context.headerFontSize,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.primaryMaroon,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyProductsState() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding * 2),
+      decoration: BoxDecoration(
+        color: AppTheme.lightGray.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(color: AppTheme.lightGray.withOpacity(0.3), style: BorderStyle.solid),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.shopping_cart_outlined,
+            color: AppTheme.lightGray,
+            size: context.iconSize('large'),
+          ),
+          SizedBox(height: context.cardPadding),
+          Text(
+            'No Products Selected',
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: context.smallPadding),
+          Text(
+            'Click "Add Products to Order" to start building your order.',
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String value, IconData icon, {Color? valueColor, bool isBold = false}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.smallPadding),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: context.iconSize('small'), color: AppTheme.primaryMaroon),
+          SizedBox(width: context.smallPadding),
+          SizedBox(
+            width: context.shouldShowCompactLayout ? 80 : 120,
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.lightGray,
+              ),
+            ),
+          ),
+          SizedBox(width: context.smallPadding),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+                color: valueColor ?? AppTheme.charcoalGray,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationButtons() {
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.pureWhite,
+        border: Border(
+          top: BorderSide(
+            color: AppTheme.lightGray.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          if (_currentStep > 0) ...[
+            Expanded(
+              child: PremiumButton(
+                text: 'Previous',
+                onPressed: _previousStep,
+                isOutlined: true,
+                height: context.buttonHeight,
+                backgroundColor: AppTheme.lightGray,
+                textColor: AppTheme.lightGray,
+                icon: Icons.arrow_back,
+              ),
+            ),
+            SizedBox(width: context.cardPadding),
+          ],
+
+          Expanded(
+            flex: _currentStep == 0 ? 1 : 2,
+            child: _currentStep < 2
+                ? PremiumButton(
+              text: _currentStep == 0 ? 'Next: Products' : 'Next: Review',
+              onPressed: _canProceedToNextStep() ? _nextStep : null,
               height: context.buttonHeight,
-              icon: Icons.add_rounded,
               backgroundColor: AppTheme.primaryMaroon,
-            );
-          },
-        ),
-        SizedBox(height: context.cardPadding),
-        PremiumButton(
-          text: 'Cancel',
-          onPressed: _handleCancel,
-          isOutlined: true,
-          height: context.buttonHeight,
-          backgroundColor: Colors.grey[600],
-          textColor: Colors.grey[600],
-        ),
-      ],
+              icon: Icons.arrow_forward,
+            )
+                : Consumer<OrderProvider>(
+              builder: (context, provider, child) {
+                return PremiumButton(
+                  text: 'Create Order',
+                  onPressed: provider.isLoading ? null : _handleSubmit,
+                  isLoading: provider.isLoading,
+                  height: context.buttonHeight,
+                  backgroundColor: AppTheme.primaryMaroon,
+                  icon: Icons.check_circle,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildDesktopButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: PremiumButton(
-            text: 'Cancel',
-            onPressed: _handleCancel,
-            isOutlined: true,
-            height: context.buttonHeight / 1.5,
-            backgroundColor: Colors.grey[600],
-            textColor: Colors.grey[600],
-          ),
-        ),
-        SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 2,
-          child: Consumer<OrderProvider>(
-            builder: (context, provider, child) {
-              return PremiumButton(
-                text: 'Create Order',
-                onPressed: provider.isLoading ? null : _handleSubmit,
-                isLoading: provider.isLoading,
-                height: context.buttonHeight / 1.5,
-                icon: Icons.add_rounded,
-                backgroundColor: AppTheme.primaryMaroon,
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
+  // Helper methods
   Color _getStatusColor(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return Colors.orange;
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return Colors.blue;
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return Colors.indigo;
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return Colors.green;
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return Colors.purple;
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return Colors.red;
     }
   }
 
   String _getStatusText(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return 'Pending';
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return 'Confirmed';
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return 'In Production';
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return 'Ready';
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return 'Delivered';
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return 'Cancelled';
     }
   }
 
   IconData _getStatusIcon(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return Icons.pending_rounded;
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return Icons.check_circle_outline;
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return Icons.work_rounded;
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return Icons.done_all_rounded;
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return Icons.local_shipping_rounded;
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return Icons.cancel_rounded;
     }
+  }
+
+  void _showProductSelectionDialog() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return ProductSelectionDialog(
+          excludeProductIds: _orderItems.map((item) => item.productId).toList(),
+          onProductSelected: (product, quantity, customizationNotes) {
+            Navigator.of(context).pop({
+              'product': product,
+              'quantity': quantity,
+              'customizationNotes': customizationNotes
+            });
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      final product = result['product'] as Product;
+      final quantity = result['quantity'] as int;
+      final customizationNotes = result['customizationNotes'] as String?;
+
+      final existingItemIndex = _orderItems.indexWhere((item) => item.productId == product.id);
+
+      if (existingItemIndex != -1) {
+        setState(() {
+          _orderItems[existingItemIndex] = _orderItems[existingItemIndex].copyWith(
+            quantity: _orderItems[existingItemIndex].quantity + quantity,
+            lineTotal: (_orderItems[existingItemIndex].quantity + quantity) * _orderItems[existingItemIndex].unitPrice,
+            totalValue: (_orderItems[existingItemIndex].quantity + quantity) * _orderItems[existingItemIndex].unitPrice,
+          );
+        });
+      } else {
+        final newOrderItem = OrderItemModel(
+          id: '',
+          orderId: '',
+          productId: product.id,
+          productName: product.name,
+          productFabric: product.fabric,
+          productColor: product.color,
+          quantity: quantity,
+          unitPrice: product.price,
+          customizationNotes: customizationNotes ?? '',
+          lineTotal: quantity * product.price,
+          isActive: true,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          currentStock: product.quantity,
+          totalValue: quantity * product.price,
+          productDisplayInfo: {
+            'name': product.name,
+            'fabric': product.fabric,
+            'color': product.color,
+            'price': product.price
+          },
+        );
+        _orderItems.add(newOrderItem);
+      }
+
+      _calculateTotalAmount();
+      setState(() {});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: AppTheme.pureWhite),
+                SizedBox(width: context.smallPadding),
+                Text('${product.name} added to order'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void _calculateTotalAmount() {
+    _totalAmount = _orderItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+    _totalAmountController.text = _totalAmount.toStringAsFixed(2);
   }
 }

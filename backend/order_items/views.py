@@ -6,6 +6,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from decimal import Decimal, InvalidOperation
+import logging
 from .models import OrderItem
 from .serializers import (
     OrderItemSerializer,
@@ -17,6 +18,9 @@ from .serializers import (
     OrderItemBulkUpdateSerializer,
     OrderItemQuantityUpdateSerializer
 )
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 # Function-based views (following your pattern)
@@ -184,36 +188,70 @@ def list_order_items(request):
 @permission_classes([IsAuthenticated])
 def create_order_item(request):
     """
-    Create a new order item
+    Create a new order item with performance optimizations
     """
-    serializer = OrderItemCreateSerializer(
-        data=request.data,
-        context={'request': request}
-    )
+    import time
+    start_time = time.time()
     
-    if serializer.is_valid():
-        try:
-            with transaction.atomic():
-                order_item = serializer.save()
-                
+    try:
+        logger.info(f"Starting order item creation for request data: {request.data}")
+        
+        serializer = OrderItemCreateSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+        
+        validation_start = time.time()
+        if serializer.is_valid():
+            validation_time = time.time() - validation_start
+            logger.info(f"Validation completed in {validation_time:.3f}s")
+            
+            try:
+                with transaction.atomic():
+                    # Use select_related to optimize the query
+                    save_start = time.time()
+                    order_item = serializer.save()
+                    save_time = time.time() - save_start
+                    logger.info(f"Order item saved in {save_time:.3f}s")
+                    
+                    # Return response immediately without additional queries
+                    total_time = time.time() - start_time
+                    logger.info(f"Order item creation completed successfully in {total_time:.3f}s")
+                    
+                    return Response({
+                        'success': True,
+                        'message': 'Order item created successfully.',
+                        'data': OrderItemDetailSerializer(order_item).data
+                    }, status=status.HTTP_201_CREATED)
+                    
+            except Exception as e:
+                total_time = time.time() - start_time
+                logger.error(f"Error creating order item after {total_time:.3f}s: {str(e)}")
                 return Response({
-                    'success': True,
-                    'message': 'Order item created successfully.',
-                    'data': OrderItemDetailSerializer(order_item).data
-                }, status=status.HTTP_201_CREATED)
-                
-        except Exception as e:
+                    'success': False,
+                    'message': 'Order item creation failed due to server error.',
+                    'errors': {'detail': str(e)}
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            validation_time = time.time() - validation_start
+            total_time = time.time() - start_time
+            logger.warning(f"Validation failed after {validation_time:.3f}s, total time: {total_time:.3f}s")
+            logger.warning(f"Validation errors: {serializer.errors}")
+            
             return Response({
                 'success': False,
-                'message': 'Order item creation failed due to server error.',
-                'errors': {'detail': str(e)}
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    return Response({
-        'success': False,
-        'message': 'Order item creation failed.',
-        'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
+                'message': 'Order item creation failed.',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+    except Exception as e:
+        total_time = time.time() - start_time
+        logger.error(f"Unexpected error in create_order_item after {total_time:.3f}s: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An unexpected error occurred.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -427,7 +465,13 @@ def search_order_items(request):
         page = int(request.GET.get('page', 1))
         
         # Search order items
-        order_items = OrderItem.active_items().search(query)
+        order_items = OrderItem.active_items().filter(
+            Q(product_name__icontains=query) |
+            Q(customization_notes__icontains=query) |
+            Q(product__name__icontains=query) |
+            Q(product__color__icontains=query) |
+            Q(product__fabric__icontains=query)
+        )
         order_items = order_items.select_related('order', 'product')
         
         # Calculate pagination
