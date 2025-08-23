@@ -95,7 +95,7 @@ class ExpenseListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'expense_summary', 'formatted_amount', 'withdrawal_by',
             'withdrawal_initials', 'date', 'time', 'category',
-            'created_by_name', 'created_at'
+            'created_by_name', 'created_at', 'description'
         ]
 
 

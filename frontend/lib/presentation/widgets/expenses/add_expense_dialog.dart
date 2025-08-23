@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
+import 'package:frontend/presentation/widgets/globals/drop_down.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
@@ -33,18 +35,11 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     // Use addPostFrameCallback to avoid rendering conflicts
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -93,28 +88,18 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Expense added successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -124,28 +109,18 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -169,7 +144,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
       initialTime: _selectedTime,
       title: 'Select Expense Date & Time',
       minDate: DateTime(2000),
-      maxDate: DateTime(2101),
+      maxDate: DateTime.now().add(const Duration(days: 365)), // Allow up to 1 year in future
       onDateTimeSelected: (date, time) {
         setState(() {
           _selectedDate = date;
@@ -192,14 +167,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -207,11 +175,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -232,37 +196,19 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
 
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: true),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
     );
   }
 
   Widget _buildDesktopLayout() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          _buildFormContent(isCompact: false),
-        ],
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: false)]),
     );
   }
 
@@ -270,9 +216,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -282,15 +226,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.receipt_long_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.receipt_long_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -327,11 +264,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -405,43 +338,18 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             // Withdrawal By Selection
             Consumer<ExpensesProvider>(
               builder: (context, provider, child) {
-                return DropdownButtonFormField<String>(
+                return PremiumDropdownField<String>(
+                  label: 'Withdrawal By',
+                  hint: 'Select who made the withdrawal',
                   value: _selectedWithdrawalBy,
-                  decoration: InputDecoration(
-                    labelText: 'Withdrawal By',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                  ),
-                  items: provider.availablePersons
-                      .map((person) => DropdownMenuItem<String>(
-                    value: person,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: _getPersonColor(person),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: AppTheme.pureWhite,
-                            size: context.iconSize('small'),
-                          ),
-                        ),
-                        SizedBox(width: context.smallPadding),
-                        Text(person),
-                      ],
-                    ),
-                  ))
-                      .toList(),
+                  prefixIcon: Icons.person_outline,
+                  items: provider.availablePersons.map((person) => DropdownItem<String>(value: person, label: person)).toList(),
                   onChanged: (person) {
-                    setState(() {
-                      _selectedWithdrawalBy = person;
-                    });
+                    if (person != null) {
+                      setState(() {
+                        _selectedWithdrawalBy = person;
+                      });
+                    }
                   },
                   validator: (value) {
                     if (value == null) {
@@ -467,12 +375,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                     child: Container(
                       padding: EdgeInsets.all(context.cardPadding),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppTheme.primaryMaroon.withOpacity(0.1),
-                            AppTheme.secondaryMaroon.withOpacity(0.1),
-                          ],
-                        ),
+                        gradient: LinearGradient(colors: [AppTheme.primaryMaroon.withOpacity(0.1), AppTheme.secondaryMaroon.withOpacity(0.1)]),
                         border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                       ),
@@ -481,19 +384,11 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.date_range_rounded,
-                                color: AppTheme.primaryMaroon,
-                                size: context.iconSize('medium'),
-                              ),
+                              Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                               SizedBox(width: context.smallPadding),
                               Text(
                                 'Select Date & Time',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.primaryMaroon,
-                                ),
+                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                               ),
                             ],
                           ),
@@ -521,11 +416,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                                   ),
                                 ],
                               ),
-                              Container(
-                                height: 40,
-                                width: 1,
-                                color: Colors.grey.shade300,
-                              ),
+                              Container(height: 40, width: 1, color: Colors.grey.shade300),
                               Column(
                                 children: [
                                   Text(
