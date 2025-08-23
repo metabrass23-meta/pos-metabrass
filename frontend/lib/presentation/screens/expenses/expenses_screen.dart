@@ -11,6 +11,7 @@ import '../../widgets/expenses/delete_expense_dialog.dart';
 import '../../widgets/expenses/edit_expense_dialog.dart';
 import '../../widgets/expenses/view_expense_dialog.dart';
 import '../../widgets/expenses/expenses_table.dart';
+import '../../widgets/expenses/expenses_filter_dialog.dart';
 
 class ExpensesPage extends StatefulWidget {
   const ExpensesPage({super.key});
@@ -25,9 +26,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
   @override
   void initState() {
     super.initState();
-    // Refresh data when page loads
+    // Load expense records and statistics when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ExpensesProvider>().refreshData();
+      final provider = context.read<ExpensesProvider>();
+      provider.loadExpenseRecords();
+      provider.loadStatistics();
     });
   }
 
@@ -38,11 +41,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   void _showAddExpenseDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AddExpenseDialog(),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const AddExpenseDialog());
   }
 
   void _showEditExpenseDialog(Expense expense) {
@@ -70,7 +69,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Future<void> _handleRefresh() async {
-    await context.read<ExpensesProvider>().refreshData();
+    final provider = context.read<ExpensesProvider>();
+    await provider.loadExpenseRecords();
+    await provider.loadStatistics();
+  }
+
+  void _handleFilterTap() {
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const ExpensesFilterDialog());
   }
 
   @override
@@ -85,7 +90,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
         onRefresh: _handleRefresh,
         color: AppTheme.primaryMaroon,
         child: Padding(
-          padding: EdgeInsets.all(context.mainPadding),
+          padding: EdgeInsets.all(context.mainPadding / 2),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -117,16 +122,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
                           Expanded(
                             child: Text(
                               provider.errorMessage ?? 'An error occurred',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                color: Colors.red[700],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red[700]),
                             ),
                           ),
                           TextButton(
                             onPressed: () {
                               provider.clearError();
-                              provider.refreshData();
+                              provider.loadExpenseRecords();
                             },
                             child: Text('Retry'),
                           ),
@@ -135,20 +137,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     );
                   }
 
-                  return context.statsCardColumns == 2
-                      ? _buildMobileStatsGrid(provider)
-                      : _buildDesktopStatsRow(provider);
+                  return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
                 },
               ),
               SizedBox(height: context.cardPadding * 0.5),
               _buildSearchSection(),
               SizedBox(height: context.cardPadding * 0.5),
               Expanded(
-                child: ExpensesTable(
-                  onEdit: _showEditExpenseDialog,
-                  onDelete: _showDeleteExpenseDialog,
-                  onView: _showViewExpenseDialog,
-                ),
+                child: ExpensesTable(onEdit: _showEditExpenseDialog, onDelete: _showDeleteExpenseDialog, onView: _showViewExpenseDialog),
               ),
             ],
           ),
@@ -166,29 +162,17 @@ class _ExpensesPageState extends State<ExpensesPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 6.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(
-                  fontSize: 3.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -201,6 +185,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget _buildDesktopHeader() {
     return Row(
       children: [
+        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +193,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               Text(
                 'Expenses Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -217,15 +202,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 'Track and manage business expenses efficiently',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
         ),
+
+        // Add Expense Button
         _buildAddButton(),
       ],
     );
@@ -235,10 +218,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Page Title
         Text(
           'Expenses Management',
           style: GoogleFonts.playfairDisplay(
-            fontSize: context.headerFontSize,
+            fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
             letterSpacing: -0.5,
@@ -247,17 +231,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track business expenses',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+
+        // Add Expense Button (full width on tablet)
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -266,6 +245,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Compact Page Title
         Text(
           'Expenses',
           style: GoogleFonts.playfairDisplay(
@@ -278,17 +258,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track expenses',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+
+        // Add Expense Button (full width)
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -296,9 +271,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -307,18 +280,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
           onTap: _showAddExpenseDialog,
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding * 0.5,
-              vertical: context.cardPadding / 2,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.5, vertical: context.cardPadding / 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add' : 'Add Expense',
@@ -341,21 +307,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
     final stats = provider.expenseStats;
     return Row(
       children: [
-        Expanded(
-            child: _buildStatsCard('Total Expenses', stats['total'].toString(),
-                Icons.receipt_long_rounded, Colors.blue)),
+        Expanded(child: _buildStatsCard('Total Records', stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                Icons.calendar_month_rounded, Colors.green)),
+        Expanded(child: _buildStatsCard('This Year', stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}',
-                Icons.attach_money_rounded, Colors.red)),
+        Expanded(child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-            child: _buildStatsCard('This Week', stats['thisWeek'].toString(),
-                Icons.date_range_rounded, Colors.orange)),
+        Expanded(child: _buildStatsCard('This Week', stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
       ],
     );
   }
@@ -366,25 +324,17 @@ class _ExpensesPageState extends State<ExpensesPage> {
       children: [
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.receipt_long_rounded, Colors.blue)),
+            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                    Icons.calendar_month_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard('This Year', stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(
-                child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}',
-                    Icons.attach_money_rounded, Colors.red)),
+            Expanded(child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-                child: _buildStatsCard('This Week', stats['thisWeek'].toString(),
-                    Icons.date_range_rounded, Colors.orange)),
+            Expanded(child: _buildStatsCard('This Week', stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
           ],
         ),
       ],
@@ -397,13 +347,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
@@ -419,20 +363,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
+        Expanded(flex: 4, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
-        SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+        Expanded(flex: 1, child: _buildFilterButton()),
       ],
     );
   }
@@ -442,13 +375,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
       children: [
         _buildSearchBar(),
         SizedBox(height: context.cardPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
+        Row(children: [Expanded(child: _buildFilterButton())]),
       ],
     );
   }
@@ -458,13 +385,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
       children: [
         _buildSearchBar(),
         SizedBox(height: context.smallPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
+        Row(children: [Expanded(child: _buildFilterButton())]),
       ],
     );
   }
@@ -477,41 +398,22 @@ class _ExpensesPageState extends State<ExpensesPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchExpenses,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search expenses...'
-                  : 'Search expenses by ID, type, description, amount, or person...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
+              hintText: context.isTablet ? 'Search expenses...' : 'Search expenses by ID, type, description, amount, or person...',
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
+              suffixIcon: provider.searchQuery.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchExpenses('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        provider.searchExpenses('');
+                      },
+                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                    )
                   : null,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
             ),
           );
         },
@@ -520,73 +422,30 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildFilterButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
+    return InkWell(
+      onTap: _handleFilterTap,
+      borderRadius: BorderRadius.circular(context.borderRadius()),
+      child: Container(
+        height: context.buttonHeight / 1.5,
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+        decoration: BoxDecoration(
+          color: AppTheme.lightGray,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: Colors.red,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.filter_list_rounded, color: Colors.red, size: context.iconSize('medium')),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                'Filter',
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.red),
               ),
-            ),
+            ],
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExportButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -598,29 +457,18 @@ class _ExpensesPageState extends State<ExpensesPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
+
           SizedBox(width: context.cardPadding),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -645,11 +493,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
