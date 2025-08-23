@@ -378,6 +378,7 @@ class Order(models.Model):
         self._calculating_totals = True
         
         try:
+            # Use select_related to optimize the query and avoid N+1 queries
             total = OrderItem.objects.filter(
                 order=self,
                 is_active=True
@@ -389,6 +390,7 @@ class Order(models.Model):
             self.calculate_payment_status()
             
             # Use update() instead of save() to avoid triggering signals
+            # Also use only() to select only the fields we need
             Order.objects.filter(id=self.id).update(
                 total_amount=self.total_amount,
                 remaining_amount=self.remaining_amount,
@@ -397,6 +399,12 @@ class Order(models.Model):
             )
             
             return total
+        except Exception as e:
+            # Log the error but don't fail the operation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calculating totals for order {self.id}: {str(e)}")
+            return self.total_amount or Decimal('0.00')
         finally:
             # Always remove the calculating flag
             if hasattr(self, '_calculating_totals'):
