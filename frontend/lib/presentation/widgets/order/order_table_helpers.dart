@@ -7,14 +7,14 @@ import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/confirmation_dialog.dart';
+import 'order_items_management_dialog.dart';
 
 class OrderTableHelpers {
   final Function(OrderModel) onEdit;
   final Function(OrderModel) onDelete;
   final Function(OrderModel) onView;
-  final Function(OrderModel) onOrderItems;
 
-  OrderTableHelpers({required this.onEdit, required this.onDelete, required this.onView, required this.onOrderItems});
+  OrderTableHelpers({required this.onEdit, required this.onDelete, required this.onView});
 
   /// Build the actions row for each order in the table
   Widget buildActionsRow(BuildContext context, OrderModel order) {
@@ -44,7 +44,7 @@ class OrderTableHelpers {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => onOrderItems(order),
+              onTap: () => _showOrderItemsManagementDialog(context, order),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding * 0.4),
@@ -513,6 +513,121 @@ class OrderTableHelpers {
     );
   }
 
+  /// Build no search results state widget
+  Widget buildNoSearchResultsState(BuildContext context, OrderProvider provider) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
+            child: Icon(Icons.search_off_rounded, size: context.iconSize('xl'), color: Colors.grey[400]),
+          ),
+
+          SizedBox(height: context.mainPadding),
+
+          Text(
+            'No Orders Found',
+            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          ),
+
+          SizedBox(height: context.smallPadding),
+
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
+            ),
+            child: Text(
+              'No orders match your search criteria "${provider.searchQuery}". Try adjusting your search terms or filters to find what you\'re looking for.',
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          SizedBox(height: context.mainPadding),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Clear Search Button
+              Container(
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(context.borderRadius())),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      provider.clearFilters();
+                    },
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.clear_rounded, color: Colors.grey[700], size: context.iconSize('medium')),
+                          SizedBox(width: context.smallPadding),
+                          Text(
+                            'Clear Search',
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(width: context.mainPadding),
+
+              // Create New Order Button
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      // This will trigger the add order dialog from parent
+                    },
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                          SizedBox(width: context.smallPadding),
+                          Text(
+                            'Create New Order',
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.pureWhite,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Get status color based on order status
   Color getStatusColor(OrderStatus status) {
     switch (status) {
@@ -572,5 +687,13 @@ class OrderTableHelpers {
   /// Format date for display
   String formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  /// Show Order Items Management Dialog
+  void _showOrderItemsManagementDialog(BuildContext context, OrderModel order) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => OrderItemsManagementDialog(order: order),
+    );
   }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/customer_provider.dart';
-import '../../../src/models/customer/customer_model.dart';
 import '../../../src/models/order/order_model.dart';
+import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
-import '../globals/text_button.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 import '../globals/text_field.dart';
+import '../globals/text_button.dart';
+import '../globals/custom_date_picker.dart';
 
 class EditOrderDialog extends StatefulWidget {
   final OrderModel order;
@@ -31,7 +32,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
 
   // Form state
   Customer? _selectedCustomer;
-  OrderStatus _selectedStatus = OrderStatus.pending;
+  OrderStatus _selectedStatus = OrderStatus.PENDING;
   DateTime? _selectedDeliveryDate;
   bool _isLoadingCustomerDetails = false;
 
@@ -39,9 +40,6 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-
-  // Options
-  final List<OrderStatus> _orderStatuses = OrderStatus.values;
 
   @override
   void initState() {
@@ -240,7 +238,6 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   // Get specific status transition error message
   String _getStatusTransitionErrorMessage() {
     final currentStatus = widget.order.status;
-    final selectedStatus = _selectedStatus;
 
     // Get valid next statuses
     final validNextStatuses = _getValidNextStatuses(currentStatus);
@@ -257,17 +254,17 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   // Get valid next statuses based on current status
   List<OrderStatus> _getValidNextStatuses(OrderStatus currentStatus) {
     switch (currentStatus) {
-      case OrderStatus.pending:
-        return [OrderStatus.confirmed, OrderStatus.cancelled];
-      case OrderStatus.confirmed:
-        return [OrderStatus.inProduction, OrderStatus.cancelled];
-      case OrderStatus.inProduction:
-        return [OrderStatus.ready, OrderStatus.cancelled];
-      case OrderStatus.ready:
-        return [OrderStatus.delivered, OrderStatus.cancelled];
-      case OrderStatus.delivered:
+      case OrderStatus.PENDING:
+        return [OrderStatus.CONFIRMED, OrderStatus.CANCELLED];
+      case OrderStatus.CONFIRMED:
+        return [OrderStatus.IN_PRODUCTION, OrderStatus.CANCELLED];
+      case OrderStatus.IN_PRODUCTION:
+        return [OrderStatus.READY, OrderStatus.CANCELLED];
+      case OrderStatus.READY:
+        return [OrderStatus.DELIVERED, OrderStatus.CANCELLED];
+      case OrderStatus.DELIVERED:
         return []; // Terminal state
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return []; // Terminal state
     }
   }
@@ -296,17 +293,17 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   // Get status priority for sorting
   int _getStatusPriority(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return 1;
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return 2;
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return 3;
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return 4;
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return 5;
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return 6;
     }
   }
@@ -518,6 +515,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 // Order Details Section
                 _buildOrderDetailsSection(),
                 SizedBox(height: context.cardPadding),
+
                 // Financial Information Section
                 _buildFinancialInfoSection(),
                 SizedBox(height: context.cardPadding),
@@ -875,15 +873,18 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           SizedBox(height: context.cardPadding),
           InkWell(
             onTap: () async {
-              final date = await showDatePicker(
-                context: context,
+              // Use custom date picker for better UX
+              await context.showSyncfusionDateTimePicker(
                 initialDate: _selectedDeliveryDate ?? DateTime.now().add(const Duration(days: 1)),
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 365)),
+                initialTime: TimeOfDay.now(),
+                title: 'Select Expected Delivery Date',
+                minDate: DateTime.now(),
+                maxDate: DateTime.now().add(const Duration(days: 365)),
+                showTimeInline: false, // Only show date for delivery
+                onDateTimeSelected: (date, time) {
+                  _handleDeliveryDateChange(date);
+                },
               );
-              if (date != null) {
-                _handleDeliveryDateChange(date);
-              }
             },
             borderRadius: BorderRadius.circular(context.borderRadius()),
             child: Container(
@@ -981,51 +982,51 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
 
   Color _getStatusColor(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return Colors.orange;
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return Colors.blue;
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return Colors.indigo;
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return Colors.green;
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return Colors.purple;
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return Colors.red;
     }
   }
 
   String _getStatusText(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return 'Pending';
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return 'Confirmed';
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return 'In Production';
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return 'Ready';
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return 'Delivered';
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return 'Cancelled';
     }
   }
 
   IconData _getStatusIcon(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return Icons.pending_rounded;
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return Icons.check_circle_outline;
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return Icons.work_rounded;
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return Icons.done_all_rounded;
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return Icons.local_shipping_rounded;
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return Icons.cancel_rounded;
     }
   }

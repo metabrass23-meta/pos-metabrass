@@ -11,7 +11,9 @@ import '../../../src/utils/responsive_breakpoints.dart';
 import '../globals/drop_down.dart';
 
 class AddOrderItemDialog extends StatefulWidget {
-  const AddOrderItemDialog({super.key});
+  final String? initialOrderId;
+
+  const AddOrderItemDialog({super.key, this.initialOrderId});
 
   @override
   State<AddOrderItemDialog> createState() => _AddOrderItemDialogState();
@@ -34,6 +36,9 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
     // Load orders and products for dropdowns
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDropdownData();
+      if (widget.initialOrderId != null) {
+        _setInitialOrderSelection();
+      }
     });
   }
 
@@ -48,6 +53,19 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
 
     if (productProvider.products.isEmpty) {
       productProvider.refreshProducts();
+    }
+  }
+
+  void _setInitialOrderSelection() {
+    final orderProvider = context.read<OrderProvider>();
+    try {
+      final initialOrder = orderProvider.orders.firstWhere((order) => order.id == widget.initialOrderId);
+      setState(() {
+        _selectedOrder = initialOrder;
+      });
+    } catch (e) {
+      // Order not found, will be handled by the dropdown
+      debugPrint('Initial order not found: ${widget.initialOrderId}');
     }
   }
 

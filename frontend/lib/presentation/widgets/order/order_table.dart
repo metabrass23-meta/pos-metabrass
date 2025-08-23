@@ -12,9 +12,8 @@ class EnhancedOrderTable extends StatefulWidget {
   final Function(OrderModel) onEdit;
   final Function(OrderModel) onDelete;
   final Function(OrderModel) onView;
-  final Function(OrderModel) onOrderItems;
 
-  const EnhancedOrderTable({super.key, required this.onEdit, required this.onDelete, required this.onView, required this.onOrderItems});
+  const EnhancedOrderTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
 
   @override
   State<EnhancedOrderTable> createState() => _EnhancedOrderTableState();
@@ -29,7 +28,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
   @override
   void initState() {
     super.initState();
-    _helpers = OrderTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView, onOrderItems: widget.onOrderItems);
+    _helpers = OrderTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
 
     // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
@@ -65,7 +64,13 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
             return _helpers.buildErrorState(context, provider);
           }
 
+          // Check if there are no orders at all vs no search results
           if (provider.orders.isEmpty) {
+            // If there's a search query but no results, show "no search results" state
+            if (provider.searchQuery.isNotEmpty) {
+              return _helpers.buildNoSearchResultsState(context, provider);
+            }
+            // If no orders at all, show the regular empty state
             return _helpers.buildEmptyState(context);
           }
 
@@ -358,19 +363,78 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'PKR ${order.totalAmount.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (order.remainingAmount > 0) ...[
-                    SizedBox(height: context.smallPadding / 4),
+                  // Show amount if available, otherwise show item count info
+                  if (order.totalAmount > 0) ...[
                     Text(
-                      'Due: ${order.remainingAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
+                      'PKR ${order.totalAmount.toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    if (order.remainingAmount > 0) ...[
+                      SizedBox(height: context.smallPadding / 4),
+                      Text(
+                        'Due: PKR ${order.remainingAmount.toStringAsFixed(0)}',
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ] else ...[
+                      SizedBox(height: context.smallPadding / 4),
+                      Text(
+                        'Fully Paid',
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.green),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ] else ...[
+                    // Show item count information when no amount
+                    Builder(
+                      builder: (context) {
+                        final totalItems = order.orderSummary['total_items'] ?? 0;
+                        final totalQuantity = order.orderSummary['total_quantity'] ?? 0;
+
+                        if (totalItems > 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${totalItems} item${totalItems == 1 ? '' : 's'}',
+                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: context.smallPadding / 4),
+                              Text(
+                                'Qty: ${totalQuantity}',
+                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue[600]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'No items',
+                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: context.smallPadding / 4),
+                              Text(
+                                'Add items to see total',
+                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ],
                 ],

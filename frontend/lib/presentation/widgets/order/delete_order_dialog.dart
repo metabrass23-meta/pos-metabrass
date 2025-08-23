@@ -17,8 +17,7 @@ class DeleteOrderDialog extends StatefulWidget {
   State<DeleteOrderDialog> createState() => _DeleteOrderDialogState();
 }
 
-class _DeleteOrderDialogState extends State<DeleteOrderDialog>
-    with SingleTickerProviderStateMixin {
+class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -31,34 +30,13 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 400), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    _shakeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.elasticOut));
 
     _animationController.forward();
   }
@@ -90,17 +68,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
   }
 
   bool _validateDeletion() {
-    return _confirmationChecked &&
-        _confirmationText.toLowerCase().trim() ==
-            widget.order.id.toLowerCase().trim();
+    return _confirmationChecked && _confirmationText.toLowerCase().trim() == widget.order.id.toLowerCase().trim();
   }
 
   void _showValidationError() {
     String message;
     if (!_confirmationChecked) {
       message = 'Please confirm that you understand this action';
-    } else if (_confirmationText.toLowerCase().trim() !=
-        widget.order.id.toLowerCase().trim()) {
+    } else if (_confirmationText.toLowerCase().trim() != widget.order.id.toLowerCase().trim()) {
       message = 'Please type the order ID exactly to confirm deletion';
     } else {
       message = 'Please complete all confirmation steps';
@@ -110,11 +85,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
   }
 
   void _showSuccessSnackbar() {
-    _showSnackbar(
-      'Order deleted successfully!',
-      Colors.green,
-      Icons.check_circle_rounded,
-    );
+    _showSnackbar('Order deleted successfully!', Colors.green, Icons.check_circle_rounded);
   }
 
   void _showErrorSnackbar(String message) {
@@ -126,20 +97,12 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              icon,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(icon, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -147,9 +110,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
         backgroundColor: color,
         duration: Duration(seconds: color == Colors.red ? 4 : 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -171,23 +132,10 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Transform.translate(
-                offset: Offset(
-                  _shakeAnimation.value * 2 * (1 - _scaleAnimation.value),
-                  0,
-                ),
+                offset: Offset(_shakeAnimation.value * 2 * (1 - _scaleAnimation.value), 0),
                 child: Container(
-                  width: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 85.w,
-                    small: 75.w,
-                    medium: 60.w,
-                    large: 50.w,
-                    ultrawide: 40.w,
-                  ),
-                  constraints: BoxConstraints(
-                    maxWidth: 500,
-                    maxHeight: 85.h,
-                  ),
+                  width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 75.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
+                  constraints: BoxConstraints(maxWidth: 500, maxHeight: 85.h),
                   margin: EdgeInsets.all(context.mainPadding),
                   decoration: BoxDecoration(
                     color: AppTheme.pureWhite,
@@ -204,9 +152,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildHeader(),
-                      Expanded(
-                        child: _buildContent(),
-                      ),
+                      Expanded(child: _buildContent()),
                     ],
                   ),
                 ),
@@ -222,9 +168,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.red, Colors.redAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.red, Colors.redAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -234,15 +178,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.delete_forever_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.delete_forever_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -279,11 +216,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -330,18 +263,11 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.red.withOpacity(0.3),
-          width: 2,
-        ),
+        border: Border.all(color: Colors.red.withOpacity(0.3), width: 2),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.warning_rounded,
-            color: Colors.red,
-            size: context.iconSize('large'),
-          ),
+          Icon(Icons.warning_rounded, color: Colors.red, size: context.iconSize('large')),
           SizedBox(width: context.cardPadding),
           Expanded(
             child: Column(
@@ -349,20 +275,12 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
               children: [
                 Text(
                   'Deletion Warning',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.red[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   'This will permanently remove all order data from the database. This action cannot be reversed.',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    color: AppTheme.charcoalGray,
-                    height: 1.4,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.4),
                 ),
               ],
             ),
@@ -378,10 +296,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.red.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.red.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,18 +306,11 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
               Container(
                 width: 50,
                 height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), shape: BoxShape.circle),
                 child: Center(
                   child: Text(
                     _getOrderInitials(),
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.red[700],
-                    ),
+                    style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.red[700]),
                   ),
                 ),
               ),
@@ -414,32 +322,21 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.smallPadding,
-                            vertical: context.smallPadding / 2,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(context.borderRadius('small')),
                           ),
                           child: Text(
                             widget.order.id,
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.red,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                           ),
                         ),
                         SizedBox(width: context.smallPadding),
                         Expanded(
                           child: Text(
                             widget.order.customerName,
-                            style: GoogleFonts.inter(
-                              fontSize: context.bodyFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.charcoalGray,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -449,11 +346,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
                       SizedBox(height: context.smallPadding),
                       Text(
                         widget.order.description,
-                        style: GoogleFonts.inter(
-                          fontSize: context.subtitleFontSize,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.grey[600],
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -466,25 +359,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
           SizedBox(height: context.cardPadding),
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Row(
               children: [
-                Icon(
-                  Icons.shopping_cart,
-                  color: Colors.blue,
-                  size: context.iconSize('small'),
-                ),
+                Icon(Icons.shopping_cart, color: Colors.blue, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   'Order created: ${_formatDate(widget.order.createdAt)}',
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blue[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                 ),
               ],
             ),
@@ -507,30 +389,18 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
         children: [
           Row(
             children: [
-              Icon(
-                Icons.info_rounded,
-                color: Colors.amber[700],
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.info_rounded, color: Colors.amber[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Impact Assessment',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
             '• All order data will be permanently removed\n• Associated customer records will remain unaffected\n• Payment records will be anonymized\n• This action cannot be undone',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              color: AppTheme.charcoalGray,
-              height: 1.5,
-            ),
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.5),
           ),
         ],
       ),
@@ -540,10 +410,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
   Widget _buildConfirmationSection() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-      ),
+      decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -556,11 +423,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
             },
             title: Text(
               'I understand this will permanently delete the order and cannot be undone',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: Colors.red[700],
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
             ),
             activeColor: Colors.red,
             dense: true,
@@ -569,11 +432,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
           SizedBox(height: context.cardPadding),
           Text(
             'Type the order ID to confirm permanent deletion:',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              fontWeight: FontWeight.w600,
-              color: Colors.red[700],
-            ),
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -584,16 +443,10 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
                   _confirmationText = value;
                 });
               },
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: widget.order.id,
-                hintStyle: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  color: Colors.grey[400],
-                ),
+                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[400]),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(context.cardPadding / 2),
               ),
@@ -602,11 +455,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
           SizedBox(height: context.smallPadding),
           Text(
             'Expected: ${widget.order.id}',
-            style: GoogleFonts.inter(
-              fontSize: context.captionFontSize,
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
-            ),
+            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600], fontStyle: FontStyle.italic),
           ),
         ],
       ),
@@ -690,17 +539,17 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog>
 
   String _getStatusText(OrderStatus status) {
     switch (status) {
-      case OrderStatus.pending:
+      case OrderStatus.PENDING:
         return 'Pending';
-      case OrderStatus.confirmed:
+      case OrderStatus.CONFIRMED:
         return 'Confirmed';
-      case OrderStatus.inProduction:
+      case OrderStatus.IN_PRODUCTION:
         return 'In Production';
-      case OrderStatus.ready:
+      case OrderStatus.READY:
         return 'Ready';
-      case OrderStatus.delivered:
+      case OrderStatus.DELIVERED:
         return 'Delivered';
-      case OrderStatus.cancelled:
+      case OrderStatus.CANCELLED:
         return 'Cancelled';
     }
   }

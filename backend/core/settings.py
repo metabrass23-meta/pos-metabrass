@@ -77,6 +77,11 @@ DATABASES = {
         'PASSWORD': 'Admin123!',
         'HOST': 'localhost',
         'PORT': '5432',
+        'OPTIONS': {
+            'connect_timeout': 10,  # Connection timeout in seconds
+            'options': '-c statement_timeout=60000',  # Statement timeout in milliseconds (60 seconds)
+            'options': '-c idle_in_transaction_session_timeout=60000',  # Idle transaction timeout
+        },
     }
 }
 

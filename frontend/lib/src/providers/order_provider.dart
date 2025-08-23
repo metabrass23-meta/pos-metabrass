@@ -1,375 +1,575 @@
 import 'package:flutter/material.dart';
-
-enum OrderStatus { pending, inProgress, completed, cancelled, delivered }
-
-class Order {
-  final String id;
-  final String customerId;
-  final String customerName;
-  final String customerPhone;
-  final String customerEmail;
-  final double advancePayment;
-  final double totalAmount;
-  final double remainingAmount;
-  final DateTime dateOrdered;
-  final DateTime expectedDeliveryDate;
-  final String description;
-  final String product;
-  final OrderStatus status;
-  final DateTime createdAt;
-
-  Order({
-    required this.id,
-    required this.customerId,
-    required this.customerName,
-    required this.customerPhone,
-    required this.customerEmail,
-    required this.advancePayment,
-    required this.totalAmount,
-    required this.remainingAmount,
-    required this.dateOrdered,
-    required this.expectedDeliveryDate,
-    required this.description,
-    required this.product,
-    required this.status,
-    required this.createdAt,
-  });
-
-  Order copyWith({
-    String? id,
-    String? customerId,
-    String? customerName,
-    String? customerPhone,
-    String? customerEmail,
-    double? advancePayment,
-    double? totalAmount,
-    double? remainingAmount,
-    DateTime? dateOrdered,
-    DateTime? expectedDeliveryDate,
-    String? description,
-    String? product,
-    OrderStatus? status,
-    DateTime? createdAt,
-  }) {
-    return Order(
-      id: id ?? this.id,
-      customerId: customerId ?? this.customerId,
-      customerName: customerName ?? this.customerName,
-      customerPhone: customerPhone ?? this.customerPhone,
-      customerEmail: customerEmail ?? this.customerEmail,
-      advancePayment: advancePayment ?? this.advancePayment,
-      totalAmount: totalAmount ?? this.totalAmount,
-      remainingAmount: remainingAmount ?? this.remainingAmount,
-      dateOrdered: dateOrdered ?? this.dateOrdered,
-      expectedDeliveryDate: expectedDeliveryDate ?? this.expectedDeliveryDate,
-      description: description ?? this.description,
-      product: product ?? this.product,
-      status: status ?? this.status,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
-
-  String get statusText {
-    switch (status) {
-      case OrderStatus.pending:
-        return 'Pending';
-      case OrderStatus.inProgress:
-        return 'In Progress';
-      case OrderStatus.completed:
-        return 'Completed';
-      case OrderStatus.cancelled:
-        return 'Cancelled';
-      case OrderStatus.delivered:
-        return 'Delivered';
-    }
-  }
-
-  Color get statusColor {
-    switch (status) {
-      case OrderStatus.pending:
-        return Colors.orange;
-      case OrderStatus.inProgress:
-        return Colors.blue;
-      case OrderStatus.completed:
-        return Colors.green;
-      case OrderStatus.cancelled:
-        return Colors.red;
-      case OrderStatus.delivered:
-        return Colors.purple;
-    }
-  }
-
-  bool get isOverdue {
-    return DateTime.now().isAfter(expectedDeliveryDate) &&
-        status != OrderStatus.completed &&
-        status != OrderStatus.delivered &&
-        status != OrderStatus.cancelled;
-  }
-
-  int get daysUntilDelivery {
-    return expectedDeliveryDate.difference(DateTime.now()).inDays;
-  }
-}
+import '../models/order/order_model.dart';
+import '../models/order/order_api_responses.dart';
+import '../services/order_service.dart';
 
 class OrderProvider extends ChangeNotifier {
-  List<Order> _orders = [];
-  List<Order> _filteredOrders = [];
+  List<OrderModel> _orders = [];
+  List<OrderModel> _filteredOrders = [];
   String _searchQuery = '';
+  String? _currentStatusFilter;
   bool _isLoading = false;
+  String? _errorMessage;
+  OrderStatisticsResponse? _statistics;
 
-  List<Order> get orders => _filteredOrders;
+  // Pagination support
+  int _currentPage = 1;
+  int _pageSize = 20;
+  int _totalCount = 0;
+
+  // Sorting support
+  String _sortBy = 'dateOrdered';
+  bool _sortAscending = false;
+
+  // Getters
+  List<OrderModel> get orders => _filteredOrders;
+  List<OrderModel> get allOrders => _orders;
   String get searchQuery => _searchQuery;
+  String? get currentStatusFilter => _currentStatusFilter;
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  OrderStatisticsResponse? get statistics => _statistics;
+
+  // Pagination getters
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  int get totalCount => _totalCount;
+  int get totalPages => (_totalCount / _pageSize).ceil();
+
+  // Sorting getters
+  String get sortBy => _sortBy;
+  bool get sortAscending => _sortAscending;
+
+  // Pagination info object for the table
+  PaginationInfo? get paginationInfo {
+    if (_totalCount == 0) return null;
+    return PaginationInfo(
+      currentPage: _currentPage,
+      pageSize: _pageSize,
+      totalCount: _totalCount,
+      totalPages: totalPages,
+      hasNext: _currentPage < totalPages,
+      hasPrevious: _currentPage > 1,
+    );
+  }
+
+  // Computed properties
+  Map<String, int> get orderStats {
+    final total = _orders.length;
+    final pending = _orders.where((order) => order.status == OrderStatus.PENDING).length;
+    final inProgress = _orders.where((order) => order.status == OrderStatus.IN_PRODUCTION || order.status == OrderStatus.CONFIRMED).length;
+    final completed = _orders.where((order) => order.status == OrderStatus.DELIVERED || order.status == OrderStatus.READY).length;
+    final cancelled = _orders.where((order) => order.status == OrderStatus.CANCELLED).length;
+
+    return {'total': total, 'pending': pending, 'inProgress': inProgress, 'completed': completed, 'cancelled': cancelled};
+  }
 
   OrderProvider() {
-    _initializeOrders();
+    // Load cached data first, then refresh from API
+    _initializeFromCache();
+    _loadOrders();
+    _loadStatistics();
   }
 
-  void _initializeOrders() {
-    final now = DateTime.now();
-    _orders = [
-      Order(
-        id: 'ORD001',
-        customerId: 'CUS001',
-        customerName: 'Aisha Khan',
-        customerPhone: '+923001234567',
-        customerEmail: 'aisha.khan@email.com',
-        advancePayment: 30000.0,
-        totalAmount: 85000.0,
-        remainingAmount: 55000.0,
-        dateOrdered: now.subtract(const Duration(days: 5)),
-        expectedDeliveryDate: now.add(const Duration(days: 15)),
-        description: 'Custom bridal dress with heavy embroidery work',
-        product: 'Bridal Dress - Red & Gold',
-        status: OrderStatus.inProgress,
-        createdAt: now.subtract(const Duration(days: 5)),
-      ),
-      Order(
-        id: 'ORD002',
-        customerId: 'CUS002',
-        customerName: 'Fatima Ali',
-        customerPhone: '+923009876543',
-        customerEmail: 'fatima.ali@email.com',
-        advancePayment: 20000.0,
-        totalAmount: 45000.0,
-        remainingAmount: 25000.0,
-        dateOrdered: now.subtract(const Duration(days: 8)),
-        expectedDeliveryDate: now.add(const Duration(days: 7)),
-        description: 'Party wear lehenga with mirror work',
-        product: 'Party Lehenga - Blue',
-        status: OrderStatus.inProgress,
-        createdAt: now.subtract(const Duration(days: 8)),
-      ),
-      Order(
-        id: 'ORD003',
-        customerId: 'CUS003',
-        customerName: 'Sarah Ahmed',
-        customerPhone: '+923005555555',
-        customerEmail: 'sarah.ahmed@email.com',
-        advancePayment: 25000.0,
-        totalAmount: 25000.0,
-        remainingAmount: 0.0,
-        dateOrdered: now.subtract(const Duration(days: 20)),
-        expectedDeliveryDate: now.subtract(const Duration(days: 5)),
-        description: 'Formal party dress for engagement',
-        product: 'Formal Party Dress - Pink',
-        status: OrderStatus.delivered,
-        createdAt: now.subtract(const Duration(days: 20)),
-      ),
-      Order(
-        id: 'ORD004',
-        customerId: 'CUS004',
-        customerName: 'Zara Sheikh',
-        customerPhone: '+923007777777',
-        customerEmail: 'zara.sheikh@email.com',
-        advancePayment: 50000.0,
-        totalAmount: 120000.0,
-        remainingAmount: 70000.0,
-        dateOrdered: now.subtract(const Duration(days: 2)),
-        expectedDeliveryDate: now.add(const Duration(days: 25)),
-        description: 'Complete wedding collection with accessories',
-        product: 'Wedding Collection - Maroon & Gold',
-        status: OrderStatus.pending,
-        createdAt: now.subtract(const Duration(days: 2)),
-      ),
-      Order(
-        id: 'ORD005',
-        customerId: 'CUS006',
-        customerName: 'Hina Malik',
-        customerPhone: '+923003333333',
-        customerEmail: 'hina.malik@email.com',
-        advancePayment: 40000.0,
-        totalAmount: 95000.0,
-        remainingAmount: 55000.0,
-        dateOrdered: now.subtract(const Duration(days: 12)),
-        expectedDeliveryDate: now.add(const Duration(days: 3)),
-        description: 'Corporate event dresses - bulk order',
-        product: 'Corporate Formal Wear Set',
-        status: OrderStatus.inProgress,
-        createdAt: now.subtract(const Duration(days: 12)),
-      ),
-      Order(
-        id: 'ORD006',
-        customerId: 'CUS001',
-        customerName: 'Aisha Khan',
-        customerPhone: '+923001234567',
-        customerEmail: 'aisha.khan@email.com',
-        advancePayment: 15000.0,
-        totalAmount: 35000.0,
-        remainingAmount: 20000.0,
-        dateOrdered: now.subtract(const Duration(days: 30)),
-        expectedDeliveryDate: now.subtract(const Duration(days: 10)),
-        description: 'Casual summer dress collection',
-        product: 'Summer Dress Collection',
-        status: OrderStatus.completed,
-        createdAt: now.subtract(const Duration(days: 30)),
-      ),
-      Order(
-        id: 'ORD007',
-        customerId: 'CUS002',
-        customerName: 'Fatima Ali',
-        customerPhone: '+923009876543',
-        customerEmail: 'fatima.ali@email.com',
-        advancePayment: 10000.0,
-        totalAmount: 28000.0,
-        remainingAmount: 18000.0,
-        dateOrdered: now.subtract(const Duration(days: 25)),
-        expectedDeliveryDate: now.subtract(const Duration(days: 2)),
-        description: 'Traditional embroidered shirt',
-        product: 'Embroidered Shirt - Green',
-        status: OrderStatus.completed,
-        createdAt: now.subtract(const Duration(days: 25)),
-      ),
-    ];
-
-    _filteredOrders = List.from(_orders);
-  }
-
-  void searchOrders(String query) {
-    _searchQuery = query;
-
-    if (query.isEmpty) {
-      _filteredOrders = List.from(_orders);
-    } else {
-      _filteredOrders = _orders
-          .where((order) =>
-      order.id.toLowerCase().contains(query.toLowerCase()) ||
-          order.customerName.toLowerCase().contains(query.toLowerCase()) ||
-          order.customerPhone.toLowerCase().contains(query.toLowerCase()) ||
-          order.customerEmail.toLowerCase().contains(query.toLowerCase()) ||
-          order.product.toLowerCase().contains(query.toLowerCase()) ||
-          order.description.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+  /// Initialize from cached data if available
+  Future<void> _initializeFromCache() async {
+    try {
+      final cachedOrders = await OrderService().getCachedOrders();
+      if (cachedOrders.isNotEmpty) {
+        _orders = cachedOrders;
+        _totalCount = _orders.length;
+        _applySearchAndFilters();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load cached orders: $e');
     }
-
-    notifyListeners();
   }
 
-  Future<void> addOrder({
-    required String customerId,
-    required String customerName,
-    required String customerPhone,
-    required String customerEmail,
-    required double advancePayment,
-    required double totalAmount,
-    required DateTime expectedDeliveryDate,
-    required String description,
-    required String product,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
+  /// Load orders from API
+  Future<void> _loadOrders() async {
+    _setLoading(true);
+    _clearError();
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    debugPrint('OrderProvider: Starting to load orders from API...');
 
-    final remainingAmount = totalAmount - advancePayment;
-    final newOrder = Order(
-      id: 'ORD${(_orders.length + 1).toString().padLeft(3, '0')}',
-      customerId: customerId,
-      customerName: customerName,
-      customerPhone: customerPhone,
-      customerEmail: customerEmail,
-      advancePayment: advancePayment,
-      totalAmount: totalAmount,
-      remainingAmount: remainingAmount,
-      dateOrdered: DateTime.now(),
-      expectedDeliveryDate: expectedDeliveryDate,
-      description: description,
-      product: product,
-      status: OrderStatus.pending,
-      createdAt: DateTime.now(),
-    );
-
-    _orders.add(newOrder);
-    searchOrders(_searchQuery);
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> updateOrder({
-    required String id,
-    required String customerId,
-    required String customerName,
-    required String customerPhone,
-    required String customerEmail,
-    required double advancePayment,
-    required double totalAmount,
-    required DateTime expectedDeliveryDate,
-    required String description,
-    required String product,
-    OrderStatus? status,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final index = _orders.indexWhere((order) => order.id == id);
-    if (index != -1) {
-      final remainingAmount = totalAmount - advancePayment;
-      _orders[index] = _orders[index].copyWith(
-        customerId: customerId,
-        customerName: customerName,
-        customerPhone: customerPhone,
-        customerEmail: customerEmail,
-        advancePayment: advancePayment,
-        totalAmount: totalAmount,
-        remainingAmount: remainingAmount,
-        expectedDeliveryDate: expectedDeliveryDate,
-        description: description,
-        product: product,
-        status: status,
+    try {
+      // Create parameters for API call
+      final params = OrderListParams(
+        page: _currentPage,
+        pageSize: _pageSize,
+        search: _searchQuery.isNotEmpty ? _searchQuery : null,
+        status: _currentStatusFilter,
+        sortBy: _getApiSortKey(_sortBy),
+        sortOrder: _sortAscending ? 'asc' : 'desc',
       );
-      searchOrders(_searchQuery);
-    }
 
-    _isLoading = false;
-    notifyListeners();
-  }
+      final response = await OrderService().getOrders(params: params);
 
-  Future<void> deleteOrder(String id) async {
-    _isLoading = true;
-    notifyListeners();
+      debugPrint('OrderProvider: API response received - success: ${response.success}, message: ${response.message}');
+      debugPrint('OrderProvider: Response data: ${response.data}');
 
-    await Future.delayed(const Duration(milliseconds: 500));
+      if (response.success && response.data != null) {
+        final ordersResponse = response.data;
+        if (ordersResponse != null) {
+          _orders = ordersResponse.orders;
 
-    _orders.removeWhere((order) => order.id == id);
-    searchOrders(_searchQuery);
+          // Update pagination info from API response
+          if (ordersResponse.pagination != null) {
+            _currentPage = ordersResponse.pagination.currentPage;
+            _pageSize = ordersResponse.pagination.pageSize;
+            _totalCount = ordersResponse.pagination.totalCount;
+          } else {
+            // Fallback to local pagination if API doesn't provide pagination
+            _totalCount = _orders.length;
+          }
 
-    _isLoading = false;
-    notifyListeners();
-  }
+          _filteredOrders = List.from(_orders);
+        }
 
-  Future<void> updateOrderStatus(String id, OrderStatus status) async {
-    final index = _orders.indexWhere((order) => order.id == id);
-    if (index != -1) {
-      _orders[index] = _orders[index].copyWith(status: status);
-      searchOrders(_searchQuery);
+        debugPrint('OrderProvider: Orders loaded successfully. Count: ${_orders.length}');
+        debugPrint('OrderProvider: First order: ${_orders.isNotEmpty ? _orders.first.toJson() : 'No orders'}');
+
+        _setLoading(false);
+        notifyListeners();
+      } else {
+        debugPrint('OrderProvider: API call failed - ${response.message}');
+        _setError(response.message ?? 'Failed to load orders');
+        _setLoading(false);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('OrderProvider: Exception occurred while loading orders: $e');
+      _setError('Error loading orders: ${e.toString()}');
+      _setLoading(false);
       notifyListeners();
     }
   }
 
-  Order? getOrderById(String id) {
+  /// Load order statistics from API
+  Future<void> _loadStatistics() async {
+    try {
+      final response = await OrderService().getOrderStatistics();
+
+      if (response.success && response.data != null) {
+        final statistics = response.data;
+        if (statistics != null) {
+          _statistics = statistics;
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to load order statistics: $e');
+    }
+  }
+
+  /// Refresh orders from API
+  Future<void> refreshOrders() async {
+    await _loadOrders();
+    await _loadStatistics();
+  }
+
+  /// Manually refresh data
+  Future<void> refreshData() async {
+    _setLoading(true);
+    notifyListeners();
+
+    try {
+      await _loadOrders();
+      await _loadStatistics();
+    } finally {
+      _setLoading(false);
+      notifyListeners();
+    }
+  }
+
+  /// Export order data for external use
+  Map<String, dynamic> exportOrderData() {
+    return {
+      'total_orders': _orders.length,
+      'total_amount': _orders.fold(0.0, (sum, order) => sum + order.totalAmount),
+      'pending_orders': _orders.where((order) => order.status == OrderStatus.PENDING).length,
+      'in_progress_orders': _orders.where((order) => order.status == OrderStatus.IN_PRODUCTION || order.status == OrderStatus.CONFIRMED).length,
+      'completed_orders': _orders.where((order) => order.status == OrderStatus.DELIVERED || order.status == OrderStatus.READY).length,
+      'orders': _orders.map((order) => order.toJson()).toList(),
+    };
+  }
+
+  /// Create a new order
+  Future<bool> createOrder({
+    required String customer,
+    required double advancePayment,
+    required DateTime dateOrdered,
+    required DateTime expectedDeliveryDate,
+    required String description,
+    required String status,
+  }) async {
+    _setLoading(true);
+    _clearError();
+    notifyListeners();
+
+    try {
+      final response = await OrderService().createOrder(
+        customer: customer,
+        advancePayment: advancePayment,
+        dateOrdered: dateOrdered,
+        expectedDeliveryDate: expectedDeliveryDate,
+        description: description,
+        status: status,
+      );
+
+      if (response.success && response.data != null) {
+        _orders.add(response.data!);
+        _totalCount = _orders.length;
+        _applySearchAndFilters();
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to create order');
+        _setLoading(false);
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to create order: ${e.toString()}');
+      _setLoading(false);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Search orders
+  Future<void> searchOrders(String query) async {
+    _searchQuery = query;
+    _currentPage = 1; // Reset to first page when searching
+    await _loadOrders(); // Reload from API with search query
+  }
+
+  /// Filter orders by status
+  Future<void> filterOrdersByStatus(String? status) async {
+    _currentStatusFilter = status;
+    _currentPage = 1; // Reset to first page when filtering
+    await _loadOrders(); // Reload from API with status filter
+  }
+
+  /// Update an existing order
+  Future<bool> updateOrder({
+    required String id,
+    required double advancePayment,
+    DateTime? expectedDeliveryDate,
+    required String description,
+    required String status,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().updateOrder(
+        id: id,
+        advancePayment: advancePayment,
+        expectedDeliveryDate: expectedDeliveryDate,
+        description: description,
+        status: status,
+      );
+
+      if (response.success && response.data != null) {
+        final index = _orders.indexWhere((order) => order.id == id);
+        if (index != -1) {
+          _orders[index] = response.data!;
+          _applySearchAndFilters();
+        }
+
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to update order');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Delete an order
+  Future<bool> deleteOrder(String id) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().deleteOrder(id);
+
+      if (response.success) {
+        _orders.removeWhere((order) => order.id == id);
+        _totalCount = _orders.length;
+        _applySearchAndFilters();
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to delete order');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Soft delete an order
+  Future<bool> softDeleteOrder(String id) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().softDeleteOrder(id);
+
+      if (response.success) {
+        final index = _orders.indexWhere((order) => order.id == id);
+        if (index != -1) {
+          _orders[index] = _orders[index].copyWith(isActive: false);
+          _applySearchAndFilters();
+        }
+
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to soft delete order');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Restore a soft-deleted order
+  Future<bool> restoreOrder(String id) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().restoreOrder(id);
+
+      if (response.success) {
+        final index = _orders.indexWhere((order) => order.id == id);
+        if (index != -1) {
+          _orders[index] = _orders[index].copyWith(isActive: true);
+          _applySearchAndFilters();
+        }
+
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to restore order');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Update order status
+  Future<bool> updateOrderStatus(String orderId, String status, {String? notes}) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().updateOrderStatus(orderId, status, notes: notes);
+
+      if (response.success) {
+        final index = _orders.indexWhere((order) => order.id == orderId);
+        if (index != -1) {
+          final currentOrder = _orders[index];
+          OrderStatus newStatus;
+
+          switch (status.toLowerCase()) {
+            case 'pending':
+              newStatus = OrderStatus.PENDING;
+              break;
+            case 'confirmed':
+              newStatus = OrderStatus.CONFIRMED;
+              break;
+            case 'in_production':
+              newStatus = OrderStatus.IN_PRODUCTION;
+              break;
+            case 'ready':
+              newStatus = OrderStatus.READY;
+              break;
+            case 'delivered':
+              newStatus = OrderStatus.DELIVERED;
+              break;
+            case 'cancelled':
+              newStatus = OrderStatus.CANCELLED;
+              break;
+            default:
+              newStatus = OrderStatus.PENDING;
+          }
+
+          _orders[index] = currentOrder.copyWith(status: newStatus);
+          _applySearchAndFilters();
+        }
+
+        _setLoading(false);
+        notifyListeners();
+
+        // Refresh statistics
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to update order status');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Add payment to an order
+  Future<bool> addOrderPayment(String orderId, double amount) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await OrderService().addOrderPayment(orderId, amount);
+
+      if (response.success) {
+        // Refresh orders to get updated payment information
+        await _loadOrders();
+        await _loadStatistics();
+
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to add payment');
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: ${e.toString()}');
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  /// Get valid next statuses for an order
+  List<OrderStatus> getValidNextStatuses(OrderModel order) {
+    switch (order.status) {
+      case OrderStatus.PENDING:
+        return [OrderStatus.CONFIRMED, OrderStatus.CANCELLED];
+      case OrderStatus.CONFIRMED:
+        return [OrderStatus.IN_PRODUCTION, OrderStatus.CANCELLED];
+      case OrderStatus.IN_PRODUCTION:
+        return [OrderStatus.READY, OrderStatus.CANCELLED];
+      case OrderStatus.READY:
+        return [OrderStatus.DELIVERED, OrderStatus.CANCELLED];
+      case OrderStatus.DELIVERED:
+        return []; // Terminal state
+      case OrderStatus.CANCELLED:
+        return []; // Terminal state
+    }
+  }
+
+  /// Check if a status transition is valid
+  bool isValidStatusTransition(OrderModel order, OrderStatus newStatus) {
+    final validNextStatuses = getValidNextStatuses(order);
+    return validNextStatuses.contains(newStatus) || newStatus == order.status;
+  }
+
+  // Pagination methods
+  Future<void> loadNextPage() async {
+    if (_currentPage < totalPages) {
+      _currentPage++;
+      await _loadOrders(); // Reload from API with new page
+    }
+  }
+
+  Future<void> loadPreviousPage() async {
+    if (_currentPage > 1) {
+      _currentPage--;
+      await _loadOrders(); // Reload from API with new page
+    }
+  }
+
+  Future<void> goToPage(int page) async {
+    if (page >= 1 && page <= totalPages) {
+      _currentPage = page;
+      await _loadOrders(); // Reload from API with new page
+    }
+  }
+
+  // Sorting methods
+  Future<void> setSortBy(String sortKey) async {
+    if (_sortBy == sortKey) {
+      // Toggle sort direction if same column
+      _sortAscending = !_sortAscending;
+    } else {
+      // New column, default to ascending
+      _sortBy = sortKey;
+      _sortAscending = true;
+    }
+
+    _currentPage = 1; // Reset to first page when sorting
+    await _loadOrders(); // Reload from API with new sorting
+  }
+
+  // Helper methods
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+  }
+
+  void _setError(String error) {
+    _errorMessage = error;
+  }
+
+  void _clearError() {
+    _errorMessage = null;
+  }
+
+  /// Apply search and filters (for local operations only)
+  void _applySearchAndFilters({String? status}) {
+    // This method is now only used for local operations
+    // Most filtering is now handled by the API
+    _filteredOrders = List.from(_orders);
+  }
+
+  /// Get order by ID
+  OrderModel? getOrderById(String id) {
     try {
       return _orders.firstWhere((order) => order.id == id);
     } catch (e) {
@@ -377,242 +577,52 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  List<Order> getOrdersByCustomerId(String customerId) {
+  /// Get orders by customer ID
+  List<OrderModel> getOrdersByCustomer(String customerId) {
     return _orders.where((order) => order.customerId == customerId).toList();
   }
 
-  Map<String, dynamic> get orderStats {
-    final totalOrders = _orders.length;
-    final pendingOrders = _orders.where((order) => order.status == OrderStatus.pending).length;
-    final inProgressOrders = _orders.where((order) => order.status == OrderStatus.inProgress).length;
-    final completedOrders = _orders.where((order) =>
-    order.status == OrderStatus.completed || order.status == OrderStatus.delivered).length;
-    final cancelledOrders = _orders.where((order) => order.status == OrderStatus.cancelled).length;
-
-    final totalRevenue = _orders
-        .where((order) => order.status == OrderStatus.completed || order.status == OrderStatus.delivered)
-        .fold<double>(0, (sum, order) => sum + order.totalAmount);
-
-    final totalAdvances = _orders.fold<double>(0, (sum, order) => sum + order.advancePayment);
-    final totalRemaining = _orders.fold<double>(0, (sum, order) => sum + order.remainingAmount);
-
-    final overdueOrders = _orders.where((order) => order.isOverdue).length;
-
-    return {
-      'total': totalOrders,
-      'pending': pendingOrders,
-      'inProgress': inProgressOrders,
-      'completed': completedOrders,
-      'cancelled': cancelledOrders,
-      'totalRevenue': totalRevenue.toStringAsFixed(0),
-      'totalAdvances': totalAdvances.toStringAsFixed(0),
-      'totalRemaining': totalRemaining.toStringAsFixed(0),
-      'overdue': overdueOrders,
-    };
+  /// Get orders by status
+  List<OrderModel> getOrdersByStatus(OrderStatus status) {
+    return _orders.where((order) => order.status == status).toList();
   }
 
-  List<Order> get pendingOrders => _orders.where((order) => order.status == OrderStatus.pending).toList();
-  List<Order> get inProgressOrders => _orders.where((order) => order.status == OrderStatus.inProgress).toList();
-  List<Order> get completedOrders => _orders.where((order) =>
-  order.status == OrderStatus.completed || order.status == OrderStatus.delivered).toList();
-  List<Order> get overdueOrders => _orders.where((order) => order.isOverdue).toList();
-
-  List<Order> get recentOrders {
-    final recent = List<Order>.from(_orders);
-    recent.sort((a, b) => b.dateOrdered.compareTo(a.dateOrdered));
-    return recent.take(10).toList();
+  /// Get overdue orders
+  List<OrderModel> getOverdueOrders() {
+    return _orders.where((order) => order.isOverdue).toList();
   }
 
-  List<Order> get upcomingDeliveries {
-    final upcoming = _orders
-        .where((order) =>
-    order.status != OrderStatus.completed &&
-        order.status != OrderStatus.delivered &&
-        order.status != OrderStatus.cancelled)
-        .toList();
-    upcoming.sort((a, b) => a.expectedDeliveryDate.compareTo(b.expectedDeliveryDate));
-    return upcoming.take(5).toList();
+  /// Get pending orders
+  List<OrderModel> getPendingOrders() {
+    return _orders.where((order) => order.status == OrderStatus.PENDING).toList();
   }
 
-  Map<String, List<Order>> get ordersByStatus => {
-    'pending': pendingOrders,
-    'inProgress': inProgressOrders,
-    'completed': completedOrders,
-    'overdue': overdueOrders,
-  };
-
-  Map<String, dynamic> get orderAnalytics {
-    final averageOrderValue = _orders.isNotEmpty
-        ? _orders.fold<double>(0, (sum, order) => sum + order.totalAmount) / _orders.length
-        : 0.0;
-
-    final averageAdvancePercentage = _orders.isNotEmpty
-        ? _orders.fold<double>(0, (sum, order) => sum + (order.advancePayment / order.totalAmount * 100)) / _orders.length
-        : 0.0;
-
-    final completionRate = _orders.isNotEmpty
-        ? (completedOrders.length / _orders.length * 100)
-        : 0.0;
-
-    final overdueRate = _orders.isNotEmpty
-        ? (overdueOrders.length / _orders.length * 100)
-        : 0.0;
-
-    return {
-      'averageOrderValue': averageOrderValue,
-      'averageAdvancePercentage': averageAdvancePercentage,
-      'completionRate': completionRate,
-      'overdueRate': overdueRate,
-      'totalOrderValue': _orders.fold<double>(0, (sum, order) => sum + order.totalAmount),
-      'pendingOrderValue': pendingOrders.fold<double>(0, (sum, order) => sum + order.totalAmount),
-    };
+  /// Get recent orders (last 7 days)
+  List<OrderModel> getRecentOrders() {
+    final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+    return _orders.where((order) => order.dateOrdered.isAfter(weekAgo)).toList();
   }
 
-  List<Map<String, dynamic>> get monthlyOrderStats {
-    final Map<int, List<Order>> ordersByMonth = {};
+  /// Clear search and filters
+  Future<void> clearFilters() async {
+    _searchQuery = '';
+    _currentStatusFilter = null;
+    _currentPage = 1;
+    await _loadOrders(); // Reload from API with cleared filters
+  }
 
-    for (final order in _orders) {
-      final month = order.dateOrdered.month;
-      ordersByMonth[month] = ordersByMonth[month] ?? [];
-      ordersByMonth[month]!.add(order);
+  /// Convert internal sort key to API sort key
+  String _getApiSortKey(String internalKey) {
+    switch (internalKey) {
+      case 'id':
+        return 'id';
+      case 'total_amount':
+        return 'total_amount';
+      case 'expected_delivery_date':
+        return 'expected_delivery_date';
+      case 'dateOrdered':
+      default:
+        return 'date_ordered';
     }
-
-    return ordersByMonth.entries.map((entry) {
-      final monthOrders = entry.value;
-      return {
-        'month': entry.key,
-        'count': monthOrders.length,
-        'revenue': monthOrders.fold<double>(0, (sum, order) => sum + order.totalAmount),
-        'completed': monthOrders.where((order) =>
-        order.status == OrderStatus.completed || order.status == OrderStatus.delivered).length,
-      };
-    }).toList();
-  }
-
-  List<Order> filterOrders({
-    OrderStatus? status,
-    DateTime? fromDate,
-    DateTime? toDate,
-    double? minAmount,
-    double? maxAmount,
-    String? customerId,
-    bool? isOverdue,
-  }) {
-    return _orders.where((order) {
-      if (status != null && order.status != status) return false;
-      if (fromDate != null && order.dateOrdered.isBefore(fromDate)) return false;
-      if (toDate != null && order.dateOrdered.isAfter(toDate)) return false;
-      if (minAmount != null && order.totalAmount < minAmount) return false;
-      if (maxAmount != null && order.totalAmount > maxAmount) return false;
-      if (customerId != null && order.customerId != customerId) return false;
-      if (isOverdue != null && order.isOverdue != isOverdue) return false;
-      return true;
-    }).toList();
-  }
-
-  List<Map<String, dynamic>> exportOrderData() {
-    return _orders.map((order) => {
-      'Order ID': order.id,
-      'Customer Name': order.customerName,
-      'Customer Phone': order.customerPhone,
-      'Customer Email': order.customerEmail,
-      'Product': order.product,
-      'Total Amount': order.totalAmount.toStringAsFixed(2),
-      'Advance Payment': order.advancePayment.toStringAsFixed(2),
-      'Remaining Amount': order.remainingAmount.toStringAsFixed(2),
-      'Date Ordered': order.dateOrdered.toString().split(' ')[0],
-      'Expected Delivery': order.expectedDeliveryDate.toString().split(' ')[0],
-      'Status': order.statusText,
-      'Description': order.description,
-      'Days Until Delivery': order.daysUntilDelivery.toString(),
-      'Is Overdue': order.isOverdue ? 'Yes' : 'No',
-    }).toList();
-  }
-
-  double getTotalRevenueByCustomer(String customerId) {
-    return _orders
-        .where((order) => order.customerId == customerId)
-        .fold<double>(0, (sum, order) => sum + order.totalAmount);
-  }
-
-  int getOrderCountByCustomer(String customerId) {
-    return _orders.where((order) => order.customerId == customerId).length;
-  }
-
-  List<Order> getTopOrdersByValue({int limit = 5}) {
-    final sortedOrders = List<Order>.from(_orders);
-    sortedOrders.sort((a, b) => b.totalAmount.compareTo(a.totalAmount));
-    return sortedOrders.take(limit).toList();
-  }
-
-  Future<void> addPayment(String orderId, double amount) async {
-    final index = _orders.indexWhere((order) => order.id == orderId);
-    if (index != -1) {
-      final order = _orders[index];
-      final newAdvancePayment = order.advancePayment + amount;
-      final newRemainingAmount = order.totalAmount - newAdvancePayment;
-
-      _orders[index] = order.copyWith(
-        advancePayment: newAdvancePayment,
-        remainingAmount: newRemainingAmount,
-      );
-
-      // If fully paid, mark as completed
-      if (newRemainingAmount <= 0) {
-        _orders[index] = _orders[index].copyWith(status: OrderStatus.completed);
-      }
-
-      searchOrders(_searchQuery);
-      notifyListeners();
-    }
-  }
-
-  // Get orders that need attention (overdue or due soon)
-  List<Order> get ordersNeedingAttention {
-    final now = DateTime.now();
-    return _orders.where((order) {
-      if (order.isOverdue) return true;
-      if (order.status == OrderStatus.pending || order.status == OrderStatus.inProgress) {
-        final daysUntilDelivery = order.expectedDeliveryDate.difference(now).inDays;
-        return daysUntilDelivery <= 3; // Due within 3 days
-      }
-      return false;
-    }).toList();
-  }
-
-  // Get financial summary
-  Map<String, dynamic> get financialSummary {
-    final totalOrderValue = _orders.fold<double>(0, (sum, order) => sum + order.totalAmount);
-    final totalAdvancesReceived = _orders.fold<double>(0, (sum, order) => sum + order.advancePayment);
-    final totalRemainingDue = _orders.fold<double>(0, (sum, order) => sum + order.remainingAmount);
-    final completedOrderValue = completedOrders.fold<double>(0, (sum, order) => sum + order.totalAmount);
-
-    return {
-      'totalOrderValue': totalOrderValue,
-      'totalAdvancesReceived': totalAdvancesReceived,
-      'totalRemainingDue': totalRemainingDue,
-      'completedOrderValue': completedOrderValue,
-      'cashFlowPercentage': totalOrderValue > 0 ? (totalAdvancesReceived / totalOrderValue * 100) : 0,
-    };
-  }
-
-  // Get customer order summary
-  Map<String, dynamic> getCustomerOrderSummary(String customerId) {
-    final customerOrders = getOrdersByCustomerId(customerId);
-    final totalOrders = customerOrders.length;
-    final totalValue = customerOrders.fold<double>(0, (sum, order) => sum + order.totalAmount);
-    final totalPaid = customerOrders.fold<double>(0, (sum, order) => sum + order.advancePayment);
-    final totalRemaining = customerOrders.fold<double>(0, (sum, order) => sum + order.remainingAmount);
-
-    return {
-      'totalOrders': totalOrders,
-      'totalValue': totalValue,
-      'totalPaid': totalPaid,
-      'totalRemaining': totalRemaining,
-      'averageOrderValue': totalOrders > 0 ? totalValue / totalOrders : 0,
-      'lastOrderDate': customerOrders.isNotEmpty
-          ? customerOrders.map((o) => o.dateOrdered).reduce((a, b) => a.isAfter(b) ? a : b)
-          : null,
-    };
   }
 }
