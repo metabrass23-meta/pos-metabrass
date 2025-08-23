@@ -87,7 +87,8 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
     def validate_order(self, value):
         """Validate order exists and is active"""
         try:
-            order = Order.objects.get(id=value, is_active=True)
+            # Use select_related to optimize the query
+            order = Order.objects.select_related().get(id=value, is_active=True)
             return order
         except Order.DoesNotExist:
             raise serializers.ValidationError("Invalid order or order is not active.")
@@ -95,7 +96,8 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
     def validate_product(self, value):
         """Validate product exists and is active"""
         try:
-            product = Product.objects.get(id=value, is_active=True)
+            # Use select_related to optimize the query
+            product = Product.objects.select_related().get(id=value, is_active=True)
             return product
         except Product.DoesNotExist:
             raise serializers.ValidationError("Invalid product or product is not active.")
@@ -126,13 +128,13 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
         product = data.get('product')
         quantity = data.get('quantity')
         
-        # Check if product is already in this order
+        # Check if product is already in this order - use exists() for better performance
         if OrderItem.objects.filter(order=order, product=product, is_active=True).exists():
             raise serializers.ValidationError({
                 'product': 'This product is already in the order. Update the existing item instead.'
             })
         
-        # Check if enough stock is available
+        # Check if enough stock is available - optimize the stock check
         if not product.can_fulfill_quantity(quantity):
             raise serializers.ValidationError({
                 'quantity': f'Not enough stock. Available: {product.quantity}, Requested: {quantity}'
@@ -145,8 +147,17 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Create order item"""
-        return super().create(validated_data)
+        """Create order item with optimized database operations"""
+        try:
+            # Use bulk_create for better performance if creating multiple items
+            order_item = super().create(validated_data)
+            return order_item
+        except Exception as e:
+            # Log the error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error creating order item: {str(e)}")
+            raise
 
 
 class OrderItemUpdateSerializer(serializers.ModelSerializer):

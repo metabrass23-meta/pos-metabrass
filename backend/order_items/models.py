@@ -148,6 +148,8 @@ class OrderItem(models.Model):
             models.Index(fields=['product']),
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['order', 'is_active']),  # Composite index for common query pattern
+            models.Index(fields=['product', 'is_active']),  # Composite index for product queries
         ]
         unique_together = [('order', 'product')]  # Prevent duplicate products in same order
 
