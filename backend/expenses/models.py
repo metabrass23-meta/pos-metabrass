@@ -136,9 +136,10 @@ class Expense(models.Model):
         """Custom validation"""
         from django.core.exceptions import ValidationError
         
-        # Date cannot be in the future
-        if self.date > timezone.now().date():
-            raise ValidationError({'date': 'Date cannot be in the future.'})
+        # Date cannot be more than 1 year in the future (allow planned expenses)
+        max_future_date = timezone.now().date() + timezone.timedelta(days=365)
+        if self.date > max_future_date:
+            raise ValidationError({'date': 'Date cannot be more than 1 year in the future.'})
         
         # Amount must be positive
         if self.amount <= 0:
