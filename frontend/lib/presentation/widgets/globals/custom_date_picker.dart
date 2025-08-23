@@ -42,9 +42,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('large'))),
       clipBehavior: Clip.antiAlias,
       child: Container(
         constraints: BoxConstraints(
@@ -62,11 +60,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(),
-            Flexible(
-              child: SingleChildScrollView(
-                child: _buildContent(),
-              ),
-            ),
+            Flexible(child: SingleChildScrollView(child: _buildContent())),
             _buildActions(),
           ],
         ),
@@ -78,34 +72,19 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
-      ),
+      decoration: const BoxDecoration(gradient: LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon])),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.date_range_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.date_range_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
           ),
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
               widget.title,
-              style: GoogleFonts.playfairDisplay(
-                fontSize: context.headerFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
         ],
@@ -132,7 +111,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                 initialSelectedDate: _tempSelectedDate,
                 initialDisplayDate: _tempSelectedDate,
                 minDate: widget.minDate ?? DateTime(2000),
-                maxDate: widget.maxDate ?? DateTime(2101),
+                maxDate: widget.maxDate ?? DateTime.now().add(const Duration(days: 365)), // Default: allow up to 1 year in future
                 selectionMode: DateRangePickerSelectionMode.single,
                 onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                   if (args.value is DateTime) {
@@ -142,51 +121,30 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                   }
                 },
                 monthCellStyle: DateRangePickerMonthCellStyle(
-                  todayTextStyle: GoogleFonts.inter(
-                    color: AppTheme.primaryMaroon,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textStyle: GoogleFonts.inter(
-                    color: AppTheme.charcoalGray,
-                  ),
-                  leadingDatesTextStyle: GoogleFonts.inter(
-                    color: Colors.grey.shade400,
-                  ),
-                  trailingDatesTextStyle: GoogleFonts.inter(
-                    color: Colors.grey.shade400,
-                  ),
+                  todayTextStyle: GoogleFonts.inter(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
+                  textStyle: GoogleFonts.inter(color: AppTheme.charcoalGray),
+                  leadingDatesTextStyle: GoogleFonts.inter(color: Colors.grey.shade400),
+                  trailingDatesTextStyle: GoogleFonts.inter(color: Colors.grey.shade400),
                 ),
                 selectionColor: AppTheme.primaryMaroon,
                 todayHighlightColor: AppTheme.primaryMaroon,
                 headerStyle: DateRangePickerHeaderStyle(
                   textAlign: TextAlign.center,
-                  textStyle: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  textStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 monthViewSettings: const DateRangePickerMonthViewSettings(
                   firstDayOfWeek: 1, // Monday
                   showTrailingAndLeadingDates: true,
                 ),
                 yearCellStyle: DateRangePickerYearCellStyle(
-                  textStyle: GoogleFonts.inter(
-                    color: AppTheme.charcoalGray,
-                  ),
-                  todayTextStyle: GoogleFonts.inter(
-                    color: AppTheme.primaryMaroon,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  textStyle: GoogleFonts.inter(color: AppTheme.charcoalGray),
+                  todayTextStyle: GoogleFonts.inter(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
           ),
 
-          if (widget.showTimeInline) ...[
-            SizedBox(height: context.cardPadding),
-            _buildTimeSection(),
-          ],
+          if (widget.showTimeInline) ...[SizedBox(height: context.cardPadding), _buildTimeSection()],
         ],
       ),
     );
@@ -206,19 +164,11 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.access_time_outlined,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.access_time_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Select Time',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -255,15 +205,10 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                           physics: const FixedExtentScrollPhysics(),
                           onSelectedItemChanged: (index) {
                             setState(() {
-                              _tempSelectedTime = TimeOfDay(
-                                hour: index,
-                                minute: _tempSelectedTime.minute,
-                              );
+                              _tempSelectedTime = TimeOfDay(hour: index, minute: _tempSelectedTime.minute);
                             });
                           },
-                          controller: FixedExtentScrollController(
-                            initialItem: _tempSelectedTime.hour,
-                          ),
+                          controller: FixedExtentScrollController(initialItem: _tempSelectedTime.hour),
                           childDelegate: ListWheelChildBuilderDelegate(
                             builder: (context, index) {
                               if (index < 0 || index >= 24) return null;
@@ -271,9 +216,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                               return Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? AppTheme.primaryMaroon.withOpacity(0.1)
-                                      : Colors.transparent,
+                                  color: isSelected ? AppTheme.primaryMaroon.withOpacity(0.1) : Colors.transparent,
                                   borderRadius: BorderRadius.circular(context.borderRadius()),
                                 ),
                                 child: Text(
@@ -281,9 +224,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                                   style: GoogleFonts.inter(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                                    color: isSelected
-                                        ? AppTheme.primaryMaroon
-                                        : AppTheme.charcoalGray,
+                                    color: isSelected ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
                                   ),
                                 ),
                               );
@@ -297,11 +238,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                 ),
 
                 // Separator
-                Container(
-                  width: 1,
-                  height: 80,
-                  color: Colors.grey.shade300,
-                ),
+                Container(width: 1, height: 80, color: Colors.grey.shade300),
 
                 // Minute selection
                 Expanded(
@@ -329,9 +266,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                               );
                             });
                           },
-                          controller: FixedExtentScrollController(
-                            initialItem: (_tempSelectedTime.minute / 5).round(),
-                          ),
+                          controller: FixedExtentScrollController(initialItem: (_tempSelectedTime.minute / 5).round()),
                           childDelegate: ListWheelChildBuilderDelegate(
                             builder: (context, index) {
                               if (index < 0 || index >= 12) return null; // 0-55 minutes (5-minute intervals)
@@ -340,9 +275,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                               return Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? AppTheme.primaryMaroon.withOpacity(0.1)
-                                      : Colors.transparent,
+                                  color: isSelected ? AppTheme.primaryMaroon.withOpacity(0.1) : Colors.transparent,
                                   borderRadius: BorderRadius.circular(context.borderRadius()),
                                 ),
                                 child: Text(
@@ -350,9 +283,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                                   style: GoogleFonts.inter(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                                    color: isSelected
-                                        ? AppTheme.primaryMaroon
-                                        : AppTheme.charcoalGray,
+                                    color: isSelected ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
                                   ),
                                 ),
                               );
@@ -376,11 +307,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
             children: [
               Text(
                 'Selected: ${_tempSelectedTime.format(context)}',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -394,9 +321,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -404,18 +329,11 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding,
-                vertical: context.smallPadding,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
             ),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w600,
-                fontSize: context.bodyFontSize,
-              ),
+              style: GoogleFonts.inter(color: Colors.grey[600], fontWeight: FontWeight.w600, fontSize: context.bodyFontSize),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -427,20 +345,12 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryMaroon,
               foregroundColor: AppTheme.pureWhite,
-              padding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding,
-                vertical: context.smallPadding,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
             ),
             child: Text(
               'Confirm',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                fontSize: context.bodyFontSize,
-              ),
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: context.bodyFontSize),
             ),
           ),
         ],
