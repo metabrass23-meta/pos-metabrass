@@ -26,10 +26,7 @@ class ExpensesProvider extends ChangeNotifier {
   DateTime? _dateTo;
 
   // Available persons for withdrawal
-  final List<String> _availablePersons = [
-    'Mr. Sheikh Parveez Maqbool',
-    'Mr Sheikh Zain Maqbool',
-  ];
+  final List<String> _availablePersons = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
 
   // Getters
   List<Expense> get expenses => _filteredRecords;
@@ -91,7 +88,7 @@ class ExpensesProvider extends ChangeNotifier {
         _paginationInfo = response.data!.pagination;
         _clearError();
       } else {
-        _setError(response.message);
+        _setError(response.message ?? 'Failed to load expense records');
         // Keep existing data on error
       }
     } catch (e) {
@@ -109,10 +106,15 @@ class ExpensesProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         _statistics = response.data!;
+        _clearError();
         notifyListeners();
+      } else {
+        debugPrint('Failed to load statistics: ${response.message}');
+        // Don't set error for statistics, just log it
       }
     } catch (e) {
       debugPrint('Error loading statistics: $e');
+      // Don't set error for statistics, just log it
     }
   }
 
@@ -150,7 +152,7 @@ class ExpensesProvider extends ChangeNotifier {
         _clearError();
         return true;
       } else {
-        _setError(response.message);
+        _setError(response.message ?? 'Failed to add expense record');
         return false;
       }
     } catch (e) {
@@ -197,7 +199,7 @@ class ExpensesProvider extends ChangeNotifier {
         _clearError();
         return true;
       } else {
-        _setError(response.message);
+        _setError(response.message ?? 'Failed to update expense record');
         return false;
       }
     } catch (e) {
@@ -222,7 +224,7 @@ class ExpensesProvider extends ChangeNotifier {
         _clearError();
         return true;
       } else {
-        _setError(response.message);
+        _setError(response.message ?? 'Failed to delete expense record');
         return false;
       }
     } catch (e) {
@@ -389,10 +391,7 @@ class ExpensesProvider extends ChangeNotifier {
   /// Get monthly expense trend
   Map<String, double> getMonthlyExpenseTrend(int year) {
     final monthlyTotals = <String, double>{};
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     for (int i = 1; i <= 12; i++) {
       final monthExpenses = _expenseRecords.where((expense) {

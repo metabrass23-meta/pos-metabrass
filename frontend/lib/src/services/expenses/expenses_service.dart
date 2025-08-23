@@ -300,7 +300,28 @@ class ExpenseService {
       DebugHelper.printApiResponse('GET Expense Statistics', response.data);
 
       if (response.statusCode == 200) {
-        return ApiResponse<ExpenseStatisticsResponse>.fromJson(response.data, (data) => ExpenseStatisticsResponse.fromJson(data as Map<String, dynamic>));
+        final responseData = response.data as Map<String, dynamic>;
+
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final statisticsData = responseData['data'] as Map<String, dynamic>;
+
+          final statisticsResponse = ExpenseStatisticsResponse.fromJson(statisticsData);
+
+          // Cache statistics if successful
+          await _cacheExpenseStatistics(statisticsResponse);
+
+          return ApiResponse<ExpenseStatisticsResponse>(
+            success: true,
+            message: responseData['message'] as String? ?? 'Expense statistics retrieved successfully',
+            data: statisticsResponse,
+          );
+        } else {
+          return ApiResponse<ExpenseStatisticsResponse>(
+            success: false,
+            message: responseData['message'] as String? ?? 'Failed to get expense statistics',
+            errors: responseData['errors'] as Map<String, dynamic>?,
+          );
+        }
       } else {
         return ApiResponse<ExpenseStatisticsResponse>(
           success: false,
@@ -311,9 +332,18 @@ class ExpenseService {
     } on DioException catch (e) {
       debugPrint('Get expense statistics DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
+
+      // Try to return cached statistics if network error
+      if (apiError.type == 'network_error') {
+        final cachedStatistics = await _getCachedExpenseStatistics();
+        if (cachedStatistics != null) {
+          return ApiResponse<ExpenseStatisticsResponse>(success: true, message: 'Showing cached statistics', data: cachedStatistics);
+        }
+      }
+
       return ApiResponse<ExpenseStatisticsResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
-      debugPrint('Get expense statistics error: ${e.toString()}');
+      DebugHelper.printError('Get expense statistics', e);
       return ApiResponse<ExpenseStatisticsResponse>(success: false, message: 'An unexpected error occurred while getting expense statistics');
     }
   }
@@ -330,10 +360,7 @@ class ExpenseService {
         queryParams['date_to'] = dateTo.toIso8601String().split('T')[0];
       }
 
-      final response = await _apiClient.get(
-        ApiConfig.expensesByAuthority(authority),
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      );
+      final response = await _apiClient.get(ApiConfig.expensesByAuthority(authority), queryParameters: queryParams.isNotEmpty ? queryParams : null);
 
       DebugHelper.printApiResponse('GET Expenses by Authority', response.data);
 
@@ -396,10 +423,7 @@ class ExpenseService {
         queryParams['date_to'] = dateTo.toIso8601String().split('T')[0];
       }
 
-      final response = await _apiClient.get(
-        ApiConfig.expensesByCategory(category),
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      );
+      final response = await _apiClient.get(ApiConfig.expensesByCategory(category), queryParameters: queryParams.isNotEmpty ? queryParams : null);
 
       DebugHelper.printApiResponse('GET Expenses by Category', response.data);
 
@@ -659,6 +683,28 @@ class ExpenseService {
     } catch (e) {
       debugPrint('Error removing expense from cache: $e');
     }
+  }
+
+  /// Cache expense statistics
+  Future<void> _cacheExpenseStatistics(ExpenseStatisticsResponse statistics) async {
+    try {
+      await _storageService.saveData(ApiConfig.expenseStatsCacheKey, statistics.toJson());
+    } catch (e) {
+      debugPrint('Failed to cache expense statistics: $e');
+    }
+  }
+
+  /// Get cached expense statistics
+  Future<ExpenseStatisticsResponse?> _getCachedExpenseStatistics() async {
+    try {
+      final cachedData = await _storageService.getData(ApiConfig.expenseStatsCacheKey);
+      if (cachedData != null) {
+        return ExpenseStatisticsResponse.fromJson(cachedData);
+      }
+    } catch (e) {
+      debugPrint('Failed to get cached expense statistics: $e');
+    }
+    return null;
   }
 
   /// Refresh expense records (for pull-to-refresh functionality)
