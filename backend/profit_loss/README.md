@@ -6,12 +6,19 @@ The Profit and Loss (P&L) system is a comprehensive financial analysis tool that
 
 ## Formula
 
-**Profit = Total Sales Income − (Labor Payments + Vendor Payments + Other Expenses + Zakat)**
+**Gross Profit = Total Sales Income − Cost of Goods Sold (COGS)**
+
+**Net Profit = Gross Profit − (Labor Payments + Vendor Payments + Other Expenses + Zakat)**
+
+**Gross Profit Margin = (Gross Profit / Total Sales Income) × 100**
+
+**Net Profit Margin = (Net Profit / Total Sales Income) × 100**
 
 ## Features
 
 ### 1. Automated Calculations
 - **Sales Income**: Automatically calculated from `sales.grand_total`
+- **Cost of Goods Sold (COGS)**: Automatically calculated from `sale_items.product.cost_price × quantity`
 - **Labor Payments**: Sum of all payments to labor in the period
 - **Vendor Payments**: Sum of all payments to vendors in the period
 - **Other Expenses**: Sum of all business expenses
@@ -62,17 +69,21 @@ POST /api/v1/profit-loss/calculate/
         "start_date": "2024-01-01",
         "end_date": "2024-01-31",
         "total_sales_income": "150000.00",
+        "total_cost_of_goods_sold": "90000.00",
+        "gross_profit": "60000.00",
+        "gross_profit_margin_percentage": "40.00",
         "total_labor_payments": "25000.00",
         "total_vendor_payments": "30000.00",
         "total_expenses": "15000.00",
         "total_zakat": "5000.00",
         "total_expenses_calculated": "75000.00",
-        "net_profit": "75000.00",
-        "profit_margin_percentage": "50.00",
+        "net_profit": "-15000.00",
+        "profit_margin_percentage": "-10.00",
         "total_products_sold": 150,
         "average_order_value": "1000.00",
-        "is_profitable": true,
+        "is_profitable": false,
         "expense_breakdown": {
+            "cost_of_goods_sold": 90000.0,
             "labor_payments": 25000.0,
             "vendor_payments": 30000.0,
             "other_expenses": 15000.0,

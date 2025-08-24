@@ -38,11 +38,15 @@ The Profit and Loss (P&L) feature has been successfully implemented as a compreh
 
 ### **Profit Calculation Formula**
 ```
-Profit = Total Sales Income − (Labor Payments + Vendor Payments + Other Expenses + Zakat)
+Gross Profit = Total Sales Income − Cost of Goods Sold (COGS)
+Net Profit = Gross Profit − (Labor Payments + Vendor Payments + Other Expenses + Zakat)
+Gross Profit Margin = (Gross Profit / Total Sales Income) × 100
+Net Profit Margin = (Net Profit / Total Sales Income) × 100
 ```
 
 ### **Data Sources**
 - **Sales Income**: `sales.grand_total` field
+- **Cost of Goods Sold**: `sale_items.product.cost_price × quantity` (automatically calculated)
 - **Labor Payments**: `payments` table with `payer_type='LABOR'`
 - **Vendor Payments**: `payments` table with `payer_type='VENDOR'`
 - **Other Expenses**: `expenses` table
@@ -73,10 +77,12 @@ Profit = Total Sales Income − (Labor Payments + Vendor Payments + Other Expens
 ## 🎨 Features
 
 ### **1. Automated Calculations**
-- Real-time profit and loss calculations
+- Real-time profit and loss calculations with **Cost of Goods Sold (COGS)**
+- **Gross Profit Analysis**: Revenue minus direct production costs
+- **Net Profit Analysis**: Gross profit minus all operating expenses
 - Automatic expense categorization
-- Profit margin percentage calculations
-- Profitability status indicators
+- **Dual Margin Analysis**: Both gross and net profit margin percentages
+- Profitability status indicators based on net profit
 
 ### **2. Comprehensive Reporting**
 - Period-based analysis
