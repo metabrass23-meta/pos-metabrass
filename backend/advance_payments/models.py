@@ -28,9 +28,11 @@ def validate_advance_amount(value):
 
 
 def validate_payment_date(value):
-    """Validate that payment date is not in the future"""
-    if value > date.today():
-        raise ValidationError("Payment date cannot be in the future.")
+    """Validate that payment date is not more than 1 year in the future"""
+    from datetime import timedelta
+    max_future_date = date.today() + timedelta(days=365)
+    if value > max_future_date:
+        raise ValidationError("Payment date cannot be more than 1 year in the future.")
 
 
 class AdvancePaymentQuerySet(models.QuerySet):

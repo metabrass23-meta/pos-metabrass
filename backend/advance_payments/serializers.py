@@ -119,8 +119,10 @@ class AdvancePaymentCreateSerializer(serializers.ModelSerializer):
     
     def validate_date(self, value):
         """Validate payment date"""
-        if value > date.today():
-            raise serializers.ValidationError("Payment date cannot be in the future.")
+        from datetime import timedelta
+        max_future_date = date.today() + timedelta(days=365)
+        if value > max_future_date:
+            raise serializers.ValidationError("Payment date cannot be more than 1 year in the future.")
         return value
     
     def validate_description(self, value):
@@ -194,8 +196,10 @@ class AdvancePaymentUpdateSerializer(serializers.ModelSerializer):
     
     def validate_date(self, value):
         """Validate payment date"""
-        if value > date.today():
-            raise serializers.ValidationError("Payment date cannot be in the future.")
+        from datetime import timedelta
+        max_future_date = date.today() + timedelta(days=365)
+        if value > max_future_date:
+            raise serializers.ValidationError("Payment date cannot be more than 1 year in the future.")
         return value
     
     def validate_description(self, value):
@@ -266,6 +270,7 @@ class AdvancePaymentListSerializer(serializers.ModelSerializer):
             'description',
             'date',
             'time',
+            'receipt_image_path',
             'remaining_salary',
             'total_salary',
             'display_name',
