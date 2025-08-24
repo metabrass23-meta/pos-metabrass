@@ -46,6 +46,14 @@ class ProfitLossRecord(models.Model):
         help_text="Total income from sales.grand_total"
     )
     
+    # Cost of Goods Sold
+    total_cost_of_goods_sold = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Total cost of goods sold in this period"
+    )
+    
     # Expense calculations
     total_labor_payments = models.DecimalField(
         max_digits=15,
@@ -79,17 +87,29 @@ class ProfitLossRecord(models.Model):
         default=Decimal('0.00'),
         help_text="Total expenses (labor + vendor + other + zakat)"
     )
+    gross_profit = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Gross profit (income - cost of goods sold)"
+    )
     net_profit = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=Decimal('0.00'),
-        help_text="Net profit (income - total expenses)"
+        help_text="Net profit (gross profit - total expenses)"
+    )
+    gross_profit_margin_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Gross profit margin as percentage of sales"
     )
     profit_margin_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=Decimal('0.00'),
-        help_text="Profit margin as percentage of sales"
+        help_text="Net profit margin as percentage of sales"
     )
     
     # Additional metrics
@@ -170,8 +190,17 @@ class ProfitLossRecord(models.Model):
             self.total_zakat
         )
         
+        # Calculate gross profit
+        self.gross_profit = self.total_sales_income - self.total_cost_of_goods_sold
+        
         # Calculate net profit
-        self.net_profit = self.total_sales_income - self.total_expenses_calculated
+        self.net_profit = self.gross_profit - self.total_expenses_calculated
+        
+        # Calculate gross profit margin percentage
+        if self.total_sales_income > 0:
+            self.gross_profit_margin_percentage = (self.gross_profit / self.total_sales_income) * 100
+        else:
+            self.gross_profit_margin_percentage = Decimal('0.00')
         
         # Calculate profit margin percentage
         if self.total_sales_income > 0:
@@ -188,6 +217,16 @@ class ProfitLossRecord(models.Model):
         return f"PKR {self.total_sales_income:,.2f}"
     
     @property
+    def formatted_total_cost_of_goods_sold(self):
+        """Currency formatted total cost of goods sold"""
+        return f"PKR {self.total_cost_of_goods_sold:,.2f}"
+    
+    @property
+    def formatted_gross_profit(self):
+        """Currency formatted gross profit"""
+        return f"PKR {self.gross_profit:,.2f}"
+    
+    @property
     def formatted_total_expenses(self):
         """Currency formatted total expenses"""
         return f"PKR {self.total_expenses_calculated:,.2f}"
@@ -201,6 +240,11 @@ class ProfitLossRecord(models.Model):
     def formatted_profit_margin(self):
         """Formatted profit margin percentage"""
         return f"{self.profit_margin_percentage:.2f}%"
+    
+    @property
+    def formatted_gross_profit_margin(self):
+        """Formatted gross profit margin percentage"""
+        return f"{self.gross_profit_margin_percentage:.2f}%"
     
     @property
     def period_display(self):
@@ -228,6 +272,7 @@ class ProfitLossRecord(models.Model):
     def expense_breakdown(self):
         """Get breakdown of expenses"""
         return {
+            'cost_of_goods_sold': float(self.total_cost_of_goods_sold),
             'labor_payments': float(self.total_labor_payments),
             'vendor_payments': float(self.total_vendor_payments),
             'other_expenses': float(self.total_expenses),
@@ -241,6 +286,9 @@ class ProfitLossRecord(models.Model):
         return {
             'period': self.period_display,
             'total_sales': float(self.total_sales_income),
+            'cost_of_goods_sold': float(self.total_cost_of_goods_sold),
+            'gross_profit': float(self.gross_profit),
+            'gross_profit_margin': float(self.gross_profit_margin_percentage),
             'total_expenses': float(self.total_expenses_calculated),
             'net_profit': float(self.net_profit),
             'profit_margin': float(self.profit_margin_percentage),
