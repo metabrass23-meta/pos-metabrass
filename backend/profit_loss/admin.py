@@ -57,7 +57,8 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
     
     list_display = [
         'period_display', 'period_type', 'total_sales_income_display',
-        'total_expenses_display', 'net_profit_display', 'profit_margin_display',
+        'total_cost_of_goods_sold_display', 'gross_profit_display', 'total_expenses_display', 
+        'net_profit_display', 'gross_profit_margin_display', 'profit_margin_display',
         'is_profitable_display', 'total_products_sold', 'created_at'
     ]
     
@@ -78,8 +79,8 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
         ('Period Information', {
             'fields': ('id', 'period_type', 'start_date', 'end_date')
         }),
-        ('Income', {
-            'fields': ('total_sales_income', 'total_products_sold', 'average_order_value')
+        ('Income & COGS', {
+            'fields': ('total_sales_income', 'total_cost_of_goods_sold', 'total_products_sold', 'average_order_value')
         }),
         ('Expenses', {
             'fields': (
@@ -89,6 +90,7 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
         }),
         ('Calculated Fields', {
             'fields': (
+                'gross_profit', 'gross_profit_margin_percentage',
                 'total_expenses_calculated', 'net_profit', 'profit_margin_percentage'
             ),
             'classes': ('collapse',)
@@ -106,6 +108,25 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
         """Display formatted total sales income"""
         return obj.formatted_total_sales_income
     total_sales_income_display.short_description = 'Sales Income'
+    
+    def total_cost_of_goods_sold_display(self, obj):
+        """Display formatted total cost of goods sold"""
+        return obj.formatted_total_cost_of_goods_sold
+    total_cost_of_goods_sold_display.short_description = 'COGS'
+    
+    def gross_profit_display(self, obj):
+        """Display formatted gross profit with color coding"""
+        if obj.gross_profit > 0:
+            return format_html(
+                '<span style="color: green; font-weight: bold;">{}</span>',
+                obj.formatted_gross_profit
+            )
+        else:
+            return format_html(
+                '<span style="color: red; font-weight: bold;">{}</span>',
+                obj.formatted_gross_profit
+            )
+    gross_profit_display.short_description = 'Gross Profit'
     
     def total_expenses_display(self, obj):
         """Display formatted total expenses"""
@@ -141,6 +162,21 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
         )
     profit_margin_display.short_description = 'Profit Margin'
     
+    def gross_profit_margin_display(self, obj):
+        """Display formatted gross profit margin with color coding"""
+        if obj.gross_profit_margin_percentage > 40:
+            color = 'green'
+        elif obj.gross_profit_margin_percentage > 25:
+            color = 'orange'
+        else:
+            color = 'red'
+        
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.formatted_gross_profit_margin
+        )
+    gross_profit_margin_display.short_description = 'Gross Profit Margin'
+    
     def is_profitable_display(self, obj):
         """Display profitability status with icon"""
         if obj.is_profitable:
@@ -158,12 +194,14 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
         breakdown = obj.expense_breakdown
         return format_html(
             '<div style="font-family: monospace;">'
+            '<strong>Cost of Goods Sold:</strong> PKR {:,}<br>'
             '<strong>Labor Payments:</strong> PKR {:,}<br>'
             '<strong>Vendor Payments:</strong> PKR {:,}<br>'
             '<strong>Other Expenses:</strong> PKR {:,}<br>'
             '<strong>Zakat:</strong> PKR {:,}<br>'
             '<strong>Total:</strong> PKR {:,}'
             '</div>',
+            breakdown['cost_of_goods_sold'],
             breakdown['labor_payments'],
             breakdown['vendor_payments'],
             breakdown['other_expenses'],
@@ -179,18 +217,24 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
             '<div style="font-family: monospace;">'
             '<strong>Period:</strong> {}<br>'
             '<strong>Total Sales:</strong> PKR {:,}<br>'
+            '<strong>Cost of Goods Sold:</strong> PKR {:,}<br>'
+            '<strong>Gross Profit:</strong> PKR {:,}<br>'
+            '<strong>Gross Profit Margin:</strong> {}<br>'
             '<strong>Total Expenses:</strong> PKR {:,}<br>'
             '<strong>Net Profit:</strong> PKR {:,}<br>'
-            '<strong>Profit Margin:</strong> {}<br>'
+            '<strong>Net Profit Margin:</strong> {}<br>'
             '<strong>Products Sold:</strong> {}<br>'
             '<strong>Average Order:</strong> PKR {:,}<br>'
             '<strong>Profitable:</strong> {}'
             '</div>',
             stats['period'],
             stats['total_sales'],
+            stats['cost_of_goods_sold'],
+            stats['gross_profit'],
+            f"{stats['gross_profit_margin']:.2f}%",
             stats['total_expenses'],
             stats['net_profit'],
-            stats['profit_margin'],
+            f"{stats['profit_margin']:.2f}%",
             stats['products_sold'],
             stats['average_order_value'],
             'Yes' if stats['is_profitable'] else 'No'
