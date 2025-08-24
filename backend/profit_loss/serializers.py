@@ -32,8 +32,11 @@ class ProfitLossRecordSerializer(serializers.ModelSerializer):
         read_only=True
     )
     formatted_total_sales_income = serializers.CharField(read_only=True)
+    formatted_total_cost_of_goods_sold = serializers.CharField(read_only=True)
+    formatted_gross_profit = serializers.CharField(read_only=True)
     formatted_total_expenses = serializers.CharField(read_only=True)
     formatted_net_profit = serializers.CharField(read_only=True)
+    formatted_gross_profit_margin = serializers.CharField(read_only=True)
     formatted_profit_margin = serializers.CharField(read_only=True)
     period_display = serializers.CharField(read_only=True)
     is_profitable = serializers.BooleanField(read_only=True)
@@ -52,20 +55,20 @@ class ProfitLossRecordSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'period_type', 'period_type_display',
             'start_date', 'end_date',
-            'total_sales_income', 'total_labor_payments', 'total_vendor_payments',
+            'total_sales_income', 'total_cost_of_goods_sold', 'total_labor_payments', 'total_vendor_payments',
             'total_expenses', 'total_zakat', 'total_expenses_calculated',
-            'net_profit', 'profit_margin_percentage',
+            'gross_profit', 'gross_profit_margin_percentage', 'net_profit', 'profit_margin_percentage',
             'total_products_sold', 'average_order_value',
             'calculation_notes', 'is_active',
-            'formatted_total_sales_income', 'formatted_total_expenses',
-            'formatted_net_profit', 'formatted_profit_margin',
-            'period_display', 'is_profitable', 'expense_breakdown',
+            'formatted_total_sales_income', 'formatted_total_cost_of_goods_sold', 'formatted_gross_profit',
+            'formatted_total_expenses', 'formatted_net_profit', 'formatted_gross_profit_margin',
+            'formatted_profit_margin', 'period_display', 'is_profitable', 'expense_breakdown',
             'summary_stats', 'calculations',
             'created_at', 'updated_at', 'created_by'
         ]
         read_only_fields = [
-            'id', 'total_expenses_calculated', 'net_profit', 
-            'profit_margin_percentage', 'created_at', 'updated_at'
+            'id', 'total_expenses_calculated', 'gross_profit', 'gross_profit_margin_percentage',
+            'net_profit', 'profit_margin_percentage', 'created_at', 'updated_at'
         ]
 
 
@@ -108,6 +111,11 @@ class ProfitLossSummarySerializer(serializers.Serializer):
         decimal_places=2,
         help_text="Total income from sales"
     )
+    total_cost_of_goods_sold = serializers.DecimalField(
+        max_digits=15, 
+        decimal_places=2,
+        help_text="Total cost of goods sold"
+    )
     total_products_sold = serializers.IntegerField(
         help_text="Total number of products sold"
     )
@@ -145,10 +153,20 @@ class ProfitLossSummarySerializer(serializers.Serializer):
     )
     
     # Profit calculations
+    gross_profit = serializers.DecimalField(
+        max_digits=15, 
+        decimal_places=2,
+        help_text="Gross profit (income - COGS)"
+    )
+    gross_profit_margin_percentage = serializers.DecimalField(
+        max_digits=5, 
+        decimal_places=2,
+        help_text="Gross profit margin as percentage"
+    )
     net_profit = serializers.DecimalField(
         max_digits=15, 
         decimal_places=2,
-        help_text="Net profit (income - expenses)"
+        help_text="Net profit (gross profit - expenses)"
     )
     profit_margin_percentage = serializers.DecimalField(
         max_digits=5, 
@@ -163,11 +181,20 @@ class ProfitLossSummarySerializer(serializers.Serializer):
     formatted_total_sales_income = serializers.CharField(
         help_text="Formatted sales income (PKR)"
     )
+    formatted_total_cost_of_goods_sold = serializers.CharField(
+        help_text="Formatted cost of goods sold (PKR)"
+    )
+    formatted_gross_profit = serializers.CharField(
+        help_text="Formatted gross profit (PKR)"
+    )
     formatted_total_expenses = serializers.CharField(
         help_text="Formatted total expenses (PKR)"
     )
     formatted_net_profit = serializers.CharField(
         help_text="Formatted net profit (PKR)"
+    )
+    formatted_gross_profit_margin = serializers.CharField(
+        help_text="Formatted gross profit margin percentage"
     )
     formatted_profit_margin = serializers.CharField(
         help_text="Formatted profit margin percentage"

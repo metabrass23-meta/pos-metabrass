@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Sum, Count, Q, F
+from django.db.models import Sum, Count, Q, F, DecimalField
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from decimal import Decimal
@@ -65,6 +65,7 @@ class ProfitLossCalculationView(APIView):
                 start_date=start_date,
                 end_date=end_date,
                 total_sales_income=profit_loss_data['total_sales_income'],
+                total_cost_of_goods_sold=profit_loss_data['total_cost_of_goods_sold'],
                 total_labor_payments=profit_loss_data['total_labor_payments'],
                 total_vendor_payments=profit_loss_data['total_vendor_payments'],
                 total_expenses=profit_loss_data['total_expenses'],
@@ -93,7 +94,7 @@ class ProfitLossCalculationView(APIView):
     
     def _calculate_profit_loss(self, start_date, end_date):
         """Calculate profit and loss for the given period"""
-        from sales.models import Sales, SaleItem
+        from sales.models import Sales
         from payments.models import Payment
         from expenses.models import Expense
         from zakats.models import Zakat
@@ -111,6 +112,21 @@ class ProfitLossCalculationView(APIView):
         total_sales_income = sales_data['total_income'] or Decimal('0.00')
         total_sales_count = sales_data['total_count'] or 0
         total_products_sold = sales_data['total_products'] or 0
+        
+        # Calculate Cost of Goods Sold (COGS)
+        from sale_items.models import SaleItem
+        from django.db.models import F
+        cogs_data = SaleItem.objects.filter(
+            sale__date_of_sale__date__range=[start_date, end_date],
+            sale__is_active=True,
+            is_active=True
+        ).select_related('product').aggregate(
+            total_cost=Sum(
+                F('product__cost_price') * F('quantity'),
+                output_field=DecimalField(max_digits=15, decimal_places=2)
+            )
+        )
+        total_cost_of_goods_sold = cogs_data['total_cost'] or Decimal('0.00')
         
         # Calculate average order value
         average_order_value = (
@@ -150,6 +166,7 @@ class ProfitLossCalculationView(APIView):
         
         return {
             'total_sales_income': total_sales_income,
+            'total_cost_of_goods_sold': total_cost_of_goods_sold,
             'total_labor_payments': total_labor_payments,
             'total_vendor_payments': total_vendor_payments,
             'total_expenses': total_expenses,
