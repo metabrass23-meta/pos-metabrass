@@ -4,9 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/payables_provider.dart';
+import '../../../src/providers/vendor_provider.dart';
+
+import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import '../globals/drop_down.dart';
+import '../globals/custom_date_picker.dart';
 
 class AddPayableDialog extends StatefulWidget {
   const AddPayableDialog({super.key});
@@ -19,36 +24,41 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   final _formKey = GlobalKey<FormState>();
   final _creditorNameController = TextEditingController();
   final _creditorPhoneController = TextEditingController();
+  final _creditorEmailController = TextEditingController();
   final _amountBorrowedController = TextEditingController();
+  final _amountPaidController = TextEditingController();
   final _reasonOrItemController = TextEditingController();
   final _notesController = TextEditingController();
-  final _amountPaidController = TextEditingController();
   final _scrollController = ScrollController();
 
   DateTime _dateBorrowed = DateTime.now();
   DateTime _expectedRepaymentDate = DateTime.now().add(const Duration(days: 30));
+  String _selectedPriority = 'MEDIUM';
+  String? _selectedVendorId;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
+  // Priority options
+  final List<String> _priorityOptions = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
+
+    // Load vendors for selection
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vendorProvider = context.read<VendorProvider>();
+      vendorProvider.loadVendors();
+    });
   }
 
   @override
@@ -56,10 +66,11 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
     _animationController.dispose();
     _creditorNameController.dispose();
     _creditorPhoneController.dispose();
+    _creditorEmailController.dispose();
     _amountBorrowedController.dispose();
+    _amountPaidController.dispose();
     _reasonOrItemController.dispose();
     _notesController.dispose();
-    _amountPaidController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -67,12 +78,6 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       final amountBorrowed = double.parse(_amountBorrowedController.text.trim());
-      final amountPaid = double.tryParse(_amountPaidController.text.trim()) ?? 0.0;
-
-      if (amountPaid > amountBorrowed) {
-        _showErrorSnackbar('Amount paid cannot exceed amount borrowed');
-        return;
-      }
 
       if (_expectedRepaymentDate.isBefore(_dateBorrowed)) {
         _showErrorSnackbar('Expected repayment date cannot be before date borrowed');
@@ -81,20 +86,29 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
 
       final payablesProvider = Provider.of<PayablesProvider>(context, listen: false);
 
-      await payablesProvider.addPayable(
+      final amountPaid = double.tryParse(_amountPaidController.text.trim()) ?? 0.0;
+
+      final success = await payablesProvider.addPayable(
         creditorName: _creditorNameController.text.trim(),
-        creditorPhone: _creditorPhoneController.text.trim(),
+        creditorPhone: _creditorPhoneController.text.trim().isEmpty ? null : _creditorPhoneController.text.trim(),
+        creditorEmail: _creditorEmailController.text.trim().isEmpty ? null : _creditorEmailController.text.trim(),
+        vendorId: _selectedVendorId,
         amountBorrowed: amountBorrowed,
+        amountPaid: amountPaid,
         reasonOrItem: _reasonOrItemController.text.trim(),
         dateBorrowed: _dateBorrowed,
         expectedRepaymentDate: _expectedRepaymentDate,
-        amountPaid: amountPaid,
+        priority: _selectedPriority,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
       if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+        if (success) {
+          _showSuccessSnackbar();
+          Navigator.of(context).pop();
+        } else {
+          _showErrorSnackbar('Failed to add payable. Please try again.');
+        }
       }
     }
   }
@@ -104,28 +118,18 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Payable added successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -135,20 +139,12 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -156,9 +152,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -170,60 +164,47 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Future<void> _selectDateBorrowed() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _dateBorrowed,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _dateBorrowed) {
-      setState(() {
-        _dateBorrowed = picked;
-        if (_expectedRepaymentDate.isBefore(_dateBorrowed.add(const Duration(days: 1)))) {
-          _expectedRepaymentDate = _dateBorrowed.add(const Duration(days: 30));
+      initialTime: const TimeOfDay(hour: 0, minute: 0),
+      onDateTimeSelected: (date, time) {
+        if (date != _dateBorrowed) {
+          setState(() {
+            _dateBorrowed = date;
+            if (_expectedRepaymentDate.isBefore(_dateBorrowed.add(const Duration(days: 1)))) {
+              _expectedRepaymentDate = _dateBorrowed.add(const Duration(days: 30));
+            }
+          });
         }
-      });
-    }
+      },
+      title: 'Select Borrowed Date',
+      minDate: DateTime.now().subtract(const Duration(days: 365)),
+      maxDate: DateTime.now(),
+      showTimeInline: false,
+    );
   }
 
   Future<void> _selectExpectedRepaymentDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _expectedRepaymentDate,
-      firstDate: _dateBorrowed.add(const Duration(days: 1)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
-          child: child!,
-        );
+      initialTime: const TimeOfDay(hour: 0, minute: 0),
+      onDateTimeSelected: (date, time) {
+        if (date != _expectedRepaymentDate) {
+          setState(() {
+            _expectedRepaymentDate = date;
+          });
+        }
       },
+      title: 'Select Expected Repayment Date',
+      minDate: _dateBorrowed.add(const Duration(days: 1)),
+      maxDate: DateTime.now().add(const Duration(days: 365)),
+      showTimeInline: false,
     );
-    if (picked != null && picked != _expectedRepaymentDate) {
-      setState(() {
-        _expectedRepaymentDate = picked;
-      });
-    }
   }
 
   double get balanceRemaining {
     final amountBorrowed = double.tryParse(_amountBorrowedController.text) ?? 0;
-    final amountPaid = double.tryParse(_amountPaidController.text) ?? 0;
-    return amountBorrowed - amountPaid;
+    return amountBorrowed;
   }
 
   @override
@@ -239,33 +220,15 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 95.w,
-                    small: 90.w,
-                    medium: 80.w,
-                    large: 70.w,
-                    ultrawide: 60.w,
-                  ),
-                  maxHeight: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.h,
-                    small: 95.h,
-                    medium: 85.h,
-                    large: 80.h,
-                    ultrawide: 75.h,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
+                  maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 95.h, medium: 85.h, large: 80.h, ultrawide: 75.h),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: Column(
@@ -296,9 +259,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -308,15 +269,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -353,11 +307,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -428,32 +378,18 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.person_outline,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.person_outline, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Creditor Information',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -482,6 +418,14 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               return null;
             },
           ),
+          SizedBox(height: context.cardPadding),
+          PremiumTextField(
+            label: 'Email (Optional)',
+            hint: 'Enter creditor email address',
+            controller: _creditorEmailController,
+            prefixIcon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+          ),
         ],
       ),
     );
@@ -494,32 +438,18 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.attach_money_rounded,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.attach_money_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Amount Details',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -556,7 +486,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               return null;
             },
           ),
-          if (_amountBorrowedController.text.isNotEmpty || _amountPaidController.text.isNotEmpty) ...[
+          if (_amountBorrowedController.text.isNotEmpty) ...[
+            // Removed balanceRemaining check
             SizedBox(height: context.cardPadding),
             _buildBalancePreview(),
           ],
@@ -572,69 +503,76 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.description_outlined,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.description_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Transaction Details',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                'Additional Details',
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
             label: 'Reason/Item',
-            hint: context.shouldShowCompactLayout ? 'Reason for borrowing' : 'Enter reason for borrowing or item description',
+            hint: context.shouldShowCompactLayout ? 'Enter reason' : 'Enter reason for borrowing or item description',
             controller: _reasonOrItemController,
-            prefixIcon: Icons.assignment_outlined,
-            maxLines: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 2,
-              small: 2,
-              medium: 3,
-              large: 3,
-              ultrawide: 3,
-            ),
+            prefixIcon: Icons.receipt_long_outlined,
+            maxLines: 3,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter reason or item';
-              if (value!.length < 5) return 'Please provide more details';
+              if (value?.isEmpty ?? true) return 'Please enter reason or item description';
+              if (value!.length < 5) return 'Description must be at least 5 characters';
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
+          Consumer<VendorProvider>(
+            builder: (context, vendorProvider, child) {
+              return PremiumDropdownField<String>(
+                label: 'Vendor (Optional)',
+                hint: 'Select vendor if creditor is a registered vendor',
+                items: [
+                  DropdownItem<String>(value: '', label: 'No vendor'),
+                  ...vendorProvider.vendors.map(
+                    (vendor) => DropdownItem<String>(value: vendor.id, label: vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name),
+                  ),
+                ],
+                value: _selectedVendorId ?? '',
+                onChanged: (value) {
+                  setState(() {
+                    _selectedVendorId = value == '' ? null : value;
+                  });
+                },
+                prefixIcon: Icons.business_outlined,
+              );
+            },
+          ),
+          SizedBox(height: context.cardPadding),
+          PremiumDropdownField<String>(
+            label: 'Priority Level',
+            hint: 'Select priority level for this payable',
+            items: _priorityOptions.map((priority) => DropdownItem<String>(value: priority, label: priority)).toList(),
+            value: _selectedPriority,
+            onChanged: (value) {
+              setState(() {
+                _selectedPriority = value!;
+              });
+            },
+            prefixIcon: Icons.priority_high_outlined,
+          ),
+          SizedBox(height: context.cardPadding),
           PremiumTextField(
             label: 'Notes (Optional)',
-            hint: context.shouldShowCompactLayout ? 'Additional notes' : 'Enter additional notes or terms',
+            hint: context.shouldShowCompactLayout ? 'Enter notes' : 'Enter additional notes or payment history',
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
-            maxLines: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 3,
-              small: 3,
-              medium: 4,
-              large: 4,
-              ultrawide: 4,
-            ),
+            maxLines: 3,
           ),
         ],
       ),
@@ -648,32 +586,18 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                color: AppTheme.primaryMaroon,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.calendar_today_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Date Information',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -686,9 +610,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
                   child: PremiumTextField(
                     label: 'Date Borrowed',
                     hint: 'Select date',
-                    controller: TextEditingController(
-                      text: '${_dateBorrowed.day}/${_dateBorrowed.month}/${_dateBorrowed.year}',
-                    ),
+                    controller: TextEditingController(text: '${_dateBorrowed.day}/${_dateBorrowed.month}/${_dateBorrowed.year}'),
                     prefixIcon: Icons.calendar_today,
                     enabled: false,
                   ),
@@ -724,17 +646,11 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
       decoration: BoxDecoration(
         color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.1) : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-        ),
+        border: Border.all(color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.3) : Colors.red.withOpacity(0.3)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.calculate_rounded,
-            color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
-            size: context.iconSize('medium'),
-          ),
+          Icon(Icons.calculate_rounded, color: balanceRemaining >= 0 ? Colors.orange : Colors.red, size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Column(
@@ -742,11 +658,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               children: [
                 Text(
                   'Balance Remaining',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${balanceRemaining.toStringAsFixed(0)}',
@@ -768,27 +680,15 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
     final daysDifference = _expectedRepaymentDate.difference(_dateBorrowed).inDays;
     return Container(
       padding: EdgeInsets.all(context.smallPadding),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-      ),
+      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            color: Colors.blue,
-            size: context.iconSize('small'),
-          ),
+          Icon(Icons.info_outline, color: Colors.blue, size: context.iconSize('small')),
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
-              daysDifference > 0
-                  ? 'Borrowing period: $daysDifference days'
-                  : 'Please select a valid repayment date',
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700],
-              ),
+              daysDifference > 0 ? 'Borrowing period: $daysDifference days' : 'Please select a valid repayment date',
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700]),
             ),
           ),
         ],

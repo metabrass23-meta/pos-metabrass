@@ -3,18 +3,17 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import '../globals/custom_date_picker.dart';
 
 class EditPayableDialog extends StatefulWidget {
   final Payable payable;
 
-  const EditPayableDialog({
-    super.key,
-    required this.payable,
-  });
+  const EditPayableDialog({super.key, required this.payable});
 
   @override
   State<EditPayableDialog> createState() => _EditPayableDialogState();
@@ -24,6 +23,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _creditorNameController;
   late TextEditingController _creditorPhoneController;
+  late TextEditingController _creditorEmailController;
   late TextEditingController _amountBorrowedController;
   late TextEditingController _reasonController;
   late TextEditingController _notesController;
@@ -40,7 +40,8 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
   void initState() {
     super.initState();
     _creditorNameController = TextEditingController(text: widget.payable.creditorName);
-    _creditorPhoneController = TextEditingController(text: widget.payable.creditorPhone);
+    _creditorPhoneController = TextEditingController(text: widget.payable.creditorPhone ?? '');
+    _creditorEmailController = TextEditingController(text: widget.payable.creditorEmail ?? '');
     _amountBorrowedController = TextEditingController(text: widget.payable.amountBorrowed.toString());
     _reasonController = TextEditingController(text: widget.payable.reasonOrItem);
     _notesController = TextEditingController(text: widget.payable.notes ?? '');
@@ -48,18 +49,11 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
     _dateBorrowed = widget.payable.dateBorrowed;
     _expectedRepaymentDate = widget.payable.expectedRepaymentDate;
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -69,6 +63,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
     _animationController.dispose();
     _creditorNameController.dispose();
     _creditorPhoneController.dispose();
+    _creditorEmailController.dispose();
     _amountBorrowedController.dispose();
     _reasonController.dispose();
     _notesController.dispose();
@@ -93,15 +88,18 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
 
       final payablesProvider = Provider.of<PayablesProvider>(context, listen: false);
 
+      final additionalAmount = double.tryParse(_amountPaidController.text.trim()) ?? 0.0;
+
       await payablesProvider.updatePayable(
         id: widget.payable.id,
         creditorName: _creditorNameController.text.trim(),
         creditorPhone: _creditorPhoneController.text.trim(),
+        creditorEmail: _creditorEmailController.text.trim(),
         amountBorrowed: amountBorrowed,
+        amountPaid: additionalAmount,
         reasonOrItem: _reasonController.text.trim(),
         dateBorrowed: _dateBorrowed,
         expectedRepaymentDate: _expectedRepaymentDate,
-        amountPaid: amountPaid,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
@@ -117,28 +115,18 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Payable updated successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -148,28 +136,18 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -181,54 +159,42 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
   }
 
   Future<void> _selectDateBorrowed() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _dateBorrowed,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _dateBorrowed) {
-      setState(() {
-        _dateBorrowed = picked;
-        if (_expectedRepaymentDate.isBefore(_dateBorrowed.add(const Duration(days: 1)))) {
-          _expectedRepaymentDate = _dateBorrowed.add(const Duration(days: 30));
+      initialTime: const TimeOfDay(hour: 0, minute: 0),
+      onDateTimeSelected: (date, time) {
+        if (date != _dateBorrowed) {
+          setState(() {
+            _dateBorrowed = date;
+            if (_expectedRepaymentDate.isBefore(_dateBorrowed.add(const Duration(days: 1)))) {
+              _expectedRepaymentDate = _dateBorrowed.add(const Duration(days: 30));
+            }
+          });
         }
-      });
-    }
+      },
+      title: 'Select Borrowed Date',
+      minDate: DateTime.now().subtract(const Duration(days: 365)),
+      maxDate: DateTime.now(),
+      showTimeInline: false,
+    );
   }
 
   Future<void> _selectExpectedRepaymentDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    await context.showSyncfusionDateTimePicker(
       initialDate: _expectedRepaymentDate,
-      firstDate: _dateBorrowed.add(const Duration(days: 1)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
-          child: child!,
-        );
+      initialTime: const TimeOfDay(hour: 0, minute: 0),
+      onDateTimeSelected: (date, time) {
+        if (date != _expectedRepaymentDate) {
+          setState(() {
+            _expectedRepaymentDate = date;
+          });
+        }
       },
+      title: 'Select Expected Repayment Date',
+      minDate: _dateBorrowed.add(const Duration(days: 1)),
+      maxDate: DateTime.now().add(const Duration(days: 365)),
+      showTimeInline: false,
     );
-    if (picked != null && picked != _expectedRepaymentDate) {
-      setState(() {
-        _expectedRepaymentDate = picked;
-      });
-    }
   }
 
   double get balanceRemaining {
@@ -250,14 +216,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 95.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -265,11 +224,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -293,11 +248,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: true))),
       ],
     );
   }
@@ -307,11 +258,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: true))),
       ],
     );
   }
@@ -321,11 +268,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: false),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: false))),
       ],
     );
   }
@@ -334,9 +277,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -346,15 +287,8 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.edit_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -385,21 +319,11 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.smallPadding,
-              vertical: context.smallPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payable.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -410,11 +334,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -456,6 +376,14 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               },
             ),
             SizedBox(height: context.cardPadding),
+            PremiumTextField(
+              label: 'Email (Optional)',
+              hint: isCompact ? 'Enter email' : 'Enter creditor email',
+              controller: _creditorEmailController,
+              prefixIcon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            SizedBox(height: context.cardPadding),
             Row(
               children: [
                 Expanded(
@@ -477,18 +405,19 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Amount Paid (PKR)',
-                    hint: 'Enter paid',
+                    label: 'Additional Amount to Pay (PKR)',
+                    hint: 'Enter additional amount',
                     controller: _amountPaidController,
                     prefixIcon: Icons.trending_up_rounded,
                     keyboardType: TextInputType.number,
                     onChanged: (value) => setState(() {}),
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
-                        final amountPaid = double.tryParse(value);
-                        if (amountPaid == null || amountPaid < 0) return 'Enter valid amount';
+                        final additionalAmount = double.tryParse(value);
+                        if (additionalAmount == null || additionalAmount < 0) return 'Enter valid amount';
+                        final currentPaid = widget.payable.amountPaid;
                         final amountBorrowed = double.tryParse(_amountBorrowedController.text) ?? 0;
-                        if (amountPaid > amountBorrowed) return 'Cannot exceed amount borrowed';
+                        if (currentPaid + additionalAmount > amountBorrowed) return 'Total payment cannot exceed amount borrowed';
                       }
                       return null;
                     },
@@ -503,26 +432,44 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                 decoration: BoxDecoration(
                   color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.1) : Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: balanceRemaining >= 0 ? Colors.orange.withOpacity(0.3) : Colors.red.withOpacity(0.3)),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.calculate_rounded,
-                      color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
-                      size: context.iconSize('medium'),
-                    ),
-                    SizedBox(width: context.smallPadding),
-                    Expanded(
-                      child: Text(
-                        'Balance Remaining: PKR ${balanceRemaining.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
+                    Row(
+                      children: [
+                        Icon(Icons.calculate_rounded, color: balanceRemaining >= 0 ? Colors.orange : Colors.red, size: context.iconSize('medium')),
+                        SizedBox(width: context.smallPadding),
+                        Text(
+                          'Payment Summary',
+                          style: GoogleFonts.inter(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
+                          ),
                         ),
+                      ],
+                    ),
+                    SizedBox(height: context.smallPadding),
+                    Text(
+                      'Current Paid: PKR ${widget.payable.amountPaid.toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      'Additional Payment: PKR ${(double.tryParse(_amountPaidController.text) ?? 0.0).toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      'Total After Update: PKR ${(widget.payable.amountPaid + (double.tryParse(_amountPaidController.text) ?? 0.0)).toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, fontWeight: FontWeight.w600, color: Colors.grey[700]),
+                    ),
+                    Text(
+                      'Balance Remaining: PKR ${balanceRemaining.toStringAsFixed(0)}',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
                       ),
                     ),
                   ],
@@ -535,14 +482,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               hint: isCompact ? 'Reason for borrowing' : 'Enter reason for borrowing or item description',
               controller: _reasonController,
               prefixIcon: Icons.assignment_outlined,
-              maxLines: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 2,
-                small: 3,
-                medium: 4,
-                large: 5,
-                ultrawide: 6,
-              ),
+              maxLines: ResponsiveBreakpoints.responsive(context, tablet: 2, small: 3, medium: 4, large: 5, ultrawide: 6),
               validator: (value) {
                 if (value?.isEmpty ?? true) return 'Please enter reason or item';
                 if (value!.length < 5) return 'Please provide more details';
@@ -555,14 +495,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               hint: isCompact ? 'Additional notes' : 'Enter additional notes or terms',
               controller: _notesController,
               prefixIcon: Icons.note_outlined,
-              maxLines: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 3,
-                small: 3,
-                medium: 4,
-                large: 4,
-                ultrawide: 4,
-              ),
+              maxLines: ResponsiveBreakpoints.responsive(context, tablet: 3, small: 3, medium: 4, large: 4, ultrawide: 4),
             ),
             SizedBox(height: context.cardPadding),
             Row(
@@ -573,8 +506,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                     child: PremiumTextField(
                       label: 'Date Borrowed',
                       hint: 'Select date',
-                      controller: TextEditingController(
-                          text: '${_dateBorrowed.day}/${_dateBorrowed.month}/${_dateBorrowed.year}'),
+                      controller: TextEditingController(text: '${_dateBorrowed.day}/${_dateBorrowed.month}/${_dateBorrowed.year}'),
                       prefixIcon: Icons.calendar_today,
                       enabled: false,
                     ),
@@ -588,7 +520,8 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                       label: 'Expected Repayment Date',
                       hint: 'Select date',
                       controller: TextEditingController(
-                          text: '${_expectedRepaymentDate.day}/${_expectedRepaymentDate.month}/${_expectedRepaymentDate.year}'),
+                        text: '${_expectedRepaymentDate.day}/${_expectedRepaymentDate.month}/${_expectedRepaymentDate.year}',
+                      ),
                       prefixIcon: Icons.event_available,
                       enabled: false,
                     ),
