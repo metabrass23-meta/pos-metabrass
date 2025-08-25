@@ -420,7 +420,8 @@ class PayableService {
         final responseData = response.data as Map<String, dynamic>;
 
         if (responseData['success'] == true && responseData['data'] != null) {
-          final statistics = PayableStatisticsResponse.fromJson(responseData['data']);
+          final data = responseData['data'];
+          final statistics = PayableStatisticsResponse.fromJson(data);
 
           // Cache statistics
           await _cacheStatistics(statistics);
@@ -629,20 +630,7 @@ class PayableService {
 
   Future<void> _cacheStatistics(PayableStatisticsResponse statistics) async {
     try {
-      await _storageService.saveData(ApiConfig.payableStatsCacheKey, {
-        'statistics': {
-          'total_payables': statistics.statistics.totalPayables,
-          'active_payables': statistics.statistics.activePayables,
-          'overdue_payables': statistics.statistics.overduePayables,
-          'urgent_payables': statistics.statistics.urgentPayables,
-          'total_amount_borrowed': statistics.statistics.totalAmountBorrowed,
-          'total_amount_paid': statistics.statistics.totalAmountPaid,
-          'total_balance_remaining': statistics.statistics.totalBalanceRemaining,
-          'average_payment_percentage': statistics.statistics.averagePaymentPercentage,
-          'total_creditors': statistics.statistics.totalCreditors,
-          'total_vendors': statistics.statistics.totalVendors,
-        },
-      });
+      await _storageService.saveData(ApiConfig.payableStatsCacheKey, statistics.toJson());
     } catch (e) {
       debugPrint('Error caching payable statistics: $e');
     }
@@ -653,8 +641,7 @@ class PayableService {
       final cachedData = await _storageService.getData(ApiConfig.payableStatsCacheKey);
       if (cachedData != null) {
         // Create a minimal statistics response from cached data
-        final stats = PayableStatistics.fromJson(cachedData['statistics']);
-        return PayableStatisticsResponse(statistics: stats, chartData: [], prioritySummary: [], statusSummary: [], vendorSummary: []);
+        return PayableStatisticsResponse.fromJson(cachedData);
       }
     } catch (e) {
       debugPrint('Error getting cached payable statistics: $e');

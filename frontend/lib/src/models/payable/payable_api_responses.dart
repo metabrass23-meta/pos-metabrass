@@ -19,29 +19,119 @@ class PayablesListResponse {
   }
 }
 
+class PayablePriorityBreakdown {
+  final String priority;
+  final int count;
+  final double amount;
+
+  PayablePriorityBreakdown({required this.priority, required this.count, required this.amount});
+
+  factory PayablePriorityBreakdown.fromJson(Map<String, dynamic> json) {
+    return PayablePriorityBreakdown(priority: json['priority'] ?? '', count: json['count'] ?? 0, amount: (json['amount'] ?? 0.0).toDouble());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'priority': priority, 'count': count, 'amount': amount};
+  }
+}
+
+class PayableStatusBreakdown {
+  final String status;
+  final int count;
+  final double amount;
+
+  PayableStatusBreakdown({required this.status, required this.count, required this.amount});
+
+  factory PayableStatusBreakdown.fromJson(Map<String, dynamic> json) {
+    return PayableStatusBreakdown(status: json['status'] ?? '', count: json['count'] ?? 0, amount: (json['amount'] ?? 0.0).toDouble());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'status': status, 'count': count, 'amount': amount};
+  }
+}
+
+class PayableTopCreditor {
+  final String creditorName;
+  final int count;
+  final double totalAmount;
+
+  PayableTopCreditor({required this.creditorName, required this.count, required this.totalAmount});
+
+  factory PayableTopCreditor.fromJson(Map<String, dynamic> json) {
+    return PayableTopCreditor(
+      creditorName: json['creditor_name'] ?? '',
+      count: json['count'] ?? 0,
+      totalAmount: (json['total_amount'] ?? 0.0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'creditor_name': creditorName, 'count': count, 'total_amount': totalAmount};
+  }
+}
+
 class PayableStatisticsResponse {
-  final PayableStatistics statistics;
-  final List<PayableChartData> chartData;
-  final List<PayablePrioritySummary> prioritySummary;
-  final List<PayableStatusSummary> statusSummary;
-  final List<PayableVendorSummary> vendorSummary;
+  final int totalPayables;
+  final int overduePayables;
+  final int urgentPayables;
+  final int paidPayables;
+  final int pendingPayables;
+  final double totalBorrowedAmount;
+  final double totalPaidAmount;
+  final double totalOutstandingAmount;
+  final double overdueAmount;
+  final List<PayablePriorityBreakdown> priorityBreakdown;
+  final List<PayableStatusBreakdown> statusBreakdown;
+  final List<PayableTopCreditor> topCreditors;
 
   PayableStatisticsResponse({
-    required this.statistics,
-    required this.chartData,
-    required this.prioritySummary,
-    required this.statusSummary,
-    required this.vendorSummary,
+    required this.totalPayables,
+    required this.overduePayables,
+    required this.urgentPayables,
+    required this.paidPayables,
+    required this.pendingPayables,
+    required this.totalBorrowedAmount,
+    required this.totalPaidAmount,
+    required this.totalOutstandingAmount,
+    required this.overdueAmount,
+    required this.priorityBreakdown,
+    required this.statusBreakdown,
+    required this.topCreditors,
   });
 
   factory PayableStatisticsResponse.fromJson(Map<String, dynamic> json) {
     return PayableStatisticsResponse(
-      statistics: PayableStatistics.fromJson(json['statistics']),
-      chartData: (json['chart_data'] as List).map((data) => PayableChartData.fromJson(data)).toList(),
-      prioritySummary: (json['priority_summary'] as List).map((data) => PayablePrioritySummary.fromJson(data)).toList(),
-      statusSummary: (json['status_summary'] as List).map((data) => PayableStatusSummary.fromJson(data)).toList(),
-      vendorSummary: (json['vendor_summary'] as List).map((data) => PayableVendorSummary.fromJson(data)).toList(),
+      totalPayables: json['total_payables'] ?? 0,
+      overduePayables: json['overdue_payables'] ?? 0,
+      urgentPayables: json['urgent_payables'] ?? 0,
+      paidPayables: json['paid_payables'] ?? 0,
+      pendingPayables: json['pending_payables'] ?? 0,
+      totalBorrowedAmount: double.tryParse(json['total_borrowed_amount']?.toString() ?? '0') ?? 0.0,
+      totalPaidAmount: double.tryParse(json['total_paid_amount']?.toString() ?? '0') ?? 0.0,
+      totalOutstandingAmount: double.tryParse(json['total_outstanding_amount']?.toString() ?? '0') ?? 0.0,
+      overdueAmount: double.tryParse(json['overdue_amount']?.toString() ?? '0') ?? 0.0,
+      priorityBreakdown: (json['priority_breakdown'] as List? ?? []).map((data) => PayablePriorityBreakdown.fromJson(data)).toList(),
+      statusBreakdown: (json['status_breakdown'] as List? ?? []).map((data) => PayableStatusBreakdown.fromJson(data)).toList(),
+      topCreditors: (json['top_creditors'] as List? ?? []).map((data) => PayableTopCreditor.fromJson(data)).toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_payables': totalPayables,
+      'overdue_payables': overduePayables,
+      'urgent_payables': urgentPayables,
+      'paid_payables': paidPayables,
+      'pending_payables': pendingPayables,
+      'total_borrowed_amount': totalBorrowedAmount,
+      'total_paid_amount': totalPaidAmount,
+      'total_outstanding_amount': totalOutstandingAmount,
+      'overdue_amount': overdueAmount,
+      'priority_breakdown': priorityBreakdown.map((p) => p.toJson()).toList(),
+      'status_breakdown': statusBreakdown.map((s) => s.toJson()).toList(),
+      'top_creditors': topCreditors.map((c) => c.toJson()).toList(),
+    };
   }
 }
 

@@ -53,6 +53,7 @@ class PayablesProvider extends ChangeNotifier {
 
   PayablesProvider() {
     loadPayables();
+    loadStatistics();
   }
 
   /// Load payables from API
@@ -509,24 +510,54 @@ class PayablesProvider extends ChangeNotifier {
 
   /// Get total amount borrowed
   double get totalAmountBorrowed {
-    return _payables.fold(0.0, (sum, payable) => sum + payable.amountBorrowed);
+    try {
+      if (_statistics != null) {
+        return _statistics!.totalBorrowedAmount;
+      }
+      return _payables.fold(0.0, (sum, payable) => sum + payable.amountBorrowed);
+    } catch (e) {
+      return _payables.fold(0.0, (sum, payable) => sum + payable.amountBorrowed);
+    }
   }
 
   /// Get total amount paid
   double get totalAmountPaid {
-    return _payables.fold(0.0, (sum, payable) => sum + payable.amountPaid);
+    try {
+      if (_statistics != null) {
+        return _statistics!.totalPaidAmount;
+      }
+      return _payables.fold(0.0, (sum, payable) => sum + payable.amountPaid);
+    } catch (e) {
+      return _payables.fold(0.0, (sum, payable) => sum + payable.amountPaid);
+    }
   }
 
   /// Get total balance remaining
   double get totalBalanceRemaining {
-    return _payables.fold(0.0, (sum, payable) => sum + payable.balanceRemaining);
+    try {
+      if (_statistics != null) {
+        return _statistics!.totalOutstandingAmount;
+      }
+      return _payables.fold(0.0, (sum, payable) => sum + payable.balanceRemaining);
+    } catch (e) {
+      return _payables.fold(0.0, (sum, payable) => sum + payable.balanceRemaining);
+    }
   }
 
   /// Get average payment percentage
   double get averagePaymentPercentage {
-    if (_payables.isEmpty) return 0.0;
-    final totalPercentage = _payables.fold(0.0, (sum, payable) => sum + payable.paymentPercentage);
-    return totalPercentage / _payables.length;
+    try {
+      if (_statistics != null && _statistics!.totalBorrowedAmount > 0) {
+        return (_statistics!.totalPaidAmount / _statistics!.totalBorrowedAmount) * 100;
+      }
+      if (_payables.isEmpty) return 0.0;
+      final totalPercentage = _payables.fold(0.0, (sum, payable) => sum + payable.paymentPercentage);
+      return totalPercentage / _payables.length;
+    } catch (e) {
+      if (_payables.isEmpty) return 0.0;
+      final totalPercentage = _payables.fold(0.0, (sum, payable) => sum + payable.paymentPercentage);
+      return totalPercentage / _payables.length;
+    }
   }
 
   /// Set sorting field
