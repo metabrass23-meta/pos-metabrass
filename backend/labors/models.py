@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from datetime import timedelta, date
+from decimal import Decimal
 
 
 class LaborQuerySet(models.QuerySet):
@@ -146,6 +147,20 @@ class Labor(models.Model):
         validators=[MinValueValidator(0)],
         help_text="Monthly salary amount"
     )
+    remaining_monthly_salary = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        help_text="Remaining salary balance for current month (resets monthly)"
+    )
+    current_month = models.PositiveIntegerField(
+        default=0,
+        help_text="Current month number (1-12) for tracking monthly resets"
+    )
+    current_year = models.PositiveIntegerField(
+        default=0,
+        help_text="Current year for tracking monthly resets"
+    )
     area = models.CharField(
         max_length=100,
         help_text="Area/locality within the city"
@@ -234,8 +249,53 @@ class Labor(models.Model):
             self.area = self.area.strip().title()
     
     def save(self, *args, **kwargs):
+        # Check if we need to reset monthly salary
+        self._reset_monthly_salary_if_needed()
+        
         self.full_clean()
         super().save(*args, **kwargs)
+    
+    def _reset_monthly_salary_if_needed(self):
+        """Reset monthly salary to full amount if it's a new month"""
+        from datetime import date
+        today = date.today()
+        current_month = today.month
+        current_year = today.year
+        
+        # If it's a new month, reset the remaining salary
+        if self.current_month != current_month or self.current_year != current_year:
+            self.remaining_monthly_salary = self.salary
+            self.current_month = current_month
+            self.current_year = current_year
+    
+    def deduct_advance_payment(self, amount):
+        """Deduct advance payment from remaining monthly salary"""
+        # Calculate the actual remaining advance amount (salary - total advances)
+        remaining_advance_amount = self.get_remaining_advance_amount()
+        
+        if amount > remaining_advance_amount:
+            raise ValidationError(f"Advance amount {amount} exceeds remaining advance amount {remaining_advance_amount}. Total advances this month: {self.get_total_advances_amount()}")
+        
+        self.remaining_monthly_salary -= amount
+        return self.remaining_monthly_salary
+    
+    def get_total_advances_amount(self):
+        """Get total advance amount for current month"""
+        from advance_payments.models import AdvancePayment
+        from django.utils import timezone
+        
+        today = timezone.now().date()
+        return AdvancePayment.objects.filter(
+            labor=self,
+            date__year=today.year,
+            date__month=today.month,
+            is_active=True
+        ).aggregate(total=models.Sum('amount'))['total'] or Decimal('0.00')
+    
+    def get_remaining_advance_amount(self):
+        """Get remaining amount that can be advanced (salary - total advances)"""
+        total_advances = self.get_total_advances_amount()
+        return self.salary - total_advances
     
     # Properties
     @property
@@ -294,6 +354,21 @@ class Labor(models.Model):
     def gender_display(self):
         """Get human-readable gender"""
         return dict(self.GENDER_CHOICES).get(self.gender, 'Unknown')
+    
+    @property
+    def remaining_monthly_salary_display(self):
+        """Get formatted remaining monthly salary"""
+        return f"PKR {self.remaining_monthly_salary:,.2f}"
+    
+    @property
+    def remaining_advance_amount_display(self):
+        """Get formatted remaining advance amount"""
+        return f"PKR {self.get_remaining_advance_amount():,.2f}"
+    
+    @property
+    def total_advances_amount_display(self):
+        """Get formatted total advances amount for current month"""
+        return f"PKR {self.get_total_advances_amount():,.2f}"
     
     # Helper methods
     def get_initials(self):
