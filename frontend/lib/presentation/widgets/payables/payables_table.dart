@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -11,12 +12,7 @@ class PayablesTable extends StatelessWidget {
   final Function(Payable) onDelete;
   final Function(Payable) onViewDetails;
 
-  const PayablesTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onViewDetails,
-  });
+  const PayablesTable({super.key, required this.onEdit, required this.onDelete, required this.onViewDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +20,7 @@ class PayablesTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Column(
         children: [
@@ -51,26 +41,9 @@ class PayablesTable extends StatelessWidget {
                 if (provider.isLoading) {
                   return Center(
                     child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      child: const CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
-                        strokeWidth: 3,
-                      ),
+                      width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
+                      height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
+                      child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
                     ),
                   );
                 }
@@ -106,46 +79,18 @@ class PayablesTable extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(
-          flex: payableColumnFlexes[0],
-          child: _buildHeaderCell(context, 'ID'),
-        ),
-        Expanded(
-          flex: payableColumnFlexes[1],
-          child: _buildHeaderCell(context, context.isTablet ? 'Creditor' : 'Creditor Details'),
-        ),
-        Expanded(
-          flex: payableColumnFlexes[2],
-          child: _buildHeaderCell(context, 'Amounts'),
-        ),
-        if (!context.shouldShowCompactLayout) ...[
-          Expanded(
-            flex: payableColumnFlexes[3],
-            child: _buildHeaderCell(context, 'Reason/Item'),
-          ),
-        ],
+        Expanded(flex: payableColumnFlexes[0], child: _buildHeaderCell(context, 'ID')),
+        Expanded(flex: payableColumnFlexes[1], child: _buildHeaderCell(context, context.isTablet ? 'Creditor' : 'Creditor Details')),
+        Expanded(flex: payableColumnFlexes[2], child: _buildHeaderCell(context, 'Amounts')),
+        if (!context.shouldShowCompactLayout) ...[Expanded(flex: payableColumnFlexes[3], child: _buildHeaderCell(context, 'Reason/Item'))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: payableColumnFlexes[4],
-            child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Dates' : 'Repayment Date'),
-          ),
+          Expanded(flex: payableColumnFlexes[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Dates' : 'Repayment Date')),
         ],
-        if (context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: payableColumnFlexes[5],
-            child: _buildHeaderCell(context, 'Progress'),
-          ),
-        ],
+        if (context.shouldShowFullLayout) ...[Expanded(flex: payableColumnFlexes[5], child: _buildHeaderCell(context, 'Progress'))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: payableColumnFlexes[6],
-            child: _buildHeaderCell(context, 'Status'),
-          ),
+          Expanded(flex: payableColumnFlexes[6], child: _buildHeaderCell(context, 'Status')),
         ],
-        Expanded(
-          flex: payableColumnFlexes[7],
-          child: _buildHeaderCell(context, 'Actions'),
-        ),
+        Expanded(flex: payableColumnFlexes[7], child: _buildHeaderCell(context, 'Actions')),
       ],
     );
   }
@@ -153,12 +98,7 @@ class PayablesTable extends StatelessWidget {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -175,36 +115,22 @@ class PayablesTable extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 2.5),
       decoration: BoxDecoration(
-        color: index.isEven
-            ? AppTheme.pureWhite
-            : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.5,
-          ),
-        ),
+        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
       child: Row(
         children: [
           Expanded(
             flex: payableColumnFlexes[0],
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
                 payable.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -218,23 +144,15 @@ class PayablesTable extends StatelessWidget {
               children: [
                 Text(
                   payable.creditorName,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    payable.creditorPhone,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
+                    payable.creditorPhone ?? 'N/A',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -255,36 +173,22 @@ class PayablesTable extends StatelessWidget {
           Expanded(
             flex: payableColumnFlexes[2],
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
               decoration: BoxDecoration(
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(
-                  color: Colors.red.withOpacity(0.3),
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
               ),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.trending_down_rounded,
-                        color: Colors.red,
-                        size: context.iconSize('small'),
-                      ),
+                      Icon(Icons.trending_down_rounded, color: Colors.red, size: context.iconSize('small')),
                       SizedBox(width: context.smallPadding / 2),
                       Expanded(
                         child: Text(
                           'PKR ${payable.amountBorrowed.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.red,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -294,20 +198,12 @@ class PayablesTable extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 4),
                     Row(
                       children: [
-                        Icon(
-                          Icons.trending_up_rounded,
-                          color: Colors.green,
-                          size: context.iconSize('small'),
-                        ),
+                        Icon(Icons.trending_up_rounded, color: Colors.green, size: context.iconSize('small')),
                         SizedBox(width: context.smallPadding / 2),
                         Expanded(
                           child: Text(
                             'PKR ${payable.amountPaid.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.green,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -328,11 +224,7 @@ class PayablesTable extends StatelessWidget {
                 children: [
                   Text(
                     payable.reasonOrItem,
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -340,10 +232,7 @@ class PayablesTable extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       payable.notes!,
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -365,29 +254,21 @@ class PayablesTable extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
-                      color: payable.isOverdue ? Colors.red : AppTheme.charcoalGray,
+                      color: payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
                     ),
                   ),
                   if (context.shouldShowFullLayout) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       'Borrowed: ${payable.formattedDateBorrowed}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[500],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                     ),
                   ],
-                  if (payable.isOverdue) ...[
+                  if (payable.isOverdueComputed) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${payable.daysOverdue} days overdue',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
                     ),
                   ],
                 ],
@@ -404,9 +285,7 @@ class PayablesTable extends StatelessWidget {
                   LinearProgressIndicator(
                     value: payable.paymentPercentage / 100,
                     backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      payable.isFullyPaid ? Colors.green : Colors.orange,
-                    ),
+                    valueColor: AlwaysStoppedAnimation<Color>(payable.isFullyPaid ? Colors.green : Colors.orange),
                     minHeight: 6,
                   ),
                   SizedBox(height: context.smallPadding / 2),
@@ -428,17 +307,11 @@ class PayablesTable extends StatelessWidget {
             Expanded(
               flex: payableColumnFlexes[6],
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                 decoration: BoxDecoration(
-                  color: payable.statusColor.withOpacity(0.1),
+                  color: payable.statusColorValue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  border: Border.all(
-                    color: payable.statusColor.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  border: Border.all(color: payable.statusColorValue.withOpacity(0.3), width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -446,20 +319,13 @@ class PayablesTable extends StatelessWidget {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: payable.statusColor,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: payable.statusColorValue, shape: BoxShape.circle),
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Expanded(
                       child: Text(
                         payable.statusText,
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: payable.statusColor,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: payable.statusColorValue),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -503,18 +369,11 @@ class PayablesTable extends StatelessWidget {
           value: 'edit',
           child: Row(
             children: [
-              Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
+              Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Edit',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.blue,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue),
               ),
             ],
           ),
@@ -523,18 +382,11 @@ class PayablesTable extends StatelessWidget {
           value: 'details',
           child: Row(
             children: [
-              Icon(
-                Icons.visibility_outlined,
-                color: Colors.green,
-                size: context.iconSize('small'),
-              ),
+              Icon(Icons.visibility_outlined, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
                 'View Details',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.green,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.green),
               ),
             ],
           ),
@@ -543,18 +395,11 @@ class PayablesTable extends StatelessWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
+              Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Delete',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.red,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
               ),
             ],
           ),
@@ -562,15 +407,8 @@ class PayablesTable extends StatelessWidget {
       ],
       child: Container(
         padding: EdgeInsets.all(context.smallPadding),
-        decoration: BoxDecoration(
-          color: AppTheme.lightGray,
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        ),
-        child: Icon(
-          Icons.more_vert,
-          size: context.iconSize('small'),
-          color: AppTheme.charcoalGray,
-        ),
+        decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+        child: Icon(Icons.more_vert, size: context.iconSize('small'), color: AppTheme.charcoalGray),
       ),
     );
   }
@@ -586,15 +424,8 @@ class PayablesTable extends StatelessWidget {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -606,15 +437,8 @@ class PayablesTable extends StatelessWidget {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.visibility_outlined,
-                color: Colors.green,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.visibility_outlined, color: Colors.green, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -626,15 +450,8 @@ class PayablesTable extends StatelessWidget {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
         ),
@@ -652,31 +469,17 @@ class PayablesTable extends StatelessWidget {
               onTap: () => onEdit(payable),
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      color: Colors.blue,
-                      size: context.iconSize('small'),
-                    ),
+                    Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Edit',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                     ),
                   ],
                 ),
@@ -692,31 +495,17 @@ class PayablesTable extends StatelessWidget {
               onTap: () => onViewDetails(payable),
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.visibility_outlined,
-                      color: Colors.green,
-                      size: context.iconSize('small'),
-                    ),
+                    Icon(Icons.visibility_outlined, color: Colors.green, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'View',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.green,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                     ),
                   ],
                 ),
@@ -732,31 +521,17 @@ class PayablesTable extends StatelessWidget {
               onTap: () => onDelete(payable),
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: context.iconSize('small'),
-                    ),
+                    Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Delete',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
                     ),
                   ],
                 ),
@@ -774,69 +549,31 @@ class PayablesTable extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
-            child: Icon(
-              Icons.credit_card_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 5.w, small: 5.w, medium: 5.w, large: 5.w, ultrawide: 5.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 5.w, small: 5.w, medium: 5.w, large: 5.w, ultrawide: 5.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
+            child: Icon(Icons.credit_card_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
           SizedBox(height: context.mainPadding),
           Text(
             'No Payables Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
-              ),
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
               'Start by adding your first payable record to track amounts borrowed from suppliers and creditors',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
           SizedBox(height: context.mainPadding),
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
+              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Material(
@@ -847,18 +584,11 @@ class PayablesTable extends StatelessWidget {
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
+                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
                         'Add First Payable',
