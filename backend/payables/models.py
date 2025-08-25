@@ -106,6 +106,7 @@ class Payable(models.Model):
         help_text="Creditor contact number"
     )
     creditor_email = models.EmailField(
+        null=True,
         blank=True,
         help_text="Optional creditor email"
     )
@@ -355,6 +356,17 @@ class Payable(models.Model):
         else:
             self.notes = payment_note
         
+        self.save()
+    
+    def add_incremental_payment(self, additional_amount):
+        """Add additional amount to existing paid amount"""
+        if additional_amount <= 0:
+            raise ValueError("Additional amount must be positive")
+        
+        if self.amount_paid + additional_amount > self.amount_borrowed:
+            raise ValueError("Total payment would exceed borrowed amount")
+        
+        self.amount_paid += additional_amount
         self.save()
     
     def soft_delete(self):
