@@ -6,29 +6,18 @@ class LaborsListResponse {
   final PaginationInfo pagination;
   final Map<String, dynamic>? filtersApplied;
 
-  LaborsListResponse({
-    required this.labors,
-    required this.pagination,
-    this.filtersApplied,
-  });
+  LaborsListResponse({required this.labors, required this.pagination, this.filtersApplied});
 
   factory LaborsListResponse.fromJson(Map<String, dynamic> json) {
     return LaborsListResponse(
-      labors: (json['labors'] as List<dynamic>?)
-          ?.map((laborJson) => LaborModel.fromJson(laborJson as Map<String, dynamic>))
-          .toList() ??
-          [],
+      labors: (json['labors'] as List<dynamic>?)?.map((laborJson) => LaborModel.fromJson(laborJson as Map<String, dynamic>)).toList() ?? [],
       pagination: PaginationInfo.fromJson(json['pagination'] as Map<String, dynamic>? ?? {}),
       filtersApplied: json['filters_applied'] as Map<String, dynamic>?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'labors': labors.map((labor) => labor.toJson()).toList(),
-      'pagination': pagination.toJson(),
-      'filters_applied': filtersApplied,
-    };
+    return {'labors': labors.map((labor) => labor.toJson()).toList(), 'pagination': pagination.toJson(), 'filters_applied': filtersApplied};
   }
 }
 
@@ -113,22 +102,12 @@ class LaborStatisticsResponse {
       recentLaborsThisWeek: json['recent_labors_this_week'] as int? ?? 0,
       salaryStatistics: LaborSalaryStatistics.fromJson(json['salary_statistics'] as Map<String, dynamic>? ?? {}),
       ageStatistics: LaborAgeStatistics.fromJson(json['age_statistics'] as Map<String, dynamic>? ?? {}),
-      genderBreakdown: (json['gender_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborGenderCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      topDesignations: (json['top_designations'] as List<dynamic>?)
-          ?.map((item) => LaborDesignationCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      topCities: (json['top_cities'] as List<dynamic>?)
-          ?.map((item) => LaborCityCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      topCastes: (json['top_castes'] as List<dynamic>?)
-          ?.map((item) => LaborCasteCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
+      genderBreakdown:
+          (json['gender_breakdown'] as List<dynamic>?)?.map((item) => LaborGenderCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      topDesignations:
+          (json['top_designations'] as List<dynamic>?)?.map((item) => LaborDesignationCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      topCities: (json['top_cities'] as List<dynamic>?)?.map((item) => LaborCityCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      topCastes: (json['top_castes'] as List<dynamic>?)?.map((item) => LaborCasteCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
     );
   }
 
@@ -156,28 +135,16 @@ class LaborSalaryStatistics {
   final double? maxSalary;
   final int totalLabors;
 
-  LaborSalaryStatistics({
-    this.totalSalaryCost,
-    this.avgSalary,
-    this.minSalary,
-    this.maxSalary,
-    required this.totalLabors,
-  });
+  LaborSalaryStatistics({this.totalSalaryCost, this.avgSalary, this.minSalary, this.maxSalary, required this.totalLabors});
 
   factory LaborSalaryStatistics.fromJson(Map<String, dynamic> json) {
     return LaborSalaryStatistics(
       totalSalaryCost: json['total_salary_cost'] is String
           ? double.tryParse(json['total_salary_cost'] as String)
           : (json['total_salary_cost'] as num?)?.toDouble(),
-      avgSalary: json['avg_salary'] is String
-          ? double.tryParse(json['avg_salary'] as String)
-          : (json['avg_salary'] as num?)?.toDouble(),
-      minSalary: json['min_salary'] is String
-          ? double.tryParse(json['min_salary'] as String)
-          : (json['min_salary'] as num?)?.toDouble(),
-      maxSalary: json['max_salary'] is String
-          ? double.tryParse(json['max_salary'] as String)
-          : (json['max_salary'] as num?)?.toDouble(),
+      avgSalary: json['avg_salary'] is String ? double.tryParse(json['avg_salary'] as String) : (json['avg_salary'] as num?)?.toDouble(),
+      minSalary: json['min_salary'] is String ? double.tryParse(json['min_salary'] as String) : (json['min_salary'] as num?)?.toDouble(),
+      maxSalary: json['max_salary'] is String ? double.tryParse(json['max_salary'] as String) : (json['max_salary'] as num?)?.toDouble(),
       totalLabors: json['total_labors'] as int? ?? 0,
     );
   }
@@ -199,18 +166,11 @@ class LaborAgeStatistics {
   final int? maxAge;
   final int totalLabors;
 
-  LaborAgeStatistics({
-    this.avgAge,
-    this.minAge,
-    this.maxAge,
-    required this.totalLabors,
-  });
+  LaborAgeStatistics({this.avgAge, this.minAge, this.maxAge, required this.totalLabors});
 
   factory LaborAgeStatistics.fromJson(Map<String, dynamic> json) {
     return LaborAgeStatistics(
-      avgAge: json['avg_age'] is String
-          ? double.tryParse(json['avg_age'] as String)
-          : (json['avg_age'] as num?)?.toDouble(),
+      avgAge: json['avg_age'] is String ? double.tryParse(json['avg_age'] as String) : (json['avg_age'] as num?)?.toDouble(),
       minAge: json['min_age'] as int?,
       maxAge: json['max_age'] as int?,
       totalLabors: json['total_labors'] as int? ?? 0,
@@ -218,12 +178,7 @@ class LaborAgeStatistics {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'avg_age': avgAge,
-      'min_age': minAge,
-      'max_age': maxAge,
-      'total_labors': totalLabors,
-    };
+    return {'avg_age': avgAge, 'min_age': minAge, 'max_age': maxAge, 'total_labors': totalLabors};
   }
 }
 
@@ -231,23 +186,14 @@ class LaborGenderCount {
   final String gender;
   final int count;
 
-  LaborGenderCount({
-    required this.gender,
-    required this.count,
-  });
+  LaborGenderCount({required this.gender, required this.count});
 
   factory LaborGenderCount.fromJson(Map<String, dynamic> json) {
-    return LaborGenderCount(
-      gender: json['gender'] as String? ?? '',
-      count: json['count'] as int? ?? 0,
-    );
+    return LaborGenderCount(gender: json['gender'] as String? ?? '', count: json['count'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'gender': gender,
-      'count': count,
-    };
+    return {'gender': gender, 'count': count};
   }
 }
 
@@ -255,23 +201,14 @@ class LaborDesignationCount {
   final String designation;
   final int count;
 
-  LaborDesignationCount({
-    required this.designation,
-    required this.count,
-  });
+  LaborDesignationCount({required this.designation, required this.count});
 
   factory LaborDesignationCount.fromJson(Map<String, dynamic> json) {
-    return LaborDesignationCount(
-      designation: json['designation'] as String? ?? '',
-      count: json['count'] as int? ?? 0,
-    );
+    return LaborDesignationCount(designation: json['designation'] as String? ?? '', count: json['count'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'designation': designation,
-      'count': count,
-    };
+    return {'designation': designation, 'count': count};
   }
 }
 
@@ -279,23 +216,14 @@ class LaborCityCount {
   final String city;
   final int count;
 
-  LaborCityCount({
-    required this.city,
-    required this.count,
-  });
+  LaborCityCount({required this.city, required this.count});
 
   factory LaborCityCount.fromJson(Map<String, dynamic> json) {
-    return LaborCityCount(
-      city: json['city'] as String? ?? '',
-      count: json['count'] as int? ?? 0,
-    );
+    return LaborCityCount(city: json['city'] as String? ?? '', count: json['count'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'city': city,
-      'count': count,
-    };
+    return {'city': city, 'count': count};
   }
 }
 
@@ -303,23 +231,14 @@ class LaborCasteCount {
   final String caste;
   final int count;
 
-  LaborCasteCount({
-    required this.caste,
-    required this.count,
-  });
+  LaborCasteCount({required this.caste, required this.count});
 
   factory LaborCasteCount.fromJson(Map<String, dynamic> json) {
-    return LaborCasteCount(
-      caste: json['caste'] as String? ?? '',
-      count: json['count'] as int? ?? 0,
-    );
+    return LaborCasteCount(caste: json['caste'] as String? ?? '', count: json['count'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'caste': caste,
-      'count': count,
-    };
+    return {'caste': caste, 'count': count};
   }
 }
 
@@ -343,18 +262,12 @@ class LaborSalaryReportResponse {
   factory LaborSalaryReportResponse.fromJson(Map<String, dynamic> json) {
     return LaborSalaryReportResponse(
       salaryStatistics: LaborSalaryStatistics.fromJson(json['salary_statistics'] as Map<String, dynamic>? ?? {}),
-      designationBreakdown: (json['designation_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborDesignationSalary.fromJson(item as Map<String, dynamic>))
-          .toList() ??
+      designationBreakdown:
+          (json['designation_breakdown'] as List<dynamic>?)?.map((item) => LaborDesignationSalary.fromJson(item as Map<String, dynamic>)).toList() ??
           [],
-      cityBreakdown: (json['city_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborCitySalary.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      genderBreakdown: (json['gender_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborGenderSalary.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
+      cityBreakdown: (json['city_breakdown'] as List<dynamic>?)?.map((item) => LaborCitySalary.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      genderBreakdown:
+          (json['gender_breakdown'] as List<dynamic>?)?.map((item) => LaborGenderSalary.fromJson(item as Map<String, dynamic>)).toList() ?? [],
       salaryRanges: LaborSalaryRanges.fromJson(json['salary_ranges'] as Map<String, dynamic>? ?? {}),
       generatedAt: json['generated_at'] as String? ?? '',
     );
@@ -378,12 +291,7 @@ class LaborDesignationSalary {
   final double totalSalary;
   final double avgSalary;
 
-  LaborDesignationSalary({
-    required this.designation,
-    required this.count,
-    required this.totalSalary,
-    required this.avgSalary,
-  });
+  LaborDesignationSalary({required this.designation, required this.count, required this.totalSalary, required this.avgSalary});
 
   factory LaborDesignationSalary.fromJson(Map<String, dynamic> json) {
     return LaborDesignationSalary(
@@ -399,12 +307,7 @@ class LaborDesignationSalary {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'designation': designation,
-      'count': count,
-      'total_salary': totalSalary,
-      'avg_salary': avgSalary,
-    };
+    return {'designation': designation, 'count': count, 'total_salary': totalSalary, 'avg_salary': avgSalary};
   }
 }
 
@@ -414,12 +317,7 @@ class LaborCitySalary {
   final double totalSalary;
   final double avgSalary;
 
-  LaborCitySalary({
-    required this.city,
-    required this.count,
-    required this.totalSalary,
-    required this.avgSalary,
-  });
+  LaborCitySalary({required this.city, required this.count, required this.totalSalary, required this.avgSalary});
 
   factory LaborCitySalary.fromJson(Map<String, dynamic> json) {
     return LaborCitySalary(
@@ -435,12 +333,7 @@ class LaborCitySalary {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'city': city,
-      'count': count,
-      'total_salary': totalSalary,
-      'avg_salary': avgSalary,
-    };
+    return {'city': city, 'count': count, 'total_salary': totalSalary, 'avg_salary': avgSalary};
   }
 }
 
@@ -450,12 +343,7 @@ class LaborGenderSalary {
   final double totalSalary;
   final double avgSalary;
 
-  LaborGenderSalary({
-    required this.gender,
-    required this.count,
-    required this.totalSalary,
-    required this.avgSalary,
-  });
+  LaborGenderSalary({required this.gender, required this.count, required this.totalSalary, required this.avgSalary});
 
   factory LaborGenderSalary.fromJson(Map<String, dynamic> json) {
     return LaborGenderSalary(
@@ -471,12 +359,7 @@ class LaborGenderSalary {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'gender': gender,
-      'count': count,
-      'total_salary': totalSalary,
-      'avg_salary': avgSalary,
-    };
+    return {'gender': gender, 'count': count, 'total_salary': totalSalary, 'avg_salary': avgSalary};
   }
 }
 
@@ -537,18 +420,12 @@ class LaborDemographicsReportResponse {
     return LaborDemographicsReportResponse(
       ageStatistics: LaborAgeStatistics.fromJson(json['age_statistics'] as Map<String, dynamic>? ?? {}),
       ageGroups: LaborAgeGroups.fromJson(json['age_groups'] as Map<String, dynamic>? ?? {}),
-      genderBreakdown: (json['gender_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborGenderCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      casteBreakdown: (json['caste_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborCasteCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
-      locationBreakdown: (json['location_breakdown'] as List<dynamic>?)
-          ?.map((item) => LaborLocationCount.fromJson(item as Map<String, dynamic>))
-          .toList() ??
-          [],
+      genderBreakdown:
+          (json['gender_breakdown'] as List<dynamic>?)?.map((item) => LaborGenderCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      casteBreakdown:
+          (json['caste_breakdown'] as List<dynamic>?)?.map((item) => LaborCasteCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      locationBreakdown:
+          (json['location_breakdown'] as List<dynamic>?)?.map((item) => LaborLocationCount.fromJson(item as Map<String, dynamic>)).toList() ?? [],
       generatedAt: json['generated_at'] as String? ?? '',
     );
   }
@@ -572,13 +449,7 @@ class LaborAgeGroups {
   final int age46To55;
   final int ageAbove55;
 
-  LaborAgeGroups({
-    required this.age16To25,
-    required this.age26To35,
-    required this.age36To45,
-    required this.age46To55,
-    required this.ageAbove55,
-  });
+  LaborAgeGroups({required this.age16To25, required this.age26To35, required this.age36To45, required this.age46To55, required this.ageAbove55});
 
   factory LaborAgeGroups.fromJson(Map<String, dynamic> json) {
     return LaborAgeGroups(
@@ -591,13 +462,7 @@ class LaborAgeGroups {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      '16_to_25': age16To25,
-      '26_to_35': age26To35,
-      '36_to_45': age36To45,
-      '46_to_55': age46To55,
-      'above_55': ageAbove55,
-    };
+    return {'16_to_25': age16To25, '26_to_35': age26To35, '36_to_45': age36To45, '46_to_55': age46To55, 'above_55': ageAbove55};
   }
 }
 
@@ -606,26 +471,14 @@ class LaborLocationCount {
   final String area;
   final int count;
 
-  LaborLocationCount({
-    required this.city,
-    required this.area,
-    required this.count,
-  });
+  LaborLocationCount({required this.city, required this.area, required this.count});
 
   factory LaborLocationCount.fromJson(Map<String, dynamic> json) {
-    return LaborLocationCount(
-      city: json['city'] as String? ?? '',
-      area: json['area'] as String? ?? '',
-      count: json['count'] as int? ?? 0,
-    );
+    return LaborLocationCount(city: json['city'] as String? ?? '', area: json['area'] as String? ?? '', count: json['count'] as int? ?? 0);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'city': city,
-      'area': area,
-      'count': count,
-    };
+    return {'city': city, 'area': area, 'count': count};
   }
 }
 
@@ -636,7 +489,7 @@ class LaborPaymentsResponse {
   final List<dynamic> regularPayments;
   final double totalAdvanceAmount;
   final double totalPaymentsAmount;
-  final double remainingAdvanceBalance;
+  final double remainingMonthlySalary;
   final DateTime? lastPaymentDate;
   final String note;
 
@@ -647,7 +500,7 @@ class LaborPaymentsResponse {
     required this.regularPayments,
     required this.totalAdvanceAmount,
     required this.totalPaymentsAmount,
-    required this.remainingAdvanceBalance,
+    required this.remainingMonthlySalary,
     this.lastPaymentDate,
     required this.note,
   });
@@ -664,12 +517,10 @@ class LaborPaymentsResponse {
       totalPaymentsAmount: json['total_payments_amount'] is String
           ? double.tryParse(json['total_payments_amount'] as String) ?? 0.0
           : (json['total_payments_amount'] as num?)?.toDouble() ?? 0.0,
-      remainingAdvanceBalance: json['remaining_advance_balance'] is String
-          ? double.tryParse(json['remaining_advance_balance'] as String) ?? 0.0
-          : (json['remaining_advance_balance'] as num?)?.toDouble() ?? 0.0,
-      lastPaymentDate: json['last_payment_date'] != null
-          ? DateTime.tryParse(json['last_payment_date'] as String)
-          : null,
+      remainingMonthlySalary: json['remaining_monthly_salary'] is String
+          ? double.tryParse(json['remaining_monthly_salary'] as String) ?? 0.0
+          : (json['remaining_monthly_salary'] as num?)?.toDouble() ?? 0.0,
+      lastPaymentDate: json['last_payment_date'] != null ? DateTime.tryParse(json['last_payment_date'] as String) : null,
       note: json['note'] as String? ?? '',
     );
   }
@@ -682,7 +533,7 @@ class LaborPaymentsResponse {
       'regular_payments': regularPayments,
       'total_advance_amount': totalAdvanceAmount,
       'total_payments_amount': totalPaymentsAmount,
-      'remaining_advance_balance': remainingAdvanceBalance,
+      'remaining_monthly_salary': remainingMonthlySalary,
       'last_payment_date': lastPaymentDate?.toIso8601String(),
       'note': note,
     };
@@ -784,18 +635,10 @@ class LaborBulkActionRequest {
   final double? salaryAmount;
   final double? salaryPercentage;
 
-  LaborBulkActionRequest({
-    required this.laborIds,
-    required this.action,
-    this.salaryAmount,
-    this.salaryPercentage,
-  });
+  LaborBulkActionRequest({required this.laborIds, required this.action, this.salaryAmount, this.salaryPercentage});
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{
-      'labor_ids': laborIds,
-      'action': action,
-    };
+    final json = <String, dynamic>{'labor_ids': laborIds, 'action': action};
 
     if (salaryAmount != null) {
       json['salary_amount'] = salaryAmount!;
@@ -849,11 +692,7 @@ class LaborListParams {
   });
 
   Map<String, dynamic> toQueryParameters() {
-    final params = <String, dynamic>{
-      'page': page.toString(),
-      'page_size': pageSize.toString(),
-      'show_inactive': showInactive.toString(),
-    };
+    final params = <String, dynamic>{'page': page.toString(), 'page_size': pageSize.toString(), 'show_inactive': showInactive.toString()};
 
     if (search != null && search!.isNotEmpty) {
       params['search'] = search!;

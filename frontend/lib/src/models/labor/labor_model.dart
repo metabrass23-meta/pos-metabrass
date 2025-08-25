@@ -26,7 +26,9 @@ class LaborModel {
   final int paymentsCount;
   final double totalPaymentsAmount;
   final DateTime? lastPaymentDate;
-  final double remainingAdvanceBalance;
+  final double remainingMonthlySalary;
+  final double remainingAdvanceAmount;
+  final double totalAdvancesAmount;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -61,7 +63,9 @@ class LaborModel {
     required this.paymentsCount,
     required this.totalPaymentsAmount,
     this.lastPaymentDate,
-    required this.remainingAdvanceBalance,
+    required this.remainingMonthlySalary,
+    required this.remainingAdvanceAmount,
+    required this.totalAdvancesAmount,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -78,9 +82,7 @@ class LaborModel {
       caste: json['caste'] as String,
       designation: json['designation'] as String,
       joiningDate: DateTime.parse(json['joining_date'] as String),
-      salary: json['salary'] is String
-          ? double.parse(json['salary'] as String)
-          : (json['salary'] as num?)?.toDouble() ?? 0.0,
+      salary: json['salary'] is String ? double.parse(json['salary'] as String) : (json['salary'] as num?)?.toDouble() ?? 0.0,
       area: json['area'] as String,
       city: json['city'] as String,
       gender: json['gender'] as String,
@@ -105,12 +107,16 @@ class LaborModel {
       totalPaymentsAmount: json['total_payments_amount'] is String
           ? double.parse(json['total_payments_amount'] as String)
           : (json['total_payments_amount'] as num?)?.toDouble() ?? 0.0,
-      lastPaymentDate: json['last_payment_date'] != null
-          ? DateTime.parse(json['last_payment_date'] as String)
-          : null,
-      remainingAdvanceBalance: json['remaining_advance_balance'] is String
-          ? double.parse(json['remaining_advance_balance'] as String)
-          : (json['remaining_advance_balance'] as num?)?.toDouble() ?? 0.0,
+      lastPaymentDate: json['last_payment_date'] != null ? DateTime.parse(json['last_payment_date'] as String) : null,
+      remainingMonthlySalary: json['remaining_monthly_salary'] is String
+          ? double.parse(json['remaining_monthly_salary'] as String)
+          : (json['remaining_monthly_salary'] as num?)?.toDouble() ?? 0.0,
+      remainingAdvanceAmount: json['remaining_advance_amount'] is String
+          ? double.parse(json['remaining_advance_amount'] as String)
+          : (json['remaining_advance_amount'] as num?)?.toDouble() ?? 0.0,
+      totalAdvancesAmount: json['total_advances_amount'] is String
+          ? double.parse(json['total_advances_amount'] as String)
+          : (json['total_advances_amount'] as num?)?.toDouble() ?? 0.0,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['created_at'] as String),
@@ -148,7 +154,9 @@ class LaborModel {
       'payments_count': paymentsCount,
       'total_payments_amount': totalPaymentsAmount,
       'last_payment_date': lastPaymentDate?.toIso8601String(),
-      'remaining_advance_balance': remainingAdvanceBalance,
+      'remaining_monthly_salary': remainingMonthlySalary,
+      'remaining_advance_amount': remainingAdvanceAmount,
+      'total_advances_amount': totalAdvancesAmount,
       'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -185,7 +193,9 @@ class LaborModel {
     int? paymentsCount,
     double? totalPaymentsAmount,
     DateTime? lastPaymentDate,
-    double? remainingAdvanceBalance,
+    double? remainingMonthlySalary,
+    double? remainingAdvanceAmount,
+    double? totalAdvancesAmount,
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -220,7 +230,9 @@ class LaborModel {
       paymentsCount: paymentsCount ?? this.paymentsCount,
       totalPaymentsAmount: totalPaymentsAmount ?? this.totalPaymentsAmount,
       lastPaymentDate: lastPaymentDate ?? this.lastPaymentDate,
-      remainingAdvanceBalance: remainingAdvanceBalance ?? this.remainingAdvanceBalance,
+      remainingMonthlySalary: remainingMonthlySalary ?? this.remainingMonthlySalary,
+      remainingAdvanceAmount: remainingAdvanceAmount ?? this.remainingAdvanceAmount,
+      totalAdvancesAmount: totalAdvancesAmount ?? this.totalAdvancesAmount,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
