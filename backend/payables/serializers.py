@@ -144,73 +144,7 @@ class PayableCreateSerializer(serializers.ModelSerializer):
             'creditor_email',
             'vendor',
             'amount_borrowed',
-            'reason_or_item',
-            'date_borrowed',
-            'expected_repayment_date',
-            'priority',
-            'notes'
-        )
-
-    def validate_creditor_name(self, value):
-        """Clean and validate creditor name"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("Creditor name is required.")
-        
-        name = value.strip()
-        if len(name) < 2:
-            raise serializers.ValidationError("Creditor name must be at least 2 characters long.")
-        
-        return name
-
-    def validate_amount_borrowed(self, value):
-        """Validate borrowed amount"""
-        if value <= 0:
-            raise serializers.ValidationError("Amount borrowed must be greater than zero.")
-        return value
-
-    def validate_reason_or_item(self, value):
-        """Clean and validate reason"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("Reason or item description is required.")
-        
-        reason = value.strip()
-        if len(reason) < 5:
-            raise serializers.ValidationError("Reason must be at least 5 characters long.")
-        
-        return reason
-
-    def validate(self, data):
-        """Cross-field validation"""
-        date_borrowed = data.get('date_borrowed')
-        expected_repayment_date = data.get('expected_repayment_date')
-        
-        # Check date logic
-        if date_borrowed and expected_repayment_date:
-            if expected_repayment_date < date_borrowed:
-                raise serializers.ValidationError({
-                    'expected_repayment_date': 'Repayment date cannot be before borrowed date.'
-                })
-        
-        return data
-
-    def create(self, validated_data):
-        """Create payable with the requesting user as creator"""
-        user = self.context['request'].user
-        validated_data['created_by'] = user
-        return super().create(validated_data)
-
-
-class PayableUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for updating payables"""
-    
-    class Meta:
-        model = Payable
-        fields = (
-            'creditor_name',
-            'creditor_phone',
-            'creditor_email',
-            'vendor',
-            'amount_borrowed',
+            'amount_paid',
             'reason_or_item',
             'date_borrowed',
             'expected_repayment_date',
@@ -249,14 +183,15 @@ class PayableUpdateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Cross-field validation"""
         amount_borrowed = data.get('amount_borrowed')
+        amount_paid = data.get('amount_paid', Decimal('0.00'))
         date_borrowed = data.get('date_borrowed')
         expected_repayment_date = data.get('expected_repayment_date')
         
-        # Check if there are payments and new amount is less than paid amount
-        if self.instance and amount_borrowed:
-            if amount_borrowed < self.instance.amount_paid:
+        # Check that initial amount_paid doesn't exceed amount_borrowed
+        if amount_borrowed and amount_paid:
+            if amount_paid > amount_borrowed:
                 raise serializers.ValidationError({
-                    'amount_borrowed': f'Cannot reduce borrowed amount below already paid amount of {self.instance.amount_paid}'
+                    'amount_paid': f'Initial amount paid cannot exceed amount borrowed of {amount_borrowed}'
                 })
         
         # Check date logic
@@ -267,6 +202,110 @@ class PayableUpdateSerializer(serializers.ModelSerializer):
                 })
         
         return data
+
+    def create(self, validated_data):
+        """Create payable with the requesting user as creator"""
+        user = self.context['request'].user
+        validated_data['created_by'] = user
+        return super().create(validated_data)
+
+
+class PayableUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating payables"""
+    
+    class Meta:
+        model = Payable
+        fields = (
+            'creditor_name',
+            'creditor_phone',
+            'creditor_email',
+            'vendor',
+            'amount_borrowed',
+            'amount_paid',
+            'reason_or_item',
+            'date_borrowed',
+            'expected_repayment_date',
+            'priority',
+            'notes'
+        )
+
+    def validate_creditor_name(self, value):
+        """Clean and validate creditor name"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Creditor name is required.")
+        
+        name = value.strip()
+        if len(name) < 2:
+            raise serializers.ValidationError("Creditor name must be at least 2 characters long.")
+        
+        return name
+
+    def validate_amount_borrowed(self, value):
+        """Validate borrowed amount"""
+        if value <= 0:
+            raise serializers.ValidationError("Amount borrowed must be greater than zero.")
+        return value
+
+    def validate_amount_paid(self, value):
+        """Validate paid amount"""
+        if value < 0:
+            raise serializers.ValidationError("Amount paid cannot be negative.")
+        return value
+
+    def validate_reason_or_item(self, value):
+        """Clean and validate reason"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Reason or item description is required.")
+        
+        reason = value.strip()
+        if len(reason) < 5:
+            raise serializers.ValidationError("Reason must be at least 5 characters long.")
+        
+        return reason
+
+    def validate(self, data):
+        """Cross-field validation"""
+        amount_borrowed = data.get('amount_borrowed')
+        amount_paid = data.get('amount_paid')
+        date_borrowed = data.get('date_borrowed')
+        expected_repayment_date = data.get('expected_repayment_date')
+        
+        # Check if there are payments and new amount is less than paid amount
+        if self.instance and amount_borrowed:
+            if amount_borrowed < self.instance.amount_paid:
+                raise serializers.ValidationError({
+                    'amount_borrowed': f'Cannot reduce borrowed amount below already paid amount of {self.instance.amount_paid}'
+                })
+        
+        # Check that additional amount_paid doesn't exceed remaining balance
+        if amount_paid and self.instance:
+            current_paid = self.instance.amount_paid
+            if current_paid + amount_paid > amount_borrowed:
+                raise serializers.ValidationError({
+                    'amount_paid': f'Additional payment of {amount_paid} would exceed remaining balance of {amount_borrowed - current_paid}'
+                })
+        
+        # Check date logic
+        if date_borrowed and expected_repayment_date:
+            if expected_repayment_date < date_borrowed:
+                raise serializers.ValidationError({
+                    'expected_repayment_date': 'Repayment date cannot be before borrowed date.'
+                })
+        
+        return data
+    
+    def update(self, instance, validated_data):
+        """Handle incremental payment updates"""
+        amount_paid = validated_data.get('amount_paid')
+        
+        if amount_paid is not None and amount_paid > 0:
+            # amount_paid now represents the ADDITIONAL amount to pay
+            # Add incremental payment
+            instance.add_incremental_payment(amount_paid)
+            # Remove amount_paid from validated_data to avoid double processing
+            validated_data.pop('amount_paid')
+        
+        return super().update(instance, validated_data)
 
 
 class PayableListSerializer(serializers.ModelSerializer):
@@ -285,11 +324,16 @@ class PayableListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'creditor_name',
+            'creditor_phone',
+            'creditor_email',
             'vendor_name',
+            'vendor',
             'amount_borrowed',
             'amount_paid',
             'balance_remaining',
             'payment_percentage',
+            'reason_or_item',
+            'notes',
             'expected_repayment_date',
             'days_until_due',
             'is_overdue',

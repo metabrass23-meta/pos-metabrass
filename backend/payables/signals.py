@@ -169,8 +169,6 @@ def payable_post_delete(sender, instance, **kwargs):
         f"(ID: {instance.id}) Status: {instance.status} "
         f"Balance: {instance.balance_remaining}"
     )
-
-
 @receiver(post_save, sender=PayablePayment)
 def payable_payment_post_save(sender, instance, created, **kwargs):
     """Handle payable payment creation"""
@@ -458,3 +456,4 @@ def validate_payment_business_rules(sender, instance, **kwargs):
                 f"payment date {instance.payment_date} ({days_old} days ago)"
             )
             
+
