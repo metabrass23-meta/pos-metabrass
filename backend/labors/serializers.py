@@ -30,7 +30,7 @@ class LaborSerializer(serializers.ModelSerializer):
     payments_count = serializers.SerializerMethodField()
     total_payments_amount = serializers.SerializerMethodField()
     last_payment_date = serializers.SerializerMethodField()
-    remaining_advance_balance = serializers.SerializerMethodField()
+    remaining_monthly_salary = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     
     class Meta:
         model = Labor
@@ -62,7 +62,9 @@ class LaborSerializer(serializers.ModelSerializer):
             'payments_count',
             'total_payments_amount',
             'last_payment_date',
-            'remaining_advance_balance',
+            'remaining_monthly_salary',
+            'remaining_advance_amount',
+            'total_advances_amount',
             'is_active',
             'created_at',
             'updated_at',
@@ -75,7 +77,8 @@ class LaborSerializer(serializers.ModelSerializer):
             'work_experience_days', 'work_experience_years', 'phone_country_code',
             'formatted_phone', 'full_address', 'gender_display',
             'advance_payments_count', 'total_advance_amount', 'payments_count',
-            'total_payments_amount', 'last_payment_date', 'remaining_advance_balance'
+            'total_payments_amount', 'last_payment_date', 'remaining_monthly_salary',
+            'remaining_advance_amount', 'total_advances_amount'
         )
     
     def get_advance_payments_count(self, obj):
@@ -98,9 +101,17 @@ class LaborSerializer(serializers.ModelSerializer):
         """Get last payment date for labor"""
         return obj.get_last_payment_date()
     
-    def get_remaining_advance_balance(self, obj):
-        """Get remaining advance balance for labor"""
-        return obj.get_remaining_advance_balance()
+    def get_remaining_monthly_salary(self, obj):
+        """Get remaining monthly salary for labor"""
+        return obj.get_remaining_monthly_salary()
+    
+    def get_remaining_advance_amount(self, obj):
+        """Get remaining advance amount for labor"""
+        return obj.get_remaining_advance_amount()
+    
+    def get_total_advances_amount(self, obj):
+        """Get total advances amount for current month"""
+        return obj.get_total_advances_amount()
 
     def validate_name(self, value):
         """Clean and validate labor name"""

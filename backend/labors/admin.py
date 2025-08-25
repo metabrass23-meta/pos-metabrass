@@ -16,6 +16,7 @@ class LaborAdmin(admin.ModelAdmin):
         'phone_formatted',
         'location_formatted',
         'salary_formatted',
+        'remaining_advance_amount_display',
         'age_gender_formatted',
         'joining_status_badge',
         'is_active',
@@ -53,6 +54,9 @@ class LaborAdmin(admin.ModelAdmin):
         'formatted_phone_display',
         'full_address_display',
         'gender_display_full',
+        'remaining_monthly_salary_display',
+        'remaining_advance_amount_display',
+        'total_advances_amount_display',
     )
     
     fieldsets = (
@@ -64,6 +68,10 @@ class LaborAdmin(admin.ModelAdmin):
         }),
         ('Employment Information', {
             'fields': ('designation', 'joining_date', 'salary', 'work_experience_display')
+        }),
+        ('Financial Information', {
+            'fields': ('remaining_monthly_salary_display', 'remaining_advance_amount_display', 'total_advances_amount_display'),
+            'classes': ('collapse',)
         }),
         ('Status', {
             'fields': ('is_active',)
@@ -160,6 +168,92 @@ class LaborAdmin(admin.ModelAdmin):
         return format_html('<span style="color: #6c757d;">—</span>')
     salary_formatted.short_description = 'Salary'
     salary_formatted.admin_order_field = 'salary'
+    
+    def remaining_advance_amount_display(self, obj):
+        """Display remaining advance amount with color coding"""
+        try:
+            # Debug: Check if labor has salary
+            if not obj.salary or obj.salary <= 0:
+                return format_html('<span style="color: #6c757d;">No Salary Set</span>')
+            
+            # Get remaining advance amount
+            remaining = obj.get_remaining_advance_amount()
+            
+            # Debug: Log the values
+            print(f"DEBUG: Labor {obj.name} - Salary: {obj.salary}, Remaining: {remaining}")
+            
+            if remaining <= 0:
+                color = '#D32F2F'  # Red
+                text = 'No Advance Available'
+            elif remaining < obj.salary * 0.3:  # Less than 30% of salary
+                color = '#F57C00'  # Orange
+                text = f'₹{remaining:,.0f}'
+            else:
+                color = '#388E3C'  # Green
+                text = f'₹{remaining:,.0f}'
+            
+            return format_html(
+                '<span style="color: {}; font-weight: 600;">{}</span>',
+                color, text
+            )
+        except Exception as e:
+            print(f"ERROR in remaining_advance_amount_display: {str(e)}")
+            return format_html('<span style="color: #ff0000;">Error: {}</span>', str(e)[:50])
+    remaining_advance_amount_display.short_description = 'Remaining Advance'
+    remaining_advance_amount_display.admin_order_field = 'remaining_monthly_salary'
+    
+    def remaining_monthly_salary_display(self, obj):
+        """Display remaining monthly salary"""
+        try:
+            if not obj.salary or obj.salary <= 0:
+                return format_html('<span style="color: #6c757d;">No Salary Set</span>')
+            
+            remaining = obj.remaining_monthly_salary
+            print(f"DEBUG: Labor {obj.name} - Salary: {obj.salary}, Remaining Monthly: {remaining}")
+            
+            if remaining <= 0:
+                color = '#D32F2F'  # Red
+                text = 'No Salary Available'
+            elif remaining < obj.salary * 0.3:  # Less than 30% of salary
+                color = '#F57C00'  # Orange
+                text = f'₹{remaining:,.0f}'
+            else:
+                color = '#388E3C'  # Green
+                text = f'₹{remaining:,.0f}'
+            
+            return format_html(
+                '<span style="color: {}; font-weight: 600;">{}</span>',
+                color, text
+            )
+        except Exception as e:
+            print(f"ERROR in remaining_monthly_salary_display: {str(e)}")
+            return format_html('<span style="color: #ff0000;">Error: {}</span>', str(e)[:50])
+    remaining_monthly_salary_display.short_description = 'Remaining Monthly Salary'
+    
+    def total_advances_amount_display(self, obj):
+        """Display total advances for current month"""
+        try:
+            if not obj.salary or obj.salary <= 0:
+                return format_html('<span style="color: #6c757d;">No Salary Set</span>')
+            
+            total_advances = obj.get_total_advances_amount()
+            print(f"DEBUG: Labor {obj.name} - Total Advances: {total_advances}")
+            
+            if total_advances > 0:
+                color = '#E91E63'  # Pink
+                text = f'₹{total_advances:,.0f}'
+            else:
+                color = '#6c757d'  # Gray
+                text = '₹0'
+            
+            return format_html(
+                '<span style="color: {}; font-weight: 600;">{}</span>',
+                color, text
+            )
+        except Exception as e:
+            print(f"ERROR in total_advances_amount_display: {str(e)}")
+            return format_html('<span style="color: #ff0000;">Error: {}</span>', str(e)[:50])
+    total_advances_amount_display.short_description = 'Total Advances (Month)'
 
     def age_gender_formatted(self, obj):
         """Display age and gender"""
