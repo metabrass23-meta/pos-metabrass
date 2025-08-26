@@ -228,6 +228,91 @@ class ApiConfig {
 
   static const String bulkExpenseActions = '/expenses/bulk-actions/';
 
+  // Advance Payments API endpoints
+  static const String advancePayments = '/advance-payments/';
+  static const String createAdvancePayment = '/advance-payments/create/';
+  static String getAdvancePaymentById(String id) => '/advance-payments/$id/';
+  static String updateAdvancePayment(String id) => '/advance-payments/$id/update/';
+  static String deleteAdvancePayment(String id) => '/advance-payments/$id/delete/';
+  static String softDeleteAdvancePayment(String id) => '/advance-payments/$id/soft-delete/';
+  static String restoreAdvancePayment(String id) => '/advance-payments/$id/restore/';
+  static const String searchAdvancePayments = '/advance-payments/search/';
+  static String paymentsByLabor(String laborId) => '/advance-payments/labor/$laborId/';
+  static const String paymentsByDateRange = '/advance-payments/date-range/';
+  static const String todayPayments = '/advance-payments/today/';
+  static const String recentPayments = '/advance-payments/recent/';
+  static const String advancePaymentStatistics = '/advance-payments/statistics/';
+  static const String monthlyReport = '/advance-payments/monthly-report/';
+  static const String laborAdvanceReport = '/advance-payments/labor-advance-report/';
+  static const String bulkAdvancePaymentActions = '/advance-payments/bulk-actions/';
+  static const String paymentsWithReceipts = '/advance-payments/with-receipts/';
+  static const String paymentsWithoutReceipts = '/advance-payments/without-receipts/';
+  static String laborAdvanceSummary(String laborId) => '/advance-payments/labor/$laborId/summary/';
+
+  // Payments API endpoints
+  static const String payments = '/payments/';
+  static const String createPayment = '/payments/create/';
+  static String getPaymentById(String id) => '/payments/$id/';
+  static String updatePayment(String id) => '/payments/$id/update/';
+  static String deletePayment(String id) => '/payments/$id/delete/';
+  static String softDeletePayment(String id) => '/payments/$id/soft-delete/';
+  static String restorePayment(String id) => '/payments/$id/restore/';
+  static const String searchPayments = '/payments/search/';
+  static String paymentsByLaborId(String laborId) => '/payments/by-labor/$laborId/';
+  static String paymentsByVendorId(String vendorId) => '/payments/by-vendor/$vendorId/';
+  static String paymentsByOrderId(String orderId) => '/payments/by-order/$orderId/';
+  static String paymentsBySaleId(String saleId) => '/payments/by-sale/$saleId/';
+  static const String paymentDateRange = '/payments/by-date-range/';
+  static String paymentsByMethod(String method) => '/payments/by-payment-method/$method/';
+  static const String paymentWithReceipts = '/payments/with-receipts/';
+  static const String paymentWithoutReceipts = '/payments/without-receipts/';
+  static const String paymentRecent = '/payments/recent/';
+  static const String paymentToday = '/payments/today/';
+  static const String paymentThisMonth = '/payments/this-month/';
+  static const String paymentThisYear = '/payments/this-year/';
+  static const String paymentStatistics = '/payments/statistics/';
+  static String markAsFinalPayment(String id) => '/payments/$id/mark-final/';
+
+  // Payables API endpoints
+  static const String payables = '/payables/';
+  static const String createPayable = '/payables/create/';
+  static String getPayableById(String id) => '/payables/$id/';
+  static String updatePayable(String id) => '/payables/$id/update/';
+  static String deletePayable(String id) => '/payables/$id/delete/';
+  static String softDeletePayable(String id) => '/payables/$id/soft-delete/';
+  static String restorePayable(String id) => '/payables/$id/restore/';
+  static const String searchPayables = '/payables/search/';
+  static String payablesByCreditor(String creditorName) => '/payables/creditor/$creditorName/';
+  static String payablesByVendor(String vendorId) => '/payables/vendor/$vendorId/';
+  static const String overduePayables = '/payables/overdue/';
+  static const String urgentPayables = '/payables/urgent/';
+  static const String dueSoonPayables = '/payables/due-soon/';
+  static const String recentPayables = '/payables/recent/';
+  static const String payableStatistics = '/payables/statistics/';
+  static const String paymentSchedule = '/payables/payment-schedule/';
+  static const String creditorSummary = '/payables/creditor-summary/';
+  static const String bulkPayableActions = '/payables/bulk-actions/';
+  static String addPayablePayment(String id) => '/payables/$id/payment/';
+  static String updatePayableContact(String id) => '/payables/$id/contact/update/';
+
+  // Profit Loss endpoints
+  static const String _profitLossBase = '$baseUrl/profit-loss';
+
+  // Main profit loss endpoints
+  static const String calculateProfitLoss = '$_profitLossBase/calculate/';
+  static const String profitLossRecords = '$_profitLossBase/records/';
+  static const String profitLossSummary = '$_profitLossBase/summary/';
+  static const String productProfitability = '$_profitLossBase/product-profitability/';
+  static const String profitLossDashboard = '$_profitLossBase/dashboard/';
+
+  // Dynamic endpoints
+  static String getProfitLossRecordById(String id) => '$_profitLossBase/records/$id/';
+
+  // Cache keys
+  static const String profitLossCacheKey = 'profit_loss_records_cache';
+  static const String profitLossSummaryCacheKey = 'profit_loss_summary_cache';
+  static const String profitLossDashboardCacheKey = 'profit_loss_dashboard_cache';
+
   // Cache keys for expenses
   static const String expensesCacheKey = 'cached_expenses';
   static const String expenseStatsCacheKey = 'cached_expense_stats';
@@ -264,6 +349,12 @@ class ApiConfig {
   static const String laborDemographicsReportCacheKey = 'cached_labor_demographics_report';
   static const String zakatsCacheKey = 'cached_zakats';
   static const String zakatStatsCacheKey = 'cached_zakat_stats';
+  static const String advancePaymentsCacheKey = 'cached_advance_payments';
+  static const String advancePaymentStatsCacheKey = 'cached_advance_payment_stats';
+  static const String paymentsCacheKey = 'cached_payments';
+  static const String paymentStatsCacheKey = 'cached_payment_stats';
+  static const String payablesCacheKey = 'cached_payables';
+  static const String payableStatsCacheKey = 'cached_payable_stats';
   static const String ordersCacheKey = 'cached_orders';
   static const String orderStatsCacheKey = 'cached_order_stats';
   static const String orderItemsCacheKey = 'cached_order_items';

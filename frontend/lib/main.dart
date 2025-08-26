@@ -14,20 +14,19 @@ import 'package:frontend/src/providers/customer_provider.dart';
 import 'package:frontend/src/providers/dashboard_provider.dart';
 import 'package:frontend/src/providers/expenses_provider.dart';
 import 'package:frontend/src/providers/labor_provider.dart';
-import 'package:frontend/src/providers/order_provider.dart';
 import 'package:frontend/src/providers/order_item_provider.dart';
+import 'package:frontend/src/providers/order_provider.dart';
 import 'package:frontend/src/providers/payables_provider.dart';
 import 'package:frontend/src/providers/payment_provider.dart';
 import 'package:frontend/src/providers/prinicipal_acc_provider.dart';
 import 'package:frontend/src/providers/product_provider.dart';
-import 'package:frontend/src/providers/profit_loss_provider.dart';
+import 'package:frontend/src/providers/profit_loss/profit_loss_provider.dart';
 import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/zakat_provider.dart';
-import 'package:frontend/src/theme/app_theme.dart';
-// Add these new imports for API integration
 import 'package:frontend/src/services/api_client.dart';
+import 'package:frontend/src/theme/app_theme.dart';
 import 'package:frontend/src/utils/storage_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -66,7 +65,7 @@ class MaqboolFabricApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Initialize AuthProvider with API integration
-        ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),
@@ -74,33 +73,51 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OrderItemProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
-        ChangeNotifierProvider(create: (_) => CustomerProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => VendorProvider()),
         ChangeNotifierProvider(create: (_) => LaborProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(create: (_) => AdvancePaymentProvider()),
         ChangeNotifierProvider(create: (_) => ReceivablesProvider()),
         ChangeNotifierProvider(create: (_) => PayablesProvider()),
-        ChangeNotifierProvider(create: (_) => ExpensesProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => ExpensesProvider()),
         ChangeNotifierProvider(create: (_) => ZakatProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
         ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
       ],
-      child: Sizer(
-        builder: (context, orientation, deviceType) {
-          return MaterialApp(
-            title: 'Maqbool Fashion - Premium POS',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.light,
-            navigatorKey: navigatorKey,
-            initialRoute: '/',
-            routes: {
-              '/': (context) => const SplashScreen(),
-              '/login': (context) => const LoginScreen(),
-              '/signup': (context) => const SignupScreen(),
-              '/dashboard': (context) => const DashboardScreen(),
+      child: Consumer2<AuthProvider, ProfitLossProvider>(
+        builder: (context, authProvider, profitLossProvider, child) {
+          // Initialize auth provider immediately (splash screen depends on it)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (authProvider.state == AuthState.initial) {
+              authProvider.initialize();
+            }
+          });
+
+          // Initialize profit loss provider when first accessed
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (profitLossProvider.profitLossHistory.isEmpty && !profitLossProvider.isLoading) {
+              profitLossProvider.initialize();
+            }
+          });
+
+          return Sizer(
+            builder: (context, orientation, deviceType) {
+              return MaterialApp(
+                title: 'Maqbool Fashion - Premium POS',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: ThemeMode.light,
+                navigatorKey: navigatorKey,
+                initialRoute: '/',
+                routes: {
+                  '/': (context) => const SplashScreen(),
+                  '/login': (context) => const LoginScreen(),
+                  '/signup': (context) => const SignupScreen(),
+                  '/dashboard': (context) => const DashboardScreen(),
+                },
+              );
             },
           );
         },
