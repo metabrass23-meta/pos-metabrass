@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import datetime, date
 from decimal import Decimal
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def advance_payment_upload_path(instance, filename):
@@ -213,6 +214,15 @@ class AdvancePayment(models.Model):
                     raise ValidationError({
                         'amount': f'Advance amount cannot exceed monthly salary of {self.labor.salary} PKR.'
                     })
+                
+                # Check if advance amount exceeds remaining advance amount
+                if not self.pk:  # Only for new records
+                    remaining_advance = self.labor.get_remaining_advance_amount()
+                    if self.amount > remaining_advance:
+                        total_advances = self.labor.get_total_advances_amount()
+                        raise ValidationError({
+                            'amount': f'Advance amount {self.amount} exceeds remaining advance amount {remaining_advance}. Total advances this month: {total_advances}.'
+                        })
             except AttributeError:
                 pass  # Labor might not be loaded
         
@@ -236,13 +246,51 @@ class AdvancePayment(models.Model):
             self.labor_role = self.labor.designation
             self.total_salary = self.labor.salary
         
-        # Calculate remaining salary
-        if self.total_salary and self.amount:
-            total_advances = self.get_total_advances_for_labor()
-            if self.pk:  # Exclude current record for updates
-                total_advances -= self.amount
-            total_advances += self.amount
-            self.remaining_salary = self.total_salary - total_advances
+        # Handle advance payment deduction from labor's remaining salary
+        if self.labor_id and self.amount:
+            if not self.pk:  # New record - deduct from labor
+                try:
+                    # Validate against remaining advance amount, not monthly salary
+                    remaining_advance = self.labor.get_remaining_advance_amount()
+                    if self.amount > remaining_advance:
+                        raise ValidationError({
+                            'amount': f'Advance amount {self.amount} exceeds remaining advance amount {remaining_advance}. Total advances this month: {self.labor.get_total_advances_amount()}'
+                        })
+                    
+                    remaining = self.labor.deduct_advance_payment(self.amount)
+                    self.remaining_salary = remaining
+                    # Save the labor to persist the deduction
+                    self.labor.save()
+                except ValidationError as e:
+                    raise ValidationError({'amount': str(e)})
+            else:  # Update record - handle amount changes
+                try:
+                    old_amount = AdvancePayment.objects.get(pk=self.pk).amount
+                    amount_difference = self.amount - old_amount
+                    if amount_difference > 0:  # Increasing amount
+                        try:
+                            # Check if the increase is within remaining advance amount
+                            remaining_advance = self.labor.get_remaining_advance_amount()
+                            if amount_difference > remaining_advance:
+                                raise ValidationError({
+                                    'amount': f'Amount increase {amount_difference} exceeds remaining advance amount {remaining_advance}. Total advances this month: {self.labor.get_total_advances_amount()}'
+                                })
+                            
+                            remaining = self.labor.deduct_advance_payment(amount_difference)
+                            self.remaining_salary = remaining
+                            # Save the labor to persist the deduction
+                            self.labor.save()
+                        except ValidationError as e:
+                            raise ValidationError({'amount': str(e)})
+                    elif amount_difference < 0:  # Decreasing amount - refund
+                        refund_amount = abs(amount_difference)
+                        self.labor.remaining_monthly_salary += refund_amount
+                        self.remaining_salary = self.labor.remaining_monthly_salary
+                        # Save the labor to persist the refund
+                        self.labor.save()
+                except (ObjectDoesNotExist, AdvancePayment.DoesNotExist):
+                    # Object was deleted or doesn't exist, treat as new
+                    pass
         
         self.full_clean()
         super().save(*args, **kwargs)
