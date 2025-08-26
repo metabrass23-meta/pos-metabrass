@@ -3,20 +3,48 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import 'advance_payment_table_helpers.dart';
 
-class AdvancePaymentTable extends StatelessWidget {
+class AdvancePaymentTable extends StatefulWidget {
   final Function(AdvancePayment) onEdit;
   final Function(AdvancePayment) onDelete;
-  final Function(AdvancePayment) onViewReceipt;
+  final Function(AdvancePayment) onView;
 
-  const AdvancePaymentTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onViewReceipt,
-  });
+  const AdvancePaymentTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
+
+  @override
+  State<AdvancePaymentTable> createState() => _AdvancePaymentTableState();
+}
+
+class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
+  final ScrollController _headerHorizontalController = ScrollController();
+  final ScrollController _contentHorizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+  late AdvancePaymentTableHelpers _helpers;
+
+  @override
+  void initState() {
+    super.initState();
+    _helpers = AdvancePaymentTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
+
+    // Synchronize horizontal scrolling between header and content
+    _headerHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
+        _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _headerHorizontalController.dispose();
+    _contentHorizontalController.dispose();
+    _verticalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,147 +52,147 @@ class AdvancePaymentTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
-      child: Column(
-        children: [
-          // Responsive Table Header
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.borderRadius('large')),
-                topRight: Radius.circular(context.borderRadius('large')),
-              ),
-            ),
-            child: _buildResponsiveHeaderRow(context),
-          ),
+      child: Consumer<AdvancePaymentProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return _buildLoadingState(context);
+          }
 
-          // Table Content
-          Expanded(
-            child: Consumer<AdvancePaymentProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
-                      ),
-                      child: const CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
-                        strokeWidth: 3,
+          if (provider.hasError) {
+            return _helpers.buildErrorState(context, provider);
+          }
+
+          if (provider.advancePayments.isEmpty) {
+            return _helpers.buildEmptyState(context);
+          }
+
+          return Scrollbar(
+            controller: _headerHorizontalController,
+            thumbVisibility: true,
+            child: Column(
+              children: [
+                // Table Header with Horizontal Scroll
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray.withOpacity(0.5),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(context.borderRadius('large')),
+                      topRight: Radius.circular(context.borderRadius('large')),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    controller: _headerHorizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: Container(
+                      width: _getTableWidth(context),
+                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
+                      child: _buildTableHeader(context),
+                    ),
+                  ),
+                ),
+
+                // Table Content with Synchronized Scroll
+                Expanded(
+                  child: Scrollbar(
+                    controller: _verticalController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _contentHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: Container(
+                        width: _getTableWidth(context),
+                        child: ListView.builder(
+                          controller: _verticalController,
+                          itemCount: provider.advancePayments.length,
+                          itemBuilder: (context, index) {
+                            final payment = provider.advancePayments[index];
+                            return _buildTableRow(context, payment, index);
+                          },
+                        ),
                       ),
                     ),
-                  );
-                }
+                  ),
+                ),
 
-                if (provider.advancePayments.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-
-                return ListView.builder(
-                  itemCount: provider.advancePayments.length,
-                  itemBuilder: (context, index) {
-                    final payment = provider.advancePayments[index];
-                    return _buildResponsiveTableRow(context, payment, index);
-                  },
-                );
-              },
+                // Pagination Controls
+                if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildResponsiveHeaderRow(BuildContext context) {
-    // Define payment table column flexes similar to your existing pattern
-    final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
-      context,
-      tablet: [1, 2, 1, 1, 1, 1, 1, 1],          // Very compressed for tablets
-      small: [1, 2, 2, 1, 1, 1, 1, 1],           // Compressed for small screens
-      medium: [1, 2, 2, 2, 1, 1, 1, 2],          // Balanced for medium screens
-      large: [1, 2, 2, 3, 2, 1, 1, 2],           // More space for description
-      ultrawide: [1, 2, 2, 3, 2, 1, 1, 2],       // Extra space for ultrawide
+  Widget _buildLoadingState(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+        height: ResponsiveBreakpoints.responsive(context, tablet: 3.w, small: 6.w, medium: 3.w, large: 4.w, ultrawide: 3.w),
+        child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
+      ),
     );
+  }
+
+  double _getTableWidth(BuildContext context) {
+    return ResponsiveBreakpoints.responsive(context, tablet: 1580.0, small: 1680.0, medium: 1780.0, large: 1880.0, ultrawide: 1980.0);
+  }
+
+  List<double> _getColumnWidths(BuildContext context) {
+    if (context.shouldShowCompactLayout) {
+      return [
+        120.0, // Payment ID
+        200.0, // Labor & Details
+        160.0, // Amount
+        140.0, // Date
+        320.0, // Actions
+      ];
+    } else {
+      return [
+        120.0, // Payment ID
+        180.0, // Labor Name
+        200.0, // Labor Details
+        200.0, // Description
+        140.0, // Amount
+        130.0, // Date
+        120.0, // Receipt
+        320.0, // Actions
+      ];
+    }
+  }
+
+  Widget _buildTableHeader(BuildContext context) {
+    final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Payment ID Column
-        Expanded(
-          flex: paymentColumnFlexes[0],
-          child: _buildHeaderCell(context, 'ID'),
-        ),
+        // Payment ID
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Payment ID', 'id')),
 
-        // Labor Info Column
-        Expanded(
-          flex: paymentColumnFlexes[1],
-          child: _buildHeaderCell(context, context.isTablet ? 'Labor' : 'Labor Details'),
-        ),
+        // Labor Name
+        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, 'Labor Name', 'labor_name')),
 
-        // Amount Column
-        Expanded(
-          flex: paymentColumnFlexes[2],
-          child: _buildHeaderCell(context, 'Amount'),
-        ),
+        // Labor Details (responsive)
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Labor Details')),
 
-        // Description Column (hidden on tablets and small screens)
-        if (!context.shouldShowCompactLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[3],
-            child: _buildHeaderCell(context, 'Description'),
-          ),
-        ],
+        // Description (responsive)
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Description')),
 
-        // Date Column (responsive visibility)
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[4],
-            child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Date & Time' : 'Date'),
-          ),
-        ],
+        // Amount
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildSortableHeaderCell(context, 'Amount', 'amount')),
 
-        // Receipt Column (only on large screens)
-        if (context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[5],
-            child: _buildHeaderCell(context, 'Receipt'),
-          ),
-        ],
+        // Date
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildSortableHeaderCell(context, 'Date', 'date')),
 
-        // Status Column (medium and large screens)
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[6],
-            child: _buildHeaderCell(context, 'Status'),
-          ),
-        ],
+        // Receipt (hidden on compact layouts)
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Receipt')),
 
-        // Actions Column (always visible)
-        Expanded(
-          flex: paymentColumnFlexes[7],
-          child: _buildHeaderCell(context, 'Actions'),
-        ),
+        // Actions
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, 'Actions')),
       ],
     );
   }
@@ -172,770 +200,295 @@ class AdvancePaymentTable extends StatelessWidget {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
-  Widget _buildResponsiveTableRow(BuildContext context, AdvancePayment payment, int index) {
-    // Define payment table column flexes similar to your existing pattern
-    final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
-      context,
-      tablet: [1, 2, 1, 1, 1, 1, 1, 1],          // Very compressed for tablets
-      small: [1, 2, 2, 1, 1, 1, 1, 1],           // Compressed for small screens
-      medium: [1, 2, 2, 2, 1, 1, 1, 2],          // Balanced for medium screens
-      large: [1, 2, 2, 3, 2, 1, 1, 2],           // More space for description
-      ultrawide: [1, 2, 2, 3, 2, 1, 1, 2],       // Extra space for ultrawide
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+    return Consumer<AdvancePaymentProvider>(
+      builder: (context, provider, child) {
+        final isCurrentSort = provider.sortBy == sortKey;
+
+        return InkWell(
+          onTap: () => provider.setSortBy(sortKey),
+          borderRadius: BorderRadius.circular(4),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Icon(
+                  isCurrentSort ? (provider.sortAscending ? Icons.arrow_upward : Icons.arrow_downward) : Icons.sort,
+                  size: 16,
+                  color: isCurrentSort ? AppTheme.primaryMaroon : Colors.grey[500],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Widget _buildTableRow(BuildContext context, AdvancePayment payment, int index) {
+    final columnWidths = _getColumnWidths(context);
 
     return Container(
-      padding: EdgeInsets.all(context.cardPadding / 2.5),
       decoration: BoxDecoration(
-        color: index.isEven
-            ? AppTheme.pureWhite
-            : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.5,
-          ),
-        ),
+        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
+      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Payment ID Column with responsive styling
-          Expanded(
-            flex: paymentColumnFlexes[0],
+          // Payment ID Column
+          Container(
+            width: columnWidths[0],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
-                payment.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
+                payment.id.substring(0, 8),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Labor Info Column with responsive layout
-          Expanded(
-            flex: paymentColumnFlexes[1],
+          // Labor Name Column
+          Container(
+            width: columnWidths[1],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   payment.laborName,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show additional info here on compact layouts
+                // Show labor details on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    payment.laborRole,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      _helpers.buildLaborAvatar(context, payment),
+                      SizedBox(width: context.smallPadding / 2),
+                      Expanded(
+                        child: Text(
+                          payment.laborRole,
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'PKR ${payment.amount.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green,
+                  // Show description on compact layouts if available
+                  if (payment.description.isNotEmpty) ...[
+                    SizedBox(height: context.smallPadding / 4),
+                    Text(
+                      payment.description,
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                  ),
+                  ],
                 ],
               ],
             ),
           ),
 
-          SizedBox(width: context.smallPadding),
-
-          // Amount Column
-          Expanded(
-            flex: paymentColumnFlexes[2],
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(
-                  color: Colors.green.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
+          // Labor Details Column (hidden on compact layouts)
+          if (!context.shouldShowCompactLayout)
+            Container(
+              width: columnWidths[2],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'PKR ${payment.amount.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (!context.shouldShowCompactLayout) ...[
-                    Text(
-                      '${payment.advancePercentage.toStringAsFixed(1)}%',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.green[700],
+                  Row(
+                    children: [
+                      _helpers.buildLaborAvatar(context, payment),
+                      SizedBox(width: context.smallPadding),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              payment.laborRole,
+                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (payment.laborPhone.isNotEmpty)
+                              Text(
+                                payment.laborPhone,
+                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                    ],
+                  ),
                 ],
               ),
             ),
-          ),
-
-          SizedBox(width: context.smallPadding),
 
           // Description Column (hidden on compact layouts)
-          if (!context.shouldShowCompactLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[3],
+          if (!context.shouldShowCompactLayout)
+            Container(
+              width: columnWidths[3],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payment.description,
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[700],
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
 
-          // Date Column (responsive visibility)
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[4],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _formatDate(payment.date),
-                    style: GoogleFonts.inter(
-                      fontSize: context.subtitleFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.charcoalGray,
-                    ),
-                  ),
-                  if (context.shouldShowFullLayout) ...[
-                    SizedBox(height: context.smallPadding / 4),
-                    Text(
-                      payment.timeText,
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ],
+          // Amount Column
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 2 : 4],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Text(
+                'PKR ${payment.amount.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
+                textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          // Receipt Column (only on large screens)
-          if (context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[5],
-              child: Center(
-                child: payment.hasReceipt
-                    ? Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding,
-                    vertical: context.smallPadding / 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    border: Border.all(
-                      color: Colors.green.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.receipt_rounded,
-                        color: Colors.green,
-                        size: context.iconSize('small'),
-                      ),
-                      SizedBox(width: context.smallPadding / 2),
-                      Text(
-                        'Available',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-                    : Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.smallPadding,
-                    vertical: context.smallPadding / 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    border: Border.all(
-                      color: Colors.red.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.receipt_long_outlined,
-                        color: Colors.red,
-                        size: context.iconSize('small'),
-                      ),
-                      SizedBox(width: context.smallPadding / 2),
-                      Text(
-                        'Missing',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
+          // Date Column
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 3 : 5],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${payment.date.day}/${payment.date.month}/${payment.date.year}',
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
-              ),
+                Text(
+                  context.shouldShowCompactLayout ? payment.time : _getRelativeDate(payment.date),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                ),
+              ],
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          // Status Column (medium and large screens)
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[6],
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: payment.statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  border: Border.all(
-                    color: payment.statusColor.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: payment.statusColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Expanded(
-                      child: Text(
-                        payment.statusText,
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: payment.statusColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          // Receipt Column (hidden on compact layouts)
+          if (!context.shouldShowCompactLayout)
+            Container(
+              width: columnWidths[6],
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: _helpers.buildReceiptBadge(context, payment),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
 
-          // Actions Column with responsive button sizing
-          Expanded(
-            flex: paymentColumnFlexes[7],
-            child: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactActions(context, payment),
-              small: _buildCompactActions(context, payment),
-              medium: _buildStandardActions(context, payment),
-              large: _buildExpandedActions(context, payment),
-              ultrawide: _buildExpandedActions(context, payment),
-            ),
+          // Actions Column
+          Container(
+            width: columnWidths[context.shouldShowCompactLayout ? 4 : 7],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: _helpers.buildActionsRow(context, payment),
           ),
         ],
       ),
     );
   }
 
-  // Compact actions for tablets and small screens
-  Widget _buildCompactActions(BuildContext context, AdvancePayment payment) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'edit') {
-          onEdit(payment);
-        } else if (value == 'delete') {
-          onDelete(payment);
-        } else if (value == 'receipt') {
-          onViewReceipt(payment);
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Edit',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'receipt',
-          child: Row(
-            children: [
-              Icon(
-                payment.hasReceipt ? Icons.visibility_outlined : Icons.add_photo_alternate_outlined,
-                color: payment.hasReceipt ? Colors.green : Colors.orange,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                payment.hasReceipt ? 'View Receipt' : 'Add Receipt',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: payment.hasReceipt ? Colors.green : Colors.orange,
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'delete',
-          child: Row(
-            children: [
-              Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Delete',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        padding: EdgeInsets.all(context.smallPadding),
-        decoration: BoxDecoration(
-          color: AppTheme.lightGray,
-          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        ),
-        child: Icon(
-          Icons.more_vert,
-          size: context.iconSize('small'),
-          color: AppTheme.charcoalGray,
+  String _getRelativeDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+
+    if (difference == 0) return 'Today';
+    if (difference == 1) return 'Yesterday';
+    if (difference < 7) return '$difference days ago';
+    if (difference < 30) return '${(difference / 7).floor()} weeks ago';
+    if (difference < 365) return '${(difference / 30).floor()} months ago';
+    return '${(difference / 365).floor()} years ago';
+  }
+
+  Widget _buildPaginationControls(BuildContext context, AdvancePaymentProvider provider) {
+    final pagination = provider.paginationInfo!;
+
+    return Container(
+      padding: EdgeInsets.all(context.cardPadding),
+      decoration: BoxDecoration(
+        color: AppTheme.lightGray.withOpacity(0.3),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(context.borderRadius('large')),
+          bottomRight: Radius.circular(context.borderRadius('large')),
         ),
       ),
-    );
-  }
-
-  // Standard actions for medium screens
-  Widget _buildStandardActions(BuildContext context, AdvancePayment payment) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onEdit(payment),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Receipt Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onViewReceipt(payment),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: payment.hasReceipt
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                payment.hasReceipt ? Icons.visibility_outlined : Icons.add_photo_alternate_outlined,
-                color: payment.hasReceipt ? Colors.green : Colors.orange,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onDelete(payment),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Expanded actions for large screens
-  Widget _buildExpandedActions(BuildContext context, AdvancePayment payment) {
-    return Row(
-      children: [
-        // Edit Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onEdit(payment),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      color: Colors.blue,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Edit',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
-
-        // Receipt Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onViewReceipt(payment),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: payment.hasReceipt
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      payment.hasReceipt ? Icons.visibility_outlined : Icons.add_photo_alternate_outlined,
-                      color: payment.hasReceipt ? Colors.green : Colors.orange,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      payment.hasReceipt ? 'View' : 'Add',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: payment.hasReceipt ? Colors.green : Colors.orange,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
-
-        // Delete Button with label
-        Expanded(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onDelete(payment),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding / 2),
-                    Text(
-                      'Delete',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 5.w,
-              small: 5.w,
-              medium: 5.w,
-              large: 5.w,
-              ultrawide: 5.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
-            child: Icon(
-              Icons.payment_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
-          ),
-
-          SizedBox(height: context.mainPadding),
-
+          // Results info
           Text(
-            'No Advance Payment Records Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} advance payments',
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
-          SizedBox(height: context.smallPadding),
+          const Spacer(),
 
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
+          // Pagination controls
+          Row(
+            children: [
+              // Previous button
+              IconButton(
+                onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
+                icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
-            ),
-            child: Text(
-              'Start by adding your first advance payment record to track labor payments efficiently',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        'Add First Payment',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
+              // Page info
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
-            ),
+
+              // Next button
+              IconButton(
+                onPressed: pagination.hasNext ? provider.loadNextPage : null,
+                icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),
+              ),
+            ],
           ),
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 }
