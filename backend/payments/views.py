@@ -417,6 +417,313 @@ def mark_as_final_payment(request, payment_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# Additional view functions for the new endpoints
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_payments(request):
+    """Search payments by query"""
+    try:
+        query = request.GET.get('q', '').strip()
+        if not query:
+            return Response({
+                'success': False,
+                'message': 'Search query is required.',
+                'errors': {'query': 'Search query parameter is required.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        payments = Payment.objects.search(query)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments matching "{query}"',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Search failed.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_labor(request, labor_id):
+    """Get payments for a specific labor"""
+    try:
+        payments = Payment.objects.by_labor(labor_id)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments for labor',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by labor.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_vendor(request, vendor_id):
+    """Get payments for a specific vendor"""
+    try:
+        payments = Payment.objects.by_vendor(vendor_id)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments for vendor',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by vendor.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_order(request, order_id):
+    """Get payments for a specific order"""
+    try:
+        payments = Payment.objects.by_order(order_id)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments for order',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by order.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_sale(request, sale_id):
+    """Get payments for a specific sale"""
+    try:
+        payments = Payment.objects.by_sale(sale_id)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments for sale',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by sale.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_date_range(request):
+    """Get payments within a date range"""
+    try:
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        if not start_date or not end_date:
+            return Response({
+                'success': False,
+                'message': 'Both start_date and end_date are required.',
+                'errors': {'date_range': 'start_date and end_date parameters are required.'}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        payments = Payment.objects.by_date_range(start_date, end_date)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments in date range',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by date range.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_by_method(request, method):
+    """Get payments by payment method"""
+    try:
+        payments = Payment.objects.by_payment_method(method.upper())
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments with method {method}',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments by method.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_with_receipts(request):
+    """Get payments that have receipt images"""
+    try:
+        payments = Payment.objects.with_receipts()
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments with receipts',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments with receipts.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments_without_receipts(request):
+    """Get payments without receipt images"""
+    try:
+        payments = Payment.objects.without_receipts()
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments without receipts',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get payments without receipts.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_recent_payments(request):
+    """Get recent payments (last 30 days)"""
+    try:
+        days = int(request.GET.get('days', 30))
+        payments = Payment.objects.recent(days)
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} recent payments',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get recent payments.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_today_payments(request):
+    """Get today's payments"""
+    try:
+        payments = Payment.objects.today()
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments today',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get today\'s payments.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_this_month_payments(request):
+    """Get this month's payments"""
+    try:
+        payments = Payment.objects.this_month()
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments this month',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get this month\'s payments.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_this_year_payments(request):
+    """Get this year's payments"""
+    try:
+        payments = Payment.objects.this_year()
+        serializer = PaymentListSerializer(payments, many=True)
+        
+        return Response({
+            'success': True,
+            'message': f'Found {payments.count()} payments this year',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get this year\'s payments.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # Class-based views (DRF standard approach)
 
 class PaymentListCreateAPIView(generics.ListCreateAPIView):

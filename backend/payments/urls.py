@@ -20,4 +20,19 @@ urlpatterns = [
     # Additional payment-specific endpoints
     path('statistics/', views.get_payment_statistics, name='get_payment_statistics'),
     path('<uuid:payment_id>/mark-final/', views.mark_as_final_payment, name='mark_as_final_payment'),
+    
+    # Search and filtering endpoints
+    path('search/', views.search_payments, name='search_payments'),
+    path('by-labor/<uuid:labor_id>/', views.get_payments_by_labor, name='get_payments_by_labor'),
+    path('by-vendor/<uuid:vendor_id>/', views.get_payments_by_vendor, name='get_payments_by_vendor'),
+    path('by-order/<uuid:order_id>/', views.get_payments_by_order, name='get_payments_by_order'),
+    path('by-sale/<uuid:sale_id>/', views.get_payments_by_sale, name='get_payments_by_sale'),
+    path('by-date-range/', views.get_payments_by_date_range, name='get_payments_by_date_range'),
+    path('by-payment-method/<str:method>/', views.get_payments_by_method, name='get_payments_by_method'),
+    path('with-receipts/', views.get_payments_with_receipts, name='get_payments_with_receipts'),
+    path('without-receipts/', views.get_payments_without_receipts, name='get_payments_without_receipts'),
+    path('recent/', views.get_recent_payments, name='get_recent_payments'),
+    path('today/', views.get_today_payments, name='get_today_payments'),
+    path('this-month/', views.get_this_month_payments, name='get_this_month_payments'),
+    path('this-year/', views.get_this_year_payments, name='get_this_year_payments'),
 ]

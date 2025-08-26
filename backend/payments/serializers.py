@@ -144,29 +144,46 @@ class PaymentListSerializer(serializers.ModelSerializer):
     formatted_amount = serializers.CharField(read_only=True)
     net_amount = serializers.DecimalField(read_only=True, max_digits=12, decimal_places=2)
     payment_period_display = serializers.CharField(read_only=True)
+    vendor_name = serializers.CharField(read_only=True)
     
     class Meta:
         model = Payment
         fields = (
             'id',
-            'labor_name',
+            'labor',
             'vendor',
+            'order',
+            'sale',
+            'labor_name',
+            'labor_phone',
+            'labor_role',
+            'vendor_name',
             'payer_type',
+            'payer_id',
             'amount_paid',
             'bonus',
             'deduction',
             'net_amount',
+            'formatted_amount',
             'payment_month',
             'payment_period_display',
             'is_final_payment',
             'payment_method',
+            'description',
             'date',
             'time',
+            'receipt_image_path',
             'has_receipt',
             'is_active',
             'created_at',
             'created_by_email'
         )
+    
+    def get_vendor_name(self, obj):
+        """Get vendor name if available"""
+        if obj.vendor:
+            return obj.vendor.name
+        return None
 
 
 class PaymentUpdateSerializer(serializers.ModelSerializer):
