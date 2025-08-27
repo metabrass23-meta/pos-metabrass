@@ -11,7 +11,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
-class EditExpenseDialog extends StatefulWidget {
+class EditExpenseDialog extends StatefulWidget {  
   final Expense expense;
 
   const EditExpenseDialog({super.key, required this.expense});
