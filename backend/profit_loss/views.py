@@ -109,30 +109,63 @@ class ProfitLossCalculationView(APIView):
             total_products=Sum('sale_items__quantity')
         )
         
+        # Validate sales data - allow zero but not negative
+        if sales_data['total_income'] is not None and sales_data['total_income'] < 0:
+            raise ValidationError("Invalid sales income data detected. Please check sales records.")
+        
         total_sales_income = sales_data['total_income'] or Decimal('0.00')
         total_sales_count = sales_data['total_count'] or 0
         total_products_sold = sales_data['total_products'] or 0
         
         # Calculate Cost of Goods Sold (COGS)
-        from sale_items.models import SaleItem
-        from django.db.models import F
-        cogs_data = SaleItem.objects.filter(
+        from sales.models import SaleItem
+        from django.db.models import F, Q
+        try:
+            cogs_data = SaleItem.objects.filter(
+                sale__date_of_sale__date__range=[start_date, end_date],
+                sale__is_active=True,
+                is_active=True,
+                product__cost_price__isnull=False,  # Only include products with cost prices
+                product__cost_price__gt=0  # Only include products with positive cost prices
+            ).select_related('product').aggregate(
+                total_cost=Sum(
+                    F('product__cost_price') * F('quantity'),
+                    output_field=DecimalField(max_digits=15, decimal_places=2)
+                )
+            )
+            total_cost_of_goods_sold = cogs_data['total_cost'] or Decimal('0.00')
+        except Exception as e:
+            # Log error but continue with zero COGS
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error calculating COGS: {str(e)}")
+            total_cost_of_goods_sold = Decimal('0.00')
+        
+        # Log warning if products without cost prices are found
+        products_without_cost = SaleItem.objects.filter(
             sale__date_of_sale__date__range=[start_date, end_date],
             sale__is_active=True,
             is_active=True
-        ).select_related('product').aggregate(
-            total_cost=Sum(
-                F('product__cost_price') * F('quantity'),
-                output_field=DecimalField(max_digits=15, decimal_places=2)
-            )
-        )
-        total_cost_of_goods_sold = cogs_data['total_cost'] or Decimal('0.00')
+        ).filter(
+            Q(product__cost_price__isnull=True) | Q(product__cost_price=0)
+        ).count()
         
-        # Calculate average order value
-        average_order_value = (
-            total_sales_income / total_sales_count if total_sales_count > 0 
-            else Decimal('0.00')
-        )
+        if products_without_cost > 0:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Found {products_without_cost} sale items without cost prices in period {start_date} to {end_date}. "
+                "These items are excluded from COGS calculation."
+            )
+        
+        # Calculate average order value - handle division by zero
+        try:
+            average_order_value = (
+                total_sales_income / total_sales_count if total_sales_count > 0 
+                else Decimal('0.00')
+            )
+        except (ZeroDivisionError, TypeError):
+            average_order_value = Decimal('0.00')
         
         # Calculate labor payments
         labor_payments = Payment.objects.filter(
@@ -142,6 +175,10 @@ class ProfitLossCalculationView(APIView):
         ).aggregate(total=Sum('amount_paid'))
         total_labor_payments = labor_payments['total'] or Decimal('0.00')
         
+        # Validate labor payments
+        if total_labor_payments < 0:
+            raise ValidationError("Labor payments cannot be negative. Please check payment records.")
+        
         # Calculate vendor payments
         vendor_payments = Payment.objects.filter(
             date__range=[start_date, end_date],
@@ -150,6 +187,10 @@ class ProfitLossCalculationView(APIView):
         ).aggregate(total=Sum('amount_paid'))
         total_vendor_payments = vendor_payments['total'] or Decimal('0.00')
         
+        # Validate vendor payments
+        if total_vendor_payments < 0:
+            raise ValidationError("Vendor payments cannot be negative. Please check payment records.")
+        
         # Calculate other expenses
         expenses = Expense.objects.filter(
             date__range=[start_date, end_date],
@@ -157,12 +198,20 @@ class ProfitLossCalculationView(APIView):
         ).aggregate(total=Sum('amount'))
         total_expenses = expenses['total'] or Decimal('0.00')
         
+        # Validate expenses
+        if total_expenses < 0:
+            raise ValidationError("Expenses cannot be negative. Please check expense records.")
+        
         # Calculate zakat
         zakat = Zakat.objects.filter(
             date__range=[start_date, end_date],
             is_active=True
         ).aggregate(total=Sum('amount'))
         total_zakat = zakat['total'] or Decimal('0.00')
+        
+        # Validate zakat
+        if total_zakat < 0:
+            raise ValidationError("Zakat amounts cannot be negative. Please check zakat records.")
         
         return {
             'total_sales_income': total_sales_income,
@@ -653,12 +702,12 @@ def profit_loss_dashboard(request):
         )
         
         # Calculate growth percentages
-        sales_growth = self._calculate_growth_percentage(
+        sales_growth = _calculate_growth_percentage(
             current_month_data['total_sales_income'],
             prev_month_data['total_sales_income']
         )
         
-        expense_growth = self._calculate_growth_percentage(
+        expense_growth = _calculate_growth_percentage(
             current_month_data['total_labor_payments'] + 
             current_month_data['total_vendor_payments'] + 
             current_month_data['total_expenses'] + 
@@ -687,11 +736,11 @@ def profit_loss_dashboard(request):
         )
         prev_net_profit = prev_month_data['total_sales_income'] - prev_total_expenses
         
-        profit_growth = self._calculate_growth_percentage(current_net_profit, prev_net_profit)
+        profit_growth = _calculate_growth_percentage(current_net_profit, prev_net_profit)
         
         # Determine trends
-        sales_trend = self._determine_trend(sales_growth)
-        profit_trend = self._determine_trend(profit_growth)
+        sales_trend = _determine_trend(sales_growth)
+        profit_trend = _determine_trend(profit_growth)
         
         dashboard_data = {
             'current_month': {
