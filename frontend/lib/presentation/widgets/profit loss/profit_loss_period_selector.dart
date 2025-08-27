@@ -3,7 +3,7 @@ import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../src/providers/profit_loss_provider.dart';
+import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
 class ProfitLossPeriodSelector extends StatelessWidget {
@@ -81,13 +81,123 @@ class ProfitLossPeriodSelector extends StatelessWidget {
         ),
         if (provider.selectedPeriodType == 'custom') ...[
           SizedBox(width: context.cardPadding),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
+          GestureDetector(
+            onTap: () => _showCustomDatePicker(context, provider),
+            child: Container(
+              padding: EdgeInsets.all(context.cardPadding / 1.5),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.primaryMaroon.withOpacity(0.1), AppTheme.primaryMaroon.withOpacity(0.05)],
+                ),
+                border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.date_range_rounded,
+                        color: AppTheme.primaryMaroon,
+                        size: context.iconSize('medium'),
+                      ),
+                      SizedBox(width: context.smallPadding),
+                      Text(
+                        'Select Date Range',
+                        style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryMaroon,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.smallPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            'From',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.charcoalGray.withOpacity(0.7),
+                            ),
+                          ),
+                          Text(
+                            '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customStartDate.year}',
+                            style: GoogleFonts.inter(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.charcoalGray,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.grey.shade400,
+                        size: context.iconSize('small'),
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        children: [
+                          Text(
+                            'To',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.charcoalGray.withOpacity(0.7),
+                            ),
+                          ),
+                          Text(
+                            '${provider.customEndDate.day}/${provider.customEndDate.month}/${provider.customEndDate.year}',
+                            style: GoogleFonts.inter(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.charcoalGray,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout(BuildContext context, ProfitLossProvider provider) {
+    return Column(
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: provider.availablePeriodTypes.map((period) {
+              final isSelected = provider.selectedPeriodType == period;
+              return Padding(
+                padding: EdgeInsets.only(right: context.smallPadding),
+                child: _buildPeriodButton(context, provider, period, isSelected),
+              );
+            }).toList(),
+          ),
+        ),
+        if (provider.selectedPeriodType == 'custom') ...[
+          SizedBox(height: context.cardPadding),
+          SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
               onTap: () => _showCustomDatePicker(context, provider),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
-                padding: EdgeInsets.all(context.cardPadding / 1.5),
+                padding: EdgeInsets.all(context.cardPadding),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -134,7 +244,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customStartDate.year}',
+                              '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customEndDate.year}',
                               style: GoogleFonts.inter(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
@@ -143,13 +253,11 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(width: 10),
                         Icon(
                           Icons.arrow_forward_rounded,
                           color: Colors.grey.shade400,
                           size: context.iconSize('small'),
                         ),
-                        SizedBox(width: 10),
                         Column(
                           children: [
                             Text(
@@ -182,125 +290,6 @@ class ProfitLossPeriodSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildTabletLayout(BuildContext context, ProfitLossProvider provider) {
-    return Column(
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: provider.availablePeriodTypes.map((period) {
-              final isSelected = provider.selectedPeriodType == period;
-              return Padding(
-                padding: EdgeInsets.only(right: context.smallPadding),
-                child: _buildPeriodButton(context, provider, period, isSelected),
-              );
-            }).toList(),
-          ),
-        ),
-        if (provider.selectedPeriodType == 'custom') ...[
-          SizedBox(height: context.cardPadding),
-          SizedBox(
-            width: double.infinity,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _showCustomDatePicker(context, provider),
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Container(
-                  padding: EdgeInsets.all(context.cardPadding),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.primaryMaroon.withOpacity(0.1),
-                        AppTheme.primaryMaroon.withOpacity(0.05),
-                      ],
-                    ),
-                    border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.date_range_rounded,
-                            color: AppTheme.primaryMaroon,
-                            size: context.iconSize('medium'),
-                          ),
-                          SizedBox(width: context.smallPadding),
-                          Text(
-                            'Select Date Range',
-                            style: GoogleFonts.inter(
-                              fontSize: context.bodyFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.primaryMaroon,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: context.smallPadding),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                'From',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.captionFontSize,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppTheme.charcoalGray.withOpacity(0.7),
-                                ),
-                              ),
-                              Text(
-                                '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customStartDate.year}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.grey.shade400,
-                            size: context.iconSize('small'),
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                'To',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.captionFontSize,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppTheme.charcoalGray.withOpacity(0.7),
-                                ),
-                              ),
-                              Text(
-                                '${provider.customEndDate.day}/${provider.customEndDate.month}/${provider.customEndDate.year}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
   Widget _buildMobileLayout(BuildContext context, ProfitLossProvider provider) {
     return _buildTabletLayout(context, provider);
   }
@@ -311,25 +300,21 @@ class ProfitLossPeriodSelector extends StatelessWidget {
     String period,
     bool isSelected,
   ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => provider.setPeriodType(period),
-        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
-          decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryMaroon : Colors.transparent,
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            border: Border.all(color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300, width: 1),
-          ),
-          child: Text(
-            _getPeriodDisplayName(period),
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
-            ),
+    return GestureDetector(
+      onTap: () => provider.setPeriodType(period),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryMaroon : Colors.transparent,
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          border: Border.all(color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300, width: 1),
+        ),
+        child: Text(
+          _getPeriodDisplayName(period),
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
           ),
         ),
       ),
@@ -504,18 +489,14 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                               ),
                             ),
                           ),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: _handleCancel,
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
-                              child: Container(
-                                padding: EdgeInsets.all(context.smallPadding),
-                                child: Icon(
-                                  Icons.close_rounded,
-                                  color: AppTheme.pureWhite,
-                                  size: context.iconSize('medium'),
-                                ),
+                          GestureDetector(
+                            onTap: _handleCancel,
+                            child: Container(
+                              padding: EdgeInsets.all(context.smallPadding),
+                              child: Icon(
+                                Icons.close_rounded,
+                                color: AppTheme.pureWhite,
+                                size: context.iconSize('medium'),
                               ),
                             ),
                           ),
@@ -529,51 +510,47 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                       child: Column(
                         children: [
                           // Start Date Selector
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: _selectStartDate,
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
-                              child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(context.cardPadding),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  border: Border.all(color: Colors.green.withOpacity(0.3)),
-                                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.calendar_today_rounded,
-                                          color: Colors.green,
-                                          size: context.iconSize('medium'),
-                                        ),
-                                        SizedBox(width: context.smallPadding),
-                                        Text(
-                                          'Start Date',
-                                          style: GoogleFonts.inter(
-                                            fontSize: context.bodyFontSize,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: context.smallPadding),
-                                    Text(
-                                      '${_startDate.day}/${_startDate.month}/${_startDate.year}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize * 1.2,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.charcoalGray,
+                          GestureDetector(
+                            onTap: _selectStartDate,
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(context.cardPadding),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                                borderRadius: BorderRadius.circular(context.borderRadius()),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today_rounded,
+                                        color: Colors.green,
+                                        size: context.iconSize('medium'),
                                       ),
+                                      SizedBox(width: context.smallPadding),
+                                      Text(
+                                        'Start Date',
+                                        style: GoogleFonts.inter(
+                                          fontSize: context.bodyFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: context.smallPadding),
+                                  Text(
+                                    '${_startDate.day}/${_startDate.month}/${_startDate.year}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.bodyFontSize * 1.2,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.charcoalGray,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -581,51 +558,47 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                           SizedBox(height: context.cardPadding),
 
                           // End Date Selector
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: _selectEndDate,
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
-                              child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(context.cardPadding),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
-                                  border: Border.all(color: Colors.red.withOpacity(0.3)),
-                                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.event_rounded,
-                                          color: Colors.red,
-                                          size: context.iconSize('medium'),
-                                        ),
-                                        SizedBox(width: context.smallPadding),
-                                        Text(
-                                          'End Date',
-                                          style: GoogleFonts.inter(
-                                            fontSize: context.bodyFontSize,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: context.smallPadding),
-                                    Text(
-                                      '${_endDate.day}/${_endDate.month}/${_endDate.year}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize * 1.2,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.charcoalGray,
+                          GestureDetector(
+                            onTap: _selectEndDate,
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(context.cardPadding),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                                borderRadius: BorderRadius.circular(context.borderRadius()),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.event_rounded,
+                                        color: Colors.red,
+                                        size: context.iconSize('medium'),
                                       ),
+                                      SizedBox(width: context.smallPadding),
+                                      Text(
+                                        'End Date',
+                                        style: GoogleFonts.inter(
+                                          fontSize: context.bodyFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: context.smallPadding),
+                                  Text(
+                                    '${_endDate.day}/${_endDate.month}/${_endDate.year}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.bodyFontSize * 1.2,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.charcoalGray,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -636,42 +609,48 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                           Row(
                             children: [
                               Expanded(
-                                child: OutlinedButton(
-                                  onPressed: _handleCancel,
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(vertical: context.cardPadding),
-                                    side: BorderSide(color: Colors.grey.shade400),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                                child: Container(
+                                  height: context.buttonHeight / 1.5,
+                                  child: OutlinedButton(
+                                    onPressed: _handleCancel,
+                                    style: OutlinedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                                      side: BorderSide(color: Colors.grey.shade400),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(context.borderRadius()),
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.bodyFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.grey[600],
+                                    child: Text(
+                                      'Cancel',
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.bodyFontSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                               SizedBox(width: context.cardPadding),
                               Expanded(
-                                child: ElevatedButton(
-                                  onPressed: _handleConfirm,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppTheme.primaryMaroon,
-                                    padding: EdgeInsets.symmetric(vertical: context.cardPadding),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                                child: Container(
+                                  height: context.buttonHeight / 1.5,
+                                  child: ElevatedButton(
+                                    onPressed: _handleConfirm,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppTheme.primaryMaroon,
+                                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(context.borderRadius()),
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    'Apply Range',
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.bodyFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.pureWhite,
+                                    child: Text(
+                                      'Apply Range',
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.bodyFontSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.pureWhite,
+                                      ),
                                     ),
                                   ),
                                 ),
