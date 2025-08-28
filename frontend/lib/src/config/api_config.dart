@@ -35,6 +35,13 @@ class ApiConfig {
   static const String bulkUpdateQuantities = '/products/bulk-update-quantities/';
   static String duplicateProduct(String id) => '/products/$id/duplicate/';
 
+  // Real-time Inventory Integration endpoints
+  static const String checkStockAvailability = '/products/check-stock/';
+  static const String reserveStockForSale = '/products/reserve-stock/';
+  static const String confirmStockDeduction = '/products/confirm-deduction/';
+  static const String getLowStockAlerts = '/products/low-stock-alerts/';
+  static const String bulkUpdateStock = '/products/bulk-update-stock/';
+
   static const String customers = '/customers/';
   static const String createCustomer = '/customers/create/';
 
@@ -66,8 +73,129 @@ class ApiConfig {
 
   static String duplicateCustomer(String id) => '/customers/$id/duplicate/';
 
+  // Quick Customer Lookup & History (for POS)
+  static const String quickCustomerLookup = '/customers/quick-lookup/';
+  static String getCustomerHistory(String id) => '/customers/$id/history/';
+  static String getCustomerSummary(String id) => '/customers/$id/summary/';
+  static const String searchCustomersAdvanced = '/customers/search-advanced/';
+
   static String customerOrders(String id) => '/customers/$id/orders/';
   static String customerSales(String id) => '/customers/$id/sales/';
+
+  // Sales API endpoints
+  static const String sales = '/sales/';
+  static const String createSale = '/sales/create/';
+  static String getSaleById(String id) => '/sales/$id/';
+  static String updateSale(String id) => '/sales/$id/update/';
+  static String deleteSale(String id) => '/sales/$id/delete/';
+  static String softDeleteSale(String id) => '/sales/$id/soft-delete/';
+  static String restoreSale(String id) => '/sales/$id/restore/';
+  static const String searchSales = '/sales/search/';
+  static String salesByStatus(String status) => '/sales/status/$status/';
+  static String salesByCustomer(String customerId) => '/sales/customer/$customerId/';
+  static String salesByPaymentMethod(String method) => '/sales/payment-method/$method/';
+  static const String pendingSales = '/sales/pending/';
+  static const String paidSales = '/sales/paid/';
+  static const String unpaidSales = '/sales/unpaid/';
+  static const String recentSales = '/sales/recent/';
+  static const String todaySales = '/sales/today/';
+  static const String thisMonthSales = '/sales/this-month/';
+  static const String thisYearSales = '/sales/this-year/';
+  static const String salesStatistics = '/sales/statistics/';
+  static String addSalePayment(String id) => '/sales/$id/add-payment/';
+  static String updateSaleStatus(String id) => '/sales/$id/update-status/';
+  static const String bulkSaleActions = '/sales/bulk-action/';
+  static String recalculateSaleTotals(String id) => '/sales/$id/recalculate/';
+  static const String createFromOrder = '/sales/create-from-order/';
+  static String customerSalesHistory(String customerId) => '/sales/by-customer/$customerId/';
+
+  // Invoice Management API endpoints
+  static const String invoices = '/sales/invoices/';
+  static const String createInvoice = '/sales/invoices/create/';
+  static String getInvoiceById(String id) => '/sales/invoices/$id/';
+  static String updateInvoice(String id) => '/sales/invoices/$id/update/';
+  static String deleteInvoice(String id) => '/sales/invoices/$id/delete/';
+  static String generateInvoicePdf(String id) => '/sales/invoices/$id/generate-pdf/';
+
+  // Receipt Management API endpoints
+  static const String receipts = '/sales/receipts/';
+  static const String createReceipt = '/sales/receipts/create/';
+  static String getReceiptById(String id) => '/sales/receipts/$id/';
+  static String updateReceipt(String id) => '/sales/receipts/$id/update/';
+  static String deleteReceipt(String id) => '/sales/receipts/$id/delete/';
+  static String generateReceiptPdf(String id) => '/sales/receipts/$id/generate-pdf/';
+
+  // Returns & Refunds API endpoints
+  static const String returns = '/sales/returns/';
+  static const String returnsEndpoint = '/sales/returns/';
+  static const String createReturn = '/sales/returns/create/';
+  static String getReturnById(String id) => '/sales/returns/$id/';
+  static String updateReturn(String id) => '/sales/returns/$id/update/';
+  static String deleteReturn(String id) => '/sales/returns/$id/delete/';
+  static String approveReturn(String id) => '/sales/returns/$id/approve/';
+  static String processReturn(String id) => '/sales/returns/$id/process/';
+  static String getReturnItems(String id) => '/sales/returns/$id/items/';
+  static String getReturnStatistics = '/sales/returns/statistics/';
+  static String getCustomerReturnHistory(String customerId) => '/sales/returns/customer/$customerId/history/';
+  static String getSaleReturnDetails(String saleId) => '/sales/returns/sale/$saleId/returns/';
+
+  // Refunds API endpoints
+  static const String refunds = '/sales/returns/refunds/';
+  static const String createRefund = '/sales/returns/refunds/create/';
+  static String getRefundById(String id) => '/sales/returns/refunds/$id/';
+  static String updateRefund(String id) => '/sales/returns/refunds/$id/update/';
+  static String deleteRefund(String id) => '/sales/returns/refunds/$id/delete/';
+  static String processRefund(String id) => '/sales/returns/refunds/$id/process/';
+  static String failRefund(String id) => '/sales/returns/refunds/$id/fail/';
+  static String cancelRefund(String id) => '/sales/returns/refunds/$id/cancel/';
+
+  // Sale Items API endpoints
+  static const String saleItems = '/sales/items/';
+  static const String createSaleItem = '/sales/items/create/';
+  static const String saleItemsCacheKey = 'sale_items_cache';
+  static String getSaleItemById(String id) => '/sales/items/$id/';
+  static String updateSaleItem(String id) => '/sales/items/$id/update/';
+  static String deleteSaleItem(String id) => '/sales/items/$id/delete/';
+  static String softDeleteSaleItem(String id) => '/sales/items/$id/soft-delete/';
+  static String restoreSaleItem(String id) => '/sales/items/$id/restore/';
+  static const String searchSaleItems = '/sales/items/search/';
+  static String saleItemsBySale(String saleId) => '/sales/items/sale/$saleId/';
+  static String saleItemsByProduct(String productId) => '/sales/items/product/$productId/';
+
+  // Tax Rates API endpoints
+  static const String taxRates = '/tax-rates/';
+  static const String createTaxRate = '/tax-rates/create/';
+  static String getTaxRateById(String id) => '/tax-rates/$id/';
+  static String updateTaxRate(String id) => '/tax-rates/$id/update/';
+  static String deleteTaxRate(String id) => '/tax-rates/$id/delete/';
+  static String softDeleteTaxRate(String id) => '/tax-rates/$id/soft-delete/';
+  static String restoreTaxRate(String id) => '/tax-rates/$id/restore/';
+  static const String searchTaxRates = '/tax-rates/search/';
+  static String taxRatesByType(String type) => '/tax-rates/type/$type/';
+  static String taxRatesByStatus(String status) => '/tax-rates/status/$status/';
+  static const String activeTaxRates = '/tax-rates/active/';
+  static const String effectiveTaxRates = '/tax-rates/effective/';
+  static const String taxRateStatistics = '/tax-rates/statistics/';
+
+  // Payment Processing API endpoints
+  static const String processPayment = '/payments/process/';
+  static const String processSplitPayment = '/payments/split/';
+
+  // Analytics & Reporting API endpoints
+  static const String getSalesAnalytics = '/analytics/sales/';
+  static const String getSalesTrends = '/analytics/sales/trends/';
+  static const String getCustomerAnalytics = '/analytics/customers/';
+  static const String getProductAnalytics = '/analytics/products/';
+  static const String getFinancialAnalytics = '/analytics/financial/';
+  static const String getRevenueAnalytics = '/analytics/revenue/';
+  static const String getProfitMarginAnalytics = '/analytics/profit-margin/';
+  static const String getTaxAnalytics = '/analytics/tax/';
+  static const String getPerformanceAnalytics = '/analytics/performance/';
+  static const String generateReport = '/analytics/reports/generate/';
+  static const String getReportTemplates = '/analytics/reports/templates/';
+  static const String exportAnalyticsData = '/analytics/export/';
+  static const String getDashboardAnalytics = '/analytics/dashboard/';
+  static const String getRealTimeAnalytics = '/analytics/real-time/';
 
   static const String vendors = '/vendors/';
   static const String createVendor = '/vendors/create/';
@@ -271,6 +399,7 @@ class ApiConfig {
   static const String paymentThisMonth = '/payments/this-month/';
   static const String paymentThisYear = '/payments/this-year/';
   static const String paymentStatistics = '/payments/statistics/';
+  static const String paymentSummary = '/payments/summary/';
   static String markAsFinalPayment(String id) => '/payments/$id/mark-final/';
 
   // Payables API endpoints
@@ -358,6 +487,10 @@ class ApiConfig {
   static const String ordersCacheKey = 'cached_orders';
   static const String orderStatsCacheKey = 'cached_order_stats';
   static const String orderItemsCacheKey = 'cached_order_items';
+  static const String salesCacheKey = 'cached_sales';
+  static const String saleStatsCacheKey = 'cached_sale_stats';
+
+  static const String taxRatesCacheKey = 'cached_tax_rates';
 
   static String getFullUrl(String endpoint) {
     return baseUrl + endpoint;
