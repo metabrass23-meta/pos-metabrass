@@ -6,6 +6,9 @@ import 'package:frontend/presentation/screens/principal%20acc/principal_acc_scre
 import 'package:frontend/presentation/screens/product/product_screen.dart';
 import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
 import 'package:frontend/presentation/screens/sales/sales_screen.dart';
+import 'package:frontend/presentation/screens/returns/return_management_screen.dart';
+import 'package:frontend/presentation/screens/invoices/invoice_management_screen.dart';
+import 'package:frontend/presentation/screens/receipts/receipt_management_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
@@ -69,6 +72,12 @@ class DashboardContent extends StatelessWidget {
     } else if (selectedIndex == 16) {
       return const ProfitLossPage();
     } else if (selectedIndex == 17) {
+      return const ReturnManagementScreen();
+    } else if (selectedIndex == 18) {
+      return const InvoiceManagementScreen();
+    } else if (selectedIndex == 19) {
+      return const ReceiptManagementScreen();
+    } else if (selectedIndex == 20) {
       return _buildPlaceholderContent(context); // Settings
     } else {
       return _buildPlaceholderContent(context);
@@ -197,6 +206,17 @@ class DashboardContent extends StatelessWidget {
                             isPositive: stats['activeVendors']['isPositive'],
                             icon: Icons.store_rounded,
                             color: Colors.teal,
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: StatsCard(
+                            title: 'Pending Returns',
+                            value: stats['pendingReturns']?['value'] ?? '0',
+                            change: stats['pendingReturns']?['change'] ?? '0%',
+                            isPositive: stats['pendingReturns']?['isPositive'] ?? false,
+                            icon: Icons.assignment_return_rounded,
+                            color: Colors.orange,
                           ),
                         ),
                       ],

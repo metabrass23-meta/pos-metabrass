@@ -37,71 +37,22 @@ class DashboardProvider extends ChangeNotifier {
 
   // Dashboard Statistics - Updated to include Active Customers
   Map<String, dynamic> get dashboardStats => {
-    'totalSales': {
-      'value': 'Rs. 2,45,000',
-      'change': '+12.5%',
-      'isPositive': true,
-    },
-    'totalOrders': {
-      'value': '1,247',
-      'change': '+8.2%',
-      'isPositive': true,
-    },
-    'totalProducts': {
-      'value': '432',
-      'change': '+5.1%',
-      'isPositive': true,
-    },
-    'activeVendors': {
-      'value': '8',
-      'change': '+2',
-      'isPositive': true,
-    },
-    'activeCustomers': {
-      'value': '156',
-      'change': '+18',
-      'isPositive': true,
-    },
-    'pendingOrders': {
-      'value': '23',
-      'change': '-2.3%',
-      'isPositive': false,
-    },
+    'totalSales': {'value': 'Rs. 2,45,000', 'change': '+12.5%', 'isPositive': true},
+    'totalOrders': {'value': '1,247', 'change': '+8.2%', 'isPositive': true},
+    'totalProducts': {'value': '432', 'change': '+5.1%', 'isPositive': true},
+    'activeVendors': {'value': '8', 'change': '+2', 'isPositive': true},
+    'activeCustomers': {'value': '156', 'change': '+18', 'isPositive': true},
+    'pendingOrders': {'value': '23', 'change': '-2.3%', 'isPositive': false},
+    'pendingReturns': {'value': '7', 'change': '+2', 'isPositive': false},
+    'totalInvoices': {'value': '89', 'change': '+15.2%', 'isPositive': true},
+    'totalReceipts': {'value': '156', 'change': '+8.7%', 'isPositive': true},
   };
 
   List<Map<String, dynamic>> get recentOrders => [
-    {
-      'id': '#MF001',
-      'customer': 'Aisha Khan',
-      'type': 'Bridal Dress',
-      'amount': 'Rs. 85,000',
-      'status': 'In Progress',
-      'date': 'Today',
-    },
-    {
-      'id': '#MF002',
-      'customer': 'Fatima Ali',
-      'type': 'Groom Sherwani',
-      'amount': 'Rs. 45,000',
-      'status': 'Completed',
-      'date': 'Yesterday',
-    },
-    {
-      'id': '#MF003',
-      'customer': 'Sarah Ahmed',
-      'type': 'Party Dress',
-      'amount': 'Rs. 25,000',
-      'status': 'Pending',
-      'date': '2 days ago',
-    },
-    {
-      'id': '#MF004',
-      'customer': 'Zara Sheikh',
-      'type': 'Wedding Lehenga',
-      'amount': 'Rs. 120,000',
-      'status': 'In Progress',
-      'date': '3 days ago',
-    },
+    {'id': '#MF001', 'customer': 'Aisha Khan', 'type': 'Bridal Dress', 'amount': 'Rs. 85,000', 'status': 'In Progress', 'date': 'Today'},
+    {'id': '#MF002', 'customer': 'Fatima Ali', 'type': 'Groom Sherwani', 'amount': 'Rs. 45,000', 'status': 'Completed', 'date': 'Yesterday'},
+    {'id': '#MF003', 'customer': 'Sarah Ahmed', 'type': 'Party Dress', 'amount': 'Rs. 25,000', 'status': 'Pending', 'date': '2 days ago'},
+    {'id': '#MF004', 'customer': 'Zara Sheikh', 'type': 'Wedding Lehenga', 'amount': 'Rs. 120,000', 'status': 'In Progress', 'date': '3 days ago'},
   ];
 
   List<Map<String, double>> get salesChart => [
@@ -115,58 +66,18 @@ class DashboardProvider extends ChangeNotifier {
 
   // Vendor-related data for dashboard
   List<Map<String, dynamic>> get topVendors => [
-    {
-      'name': 'Ali Textiles & Co.',
-      'city': 'Karachi',
-      'revenue': 'Rs. 2,50,000',
-      'orders': 45,
-    },
-    {
-      'name': 'Khan Fabrics',
-      'city': 'Lahore',
-      'revenue': 'Rs. 1,85,000',
-      'orders': 38,
-    },
-    {
-      'name': 'Hassan Brothers Trading',
-      'city': 'Karachi',
-      'revenue': 'Rs. 1,45,000',
-      'orders': 32,
-    },
-    {
-      'name': 'Sheikh Embroidery Works',
-      'city': 'Islamabad',
-      'revenue': 'Rs. 98,000',
-      'orders': 25,
-    },
+    {'name': 'Ali Textiles & Co.', 'city': 'Karachi', 'revenue': 'Rs. 2,50,000', 'orders': 45},
+    {'name': 'Khan Fabrics', 'city': 'Lahore', 'revenue': 'Rs. 1,85,000', 'orders': 38},
+    {'name': 'Hassan Brothers Trading', 'city': 'Karachi', 'revenue': 'Rs. 1,45,000', 'orders': 32},
+    {'name': 'Sheikh Embroidery Works', 'city': 'Islamabad', 'revenue': 'Rs. 98,000', 'orders': 25},
   ];
 
   // Customer-related data for dashboard
   List<Map<String, dynamic>> get topCustomers => [
-    {
-      'name': 'Zara Sheikh',
-      'type': 'VIP Customer',
-      'totalSpent': 'Rs. 1,20,000',
-      'orders': 8,
-    },
-    {
-      'name': 'Aisha Khan',
-      'type': 'Premium Customer',
-      'totalSpent': 'Rs. 85,000',
-      'orders': 5,
-    },
-    {
-      'name': 'Hina Malik',
-      'type': 'Corporate Client',
-      'totalSpent': 'Rs. 95,000',
-      'orders': 6,
-    },
-    {
-      'name': 'Fatima Ali',
-      'type': 'Regular Customer',
-      'totalSpent': 'Rs. 45,000',
-      'orders': 3,
-    },
+    {'name': 'Zara Sheikh', 'type': 'VIP Customer', 'totalSpent': 'Rs. 1,20,000', 'orders': 8},
+    {'name': 'Aisha Khan', 'type': 'Premium Customer', 'totalSpent': 'Rs. 85,000', 'orders': 5},
+    {'name': 'Hina Malik', 'type': 'Corporate Client', 'totalSpent': 'Rs. 95,000', 'orders': 6},
+    {'name': 'Fatima Ali', 'type': 'Regular Customer', 'totalSpent': 'Rs. 45,000', 'orders': 3},
   ];
 
   // Recent activities including vendor and customer activities
@@ -203,30 +114,10 @@ class DashboardProvider extends ChangeNotifier {
 
   // Performance metrics with vendor and customer data
   Map<String, dynamic> get performanceMetrics => {
-    'revenueTarget': {
-      'label': 'Revenue Target',
-      'value': 'Rs. 3,00,000',
-      'percentage': '82%',
-      'color': Colors.blue,
-    },
-    'customerGrowth': {
-      'label': 'Customer Growth',
-      'value': '200',
-      'percentage': '78%',
-      'color': Colors.indigo,
-    },
-    'vendorPartnerships': {
-      'label': 'Vendor Partnerships',
-      'value': '25',
-      'percentage': '88%',
-      'color': Colors.teal,
-    },
-    'conversionRate': {
-      'label': 'Conversion Rate',
-      'value': '65%',
-      'percentage': '92%',
-      'color': Colors.orange,
-    },
+    'revenueTarget': {'label': 'Revenue Target', 'value': 'Rs. 3,00,000', 'percentage': '82%', 'color': Colors.blue},
+    'customerGrowth': {'label': 'Customer Growth', 'value': '200', 'percentage': '78%', 'color': Colors.indigo},
+    'vendorPartnerships': {'label': 'Vendor Partnerships', 'value': '25', 'percentage': '88%', 'color': Colors.teal},
+    'conversionRate': {'label': 'Conversion Rate', 'value': '65%', 'percentage': '92%', 'color': Colors.orange},
   };
 
   // Customer statistics summary
@@ -305,37 +196,13 @@ class DashboardProvider extends ChangeNotifier {
   Map<String, dynamic> getStatsForPeriod(String period) {
     switch (period) {
       case 'today':
-        return {
-          'sales': 'Rs. 45,230',
-          'orders': 23,
-          'customers': 156,
-          'vendors': 8,
-          'products': 432,
-        };
+        return {'sales': 'Rs. 45,230', 'orders': 23, 'customers': 156, 'vendors': 8, 'products': 432};
       case 'week':
-        return {
-          'sales': 'Rs. 3,24,500',
-          'orders': 156,
-          'customers': 156,
-          'vendors': 8,
-          'products': 432,
-        };
+        return {'sales': 'Rs. 3,24,500', 'orders': 156, 'customers': 156, 'vendors': 8, 'products': 432};
       case 'month':
-        return {
-          'sales': 'Rs. 12,45,000',
-          'orders': 672,
-          'customers': 156,
-          'vendors': 8,
-          'products': 432,
-        };
+        return {'sales': 'Rs. 12,45,000', 'orders': 672, 'customers': 156, 'vendors': 8, 'products': 432};
       default:
-        return {
-          'sales': 'Rs. 2,45,000',
-          'orders': 1247,
-          'customers': 156,
-          'vendors': 8,
-          'products': 432,
-        };
+        return {'sales': 'Rs. 2,45,000', 'orders': 1247, 'customers': 156, 'vendors': 8, 'products': 432};
     }
   }
 
