@@ -540,40 +540,6 @@ class ExpenseService {
     }
   }
 
-  /// Bulk actions on expenses
-  Future<ApiResponse<Map<String, dynamic>>> bulkExpenseActions({required List<String> expenseIds, required String action}) async {
-    try {
-      final request = ExpenseBulkActionRequest(expenseIds: expenseIds, action: action);
-
-      DebugHelper.printJson('Bulk Expense Actions Request', request.toJson());
-
-      final response = await _apiClient.post(ApiConfig.bulkExpenseActions, data: request.toJson());
-
-      DebugHelper.printApiResponse('POST Bulk Expense Actions', response.data);
-
-      if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>(
-          success: true,
-          message: response.data['message'] ?? 'Bulk action completed successfully',
-          data: response.data['data'] as Map<String, dynamic>?,
-        );
-      } else {
-        return ApiResponse<Map<String, dynamic>>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to perform bulk action',
-          errors: response.data['errors'] as Map<String, dynamic>?,
-        );
-      }
-    } on DioException catch (e) {
-      debugPrint('Bulk expense actions DioException: ${e.toString()}');
-      final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
-    } catch (e) {
-      debugPrint('Bulk expense actions error: ${e.toString()}');
-      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while performing bulk action');
-    }
-  }
-
   /// Get recent expenses
   Future<ApiResponse<ExpensesListResponse>> getRecentExpenses({int limit = 10}) async {
     try {
