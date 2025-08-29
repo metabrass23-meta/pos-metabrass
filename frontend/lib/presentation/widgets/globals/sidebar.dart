@@ -208,6 +208,12 @@ class PremiumSidebar extends StatelessWidget {
     {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
     {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
     {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
+    {'icon': Icons.receipt_rounded, 'title': 'Tax Management', 'badge': null},
+
+    // Management & Returns
+    {'icon': Icons.assignment_return_rounded, 'title': 'Return Management', 'badge': null},
+    {'icon': Icons.receipt_long_rounded, 'title': 'Invoice Management', 'badge': null},
+    {'icon': Icons.receipt_rounded, 'title': 'Receipt Management', 'badge': null},
 
     // System
     {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},

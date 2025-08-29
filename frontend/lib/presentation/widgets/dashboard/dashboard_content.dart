@@ -29,6 +29,7 @@ import '../../screens/order_item/order_item_screen.dart';
 import '../../screens/profit loss/profit_loss_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
+import '../../screens/tax_management_screen.dart';
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
@@ -72,12 +73,14 @@ class DashboardContent extends StatelessWidget {
     } else if (selectedIndex == 16) {
       return const ProfitLossPage();
     } else if (selectedIndex == 17) {
-      return const ReturnManagementScreen();
+      return const TaxManagementScreen();
     } else if (selectedIndex == 18) {
-      return const InvoiceManagementScreen();
+      return const ReturnManagementScreen();
     } else if (selectedIndex == 19) {
-      return const ReceiptManagementScreen();
+      return const InvoiceManagementScreen();
     } else if (selectedIndex == 20) {
+      return const ReceiptManagementScreen();
+    } else if (selectedIndex == 21) {
       return _buildPlaceholderContent(context); // Settings
     } else {
       return _buildPlaceholderContent(context);
