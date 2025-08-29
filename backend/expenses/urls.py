@@ -16,9 +16,6 @@ urlpatterns = [
     
     # Analytics and reporting endpoints
     path('statistics/', views.expense_statistics, name='expense-statistics'),
-    path('monthly-summary/', views.monthly_summary, name='monthly-summary'),
+    path('monthly-summary/', views.expense_monthly_summary, name='expense-monthly-summary'),
     path('recent/', views.recent_expenses, name='recent-expenses'),
-    
-    # Bulk operations
-    path('bulk-actions/', views.bulk_actions, name='bulk-actions'),
 ]
