@@ -5,28 +5,18 @@ class ExpensesListResponse {
   final PaginationInfo pagination;
   final Map<String, dynamic>? filtersApplied;
 
-  ExpensesListResponse({
-    required this.expenses,
-    required this.pagination,
-    this.filtersApplied,
-  });
+  ExpensesListResponse({required this.expenses, required this.pagination, this.filtersApplied});
 
   factory ExpensesListResponse.fromJson(Map<String, dynamic> json) {
     return ExpensesListResponse(
-      expenses: (json['expenses'] as List)
-          .map((expenseJson) => Expense.fromJson(expenseJson))
-          .toList(),
+      expenses: (json['expenses'] as List).map((expenseJson) => Expense.fromJson(expenseJson)).toList(),
       pagination: PaginationInfo.fromJson(json['pagination']),
       filtersApplied: json['filters_applied'] as Map<String, dynamic>?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'expenses': expenses.map((expense) => expense.toJson()).toList(),
-      'pagination': pagination.toJson(),
-      'filters_applied': filtersApplied,
-    };
+    return {'expenses': expenses.map((expense) => expense.toJson()).toList(), 'pagination': pagination.toJson(), 'filters_applied': filtersApplied};
   }
 }
 
@@ -103,24 +93,17 @@ class ExpenseStatisticsResponse {
       averageExpense: (json['average_expense'] as num?)?.toDouble() ?? 0.0,
       formattedTotal: json['formatted_total'] as String? ?? 'PKR 0.00',
       formattedAverage: json['formatted_average'] as String? ?? 'PKR 0.00',
-      byAuthority: (json['by_authority'] as Map<String, dynamic>?)?.map(
-            (key, value) => MapEntry(
-              key,
-              ExpenseAuthorityStats.fromJson(value as Map<String, dynamic>),
-            ),
+      byAuthority:
+          (json['by_authority'] as Map<String, dynamic>?)?.map(
+            (key, value) => MapEntry(key, ExpenseAuthorityStats.fromJson(value as Map<String, dynamic>)),
           ) ??
           {},
-      byCategory: (json['by_category'] as Map<String, dynamic>?)?.map(
-            (key, value) => MapEntry(
-              key,
-              ExpenseCategoryStats.fromJson(value as Map<String, dynamic>),
-            ),
+      byCategory:
+          (json['by_category'] as Map<String, dynamic>?)?.map(
+            (key, value) => MapEntry(key, ExpenseCategoryStats.fromJson(value as Map<String, dynamic>)),
           ) ??
           {},
-      monthlyTrend: (json['monthly_trend'] as List?)
-              ?.map((item) => ExpenseMonthlyTrend.fromJson(item))
-              .toList() ??
-          [],
+      monthlyTrend: (json['monthly_trend'] as List?)?.map((item) => ExpenseMonthlyTrend.fromJson(item)).toList() ?? [],
     );
   }
 
@@ -144,12 +127,7 @@ class ExpenseAuthorityStats {
   final int count;
   final double percentage;
 
-  ExpenseAuthorityStats({
-    required this.totalAmount,
-    required this.formattedAmount,
-    required this.count,
-    required this.percentage,
-  });
+  ExpenseAuthorityStats({required this.totalAmount, required this.formattedAmount, required this.count, required this.percentage});
 
   factory ExpenseAuthorityStats.fromJson(Map<String, dynamic> json) {
     return ExpenseAuthorityStats(
@@ -161,12 +139,7 @@ class ExpenseAuthorityStats {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'total_amount': totalAmount,
-      'formatted_amount': formattedAmount,
-      'count': count,
-      'percentage': percentage,
-    };
+    return {'total_amount': totalAmount, 'formatted_amount': formattedAmount, 'count': count, 'percentage': percentage};
   }
 }
 
@@ -176,12 +149,7 @@ class ExpenseCategoryStats {
   final int count;
   final double percentage;
 
-  ExpenseCategoryStats({
-    required this.totalAmount,
-    required this.formattedAmount,
-    required this.count,
-    required this.percentage,
-  });
+  ExpenseCategoryStats({required this.totalAmount, required this.formattedAmount, required this.count, required this.percentage});
 
   factory ExpenseCategoryStats.fromJson(Map<String, dynamic> json) {
     return ExpenseCategoryStats(
@@ -193,12 +161,7 @@ class ExpenseCategoryStats {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'total_amount': totalAmount,
-      'formatted_amount': formattedAmount,
-      'count': count,
-      'percentage': percentage,
-    };
+    return {'total_amount': totalAmount, 'formatted_amount': formattedAmount, 'count': count, 'percentage': percentage};
   }
 }
 
@@ -208,12 +171,7 @@ class ExpenseMonthlyTrend {
   final String formattedAmount;
   final int count;
 
-  ExpenseMonthlyTrend({
-    required this.month,
-    required this.totalAmount,
-    required this.formattedAmount,
-    required this.count,
-  });
+  ExpenseMonthlyTrend({required this.month, required this.totalAmount, required this.formattedAmount, required this.count});
 
   factory ExpenseMonthlyTrend.fromJson(Map<String, dynamic> json) {
     return ExpenseMonthlyTrend(
@@ -225,12 +183,7 @@ class ExpenseMonthlyTrend {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'month': month,
-      'total_amount': totalAmount,
-      'formatted_amount': formattedAmount,
-      'count': count,
-    };
+    return {'month': month, 'total_amount': totalAmount, 'formatted_amount': formattedAmount, 'count': count};
   }
 }
 
@@ -305,35 +258,13 @@ class ExpenseUpdateRequest {
   }
 }
 
-class ExpenseBulkActionRequest {
-  final List<String> expenseIds;
-  final String action; // 'activate', 'deactivate', 'delete'
-
-  ExpenseBulkActionRequest({
-    required this.expenseIds,
-    required this.action,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'expense_ids': expenseIds,
-      'action': action,
-    };
-  }
-}
-
 class ExpenseDateRangeRequest {
   final DateTime startDate;
   final DateTime endDate;
   final int page;
   final int pageSize;
 
-  ExpenseDateRangeRequest({
-    required this.startDate,
-    required this.endDate,
-    this.page = 1,
-    this.pageSize = 20,
-  });
+  ExpenseDateRangeRequest({required this.startDate, required this.endDate, this.page = 1, this.pageSize = 20});
 
   Map<String, dynamic> toJson() {
     return {
@@ -370,10 +301,7 @@ class ExpenseListParams {
   });
 
   Map<String, dynamic> toQueryParameters() {
-    final params = <String, dynamic>{
-      'page': page.toString(),
-      'page_size': pageSize.toString(),
-    };
+    final params = <String, dynamic>{'page': page.toString(), 'page_size': pageSize.toString()};
 
     if (search != null && search!.isNotEmpty) {
       params['search'] = search!;

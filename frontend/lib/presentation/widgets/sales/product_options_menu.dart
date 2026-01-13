@@ -13,13 +13,7 @@ class ProductOptionsMenu extends StatelessWidget {
   final VoidCallback? onCreateCustomOrder;
   final VoidCallback? onApplyDiscount;
 
-  const ProductOptionsMenu({
-    super.key,
-    required this.product,
-    this.onCustomizeAndAdd,
-    this.onCreateCustomOrder,
-    this.onApplyDiscount,
-  });
+  const ProductOptionsMenu({super.key, required this.product, this.onCustomizeAndAdd, this.onCreateCustomOrder, this.onApplyDiscount});
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +45,8 @@ class ProductOptionsMenu extends StatelessWidget {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                    child: Icon(
-                      Icons.checkroom_outlined,
-                      color: Colors.grey[500],
-                      size: context.iconSize('medium'),
-                    ),
+                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(context.borderRadius())),
+                    child: Icon(Icons.checkroom_outlined, color: Colors.grey[500], size: context.iconSize('medium')),
                   ),
                   SizedBox(width: context.cardPadding),
                   Expanded(
@@ -68,21 +55,13 @@ class ProductOptionsMenu extends StatelessWidget {
                       children: [
                         Text(
                           product.name,
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.charcoalGray,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'PKR ${product.price.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.primaryMaroon,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
                         ),
                       ],
                     ),
@@ -102,7 +81,10 @@ class ProductOptionsMenu extends StatelessWidget {
                   color: AppTheme.primaryMaroon,
                   onTap: () {
                     Navigator.of(context).pop();
-                    Provider.of<SalesProvider>(context, listen: false).addToCart(product, 1);
+                    Provider.of<SalesProvider>(
+                      context,
+                      listen: false,
+                    ).addToCartWithCustomization(productId: product.id, productName: product.name, unitPrice: product.price, quantity: 1);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
@@ -110,19 +92,14 @@ class ProductOptionsMenu extends StatelessWidget {
                             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
                             SizedBox(width: context.smallPadding),
                             Expanded(
-                              child: Text(
-                                '${product.name} added to cart',
-                                style: GoogleFonts.inter(color: AppTheme.pureWhite),
-                              ),
+                              child: Text('${product.name} added to cart', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
                             ),
                           ],
                         ),
                         backgroundColor: Colors.green,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                       ),
                     );
                   },
@@ -189,18 +166,12 @@ class ProductOptionsMenu extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.cardPadding / 2,
-            vertical: context.cardPadding / 2,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
           child: Row(
             children: [
               Container(
                 padding: EdgeInsets.all(context.smallPadding / 1.5),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
+                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
                 child: Icon(icon, color: color, size: context.iconSize('medium')),
               ),
               SizedBox(width: context.cardPadding),
@@ -210,11 +181,7 @@ class ProductOptionsMenu extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     Text(
                       subtitle,

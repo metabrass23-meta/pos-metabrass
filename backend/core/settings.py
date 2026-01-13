@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'payments',
     'receivables',
     'profit_loss',
+    'principal_account',
+    'analytics',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'maqboolfashion_db',
+        'NAME': 'POS_DB',
         'USER': 'postgres',
         'PASSWORD': 'Admin123!',
         'HOST': 'localhost',

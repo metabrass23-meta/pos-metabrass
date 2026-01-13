@@ -17,6 +17,12 @@ from customers.models import Customer
 from products.models import Product
 from orders.models import Order
 from order_items.models import OrderItem
+from .models import Invoice, Receipt
+from .serializers import (
+    InvoiceCreateSerializer, InvoiceSerializer, InvoiceUpdateSerializer, InvoiceListSerializer,
+    ReceiptCreateSerializer, ReceiptSerializer, ReceiptUpdateSerializer, ReceiptListSerializer
+)
+from django.utils import timezone
 
 
 # Function-based views for Sales
@@ -337,6 +343,62 @@ def customer_sales_history(request, customer_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def bulk_action_sales(request):
+    """Perform bulk actions on sales"""
+    serializer = SalesBulkActionSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        try:
+            action = serializer.validated_data['action']
+            sale_ids = serializer.validated_data['sale_ids']
+            
+            with transaction.atomic():
+                sales = Sales.objects.filter(id__in=sale_ids, is_active=True)
+                updated_count = 0
+                
+                if action == 'activate':
+                    updated_count = sales.update(is_active=True)
+                elif action == 'deactivate':
+                    updated_count = sales.update(is_active=False)
+                elif action == 'confirm':
+                    updated_count = sales.filter(status='DRAFT').update(status='CONFIRMED')
+                elif action == 'invoice':
+                    updated_count = sales.filter(status='CONFIRMED').update(status='INVOICED')
+                elif action == 'mark_paid':
+                    updated_count = sales.filter(status='INVOICED').update(status='PAID')
+                elif action == 'deliver':
+                    updated_count = sales.filter(status='PAID').update(status='DELIVERED')
+                elif action == 'cancel':
+                    updated_count = sales.filter(status__in=['DRAFT', 'CONFIRMED', 'INVOICED']).update(status='CANCELLED')
+                elif action == 'return':
+                    updated_count = sales.filter(status='DELIVERED').update(status='RETURNED')
+                elif action == 'recalculate':
+                    for sale in sales:
+                        sale.recalculate_totals()
+                    updated_count = len(sales)
+                
+                return Response({
+                    'success': True,
+                    'message': f'Bulk action "{action}" completed successfully on {updated_count} sales.',
+                    'updated_count': updated_count
+                }, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Failed to perform bulk action.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({
+        'success': False,
+        'message': 'Bulk action failed.',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sales_statistics(request):
@@ -629,5 +691,629 @@ def delete_sale_item(request, item_id):
         return Response({
             'success': False,
             'message': 'Failed to delete sale item.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ===== INVOICE MANAGEMENT =====
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_invoice(request):
+    """Create a new invoice for a sale"""
+    serializer = InvoiceCreateSerializer(data=request.data, context={'request': request})
+    
+    if serializer.is_valid():
+        try:
+            with transaction.atomic():
+                invoice = serializer.save()
+                
+                # Update sale status to INVOICED if it's not already
+                sale = invoice.sale
+                if sale.status == 'CONFIRMED':
+                    sale.status = 'INVOICED'
+                    sale.save(update_fields=['status', 'updated_at'])
+                
+                return Response({
+                    'success': True,
+                    'message': 'Invoice created successfully',
+                    'data': InvoiceSerializer(invoice).data
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Failed to create invoice',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({
+        'success': False,
+        'message': 'Invalid invoice data',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_invoice(request, invoice_id):
+    """Get invoice details"""
+    try:
+        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        serializer = InvoiceSerializer(invoice)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get invoice',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_invoice(request, invoice_id):
+    """Update invoice details"""
+    try:
+        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        serializer = InvoiceUpdateSerializer(invoice, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            invoice = serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Invoice updated successfully',
+                'data': InvoiceSerializer(invoice).data
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            'success': False,
+            'message': 'Invalid invoice data',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to update invoice',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_invoices(request):
+    """List all invoices with filtering and pagination"""
+    try:
+        # Get query parameters
+        show_inactive = request.GET.get('show_inactive', 'false').lower() == 'true'
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Filter parameters
+        status_filter = request.GET.get('status', '').strip()
+        customer_id = request.GET.get('customer_id', '').strip()
+        date_from = request.GET.get('date_from', '').strip()
+        date_to = request.GET.get('date_to', '').strip()
+        overdue_only = request.GET.get('overdue_only', 'false').lower() == 'true'
+        
+        # Base queryset
+        if show_inactive:
+            invoices = Invoice.objects.all()
+        else:
+            invoices = Invoice.objects.filter(is_active=True)
+        
+        # Apply filters
+        if status_filter:
+            invoices = invoices.filter(status=status_filter.upper())
+        
+        if customer_id:
+            invoices = invoices.filter(sale__customer_id=customer_id)
+        
+        if date_from and date_to:
+            invoices = invoices.filter(issue_date__date__range=[date_from, date_to])
+        
+        if overdue_only:
+            invoices = invoices.filter(due_date__lt=timezone.now().date(), status__in=['DRAFT', 'ISSUED', 'SENT'])
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        total_count = invoices.count()
+        
+        invoices_page = invoices[start:end]
+        serializer = InvoiceListSerializer(invoices_page, many=True)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total_count': total_count,
+                'total_pages': (total_count + page_size - 1) // page_size
+            }
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to list invoices',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_invoice_pdf(request, invoice_id):
+    """Generate PDF for invoice"""
+    try:
+        from reportlab.lib.pagesizes import letter, A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.lib import colors
+        from reportlab.pdfgen import canvas
+        from django.conf import settings
+        import os
+        from io import BytesIO
+        
+        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        
+        # Create PDF buffer
+        buffer = BytesIO()
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        story = []
+        
+        # Get styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            spaceAfter=30,
+            alignment=1,  # Center alignment
+        )
+        
+        # Add title
+        story.append(Paragraph(f"INVOICE #{invoice.invoice_number}", title_style))
+        story.append(Spacer(1, 20))
+        
+        # Company and customer info
+        company_info = [
+            ['Company: Maqbool Fabric', f'Invoice Date: {invoice.issue_date.strftime("%B %d, %Y")}'],
+            ['Address: Your Company Address', f'Due Date: {invoice.due_date.strftime("%B %d, %Y")}'],
+            ['Phone: +92-XXX-XXXXXXX', f'Status: {invoice.status}'],
+        ]
+        
+        company_table = Table(company_info, colWidths=[3*inch, 3*inch])
+        company_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', 10),
+            ('BOTTOMPADDING', 6, 6, 6),
+        ]))
+        story.append(company_table)
+        story.append(Spacer(1, 20))
+        
+        # Customer details
+        if invoice.sale and invoice.sale.customer:
+            customer = invoice.sale.customer
+            customer_info = [
+                ['Customer Information:'],
+                ['Name:', customer.name],
+                ['Phone:', customer.phone or 'N/A'],
+                ['Email:', customer.email or 'N/A'],
+                ['Address:', customer.address or 'N/A'],
+            ]
+            
+            customer_table = Table(customer_info, colWidths=[1.5*inch, 4.5*inch])
+            customer_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', 10),
+                ('BOTTOMPADDING', 6, 6, 6),
+                ('BACKGROUND', (0, 0), (0, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+            ]))
+            story.append(customer_table)
+            story.append(Spacer(1, 20))
+        
+        # Invoice items
+        if invoice.sale and invoice.sale.sale_items.exists():
+            items_data = [['Item', 'Description', 'Qty', 'Unit Price', 'Total']]
+            
+            for item in invoice.sale.sale_items.all():
+                items_data.append([
+                    item.product.name if item.product else 'N/A',
+                    item.product.description[:50] + '...' if item.product and item.product.description and len(item.product.description) > 50 else (item.product.description if item.product else 'N/A'),
+                    str(item.quantity),
+                    f"PKR {item.unit_price:.2f}",
+                    f"PKR {(item.quantity * item.unit_price):.2f}",
+                ])
+            
+            items_table = Table(items_data, colWidths=[1.5*inch, 2*inch, 0.8*inch, 1.2*inch, 1.2*inch])
+            items_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', 10),
+                ('BOTTOMPADDING', 6, 6, 6),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+            story.append(items_table)
+            story.append(Spacer(1, 20))
+        
+        # Totals
+        totals_data = [
+            ['Subtotal:', f"PKR {invoice.sale.subtotal:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Tax:', f"PKR {invoice.sale.taxAmount:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Discount:', f"PKR {invoice.sale.discountAmount:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Total:', f"PKR {invoice.sale.grandTotal:.2f}" if invoice.sale else 'PKR 0.00'],
+        ]
+        
+        totals_table = Table(totals_data, colWidths=[1*inch, 1*inch])
+        totals_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', 10),
+            ('BOTTOMPADDING', 6, 6, 6),
+            ('FONTNAME', (0, -1), (1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, -1), (1, -1), 12),
+        ]))
+        story.append(totals_table)
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Get PDF content
+        pdf_content = buffer.getvalue()
+        buffer.close()
+        
+        # Save PDF to file
+        filename = f"invoice_{invoice.invoice_number}_{invoice.issue_date.strftime('%Y%m%d')}.pdf"
+        filepath = os.path.join(settings.MEDIA_ROOT, 'invoices', filename)
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        with open(filepath, 'wb') as f:
+            f.write(pdf_content)
+        
+        # Update invoice with PDF file
+        from django.core.files.base import ContentFile
+        invoice.pdf_file.save(filename, ContentFile(pdf_content), save=True)
+        invoice.status = 'ISSUED'
+        invoice.save(update_fields=['status', 'updated_at', 'pdf_file'])
+        
+        return Response({
+            'success': True,
+            'message': 'Invoice PDF generated successfully',
+            'data': {
+                'invoice_id': str(invoice.id),
+                'status': invoice.status,
+                'pdf_url': invoice.pdf_file.url if invoice.pdf_file else None,
+                'filename': filename
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to generate invoice PDF',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ===== RECEIPT MANAGEMENT =====
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_receipt(request):
+    """Create a new receipt for a payment"""
+    serializer = ReceiptCreateSerializer(data=request.data, context={'request': request})
+    
+    if serializer.is_valid():
+        try:
+            with transaction.atomic():
+                receipt = serializer.save()
+                
+                return Response({
+                    'success': True,
+                    'message': 'Receipt created successfully',
+                    'data': ReceiptSerializer(receipt).data
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Failed to create receipt',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({
+        'success': False,
+        'message': 'Invalid receipt data',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_receipt(request, receipt_id):
+    """Get receipt details"""
+    try:
+        receipt = get_object_or_404(Receipt, id=receipt_id, is_active=True)
+        serializer = ReceiptSerializer(receipt)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to get receipt',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_receipt(request, receipt_id):
+    """Update receipt details"""
+    try:
+        receipt = get_object_or_404(Receipt, id=receipt_id, is_active=True)
+        serializer = ReceiptUpdateSerializer(receipt, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            receipt = serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Receipt updated successfully',
+                'data': ReceiptSerializer(receipt).data
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            'success': False,
+            'message': 'Invalid receipt data',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to update receipt',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_receipts(request):
+    """List all receipts with filtering and pagination"""
+    try:
+        # Get query parameters
+        show_inactive = request.GET.get('show_inactive', 'false').lower() == 'true'
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Filter parameters
+        sale_id = request.GET.get('sale_id', '').strip()
+        payment_id = request.GET.get('payment_id', '').strip()
+        status_filter = request.GET.get('status', '').strip()
+        date_from = request.GET.get('date_from', '').strip()
+        date_to = request.GET.get('date_to', '').strip()
+        
+        # Base queryset
+        if show_inactive:
+            receipts = Receipt.objects.all()
+        else:
+            receipts = Receipt.objects.filter(is_active=True)
+        
+        # Apply filters
+        if sale_id:
+            receipts = receipts.filter(sale_id=sale_id)
+        
+        if payment_id:
+            receipts = receipts.filter(payment_id=payment_id)
+        
+        if status_filter:
+            receipts = receipts.filter(status=status_filter.upper())
+        
+        if date_from and date_to:
+            receipts = receipts.filter(generated_at__date__range=[date_from, date_to])
+        
+        # Pagination
+        start = (page - 1) * page_size
+        end = start + page_size
+        total_count = receipts.count()
+        
+        receipts_page = receipts[start:end]
+        serializer = ReceiptListSerializer(receipts_page, many=True)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data,
+            'pagination': {
+                'page': page,
+                'page_size': page_size,
+                'total_count': total_count,
+                'total_pages': (total_count + page_size - 1) // page_size
+            }
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to list receipts',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_receipt_pdf(request, receipt_id):
+    """Generate PDF for receipt"""
+    try:
+        from reportlab.lib.pagesizes import letter, A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.lib import colors
+        from reportlab.pdfgen import canvas
+        from django.conf import settings
+        import os
+        from io import BytesIO
+        
+        receipt = get_object_or_404(Receipt, id=receipt_id, is_active=True)
+        
+        # Create PDF buffer
+        buffer = BytesIO()
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        story = []
+        
+        # Get styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            spaceAfter=30,
+            alignment=1,  # Center alignment
+        )
+        
+        # Add title
+        story.append(Paragraph(f"RECEIPT #{receipt.receipt_number}", title_style))
+        story.append(Spacer(1, 20))
+        
+        # Company and receipt info
+        company_info = [
+            ['Company: Maqbool Fabric', f'Receipt Date: {receipt.generated_at.strftime("%B %d, %Y")}'],
+            ['Address: Your Company Address', f'Time: {receipt.generated_at.strftime("%I:%M %p")}'],
+            ['Phone: +92-XXX-XXXXXXX', f'Status: {receipt.status}'],
+        ]
+        
+        company_table = Table(company_info, colWidths=[3*inch, 3*inch])
+        company_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', 10),
+            ('BOTTOMPADDING', 6, 6, 6),
+        ]))
+        story.append(company_table)
+        story.append(Spacer(1, 20))
+        
+        # Payment details
+        if receipt.payment:
+            payment = receipt.payment
+            payment_info = [
+                ['Payment Information:'],
+                ['Payment ID:', payment.id],
+                ['Payment Method:', payment.payment_method],
+                ['Amount:', f"PKR {payment.amount:.2f}"],
+                ['Status:', payment.status],
+            ]
+            
+            payment_table = Table(payment_info, colWidths=[1.5*inch, 4.5*inch])
+            payment_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', 10),
+                ('BOTTOMPADDING', 6, 6, 6),
+                ('BACKGROUND', (0, 0), (0, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+            ]))
+            story.append(payment_table)
+            story.append(Spacer(1, 20))
+        
+        # Sale details
+        if receipt.sale:
+            sale = receipt.sale
+            if sale.customer:
+                customer = sale.customer
+                customer_info = [
+                    ['Customer Information:'],
+                    ['Name:', customer.name],
+                    ['Phone:', customer.phone or 'N/A'],
+                    ['Email:', customer.email or 'N/A'],
+                ]
+                
+                customer_table = Table(customer_info, colWidths=[1.5*inch, 4.5*inch])
+                customer_table.setStyle(TableStyle([
+                    ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                    ('FONTSIZE', 10),
+                    ('BOTTOMPADDING', 6, 6, 6),
+                    ('BACKGROUND', (0, 0), (0, 0), colors.grey),
+                    ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+                ]))
+                story.append(customer_table)
+                story.append(Spacer(1, 20))
+        
+        # Receipt summary
+        summary_data = [
+            ['Receipt Summary:'],
+            ['Total Amount:', f"PKR {receipt.amount:.2f}"],
+            ['Payment Method:', receipt.payment.payment_method if receipt.payment else 'N/A'],
+            ['Transaction Date:', receipt.generated_at.strftime("%B %d, %Y at %I:%M %p")],
+        ]
+        
+        summary_table = Table(summary_data, colWidths=[1.5*inch, 4.5*inch])
+        summary_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', 10),
+            ('BOTTOMPADDING', 6, 6, 6),
+            ('BACKGROUND', (0, 0), (0, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+        ]))
+        story.append(summary_table)
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Get PDF content
+        pdf_content = buffer.getvalue()
+        buffer.close()
+        
+        # Save PDF to file
+        filename = f"receipt_{receipt.receipt_number}_{receipt.generated_at.strftime('%Y%m%d_%H%M')}.pdf"
+        filepath = os.path.join(settings.MEDIA_ROOT, 'receipts', filename)
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        with open(filepath, 'wb') as f:
+            f.write(pdf_content)
+        
+        # Update receipt with PDF file
+        from django.core.files.base import ContentFile
+        receipt.pdf_file.save(filename, ContentFile(pdf_content), save=True)
+        receipt.status = 'GENERATED'
+        receipt.save(update_fields=['status', 'updated_at', 'pdf_file'])
+        
+        return Response({
+            'success': True,
+            'message': 'Receipt PDF generated successfully',
+            'data': {
+                'receipt_id': str(receipt.id),
+                'status': receipt.status,
+                'pdf_url': receipt.pdf_file.url if receipt.pdf_file else None,
+                'filename': filename
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to generate receipt PDF',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

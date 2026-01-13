@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import '../../../src/providers/advance_payment_provider.dart';
+import '../../../src/models/advance_payment/advance_payment_model.dart';
+
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 
@@ -23,26 +24,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -76,14 +62,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -91,11 +70,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -119,11 +94,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
       ],
     );
   }
@@ -133,11 +104,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
       ],
     );
   }
@@ -147,11 +114,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildContent(isCompact: false),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: false))),
       ],
     );
   }
@@ -160,11 +123,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: widget.payment.hasReceipt
-              ? [Colors.green, Colors.greenAccent]
-              : [Colors.orange, Colors.orangeAccent],
-        ),
+        gradient: LinearGradient(colors: widget.payment.hasReceipt ? [Colors.green, Colors.greenAccent] : [Colors.orange, Colors.orangeAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -174,10 +133,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Icon(
               widget.payment.hasReceipt ? Icons.receipt_rounded : Icons.receipt_long_outlined,
               color: AppTheme.pureWhite,
@@ -201,9 +157,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    widget.payment.hasReceipt
-                        ? 'View receipt details and image'
-                        : 'Add receipt for this payment',
+                    widget.payment.hasReceipt ? 'View receipt details and image' : 'Add receipt for this payment',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -215,21 +169,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -240,11 +184,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -271,11 +211,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               children: [
                 Text(
                   'Payment Details',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 SizedBox(height: context.cardPadding),
                 ResponsiveBreakpoints.responsive(
@@ -303,11 +239,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
           SizedBox(height: context.cardPadding),
           _buildSalaryProgressSection(),
           SizedBox(height: context.cardPadding),
-          if (widget.payment.hasReceipt) ...[
-            _buildReceiptImageSection(isCompact: isCompact),
-          ] else ...[
-            _buildNoReceiptSection(isCompact: isCompact),
-          ],
+          if (widget.payment.hasReceipt) ...[_buildReceiptImageSection(isCompact: isCompact)] else ...[_buildNoReceiptSection(isCompact: isCompact)],
           SizedBox(height: context.mainPadding),
           Align(
             alignment: Alignment.centerRight,
@@ -331,50 +263,28 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
       children: [
         Text(
           'Labor',
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           widget.payment.laborName,
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.charcoalGray,
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         Text(
           '${widget.payment.laborRole} • ${widget.payment.laborPhone}',
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
         Text(
           'Amount',
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           'PKR ${widget.payment.amount.toStringAsFixed(0)}',
-          style: GoogleFonts.inter(
-            fontSize: context.headerFontSize * 0.8,
-            fontWeight: FontWeight.w700,
-            color: Colors.green,
-          ),
+          style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: Colors.green),
         ),
         Text(
           '${widget.payment.advancePercentage.toStringAsFixed(1)}% of salary',
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            color: Colors.green[700],
-          ),
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.green[700]),
         ),
       ],
     );
@@ -389,26 +299,15 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
             children: [
               Text(
                 'Labor',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 widget.payment.laborName,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 '${widget.payment.laborRole} • ${widget.payment.laborPhone}',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -419,26 +318,15 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
             children: [
               Text(
                 'Amount',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 'PKR ${widget.payment.amount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
-                  fontSize: context.headerFontSize * 0.8,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.green,
-                ),
+                style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: Colors.green),
               ),
               Text(
                 '${widget.payment.advancePercentage.toStringAsFixed(1)}% of salary',
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.green[700],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.green[700]),
               ),
             ],
           ),
@@ -453,21 +341,14 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.smallPadding),
-          decoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          ),
+          decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
           child: Row(
             children: [
               Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
               SizedBox(width: context.smallPadding),
               Text(
                 _formatDate(widget.payment.date),
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -476,21 +357,14 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.smallPadding),
-          decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          ),
+          decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
           child: Row(
             children: [
               Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.orange),
               SizedBox(width: context.smallPadding),
               Text(
                 widget.payment.timeText,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -505,21 +379,14 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
         Expanded(
           child: Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Row(
               children: [
                 Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                 SizedBox(width: context.smallPadding),
                 Text(
                   _formatDate(widget.payment.date),
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -529,21 +396,14 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
         Expanded(
           child: Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Row(
               children: [
                 Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.orange),
                 SizedBox(width: context.smallPadding),
                 Text(
                   widget.payment.timeText,
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -556,29 +416,18 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
   Widget _buildDescriptionSection() {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-      ),
+      decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Description',
-            style: GoogleFonts.inter(
-              fontSize: context.captionFontSize,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             widget.payment.description,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w400,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
           ),
         ],
       ),
@@ -601,28 +450,15 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               Expanded(
                 child: Text(
                   'Total Salary: PKR ${widget.payment.totalSalary.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    color: Colors.grey[700],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.cardPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: widget.payment.statusColor,
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+                decoration: BoxDecoration(color: widget.payment.statusColor, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
                   widget.payment.statusText,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.pureWhite,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                 ),
               ),
             ],
@@ -641,35 +477,19 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               ),
               Text(
                 '${((widget.payment.totalSalary - widget.payment.remainingSalary) / widget.payment.totalSalary * 100).toStringAsFixed(1)}% used',
-                style: GoogleFonts.inter(
-                  fontSize: context.subtitleFontSize,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Container(
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 6,
-              small: 7,
-              medium: 8,
-              large: 9,
-              ultrawide: 10,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              color: Colors.grey.shade300,
-            ),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 6, small: 7, medium: 8, large: 9, ultrawide: 10),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.grey.shade300),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: (widget.payment.totalSalary - widget.payment.remainingSalary) / widget.payment.totalSalary,
               child: Container(
-                decoration: BoxDecoration(
-                  color: widget.payment.statusColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+                decoration: BoxDecoration(color: widget.payment.statusColor, borderRadius: BorderRadius.circular(4)),
               ),
             ),
           ),
@@ -695,25 +515,14 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
               SizedBox(width: context.smallPadding),
               Text(
                 'Receipt Image',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.green,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Container(
             width: double.infinity,
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 25.h,
-              small: 30.h,
-              medium: 35.h,
-              large: 40.h,
-              ultrawide: 45.h,
-            ),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 25.h, small: 30.h, medium: 35.h, large: 40.h, ultrawide: 45.h),
             decoration: BoxDecoration(
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -722,27 +531,16 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.image_outlined,
-                  size: context.iconSize('xl') * 2,
-                  color: Colors.grey[500],
-                ),
+                Icon(Icons.image_outlined, size: context.iconSize('xl') * 2, color: Colors.grey[500]),
                 SizedBox(height: context.smallPadding),
                 Text(
                   'Receipt Image Preview',
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
                 ),
                 if (widget.payment.receiptImagePath != null) ...[
                   Text(
                     widget.payment.receiptImagePath!,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[500],
-                      fontStyle: FontStyle.italic,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[500], fontStyle: FontStyle.italic),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -767,19 +565,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            color: Colors.orange,
-            size: context.iconSize('xl'),
-          ),
+          Icon(Icons.receipt_long_outlined, color: Colors.orange, size: context.iconSize('xl')),
           SizedBox(height: context.cardPadding),
           Text(
             'No Receipt Available',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: Colors.orange,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding),
@@ -787,10 +577,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
             isCompact
                 ? 'No receipt available. Add one for better records.'
                 : 'No receipt image was uploaded for this payment. Consider adding a receipt for better record keeping.',
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              color: Colors.orange[400],
-            ),
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[400]),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -801,17 +588,12 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> with SingleTicker
                 SnackBar(
                   content: Text(
                     'Receipt upload functionality to be implemented',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      color: AppTheme.pureWhite,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
                   ),
                   backgroundColor: Colors.blue,
                   duration: const Duration(seconds: 2),
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                 ),
               );
             },

@@ -1,10 +1,12 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import Sum
-from .models import Sales, SaleItem
+from django.db import transaction
+from .models import Sales, SaleItem, TaxRate
 from orders.models import Order
 from order_items.models import OrderItem
 import logging
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +20,17 @@ def update_customer_sales_activity(sender, instance, created, **kwargs):
             
             # Update customer's last sale date
             if hasattr(customer, 'update_last_sale_date'):
-                customer.update_last_sale_date()
+                try:
+                    customer.update_last_sale_date()
+                except Exception as e:
+                    logger.warning(f"Failed to update last sale date for customer {customer.id}: {str(e)}")
             
             # Update customer's sales count and amount
             if hasattr(customer, 'update_sales_metrics'):
-                customer.update_sales_metrics()
+                try:
+                    customer.update_sales_metrics()
+                except Exception as e:
+                    logger.warning(f"Failed to update sales metrics for customer {customer.id}: {str(e)}")
             
             logger.info(f"Updated sales activity for customer: {customer.name}")
             
@@ -39,7 +47,10 @@ def update_product_sales_metrics(sender, instance, created, **kwargs):
             
             # Update product's sales quantity and revenue
             if hasattr(product, 'update_sales_metrics'):
-                product.update_sales_metrics()
+                try:
+                    product.update_sales_metrics()
+                except Exception as e:
+                    logger.warning(f"Failed to update sales metrics for product {product.id}: {str(e)}")
             
             logger.info(f"Updated sales metrics for product: {product.name}")
             
@@ -222,24 +233,72 @@ def validate_payment_method_consistency(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Sales)
 def update_tax_calculations(sender, instance, created, **kwargs):
-    """Ensure tax calculations are accurate"""
+    """Ensure tax calculations are accurate with new tax configuration system"""
     try:
         if created or instance.status in ['DRAFT', 'CONFIRMED']:
-            # Validate GST calculation
-            expected_tax = (instance.subtotal - instance.overall_discount) * (instance.gst_percentage / 100)
-            
-            if abs(instance.tax_amount - expected_tax) > 0.01:
-                logger.warning(
-                    f"Tax calculation mismatch for sale {instance.invoice_number}: "
-                    f"expected {expected_tax}, got {instance.tax_amount}"
-                )
+            # Validate tax calculation using new tax configuration
+            if instance.tax_configuration:
+                taxable_amount = instance.subtotal - instance.overall_discount
+                expected_tax = Decimal('0.00')
                 
-                # Auto-correct if in draft status
-                if instance.status == 'DRAFT':
-                    instance.tax_amount = expected_tax
-                    instance.grand_total = instance.subtotal - instance.overall_discount + instance.tax_amount
-                    instance.save(update_fields=['tax_amount', 'grand_total'])
-                    logger.info(f"Auto-corrected tax calculations for sale: {instance.invoice_number}")
+                # Calculate expected tax from configuration
+                for tax_type, tax_data in instance.tax_configuration.items():
+                    if 'percentage' in tax_data:
+                        percentage = Decimal(str(tax_data['percentage']))
+                        tax_amount = (taxable_amount * percentage) / 100
+                        expected_tax += tax_amount
+                
+                # Check if calculated tax matches stored tax
+                if abs(instance.tax_amount - expected_tax) > 0.01:
+                    logger.warning(
+                        f"Tax calculation mismatch for sale {instance.invoice_number}: "
+                        f"expected {expected_tax}, got {instance.tax_amount}"
+                    )
+                    
+                    # Auto-correct if in draft status
+                    if instance.status == 'DRAFT' and not hasattr(instance, '_updating_tax'):
+                        instance._updating_tax = True
+                        try:
+                            # Recalculate taxes
+                            instance.calculate_taxes()
+                            instance.grand_total = instance.subtotal - instance.overall_discount + instance.tax_amount
+                            instance.save(update_fields=['tax_amount', 'grand_total'])
+                            logger.info(f"Auto-corrected tax calculations for sale: {instance.invoice_number}")
+                        finally:
+                            delattr(instance, '_updating_tax')
+            else:
+                # No tax configuration, ensure tax_amount is 0
+                if instance.tax_amount != 0:
+                    logger.warning(
+                        f"Sale {instance.invoice_number} has no tax configuration but tax_amount is {instance.tax_amount}"
+                    )
                     
     except Exception as e:
         logger.error(f"Failed to update tax calculations: {str(e)}")
+
+
+@receiver(post_save, sender=TaxRate)
+def update_sales_with_tax_rate_changes(sender, instance, created, **kwargs):
+    """Update sales when tax rates change"""
+    try:
+        if not created and instance.is_active:
+            # If tax rate was updated, we might need to update existing sales
+            # This is a complex operation that should be handled carefully
+            logger.info(f"Tax rate {instance.name} updated. Consider reviewing existing sales.")
+            
+    except Exception as e:
+        logger.error(f"Failed to handle tax rate change: {str(e)}")
+
+
+@receiver(post_save, sender=TaxRate)
+def validate_tax_rate_effectiveness(sender, instance, created, **kwargs):
+    """Validate tax rate effectiveness dates"""
+    try:
+        if instance.effective_to and instance.effective_to < instance.effective_from:
+            logger.warning(
+                f"Tax rate {instance.name} has invalid effective dates: "
+                f"from {instance.effective_from} to {instance.effective_to}"
+            )
+            
+    except Exception as e:
+        logger.error(f"Failed to validate tax rate effectiveness: {str(e)}")

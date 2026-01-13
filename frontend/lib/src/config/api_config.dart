@@ -354,8 +354,6 @@ class ApiConfig {
   static const String expenseMonthlySummary = '/expenses/monthly-summary/';
   static const String recentExpenses = '/expenses/recent/';
 
-  static const String bulkExpenseActions = '/expenses/bulk-actions/';
-
   // Advance Payments API endpoints
   static const String advancePayments = '/advance-payments/';
   static const String createAdvancePayment = '/advance-payments/create/';
@@ -437,6 +435,21 @@ class ApiConfig {
   // Dynamic endpoints
   static String getProfitLossRecordById(String id) => '$_profitLossBase/records/$id/';
 
+  // Principal Account endpoints
+  static const String principalAccount = '/principal-account/';
+  static const String createPrincipalAccount = '/principal-account/';
+  static String getPrincipalAccountById(String id) => '/principal-account/$id/';
+  static String updatePrincipalAccount(String id) => '/principal-account/$id/';
+  static String deletePrincipalAccount(String id) => '/principal-account/$id/';
+
+  // Principal Account specific endpoints
+  static const String principalAccountBalance = '/principal-account/balance/';
+  static const String principalAccountStatistics = '/principal-account/statistics/';
+  static const String createPrincipalAccountFromModule = '/principal-account/create-from-module/';
+
+  // Note: Backend uses UUIDs for transaction IDs and has limited endpoints
+  // Additional endpoints can be added as needed
+
   // Cache keys
   static const String profitLossCacheKey = 'profit_loss_records_cache';
   static const String profitLossSummaryCacheKey = 'profit_loss_summary_cache';
@@ -489,6 +502,11 @@ class ApiConfig {
   static const String orderItemsCacheKey = 'cached_order_items';
   static const String salesCacheKey = 'cached_sales';
   static const String saleStatsCacheKey = 'cached_sale_stats';
+
+  // Principal Account cache keys
+  static const String principalAccountCacheKey = 'cached_principal_accounts';
+  static const String principalAccountStatsCacheKey = 'cached_principal_account_stats';
+  static const String principalAccountBalanceCacheKey = 'cached_principal_account_balance';
 
   static const String taxRatesCacheKey = 'cached_tax_rates';
 

@@ -25,6 +25,10 @@ import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/zakat_provider.dart';
+import 'package:frontend/src/providers/return_provider.dart';
+import 'package:frontend/src/providers/invoice_provider.dart';
+import 'package:frontend/src/providers/receipt_provider.dart';
+import 'package:frontend/src/providers/refund_provider.dart';
 import 'package:frontend/src/services/api_client.dart';
 import 'package:frontend/src/theme/app_theme.dart';
 import 'package:frontend/src/utils/storage_service.dart';
@@ -84,6 +88,10 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ZakatProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
         ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
+        ChangeNotifierProvider(create: (_) => ReturnProvider()),
+        ChangeNotifierProvider(create: (_) => InvoiceProvider()),
+        ChangeNotifierProvider(create: (_) => ReceiptProvider()),
+        ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
       child: Consumer2<AuthProvider, ProfitLossProvider>(
         builder: (context, authProvider, profitLossProvider, child) {

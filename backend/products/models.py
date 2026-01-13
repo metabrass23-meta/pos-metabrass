@@ -49,6 +49,31 @@ class Product(models.Model):
         default=0,
         help_text="Available quantity in stock"
     )
+    # New field for available quantity (excluding reserved stock)
+    quantity_available = models.PositiveIntegerField(
+        default=0,
+        help_text="Available quantity excluding reserved stock"
+    )
+    # New field for reserved quantity
+    quantity_reserved = models.PositiveIntegerField(
+        default=0,
+        help_text="Quantity currently reserved for pending sales"
+    )
+    # New field for minimum stock threshold
+    min_stock_threshold = models.PositiveIntegerField(
+        default=5,
+        help_text="Minimum stock level before low stock warning"
+    )
+    # New field for reorder point
+    reorder_point = models.PositiveIntegerField(
+        default=10,
+        help_text="Stock level at which to reorder"
+    )
+    # New field for maximum stock level
+    max_stock_level = models.PositiveIntegerField(
+        default=100,
+        help_text="Maximum stock level to maintain"
+    )
     category = models.ForeignKey(
         'categories.Category',
         on_delete=models.PROTECT,
@@ -66,8 +91,7 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='created_products',
-        help_text="User who created this product"
+        related_name='created_products'
     )
 
     class Meta:
@@ -129,6 +153,19 @@ class Product(models.Model):
         else:
             return 'HIGH_STOCK'
         
+    def update_sales_metrics(self):
+        """Update sales metrics for this product"""
+        try:
+            # This method is called by sales signals to update product metrics
+            # The metrics are already calculated via properties, so we just need to ensure
+            # the product is saved to trigger any necessary updates
+            self.save(update_fields=['updated_at'])
+        except Exception as e:
+            # Log error but don't fail the operation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to update sales metrics for product {self.name}: {str(e)}")
+
     def get_total_sales_quantity(self):
         """Get total quantity sold through sales"""
         from django.db.models import Sum
@@ -341,6 +378,109 @@ class Product(models.Model):
             return False
         return self.quantity >= requested_quantity
 
+    def get_reserved_quantity(self):
+        """Get total reserved quantity for this product"""
+        from .models import StockReservation
+        return StockReservation.objects.filter(
+            product=self,
+            is_active=True,
+            is_confirmed=False
+        ).aggregate(
+            total=models.Sum('quantity_reserved')
+        )['total'] or 0
+
+    def update_available_quantity(self):
+        """Update available quantity based on total and reserved quantities"""
+        self.quantity_available = self.quantity - self.get_reserved_quantity()
+        self.save(update_fields=['quantity_available'])
+
+    def reserve_stock(self, quantity, sale_id, user, duration_minutes=30):
+        """Reserve stock for a pending sale"""
+        if not self.can_fulfill_quantity(quantity):
+            raise ValidationError(f"Insufficient available stock. Available: {self.quantity_available}, Requested: {quantity}")
+        
+        from .models import StockReservation
+        from django.utils import timezone
+        from datetime import timedelta
+        reservation = StockReservation.objects.create(
+            product=self,
+            sale_id=sale_id,
+            quantity_reserved=quantity,
+            reserved_until=timezone.now() + timedelta(minutes=duration_minutes),
+            reserved_by=user
+        )
+        
+        # Update available quantity
+        self.update_available_quantity()
+        
+        return reservation
+
+    def confirm_stock_deduction(self, sale_id):
+        """Confirm stock deduction after sale confirmation"""
+        from .models import StockReservation
+        from django.utils import timezone
+        from datetime import timedelta
+        reservations = StockReservation.objects.filter(
+            product=self,
+            sale_id=sale_id,
+            is_active=True,
+            is_confirmed=False
+        )
+        
+        total_deduction = 0
+        for reservation in reservations:
+            total_deduction += reservation.quantity_reserved
+            reservation.is_confirmed = True
+            reservation.confirmed_at = timezone.now()
+            reservation.save(update_fields=['is_confirmed', 'confirmed_at'])
+        
+        if total_deduction > 0:
+            old_quantity = self.quantity
+            self.quantity -= total_deduction
+            self.save(update_fields=['quantity', 'updated_at'])
+            
+            # Log the stock change
+            from .models import StockChangeLog
+            StockChangeLog.objects.create(
+                product=self,
+                old_quantity=old_quantity,
+                new_quantity=self.quantity,
+                change_type='SALE_CONFIRMATION',
+                reason=f'Stock deducted for sale {sale_id}',
+                changed_by=reservations.first().reserved_by
+            )
+            
+            # Update available quantity
+            self.update_available_quantity()
+        
+        return total_deduction
+
+    def get_stock_alerts(self):
+        """Get stock alerts for this product"""
+        alerts = []
+        
+        if self.quantity == 0:
+            alerts.append({
+                'level': 'CRITICAL',
+                'message': 'Product is out of stock',
+                'action': 'Restock immediately'
+            })
+        elif self.quantity <= self.min_stock_threshold:
+            alerts.append({
+                'level': 'WARNING',
+                'message': f'Low stock: {self.quantity} remaining',
+                'action': 'Consider restocking'
+            })
+        
+        if self.quantity <= self.reorder_point:
+            alerts.append({
+                'level': 'INFO',
+                'message': f'Stock at reorder point: {self.quantity}',
+                'action': 'Place reorder'
+            })
+        
+        return alerts
+
     @classmethod
     def active_products(cls):
         """Return only active products"""
@@ -454,4 +594,165 @@ class ProductQuerySet(models.QuerySet):
 
 # Add the custom manager to the Product model
 Product.add_to_class('objects', models.Manager.from_queryset(ProductQuerySet)())
+    
+class StockReservation(models.Model):
+    """Model for tracking stock reservations during sales process"""
+    
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='stock_reservations'
+    )
+    sale_id = models.CharField(
+        max_length=100,
+        help_text="ID of the sale this reservation is for"
+    )
+    quantity_reserved = models.PositiveIntegerField(
+        help_text="Quantity reserved for this sale"
+    )
+    reserved_until = models.DateTimeField(
+        help_text="When this reservation expires"
+    )
+    is_confirmed = models.BooleanField(
+        default=False,
+        help_text="Whether this reservation has been confirmed"
+    )
+    confirmed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When this reservation was confirmed"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this reservation is active"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    reserved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='stock_reservations'
+    )
+
+    class Meta:
+        db_table = 'stock_reservation'
+        verbose_name = 'Stock Reservation'
+        verbose_name_plural = 'Stock Reservations'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['product', 'is_active']),
+            models.Index(fields=['sale_id', 'is_active']),
+            models.Index(fields=['reserved_until']),
+            models.Index(fields=['is_confirmed']),
+        ]
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity_reserved} reserved for sale {self.sale_id}"
+
+    def is_expired(self):
+        """Check if reservation has expired"""
+        from django.utils import timezone
+        return timezone.now() > self.reserved_until
+
+    def extend_reservation(self, additional_minutes):
+        """Extend reservation duration"""
+        from datetime import timedelta
+        self.reserved_until += timedelta(minutes=additional_minutes)
+        self.save(update_fields=['reserved_until', 'updated_at'])
+
+    def cancel_reservation(self):
+        """Cancel this reservation"""
+        self.is_active = False
+        self.save(update_fields=['is_active', 'updated_at'])
+        
+        # Update product available quantity
+        self.product.update_available_quantity()
+
+class StockChangeLog(models.Model):
+    """Model for logging all stock quantity changes"""
+    
+    CHANGE_TYPE_CHOICES = [
+        ('SALE_CONFIRMATION', 'Sale Confirmation'),
+        ('MANUAL_ADJUSTMENT', 'Manual Adjustment'),
+        ('RESTOCK', 'Restock'),
+        ('RETURN', 'Return'),
+        ('DAMAGE', 'Damage'),
+        ('BULK_UPDATE', 'Bulk Update'),
+        ('SYSTEM_CORRECTION', 'System Correction'),
+    ]
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='stock_changes'
+    )
+    old_quantity = models.PositiveIntegerField(
+        help_text="Quantity before change"
+    )
+    new_quantity = models.PositiveIntegerField(
+        help_text="Quantity after change"
+    )
+    change_type = models.CharField(
+        max_length=20,
+        choices=CHANGE_TYPE_CHOICES,
+        help_text="Type of stock change"
+    )
+    reason = models.TextField(
+        blank=True,
+        help_text="Reason for the stock change"
+    )
+    reference_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Reference ID (sale, order, etc.)"
+    )
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='stock_changes'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'stock_change_log'
+        verbose_name = 'Stock Change Log'
+        verbose_name_plural = 'Stock Change Logs'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['product', 'created_at']),
+            models.Index(fields=['change_type', 'created_at']),
+            models.Index(fields=['changed_by', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.product.name}: {self.old_quantity} → {self.new_quantity} ({self.change_type})"
+
+    @property
+    def quantity_difference(self):
+        """Calculate the difference in quantity"""
+        return self.new_quantity - self.old_quantity
+
+    @property
+    def is_increase(self):
+        """Check if this was a stock increase"""
+        return self.quantity_difference > 0
+
+    @property
+    def is_decrease(self):
+        """Check if this was a stock decrease"""
+        return self.quantity_difference < 0 
     

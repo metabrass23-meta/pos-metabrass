@@ -3,12 +3,13 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'payment_receipt_content.dart';
 
 class ViewPaymentReceiptDialog extends StatefulWidget {
-  final Payment payment;
+  final PaymentModel payment;
 
   const ViewPaymentReceiptDialog({super.key, required this.payment});
 
@@ -16,8 +17,7 @@ class ViewPaymentReceiptDialog extends StatefulWidget {
   State<ViewPaymentReceiptDialog> createState() => _ViewPaymentReceiptDialogState();
 }
 
-class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
-    with SingleTickerProviderStateMixin {
+class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -25,26 +25,11 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -74,14 +59,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -89,11 +67,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -119,11 +93,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
         _buildHeader(),
         Flexible(
           child: SingleChildScrollView(
-            child: PaymentReceiptContent(
-              payment: widget.payment,
-              isCompact: true,
-              onClose: _handleClose,
-            ),
+            child: PaymentReceiptContent(payment: widget.payment, isCompact: true, onClose: _handleClose),
           ),
         ),
       ],
@@ -137,11 +107,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
         _buildHeader(),
         Flexible(
           child: SingleChildScrollView(
-            child: PaymentReceiptContent(
-              payment: widget.payment,
-              isCompact: true,
-              onClose: _handleClose,
-            ),
+            child: PaymentReceiptContent(payment: widget.payment, isCompact: true, onClose: _handleClose),
           ),
         ),
       ],
@@ -155,11 +121,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
         _buildHeader(),
         Flexible(
           child: SingleChildScrollView(
-            child: PaymentReceiptContent(
-              payment: widget.payment,
-              isCompact: false,
-              onClose: _handleClose,
-            ),
+            child: PaymentReceiptContent(payment: widget.payment, isCompact: false, onClose: _handleClose),
           ),
         ),
       ],
@@ -170,11 +132,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: widget.payment.hasReceipt
-              ? [Colors.green, Colors.greenAccent]
-              : [Colors.orange, Colors.orangeAccent],
-        ),
+        gradient: LinearGradient(colors: widget.payment.hasReceipt ? [Colors.green, Colors.greenAccent] : [Colors.orange, Colors.orangeAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -184,10 +142,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Icon(
               widget.payment.hasReceipt ? Icons.receipt_rounded : Icons.receipt_long_outlined,
               color: AppTheme.pureWhite,
@@ -211,9 +166,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    widget.payment.hasReceipt
-                        ? 'View payment details and receipt'
-                        : 'Add receipt for this payment',
+                    widget.payment.hasReceipt ? 'View payment details and receipt' : 'Add receipt for this payment',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -225,21 +178,11 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -250,11 +193,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),

@@ -28,6 +28,9 @@ Pillow
 python-dateutil
 pytz
 
+# PDF Generation
+reportlab
+
 # Testing
 factory-boy
 pytest-django

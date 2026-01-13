@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
+import '../../../src/models/principal_account/principal_account_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/prinicipal acc/add_principal_acc_dialog.dart';
 import '../../widgets/prinicipal acc/delete_principal_acc_dialog.dart';
@@ -28,11 +29,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
   }
 
   void _showAddPrincipalAccountDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AddPrincipalAccountDialog(),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const AddPrincipalAccountDialog());
   }
 
   void _showEditPrincipalAccountDialog(PrincipalAccount account) {
@@ -83,9 +80,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
             SizedBox(height: context.mainPadding),
             Consumer<PrincipalAccountProvider>(
               builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
+                return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
               },
             ),
             SizedBox(height: context.cardPadding * 0.5),
@@ -113,29 +108,17 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 6.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(
-                  fontSize: 3.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -154,11 +137,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.account_balance_wallet_rounded,
-                    color: AppTheme.primaryMaroon,
-                    size: context.iconSize('large'),
-                  ),
+                  Icon(Icons.account_balance_wallet_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('large')),
                   SizedBox(width: context.cardPadding),
                   Text(
                     'Principal Account Ledger',
@@ -174,11 +153,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 'Track all cash movements and maintain financial balance',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -194,11 +169,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.primaryMaroon,
-              size: context.iconSize('large'),
-            ),
+            Icon(Icons.account_balance_wallet_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('large')),
             SizedBox(width: context.cardPadding),
             Text(
               'Principal Account',
@@ -214,17 +185,10 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track cash movements and balance',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -235,11 +199,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.primaryMaroon,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.account_balance_wallet_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Ledger',
@@ -255,17 +215,10 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Cash movements',
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -273,9 +226,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -284,18 +235,11 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
           onTap: _showAddPrincipalAccountDialog,
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding * 0.5,
-              vertical: context.cardPadding / 2,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.5, vertical: context.cardPadding / 2),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add Entry' : 'Add Ledger Entry',
@@ -316,49 +260,27 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
 
   Widget _buildDesktopStatsRow(PrincipalAccountProvider provider) {
     final stats = provider.accountStats;
+    if (stats == null) {
+      return const SizedBox.shrink();
+    }
     return Row(
       children: [
-        Expanded(
-          child: _buildStatsCard(
-              'Current Balance',
-              'PKR ${stats['currentBalance']}',
-              Icons.account_balance_wallet_rounded,
-              Colors.blue
-          ),
-        ),
+        Expanded(child: _buildStatsCard('Current Balance', stats.formattedCurrentBalance, Icons.account_balance_wallet_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          child: _buildStatsCard(
-              'Total Entries',
-              stats['total'].toString(),
-              Icons.receipt_long_rounded,
-              Colors.green
-          ),
-        ),
+        Expanded(child: _buildStatsCard('Total Entries', stats.transactionCount.toString(), Icons.receipt_long_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          child: _buildStatsCard(
-              'Total Credits',
-              'PKR ${stats['totalCredits']}',
-              Icons.add_circle_outline,
-              Colors.green
-          ),
-        ),
+        Expanded(child: _buildStatsCard('Total Credits', stats.formattedTotalCredits, Icons.add_circle_outline, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          child: _buildStatsCard(
-              'Total Debits',
-              'PKR ${stats['totalDebits']}',
-              Icons.remove_circle_outline,
-              Colors.red
-          ),
-        ),
+        Expanded(child: _buildStatsCard('Total Debits', stats.formattedTotalDebits, Icons.remove_circle_outline, Colors.red)),
       ],
     );
   }
 
   Widget _buildMobileStatsGrid(PrincipalAccountProvider provider) {
     final stats = provider.accountStats;
+    if (stats == null) {
+      return const SizedBox.shrink();
+    }
     return Column(
       children: [
         // Current Balance - Full Width
@@ -367,31 +289,16 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
           height: context.statsCardHeight / 1.2,
           padding: EdgeInsets.all(context.cardPadding),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-            ),
+            gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
             borderRadius: BorderRadius.circular(context.borderRadius()),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: context.shadowBlur(),
-                offset: Offset(0, context.smallPadding),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
           ),
           child: Row(
             children: [
               Container(
                 padding: EdgeInsets.all(context.cardPadding),
-                decoration: BoxDecoration(
-                  color: AppTheme.pureWhite.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('large'),
-                ),
+                decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+                child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
               ),
               SizedBox(width: context.cardPadding),
               Expanded(
@@ -400,12 +307,8 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'PKR ${stats['currentBalance']}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.headerFontSize * 0.8,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.pureWhite,
-                      ),
+                      stats.formattedCurrentBalance,
+                      style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w800, color: AppTheme.pureWhite),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -428,45 +331,17 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(
-              child: _buildStatsCard(
-                  'Total',
-                  stats['total'].toString(),
-                  Icons.receipt_long_rounded,
-                  Colors.blue
-              ),
-            ),
+            Expanded(child: _buildStatsCard('Total', stats.transactionCount.toString(), Icons.receipt_long_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-              child: _buildStatsCard(
-                  'This Month',
-                  stats['thisMonth'].toString(),
-                  Icons.calendar_month_rounded,
-                  Colors.green
-              ),
-            ),
+            Expanded(child: _buildStatsCard('This Month', stats.monthlyTrend.length.toString(), Icons.calendar_month_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(
-              child: _buildStatsCard(
-                  'Credits',
-                  'PKR ${stats['totalCredits']}',
-                  Icons.add_circle_outline,
-                  Colors.green
-              ),
-            ),
+            Expanded(child: _buildStatsCard('Credits', stats.formattedTotalCredits, Icons.add_circle_outline, Colors.green)),
             SizedBox(width: context.cardPadding),
-            Expanded(
-              child: _buildStatsCard(
-                  'Debits',
-                  'PKR ${stats['totalDebits']}',
-                  Icons.remove_circle_outline,
-                  Colors.red
-              ),
-            ),
+            Expanded(child: _buildStatsCard('Debits', stats.formattedTotalDebits, Icons.remove_circle_outline, Colors.red)),
           ],
         ),
       ],
@@ -479,13 +354,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
@@ -501,20 +370,11 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
+        Expanded(flex: 3, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
+        Expanded(flex: 1, child: _buildFilterButton()),
         SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+        Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
   }
@@ -558,42 +418,23 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         builder: (context, provider, child) {
           return TextField(
             controller: _searchController,
-            onChanged: provider.searchAccounts,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            onChanged: (query) => provider.searchAccounts(query),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet
-                  ? 'Search ledger entries...'
-                  : 'Search by ID, description, amount, source module, or handler...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
+              hintText: context.isTablet ? 'Search ledger entries...' : 'Search by ID, description, amount, source module, or handler...',
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchAccounts('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        provider.searchAccounts('');
+                      },
+                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                    )
                   : null,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
             ),
           );
         },
@@ -608,28 +449,17 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       decoration: BoxDecoration(
         color: AppTheme.lightGray,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
+          Icon(Icons.filter_list_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
               'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
             ),
           ],
         ],
@@ -644,28 +474,17 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       decoration: BoxDecoration(
         color: AppTheme.accentGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
+          Icon(Icons.download_rounded, color: AppTheme.accentGold, size: context.iconSize('medium')),
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
               'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
             ),
           ],
         ],
@@ -680,27 +499,14 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -727,11 +533,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -7,6 +7,95 @@ from decimal import Decimal
 from datetime import date
 
 
+class TaxRate(models.Model):
+    """Tax rate configuration for different tax types"""
+    
+    TAX_TYPE_CHOICES = [
+        ('GST', 'General Sales Tax'),
+        ('FED', 'Federal Excise Duty'),
+        ('WHT', 'Withholding Tax'),
+        ('ADDITIONAL', 'Additional Tax'),
+        ('CUSTOM', 'Custom Tax Rate'),
+    ]
+    
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    
+    name = models.CharField(
+        max_length=100,
+        help_text="Tax rate name (e.g., Standard GST, Reduced GST, FED on Textiles)"
+    )
+    
+    tax_type = models.CharField(
+        max_length=20,
+        choices=TAX_TYPE_CHOICES,
+        default='GST',
+        help_text="Type of tax"
+    )
+    
+    percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        help_text="Tax rate percentage (e.g., 17.00 for 17%)"
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this tax rate is currently active"
+    )
+    
+    description = models.TextField(
+        blank=True,
+        help_text="Description of when this tax rate applies"
+    )
+    
+    effective_from = models.DateField(
+        default=date.today,
+        help_text="Date from which this tax rate is effective"
+    )
+    
+    effective_to = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Date until which this tax rate is effective (null for indefinite)"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'tax_rates'
+        verbose_name = 'Tax Rate'
+        verbose_name_plural = 'Tax Rates'
+        ordering = ['tax_type', 'effective_from']
+    
+    def __str__(self):
+        return f"{self.name} ({self.percentage}%)"
+    
+    @property
+    def is_currently_effective(self):
+        """Check if tax rate is currently effective"""
+        today = date.today()
+        if not self.is_active:
+            return False
+        if self.effective_from > today:
+            return False
+        if self.effective_to and self.effective_to < today:
+            return False
+        return True
+    
+    def clean(self):
+        """Validate model data"""
+        if self.percentage < 0 or self.percentage > 100:
+            raise ValidationError({'percentage': 'Tax percentage must be between 0 and 100.'})
+        
+        if self.effective_to and self.effective_to < self.effective_from:
+            raise ValidationError({'effective_to': 'Effective to date cannot be before effective from date.'})
+
+
 def generate_invoice_number():
     """Generate sequential invoice number in format: INV-YYYY-XXXX"""
     today = date.today()
@@ -28,6 +117,766 @@ def generate_invoice_number():
         new_sequence = 1
     
     return f'INV-{year}-{new_sequence:04d}'
+
+
+class Return(models.Model):
+    """Return request model for processing customer returns"""
+    
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+        ('PROCESSED', 'Processed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    REASON_CHOICES = [
+        ('DEFECTIVE', 'Defective Product'),
+        ('WRONG_ITEM', 'Wrong Item Received'),
+        ('DAMAGED', 'Damaged in Transit'),
+        ('SIZE_ISSUE', 'Size/Fit Issue'),
+        ('QUALITY_ISSUE', 'Quality Issue'),
+        ('CUSTOMER_REQUEST', 'Customer Request'),
+        ('OTHER', 'Other'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    return_number = models.CharField(
+        max_length=50,
+        unique=True,
+        help_text="Unique return number"
+    )
+    sale = models.ForeignKey(
+        'Sales',
+        on_delete=models.CASCADE,
+        related_name='returns',
+        help_text="Original sale for this return"
+    )
+    customer = models.ForeignKey(
+        'customers.Customer',
+        on_delete=models.CASCADE,
+        related_name='returns',
+        help_text="Customer requesting the return"
+    )
+    reason = models.CharField(
+        max_length=20,
+        choices=REASON_CHOICES,
+        help_text="Primary reason for return"
+    )
+    reason_details = models.TextField(
+        blank=True,
+        help_text="Detailed explanation of return reason"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        help_text="Current status of return request"
+    )
+    return_date = models.DateTimeField(
+        auto_now_add=True,
+        help_text="When return was requested"
+    )
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When return was approved"
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_returns',
+        help_text="User who approved the return"
+    )
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When return was processed"
+    )
+    processed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='processed_returns',
+        help_text="User who processed the return"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Additional notes about the return"
+    )
+    refund_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Amount to be refunded"
+    )
+    refund_method = models.CharField(
+        max_length=20,
+        choices=[
+            ('CASH', 'Cash'),
+            ('BANK_TRANSFER', 'Bank Transfer'),
+            ('CHECK', 'Check'),
+            ('CREDIT_NOTE', 'Credit Note'),
+            ('EXCHANGE', 'Exchange'),
+            ('OTHER', 'Other'),
+        ],
+        null=True,
+        blank=True,
+        help_text="Method of refund"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Used for soft deletion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_returns',
+        help_text="User who created this return request"
+    )
+    
+    class Meta:
+        db_table = 'sales_return'
+        verbose_name = 'Return'
+        verbose_name_plural = 'Returns'
+        ordering = ['-return_date', '-created_at']
+        indexes = [
+            models.Index(fields=['return_number']),
+            models.Index(fields=['sale']),
+            models.Index(fields=['customer']),
+            models.Index(fields=['status']),
+            models.Index(fields=['return_date']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"Return {self.return_number} - {self.sale.invoice_number}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate return number if not set"""
+        if not self.return_number:
+            self.return_number = self._generate_return_number()
+        super().save(*args, **kwargs)
+    
+    def _generate_return_number(self):
+        """Generate unique return number"""
+        today = date.today()
+        year = today.year
+        
+        last_return = Return.objects.filter(
+            return_number__startswith=f'RET-{year}-'
+        ).order_by('-return_number').first()
+        
+        if last_return:
+            try:
+                last_sequence = int(last_return.return_number.split('-')[-1])
+                new_sequence = last_sequence + 1
+            except (ValueError, IndexError):
+                new_sequence = 1
+        else:
+            new_sequence = 1
+        
+        return f'RET-{year}-{new_sequence:04d}'
+    
+    def approve(self, approved_by_user):
+        """Approve the return request"""
+        self.status = 'APPROVED'
+        self.approved_at = timezone.now()
+        self.approved_by = approved_by_user
+        self.save(update_fields=['status', 'approved_at', 'approved_by', 'updated_at'])
+    
+    def reject(self, rejected_by_user, reason):
+        """Reject the return request"""
+        self.status = 'REJECTED'
+        self.notes = f"Rejected: {reason}"
+        self.save(update_fields=['status', 'notes', 'updated_at'])
+    
+    def process(self, processed_by_user, refund_amount=None, refund_method=None):
+        """Process the approved return"""
+        self.status = 'PROCESSED'
+        self.processed_at = timezone.now()
+        self.processed_by = processed_by_user
+        if refund_amount is not None:
+            self.refund_amount = refund_amount
+        if refund_method is not None:
+            self.refund_method = refund_method
+        self.save(update_fields=['status', 'processed_at', 'processed_by', 'refund_amount', 'refund_method', 'updated_at'])
+    
+    def cancel(self, cancelled_by_user, reason):
+        """Cancel the return request"""
+        self.status = 'CANCELLED'
+        self.notes = f"Cancelled: {reason}"
+        self.save(update_fields=['status', 'notes', 'updated_at'])
+    
+    @property
+    def total_return_amount(self):
+        """Calculate total amount to be returned"""
+        return sum(item.return_amount for item in self.return_items.all())
+    
+    @property
+    def items_count(self):
+        """Get count of return items"""
+        return self.return_items.count()
+
+
+class ReturnItem(models.Model):
+    """Individual items being returned"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    return_request = models.ForeignKey(
+        Return,
+        on_delete=models.CASCADE,
+        related_name='return_items',
+        help_text="Return request this item belongs to"
+    )
+    sale_item = models.ForeignKey(
+        'SaleItem',
+        on_delete=models.CASCADE,
+        related_name='return_items',
+        help_text="Original sale item being returned"
+    )
+    quantity_returned = models.PositiveIntegerField(
+        help_text="Quantity being returned"
+    )
+    return_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Amount to be returned for this item"
+    )
+    return_reason = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Specific reason for returning this item"
+    )
+    condition = models.CharField(
+        max_length=20,
+        choices=[
+            ('NEW', 'New'),
+            ('LIKE_NEW', 'Like New'),
+            ('GOOD', 'Good'),
+            ('FAIR', 'Fair'),
+            ('POOR', 'Poor'),
+        ],
+        default='GOOD',
+        help_text="Condition of returned item"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Additional notes about this item"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Used for soft deletion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'sales_return_item'
+        verbose_name = 'Return Item'
+        verbose_name_plural = 'Return Items'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['return_request']),
+            models.Index(fields=['sale_item']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"{self.sale_item.product.name} x{self.quantity_returned} - Return {self.return_request.return_number}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-calculate return amount if not set"""
+        if not self.return_amount:
+            self.return_amount = self.sale_item.unit_price * self.quantity_returned
+        super().save(*args, **kwargs)
+
+
+class Refund(models.Model):
+    """Refund processing for returns"""
+    
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('PROCESSED', 'Processed'),
+        ('FAILED', 'Failed'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    METHOD_CHOICES = [
+        ('CASH', 'Cash'),
+        ('BANK_TRANSFER', 'Bank Transfer'),
+        ('CHECK', 'Check'),
+        ('CREDIT_NOTE', 'Credit Note'),
+        ('OTHER', 'Other'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    refund_number = models.CharField(
+        max_length=50,
+        unique=True,
+        help_text="Unique refund number"
+    )
+    return_request = models.ForeignKey(
+        Return,
+        on_delete=models.CASCADE,
+        related_name='refunds',
+        help_text="Return request this refund is for"
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Amount to be refunded"
+    )
+    method = models.CharField(
+        max_length=20,
+        choices=METHOD_CHOICES,
+        help_text="Refund method"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        help_text="Current status of refund"
+    )
+    reference_number = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="External reference number (check number, transfer ID, etc.)"
+    )
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When refund was processed"
+    )
+    processed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='processed_refunds',
+        help_text="User who processed the refund"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Additional notes about the refund"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Used for soft deletion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_refunds',
+        help_text="User who created this refund"
+    )
+    
+    class Meta:
+        db_table = 'sales_refund'
+        verbose_name = 'Refund'
+        verbose_name_plural = 'Refunds'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['refund_number']),
+            models.Index(fields=['return_request']),
+            models.Index(fields=['status']),
+            models.Index(fields=['method']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"Refund {self.refund_number} - {self.return_request.return_number}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate refund number if not set"""
+        if not self.refund_number:
+            self.refund_number = self._generate_refund_number()
+        super().save(*args, **kwargs)
+    
+    def _generate_refund_number(self):
+        """Generate unique refund number"""
+        today = date.today()
+        year = today.year
+        
+        last_refund = Refund.objects.filter(
+            refund_number__startswith=f'REF-{year}-'
+        ).order_by('-refund_number').first()
+        
+        if last_refund:
+            try:
+                last_sequence = int(last_refund.refund_number.split('-')[-1])
+                new_sequence = last_sequence + 1
+            except (ValueError, IndexError):
+                new_sequence = 1
+        else:
+            new_sequence = 1
+        
+        return f'REF-{year}-{new_sequence:04d}'
+    
+    def process(self, processed_by_user, reference_number=None):
+        """Process the refund"""
+        self.status = 'PROCESSED'
+        self.processed_at = timezone.now()
+        self.processed_by = processed_by_user
+        if reference_number:
+            self.reference_number = reference_number
+        self.save(update_fields=['status', 'processed_at', 'processed_by', 'reference_number', 'updated_at'])
+    
+    def fail(self, failed_by_user, reason):
+        """Mark refund as failed"""
+        self.status = 'FAILED'
+        self.notes = f"Failed: {reason}"
+        self.save(update_fields=['status', 'notes', 'updated_at'])
+    
+    def cancel(self, cancelled_by_user, reason):
+        """Cancel the refund"""
+        self.status = 'CANCELLED'
+        self.notes = f"Cancelled: {reason}"
+        self.save(update_fields=['status', 'notes', 'updated_at'])
+
+
+class Invoice(models.Model):
+    """Invoice model for managing sale invoices and receipts"""
+    
+    INVOICE_STATUS_CHOICES = [
+        ('DRAFT', 'Draft'),
+        ('ISSUED', 'Issued'),
+        ('SENT', 'Sent to Customer'),
+        ('VIEWED', 'Viewed by Customer'),
+        ('PAID', 'Paid'),
+        ('OVERDUE', 'Overdue'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    sale = models.OneToOneField(
+        'Sales',
+        on_delete=models.CASCADE,
+        related_name='invoice',
+        help_text="Associated sale"
+    )
+    invoice_number = models.CharField(
+        max_length=20,
+        unique=True,
+        help_text="Unique invoice number"
+    )
+    issue_date = models.DateTimeField(
+        default=timezone.now,
+        help_text="Date and time invoice was issued"
+    )
+    due_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Payment due date (optional)"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=INVOICE_STATUS_CHOICES,
+        default='DRAFT',
+        help_text="Current invoice status"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Additional invoice notes"
+    )
+    terms_conditions = models.TextField(
+        blank=True,
+        help_text="Terms and conditions for this invoice"
+    )
+    pdf_file = models.FileField(
+        upload_to='invoices/',
+        null=True,
+        blank=True,
+        help_text="Generated PDF invoice file"
+    )
+    email_sent = models.BooleanField(
+        default=False,
+        help_text="Whether invoice was emailed to customer"
+    )
+    email_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When invoice was last emailed"
+    )
+    viewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When customer last viewed the invoice"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Used for soft deletion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_invoices',
+        help_text="User who created this invoice"
+    )
+    
+    class Meta:
+        db_table = 'sales_invoice'
+        verbose_name = 'Invoice'
+        verbose_name_plural = 'Invoices'
+        ordering = ['-issue_date', '-created_at']
+        indexes = [
+            models.Index(fields=['invoice_number']),
+            models.Index(fields=['sale']),
+            models.Index(fields=['status']),
+            models.Index(fields=['issue_date']),
+            models.Index(fields=['due_date']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"Invoice {self.invoice_number} - {self.sale.invoice_number}"
+    
+    def clean(self):
+        """Validate model data"""
+        if self.due_date and self.due_date < self.issue_date.date():
+            raise ValidationError({'due_date': 'Due date cannot be before issue date.'})
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate invoice number if not set"""
+        if not self.invoice_number:
+            self.invoice_number = self._generate_invoice_number()
+        
+        # Auto-set due date if not specified (30 days from issue)
+        if not self.due_date:
+            from datetime import timedelta
+            self.due_date = self.issue_date.date() + timedelta(days=30)
+        
+        super().save(*args, **kwargs)
+    
+    def _generate_invoice_number(self):
+        """Generate unique invoice number"""
+        today = date.today()
+        year = today.year
+        
+        # Get the last invoice number for this year
+        last_invoice = Invoice.objects.filter(
+            invoice_number__startswith=f'INV-{year}-'
+        ).order_by('-invoice_number').first()
+        
+        if last_invoice:
+            try:
+                # Extract the sequence number and increment
+                last_sequence = int(last_invoice.invoice_number.split('-')[-1])
+                new_sequence = last_sequence + 1
+            except (ValueError, IndexError):
+                new_sequence = 1
+        else:
+            new_sequence = 1
+        
+        return f'INV-{year}-{new_sequence:04d}'
+    
+    @property
+    def is_overdue(self):
+        """Check if invoice is overdue"""
+        if self.due_date and self.status not in ['PAID', 'CANCELLED']:
+            return timezone.now().date() > self.due_date
+        return False
+    
+    @property
+    def days_until_due(self):
+        """Days until payment is due"""
+        if self.due_date and self.status not in ['PAID', 'CANCELLED']:
+            delta = self.due_date - timezone.now().date()
+            return delta.days
+        return 0
+    
+    @property
+    def formatted_due_date(self):
+        """Formatted due date for display"""
+        if self.due_date:
+            return self.due_date.strftime('%d/%m/%Y')
+        return 'Not specified'
+    
+    def mark_as_sent(self):
+        """Mark invoice as sent to customer"""
+        self.email_sent = True
+        self.email_sent_at = timezone.now()
+        self.status = 'SENT'
+        self.save(update_fields=['email_sent', 'email_sent_at', 'status', 'updated_at'])
+    
+    def mark_as_viewed(self):
+        """Mark invoice as viewed by customer"""
+        self.viewed_at = timezone.now()
+        self.status = 'VIEWED'
+        self.save(update_fields=['viewed_at', 'status', 'updated_at'])
+    
+    def mark_as_paid(self):
+        """Mark invoice as paid"""
+        self.status = 'PAID'
+        self.save(update_fields=['status', 'updated_at'])
+    
+    def cancel_invoice(self):
+        """Cancel the invoice"""
+        self.status = 'CANCELLED'
+        self.save(update_fields=['status', 'updated_at'])
+
+
+class Receipt(models.Model):
+    """Receipt model for managing payment receipts"""
+    
+    RECEIPT_STATUS_CHOICES = [
+        ('GENERATED', 'Generated'),
+        ('SENT', 'Sent to Customer'),
+        ('VIEWED', 'Viewed by Customer'),
+        ('ARCHIVED', 'Archived'),
+    ]
+    
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    sale = models.ForeignKey(
+        'Sales',
+        on_delete=models.CASCADE,
+        related_name='receipts',
+        help_text="Associated sale"
+    )
+    payment = models.ForeignKey(
+        'payments.Payment',
+        on_delete=models.CASCADE,
+        related_name='receipts',
+        help_text="Associated payment"
+    )
+    receipt_number = models.CharField(
+        max_length=20,
+        unique=True,
+        help_text="Unique receipt number"
+    )
+    generated_at = models.DateTimeField(
+        default=timezone.now,
+        help_text="When receipt was generated"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=RECEIPT_STATUS_CHOICES,
+        default='GENERATED',
+        help_text="Current receipt status"
+    )
+    pdf_file = models.FileField(
+        upload_to='receipts/',
+        null=True,
+        blank=True,
+        help_text="Generated PDF receipt file"
+    )
+    email_sent = models.BooleanField(
+        default=False,
+        help_text="Whether receipt was emailed to customer"
+    )
+    email_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When receipt was last emailed"
+    )
+    viewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When customer last viewed the receipt"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Additional receipt notes"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Used for soft deletion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_receipts',
+        help_text="User who generated this receipt"
+    )
+    
+    class Meta:
+        db_table = 'sales_receipt'
+        verbose_name = 'Receipt'
+        verbose_name_plural = 'Receipts'
+        ordering = ['-generated_at', '-created_at']
+        indexes = [
+            models.Index(fields=['receipt_number']),
+            models.Index(fields=['sale']),
+            models.Index(fields=['payment']),
+            models.Index(fields=['status']),
+            models.Index(fields=['generated_at']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"Receipt {self.receipt_number} - {self.sale.invoice_number}"
+    
+    def save(self, *args, **kwargs):
+        """Auto-generate receipt number if not set"""
+        if not self.receipt_number:
+            self.receipt_number = self._generate_receipt_number()
+        super().save(*args, **kwargs)
+    
+    def _generate_receipt_number(self):
+        """Generate unique receipt number"""
+        today = date.today()
+        year = today.year
+        
+        last_receipt = Receipt.objects.filter(
+            receipt_number__startswith=f'RCP-{year}-'
+        ).order_by('-receipt_number').first()
+        
+        if last_receipt:
+            try:
+                last_sequence = int(last_receipt.receipt_number.split('-')[-1])
+                new_sequence = last_sequence + 1
+            except (ValueError, IndexError):
+                new_sequence = 1
+        else:
+            new_sequence = 1
+        
+        return f'RCP-{year}-{new_sequence:04d}'
+    
+    def mark_as_sent(self):
+        """Mark receipt as sent to customer"""
+        self.email_sent = True
+        self.email_sent_at = timezone.now()
+        self.status = 'SENT'
+        self.save(update_fields=['email_sent', 'email_sent_at', 'status', 'updated_at'])
+    
+    def mark_as_viewed(self):
+        """Mark receipt as viewed by customer"""
+        self.viewed_at = timezone.now()
+        self.status = 'VIEWED'
+        self.save(update_fields=['viewed_at', 'status', 'updated_at'])
+    
+    def archive_receipt(self):
+        """Archive the receipt"""
+        self.status = 'ARCHIVED'
+        self.save(update_fields=['status', 'updated_at'])
 
 
 class SalesQuerySet(models.QuerySet):

@@ -6,14 +6,12 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../../../src/models/principal_account/principal_account_model.dart';
 
 class DeletePrincipalAccountDialog extends StatefulWidget {
   final PrincipalAccount account;
 
-  const DeletePrincipalAccountDialog({
-    super.key,
-    required this.account,
-  });
+  const DeletePrincipalAccountDialog({super.key, required this.account});
 
   @override
   State<DeletePrincipalAccountDialog> createState() => _DeletePrincipalAccountDialogState();
@@ -28,22 +26,13 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 400), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    _shakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
-    );
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.elasticOut));
 
     _animationController.forward();
   }
@@ -70,28 +59,18 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Principal account entry deleted successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -113,23 +92,10 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Transform.translate(
-                offset: Offset(
-                  _shakeAnimation.value * 2 * (1 - _scaleAnimation.value),
-                  0,
-                ),
+                offset: Offset(_shakeAnimation.value * 2 * (1 - _scaleAnimation.value), 0),
                 child: Container(
-                  width: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 85.w,
-                    small: 75.w,
-                    medium: 65.w,
-                    large: 55.w,
-                    ultrawide: 45.w,
-                  ),
-                  constraints: BoxConstraints(
-                    maxWidth: 550,
-                    maxHeight: 85.h,
-                  ),
+                  width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 75.w, medium: 65.w, large: 55.w, ultrawide: 45.w),
+                  constraints: BoxConstraints(maxWidth: 550, maxHeight: 85.h),
                   margin: EdgeInsets.all(context.mainPadding),
                   decoration: BoxDecoration(
                     color: AppTheme.pureWhite,
@@ -143,13 +109,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                     ],
                   ),
                   child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildHeader(),
-                        _buildContent(),
-                      ],
-                    ),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildContent()]),
                   ),
                 ),
               ),
@@ -164,9 +124,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.red, Colors.redAccent],
-        ),
+        gradient: const LinearGradient(colors: [Colors.red, Colors.redAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -176,15 +134,8 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.warning_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.warning_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -221,11 +172,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -242,31 +189,10 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
         children: [
           Center(
             child: Container(
-              width: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 15.w,
-                small: 20.w,
-                medium: 12.w,
-                large: 10.w,
-                ultrawide: 8.w,
-              ),
-              height: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 15.w,
-                small: 20.w,
-                medium: 12.w,
-                large: 10.w,
-                ultrawide: 8.w,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.delete_forever_rounded,
-                size: context.iconSize('xl'),
-                color: Colors.red,
-              ),
+              width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+              height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(Icons.delete_forever_rounded, size: context.iconSize('xl'), color: Colors.red),
             ),
           ),
           SizedBox(height: context.mainPadding),
@@ -274,11 +200,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
             context.shouldShowCompactLayout
                 ? 'Are you sure you want to delete this principal account entry?'
                 : 'Are you absolutely sure you want to delete this principal account entry?',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize * 1.1,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -289,10 +211,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
             decoration: BoxDecoration(
               color: Colors.red.withOpacity(0.05),
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: Colors.red.withOpacity(0.2),
-                width: 1,
-              ),
+              border: Border.all(color: Colors.red.withOpacity(0.2), width: 1),
             ),
             child: Column(
               children: [
@@ -300,30 +219,20 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.smallPadding,
-                        vertical: context.smallPadding / 2,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       ),
                       child: Text(
                         widget.account.id,
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.smallPadding / 2,
-                          vertical: context.smallPadding / 4,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                         decoration: BoxDecoration(
                           color: widget.account.sourceModuleColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -339,7 +248,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                             SizedBox(width: context.smallPadding / 2),
                             Expanded(
                               child: Text(
-                                widget.account.formattedSourceModule,
+                                widget.account.sourceModule.replaceAll('_', ' ').toUpperCase(),
                                 style: GoogleFonts.inter(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w600,
@@ -363,20 +272,12 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                   children: [
                     Text(
                       'Description:',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       widget.account.description,
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -395,17 +296,10 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Type:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding,
-                              vertical: context.smallPadding / 3,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                             decoration: BoxDecoration(
                               color: widget.account.typeColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -413,11 +307,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  widget.account.typeIcon,
-                                  color: widget.account.typeColor,
-                                  size: context.iconSize('small'),
-                                ),
+                                Icon(widget.account.typeIcon, color: widget.account.typeColor, size: context.iconSize('small')),
                                 SizedBox(width: context.smallPadding / 2),
                                 Text(
                                   widget.account.type.toUpperCase(),
@@ -441,28 +331,17 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Amount:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding,
-                              vertical: context.smallPadding / 3,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                             decoration: BoxDecoration(
                               color: Colors.red.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(context.borderRadius('small')),
                             ),
                             child: Text(
                               'PKR ${widget.account.amount.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.red[700],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                             ),
                           ),
                         ],
@@ -483,28 +362,17 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Balance After:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding,
-                              vertical: context.smallPadding / 3,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                             decoration: BoxDecoration(
                               color: Colors.blue.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(context.borderRadius('small')),
                             ),
                             child: Text(
                               'PKR ${widget.account.balanceAfter.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.blue[700],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
                             ),
                           ),
                         ],
@@ -518,62 +386,48 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Handled By:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           widget.account.handledBy != null
                               ? Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding,
-                              vertical: context.smallPadding / 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getPersonColor(widget.account.handledBy!).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 16,
-                                  height: 16,
+                                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
                                   decoration: BoxDecoration(
-                                    color: _getPersonColor(widget.account.handledBy!),
-                                    shape: BoxShape.circle,
+                                    color: _getPersonColor(widget.account.handledBy!).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                   ),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: AppTheme.pureWhite,
-                                    size: 10,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(color: _getPersonColor(widget.account.handledBy!), shape: BoxShape.circle),
+                                        child: Icon(Icons.person, color: AppTheme.pureWhite, size: 10),
+                                      ),
+                                      SizedBox(width: context.smallPadding / 2),
+                                      Flexible(
+                                        child: Text(
+                                          widget.account.handledBy!,
+                                          style: GoogleFonts.inter(
+                                            fontSize: context.captionFontSize,
+                                            fontWeight: FontWeight.w600,
+                                            color: _getPersonColor(widget.account.handledBy!),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(width: context.smallPadding / 2),
-                                Flexible(
-                                  child: Text(
-                                    widget.account.handledBy!,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.captionFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: _getPersonColor(widget.account.handledBy!),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                                )
                               : Text(
-                            'Not specified',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[600],
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
+                                  'Not specified',
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.captionFontSize,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[600],
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
                         ],
                       ),
                     ),
@@ -592,27 +446,15 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Date:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.account.formattedDate,
-                            style: GoogleFonts.inter(
-                              fontSize: context.subtitleFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.charcoalGray,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                           Text(
                             widget.account.relativeDate,
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -625,19 +467,11 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             'Time:',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.account.formattedTime,
-                            style: GoogleFonts.inter(
-                              fontSize: context.subtitleFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.charcoalGray,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -652,28 +486,17 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                     children: [
                       Text(
                         'Source ID: ',
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.smallPadding / 2,
-                          vertical: context.smallPadding / 4,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                         decoration: BoxDecoration(
                           color: Colors.grey.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
                         ),
                         child: Text(
                           widget.account.sourceId!,
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.charcoalGray,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ),
                     ],
@@ -688,28 +511,17 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
           // Warning Message
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Row(
               children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.orange,
-                  size: context.iconSize('small'),
-                ),
+                Icon(Icons.warning_amber_rounded, color: Colors.orange, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
                     context.shouldShowCompactLayout
                         ? 'This will permanently delete the principal account entry and affect balance calculations.'
                         : 'This will permanently delete the principal account entry and may affect balance calculations. This action cannot be undone.',
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.orange[700],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
               ],

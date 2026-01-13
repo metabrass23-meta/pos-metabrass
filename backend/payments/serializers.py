@@ -4,10 +4,18 @@ from labors.models import Labor
 from vendors.models import Vendor
 from orders.models import Order
 from sales.models import Sales
+from datetime import datetime
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     """Serializer for Payment model"""
+    
+    # Custom fields for better frontend compatibility
+    time = serializers.SerializerMethodField()
+    date = serializers.DateField(format='%Y-%m-%d')
+    payment_month = serializers.DateField(format='%Y-%m-%d')
+    created_at = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S')
+    updated_at = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S')
     
     created_by = serializers.StringRelatedField(read_only=True)
     created_by_id = serializers.IntegerField(read_only=True, source='created_by.id')
@@ -21,42 +29,26 @@ class PaymentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Payment
-        fields = (
-            'id', 
-            'labor', 
-            'vendor', 
-            'order', 
-            'sale',
-            'payer_type', 
-            'payer_id',
-            'labor_name', 
-            'labor_phone', 
-            'labor_role',
-            'amount_paid', 
-            'bonus', 
-            'deduction',
-            'payment_month', 
-            'is_final_payment',
-            'payment_method', 
-            'description',
-            'date', 
-            'time',
-            'receipt_image_path',
-            'is_active',
-            'created_at', 
-            'updated_at',
-            'created_by',
-            'created_by_id',
-            'formatted_amount',
-            'net_amount',
-            'payment_period_display',
-            'has_receipt'
-        )
-        read_only_fields = (
-            'id', 'created_at', 'updated_at', 'created_by', 'created_by_id',
-            'labor_name', 'labor_phone', 'labor_role', 'payer_id',
-            'formatted_amount', 'net_amount', 'payment_period_display', 'has_receipt'
-        )
+        fields = [
+            'id', 'labor', 'vendor', 'order', 'sale', 'payer_type', 'payer_id',
+            'labor_name', 'labor_phone', 'labor_role', 'amount_paid', 'bonus',
+            'deduction', 'payment_month', 'is_final_payment', 'payment_method',
+            'description', 'date', 'time', 'receipt_image_path', 'is_active',
+            'created_at', 'updated_at', 'created_by'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_time(self, obj):
+        """Format time as ISO string for frontend compatibility"""
+        if obj.time:
+            # Convert time to full datetime for frontend
+            from django.utils import timezone
+            today = timezone.now().date()
+            full_datetime = timezone.make_aware(
+                datetime.combine(today, obj.time)
+            )
+            return full_datetime.isoformat()
+        return None
     
     def validate(self, data):
         """Validate payment data"""
@@ -216,9 +208,9 @@ class PaymentDetailSerializer(PaymentSerializer):
     sale_details = serializers.SerializerMethodField()
     
     class Meta(PaymentSerializer.Meta):
-        fields = PaymentSerializer.Meta.fields + (
+        fields = PaymentSerializer.Meta.fields + [
             'labor_details', 'vendor_details', 'order_details', 'sale_details'
-        )
+        ]
     
     def get_labor_details(self, obj):
         """Get labor details if available"""

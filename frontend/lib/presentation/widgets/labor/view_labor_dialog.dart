@@ -17,8 +17,7 @@ class ViewLaborDetailsDialog extends StatefulWidget {
   State<ViewLaborDetailsDialog> createState() => _ViewLaborDetailsDialogState();
 }
 
-class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
-    with SingleTickerProviderStateMixin {
+class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -28,26 +27,11 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -57,20 +41,12 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_outline,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -78,9 +54,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -90,28 +64,18 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -135,9 +99,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
       });
 
       final provider = context.read<LaborProvider>();
-      final success = newStatus
-          ? await provider.restoreLabor(widget.labor.id)
-          : await provider.softDeleteLabor(widget.labor.id);
+      final success = newStatus ? await provider.restoreLabor(widget.labor.id) : await provider.softDeleteLabor(widget.labor.id);
 
       if (success) {
         _showSuccessSnackbar('Labor status updated successfully!');
@@ -167,14 +129,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -182,24 +137,18 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: _isLoadingDetails
                     ? _buildLoadingState()
                     : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildHeader(),
-                    Flexible(
-                      child: _buildContent(),
-                    ),
-                  ],
-                ),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildHeader(),
+                          Flexible(child: _buildContent()),
+                        ],
+                      ),
               ),
             ),
           ),
@@ -214,18 +163,11 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: AppTheme.primaryMaroon,
-            strokeWidth: 3,
-          ),
+          CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
           SizedBox(height: context.cardPadding),
           Text(
             'Loading labor details...',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -236,11 +178,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: widget.labor.isActive
-              ? [Colors.green, Colors.greenAccent]
-              : [Colors.orange, Colors.orangeAccent],
-        ),
+        gradient: LinearGradient(colors: widget.labor.isActive ? [Colors.green, Colors.greenAccent] : [Colors.orange, Colors.orangeAccent]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -250,15 +188,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.engineering_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.engineering_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -289,23 +220,11 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
-              widget.labor.id.length > 10
-                  ? '${widget.labor.id.substring(0, 10)}...'
-                  : widget.labor.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              widget.labor.id.length > 10 ? '${widget.labor.id.substring(0, 10)}...' : widget.labor.id,
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -316,11 +235,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -368,18 +283,11 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
           Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
             child: Center(
               child: Text(
                 widget.labor.initials,
-                style: GoogleFonts.inter(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
               ),
             ),
           ),
@@ -399,36 +307,22 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Row(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: context.iconSize('small'),
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Joined ${_formatDate(widget.labor.joiningDate)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 4),
                 Row(
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: context.iconSize('small'),
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${widget.labor.workExperienceDays} days experience (${widget.labor.workExperienceYears.toStringAsFixed(1)} years)',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -514,7 +408,11 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
           SizedBox(height: context.smallPadding),
           _buildInfoRow('Total Payments', 'PKR ${widget.labor.totalPaymentsAmount.toStringAsFixed(2)}', Icons.receipt),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Remaining Balance', 'PKR ${widget.labor.remainingAdvanceBalance.toStringAsFixed(2)}', Icons.account_balance),
+          _buildInfoRow('Remaining Monthly Salary', 'PKR ${widget.labor.remainingMonthlySalary.toStringAsFixed(2)}', Icons.account_balance),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('Remaining Advance Amount', 'PKR ${widget.labor.remainingAdvanceAmount.toStringAsFixed(2)}', Icons.account_balance_wallet),
+          SizedBox(height: context.smallPadding),
+          _buildInfoRow('Total Advances This Month', 'PKR ${widget.labor.totalAdvancesAmount.toStringAsFixed(2)}', Icons.payment),
           SizedBox(height: context.smallPadding),
           _buildInfoRow('Payment Records', '${widget.labor.paymentsCount} payments', Icons.history),
           if (widget.labor.lastPaymentDate != null) ...[
@@ -546,10 +444,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
           SizedBox(height: context.smallPadding),
           Row(
             children: [
-              if (widget.labor.isNewLabor)
-                _buildStatusBadge('New Labor', Colors.green),
-              if (widget.labor.isRecentLabor)
-                _buildStatusBadge('Recent', Colors.blue),
+              if (widget.labor.isNewLabor) _buildStatusBadge('New Labor', Colors.green),
+              if (widget.labor.isRecentLabor) _buildStatusBadge('Recent', Colors.blue),
             ],
           ),
         ],
@@ -559,10 +455,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
 
   Widget _buildStatusBadge(String label, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.smallPadding,
-        vertical: context.smallPadding / 2,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
       margin: EdgeInsets.only(right: context.smallPadding),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -571,21 +464,12 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(
-          fontSize: context.captionFontSize,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
 
-  Widget _buildInfoCard({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required Widget child,
-  }) {
+  Widget _buildInfoCard({required String title, required IconData icon, required Color color, required Widget child}) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -602,11 +486,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -624,20 +504,12 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
         SizedBox(width: context.smallPadding),
         Text(
           '$label: ',
-          style: GoogleFonts.inter(
-            fontSize: context.subtitleFontSize,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.inter(
-              fontSize: context.subtitleFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
         ),
       ],
@@ -667,8 +539,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog>
             icon: Icons.restore,
             backgroundColor: Colors.green,
           ),
-        if (!widget.labor.isActive)
-          SizedBox(height: context.cardPadding),
+        if (!widget.labor.isActive) SizedBox(height: context.cardPadding),
         PremiumButton(
           text: 'Close',
           onPressed: _handleClose,

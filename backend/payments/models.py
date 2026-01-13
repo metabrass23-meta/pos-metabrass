@@ -12,11 +12,23 @@ from decimal import Decimal
 def payment_receipt_upload_path(instance, filename):
     """Generate upload path for payment receipt images"""
     # Extract file extension
-    ext = filename.split('.')[-1]
+    ext = filename.split('.')[-1].lower()
+    
+    # Validate file extension
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'pdf']
+    if ext not in allowed_extensions:
+        raise ValidationError(f'File type .{ext} is not supported. Please use: {", ".join(allowed_extensions)}')
+    
     # Generate new filename with UUID
     new_filename = f"{uuid.uuid4()}.{ext}"
     # Return path: payments/YYYY/MM/DD/filename
     return f"payments/{instance.date.year}/{instance.date.month:02d}/{instance.date.day:02d}/{new_filename}"
+
+
+def validate_receipt_file_size(value):
+    """Validate receipt file size (max 5MB)"""
+    if value.size > 5 * 1024 * 1024:  # 5MB
+        raise ValidationError('Receipt file size cannot exceed 5MB.')
 
 
 def validate_payment_amount(value):
@@ -269,11 +281,12 @@ class Payment(models.Model):
     )
     
     # Receipt management
-    receipt_image_path = models.ImageField(
+    receipt_image_path = models.FileField(
         upload_to=payment_receipt_upload_path,
         blank=True,
         null=True,
-        help_text="Receipt image for payment verification"
+        validators=[validate_receipt_file_size],
+        help_text="Receipt file for payment verification (JPG, PNG, PDF, max 5MB)"
     )
     
     # System fields
@@ -339,24 +352,39 @@ class Payment(models.Model):
         if not any([self.labor, self.vendor, self.order, self.sale]):
             raise ValidationError('At least one entity (labor, vendor, order, or sale) must be specified.')
         
-        # Validate payer_type consistency
-        if self.labor and self.payer_type != 'LABOR':
-            raise ValidationError({'payer_type': 'Payer type should be LABOR when labor is specified.'})
-        
-        if self.vendor and self.payer_type != 'VENDOR':
-            raise ValidationError({'payer_type': 'Payer type should be VENDOR when vendor is specified.'})
-        
         # Validate payment month is not in future
         if self.payment_month and self.payment_month > date.today():
             raise ValidationError({'payment_month': 'Payment month cannot be in the future.'})
+        
+        # Validate business rules
+        if self.labor:
+            # Check if payment amount exceeds monthly salary
+            if hasattr(self.labor, 'salary') and self.labor.salary:
+                max_allowed = self.labor.salary + (self.bonus or 0) - (self.deduction or 0)
+                if self.amount_paid > max_allowed and not self.is_final_payment:
+                    raise ValidationError({
+                        'amount_paid': f'Payment amount cannot exceed monthly salary (PKR {max_allowed:,.2f}) unless marked as final payment.'
+                    })
+            
+            # Check for duplicate payments in same month (excluding this instance)
+            existing_payments = Payment.objects.filter(
+                labor=self.labor,
+                payment_month=self.payment_month,
+                is_active=True
+            ).exclude(id=self.id)
+            
+            if existing_payments.exists() and self.is_final_payment:
+                raise ValidationError({
+                    'is_final_payment': 'A final payment already exists for this labor in the specified month.'
+                })
     
     def save(self, *args, **kwargs):
         """Custom save method with validation and data caching"""
         # Cache labor information if labor is specified
         if self.labor:
-            self.labor_name = self.labor.name
-            self.labor_phone = self.labor.phone_number
-            self.labor_role = self.labor.designation
+            self.labor_name = self.labor.name if hasattr(self.labor, 'name') else ''
+            self.labor_phone = self.labor.phone_number if hasattr(self.labor, 'phone_number') else ''
+            self.labor_role = self.labor.designation if hasattr(self.labor, 'designation') else ''
             self.payer_type = 'LABOR'
             self.payer_id = self.labor.id
         
@@ -366,12 +394,12 @@ class Payment(models.Model):
             self.payer_id = self.vendor.id
         
         # Set payer type for order
-        elif self.order:
+        elif self.order and hasattr(self.order, 'customer'):
             self.payer_type = 'CUSTOMER'
             self.payer_id = self.order.customer.id
         
         # Set payer type for sale
-        elif self.sale:
+        elif self.sale and hasattr(self.sale, 'customer'):
             self.payer_type = 'CUSTOMER'
             self.payer_id = self.sale.customer.id
         
@@ -517,42 +545,13 @@ class Payment(models.Model):
             'final_payments_count': active_payments.filter(is_final_payment=True).count(),
             'partial_payments_count': active_payments.filter(is_final_payment=False).count(),
         }
+    
+    @property
+    def formatted_amount(self):
+        """Currency formatted amount display"""
+        if self.amount_paid is None:
+            return "PKR 0.00"
+        return f"PKR {self.amount_paid:,.2f}"
 
 
-class PaymentQuerySet(models.QuerySet):
-    """Custom QuerySet for Payment model"""
-    
-    def active(self):
-        return self.filter(is_active=True)
-    
-    def by_payer_type(self, payer_type):
-        return self.filter(payer_type=payer_type.upper())
-    
-    def by_payment_method(self, payment_method):
-        return self.filter(payment_method=payment_method.upper())
-    
-    def search(self, query):
-        """Search payments by various fields"""
-        return self.filter(
-            models.Q(labor_name__icontains=query) |
-            models.Q(labor_phone__icontains=query) |
-            models.Q(labor_role__icontains=query) |
-            models.Q(vendor__business_name__icontains=query) |
-            models.Q(description__icontains=query)
-        )
-    
-    def created_between(self, start_date, end_date):
-        """Filter payments created between dates"""
-        return self.filter(created_at__date__range=[start_date, end_date])
-    
-    def with_receipts(self):
-        """Get payments that have receipt images"""
-        return self.exclude(receipt_image_path='')
-    
-    def without_receipts(self):
-        """Get payments without receipt images"""
-        return self.filter(receipt_image_path='')
-
-
-# Add the custom manager to the Payment model
-Payment.add_to_class('objects', models.Manager.from_queryset(PaymentQuerySet)())
+# Custom manager is already set via PaymentQuerySet.as_manager()

@@ -873,4 +873,169 @@ class CustomerService {
       return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting recent customers');
     }
   }
+
+  /// Quick customer lookup by phone or name (for POS)
+  Future<ApiResponse<List<CustomerModel>>> quickCustomerLookup({required String query, int limit = 10, bool includeInactive = false}) async {
+    try {
+      final queryParams = {'query': query, 'limit': limit.toString(), 'include_inactive': includeInactive.toString(), 'quick_lookup': 'true'};
+
+      DebugHelper.printApiResponse('GET Quick Customer Lookup', queryParams);
+
+      final response = await _apiClient.get(ApiConfig.quickCustomerLookup, queryParameters: queryParams);
+
+      DebugHelper.printApiResponse('GET Quick Customer Lookup Response', response.data);
+
+      if (response.statusCode == 200) {
+        final customers = (response.data['data'] as List?)?.map((json) => CustomerModel.fromJson(json as Map<String, dynamic>)).toList() ?? [];
+
+        return ApiResponse<List<CustomerModel>>(
+          success: true,
+          data: customers,
+          message: response.data['message'] ?? 'Customer lookup completed successfully',
+        );
+      } else {
+        return ApiResponse<List<CustomerModel>>(
+          success: false,
+          message: response.data['message'] ?? 'Failed to perform customer lookup',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
+    } on DioException catch (e) {
+      DebugHelper.printError('Quick customer lookup DioException', e);
+      final apiError = ApiError.fromDioError(e);
+      return ApiResponse<List<CustomerModel>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+    } catch (e) {
+      DebugHelper.printError('Quick customer lookup', e);
+      return ApiResponse<List<CustomerModel>>(success: false, message: 'An unexpected error occurred during customer lookup');
+    }
+  }
+
+  /// Get customer history (orders, sales, payments)
+  Future<ApiResponse<Map<String, dynamic>>> getCustomerHistory({
+    required String customerId,
+    String? historyType, // 'all', 'orders', 'sales', 'payments'
+    int limit = 50,
+  }) async {
+    try {
+      final queryParams = {'history_type': historyType ?? 'all', 'limit': limit.toString()};
+
+      DebugHelper.printApiResponse('GET Customer History', {'customer_id': customerId, ...queryParams});
+
+      final response = await _apiClient.get(ApiConfig.getCustomerHistory(customerId), queryParameters: queryParams);
+
+      DebugHelper.printApiResponse('GET Customer History Response', response.data);
+
+      if (response.statusCode == 200) {
+        return ApiResponse<Map<String, dynamic>>(
+          success: true,
+          data: response.data['data'] as Map<String, dynamic>? ?? {},
+          message: response.data['message'] ?? 'Customer history retrieved successfully',
+        );
+      } else {
+        return ApiResponse<Map<String, dynamic>>(
+          success: false,
+          message: response.data['message'] ?? 'Failed to get customer history',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
+    } on DioException catch (e) {
+      DebugHelper.printError('Get customer history DioException', e);
+      final apiError = ApiError.fromDioError(e);
+      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+    } catch (e) {
+      DebugHelper.printError('Get customer history', e);
+      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while getting customer history');
+    }
+  }
+
+  /// Get customer summary (quick stats for POS)
+  Future<ApiResponse<Map<String, dynamic>>> getCustomerSummary(String customerId) async {
+    try {
+      DebugHelper.printApiResponse('GET Customer Summary', {'customer_id': customerId});
+
+      final response = await _apiClient.get(ApiConfig.getCustomerSummary(customerId));
+
+      DebugHelper.printApiResponse('GET Customer Summary Response', response.data);
+
+      if (response.statusCode == 200) {
+        return ApiResponse<Map<String, dynamic>>(
+          success: true,
+          data: response.data['data'] as Map<String, dynamic>? ?? {},
+          message: response.data['message'] ?? 'Customer summary retrieved successfully',
+        );
+      } else {
+        return ApiResponse<Map<String, dynamic>>(
+          success: false,
+          message: response.data['message'] ?? 'Failed to get customer summary',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
+    } on DioException catch (e) {
+      DebugHelper.printError('Get customer summary DioException', e);
+      final apiError = ApiError.fromDioError(e);
+      return ApiResponse<Map<String, dynamic>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+    } catch (e) {
+      DebugHelper.printError('Get customer summary', e);
+      return ApiResponse<Map<String, dynamic>>(success: false, message: 'An unexpected error occurred while getting customer summary');
+    }
+  }
+
+  /// Search customers with advanced filters (for POS)
+  Future<ApiResponse<List<CustomerModel>>> searchCustomersAdvanced({
+    String? query,
+    String? phone,
+    String? email,
+    String? city,
+    String? customerType,
+    String? status,
+    bool? hasRecentActivity,
+    int? minOrderCount,
+    double? minTotalSpent,
+    int limit = 20,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+
+      if (query != null && query.isNotEmpty) queryParams['query'] = query;
+      if (phone != null && phone.isNotEmpty) queryParams['phone'] = phone;
+      if (email != null && email.isNotEmpty) queryParams['email'] = email;
+      if (city != null && city.isNotEmpty) queryParams['city'] = city;
+      if (customerType != null && customerType.isNotEmpty) queryParams['customer_type'] = customerType;
+      if (status != null && status.isNotEmpty) queryParams['status'] = status;
+      if (hasRecentActivity != null) queryParams['has_recent_activity'] = hasRecentActivity.toString();
+      if (minOrderCount != null) queryParams['min_order_count'] = minOrderCount.toString();
+      if (minTotalSpent != null) queryParams['min_total_spent'] = minTotalSpent.toString();
+
+      queryParams['limit'] = limit.toString();
+
+      DebugHelper.printApiResponse('GET Advanced Customer Search', queryParams);
+
+      final response = await _apiClient.get(ApiConfig.searchCustomersAdvanced, queryParameters: queryParams);
+
+      DebugHelper.printApiResponse('GET Advanced Customer Search Response', response.data);
+
+      if (response.statusCode == 200) {
+        final customers = (response.data['data'] as List?)?.map((json) => CustomerModel.fromJson(json as Map<String, dynamic>)).toList() ?? [];
+
+        return ApiResponse<List<CustomerModel>>(
+          success: true,
+          data: customers,
+          message: response.data['message'] ?? 'Advanced customer search completed successfully',
+        );
+      } else {
+        return ApiResponse<List<CustomerModel>>(
+          success: false,
+          message: response.data['message'] ?? 'Failed to perform advanced customer search',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
+    } on DioException catch (e) {
+      DebugHelper.printError('Advanced customer search DioException', e);
+      final apiError = ApiError.fromDioError(e);
+      return ApiResponse<List<CustomerModel>>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+    } catch (e) {
+      DebugHelper.printError('Advanced customer search', e);
+      return ApiResponse<List<CustomerModel>>(success: false, message: 'An unexpected error occurred during advanced customer search');
+    }
+  }
 }

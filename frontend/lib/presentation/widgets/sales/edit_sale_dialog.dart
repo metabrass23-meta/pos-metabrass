@@ -5,12 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/providers/sales_provider.dart';
+import '../../../src/models/sales/sale_model.dart';
+import '../../../src/models/sales/request_models.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class EditSaleDialog extends StatefulWidget {
-  final Sale sale;
+  final SaleModel sale;
 
   const EditSaleDialog({super.key, required this.sale});
 
@@ -35,26 +37,19 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
 
     // Initialize with existing sale data
     _amountPaidController.text = widget.sale.amountPaid.toStringAsFixed(0);
-    _notesController.text = widget.sale.notes;
-    _selectedPaymentMethod = widget.sale.paymentMethod;
-    _selectedStatus = widget.sale.status;
+    _notesController.text = widget.sale.notes ?? '';
+    _selectedPaymentMethod = widget.sale.paymentMethod ?? 'CASH';
+    _selectedStatus = widget.sale.status ?? 'DRAFT';
   }
 
   @override
@@ -73,11 +68,8 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
 
       await provider.updateSale(
-        widget.sale,
-        amountPaid: amountPaid,
-        paymentMethod: _selectedPaymentMethod,
-        status: _selectedStatus,
-        notes: _notesController.text,
+        widget.sale.id,
+        UpdateSaleRequest(paymentMethod: _selectedPaymentMethod, status: _selectedStatus, notes: _notesController.text),
       );
 
       if (mounted) {
@@ -92,28 +84,18 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Sale updated successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -149,33 +131,15 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 95.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
-                  maxHeight: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 90.h,
-                    small: 85.h,
-                    medium: 80.h,
-                    large: 75.h,
-                    ultrawide: 70.h,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
+                  maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 85.h, medium: 80.h, large: 75.h, ultrawide: 70.h),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -200,10 +164,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       children: [
         _buildHeader(),
         Flexible(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: _buildFormContent(isCompact: true),
-          ),
+          child: SingleChildScrollView(controller: _scrollController, child: _buildFormContent(isCompact: true)),
         ),
       ],
     );
@@ -215,10 +176,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       children: [
         _buildHeader(),
         Flexible(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: _buildFormContent(isCompact: false),
-          ),
+          child: SingleChildScrollView(controller: _scrollController, child: _buildFormContent(isCompact: false)),
         ),
       ],
     );
@@ -228,9 +186,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -240,15 +196,8 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.edit_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -281,21 +230,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
 
           // Sale ID Badge
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.smallPadding,
-              vertical: context.smallPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.sale.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
 
@@ -307,11 +246,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -361,19 +296,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
         children: [
           Row(
             children: [
-              Icon(
-                Icons.receipt_long_rounded,
-                color: Colors.blue,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.receipt_long_rounded, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Sale Summary (Read-Only)',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -388,18 +315,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Customer',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       widget.sale.customerName,
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -410,18 +330,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Items',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       '${widget.sale.totalItems} items',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -440,18 +353,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Subtotal',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.subtotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -462,18 +368,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Grand Total',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.primaryMaroon,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
                     ),
                   ],
                 ),
@@ -492,18 +391,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                       children: [
                         Text(
                           'Discount',
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            color: Colors.grey[600],
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                         Text(
                           'PKR ${widget.sale.overallDiscount.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.orange,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
                         ),
                       ],
                     ),
@@ -515,18 +407,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                       children: [
                         Text(
                           'GST',
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            color: Colors.grey[600],
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                         Text(
                           '${widget.sale.gstPercentage}%',
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.charcoalGray,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ],
                     ),
@@ -552,19 +437,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
         children: [
           Row(
             children: [
-              Icon(
-                Icons.edit_rounded,
-                color: Colors.green,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.edit_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Editable Fields',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -573,11 +450,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
           // Payment Method
           Text(
             'Payment Method',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -597,18 +470,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Row(
                         children: [
-                          Icon(
-                            _getPaymentMethodIcon(method),
-                            color: AppTheme.primaryMaroon,
-                            size: context.iconSize('medium'),
-                          ),
+                          Icon(_getPaymentMethodIcon(method), color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
                             method,
-                            style: GoogleFonts.inter(
-                              fontSize: context.bodyFontSize,
-                              color: AppTheme.charcoalGray,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -641,11 +507,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
           // Status
           Text(
             'Status',
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -669,18 +531,12 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                            ),
+                            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                           ),
                           SizedBox(width: context.smallPadding),
                           Text(
                             status,
-                            style: GoogleFonts.inter(
-                              fontSize: context.bodyFontSize,
-                              color: AppTheme.charcoalGray,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -715,37 +571,22 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       decoration: BoxDecoration(
         color: remaining <= 0 ? Colors.green.withOpacity(0.05) : Colors.orange.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: remaining <= 0
-              ? Colors.green.withOpacity(0.2)
-              : Colors.orange.withOpacity(0.2),
-        ),
+        border: Border.all(color: remaining <= 0 ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.calculate_rounded,
-                color: remaining <= 0 ? Colors.green : Colors.orange,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.calculate_rounded, color: remaining <= 0 ? Colors.green : Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Payment Summary',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.smallPadding,
-                  vertical: context.smallPadding / 2,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                 decoration: BoxDecoration(
                   color: _getStatusColor(calculatedStatus).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -756,10 +597,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(calculatedStatus),
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: _getStatusColor(calculatedStatus), shape: BoxShape.circle),
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
@@ -786,18 +624,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Grand Total',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.charcoalGray,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -808,18 +639,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'Amount Paying',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${(double.tryParse(_amountPaidController.text) ?? 0.0).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
-                        fontSize: context.subtitleFontSize,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.green,
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green),
                     ),
                   ],
                 ),
@@ -830,10 +654,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       remaining > 0 ? 'Remaining' : 'Change',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey[600],
-                      ),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${remaining.abs().toStringAsFixed(0)}',

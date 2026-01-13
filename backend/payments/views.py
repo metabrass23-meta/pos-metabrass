@@ -13,6 +13,7 @@ from .serializers import (
     PaymentUpdateSerializer,
     PaymentDetailSerializer
 )
+from django.utils import timezone
 
 
 # Function-based views (following your module pattern)
@@ -810,3 +811,194 @@ class PaymentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
             'success': True,
             'message': f'Payment "{payment_info}" deleted permanently.'
         }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def process_payment(request):
+    """
+    Process payment for a sale
+    """
+    try:
+        sale_id = request.data.get('sale_id')
+        amount = request.data.get('amount')
+        payment_method = request.data.get('payment_method')
+        currency = request.data.get('currency', 'PKR')
+        reference = request.data.get('reference')
+        notes = request.data.get('notes')
+        metadata = request.data.get('metadata', {})
+        
+        if not all([sale_id, amount, payment_method]):
+            return Response({
+                'success': False,
+                'message': 'Missing required fields: sale_id, amount, payment_method'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate amount
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                return Response({
+                    'success': False,
+                    'message': 'Amount must be greater than zero'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except (ValueError, TypeError):
+            return Response({
+                'success': False,
+                'message': 'Invalid amount format'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create payment record
+        from sales.models import Sales
+        try:
+            sale = Sales.objects.get(id=sale_id, is_active=True)
+        except Sales.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Sale not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Create payment
+        payment = Payment.objects.create(
+            sale=sale,
+            payer_type='CUSTOMER',
+            payer_id=sale.customer.id,
+            amount_paid=amount,
+            payment_month=timezone.now().date(),
+            payment_method=payment_method.upper(),
+            description=notes or f'Payment for sale {sale.invoice_number}',
+            date=timezone.now().date(),
+            time=timezone.now().time(),
+            created_by=request.user
+        )
+        
+        # Update sale payment status
+        sale.amount_paid += amount
+        sale.remaining_amount = max(0, sale.grand_total - sale.amount_paid)
+        sale.is_fully_paid = sale.remaining_amount == 0
+        sale.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Payment processed successfully',
+            'data': {
+                'payment_id': str(payment.id),
+                'sale_id': str(sale.id),
+                'amount_paid': float(amount),
+                'remaining_amount': float(sale.remaining_amount),
+                'is_fully_paid': sale.is_fully_paid,
+                'reference': reference,
+                'metadata': metadata
+            }
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Failed to process payment: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def process_split_payment(request):
+    """
+    Process split payment for a sale
+    """
+    try:
+        sale_id = request.data.get('sale_id')
+        split_details = request.data.get('split_details', [])
+        currency = request.data.get('currency', 'PKR')
+        reference = request.data.get('reference')
+        notes = request.data.get('notes')
+        
+        if not sale_id or not split_details:
+            return Response({
+                'success': False,
+                'message': 'Missing required fields: sale_id, split_details'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate split details
+        total_amount = 0
+        for split in split_details:
+            if not all(k in split for k in ['amount', 'payment_method']):
+                return Response({
+                    'success': False,
+                    'message': 'Each split must have amount and payment_method'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                amount = float(split['amount'])
+                if amount <= 0:
+                    return Response({
+                        'success': False,
+                        'message': 'Split amounts must be greater than zero'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                total_amount += amount
+            except (ValueError, TypeError):
+                return Response({
+                    'success': False,
+                    'message': 'Invalid amount format in split details'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get sale
+        from sales.models import Sales
+        try:
+            sale = Sales.objects.get(id=sale_id, is_active=True)
+        except Sales.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Sale not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Validate total amount
+        if abs(total_amount - float(sale.grand_total)) > 0.01:  # Allow small rounding differences
+            return Response({
+                'success': False,
+                'message': f'Split total ({total_amount}) must equal sale total ({sale.grand_total})'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create payments for each split
+        created_payments = []
+        for split in split_details:
+            payment = Payment.objects.create(
+                sale=sale,
+                payer_type='CUSTOMER',
+                payer_id=sale.customer.id,
+                amount_paid=split['amount'],
+                payment_month=timezone.now().date(),
+                payment_method=split['payment_method'].upper(),
+                description=notes or f'Split payment for sale {sale.invoice_number}',
+                date=timezone.now().date(),
+                time=timezone.now().time(),
+                created_by=request.user
+            )
+            created_payments.append({
+                'payment_id': str(payment.id),
+                'amount': split['amount'],
+                'payment_method': split['payment_method']
+            })
+        
+        # Update sale payment status
+        sale.amount_paid = total_amount
+        sale.remaining_amount = 0
+        sale.is_fully_paid = True
+        sale.payment_method = 'SPLIT'
+        sale.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Split payment processed successfully',
+            'data': {
+                'sale_id': str(sale.id),
+                'total_amount': total_amount,
+                'payments': created_payments,
+                'reference': reference,
+                'metadata': {'currency': currency}
+            }
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Failed to process split payment: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

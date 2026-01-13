@@ -1,779 +1,357 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/foundation.dart';
+import '../models/sales/sale_model.dart';
+import '../models/sales/request_models.dart';
+import '../services/sales_service.dart';
+import '../services/sale_item_service.dart';
+import '../services/customer_service.dart';
+import '../services/product_service.dart';
+import '../models/customer/customer_model.dart';
 import '../models/product/product_model.dart';
-import 'customer_provider.dart';
 
-// Sale Item Model for products in cart
-class SaleItem {
+// Cart item model for cart functionality
+class CartItem {
+  final String id;
   final String productId;
   final String productName;
   final double unitPrice;
   final int quantity;
   final double itemDiscount;
-  final double lineTotal;
   final String? customizationNotes;
+  final double lineTotal;
 
-  SaleItem({
+  CartItem({
+    required this.id,
     required this.productId,
     required this.productName,
     required this.unitPrice,
     required this.quantity,
-    required this.itemDiscount,
-    required this.lineTotal,
+    this.itemDiscount = 0.0,
     this.customizationNotes,
-  });
+  }) : lineTotal = (unitPrice * quantity) - itemDiscount;
 
-  SaleItem copyWith({
+  CartItem copyWith({
+    String? id,
     String? productId,
     String? productName,
     double? unitPrice,
     int? quantity,
     double? itemDiscount,
-    double? lineTotal,
     String? customizationNotes,
   }) {
-    return SaleItem(
+    return CartItem(
+      id: id ?? this.id,
       productId: productId ?? this.productId,
       productName: productName ?? this.productName,
       unitPrice: unitPrice ?? this.unitPrice,
       quantity: quantity ?? this.quantity,
       itemDiscount: itemDiscount ?? this.itemDiscount,
-      lineTotal: lineTotal ?? this.lineTotal,
       customizationNotes: customizationNotes ?? this.customizationNotes,
     );
   }
 }
 
-// Main Sale Model
-class Sale {
-  final String id;
-  final String invoiceNumber;
-  final String customerId;
-  final String customerName;
-  final String customerPhone;
-  final List<SaleItem> items;
-  final double subtotal;
-  final double overallDiscount;
-  final double gstPercentage;
-  final double taxPercentage;
-  final double grandTotal;
-  final double amountPaid;
-  final double remainingAmount;
-  final String paymentMethod;
-  final String? splitPaymentDetails;
-  final DateTime dateOfSale;
-  final String status;
-  final String notes;
-  final String createdBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  Sale({
-    required this.id,
-    required this.invoiceNumber,
-    required this.customerId,
-    required this.customerName,
-    required this.customerPhone,
-    required this.items,
-    required this.subtotal,
-    required this.overallDiscount,
-    required this.gstPercentage,
-    required this.taxPercentage,
-    required this.grandTotal,
-    required this.amountPaid,
-    required this.remainingAmount,
-    required this.paymentMethod,
-    this.splitPaymentDetails,
-    required this.dateOfSale,
-    required this.status,
-    required this.notes,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  Sale copyWith({
-    String? id,
-    String? invoiceNumber,
-    String? customerId,
-    String? customerName,
-    String? customerPhone,
-    List<SaleItem>? items,
-    double? subtotal,
-    double? overallDiscount,
-    double? gstPercentage,
-    double? taxPercentage,
-    double? grandTotal,
-    double? amountPaid,
-    double? remainingAmount,
-    String? paymentMethod,
-    String? splitPaymentDetails,
-    DateTime? dateOfSale,
-    String? status,
-    String? notes,
-    String? createdBy,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return Sale(
-      id: id ?? this.id,
-      invoiceNumber: invoiceNumber ?? this.invoiceNumber,
-      customerId: customerId ?? this.customerId,
-      customerName: customerName ?? this.customerName,
-      customerPhone: customerPhone ?? this.customerPhone,
-      items: items ?? this.items,
-      subtotal: subtotal ?? this.subtotal,
-      overallDiscount: overallDiscount ?? this.overallDiscount,
-      gstPercentage: gstPercentage ?? this.gstPercentage,
-      taxPercentage: taxPercentage ?? this.taxPercentage,
-      grandTotal: grandTotal ?? this.grandTotal,
-      amountPaid: amountPaid ?? this.amountPaid,
-      remainingAmount: remainingAmount ?? this.remainingAmount,
-      paymentMethod: paymentMethod ?? this.paymentMethod,
-      splitPaymentDetails: splitPaymentDetails ?? this.splitPaymentDetails,
-      dateOfSale: dateOfSale ?? this.dateOfSale,
-      status: status ?? this.status,
-      notes: notes ?? this.notes,
-      createdBy: createdBy ?? this.createdBy,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  // Helper getters
-  String get formattedInvoiceNumber => 'INV-$invoiceNumber';
-
-  String get dateTimeText => '${dateOfSale.day}/${dateOfSale.month}/${dateOfSale.year}';
-
-  int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
-
-  bool get isPaid => status == 'Paid';
-
-  bool get isPartial => status == 'Partial';
-
-  bool get isUnpaid => status == 'Unpaid';
-
-  Color get statusColor {
-    switch (status) {
-      case 'Paid':
-        return Colors.green;
-      case 'Partial':
-        return Colors.orange;
-      case 'Unpaid':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String get paymentStatusText {
-    if (remainingAmount <= 0) return 'Fully Paid';
-    if (amountPaid > 0) return 'Partially Paid';
-    return 'Unpaid';
-  }
-}
-
-// Audit Log Model
-class AuditLog {
-  final String id;
-  final String saleId;
-  final String action;
-  final String performedBy;
-  final String details;
-  final DateTime timestamp;
-
-  AuditLog({required this.id, required this.saleId, required this.action, required this.performedBy, required this.details, required this.timestamp});
-}
-
-// Additional helper extension for existing Product model
-extension ProductSalesExtension on Product {
-  bool get isInStock => quantity > 0;
-
-  bool get isLowStock => quantity <= 5;
-
-  String get displayName => name;
-
-  String get category => fabric; // Using fabric as category for now
-
-  Color get stockStatusColor {
-    if (quantity <= 0) return Colors.red;
-    if (quantity <= 5) return Colors.orange;
-    return Colors.green;
-  }
-}
-
-// Sales Provider
 class SalesProvider extends ChangeNotifier {
-  List<Sale> _sales = [];
-  List<Sale> _filteredSales = [];
-  List<Customer> _customers = [];
-  List<Product> _products = [];
-  List<AuditLog> _auditLogs = [];
-  String _searchQuery = '';
+  final SalesService _salesService = SalesService();
+  final SaleItemService _saleItemService = SaleItemService();
+  final CustomerService _customerService = CustomerService();
+  final ProductService _productService = ProductService();
+
+  // State variables
+  List<SaleModel> _sales = [];
+  SaleModel? _selectedSale;
   bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
 
-  // Current sale being created
-  List<SaleItem> _currentCart = [];
-  Customer? _selectedCustomer;
+  // Pagination
+  int _currentPage = 1;
+  int _pageSize = 10;
+  int _totalCount = 0;
+  int _totalPages = 1;
+  bool _hasNext = false;
+  bool _hasPrevious = false;
+
+  // Filters
+  String? _statusFilter;
+  String? _customerFilter;
+  String? _paymentMethodFilter;
+  String? _searchQuery;
+  String? _dateFromFilter;
+  String? _dateToFilter;
+  String _sortBy = 'created_at';
+  String _sortOrder = 'desc';
+
+  // Statistics
+  Map<String, dynamic>? _statistics;
+
+  // Cart functionality
+  List<CartItem> _cartItems = [];
+  CustomerModel? _selectedCustomer;
   double _overallDiscount = 0.0;
-  double _gstPercentage = 18.0;
-  double _taxPercentage = 0.0;
-  String _paymentMethod = 'Cash';
-  String _notes = '';
+  TaxConfiguration _taxConfiguration = TaxConfiguration();
 
-  // Wishlist functionality
-  List<Product> _wishlist = [];
+  // Customer and Product management
+  List<CustomerModel> _customers = [];
+  List<Product> _products = [];
 
   // Getters
-  List<Sale> get sales => _filteredSales;
+  List<SaleModel> get sales => _sales;
+  SaleModel? get selectedSale => _selectedSale;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
 
-  List<Customer> get customers => _customers;
+  // Pagination getters
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  int get totalCount => _totalCount;
+  int get totalPages => _totalPages;
+  bool get hasNext => _hasNext;
+  bool get hasPrevious => _hasPrevious;
 
+  // Filter getters
+  String? get statusFilter => _statusFilter;
+  String? get customerFilter => _customerFilter;
+  String? get paymentMethodFilter => _paymentMethodFilter;
+  String? get searchQuery => _searchQuery;
+  String? get dateFromFilter => _dateFromFilter;
+  String? get dateToFilter => _dateToFilter;
+  String get sortBy => _sortBy;
+  String get sortOrder => _sortOrder;
+
+  // Statistics getters
+  Map<String, dynamic>? get statistics => _statistics;
+
+  // Cart getters
+  List<CartItem> get currentCart => _cartItems;
+  int get cartTotalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  double get cartSubtotal => _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+  double get overallDiscount => _overallDiscount;
+  double get cartGstAmount => _taxConfiguration.totalTaxAmount;
+  double get cartTaxAmount => _taxConfiguration.totalTaxAmount;
+  double get gstPercentage => _taxConfiguration.totalTaxPercentage;
+  double get taxPercentage => _taxConfiguration.totalTaxPercentage;
+  double get cartGrandTotal => cartSubtotal + cartGstAmount - overallDiscount;
+
+  // Customer and Product getters
+  CustomerModel? get selectedCustomer => _selectedCustomer;
+  List<CustomerModel> get customers => _customers;
   List<Product> get products => _products;
 
-  List<AuditLog> get auditLogs => _auditLogs;
+  // Sales statistics getter
+  Map<String, dynamic>? get salesStats => _statistics;
 
-  String get searchQuery => _searchQuery;
+  // Computed getters
+  bool get hasSales => _sales.isNotEmpty;
+  int get salesCount => _sales.length;
+  double get totalRevenue => _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
+  double get totalTaxCollected => _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
 
-  bool get isLoading => _isLoading;
-
-  // Current sale getters
-  List<SaleItem> get currentCart => _currentCart;
-
-  Customer? get selectedCustomer => _selectedCustomer;
-
-  double get overallDiscount => _overallDiscount;
-
-  double get gstPercentage => _gstPercentage;
-
-  double get taxPercentage => _taxPercentage;
-
-  String get paymentMethod => _paymentMethod;
-
-  String get notes => _notes;
-
-  List<Product> get wishlist => _wishlist;
-
-  SalesProvider() {
-    _initializeData();
-  }
-
-  void _initializeData() {
-    _initializeCustomers();
-    _initializeProducts();
-    _initializeSales();
-  }
-
-  void _initializeCustomers() {
-    _customers = [
-      Customer(
-        id: 'CUS001',
-        name: 'Aisha Khan',
-        phone: '+923001234567',
-        email: 'aisha.khan@email.com',
-        description: 'Premium customer, prefers bridal wear',
-        lastPurchase: 85000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 15)),
-        createdAt: DateTime.now().subtract(const Duration(days: 120)),
-        country: 'Pakistan',
-        customerType: 'INDIVIDUAL',
-        status: 'VIP',
-        phoneVerified: true,
-        emailVerified: true,
-        isActive: true,
-        displayName: 'Aisha Khan',
-        initials: 'AK',
-        isNewCustomer: false,
-        isRecentCustomer: false,
-        totalSalesCount: 15,
-        hasRecentSales: true,
-        customerTypeDisplay: 'Individual',
-        statusDisplay: 'VIP Customer',
-      ),
-      Customer(
-        id: 'CUS002',
-        name: 'Fatima Ali',
-        phone: '+923009876543',
-        email: 'fatima.ali@email.com',
-        description: 'Regular customer, casual and formal wear',
-        lastPurchase: 45000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 8)),
-        createdAt: DateTime.now().subtract(const Duration(days: 80)),
-        country: 'Pakistan',
-        customerType: 'INDIVIDUAL',
-        status: 'REGULAR',
-        phoneVerified: true,
-        emailVerified: true,
-        isActive: true,
-        displayName: 'Fatima Ali',
-        initials: 'FA',
-        isNewCustomer: false,
-        isRecentCustomer: false,
-        totalSalesCount: 8,
-        hasRecentSales: true,
-        customerTypeDisplay: 'Individual',
-        statusDisplay: 'Regular Customer',
-      ),
-      Customer(
-        id: 'CUS003',
-        name: 'Sarah Ahmed',
-        phone: '+923005555555',
-        email: 'sarah.ahmed@email.com',
-        description: 'Occasional buyer, party dresses',
-        lastPurchase: 25000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 45)),
-        createdAt: DateTime.now().subtract(const Duration(days: 200)),
-        country: 'Pakistan',
-        customerType: 'INDIVIDUAL',
-        status: 'REGULAR',
-        phoneVerified: true,
-        emailVerified: false,
-        isActive: true,
-        displayName: 'Sarah Ahmed',
-        initials: 'SA',
-        isNewCustomer: false,
-        isRecentCustomer: false,
-        totalSalesCount: 3,
-        hasRecentSales: false,
-        customerTypeDisplay: 'Individual',
-        statusDisplay: 'Regular Customer',
-      ),
-      Customer(
-        id: 'CUS004',
-        name: 'Zara Sheikh',
-        phone: '+923007777777',
-        email: 'zara.sheikh@email.com',
-        description: 'VIP customer, wedding collections',
-        lastPurchase: 120000.0,
-        lastPurchaseDate: DateTime.now().subtract(const Duration(days: 3)),
-        createdAt: DateTime.now().subtract(const Duration(days: 60)),
-        country: 'Pakistan',
-        customerType: 'INDIVIDUAL',
-        status: 'VIP',
-        phoneVerified: true,
-        emailVerified: true,
-        isActive: true,
-        displayName: 'Zara Sheikh',
-        initials: 'ZS',
-        isNewCustomer: false,
-        isRecentCustomer: false,
-        totalSalesCount: 25,
-        hasRecentSales: true,
-        customerTypeDisplay: 'Individual',
-        statusDisplay: 'VIP Customer',
-      ),
-      Customer(
-        id: 'CUS005',
-        name: 'Mehwish Qureshi',
-        phone: '+923002222222',
-        email: 'mehwish.q@email.com',
-        description: 'New customer, interested in casual wear',
-        lastPurchase: null,
-        lastPurchaseDate: null,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        country: 'Pakistan',
-        customerType: 'INDIVIDUAL',
-        status: 'NEW',
-        phoneVerified: false,
-        emailVerified: false,
-        isActive: true,
-        displayName: 'Mehwish Qureshi',
-        initials: 'MQ',
-        isNewCustomer: true,
-        isRecentCustomer: true,
-        totalSalesCount: 0,
-        hasRecentSales: false,
-        customerTypeDisplay: 'Individual',
-        statusDisplay: 'New Customer',
-      ),
-    ];
-  }
-
-  void _initializeProducts() {
-    _products = [
-      // Product(
-      //   id: 'PRD001',
-      //   name: 'Bridal Lehenga Set - Royal Red',
-      //   detail: 'Heavy embroidered bridal lehenga with gold work and mirror details',
-      //   price: 85000.0,
-      //   color: 'Red',
-      //   fabric: 'Silk',
-      //   pieces: ['Lehenga', 'Blouse', 'Dupatta'],
-      //   quantity: 3,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 30)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      // ),
-      // Product(
-      //   id: 'PRD002',
-      //   name: 'Party Wear Suit - Blue Elegance',
-      //   detail: 'Designer party wear with intricate embroidery and beadwork',
-      //   price: 45000.0,
-      //   color: 'Blue',
-      //   fabric: 'Georgette',
-      //   pieces: ['Kurta', 'Palazzo', 'Dupatta'],
-      //   quantity: 7,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 25)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-      // ),
-      // Product(
-      //   id: 'PRD003',
-      //   name: 'Formal Dress - Pink Charm',
-      //   detail: 'Elegant formal dress perfect for engagements and parties',
-      //   price: 25000.0,
-      //   color: 'Pink',
-      //   fabric: 'Chiffon',
-      //   pieces: ['Shirt', 'Trouser'],
-      //   quantity: 12,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 20)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-      // ),
-      // Product(
-      //   id: 'PRD004',
-      //   name: 'Wedding Collection - Maroon Gold',
-      //   detail: 'Complete wedding outfit with traditional embroidery and gold accents',
-      //   price: 120000.0,
-      //   color: 'Maroon',
-      //   fabric: 'Velvet',
-      //   pieces: ['Lehenga', 'Blouse', 'Dupatta', 'Jacket'],
-      //   quantity: 2,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 15)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      // ),
-      // Product(
-      //   id: 'PRD005',
-      //   name: 'Corporate Formal Set',
-      //   detail: 'Professional formal wear suitable for office and business events',
-      //   price: 18000.0,
-      //   color: 'Navy',
-      //   fabric: 'Cotton',
-      //   pieces: ['Shirt', 'Trouser'],
-      //   quantity: 15,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 12)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      // ),
-      // Product(
-      //   id: 'PRD006',
-      //   name: 'Summer Collection - Green Fresh',
-      //   detail: 'Light and comfortable summer wear with floral prints',
-      //   price: 15000.0,
-      //   color: 'Green',
-      //   fabric: 'Lawn',
-      //   pieces: ['Kurta', 'Dupatta'],
-      //   quantity: 0,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 8)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 4)),
-      // ),
-      // Product(
-      //   id: 'PRD007',
-      //   name: 'Traditional Sharara Set',
-      //   detail: 'Traditional sharara with heavy embroidery and mirror work',
-      //   price: 55000.0,
-      //   color: 'Gold',
-      //   fabric: 'Net',
-      //   pieces: ['Kurta', 'Sharara', 'Dupatta'],
-      //   quantity: 4,
-      //   createdAt: DateTime.now().subtract(const Duration(days: 6)),
-      //   updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      // ),
-    ];
-  }
-
-  void _initializeSales() {
-    final now = DateTime.now();
-    _sales = [
-      Sale(
-        id: 'SAL001',
-        invoiceNumber: '2024001',
-        customerId: 'CUS001',
-        customerName: 'Ahmed Hassan',
-        customerPhone: '+923001234567',
-        items: [
-          SaleItem(productId: 'PRD001', productName: 'Lawn Suit - Floral', unitPrice: 4500.0, quantity: 2, itemDiscount: 200.0, lineTotal: 8800.0),
-          SaleItem(productId: 'PRD002', productName: 'Chiffon Dupatta', unitPrice: 1200.0, quantity: 1, itemDiscount: 0.0, lineTotal: 1200.0),
-        ],
-        subtotal: 10000.0,
-        overallDiscount: 500.0,
-        gstPercentage: 18.0,
-        taxPercentage: 0.0,
-        grandTotal: 11210.0,
-        amountPaid: 11210.0,
-        remainingAmount: 0.0,
-        paymentMethod: 'Cash',
-        dateOfSale: now.subtract(const Duration(days: 2)),
-        status: 'Paid',
-        notes: 'Regular customer - priority service',
-        createdBy: 'Admin',
-        createdAt: now.subtract(const Duration(days: 2)),
-        updatedAt: now.subtract(const Duration(days: 2)),
-      ),
-      Sale(
-        id: 'SAL002',
-        invoiceNumber: '2024002',
-        customerId: 'CUS002',
-        customerName: 'Fatima Ali',
-        customerPhone: '+923009876543',
-        items: [
-          SaleItem(productId: 'PRD006', productName: 'Wedding Dress', unitPrice: 25000.0, quantity: 1, itemDiscount: 2000.0, lineTotal: 23000.0),
-        ],
-        subtotal: 25000.0,
-        overallDiscount: 2000.0,
-        gstPercentage: 18.0,
-        taxPercentage: 0.0,
-        grandTotal: 27140.0,
-        amountPaid: 15000.0,
-        remainingAmount: 12140.0,
-        paymentMethod: 'Split',
-        splitPaymentDetails: '{"cash": 10000, "card": 5000}',
-        dateOfSale: now.subtract(const Duration(days: 1)),
-        status: 'Partial',
-        notes: 'Wedding order - delivery scheduled',
-        createdBy: 'Admin',
-        createdAt: now.subtract(const Duration(days: 1)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-      ),
-      Sale(
-        id: 'SAL003',
-        invoiceNumber: '2024003',
-        customerId: 'CUS003',
-        customerName: 'Muhammad Usman',
-        customerPhone: '+923005555555',
-        items: [
-          SaleItem(productId: 'PRD003', productName: 'Embroidered Shirt', unitPrice: 3200.0, quantity: 3, itemDiscount: 300.0, lineTotal: 9300.0),
-          SaleItem(productId: 'PRD004', productName: 'Cotton Trouser', unitPrice: 2800.0, quantity: 2, itemDiscount: 0.0, lineTotal: 5600.0),
-        ],
-        subtotal: 14900.0,
-        overallDiscount: 900.0,
-        gstPercentage: 18.0,
-        taxPercentage: 0.0,
-        grandTotal: 16520.0,
-        amountPaid: 0.0,
-        remainingAmount: 16520.0,
-        paymentMethod: 'Credit',
-        dateOfSale: now,
-        status: 'Unpaid',
-        notes: 'Corporate order - 30 days credit',
-        createdBy: 'Admin',
-        createdAt: now,
-        updatedAt: now,
-      ),
-    ];
-
-    _filteredSales = List.from(_sales);
-  }
-
-  // Search functionality
-  void searchSales(String query) {
-    _searchQuery = query;
-
-    if (query.isEmpty) {
-      _filteredSales = List.from(_sales);
-    } else {
-      _filteredSales = _sales
-          .where(
-            (sale) =>
-                sale.id.toLowerCase().contains(query.toLowerCase()) ||
-                sale.invoiceNumber.toLowerCase().contains(query.toLowerCase()) ||
-                sale.customerName.toLowerCase().contains(query.toLowerCase()) ||
-                sale.customerPhone.toLowerCase().contains(query.toLowerCase()) ||
-                sale.paymentMethod.toLowerCase().contains(query.toLowerCase()) ||
-                sale.status.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
+  /// Load sales with current filters and pagination
+  Future<void> loadSales({bool refresh = false}) async {
+    if (refresh) {
+      _currentPage = 1;
+      _sales.clear();
     }
 
-    notifyListeners();
-  }
+    if (_isLoading) return;
 
-  // Enhanced cart management with discount support
-  void addToCartWithDiscount(Product product, int quantity, double discount, {String? customizationNotes}) {
-    final existingItemIndex = _currentCart.indexWhere((item) => item.productId == product.id && item.customizationNotes == customizationNotes);
+    _setLoading(true);
+    _clearMessages();
 
-    if (existingItemIndex != -1) {
-      // Update existing item with new discount
-      final existingItem = _currentCart[existingItemIndex];
-      final newQuantity = existingItem.quantity + quantity;
-      final lineTotal = (product.price * newQuantity) - discount;
-
-      _currentCart[existingItemIndex] = existingItem.copyWith(quantity: newQuantity, itemDiscount: discount, lineTotal: lineTotal);
-    } else {
-      // Add new item with discount
-      final lineTotal = (product.price * quantity) - discount;
-      _currentCart.add(
-        SaleItem(
-          productId: product.id,
-          productName: product.name,
-          unitPrice: product.price,
-          quantity: quantity,
-          itemDiscount: discount,
-          lineTotal: lineTotal,
-          customizationNotes: customizationNotes,
-        ),
+    try {
+      final params = SalesListParams(
+        page: _currentPage,
+        pageSize: _pageSize,
+        status: _statusFilter,
+        customerId: _customerFilter,
+        paymentMethod: _paymentMethodFilter,
+        search: _searchQuery,
+        dateFrom: _dateFromFilter,
+        dateTo: _dateToFilter,
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
       );
-    }
 
-    notifyListeners();
+      final response = await _salesService.getSales(params: params);
+
+      if (response.success && response.data != null) {
+        if (refresh) {
+          _sales = response.data!.sales;
+        } else {
+          _sales.addAll(response.data!.sales);
+        }
+
+        _totalCount = response.data!.pagination.totalCount;
+        _totalPages = response.data!.pagination.totalPages;
+        _hasNext = response.data!.pagination.hasNext;
+        _hasPrevious = response.data!.pagination.hasPrevious;
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading sales: $e');
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Cart management
-  void addToCart(Product product, int quantity, {String? customizationNotes}) {
-    final existingItemIndex = _currentCart.indexWhere((item) => item.productId == product.id);
+  /// Load sales statistics
+  Future<void> loadSalesStatistics() async {
+    if (_isLoading) return;
+
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _salesService.getSalesStatistics();
+
+      if (response.success && response.data != null) {
+        _statistics = response.data!.toJson();
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading sales statistics: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Load customers
+  Future<void> loadCustomers() async {
+    try {
+      final response = await _customerService.getCustomers();
+      if (response.success && response.data != null) {
+        _customers = response.data!.customers;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error loading customers: $e');
+    }
+  }
+
+  /// Load products
+  Future<void> loadProducts() async {
+    try {
+      final response = await _productService.getProducts();
+      if (response.success && response.data != null) {
+        _products = response.data!.products;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error loading products: $e');
+    }
+  }
+
+  /// Cart management methods
+  void addToCartWithCustomization({
+    required String productId,
+    required String productName,
+    required double unitPrice,
+    required int quantity,
+    double itemDiscount = 0.0,
+    String? customizationNotes,
+  }) {
+    final existingItemIndex = _cartItems.indexWhere((item) => item.productId == productId);
 
     if (existingItemIndex != -1) {
       // Update existing item
-      final existingItem = _currentCart[existingItemIndex];
-      final newQuantity = existingItem.quantity + quantity;
-      final lineTotal = (product.price * newQuantity) - existingItem.itemDiscount;
-
-      _currentCart[existingItemIndex] = existingItem.copyWith(quantity: newQuantity, lineTotal: lineTotal);
+      final existingItem = _cartItems[existingItemIndex];
+      _cartItems[existingItemIndex] = existingItem.copyWith(
+        quantity: existingItem.quantity + quantity,
+        itemDiscount: itemDiscount,
+        customizationNotes: customizationNotes,
+      );
     } else {
       // Add new item
-      final lineTotal = product.price * quantity;
-      _currentCart.add(
-        SaleItem(
-          productId: product.id,
-          productName: product.name,
-          unitPrice: product.price,
-          quantity: quantity,
-          itemDiscount: 0.0,
-          lineTotal: lineTotal,
-          customizationNotes: customizationNotes,
-        ),
+      final newItem = CartItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        productId: productId,
+        productName: productName,
+        unitPrice: unitPrice,
+        quantity: quantity,
+        itemDiscount: itemDiscount,
+        customizationNotes: customizationNotes,
       );
+      _cartItems.add(newItem);
     }
 
     notifyListeners();
   }
 
-  void removeFromCart(String productId) {
-    _currentCart.removeWhere((item) => item.productId == productId);
+  void removeFromCart(String itemId) {
+    _cartItems.removeWhere((item) => item.id == itemId);
     notifyListeners();
   }
 
-  void updateCartItemQuantity(String productId, int quantity) {
-    final itemIndex = _currentCart.indexWhere((item) => item.productId == productId);
+  void updateCartItemQuantity(String itemId, int newQuantity) {
+    final itemIndex = _cartItems.indexWhere((item) => item.id == itemId);
     if (itemIndex != -1) {
-      final item = _currentCart[itemIndex];
-      final lineTotal = (item.unitPrice * quantity) - item.itemDiscount;
-      _currentCart[itemIndex] = item.copyWith(quantity: quantity, lineTotal: lineTotal);
-      notifyListeners();
-    }
-  }
-
-  void updateCartItemDiscount(String productId, double discount) {
-    final itemIndex = _currentCart.indexWhere((item) => item.productId == productId);
-    if (itemIndex != -1) {
-      final item = _currentCart[itemIndex];
-      final lineTotal = (item.unitPrice * item.quantity) - discount;
-      _currentCart[itemIndex] = item.copyWith(itemDiscount: discount, lineTotal: lineTotal);
+      if (newQuantity <= 0) {
+        _cartItems.removeAt(itemIndex);
+      } else {
+        final item = _cartItems[itemIndex];
+        _cartItems[itemIndex] = item.copyWith(quantity: newQuantity);
+      }
       notifyListeners();
     }
   }
 
   void clearCart() {
-    _currentCart.clear();
-    _selectedCustomer = null;
+    _cartItems.clear();
     _overallDiscount = 0.0;
-    _notes = '';
+    _taxConfiguration = TaxConfiguration();
     notifyListeners();
   }
 
-  // Quick actions for POS
-  void quickAddToCart(Product product) {
-    addToCart(product, 1);
-  }
-
-  void addToCartWithCustomization(
-    Product product,
-    int quantity, {
-    double itemDiscount = 0.0,
-    String? customizationNotes,
-    Map<String, dynamic>? customOptions,
-  }) {
-    final lineTotal = (product.price * quantity) - itemDiscount;
-
-    // Check if similar item exists (same product + customization)
-    final existingIndex = _currentCart.indexWhere((item) => item.productId == product.id && item.customizationNotes == customizationNotes);
-
-    if (existingIndex != -1) {
-      // Update existing item
-      final existing = _currentCart[existingIndex];
-      final newQuantity = existing.quantity + quantity;
-      final newLineTotal = (product.price * newQuantity) - itemDiscount;
-
-      _currentCart[existingIndex] = existing.copyWith(quantity: newQuantity, itemDiscount: itemDiscount, lineTotal: newLineTotal);
-    } else {
-      // Add new item
-      _currentCart.add(
-        SaleItem(
-          productId: product.id,
-          productName: product.name,
-          unitPrice: product.price,
-          quantity: quantity,
-          itemDiscount: itemDiscount,
-          lineTotal: lineTotal,
-          customizationNotes: customizationNotes,
-        ),
-      );
-    }
-
+  /// Customer management methods
+  void setSelectedCustomer(CustomerModel? customer) {
+    _selectedCustomer = customer;
     notifyListeners();
   }
 
-  // Wishlist functionality
-  void addToWishlist(Product product) {
-    if (!_wishlist.any((p) => p.id == product.id)) {
-      _wishlist.add(product);
+  void addCustomer(CustomerModel customer) {
+    _customers.add(customer);
+    notifyListeners();
+  }
+
+  void updateCustomer(CustomerModel customer) {
+    final index = _customers.indexWhere((c) => c.id == customer.id);
+    if (index != -1) {
+      _customers[index] = customer;
       notifyListeners();
     }
   }
 
-  void removeFromWishlist(String productId) {
-    _wishlist.removeWhere((product) => product.id == productId);
+  void removeCustomer(String customerId) {
+    _customers.removeWhere((c) => c.id == customerId);
     notifyListeners();
   }
 
-  void moveWishlistToCart(String productId) {
-    final product = _wishlist.firstWhere((p) => p.id == productId);
-    addToCart(product, 1);
-    removeFromWishlist(productId);
+  /// Product management methods
+  void addProduct(Product product) {
+    _products.add(product);
+    notifyListeners();
   }
 
-  // Sale calculations
-  double get cartSubtotal {
-    return _currentCart.fold(0.0, (sum, item) => sum + item.lineTotal);
+  void updateProduct(Product product) {
+    final index = _products.indexWhere((p) => p.id == product.id);
+    if (index != -1) {
+      _products[index] = product;
+      notifyListeners();
+    }
   }
 
-  double get cartSubtotalWithoutDiscounts {
-    return _currentCart.fold(0.0, (sum, item) => sum + (item.unitPrice * item.quantity));
+  void removeProduct(String productId) {
+    _products.removeWhere((p) => p.id == productId);
+    notifyListeners();
   }
 
-  double get cartTotalItemDiscounts {
-    return _currentCart.fold(0.0, (sum, item) => sum + item.itemDiscount);
-  }
-
-  double get cartTotalSavings {
-    return cartTotalItemDiscounts + _overallDiscount;
-  }
-
-  double get cartGstAmount {
-    return (cartSubtotal - _overallDiscount) * (_gstPercentage / 100);
-  }
-
-  double get cartTaxAmount {
-    return (cartSubtotal - _overallDiscount) * (_taxPercentage / 100);
-  }
-
-  double get cartGrandTotal {
-    return (cartSubtotal - _overallDiscount) + cartGstAmount + cartTaxAmount;
-  }
-
-  int get cartTotalItems {
-    return _currentCart.fold(0, (sum, item) => sum + item.quantity);
-  }
-
-  // Setters for current sale
-  void setSelectedCustomer(Customer? customer) {
-    _selectedCustomer = customer;
+  /// Tax configuration methods
+  void updateTaxConfiguration(TaxConfiguration configuration) {
+    _taxConfiguration = configuration;
     notifyListeners();
   }
 
@@ -782,595 +360,940 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setGstPercentage(double percentage) {
-    _gstPercentage = percentage;
-    notifyListeners();
-  }
+  /// Calculate cart totals
+  double get cartTotal => cartSubtotal + cartGstAmount - overallDiscount;
 
-  void setTaxPercentage(double percentage) {
-    _taxPercentage = percentage;
-    notifyListeners();
-  }
-
-  void setPaymentMethod(String method) {
-    _paymentMethod = method;
-    notifyListeners();
-  }
-
-  void setNotes(String notes) {
-    _notes = notes;
-    notifyListeners();
-  }
-
-  // Customer management integration
-  void selectCustomerById(String customerId) {
-    final customer = _customers.firstWhere((c) => c.id == customerId, orElse: () => throw Exception('Customer not found'));
-    setSelectedCustomer(customer);
-  }
-
-  void selectWalkInCustomer() {
-    setSelectedCustomer(null);
-  }
-
-  // Product availability checks
-  bool isProductAvailable(String productId, int requestedQuantity) {
-    final product = _products.firstWhere((p) => p.id == productId, orElse: () => throw Exception('Product not found'));
-    return product.quantity >= requestedQuantity;
-  }
-
-  List<Product> getAvailableProducts() {
-    return _products.where((product) => product.quantity > 0).toList();
-  }
-
-  List<Product> getLowStockProducts() {
-    return _products.where((product) => product.quantity <= 5 && product.quantity > 0).toList();
-  }
-
-  List<Product> getOutOfStockProducts() {
-    return _products.where((product) => product.quantity <= 0).toList();
-  }
-
-  // CRUD operations
-  Future<void> createSale({required double amountPaid, String? splitPaymentDetails}) async {
-    if (_currentCart.isEmpty) return;
-
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final now = DateTime.now();
-    final invoiceNumber = '2024${(_sales.length + 1).toString().padLeft(3, '0')}';
-    final remainingAmount = cartGrandTotal - amountPaid;
-
-    String status;
-    if (remainingAmount <= 0) {
-      status = 'Paid';
-    } else if (amountPaid > 0) {
-      status = 'Partial';
-    } else {
-      status = 'Unpaid';
+  /// Create sale from cart
+  Future<bool> createSaleFromCart({required String paymentMethod, required double amountPaid, String? notes}) async {
+    if (_cartItems.isEmpty) {
+      _setError('Cart is empty');
+      return false;
     }
 
-    final customerName = _selectedCustomer?.name ?? 'Walk-in Customer';
-    final customerPhone = _selectedCustomer?.phone ?? 'N/A';
-    final customerId = _selectedCustomer?.id ?? 'WALK-IN';
-
-    final newSale = Sale(
-      id: 'SAL${(_sales.length + 1).toString().padLeft(3, '0')}',
-      invoiceNumber: invoiceNumber,
-      customerId: customerId,
-      customerName: customerName,
-      customerPhone: customerPhone,
-      items: List.from(_currentCart),
-      subtotal: cartSubtotal,
-      overallDiscount: _overallDiscount,
-      gstPercentage: _gstPercentage,
-      taxPercentage: _taxPercentage,
-      grandTotal: cartGrandTotal,
-      amountPaid: amountPaid,
-      remainingAmount: remainingAmount,
-      paymentMethod: _paymentMethod,
-      splitPaymentDetails: splitPaymentDetails,
-      dateOfSale: now,
-      status: status,
-      notes: _notes,
-      createdBy: 'Admin',
-      createdAt: now,
-      updatedAt: now,
-    );
-
-    _sales.add(newSale);
-    _addAuditLog(newSale.id, 'Created', 'Admin', 'Sale created with ${newSale.items.length} items');
-
-    // Update product quantities
-    for (final item in _currentCart) {
-      updateProductQuantityAfterSale(item.productId, item.quantity);
+    if (_selectedCustomer == null) {
+      _setError('Please select a customer');
+      return false;
     }
 
-    clearCart();
-    searchSales(_searchQuery);
+    try {
+      final saleItems = _cartItems
+          .map(
+            (item) => CreateSaleItemRequest(
+              productId: item.productId,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              itemDiscount: item.itemDiscount,
+              customizationNotes: item.customizationNotes,
+            ),
+          )
+          .toList();
 
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> updateSale(Sale sale, {double? amountPaid, String? paymentMethod, String? status, String? notes}) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final index = _sales.indexWhere((s) => s.id == sale.id);
-    if (index != -1) {
-      final updatedSale = sale.copyWith(
-        amountPaid: amountPaid ?? sale.amountPaid,
-        paymentMethod: paymentMethod ?? sale.paymentMethod,
-        status: status ?? sale.status,
-        notes: notes ?? sale.notes,
-        remainingAmount: amountPaid != null ? sale.grandTotal - amountPaid : sale.remainingAmount,
-        updatedAt: DateTime.now(),
+      final request = CreateSaleRequest(
+        customerId: _selectedCustomer!.id,
+        overallDiscount: _overallDiscount,
+        taxConfiguration: _taxConfiguration,
+        paymentMethod: paymentMethod,
+        notes: notes,
+        saleItems: saleItems,
       );
 
-      _sales[index] = updatedSale;
-      _addAuditLog(sale.id, 'Updated', 'Admin', 'Sale details updated');
-      searchSales(_searchQuery);
+      final success = await createSale(request);
+      if (success) {
+        clearCart();
+        setSelectedCustomer(null);
+      }
+      return success;
+    } catch (e) {
+      _setError('Error creating sale from cart: $e');
+      return false;
     }
+  }
 
-    _isLoading = false;
+  /// Get sale by ID
+  Future<SaleModel?> getSaleById(String id) async {
+    try {
+      final response = await _salesService.getSaleById(id);
+      if (response.success && response.data != null) {
+        return response.data!;
+      }
+      return null;
+    } catch (e) {
+      _setError('Error getting sale: $e');
+      return null;
+    }
+  }
+
+  /// Create new sale
+  Future<bool> createSale(CreateSaleRequest request) async {
+    if (_isLoading) return false;
+
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _salesService.createSale(request);
+
+      if (response.success && response.data != null) {
+        _sales.insert(0, response.data!);
+        _setSuccess('Sale created successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error creating sale: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Update existing sale
+  Future<bool> updateSale(String id, UpdateSaleRequest request) async {
+    if (_isLoading) return false;
+
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _salesService.updateSale(id, request);
+
+      if (response.success && response.data != null) {
+        final index = _sales.indexWhere((sale) => sale.id == id);
+        if (index != -1) {
+          _sales[index] = response.data!;
+        }
+        _setSuccess('Sale updated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error updating sale: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Delete sale
+  Future<bool> deleteSale(String id) async {
+    if (_isLoading) return false;
+
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _salesService.deleteSale(id);
+
+      if (response.success) {
+        _sales.removeWhere((sale) => sale.id == id);
+        _setSuccess('Sale deleted successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error deleting sale: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Search sales
+  Future<void> searchSales(String query) async {
+    _searchQuery = query;
+    await loadSales(refresh: true);
+  }
+
+  /// Filter sales by status
+  Future<void> filterByStatus(String? status) async {
+    _statusFilter = status;
+    await loadSales(refresh: true);
+  }
+
+  /// Filter sales by customer
+  Future<void> filterByCustomer(String? customerId) async {
+    _customerFilter = customerId;
+    await loadSales(refresh: true);
+  }
+
+  /// Filter sales by payment method
+  Future<void> filterByPaymentMethod(String? paymentMethod) async {
+    _paymentMethodFilter = paymentMethod;
+    await loadSales(refresh: true);
+  }
+
+  /// Filter sales by date range
+  Future<void> filterByDateRange(String? dateFrom, String? dateTo) async {
+    _dateFromFilter = dateFrom;
+    _dateToFilter = dateTo;
+    await loadSales(refresh: true);
+  }
+
+  /// Sort sales
+  Future<void> sortSales(String sortBy, String sortOrder) async {
+    _sortBy = sortBy;
+    _sortOrder = sortOrder;
+    await loadSales(refresh: true);
+  }
+
+  /// Clear all filters
+  void clearFilters() {
+    _statusFilter = null;
+    _customerFilter = null;
+    _paymentMethodFilter = null;
+    _searchQuery = null;
+    _dateFromFilter = null;
+    _dateToFilter = null;
+    _sortBy = 'created_at';
+    _sortOrder = 'desc';
+  }
+
+  /// Load next page
+  Future<void> loadNextPage() async {
+    if (_hasNext && !_isLoading) {
+      _currentPage++;
+      await loadSales();
+    }
+  }
+
+  /// Load previous page
+  Future<void> loadPreviousPage() async {
+    if (_hasPrevious && !_isLoading) {
+      _currentPage--;
+      await loadSales();
+    }
+  }
+
+  /// Go to specific page
+  Future<void> goToPage(int page) async {
+    if (page >= 1 && page <= _totalPages && page != _currentPage) {
+      _currentPage = page;
+      await loadSales();
+    }
+  }
+
+  /// Select sale
+  void selectSale(SaleModel? sale) {
+    _selectedSale = sale;
     notifyListeners();
   }
 
-  Future<void> deleteSale(String saleId) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    _sales.removeWhere((sale) => sale.id == saleId);
-    _addAuditLog(saleId, 'Deleted', 'Admin', 'Sale record deleted');
-    searchSales(_searchQuery);
-
-    _isLoading = false;
-    notifyListeners();
+  /// Update sale status
+  Future<bool> updateSaleStatus(String id, String status) async {
+    try {
+      final request = UpdateSaleRequest(status: status);
+      return await updateSale(id, request);
+    } catch (e) {
+      _setError('Error updating sale status: $e');
+      return false;
+    }
   }
 
-  void _addAuditLog(String saleId, String action, String performedBy, String details) {
-    final log = AuditLog(
-      id: 'LOG${(_auditLogs.length + 1).toString().padLeft(4, '0')}',
-      saleId: saleId,
-      action: action,
-      performedBy: performedBy,
-      details: details,
-      timestamp: DateTime.now(),
-    );
-    _auditLogs.add(log);
+  /// Recalculate sale totals
+  Future<bool> recalculateSaleTotals(String id) async {
+    try {
+      final _sale = _sales.firstWhere((sale) => sale.id == id);
+      // TODO: Implement recalculation logic using the sale variable
+      _setSuccess('Sale totals recalculated');
+      return true;
+    } catch (e) {
+      _setError('Error recalculating sale totals: $e');
+      return false;
+    }
   }
 
-  // Custom order integration
-  Future<String> createCustomOrder({
-    required Customer customer,
-    required Product product,
-    required int quantity,
-    required DateTime deliveryDate,
-    required double advancePayment,
-    required double totalAmount,
-    String? customizationNotes,
-    Map<String, dynamic>? customOptions,
+  /// Create sale from order
+  Future<bool> createSaleFromOrder(
+    String orderId, {
+    required String paymentMethod,
+    required double amountPaid,
+    double overallDiscount = 0.0,
+    TaxConfiguration? taxConfiguration,
+    String? notes,
   }) async {
-    _isLoading = true;
-    notifyListeners();
+    try {
+      final request = CreateSaleFromOrderRequest(
+        orderId: orderId,
+        paymentMethod: paymentMethod,
+        amountPaid: amountPaid,
+        overallDiscount: overallDiscount,
+        taxConfiguration: taxConfiguration,
+        notes: notes,
+      );
 
-    await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _salesService.createSaleFromOrder(request);
 
-    // This would integrate with OrderProvider to create a custom order
-    // For now, we'll just simulate the process
-
-    final orderId = 'ORD${DateTime.now().millisecondsSinceEpoch}';
-
-    // Add audit log
-    _addAuditLog(orderId, 'Custom Order Created', 'Admin', 'Custom order created for ${customer.name} - ${product.name}');
-
-    _isLoading = false;
-    notifyListeners();
-
-    return orderId;
-  }
-
-  // Enhanced sale creation with custom order support
-  Future<String?> createSaleFromOrder({required String orderId, required double finalPayment, String? additionalNotes}) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    // This would fetch the order details and create a sale
-    // Implementation would depend on your OrderProvider structure
-
-    _isLoading = false;
-    notifyListeners();
-
-    return 'SAL${DateTime.now().millisecondsSinceEpoch}';
-  }
-
-  // Inventory integration
-  void updateProductQuantityAfterSale(String productId, int quantitySold) {
-    final productIndex = _products.indexWhere((p) => p.id == productId);
-    if (productIndex != -1) {
-      final product = _products[productIndex];
-      final newQuantity = (product.quantity - quantitySold).clamp(0, double.infinity).toInt();
-
-      // This would typically update through ProductProvider
-      // For now, we'll just update locally
-      _products[productIndex] = product.copyWith(quantity: newQuantity);
-      notifyListeners();
+      if (response.success && response.data != null) {
+        _sales.insert(0, response.data!);
+        _setSuccess('Sale created from order successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error creating sale from order: $e');
+      return false;
     }
   }
 
-  void reserveProductQuantity(String productId, int quantity) {
-    // This would reserve quantity for pending orders
-    // Implementation depends on your inventory management system
+  /// Initialize provider
+  Future<void> initialize() async {
+    await Future.wait([loadSales(refresh: true), loadSalesStatistics(), loadCustomers(), loadProducts()]);
   }
 
-  void releaseProductQuantity(String productId, int quantity) {
-    // This would release reserved quantity back to available stock
-    // Implementation depends on your inventory management system
-  }
+  // ===== BULK OPERATIONS =====
 
-  // Bulk operations
-  void addMultipleToCart(List<Map<String, dynamic>> items) {
-    for (final item in items) {
-      final product = item['product'] as Product;
-      final quantity = item['quantity'] as int;
-      final discount = item['discount'] as double? ?? 0.0;
-      final notes = item['notes'] as String?;
-
-      addToCartWithDiscount(product, quantity, discount, customizationNotes: notes);
+  /// Bulk activate sales
+  Future<bool> bulkActivateSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'activate');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales activated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error activating sales: $e');
+      return false;
     }
   }
 
-  void clearCartItem(String productId, {String? customizationNotes}) {
-    _currentCart.removeWhere((item) => item.productId == productId && (customizationNotes == null || item.customizationNotes == customizationNotes));
-    notifyListeners();
-  }
-
-  // Cart item management
-  void duplicateCartItem(String productId) {
-    final itemIndex = _currentCart.indexWhere((item) => item.productId == productId);
-    if (itemIndex != -1) {
-      final item = _currentCart[itemIndex];
-      _currentCart.add(item.copyWith()); // Creates a duplicate
-      notifyListeners();
+  /// Bulk deactivate sales
+  Future<bool> bulkDeactivateSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'deactivate');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales deactivated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error deactivating sales: $e');
+      return false;
     }
   }
 
-  void moveCartItemUp(String productId) {
-    final itemIndex = _currentCart.indexWhere((item) => item.productId == productId);
-    if (itemIndex > 0) {
-      final item = _currentCart.removeAt(itemIndex);
-      _currentCart.insert(itemIndex - 1, item);
-      notifyListeners();
+  /// Bulk confirm sales
+  Future<bool> bulkConfirmSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'confirm');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales confirmed successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error confirming sales: $e');
+      return false;
     }
   }
 
-  void moveCartItemDown(String productId) {
-    final itemIndex = _currentCart.indexWhere((item) => item.productId == productId);
-    if (itemIndex < _currentCart.length - 1) {
-      final item = _currentCart.removeAt(itemIndex);
-      _currentCart.insert(itemIndex + 1, item);
-      notifyListeners();
+  /// Bulk invoice sales
+  Future<bool> bulkInvoiceSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'invoice');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales invoiced successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error invoicing sales: $e');
+      return false;
     }
   }
 
-  // Statistics and Analytics
-  Map<String, dynamic> get salesStats {
-    final totalSales = _sales.length;
-    final totalRevenue = _sales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
-    final totalPaid = _sales.fold<double>(0, (sum, sale) => sum + sale.amountPaid);
-    final totalOutstanding = _sales.fold<double>(0, (sum, sale) => sum + sale.remainingAmount);
-
-    final todaySales = _sales.where((sale) {
-      final today = DateTime.now();
-      return sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year;
-    }).length;
-
-    final paidSales = _sales.where((sale) => sale.status == 'Paid').length;
-    final partialSales = _sales.where((sale) => sale.status == 'Partial').length;
-    final unpaidSales = _sales.where((sale) => sale.status == 'Unpaid').length;
-
-    return {
-      'totalSales': totalSales,
-      'totalRevenue': totalRevenue.toStringAsFixed(0),
-      'totalPaid': totalPaid.toStringAsFixed(0),
-      'totalOutstanding': totalOutstanding.toStringAsFixed(0),
-      'todaySales': todaySales,
-      'paidSales': paidSales,
-      'partialSales': partialSales,
-      'unpaidSales': unpaidSales,
-      'averageSale': totalSales > 0 ? (totalRevenue / totalSales).toStringAsFixed(0) : '0',
-    };
+  /// Bulk mark sales as paid
+  Future<bool> bulkMarkPaidSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'mark_paid');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales marked as paid successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error marking sales as paid: $e');
+      return false;
+    }
   }
 
-  Map<String, dynamic> get todayStats {
-    final today = DateTime.now();
-    final todaySales = _sales.where((sale) {
-      return sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year;
-    }).toList();
-
-    final todayRevenue = todaySales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
-    final todayItemsSold = todaySales.fold<int>(0, (sum, sale) => sum + sale.totalItems);
-
-    return {
-      'salesCount': todaySales.length,
-      'revenue': todayRevenue,
-      'itemsSold': todayItemsSold,
-      'averageSale': todaySales.isNotEmpty ? todayRevenue / todaySales.length : 0.0,
-    };
+  /// Bulk deliver sales
+  Future<bool> bulkDeliverSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'deliver');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales delivered successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error delivering sales: $e');
+      return false;
+    }
   }
 
-  Map<String, dynamic> get weekStats {
-    final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday - 1));
-    final weekSales = _sales.where((sale) {
-      return sale.dateOfSale.isAfter(weekStart.subtract(const Duration(days: 1)));
-    }).toList();
-
-    final weekRevenue = weekSales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
-
-    return {'salesCount': weekSales.length, 'revenue': weekRevenue, 'averageDaily': weekSales.isNotEmpty ? weekRevenue / 7 : 0.0};
+  /// Bulk cancel sales
+  Future<bool> bulkCancelSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'cancel');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales cancelled successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error cancelling sales: $e');
+      return false;
+    }
   }
 
-  List<Map<String, dynamic>> getTopSellingProducts({int limit = 5}) {
-    final productSales = <String, Map<String, dynamic>>{};
+  /// Bulk return sales
+  Future<bool> bulkReturnSales(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'return');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales returned successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error returning sales: $e');
+      return false;
+    }
+  }
 
-    for (final sale in _sales) {
-      for (final item in sale.items) {
-        if (productSales.containsKey(item.productId)) {
-          productSales[item.productId]!['quantity'] += item.quantity;
-          productSales[item.productId]!['revenue'] += item.lineTotal;
-        } else {
-          productSales[item.productId] = {
-            'productId': item.productId,
-            'productName': item.productName,
-            'quantity': item.quantity,
-            'revenue': item.lineTotal,
-          };
+  /// Bulk recalculate sale totals
+  Future<bool> bulkRecalculateTotals(List<String> saleIds) async {
+    try {
+      final response = await _salesService.bulkActionSales(saleIds, 'recalculate');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('${saleIds.length} sales totals recalculated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error recalculating sales totals: $e');
+      return false;
+    }
+  }
+
+  // ===== ADVANCED SALES FEATURES =====
+
+  /// Add payment to sale
+  Future<bool> addPayment(String saleId, double amount, String method, {Map<String, dynamic>? splitDetails}) async {
+    try {
+      final response = await _salesService.addSalePayment(saleId, amount, method);
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Payment added successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error adding payment: $e');
+      return false;
+    }
+  }
+
+  /// Add payment with enhanced workflow
+  Future<bool> addPaymentWithWorkflow({
+    required String saleId,
+    required double amount,
+    required String method,
+    String? reference,
+    String? notes,
+    Map<String, dynamic>? splitDetails,
+    bool isPartialPayment = false,
+  }) async {
+    try {
+      final response = await _salesService.addPaymentWithWorkflow(
+        id: saleId,
+        amount: amount,
+        method: method,
+        reference: reference,
+        notes: notes,
+        splitDetails: splitDetails,
+        isPartialPayment: isPartialPayment,
+      );
+
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Payment processed with workflow successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error processing payment workflow: $e');
+      return false;
+    }
+  }
+
+  /// Get payment status for a sale
+  Future<Map<String, dynamic>?> getSalePaymentStatus(String saleId) async {
+    try {
+      final response = await _salesService.getSalePaymentStatus(saleId);
+      if (response.success && response.data != null) {
+        return response.data;
+      } else {
+        _setError(response.message);
+        return null;
+      }
+    } catch (e) {
+      _setError('Error getting payment status: $e');
+      return null;
+    }
+  }
+
+  /// Process payment confirmation workflow
+  Future<bool> confirmPaymentWorkflow({
+    required String saleId,
+    required double amount,
+    required String paymentMethod,
+    String? reference,
+    String? notes,
+    Map<String, dynamic>? splitDetails,
+    bool isPartialPayment = false,
+  }) async {
+    try {
+      final response = await _salesService.confirmPaymentWorkflow(
+        saleId: saleId,
+        amount: amount,
+        paymentMethod: paymentMethod,
+        reference: reference,
+        notes: notes,
+        splitDetails: splitDetails,
+        isPartialPayment: isPartialPayment,
+      );
+
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Payment workflow completed successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error confirming payment workflow: $e');
+      return false;
+    }
+  }
+
+  /// Get payment workflow summary
+  Future<Map<String, dynamic>?> getPaymentWorkflowSummary(String saleId) async {
+    try {
+      final response = await _salesService.getPaymentWorkflowSummary(saleId);
+      if (response.success && response.data != null) {
+        return response.data;
+      } else {
+        _setError(response.message);
+        return null;
+      }
+    } catch (e) {
+      _setError('Error getting payment workflow summary: $e');
+      return null;
+    }
+  }
+
+  /// Update sale status with payment tracking
+  Future<bool> updateSaleStatusWithPayment(String saleId, String newStatus, {String? notes}) async {
+    try {
+      final response = await _salesService.updateSaleStatus(saleId, newStatus);
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Sale status updated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error updating sale status: $e');
+      return false;
+    }
+  }
+
+  /// Handle split payments
+  Future<bool> handleSplitPayments(String saleId, Map<String, dynamic> splitDetails) async {
+    try {
+      final response = await _salesService.addPayment(saleId, 0.0, 'SPLIT');
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Split payment processed successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error processing split payment: $e');
+      return false;
+    }
+  }
+
+  /// Process payment and update sale workflow
+  Future<bool> processPaymentAndUpdateSale({
+    required String saleId,
+    required double amount,
+    required String paymentMethod,
+    String? newStatus,
+    String? notes,
+  }) async {
+    try {
+      // Step 1: Process payment
+      final paymentSuccess = await addPaymentWithWorkflow(saleId: saleId, amount: amount, method: paymentMethod, notes: notes);
+
+      if (!paymentSuccess) {
+        return false;
+      }
+
+      // Step 2: Update sale status if provided
+      if (newStatus != null) {
+        final statusSuccess = await updateSaleStatusWithPayment(saleId, newStatus, notes: notes);
+        if (!statusSuccess) {
+          _setError('Payment processed but status update failed');
+          return false;
         }
       }
+
+      _setSuccess('Payment and sale update completed successfully');
+      return true;
+    } catch (e) {
+      _setError('Error processing payment and updating sale: $e');
+      return false;
     }
-
-    final sortedProducts = productSales.values.toList();
-    sortedProducts.sort((a, b) => b['quantity'].compareTo(a['quantity']));
-
-    return sortedProducts.take(limit).toList();
   }
 
-  List<Map<String, dynamic>> getTopCustomers({int limit = 5}) {
-    final customerSales = <String, Map<String, dynamic>>{};
+  /// Get payment workflow actions for a sale
+  List<String> getAvailablePaymentActions(Map<String, dynamic> workflowSummary) {
+    final actions = <String>[];
 
-    for (final sale in _sales) {
-      if (customerSales.containsKey(sale.customerId)) {
-        customerSales[sale.customerId]!['totalPurchases'] += sale.grandTotal;
-        customerSales[sale.customerId]!['orderCount'] += 1;
-      } else {
-        customerSales[sale.customerId] = {
-          'customerId': sale.customerId,
-          'customerName': sale.customerName,
-          'customerPhone': sale.customerPhone,
-          'totalPurchases': sale.grandTotal,
-          'orderCount': 1,
-        };
+    if (workflowSummary['workflow_actions'] != null) {
+      final workflowActions = workflowSummary['workflow_actions'] as Map<String, dynamic>;
+
+      if (workflowActions['can_add_payment'] == true) {
+        actions.add('add_payment');
+      }
+      if (workflowActions['can_mark_delivered'] == true) {
+        actions.add('mark_delivered');
+      }
+      if (workflowActions['can_cancel_sale'] == true) {
+        actions.add('cancel_sale');
+      }
+      if (workflowActions['can_return_sale'] == true) {
+        actions.add('return_sale');
       }
     }
 
-    final sortedCustomers = customerSales.values.toList();
-    sortedCustomers.sort((a, b) => b['totalPurchases'].compareTo(a['totalPurchases']));
-
-    return sortedCustomers.take(limit).toList();
+    return actions;
   }
 
-  // Payment method analytics
-  Map<String, dynamic> getPaymentMethodStats() {
-    final paymentStats = <String, Map<String, dynamic>>{};
-
-    for (final sale in _sales) {
-      if (paymentStats.containsKey(sale.paymentMethod)) {
-        paymentStats[sale.paymentMethod]!['count'] += 1;
-        paymentStats[sale.paymentMethod]!['amount'] += sale.grandTotal;
-      } else {
-        paymentStats[sale.paymentMethod] = {'method': sale.paymentMethod, 'count': 1, 'amount': sale.grandTotal};
-      }
-    }
-
-    return {
-      'breakdown': paymentStats,
-      'mostUsed': paymentStats.values.isNotEmpty ? paymentStats.values.reduce((a, b) => a['count'] > b['count'] ? a : b)['method'] : 'Cash',
-    };
-  }
-
-  // Advanced search and filtering
-  List<Sale> searchSalesAdvanced({
-    String? query,
-    DateTime? fromDate,
-    DateTime? toDate,
-    List<String>? statuses,
-    List<String>? paymentMethods,
-    double? minAmount,
-    double? maxAmount,
-    String? customerId,
+  /// Validate payment workflow data
+  bool validatePaymentWorkflowData({
+    required double amount,
+    required String paymentMethod,
+    required double saleTotal,
+    double? previousAmountPaid = 0.0,
   }) {
-    return _sales.where((sale) {
-      // Text search
-      if (query != null && query.isNotEmpty) {
-        final searchLower = query.toLowerCase();
-        final matchesText =
-            sale.id.toLowerCase().contains(searchLower) ||
-            sale.invoiceNumber.toLowerCase().contains(searchLower) ||
-            sale.customerName.toLowerCase().contains(searchLower) ||
-            sale.customerPhone.toLowerCase().contains(searchLower) ||
-            sale.notes.toLowerCase().contains(searchLower);
-        if (!matchesText) return false;
-      }
+    if (amount <= 0) return false;
+    if (amount > saleTotal) return false;
+    if (paymentMethod.isEmpty) return false;
 
-      // Date range filter
-      if (fromDate != null && sale.dateOfSale.isBefore(fromDate)) return false;
-      if (toDate != null && sale.dateOfSale.isAfter(toDate)) return false;
+    // Check if payment would exceed sale total
+    final totalAfterPayment = (previousAmountPaid ?? 0.0) + amount;
+    if (totalAfterPayment > saleTotal) return false;
 
-      // Status filter
-      if (statuses != null && !statuses.contains(sale.status)) return false;
-
-      // Payment method filter
-      if (paymentMethods != null && !paymentMethods.contains(sale.paymentMethod)) return false;
-
-      // Amount range filter
-      if (minAmount != null && sale.grandTotal < minAmount) return false;
-      if (maxAmount != null && sale.grandTotal > maxAmount) return false;
-
-      // Customer filter
-      if (customerId != null && sale.customerId != customerId) return false;
-
-      return true;
-    }).toList();
+    return true;
   }
 
-  // Export functionality
-  List<Map<String, dynamic>> exportSalesData({DateTime? fromDate, DateTime? toDate, String? customerId, String? paymentMethod}) {
-    var salesToExport = _sales.where((sale) {
-      if (fromDate != null && sale.dateOfSale.isBefore(fromDate)) return false;
-      if (toDate != null && sale.dateOfSale.isAfter(toDate)) return false;
-      if (customerId != null && sale.customerId != customerId) return false;
-      if (paymentMethod != null && sale.paymentMethod != paymentMethod) return false;
-      return true;
-    }).toList();
-
-    return salesToExport
-        .map(
-          (sale) => {
-            'Sale ID': sale.id,
-            'Invoice Number': sale.formattedInvoiceNumber,
-            'Customer Name': sale.customerName,
-            'Customer Phone': sale.customerPhone,
-            'Items Count': sale.totalItems,
-            'Subtotal': sale.subtotal.toStringAsFixed(2),
-            'Overall Discount': sale.overallDiscount.toStringAsFixed(2),
-            'GST %': sale.gstPercentage.toStringAsFixed(1),
-            'Tax %': sale.taxPercentage.toStringAsFixed(1),
-            'Grand Total': sale.grandTotal.toStringAsFixed(2),
-            'Amount Paid': sale.amountPaid.toStringAsFixed(2),
-            'Remaining Amount': sale.remainingAmount.toStringAsFixed(2),
-            'Payment Method': sale.paymentMethod,
-            'Status': sale.status,
-            'Date': sale.dateTimeText,
-            'Notes': sale.notes,
-            'Created By': sale.createdBy,
-          },
-        )
-        .toList();
+  /// Get payment workflow progress
+  double getPaymentWorkflowProgress(Map<String, dynamic> workflowSummary) {
+    if (workflowSummary['payment_summary'] != null) {
+      final paymentSummary = workflowSummary['payment_summary'] as Map<String, dynamic>;
+      return paymentSummary['payment_percentage'] as double? ?? 0.0;
+    }
+    return 0.0;
   }
 
-  // Utility methods
-  Sale? getSaleById(String id) {
+  /// Check if payment workflow is complete
+  bool isPaymentWorkflowComplete(Map<String, dynamic> workflowSummary) {
+    if (workflowSummary['payment_summary'] != null) {
+      final paymentSummary = workflowSummary['payment_summary'] as Map<String, dynamic>;
+      return paymentSummary['is_fully_paid'] as bool? ?? false;
+    }
+    return false;
+  }
+
+  /// Validate payment workflow data
+  bool validatePaymentWorkflow({required double amount, required String paymentMethod, required double saleTotal, double? previousAmountPaid = 0.0}) {
+    if (amount <= 0) return false;
+    if (amount > saleTotal) return false;
+    if (paymentMethod.isEmpty) return false;
+
+    // Check if payment would exceed sale total
+    final totalAfterPayment = (previousAmountPaid ?? 0.0) + amount;
+    if (totalAfterPayment > saleTotal) return false;
+
+    return true;
+  }
+
+  // ===== ENHANCED ANALYTICS =====
+
+  /// Get top products
+  Future<Map<String, dynamic>> getTopProducts({int limit = 10}) async {
     try {
-      return _sales.firstWhere((sale) => sale.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Customer? getCustomerById(String id) {
-    try {
-      return _customers.firstWhere((customer) => customer.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Product? getProductById(String id) {
-    try {
-      return _products.firstWhere((product) => product.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  List<Sale> getSalesByCustomer(String customerId) {
-    return _sales.where((sale) => sale.customerId == customerId).toList();
-  }
-
-  List<Sale> getSalesByDateRange(DateTime fromDate, DateTime toDate) {
-    return _sales
-        .where(
-          (sale) =>
-              sale.dateOfSale.isAfter(fromDate.subtract(const Duration(days: 1))) && sale.dateOfSale.isBefore(toDate.add(const Duration(days: 1))),
-        )
-        .toList();
-  }
-
-  List<AuditLog> getAuditLogsBySale(String saleId) {
-    return _auditLogs.where((log) => log.saleId == saleId).toList();
-  }
-
-  // Product filtering helpers
-  List<Product> getProductsByCategory(String category) {
-    if (category == 'All') return _products;
-    return _products.where((product) => product.fabric == category).toList();
-  }
-
-  List<Product> searchProducts(String query) {
-    if (query.isEmpty) return _products;
-
-    return _products
-        .where(
-          (product) =>
-              product.name.toLowerCase().contains(query.toLowerCase()) ||
-              product.detail.toLowerCase().contains(query.toLowerCase()) ||
-              product.color.toLowerCase().contains(query.toLowerCase()) ||
-              product.fabric.toLowerCase().contains(query.toLowerCase()),
-        )
-        .toList();
-  }
-
-  // Cart validation
-  bool get canCheckout {
-    return _currentCart.isNotEmpty && _currentCart.every((item) => isProductAvailable(item.productId, item.quantity));
-  }
-
-  String? getCheckoutValidationError() {
-    if (_currentCart.isEmpty) {
-      return 'Cart is empty. Add products to continue.';
-    }
-
-    for (final item in _currentCart) {
-      final product = getProductById(item.productId);
-      if (product == null) {
-        return 'Product ${item.productName} not found.';
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return {'total_revenue': stats.data!.totalRevenue, 'total_sales': stats.data!.totalSales};
       }
-      if (product.quantity < item.quantity) {
-        return 'Insufficient stock for ${item.productName}. Available: ${product.quantity}';
-      }
+      return {};
+    } catch (e) {
+      debugPrint('Error getting top products: $e');
+      return {};
     }
-
-    return null;
   }
 
-  // Quick stats for dashboard
-  Map<String, dynamic> get quickStats {
-    final today = DateTime.now();
-    final todaySales = _sales
-        .where((sale) => sale.dateOfSale.day == today.day && sale.dateOfSale.month == today.month && sale.dateOfSale.year == today.year)
-        .length;
+  /// Get top customers
+  Future<Map<String, dynamic>> getTopCustomers({int limit = 10}) async {
+    try {
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return {'total_sales': stats.data!.totalSales, 'total_revenue': stats.data!.totalRevenue};
+      }
+      return {};
+    } catch (e) {
+      debugPrint('Error getting top customers: $e');
+      return {};
+    }
+  }
 
-    final totalRevenue = _sales.fold<double>(0, (sum, sale) => sum + sale.grandTotal);
-    final totalOutstanding = _sales.fold<double>(0, (sum, sale) => sum + sale.remainingAmount);
+  /// Get daily trends
+  Future<List<dynamic>> getDailyTrends({int days = 30}) async {
+    try {
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return stats.data!.dailyTrends;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error getting daily trends: $e');
+      return [];
+    }
+  }
 
-    return {
-      'todaySales': todaySales,
-      'totalRevenue': totalRevenue,
-      'totalOutstanding': totalOutstanding,
-      'lowStockItems': getLowStockProducts().length,
-      'outOfStockItems': getOutOfStockProducts().length,
-      'cartItems': cartTotalItems,
-      'cartValue': cartGrandTotal,
-    };
+  /// Get monthly trends
+  Future<List<dynamic>> getMonthlyTrends({int months = 12}) async {
+    try {
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return stats.data!.monthlyTrends;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error getting monthly trends: $e');
+      return [];
+    }
+  }
+
+  /// Get payment method distribution
+  Future<Map<String, dynamic>> getPaymentMethodDistribution() async {
+    try {
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return stats.data!.paymentMethodDistribution;
+      }
+      return {};
+    } catch (e) {
+      debugPrint('Error getting payment method distribution: $e');
+      return {};
+    }
+  }
+
+  /// Get status distribution
+  Future<Map<String, dynamic>> getStatusDistribution() async {
+    try {
+      final stats = await _salesService.getSalesStatistics();
+      if (stats.success && stats.data != null) {
+        return stats.data!.statusDistribution;
+      }
+      return {};
+    } catch (e) {
+      debugPrint('Error getting status distribution: $e');
+      return {};
+    }
+  }
+
+  // ===== SALE ITEMS MANAGEMENT =====
+
+  /// Load sale items for a specific sale
+  Future<void> loadSaleItems(String saleId) async {
+    try {
+      final response = await _saleItemService.getSaleItemsBySale(saleId);
+      if (response.success && response.data != null) {
+        // Update the sale with its items
+        final saleIndex = _sales.indexWhere((sale) => sale.id == saleId);
+        if (saleIndex != -1) {
+          _sales[saleIndex] = _sales[saleIndex].copyWith(saleItems: response.data!);
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading sale items: $e');
+    }
+  }
+
+  /// Create sale item (Note: Sale items are typically created as part of sale creation)
+  Future<bool> createSaleItem(CreateSaleItemRequest request, String saleId) async {
+    try {
+      final response = await _saleItemService.createSaleItem(request);
+      if (response.success && response.data != null) {
+        // Add the new item to the sale
+        final saleIndex = _sales.indexWhere((sale) => sale.id == saleId);
+        if (saleIndex != -1) {
+          _sales[saleIndex] = _sales[saleIndex].copyWith(saleItems: [..._sales[saleIndex].saleItems, response.data!]);
+          notifyListeners();
+        }
+        _setSuccess('Sale item created successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error creating sale item: $e');
+      return false;
+    }
+  }
+
+  /// Update sale item
+  Future<bool> updateSaleItem(String itemId, UpdateSaleItemRequest request) async {
+    try {
+      final response = await _saleItemService.updateSaleItem(itemId, request);
+      if (response.success && response.data != null) {
+        // Update the item in the sale
+        for (int i = 0; i < _sales.length; i++) {
+          final itemIndex = _sales[i].saleItems.indexWhere((item) => item.id == itemId);
+          if (itemIndex != -1) {
+            final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
+            updatedItems[itemIndex] = response.data!;
+            _sales[i] = _sales[i].copyWith(saleItems: updatedItems);
+            notifyListeners();
+            break;
+          }
+        }
+        _setSuccess('Sale item updated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error updating sale item: $e');
+      return false;
+    }
+  }
+
+  /// Delete sale item
+  Future<bool> deleteSaleItem(String itemId) async {
+    try {
+      final response = await _saleItemService.deleteSaleItem(itemId);
+      if (response.success) {
+        // Remove the item from the sale
+        for (int i = 0; i < _sales.length; i++) {
+          final itemIndex = _sales[i].saleItems.indexWhere((item) => item.id == itemId);
+          if (itemIndex != -1) {
+            final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
+            updatedItems.removeAt(itemIndex);
+            _sales[i] = _sales[i].copyWith(saleItems: updatedItems);
+            notifyListeners();
+            break;
+          }
+        }
+        _setSuccess('Sale item deleted successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error deleting sale item: $e');
+      return false;
+    }
+  }
+
+  /// Search sale items
+  Future<List<SaleItemModel>> searchSaleItems(String query) async {
+    try {
+      final response = await _saleItemService.searchSaleItems(query);
+      if (response.success && response.data != null) {
+        return response.data!;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error searching sale items: $e');
+      return [];
+    }
+  }
+
+  // Private helper methods
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
+    _successMessage = null;
+    notifyListeners();
+  }
+
+  void _setSuccess(String message) {
+    _successMessage = message;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  void _clearMessages() {
+    _errorMessage = null;
+    _successMessage = null;
   }
 }

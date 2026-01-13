@@ -736,4 +736,316 @@ def duplicate_product(request, product_id):
             'message': 'Product duplication failed.',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_stock_availability(request):
+    """Check real-time stock availability for products"""
+    try:
+        product_ids = request.GET.getlist('product_ids[]')
+        if not product_ids:
+            return Response({
+                'success': False,
+                'message': 'Product IDs are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        products = Product.objects.filter(id__in=product_ids, is_active=True)
+        stock_info = []
+        
+        for product in products:
+            stock_info.append({
+                'product_id': str(product.id),
+                'product_name': product.name,
+                'available_quantity': product.quantity,
+                'stock_status': product.stock_status,
+                'stock_status_display': product.stock_status_display,
+                'can_fulfill': product.quantity > 0,
+                'low_stock_warning': product.quantity <= 5,
+                'out_of_stock': product.quantity == 0,
+                'last_updated': product.updated_at.isoformat()
+            })
+        
+        return Response({
+            'success': True,
+            'data': stock_info,
+            'message': 'Stock availability checked successfully'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error checking stock availability: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reserve_stock_for_sale(request):
+    """Reserve stock for a pending sale (temporary hold)"""
+    try:
+        product_id = request.data.get('product_id')
+        quantity = request.data.get('quantity')
+        sale_id = request.data.get('sale_id')
+        reservation_duration = request.data.get('reservation_duration', 30)  # minutes
+        
+        if not all([product_id, quantity, sale_id]):
+            return Response({
+                'success': False,
+                'message': 'Product ID, quantity, and sale ID are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            product = Product.objects.get(id=product_id, is_active=True)
+        except Product.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Product not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        if product.quantity < quantity:
+            return Response({
+                'success': False,
+                'message': f'Insufficient stock. Available: {product.quantity}, Requested: {quantity}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create stock reservation
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        reservation = StockReservation.objects.create(
+            product=product,
+            sale_id=sale_id,
+            quantity_reserved=quantity,
+            reserved_until=timezone.now() + timedelta(minutes=reservation_duration),
+            reserved_by=request.user
+        )
+        
+        # Update product available quantity (reserved stock is not available for other sales)
+        product.quantity_available = product.quantity - product.get_reserved_quantity()
+        product.save(update_fields=['quantity_available'])
+        
+        return Response({
+            'success': True,
+            'data': {
+                'reservation_id': str(reservation.id),
+                'product_id': str(product.id),
+                'quantity_reserved': quantity,
+                'reserved_until': reservation.reserved_until.isoformat(),
+                'available_quantity': product.quantity_available
+            },
+            'message': 'Stock reserved successfully'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error reserving stock: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def confirm_stock_deduction(request):
+    """Confirm stock deduction after sale is confirmed"""
+    try:
+        sale_id = request.data.get('sale_id')
+        if not sale_id:
+            return Response({
+                'success': False,
+                'message': 'Sale ID is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get all stock reservations for this sale
+        reservations = StockReservation.objects.filter(
+            sale_id=sale_id,
+            is_active=True
+        )
+        
+        if not reservations.exists():
+            return Response({
+                'success': False,
+                'message': 'No stock reservations found for this sale'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        deduction_results = []
+        
+        for reservation in reservations:
+            product = reservation.product
+            
+            # Deduct stock
+            old_quantity = product.quantity
+            new_quantity = old_quantity - reservation.quantity_reserved
+            
+            if new_quantity < 0:
+                return Response({
+                    'success': False,
+                    'message': f'Insufficient stock for product {product.name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Update product quantity
+            product.quantity = new_quantity
+            product.save(update_fields=['quantity', 'updated_at'])
+            
+            # Mark reservation as confirmed
+            reservation.is_confirmed = True
+            reservation.confirmed_at = timezone.now()
+            reservation.save(update_fields=['is_confirmed', 'confirmed_at'])
+            
+            deduction_results.append({
+                'product_id': str(product.id),
+                'product_name': product.name,
+                'quantity_deducted': reservation.quantity_reserved,
+                'old_quantity': old_quantity,
+                'new_quantity': new_quantity,
+                'stock_status': product.stock_status,
+                'low_stock_warning': product.quantity <= 5
+            })
+        
+        return Response({
+            'success': True,
+            'data': {
+                'sale_id': sale_id,
+                'deductions': deduction_results,
+                'total_products_updated': len(deduction_results)
+            },
+            'message': 'Stock deduction confirmed successfully'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error confirming stock deduction: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_low_stock_alerts(request):
+    """Get low stock alerts for products"""
+    try:
+        threshold = int(request.GET.get('threshold', 5))
+        include_out_of_stock = request.GET.get('include_out_of_stock', 'true').lower() == 'true'
+        
+        query = Product.objects.filter(is_active=True)
+        
+        if include_out_of_stock:
+            query = query.filter(quantity__lte=threshold)
+        else:
+            query = query.filter(quantity__gt=0, quantity__lte=threshold)
+        
+        products = query.select_related('category').order_by('quantity', 'name')
+        
+        alerts = []
+        for product in products:
+            alerts.append({
+                'product_id': str(product.id),
+                'product_name': product.name,
+                'category_name': product.category.name if product.category else 'Uncategorized',
+                'current_quantity': product.quantity,
+                'stock_status': product.stock_status,
+                'stock_status_display': product.stock_status_display,
+                'last_updated': product.updated_at.isoformat(),
+                'alert_level': 'CRITICAL' if product.quantity == 0 else 'WARNING',
+                'days_since_update': (timezone.now() - product.updated_at).days
+            })
+        
+        return Response({
+            'success': True,
+            'data': {
+                'alerts': alerts,
+                'total_alerts': len(alerts),
+                'threshold': threshold,
+                'critical_count': len([a for a in alerts if a['alert_level'] == 'CRITICAL']),
+                'warning_count': len([a for a in alerts if a['alert_level'] == 'WARNING'])
+            },
+            'message': 'Low stock alerts retrieved successfully'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error getting low stock alerts: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def bulk_update_stock(request):
+    """Bulk update stock quantities for multiple products"""
+    try:
+        updates = request.data.get('updates', [])
+        if not updates:
+            return Response({
+                'success': False,
+                'message': 'Updates array is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        results = []
+        errors = []
+        
+        for update in updates:
+            try:
+                product_id = update.get('product_id')
+                new_quantity = update.get('quantity')
+                reason = update.get('reason', 'Bulk update')
+                
+                if not all([product_id, new_quantity is not None]):
+                    errors.append({
+                        'product_id': product_id,
+                        'error': 'Product ID and quantity are required'
+                    })
+                    continue
+                
+                try:
+                    product = Product.objects.get(id=product_id, is_active=True)
+                except Product.DoesNotExist:
+                    errors.append({
+                        'product_id': product_id,
+                        'error': 'Product not found'
+                    })
+                    continue
+                
+                old_quantity = product.quantity
+                product.quantity = new_quantity
+                product.save(update_fields=['quantity', 'updated_at'])
+                
+                # Log stock change
+                StockChangeLog.objects.create(
+                    product=product,
+                    old_quantity=old_quantity,
+                    new_quantity=new_quantity,
+                    change_type='BULK_UPDATE',
+                    reason=reason,
+                    changed_by=request.user
+                )
+                
+                results.append({
+                    'product_id': str(product.id),
+                    'product_name': product.name,
+                    'old_quantity': old_quantity,
+                    'new_quantity': new_quantity,
+                    'stock_status': product.stock_status,
+                    'low_stock_warning': product.quantity <= 5
+                })
+                
+            except Exception as e:
+                errors.append({
+                    'product_id': update.get('product_id'),
+                    'error': str(e)
+                })
+        
+        return Response({
+            'success': True,
+            'data': {
+                'successful_updates': results,
+                'errors': errors,
+                'total_processed': len(updates),
+                'successful_count': len(results),
+                'error_count': len(errors)
+            },
+            'message': f'Bulk stock update completed. {len(results)} successful, {len(errors)} errors'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Error performing bulk stock update: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         

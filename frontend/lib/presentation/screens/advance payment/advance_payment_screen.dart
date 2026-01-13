@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/advance payment/add_advance_payment_dialog.dart';
+import '../../widgets/advance payment/advance_payment_filter_dialog.dart';
 import '../../widgets/advance payment/advance_payment_table.dart';
 import '../../widgets/advance payment/delete_advance_payment_dialog.dart';
 import '../../widgets/advance payment/edit_advance_payment_dialog.dart';
@@ -23,9 +25,33 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Load advance payment records and statistics when page initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<AdvancePaymentProvider>();
+      provider.loadAdvancePayments();
+      provider.loadStatistics();
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    final provider = context.read<AdvancePaymentProvider>();
+    await provider.refreshAdvancePayments();
+  }
+
+  void _handleFilterTap() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AdvancePaymentFilterDialog(),
+    );
   }
 
   void _showAddAdvancePaymentDialog() {
@@ -52,7 +78,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
     );
   }
 
-  void _showViewReceiptDialog(AdvancePayment payment) {
+  void _showViewAdvancePaymentDialog(AdvancePayment payment) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -68,38 +94,77 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<AdvancePaymentProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: AdvancePaymentTable(
-                onEdit: _showEditAdvancePaymentDialog,
-                onDelete: _showDeleteAdvancePaymentDialog,
-                onViewReceipt: _showViewReceiptDialog,
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppTheme.primaryMaroon,
+        child: Padding(
+          padding: EdgeInsets.all(context.mainPadding / 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildTabletHeader(),
+                small: _buildMobileHeader(),
+                medium: _buildDesktopHeader(),
+                large: _buildDesktopHeader(),
+                ultrawide: _buildDesktopHeader(),
               ),
-            ),
-          ],
+              SizedBox(height: context.mainPadding),
+              Consumer<AdvancePaymentProvider>(
+                builder: (context, provider, child) {
+                  // Show error message if there's an error
+                  if (provider.hasError) {
+                    return Container(
+                      padding: EdgeInsets.all(context.cardPadding),
+                      margin: EdgeInsets.only(bottom: context.cardPadding),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(context.borderRadius()),
+                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline, color: Colors.red),
+                          SizedBox(width: context.smallPadding),
+                          Expanded(
+                            child: Text(
+                              provider.errorMessage ?? 'An error occurred',
+                              style: GoogleFonts.inter(
+                                fontSize: context.bodyFontSize,
+                                color: Colors.red[700],
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              provider.clearError();
+                              provider.loadAdvancePayments();
+                            },
+                            child: Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return context.statsCardColumns == 2
+                      ? _buildMobileStatsGrid(provider)
+                      : _buildDesktopStatsRow(provider);
+                },
+              ),
+              SizedBox(height: context.cardPadding * 0.5),
+              _buildSearchSection(),
+              SizedBox(height: context.cardPadding * 0.5),
+              Expanded(
+                child: AdvancePaymentTable(
+                  onEdit: _showEditAdvancePaymentDialog,
+                  onDelete: _showDeleteAdvancePaymentDialog,
+                  onView: _showViewAdvancePaymentDialog,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -114,11 +179,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
@@ -156,7 +217,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               Text(
                 'Advance Payment Management',
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: context.headerFontSize,
+                  fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
                   letterSpacing: -0.5,
@@ -202,10 +263,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -233,10 +291,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
@@ -244,9 +299,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -262,11 +315,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add' : 'Add Payment',
@@ -290,20 +339,40 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
     return Row(
       children: [
         Expanded(
-            child: _buildStatsCard('Total Payments', stats['total'].toString(),
-                Icons.payment_rounded, Colors.blue)),
+          child: _buildStatsCard(
+            'Total Payments',
+            stats['total'].toString(),
+            Icons.payment_rounded,
+            Colors.blue,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}',
-                Icons.attach_money_rounded, Colors.green)),
+          child: _buildStatsCard(
+            'Total Amount',
+            'PKR ${stats['totalAmount']}',
+            Icons.attach_money_rounded,
+            Colors.green,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('With Receipts', stats['withReceipts'].toString(),
-                Icons.receipt_rounded, Colors.purple)),
+          child: _buildStatsCard(
+            'With Receipts',
+            stats['withReceipts'].toString(),
+            Icons.receipt_rounded,
+            Colors.purple,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
         Expanded(
-            child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                Icons.calendar_month_rounded, Colors.orange)),
+          child: _buildStatsCard(
+            'This Month',
+            stats['thisMonth'].toString(),
+            Icons.calendar_month_rounded,
+            Colors.orange,
+          ),
+        ),
       ],
     );
   }
@@ -315,24 +384,39 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Total', stats['total'].toString(),
-                    Icons.payment_rounded, Colors.blue)),
+              child: _buildStatsCard('Total', stats['total'].toString(), Icons.payment_rounded, Colors.blue),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}',
-                    Icons.attach_money_rounded, Colors.green)),
+              child: _buildStatsCard(
+                'Amount',
+                'PKR ${stats['totalAmount']}',
+                Icons.attach_money_rounded,
+                Colors.green,
+              ),
+            ),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
             Expanded(
-                child: _buildStatsCard('Receipts', stats['withReceipts'].toString(),
-                    Icons.receipt_rounded, Colors.purple)),
+              child: _buildStatsCard(
+                'Receipts',
+                stats['withReceipts'].toString(),
+                Icons.receipt_rounded,
+                Colors.purple,
+              ),
+            ),
             SizedBox(width: context.cardPadding),
             Expanded(
-                child: _buildStatsCard('This Month', stats['thisMonth'].toString(),
-                    Icons.calendar_month_rounded, Colors.orange)),
+              child: _buildStatsCard(
+                'This Month',
+                stats['thisMonth'].toString(),
+                Icons.calendar_month_rounded,
+                Colors.orange,
+              ),
+            ),
           ],
         ),
       ],
@@ -353,13 +437,77 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           ),
         ],
       ),
-      child: ResponsiveBreakpoints.responsive(
-        context,
-        tablet: _buildTabletSearchLayout(),
-        small: _buildMobileSearchLayout(),
-        medium: _buildDesktopSearchLayout(),
-        large: _buildDesktopSearchLayout(),
-        ultrawide: _buildDesktopSearchLayout(),
+      child: Consumer<AdvancePaymentProvider>(
+        builder: (context, provider, child) {
+          // Show centered loading indicator when initially loading
+          if (provider.isLoading && provider.advancePayments.isEmpty) {
+            return Container(
+              height: ResponsiveBreakpoints.responsive(
+                context,
+                tablet: 80,
+                small: 100,
+                medium: 120,
+                large: 140,
+                ultrawide: 160,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: ResponsiveBreakpoints.responsive(
+                        context,
+                        tablet: 24,
+                        small: 28,
+                        medium: 32,
+                        large: 36,
+                        ultrawide: 40,
+                      ),
+                      height: ResponsiveBreakpoints.responsive(
+                        context,
+                        tablet: 24,
+                        small: 28,
+                        medium: 32,
+                        large: 36,
+                        ultrawide: 40,
+                      ),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon),
+                      ),
+                    ),
+                    SizedBox(height: context.smallPadding),
+                    Text(
+                      'Loading advance payments...',
+                      style: GoogleFonts.inter(
+                        fontSize: ResponsiveBreakpoints.responsive(
+                          context,
+                          tablet: context.bodyFontSize * 0.9,
+                          small: context.bodyFontSize,
+                          medium: context.bodyFontSize * 1.1,
+                          large: context.bodyFontSize * 1.2,
+                          ultrawide: context.bodyFontSize * 1.3,
+                        ),
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.charcoalGray,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Show search controls when not loading or when data is available
+          return ResponsiveBreakpoints.responsive(
+            context,
+            tablet: _buildTabletSearchLayout(),
+            small: _buildMobileSearchLayout(),
+            medium: _buildDesktopSearchLayout(),
+            large: _buildDesktopSearchLayout(),
+            ultrawide: _buildDesktopSearchLayout(),
+          );
+        },
       ),
     );
   }
@@ -367,20 +515,11 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
+        Expanded(flex: 3, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
+        Expanded(flex: 1, child: _buildFilterButton()),
         SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+        Expanded(flex: 1, child: _buildRefreshButton()),
       ],
     );
   }
@@ -394,7 +533,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           children: [
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
+            Expanded(child: _buildRefreshButton()),
           ],
         ),
       ],
@@ -410,7 +549,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           children: [
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
+            Expanded(child: _buildRefreshButton()),
           ],
         ),
       ],
@@ -425,18 +564,13 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchAdvancePayments,
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            enabled: !provider.isLoading,
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
               hintText: context.isTablet
                   ? 'Search payments...'
                   : 'Search by ID, labor name, phone, role, or description...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(
                 Icons.search_rounded,
                 color: Colors.grey[500],
@@ -444,16 +578,16 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  provider.searchAdvancePayments('');
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        provider.searchAdvancePayments('');
+                      },
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: Colors.grey[500],
+                        size: context.iconSize('small'),
+                      ),
+                    )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -468,74 +602,91 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildFilterButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Filter',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
+    return Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: _handleFilterTap,
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            child: Container(
+              height: context.buttonHeight / 1.5,
+              padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+              decoration: BoxDecoration(
+                color: AppTheme.lightGray,
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.filter_list_rounded,
+                    color: AppTheme.primaryMaroon,
+                    size: context.iconSize('medium'),
+                  ),
+                  if (!context.isTablet) ...[
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'Filter',
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.primaryMaroon,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ],
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildExportButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
+  Widget _buildRefreshButton() {
+    return Consumer<AdvancePaymentProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          height: context.buttonHeight / 1.5,
+          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+          decoration: BoxDecoration(
+            color: AppTheme.lightGray,
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            border: Border.all(color: Colors.grey.shade300, width: 1),
           ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Export',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
-              ),
+          child: InkWell(
+            onTap: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              await _handleRefresh();
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text('Data refreshed successfully'),
+                  backgroundColor: AppTheme.primaryMaroon,
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.refresh_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                if (!context.isTablet) ...[
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Refresh',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryMaroon,
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -562,11 +713,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: context.iconSize('medium'),
-            ),
+            child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -577,14 +724,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                 Text(
                   value,
                   style: GoogleFonts.inter(
-                    fontSize: ResponsiveBreakpoints.responsive(
-                      context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
-                    ),
+                    fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
                   ),

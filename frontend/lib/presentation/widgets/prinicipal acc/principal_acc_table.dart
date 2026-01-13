@@ -5,18 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/models/principal_account/principal_account_model.dart';
 
 class PrincipalAccountTable extends StatefulWidget {
   final Function(PrincipalAccount) onEdit;
   final Function(PrincipalAccount) onDelete;
   final Function(PrincipalAccount) onView;
 
-  const PrincipalAccountTable({
-    super.key,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onView,
-  });
+  const PrincipalAccountTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
 
   @override
   State<PrincipalAccountTable> createState() => _PrincipalAccountTableState();
@@ -39,35 +35,15 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
       ),
       child: Consumer<PrincipalAccountProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
             return Center(
               child: SizedBox(
-                width: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 8.w,
-                  small: 6.w,
-                  medium: 5.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
-                height: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 8.w,
-                  small: 6.w,
-                  medium: 5.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
+                height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
                 child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
@@ -98,11 +74,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                     controller: _horizontalController,
                     scrollDirection: Axis.horizontal,
                     physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.all(context.cardPadding),
-                      child: _buildTableHeader(context),
-                    ),
+                    child: Container(width: _getTableWidth(context), padding: EdgeInsets.all(context.cardPadding), child: _buildTableHeader(context)),
                   ),
                 ),
 
@@ -151,15 +123,8 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -175,29 +140,18 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   ),
                 ),
                 Text(
-                  'PKR ${provider.currentBalance.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
-                    fontSize: context.headerFontSize,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.pureWhite,
-                  ),
+                  'PKR ${provider.currentBalance?.currentBalance.toStringAsFixed(0) ?? '0'}',
+                  style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
               ],
             ),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Text(
               '${provider.accounts.length} Transactions',
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
         ],
@@ -207,14 +161,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
 
   double _getTableWidth(BuildContext context) {
     // Fixed table width to ensure all columns are visible
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: 1800.0,
-      small: 1900.0,
-      medium: 2000.0,
-      large: 2100.0,
-      ultrawide: 2200.0,
-    );
+    return ResponsiveBreakpoints.responsive(context, tablet: 1800.0, small: 1900.0, medium: 2000.0, large: 2100.0, ultrawide: 2200.0);
   }
 
   Widget _buildTableHeader(BuildContext context) {
@@ -273,12 +220,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
-      ),
+      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -298,21 +240,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
                 account.id,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ),
           ),
@@ -322,10 +257,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: account.sourceModuleColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -333,20 +265,12 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    _getSourceModuleIcon(account.sourceModule),
-                    color: account.sourceModuleColor,
-                    size: context.iconSize('small'),
-                  ),
+                  Icon(_getSourceModuleIcon(account.sourceModule), color: account.sourceModuleColor, size: context.iconSize('small')),
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
-                      account.formattedSourceModule,
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: account.sourceModuleColor,
-                      ),
+                      account.sourceModule.replaceAll('_', ' ').toUpperCase(),
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: account.sourceModuleColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -362,11 +286,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               account.description,
-              style: GoogleFonts.inter(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -377,10 +297,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
               decoration: BoxDecoration(
                 color: account.typeColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -392,11 +309,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     account.type.toUpperCase(),
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w700,
-                      color: account.typeColor,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
                   ),
                 ],
               ),
@@ -408,21 +321,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 3,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
               decoration: BoxDecoration(
                 color: account.typeColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
                 'PKR ${account.amount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w700,
-                  color: account.typeColor,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
               ),
             ),
           ),
@@ -432,21 +338,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 3,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${account.balanceAfter.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.blue[700],
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
               ),
             ),
           ),
@@ -457,10 +353,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: account.handledBy != null
                 ? Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.smallPadding / 2,
-                      vertical: context.smallPadding / 4,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                     decoration: BoxDecoration(
                       color: _getPersonColor(account.handledBy!).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -471,10 +364,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                         Container(
                           width: 16,
                           height: 16,
-                          decoration: BoxDecoration(
-                            color: _getPersonColor(account.handledBy!),
-                            shape: BoxShape.circle,
-                          ),
+                          decoration: BoxDecoration(color: _getPersonColor(account.handledBy!), shape: BoxShape.circle),
                           child: Icon(Icons.person, color: AppTheme.pureWhite, size: 10),
                         ),
                         SizedBox(width: context.smallPadding / 2),
@@ -513,19 +403,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               children: [
                 Text(
                   account.formattedDate,
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   account.relativeDate,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -536,14 +418,8 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             width: columnWidths[8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -551,11 +427,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     account.formattedTime,
-                    style: GoogleFonts.inter(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.purple,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
                   ),
                 ],
               ),
@@ -585,10 +457,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
             ),
           ),
@@ -604,10 +473,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
@@ -620,17 +486,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Export account entry ${account.id}'), backgroundColor: Colors.green),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Export account entry ${account.id}'), backgroundColor: Colors.green));
             },
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.download_outlined, color: Colors.green, size: context.iconSize('small')),
             ),
           ),
@@ -646,10 +509,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
@@ -664,64 +524,28 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 15.w,
-              small: 20.w,
-              medium: 12.w,
-              large: 10.w,
-              ultrawide: 8.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_outlined,
-              size: context.iconSize('xl'),
-              color: Colors.grey[400],
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
+            child: Icon(Icons.account_balance_wallet_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
 
           Text(
             'No Principal Account Records Found',
-            style: GoogleFonts.inter(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
 
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
-              ),
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
               'Start by adding your first principal account entry to track all cash movements',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -741,10 +565,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

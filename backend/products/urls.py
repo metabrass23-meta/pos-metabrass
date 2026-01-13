@@ -31,4 +31,11 @@ urlpatterns = [
     
     # Product operations
     path('<uuid:product_id>/duplicate/', views.duplicate_product, name='duplicate_product'),
+    
+    # Real-time Inventory Management
+    path('check-stock/', views.check_stock_availability, name='check_stock_availability'),
+    path('reserve-stock/', views.reserve_stock_for_sale, name='reserve_stock_for_sale'),
+    path('confirm-stock-deduction/', views.confirm_stock_deduction, name='confirm_stock_deduction'),
+    path('low-stock-alerts/', views.get_low_stock_alerts, name='get_low_stock_alerts'),
+    path('bulk-update-stock/', views.bulk_update_stock, name='bulk_update_stock'),
 ]

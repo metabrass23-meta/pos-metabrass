@@ -35,4 +35,8 @@ urlpatterns = [
     path('today/', views.get_today_payments, name='get_today_payments'),
     path('this-month/', views.get_this_month_payments, name='get_this_month_payments'),
     path('this-year/', views.get_this_year_payments, name='get_this_year_payments'),
+    
+    # Payment processing endpoints
+    path('process/', views.process_payment, name='process_payment'),
+    path('split/', views.process_split_payment, name='process_split_payment'),
 ]

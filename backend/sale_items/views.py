@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from sales.models import SaleItem
-from sales.serializers import SaleItemSerializer, SaleItemListSerializer
+from .serializers import SaleItemSerializer, SaleItemListSerializer, SaleItemCreateSerializer, SaleItemUpdateSerializer
 
 
 @api_view(['GET'])
@@ -68,7 +68,6 @@ def get_sale_item(request, item_id):
 @permission_classes([IsAuthenticated])
 def create_sale_item(request):
     """Create a new sale item"""
-    from sales.serializers import SaleItemCreateSerializer
     
     serializer = SaleItemCreateSerializer(data=request.data)
     
@@ -103,7 +102,6 @@ def create_sale_item(request):
 @permission_classes([IsAuthenticated])
 def update_sale_item(request, item_id):
     """Update sale item"""
-    from sales.serializers import SaleItemUpdateSerializer
     
     try:
         sale_item = get_object_or_404(SaleItem, id=item_id, is_active=True)

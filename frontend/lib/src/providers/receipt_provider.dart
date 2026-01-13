@@ -1,0 +1,311 @@
+import 'package:flutter/foundation.dart';
+import '../models/sales/sale_model.dart';
+import '../services/receipt_service.dart';
+import '../utils/debug_helper.dart';
+
+class ReceiptProvider extends ChangeNotifier {
+  final ReceiptService _receiptService = ReceiptService();
+
+  // State variables
+  List<ReceiptModel> _receipts = [];
+  bool _isLoading = false;
+  String? _error;
+  String? _success;
+  Map<String, dynamic>? _pagination;
+
+  // Filter state
+  String? _selectedSaleId;
+  String? _selectedPaymentId;
+  String? _selectedStatus;
+  DateTime? _dateFrom;
+  DateTime? _dateTo;
+  bool _showInactive = false;
+
+  // Getters
+  List<ReceiptModel> get receipts => _receipts;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  String? get success => _success;
+  Map<String, dynamic>? get pagination => _pagination;
+
+  // Filter getters
+  String? get selectedSaleId => _selectedSaleId;
+  String? get selectedPaymentId => _selectedPaymentId;
+  String? get selectedStatus => _selectedStatus;
+  DateTime? get dateFrom => _dateFrom;
+  DateTime? get dateTo => _dateTo;
+  bool get showInactive => _showInactive;
+
+  // Computed properties
+  List<ReceiptModel> get generatedReceipts => _receipts.where((receipt) => receipt.status == 'GENERATED').toList();
+  List<ReceiptModel> get sentReceipts => _receipts.where((receipt) => receipt.status == 'SENT').toList();
+  List<ReceiptModel> get viewedReceipts => _receipts.where((receipt) => receipt.status == 'VIEWED').toList();
+  int get totalReceipts => _receipts.length;
+  int get unviewedCount => _receipts.where((receipt) => receipt.status != 'VIEWED').length;
+
+  /// Load receipts with current filters
+  Future<void> loadReceipts({bool refresh = false, int? page, int? pageSize}) async {
+    if (!refresh && _receipts.isNotEmpty) return;
+
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.listReceipts(
+        saleId: _selectedSaleId,
+        paymentId: _selectedPaymentId,
+        status: _selectedStatus,
+        dateFrom: _dateFrom?.toIso8601String(),
+        dateTo: _dateTo?.toIso8601String(),
+        showInactive: _showInactive,
+        page: page,
+        pageSize: pageSize,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        _receipts = (data['data'] as List<dynamic>).map((item) => ReceiptModel.fromJson(item as Map<String, dynamic>)).toList();
+        _pagination = data['pagination'] as Map<String, dynamic>?;
+        _setSuccess('Receipts loaded successfully');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      DebugHelper.printError('Load receipts in provider', e);
+      _setError('Failed to load receipts: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Create a new receipt
+  Future<bool> createReceipt({required String saleId, required String paymentId, String? notes}) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.createReceipt(saleId: saleId, paymentId: paymentId, notes: notes);
+
+      if (response.success && response.data != null) {
+        _receipts.insert(0, response.data!);
+        _setSuccess('Receipt created successfully');
+        notifyListeners();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      DebugHelper.printError('Create receipt in provider', e);
+      _setError('Failed to create receipt: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Update receipt
+  Future<bool> updateReceipt({required String id, String? notes, String? status}) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.updateReceipt(id: id, notes: notes, status: status);
+
+      if (response.success && response.data != null) {
+        final index = _receipts.indexWhere((receipt) => receipt.id == id);
+        if (index != -1) {
+          _receipts[index] = response.data!;
+          _setSuccess('Receipt updated successfully');
+          notifyListeners();
+          return true;
+        }
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      DebugHelper.printError('Update receipt in provider', e);
+      _setError('Failed to update receipt: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+    return false;
+  }
+
+  /// Generate PDF for receipt
+  Future<bool> generateReceiptPdf(String id) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.generateReceiptPdf(id);
+
+      if (response.success && response.data != null) {
+        // Update receipt status to GENERATED
+        final index = _receipts.indexWhere((receipt) => receipt.id == id);
+        if (index != -1) {
+          _receipts[index] = _receipts[index].copyWith(status: 'GENERATED');
+          _setSuccess('Receipt PDF generated successfully');
+          notifyListeners();
+          return true;
+        }
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      DebugHelper.printError('Generate receipt PDF in provider', e);
+      _setError('Failed to generate receipt PDF: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+    return false;
+  }
+
+  /// Get receipt by ID
+  ReceiptModel? getReceiptById(String id) {
+    try {
+      return _receipts.firstWhere((receipt) => receipt.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get receipts by sale ID
+  List<ReceiptModel> getReceiptsBySale(String saleId) {
+    return _receipts.where((receipt) => receipt.saleId == saleId).toList();
+  }
+
+  /// Get receipts by payment ID
+  List<ReceiptModel> getReceiptsByPayment(String paymentId) {
+    return _receipts.where((receipt) => receipt.paymentId == paymentId).toList();
+  }
+
+  /// Delete a receipt
+  Future<bool> deleteReceipt(String id) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.deleteReceipt(id);
+
+      if (response.success) {
+        _receipts.removeWhere((receipt) => receipt.id == id);
+        _setSuccess('Receipt deleted successfully');
+        notifyListeners();
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      DebugHelper.printError('Delete receipt in provider', e);
+      _setError('Failed to delete receipt: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Filter receipts by sale
+  void filterBySale(String? saleId) {
+    _selectedSaleId = saleId;
+    loadReceipts(refresh: true);
+  }
+
+  /// Filter receipts by payment
+  void filterByPayment(String? paymentId) {
+    _selectedPaymentId = paymentId;
+    loadReceipts(refresh: true);
+  }
+
+  /// Filter receipts by status
+  void filterByStatus(String? status) {
+    _selectedStatus = status;
+    loadReceipts(refresh: true);
+  }
+
+  /// Filter receipts by date range
+  void filterByDateRange(DateTime? from, DateTime? to) {
+    _dateFrom = from;
+    _dateTo = to;
+    loadReceipts(refresh: true);
+  }
+
+  /// Toggle inactive receipts
+  void toggleInactive(bool showInactive) {
+    _showInactive = showInactive;
+    loadReceipts(refresh: true);
+  }
+
+  /// Clear all filters
+  void clearFilters() {
+    _selectedSaleId = null;
+    _selectedPaymentId = null;
+    _selectedStatus = null;
+    _dateFrom = null;
+    _dateTo = null;
+    _showInactive = false;
+    loadReceipts(refresh: true);
+  }
+
+  /// Set filters for search and status
+  void setFilters({String? search, String? status}) {
+    if (search != null) {
+      // Implement search logic if needed
+      // For now, just reload receipts
+    }
+    if (status != null) {
+      _selectedStatus = status;
+    }
+    loadReceipts(refresh: true);
+  }
+
+  /// Initialize the provider
+  Future<void> initialize() async {
+    await loadReceipts();
+  }
+
+  /// Get filtered receipts based on current filters
+  List<ReceiptModel> get filteredReceipts {
+    List<ReceiptModel> filtered = _receipts;
+
+    if (_selectedStatus != null && _selectedStatus!.isNotEmpty) {
+      filtered = filtered.where((receipt) => receipt.status == _selectedStatus).toList();
+    }
+
+    return filtered;
+  }
+
+  /// Refresh receipts
+  Future<void> refresh() async {
+    await loadReceipts(refresh: true);
+  }
+
+  // Private helper methods
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String error) {
+    _error = error;
+    _success = null;
+    notifyListeners();
+  }
+
+  void _setSuccess(String success) {
+    _success = success;
+    _error = null;
+    notifyListeners();
+  }
+
+  void _clearMessages() {
+    _error = null;
+    _success = null;
+    notifyListeners();
+  }
+}

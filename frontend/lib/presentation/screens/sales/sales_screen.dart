@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/providers/sales_provider.dart';
+import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../widgets/sales/cart_sidebar.dart';
 import '../../widgets/sales/checkout_dialog.dart';
@@ -34,22 +35,14 @@ class _SalesPageState extends State<SalesPage> {
   }
 
   void _showCheckoutDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const CheckoutDialog(),
-    );
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const CheckoutDialog());
   }
 
   void _showSalesHistoryDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => _buildSalesHistoryDialog(),
-    );
+    showDialog(context: context, barrierDismissible: true, builder: (context) => _buildSalesHistoryDialog());
   }
 
-  void _handleViewSale(Sale sale) {
+  void _handleViewSale(SaleModel sale) {
     Navigator.of(context).pop(); // Close history dialog first
     showDialog(
       context: context,
@@ -57,7 +50,7 @@ class _SalesPageState extends State<SalesPage> {
     );
   }
 
-  void _handleEditSale(Sale sale) {
+  void _handleEditSale(SaleModel sale) {
     Navigator.of(context).pop(); // Close history dialog first
     showDialog(
       context: context,
@@ -65,7 +58,7 @@ class _SalesPageState extends State<SalesPage> {
     );
   }
 
-  void _handleDeleteSale(Sale sale) {
+  void _handleDeleteSale(SaleModel sale) {
     Navigator.of(context).pop(); // Close history dialog first
     showDialog(
       context: context,
@@ -91,10 +84,7 @@ class _SalesPageState extends State<SalesPage> {
                 _buildPOSHeader(),
                 _buildSearchAndFilters(),
                 Expanded(
-                  child: ProductGrid(
-                    searchQuery: _searchController.text,
-                    selectedCategory: _selectedCategory,
-                  ),
+                  child: ProductGrid(searchQuery: _searchController.text, selectedCategory: _selectedCategory),
                 ),
               ],
             ),
@@ -102,28 +92,12 @@ class _SalesPageState extends State<SalesPage> {
 
           // Cart Sidebar
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 25.w,
-              small: 40.w,
-              medium: 25.w,
-              large: 30.w,
-              ultrawide: 25.w,
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 25.w, small: 40.w, medium: 25.w, large: 30.w, ultrawide: 25.w),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: context.shadowBlur(),
-                  offset: Offset(-2, 0),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: context.shadowBlur(), offset: Offset(-2, 0))],
             ),
-            child: CartSidebar(
-              onCheckout: _showCheckoutDialog,
-              customerSearchController: _customerSearchController,
-            ),
+            child: CartSidebar(onCheckout: _showCheckoutDialog, customerSearchController: _customerSearchController),
           ),
         ],
       ),
@@ -139,29 +113,17 @@ class _SalesPageState extends State<SalesPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.screen_rotation_outlined,
-                size: 15.w,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 6.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'POS System requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(
-                  fontSize: 3.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -176,13 +138,7 @@ class _SalesPageState extends State<SalesPage> {
       padding: EdgeInsets.all(context.mainPadding),
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, 2))],
       ),
       child: Row(
         children: [
@@ -203,11 +159,7 @@ class _SalesPageState extends State<SalesPage> {
                   SizedBox(height: context.cardPadding / 4),
                   Text(
                     'Select products and manage sales transactions',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   ),
                 ],
               ],
@@ -229,35 +181,21 @@ class _SalesPageState extends State<SalesPage> {
               onTap: _showSalesHistoryDialog,
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.cardPadding / 2,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryMaroon.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: AppTheme.primaryMaroon.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.history_rounded,
-                      color: AppTheme.primaryMaroon,
-                      size: context.iconSize('medium'),
-                    ),
+                    Icon(Icons.history_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                     if (!context.isTablet) ...[
                       SizedBox(width: context.smallPadding),
                       Text(
                         'View History',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryMaroon,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                       ),
                     ],
                   ],
@@ -270,30 +208,17 @@ class _SalesPageState extends State<SalesPage> {
 
           // Current Time
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.lightGray.withOpacity(0.5), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Column(
               children: [
                 Text(
                   TimeOfDay.now().format(context),
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'Current Time',
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    color: Colors.grey[600],
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -309,37 +234,23 @@ class _SalesPageState extends State<SalesPage> {
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: context.iconSize('medium'),
-          ),
+          Icon(icon, color: color, size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 title,
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -352,31 +263,13 @@ class _SalesPageState extends State<SalesPage> {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: ResponsiveBreakpoints.responsive(
-          context,
-          tablet: 95.w,
-          small: 90.w,
-          medium: 85.w,
-          large: 80.w,
-          ultrawide: 75.w,
-        ),
-        height: ResponsiveBreakpoints.responsive(
-          context,
-          tablet: 90.h,
-          small: 85.h,
-          medium: 80.h,
-          large: 75.h,
-          ultrawide: 70.h,
-        ),
+        width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 85.w, large: 80.w, ultrawide: 75.w),
+        height: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 85.h, medium: 80.h, large: 75.h, ultrawide: 70.h),
         decoration: BoxDecoration(
           color: AppTheme.pureWhite,
           borderRadius: BorderRadius.circular(context.borderRadius('large')),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: context.shadowBlur('heavy'),
-              offset: Offset(0, context.cardPadding),
-            ),
+            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
           ],
         ),
         child: Column(
@@ -385,9 +278,7 @@ class _SalesPageState extends State<SalesPage> {
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-                ),
+                gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(context.borderRadius('large')),
                   topRight: Radius.circular(context.borderRadius('large')),
@@ -401,11 +292,7 @@ class _SalesPageState extends State<SalesPage> {
                       color: AppTheme.pureWhite.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                     ),
-                    child: Icon(
-                      Icons.history_rounded,
-                      color: AppTheme.pureWhite,
-                      size: context.iconSize('large'),
-                    ),
+                    child: Icon(Icons.history_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
                   ),
                   SizedBox(width: context.cardPadding),
                   Expanded(
@@ -450,19 +337,12 @@ class _SalesPageState extends State<SalesPage> {
                           child: Column(
                             children: [
                               Text(
-                                '${stats['totalSales']} Sales',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.captionFontSize,
-                                  color: AppTheme.pureWhite.withOpacity(0.8),
-                                ),
+                                '${stats?['total_sales'] ?? 0} Sales',
+                                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.pureWhite.withOpacity(0.8)),
                               ),
                               Text(
-                                'PKR ${stats['totalRevenue']}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.pureWhite,
-                                ),
+                                'PKR ${(stats?['total_revenue'] ?? 0).toStringAsFixed(0)}',
+                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                               ),
                             ],
                           ),
@@ -478,11 +358,7 @@ class _SalesPageState extends State<SalesPage> {
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
                         padding: EdgeInsets.all(context.smallPadding),
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: AppTheme.pureWhite,
-                          size: context.iconSize('medium'),
-                        ),
+                        child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       ),
                     ),
                   ),
@@ -491,21 +367,13 @@ class _SalesPageState extends State<SalesPage> {
             ),
 
             // Search and Filter Bar
-            Container(
-              padding: EdgeInsets.all(context.cardPadding),
-              color: AppTheme.lightGray.withOpacity(0.3),
-              child: _buildHistoryFilters(),
-            ),
+            Container(padding: EdgeInsets.all(context.cardPadding), color: AppTheme.lightGray.withOpacity(0.3), child: _buildHistoryFilters()),
 
             // Sales Table
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(context.cardPadding),
-                child: SalesTable(
-                  onView: _handleViewSale,
-                  onEdit: _handleEditSale,
-                  onDelete: _handleDeleteSale,
-                ),
+                child: SalesTable(onView: _handleViewSale, onEdit: _handleEditSale, onDelete: _handleDeleteSale),
               ),
             ),
           ],
@@ -527,36 +395,17 @@ class _SalesPageState extends State<SalesPage> {
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius()),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: context.shadowBlur('light'),
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur('light'), offset: Offset(0, 1))],
                 ),
                 child: TextField(
                   onChanged: (value) => provider.searchSales(value),
-                  style: GoogleFonts.inter(
-                    fontSize: context.bodyFontSize,
-                    color: AppTheme.charcoalGray,
-                  ),
+                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
                     hintText: 'Search sales by invoice, customer, phone...',
-                    hintStyle: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize * 0.9,
-                      color: Colors.grey[500],
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search_rounded,
-                      color: Colors.grey[500],
-                      size: context.iconSize('medium'),
-                    ),
+                    hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+                    prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: context.cardPadding / 2,
-                      vertical: context.cardPadding / 2,
-                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
                   ),
                 ),
               ),
@@ -586,10 +435,7 @@ class _SalesPageState extends State<SalesPage> {
                         value: status,
                         child: Text(
                           status,
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            color: AppTheme.charcoalGray,
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                         ),
                       );
                     }).toList(),
@@ -612,51 +458,32 @@ class _SalesPageState extends State<SalesPage> {
                           children: [
                             Icon(Icons.file_download_rounded, color: AppTheme.pureWhite),
                             SizedBox(width: context.smallPadding),
-                            Text(
-                              'Exporting sales data...',
-                              style: GoogleFonts.inter(color: AppTheme.pureWhite),
-                            ),
+                            Text('Exporting sales data...', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
                           ],
                         ),
                         backgroundColor: Colors.green,
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                       ),
                     );
                   },
                   borderRadius: BorderRadius.circular(context.borderRadius()),
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.cardPadding,
-                      vertical: context.cardPadding / 3,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 3),
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.borderRadius()),
-                      border: Border.all(
-                        color: Colors.green.withOpacity(0.3),
-                        width: 1,
-                      ),
+                      border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.file_download_rounded,
-                          color: Colors.green,
-                          size: context.iconSize('medium'),
-                        ),
+                        Icon(Icons.file_download_rounded, color: Colors.green, size: context.iconSize('medium')),
                         if (!context.isTablet) ...[
                           SizedBox(width: context.smallPadding),
                           Text(
                             'Export',
-                            style: GoogleFonts.inter(
-                              fontSize: context.bodyFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.green,
-                            ),
+                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                           ),
                         ],
                       ],
@@ -695,50 +522,27 @@ class _SalesPageState extends State<SalesPage> {
           decoration: BoxDecoration(
             color: AppTheme.pureWhite,
             borderRadius: BorderRadius.circular(context.borderRadius()),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: context.shadowBlur('light'),
-                offset: Offset(0, 1),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur('light'), offset: Offset(0, 1))],
           ),
           child: TextField(
             controller: _searchController,
             onChanged: (value) => setState(() {}),
-            style: GoogleFonts.inter(
-              fontSize: context.bodyFontSize,
-              color: AppTheme.charcoalGray,
-            ),
+            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
               hintText: 'Search products...',
-              hintStyle: GoogleFonts.inter(
-                fontSize: context.bodyFontSize * 0.9,
-                color: Colors.grey[500],
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.grey[500],
-                size: context.iconSize('medium'),
-              ),
+              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                    )
                   : null,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
             ),
           ),
         ),
@@ -766,17 +570,11 @@ class _SalesPageState extends State<SalesPage> {
                         onTap: () => setState(() => _selectedCategory = category),
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.cardPadding,
-                            vertical: context.smallPadding,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
                           decoration: BoxDecoration(
                             color: isSelected ? AppTheme.primaryMaroon : AppTheme.pureWhite,
                             borderRadius: BorderRadius.circular(context.borderRadius()),
-                            border: Border.all(
-                              color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300,
-                              width: 1,
-                            ),
+                            border: Border.all(color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300, width: 1),
                           ),
                           child: Text(
                             category,
@@ -810,50 +608,27 @@ class _SalesPageState extends State<SalesPage> {
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: context.shadowBlur('light'),
-                  offset: Offset(0, 1),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur('light'), offset: Offset(0, 1))],
             ),
             child: TextField(
               controller: _searchController,
               onChanged: (value) => setState(() {}),
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                color: AppTheme.charcoalGray,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: 'Search products by name, color, fabric...',
-                hintStyle: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize * 0.9,
-                  color: Colors.grey[500],
-                ),
-                prefixIcon: Icon(
-                  Icons.search_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('medium'),
-                ),
+                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+                prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    Icons.clear_rounded,
-                    color: Colors.grey[500],
-                    size: context.iconSize('small'),
-                  ),
-                )
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                      )
                     : null,
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding / 2,
-                  vertical: context.cardPadding / 2,
-                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
               ),
             ),
           ),
@@ -870,10 +645,7 @@ class _SalesPageState extends State<SalesPage> {
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: Colors.grey.shade300,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
             ),
             child: Consumer<SalesProvider>(
               builder: (context, provider, child) {
@@ -883,16 +655,17 @@ class _SalesPageState extends State<SalesPage> {
                     value: _selectedCategory,
                     isExpanded: true,
                     onChanged: (value) => setState(() => _selectedCategory = value ?? 'All'),
-                    items: categories.map((category) => DropdownMenuItem(
-                      value: category,
-                      child: Text(
-                        category,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          color: AppTheme.charcoalGray,
-                        ),
-                      ),
-                    )).toList(),
+                    items: categories
+                        .map(
+                          (category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(
+                              category,
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 );
               },
@@ -909,27 +682,16 @@ class _SalesPageState extends State<SalesPage> {
           decoration: BoxDecoration(
             color: AppTheme.accentGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(context.borderRadius()),
-            border: Border.all(
-              color: AppTheme.accentGold.withOpacity(0.3),
-              width: 1,
-            ),
+            border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.filter_list_rounded,
-                color: AppTheme.accentGold,
-                size: context.iconSize('medium'),
-              ),
+              Icon(Icons.filter_list_rounded, color: AppTheme.accentGold, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 'Filter',
-                style: GoogleFonts.inter(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.accentGold,
-                ),
+                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
               ),
             ],
           ),

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'sales'
@@ -12,6 +12,9 @@ urlpatterns = [
     path('<uuid:sale_id>/delete/', views.delete_sale, name='delete_sale'),
     path('<uuid:sale_id>/add-payment/', views.add_payment, name='add_payment'),
     path('<uuid:sale_id>/update-status/', views.update_status, name='update_status'),
+    
+    # Bulk operations
+    path('bulk-action/', views.bulk_action_sales, name='bulk_action_sales'),
     
     # Customer sales history
     path('by-customer/<uuid:customer_id>/', views.customer_sales_history, name='customer_sales_history'),
@@ -27,4 +30,21 @@ urlpatterns = [
     path('items/create/', views.create_sale_item, name='create_sale_item'),
     path('items/<uuid:item_id>/update/', views.update_sale_item, name='update_sale_item'),
     path('items/<uuid:item_id>/delete/', views.delete_sale_item, name='delete_sale_item'),
+    
+    # Invoice management endpoints
+    path('invoices/', views.list_invoices, name='list_invoices'),
+    path('invoices/create/', views.create_invoice, name='create_invoice'),
+    path('invoices/<uuid:invoice_id>/', views.get_invoice, name='get_invoice'),
+    path('invoices/<uuid:invoice_id>/update/', views.update_invoice, name='update_invoice'),
+    path('invoices/<uuid:invoice_id>/generate-pdf/', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    
+    # Receipt management endpoints
+    path('receipts/', views.list_receipts, name='list_receipts'),
+    path('receipts/create/', views.create_receipt, name='create_receipt'),
+    path('receipts/<uuid:receipt_id>/', views.get_receipt, name='get_receipt'),
+    path('receipts/<uuid:receipt_id>/update/', views.update_receipt, name='update_receipt'),
+    path('receipts/<uuid:receipt_id>/generate-pdf/', views.generate_receipt_pdf, name='generate_receipt_pdf'),
+    
+    # Return system endpoints
+    path('returns/', include('sales.return_urls')),
 ]

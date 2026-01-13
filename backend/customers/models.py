@@ -318,6 +318,40 @@ class Customer(models.Model):
         self.last_order_date = sale_date  # Reuse existing field
         self.save(update_fields=['last_order_date', 'updated_at'])
 
+    def update_sales_metrics(self):
+        """Update sales metrics for this customer"""
+        try:
+            # This method is called by sales signals to update customer metrics
+            # The metrics are already calculated via properties, so we just need to ensure
+            # the customer is saved to trigger any necessary updates
+            self.save(update_fields=['updated_at'])
+        except Exception as e:
+            # Log error but don't fail the operation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to update sales metrics for customer {self.name}: {str(e)}")
+
+    def update_credit_usage(self, credit_amount):
+        """Update customer credit usage when credit sale is created"""
+        try:
+            # This method is called by sales signals to update credit usage
+            # For now, we'll just log the credit usage
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(f"Credit usage updated for customer {self.name}: PKR {credit_amount:,.2f}")
+            
+            # You can extend this to track credit limits, payment history, etc.
+            # For example:
+            # if hasattr(self, 'credit_limit'):
+            #     self.credit_limit -= credit_amount
+            #     self.save(update_fields=['credit_limit', 'updated_at'])
+            
+        except Exception as e:
+            # Log error but don't fail the operation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to update credit usage for customer {self.name}: {str(e)}")
+
     # Enhanced Sales Integration Properties and Methods
     @property
     def average_sale_amount(self):

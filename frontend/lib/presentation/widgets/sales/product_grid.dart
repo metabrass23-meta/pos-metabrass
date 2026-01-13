@@ -30,22 +30,8 @@ class ProductGrid extends StatelessWidget {
           if (provider.isLoading) {
             return Center(
               child: SizedBox(
-                width: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 8.w,
-                  small: 6.w,
-                  medium: 5.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
-                height: ResponsiveBreakpoints.responsive(
-                  context,
-                  tablet: 8.w,
-                  small: 6.w,
-                  medium: 5.w,
-                  large: 4.w,
-                  ultrawide: 3.w,
-                ),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
+                height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
                 child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
               ),
             );
@@ -56,33 +42,12 @@ class ProductGrid extends StatelessWidget {
           }
 
           // Calculate fixed card width for horizontal scrolling
-          final cardWidth = ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 180.0,
-            small: 200.0,
-            medium: 220.0,
-            large: 240.0,
-            ultrawide: 260.0,
-          );
+          final cardWidth = ResponsiveBreakpoints.responsive(context, tablet: 180.0, small: 200.0, medium: 220.0, large: 240.0, ultrawide: 260.0);
 
-          final cardHeight = ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 240.0,
-            small: 320.0,
-            medium: 310.0,
-            large: 310.0,
-            ultrawide: 340.0,
-          );
+          final cardHeight = ResponsiveBreakpoints.responsive(context, tablet: 240.0, small: 320.0, medium: 310.0, large: 310.0, ultrawide: 340.0);
 
           // Calculate how many rows we need based on products
-          final productsPerRow = ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 3,
-            small: 4,
-            medium: 5,
-            large: 6,
-            ultrawide: 7,
-          );
+          final productsPerRow = ResponsiveBreakpoints.responsive(context, tablet: 3, small: 4, medium: 5, large: 6, ultrawide: 7);
 
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -99,11 +64,7 @@ class ProductGrid extends StatelessWidget {
                 itemCount: filteredProducts.length,
                 itemBuilder: (context, index) {
                   final product = filteredProducts[index];
-                  return SizedBox(
-                    width: cardWidth,
-                    height: cardHeight,
-                    child: _buildEnhancedProductCard(context, product, provider),
-                  );
+                  return SizedBox(width: cardWidth, height: cardHeight, child: _buildEnhancedProductCard(context, product, provider));
                 },
               ),
             ),
@@ -146,13 +107,7 @@ class ProductGrid extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
       ),
       child: Material(
         color: Colors.transparent,
@@ -171,25 +126,15 @@ class ProductGrid extends StatelessWidget {
                     children: [
                       Container(
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              _getCategoryIcon(product.fabric),
-                              size: context.iconSize('xl'),
-                              color: Colors.grey[400],
-                            ),
+                            Icon(_getCategoryIcon(product.fabric), size: context.iconSize('xl'), color: Colors.grey[400]),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               product.fabric,
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize,
-                                color: Colors.grey[500],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[500]),
                             ),
                           ],
                         ),
@@ -211,10 +156,7 @@ class ProductGrid extends StatelessWidget {
                                   onTap: () => _showDiscountDialog(context, product, provider),
                                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: context.smallPadding / 2,
-                                      vertical: context.smallPadding / 4,
-                                    ),
+                                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                                     decoration: BoxDecoration(
                                       color: Colors.orange.withOpacity(0.9),
                                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -222,11 +164,7 @@ class ProductGrid extends StatelessWidget {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(
-                                          Icons.local_offer_rounded,
-                                          color: AppTheme.pureWhite,
-                                          size: context.iconSize('small') * 0.8,
-                                        ),
+                                        Icon(Icons.local_offer_rounded, color: AppTheme.pureWhite, size: context.iconSize('small') * 0.8),
                                         SizedBox(width: 2),
                                         Text(
                                           '%',
@@ -244,10 +182,7 @@ class ProductGrid extends StatelessWidget {
 
                               // Stock Status Badge
                               Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: context.smallPadding / 2,
-                                  vertical: context.smallPadding / 4,
-                                ),
+                                padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                                 decoration: BoxDecoration(
                                   color: product.stockStatusColor,
                                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -283,19 +218,11 @@ class ProductGrid extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: context.iconSize('large'),
-                                  color: AppTheme.pureWhite,
-                                ),
+                                Icon(Icons.inventory_2_outlined, size: context.iconSize('large'), color: AppTheme.pureWhite),
                                 SizedBox(height: context.smallPadding / 2),
                                 Text(
                                   'Out of Stock',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.captionFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.pureWhite,
-                                  ),
+                                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                                 ),
                               ],
                             ),
@@ -330,10 +257,7 @@ class ProductGrid extends StatelessWidget {
                           ),
                           if (!isOutOfStock)
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: context.smallPadding / 3,
-                                vertical: 1,
-                              ),
+                              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 3, vertical: 1),
                               decoration: BoxDecoration(
                                 color: _getCategoryColor(product.fabric).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -368,20 +292,13 @@ class ProductGrid extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '${product.color} • ${product.pieces.length} pcs',
-                              style: GoogleFonts.inter(
-                                fontSize: context.captionFontSize * 0.9,
-                                color: Colors.grey[600],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.captionFontSize * 0.9, color: Colors.grey[600]),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (_isCustomizable(product))
-                            Icon(
-                              Icons.tune_rounded,
-                              size: context.iconSize('small') * 0.8,
-                              color: AppTheme.primaryMaroon,
-                            ),
+                            Icon(Icons.tune_rounded, size: context.iconSize('small') * 0.8, color: AppTheme.primaryMaroon),
                         ],
                       ),
 
@@ -435,11 +352,7 @@ class ProductGrid extends StatelessWidget {
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.add_shopping_cart_rounded,
-                                          size: context.iconSize('small'),
-                                          color: AppTheme.primaryMaroon,
-                                        ),
+                                        Icon(Icons.add_shopping_cart_rounded, size: context.iconSize('small'), color: AppTheme.primaryMaroon),
                                         SizedBox(width: context.smallPadding / 3),
                                         Text(
                                           'Add',
@@ -470,11 +383,7 @@ class ProductGrid extends StatelessWidget {
                                     color: Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                   ),
-                                  child: Icon(
-                                    Icons.more_horiz_rounded,
-                                    size: context.iconSize('small'),
-                                    color: Colors.grey[600],
-                                  ),
+                                  child: Icon(Icons.more_horiz_rounded, size: context.iconSize('small'), color: Colors.grey[600]),
                                 ),
                               ),
                             ),
@@ -485,21 +394,14 @@ class ProductGrid extends StatelessWidget {
                       if (isLowStock)
                         Container(
                           margin: EdgeInsets.only(top: context.smallPadding / 2),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.smallPadding / 2,
-                            vertical: context.smallPadding / 4,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(context.borderRadius('small')),
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.warning_amber_rounded,
-                                size: context.iconSize('small') * 0.8,
-                                color: Colors.orange[700],
-                              ),
+                              Icon(Icons.warning_amber_rounded, size: context.iconSize('small') * 0.8, color: Colors.orange[700]),
                               SizedBox(width: context.smallPadding / 3),
                               Text(
                                 'Low Stock',
@@ -535,30 +437,16 @@ class ProductGrid extends StatelessWidget {
         onTap: () => _showExistingOrdersDialog(context, product, provider),
         borderRadius: BorderRadius.circular(context.borderRadius('small')),
         child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.smallPadding / 2,
-            vertical: context.smallPadding / 4,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          ),
+          padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.9), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.assignment_rounded,
-                color: AppTheme.pureWhite,
-                size: context.iconSize('small') * 0.8,
-              ),
+              Icon(Icons.assignment_rounded, color: AppTheme.pureWhite, size: context.iconSize('small') * 0.8),
               SizedBox(width: 2),
               Text(
                 _getExistingOrderCount(product, provider).toString(),
-                style: GoogleFonts.inter(
-                  fontSize: context.captionFontSize * 0.7,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.pureWhite,
-                ),
+                style: GoogleFonts.inter(fontSize: context.captionFontSize * 0.7, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
               ),
             ],
           ),
@@ -573,64 +461,30 @@ class ProductGrid extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 8.w,
-              small: 8.w,
-              medium: 6.w,
-              large: 5.w,
-              ultrawide: 4.w,
-            ),
-            height: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 8.w,
-              small: 8.w,
-              medium: 6.w,
-              large: 5.w,
-              ultrawide: 4.w,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray,
-              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
-            ),
+            width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 8.w, medium: 6.w, large: 5.w, ultrawide: 4.w),
+            height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 8.w, medium: 6.w, large: 5.w, ultrawide: 4.w),
+            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
             child: Icon(Icons.inventory_2_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
           ),
 
           SizedBox(height: context.mainPadding),
 
           Text(
-            searchQuery.isNotEmpty || selectedCategory != 'All'
-                ? 'No Products Found'
-                : 'No Products Available',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: context.headerFontSize * 0.8,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.charcoalGray,
-            ),
+            searchQuery.isNotEmpty || selectedCategory != 'All' ? 'No Products Found' : 'No Products Available',
+            style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
 
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 80.w,
-                small: 70.w,
-                medium: 60.w,
-                large: 50.w,
-                ultrawide: 40.w,
-              ),
+              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
               searchQuery.isNotEmpty || selectedCategory != 'All'
                   ? 'Try adjusting your search or filter criteria'
                   : 'Add products to your inventory to start selling',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -645,10 +499,7 @@ class ProductGrid extends StatelessWidget {
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding,
-                    vertical: context.cardPadding / 2,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppTheme.primaryMaroon, width: 1),
                     borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -656,19 +507,11 @@ class ProductGrid extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.clear_all_rounded,
-                        color: AppTheme.primaryMaroon,
-                        size: context.iconSize('medium'),
-                      ),
+                      Icon(Icons.clear_all_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
                         'Clear Filters',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryMaroon,
-                        ),
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                       ),
                     ],
                   ),
@@ -818,7 +661,7 @@ class ProductGrid extends StatelessWidget {
 
   // Action Methods
   void _quickAddToCart(BuildContext context, Product product, SalesProvider provider) {
-    provider.addToCart(product, 1);
+    provider.addToCartWithCustomization(productId: product.id, productName: product.name, unitPrice: product.price, quantity: 1);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -826,10 +669,7 @@ class ProductGrid extends StatelessWidget {
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
             SizedBox(width: context.smallPadding),
             Expanded(
-              child: Text(
-                '${product.name} added to cart',
-                style: GoogleFonts.inter(color: AppTheme.pureWhite),
-              ),
+              child: Text('${product.name} added to cart', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
             ),
           ],
         ),
@@ -935,24 +775,13 @@ class _DiscountDialogState extends State<DiscountDialog> {
       backgroundColor: Colors.transparent,
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 85.w,
-            small: 75.w,
-            medium: 65.w,
-            large: 55.w,
-            ultrawide: 45.w,
-          ),
+          maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 75.w, medium: 65.w, large: 55.w, ultrawide: 45.w),
         ),
         decoration: BoxDecoration(
           color: AppTheme.pureWhite,
           borderRadius: BorderRadius.circular(context.borderRadius('large')),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: context.shadowBlur('heavy'),
-              offset: Offset(0, context.cardPadding),
-            ),
+            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
           ],
         ),
         child: Column(
@@ -976,11 +805,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       color: AppTheme.pureWhite.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                     ),
-                    child: Icon(
-                      Icons.local_offer_rounded,
-                      color: AppTheme.pureWhite,
-                      size: context.iconSize('large'),
-                    ),
+                    child: Icon(Icons.local_offer_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
                   ),
                   SizedBox(width: context.cardPadding),
                   Expanded(
@@ -997,10 +822,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                         ),
                         Text(
                           widget.product.name,
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            color: AppTheme.pureWhite.withOpacity(0.9),
-                          ),
+                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1014,11 +836,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
                         padding: EdgeInsets.all(context.smallPadding),
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: AppTheme.pureWhite,
-                          size: context.iconSize('medium'),
-                        ),
+                        child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       ),
                     ),
                   ),
@@ -1035,11 +853,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                   // Quick Discount Buttons
                   Text(
                     'Quick Discounts',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.charcoalGray,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   Row(
@@ -1066,11 +880,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                 ),
                                 child: Text(
                                   '$discount%',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.captionFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.orange[700],
-                                  ),
+                                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -1098,10 +908,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                           children: [
                             Text(
                               'Original Price:',
-                              style: GoogleFonts.inter(
-                                fontSize: context.subtitleFontSize,
-                                color: AppTheme.charcoalGray,
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                             ),
                             Text(
                               'PKR ${widget.product.price.toStringAsFixed(0)}',
@@ -1121,18 +928,11 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             children: [
                               Text(
                                 'Discount:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  color: Colors.orange[700],
-                                ),
+                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                               ),
                               Text(
                                 '- PKR ${_calculatedDiscount.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.subtitleFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange[700],
-                                ),
+                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                               ),
                             ],
                           ),
@@ -1144,19 +944,11 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             children: [
                               Text(
                                 'Final Price:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.charcoalGray,
-                                ),
+                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                               ),
                               Text(
                                 'PKR ${discountedPrice.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.green[700],
-                                ),
+                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
                               ),
                             ],
                           ),
@@ -1185,11 +977,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                 padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
                                 child: Text(
                                   'Cancel',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
+                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -1211,10 +999,13 @@ class _DiscountDialogState extends State<DiscountDialog> {
                               onTap: _calculatedDiscount > 0
                                   ? () {
                                       // Apply discount and add to cart
-                                      Provider.of<SalesProvider>(
-                                        context,
-                                        listen: false,
-                                      ).addToCartWithDiscount(widget.product, 1, _calculatedDiscount);
+                                      Provider.of<SalesProvider>(context, listen: false).addToCartWithCustomization(
+                                        productId: widget.product.id,
+                                        productName: widget.product.name,
+                                        unitPrice: widget.product.price,
+                                        quantity: 1,
+                                        itemDiscount: _calculatedDiscount,
+                                      );
                                       Navigator.of(context).pop();
 
                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -1233,11 +1024,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
-                                      Icons.add_shopping_cart_rounded,
-                                      color: AppTheme.pureWhite,
-                                      size: context.iconSize('medium'),
-                                    ),
+                                    Icon(Icons.add_shopping_cart_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                                     SizedBox(width: context.smallPadding),
                                     Text(
                                       'Add with Discount',

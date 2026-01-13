@@ -1,5 +1,7 @@
-from django.contrib import admin
-# SaleItem is already registered in sales/admin.py
-# This file exists for app structure consistency only
+# Sale Items admin is defined in the sales app
+# This file exists for app structure consistency and backward compatibility
 
-# No admin registration needed here - SaleItem is managed by sales app
+from sales.admin import SaleItemAdmin
+
+# Re-export admin for backward compatibility
+__all__ = ['SaleItemAdmin']

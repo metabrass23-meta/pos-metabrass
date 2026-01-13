@@ -3,18 +3,17 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import '../globals/drop_down.dart';
 
 class EditPaymentDialog extends StatefulWidget {
-  final Payment payment;
+  final PaymentModel payment;
 
-  const EditPaymentDialog({
-    super.key,
-    required this.payment,
-  });
+  const EditPaymentDialog({super.key, required this.payment});
 
   @override
   State<EditPaymentDialog> createState() => _EditPaymentDialogState();
@@ -46,26 +45,20 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
     _bonusController = TextEditingController(text: widget.payment.bonus > 0 ? widget.payment.bonus.toString() : '');
     _deductionController = TextEditingController(text: widget.payment.deduction > 0 ? widget.payment.deduction.toString() : '');
     _descriptionController = TextEditingController(text: widget.payment.description);
-    _selectedLaborId = widget.payment.laborId;
+    _selectedLaborId = widget.payment.laborId ?? '';
     _selectedPaymentMethod = widget.payment.paymentMethod;
-    _selectedPaymentMonth = widget.payment.paymentMonth;
+    _selectedPaymentMonth = '${widget.payment.paymentMonth.day}/${widget.payment.paymentMonth.month}/${widget.payment.paymentMonth.year}';
+    debugPrint('EditPaymentDialog: API month: ${widget.payment.paymentMonth}, converted to: $_selectedPaymentMonth');
     _selectedDate = widget.payment.date;
-    _selectedTime = widget.payment.time;
+    _selectedTime = TimeOfDay(hour: widget.payment.time.hour, minute: widget.payment.time.minute);
     _isFinalPayment = widget.payment.isFinalPayment;
     _receiptImagePath = widget.payment.receiptImagePath;
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
   }
@@ -83,10 +76,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
   void _handleUpdate() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<PaymentProvider>(context, listen: false);
-      final selectedLabor = provider.laborers.firstWhere(
-            (labor) => labor.id == _selectedLaborId,
-        orElse: () => provider.laborers.first,
-      );
+      final selectedLabor = provider.laborers.firstWhere((labor) => labor.id == _selectedLaborId, orElse: () => provider.laborers.first);
 
       final amount = double.parse(_amountController.text.trim());
       final bonus = double.tryParse(_bonusController.text.trim()) ?? 0.0;
@@ -94,8 +84,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       final netAmount = amount + bonus - deduction;
 
       // Calculate available amount considering the current payment being edited
-      final availableAmount = selectedLabor.remainingAmount +
-          (selectedLabor.id == widget.payment.laborId ? widget.payment.netAmount : 0);
+      final availableAmount = selectedLabor.remainingAmount + (selectedLabor.id == widget.payment.laborId ? widget.payment.netAmount : 0);
 
       if (netAmount > availableAmount && !_isFinalPayment) {
         _showErrorSnackbar('Net amount cannot exceed available amount of PKR ${availableAmount.toStringAsFixed(0)}');
@@ -105,16 +94,21 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       await provider.updatePayment(
         id: widget.payment.id,
         laborId: _selectedLaborId,
+        vendorId: null, // Add vendorId parameter
+        orderId: null, // Add orderId parameter
+        saleId: null, // Add saleId parameter
         amountPaid: amount,
         bonus: bonus,
         deduction: deduction,
-        paymentMonth: _selectedPaymentMonth,
+        paymentMonth: _parseDisplayMonthToDateTime(_selectedPaymentMonth),
         isFinalPayment: _isFinalPayment,
         paymentMethod: _selectedPaymentMethod,
         description: _descriptionController.text.trim(),
         date: _selectedDate,
-        time: _selectedTime,
+        time: DateTime(2024, 1, 1, _selectedTime.hour, _selectedTime.minute),
         receiptImagePath: _receiptImagePath,
+        payerType: 'labor', // Add payerType parameter
+        payerId: _selectedLaborId, // Add payerId parameter
       );
 
       if (mounted) {
@@ -129,28 +123,18 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               'Payment updated successfully!',
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -160,28 +144,18 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error_rounded,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
+            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -200,11 +174,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       lastDate: DateTime.now().add(const Duration(days: 30)),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
+          data: Theme.of(context).copyWith(colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.primaryMaroon)),
           child: child!,
         );
       },
@@ -222,11 +192,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       initialTime: _selectedTime,
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppTheme.primaryMaroon,
-            ),
-          ),
+          data: Theme.of(context).copyWith(colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.primaryMaroon)),
           child: child!,
         );
       },
@@ -241,8 +207,12 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
   List<String> _generatePaymentMonths() {
     final List<String> months = [];
     final now = DateTime.now();
-    final monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
+    final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Add previous year months (to handle cases where API has old data)
+    for (int i = 0; i < 12; i++) {
+      months.add('${monthNames[i]} ${now.year - 1}');
+    }
 
     // Add current year months
     for (int i = 0; i < 12; i++) {
@@ -254,20 +224,56 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       months.add('${monthNames[i]} ${now.year + 1}');
     }
 
+    debugPrint('EditPaymentDialog: Generated months: ${months.take(5).toList()}... (total: ${months.length})');
     return months;
+  }
+
+  String _convertApiMonthToDisplay(String apiMonth) {
+    try {
+      final parts = apiMonth.split('-');
+      if (parts.length == 3) {
+        final year = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        return '${monthNames[month - 1]} $year';
+      }
+    } catch (e) {
+      debugPrint('Error converting API month format: $e');
+    }
+    // Generate a fallback based on current date
+    final now = DateTime.now();
+    final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return '${monthNames[now.month - 1]} ${now.year}';
+  }
+
+  String _convertDisplayMonthToApi(String displayMonth) {
+    try {
+      final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      final parts = displayMonth.split(' ');
+      if (parts.length == 2) {
+        final monthName = parts[0];
+        final year = int.parse(parts[1]);
+        final monthIndex = monthNames.indexOf(monthName);
+        if (monthIndex != -1) {
+          final month = monthIndex + 1;
+          return '${year.toString().padLeft(4, '0')}-${month.toString().padLeft(2, '0')}-01';
+        }
+      }
+    } catch (e) {
+      debugPrint('Error converting display month format: $e');
+    }
+    // Generate a fallback based on current date
+    final now = DateTime.now();
+    return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-01';
   }
 
   void _selectReceiptImage() {
     setState(() {
       _receiptImagePath = 'receipt_${DateTime.now().millisecondsSinceEpoch}.jpg';
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Receipt image selected'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Receipt image selected'), backgroundColor: Colors.green, duration: const Duration(seconds: 2)));
   }
 
   void _removeReceiptImage() {
@@ -296,14 +302,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 95.w,
-                    small: 85.w,
-                    medium: 75.w,
-                    large: 65.w,
-                    ultrawide: 55.w,
-                  ),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -311,11 +310,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: context.shadowBlur('heavy'),
-                      offset: Offset(0, context.cardPadding),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -339,11 +334,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: true))),
       ],
     );
   }
@@ -353,11 +344,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: true),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: true))),
       ],
     );
   }
@@ -367,11 +354,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(
-          child: SingleChildScrollView(
-            child: _buildFormContent(isCompact: false),
-          ),
-        ),
+        Flexible(child: SingleChildScrollView(child: _buildFormContent(isCompact: false))),
       ],
     );
   }
@@ -380,9 +363,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-        ),
+        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -392,15 +373,8 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Icon(
-              Icons.edit_outlined,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('large'),
-            ),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -431,21 +405,11 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.smallPadding,
-              vertical: context.smallPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.pureWhite,
-              ),
+              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -456,11 +420,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(
-                  Icons.close_rounded,
-                  color: AppTheme.pureWhite,
-                  size: context.iconSize('medium'),
-                ),
+                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -479,51 +439,19 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
           children: [
             Consumer<PaymentProvider>(
               builder: (context, provider, child) {
-                return DropdownButtonFormField<String>(
+                return PremiumDropdownField<String>(
+                  label: 'Labor',
+                  hint: 'Select labor for payment',
                   value: _selectedLaborId,
-                  isDense: false,
-                  decoration: InputDecoration(
-                    labelText: 'Labor',
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-                    prefixIcon: Icon(Icons.person_outline, size: context.iconSize('medium')),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 20,
-                        small: 22,
-                        medium: 24,
-                        large: 26,
-                        ultrawide: 28,
-                      ),
-                      horizontal: 16,
-                    ),
-                  ),
+                  prefixIcon: Icons.person_outline,
                   items: provider.laborers
-                      .map((labor) => DropdownMenuItem<String>(
-                    value: labor.id,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${labor.name} - ${labor.role}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      .map(
+                        (labor) => DropdownItem<String>(
+                          value: labor.id,
+                          label:
+                              '${labor.name} - ${labor.role} (Available: PKR ${(labor.remainingAmount + (labor.id == widget.payment.laborId ? widget.payment.netAmount : 0)).toStringAsFixed(0)})',
                         ),
-                        Text(
-                          'Available: PKR ${(labor.remainingAmount + (labor.id == widget.payment.laborId ? widget.payment.netAmount : 0)).toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            color: labor.remainingAmount <= 0 ? Colors.red : Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ))
+                      )
                       .toList(),
                   onChanged: (laborId) {
                     setState(() => _selectedLaborId = laborId!);
@@ -536,44 +464,34 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
             Row(
               children: [
                 Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedPaymentMonth,
-                    decoration: InputDecoration(
-                      labelText: 'Payment Month',
-                      labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-                      prefixIcon: Icon(Icons.calendar_month, size: context.iconSize('medium')),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                      ),
-                    ),
-                    items: _generatePaymentMonths().map((month) => DropdownMenuItem<String>(
-                      value: month,
-                      child: Text(month, style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
-                    )).toList(),
-                    onChanged: (month) {
-                      setState(() {
-                        _selectedPaymentMonth = month!;
-                      });
+                  child: Builder(
+                    builder: (context) {
+                      final months = _generatePaymentMonths();
+                      debugPrint('EditPaymentDialog: Dropdown value: $_selectedPaymentMonth, available months: ${months.take(5).toList()}...');
+                      return PremiumDropdownField<String>(
+                        label: 'Payment Month',
+                        hint: 'Select payment month',
+                        value: _selectedPaymentMonth,
+                        prefixIcon: Icons.calendar_month,
+                        items: months.map((month) => DropdownItem<String>(value: month, label: month)).toList(),
+                        onChanged: (month) {
+                          setState(() {
+                            _selectedPaymentMonth = month!;
+                          });
+                        },
+                        validator: (value) => value == null ? 'Please select payment month' : null,
+                      );
                     },
-                    validator: (value) => value == null ? 'Please select payment month' : null,
                   ),
                 ),
                 SizedBox(width: context.cardPadding),
                 Expanded(
-                  child: DropdownButtonFormField<String>(
+                  child: PremiumDropdownField<String>(
+                    label: 'Payment Method',
+                    hint: 'Select payment method',
                     value: _selectedPaymentMethod,
-                    decoration: InputDecoration(
-                      labelText: 'Payment Method',
-                      labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-                      prefixIcon: Icon(Icons.payment, size: context.iconSize('medium')),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                      ),
-                    ),
-                    items: PaymentProvider.paymentMethods.map((method) => DropdownMenuItem<String>(
-                      value: method,
-                      child: Text(method, style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
-                    )).toList(),
+                    prefixIcon: Icons.payment,
+                    items: PaymentProvider().paymentMethods.map((method) => DropdownItem<String>(value: method, label: method)).toList(),
                     onChanged: (method) {
                       setState(() {
                         _selectedPaymentMethod = method!;
@@ -639,26 +557,18 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                 ),
               ],
             ),
-            if (_amountController.text.isNotEmpty ||
-                _bonusController.text.isNotEmpty ||
-                _deductionController.text.isNotEmpty) ...[
+            if (_amountController.text.isNotEmpty || _bonusController.text.isNotEmpty || _deductionController.text.isNotEmpty) ...[
               SizedBox(height: context.cardPadding),
               Container(
                 padding: EdgeInsets.all(context.cardPadding),
                 decoration: BoxDecoration(
                   color: netAmount >= 0 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: netAmount >= 0 ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: netAmount >= 0 ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.calculate_rounded,
-                      color: netAmount >= 0 ? Colors.green : Colors.red,
-                      size: context.iconSize('medium'),
-                    ),
+                    Icon(Icons.calculate_rounded, color: netAmount >= 0 ? Colors.green : Colors.red, size: context.iconSize('medium')),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
@@ -680,14 +590,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
               hint: isCompact ? 'Enter notes' : 'Enter payment description or notes',
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
-              maxLines: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 2,
-                small: 3,
-                medium: 4,
-                large: 5,
-                ultrawide: 6,
-              ),
+              maxLines: ResponsiveBreakpoints.responsive(context, tablet: 2, small: 3, medium: 4, large: 5, ultrawide: 6),
               validator: (value) {
                 if (value?.isEmpty ?? true) return 'Please enter description';
                 if (value!.length < 5) return 'Description must be at least 5 characters';
@@ -703,8 +606,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                     child: PremiumTextField(
                       label: 'Date',
                       hint: 'Select date',
-                      controller: TextEditingController(
-                          text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
+                      controller: TextEditingController(text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
                       prefixIcon: Icons.calendar_today,
                       enabled: false,
                     ),
@@ -718,7 +620,8 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                       label: 'Time',
                       hint: 'Select time',
                       controller: TextEditingController(
-                          text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}'),
+                        text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
+                      ),
                       prefixIcon: Icons.access_time,
                       enabled: false,
                     ),
@@ -732,9 +635,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
               decoration: BoxDecoration(
                 color: _isFinalPayment ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(context.borderRadius()),
-                border: Border.all(
-                  color: _isFinalPayment ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3),
-                ),
+                border: Border.all(color: _isFinalPayment ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
@@ -757,13 +658,8 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                           ),
                         ),
                         Text(
-                          _isFinalPayment
-                              ? 'This completes the payment for the selected month'
-                              : 'Mark this as the final payment for the month',
-                          style: GoogleFonts.inter(
-                            fontSize: context.captionFontSize,
-                            color: _isFinalPayment ? Colors.green[700] : Colors.grey[600],
-                          ),
+                          _isFinalPayment ? 'This completes the payment for the selected month' : 'Mark this as the final payment for the month',
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: _isFinalPayment ? Colors.green[700] : Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -792,11 +688,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                 children: [
                   Text(
                     'Receipt Image (Optional)',
-                    style: GoogleFonts.inter(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.charcoalGray,
-                    ),
+                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   if (_receiptImagePath == null) ...[
@@ -812,18 +704,11 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                         ),
                         child: Column(
                           children: [
-                            Icon(
-                              Icons.add_photo_alternate_outlined,
-                              size: context.iconSize('xl'),
-                              color: Colors.grey[600],
-                            ),
+                            Icon(Icons.add_photo_alternate_outlined, size: context.iconSize('xl'), color: Colors.grey[600]),
                             SizedBox(height: context.smallPadding),
                             Text(
                               'Tap to select receipt image',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                color: Colors.grey[600],
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -839,29 +724,17 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.receipt_rounded,
-                            color: Colors.green,
-                            size: context.iconSize('medium'),
-                          ),
+                          Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Expanded(
                             child: Text(
                               'Receipt image selected',
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green,
-                              ),
+                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                             ),
                           ),
                           IconButton(
                             onPressed: _removeReceiptImage,
-                            icon: Icon(
-                              Icons.close_rounded,
-                              color: Colors.red,
-                              size: context.iconSize('small'),
-                            ),
+                            icon: Icon(Icons.close_rounded, color: Colors.red, size: context.iconSize('small')),
                           ),
                         ],
                       ),
@@ -944,5 +817,18 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
         ),
       ],
     );
+  }
+
+  DateTime _parseDisplayMonthToDateTime(String displayMonth) {
+    // Parse DD/MM/YYYY format to DateTime
+    final parts = displayMonth.split('/');
+    if (parts.length == 3) {
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    }
+    // Fallback to current date if parsing fails
+    return DateTime.now();
   }
 }

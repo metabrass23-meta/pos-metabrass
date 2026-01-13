@@ -1,314 +1,23 @@
 import 'package:flutter/material.dart';
+import '../models/payment/payment_model.dart';
+import '../models/payment/payment_request_models.dart';
+import '../models/payment/payment_response_models.dart';
 import '../services/payment_service.dart';
 import '../services/labor/labor_service.dart';
-
-class Payment {
-  final String id;
-  final String? laborId;
-  final String? vendorId;
-  final String? orderId;
-  final String? saleId;
-  final String? laborName;
-  final String? laborPhone;
-  final String? laborRole;
-  final String? vendorName;
-  final double amountPaid;
-  final double bonus;
-  final double deduction;
-  final String paymentMonth;
-  final bool isFinalPayment;
-  final String paymentMethod;
-  final String description;
-  final DateTime date;
-  final TimeOfDay time;
-  final String? receiptImagePath;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String payerType;
-  final String? payerId;
-  final bool isActive;
-
-  Payment({
-    required this.id,
-    this.laborId,
-    this.vendorId,
-    this.orderId,
-    this.saleId,
-    this.laborName,
-    this.laborPhone,
-    this.laborRole,
-    this.vendorName,
-    required this.amountPaid,
-    this.bonus = 0.0,
-    this.deduction = 0.0,
-    required this.paymentMonth,
-    this.isFinalPayment = false,
-    required this.paymentMethod,
-    required this.description,
-    required this.date,
-    required this.time,
-    this.receiptImagePath,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.payerType,
-    this.payerId,
-    this.isActive = true,
-  });
-
-  Payment copyWith({
-    String? id,
-    String? laborId,
-    String? vendorId,
-    String? orderId,
-    String? saleId,
-    String? laborName,
-    String? laborPhone,
-    String? laborRole,
-    String? vendorName,
-    double? amountPaid,
-    double? bonus,
-    double? deduction,
-    String? paymentMonth,
-    bool? isFinalPayment,
-    String? paymentMethod,
-    String? description,
-    DateTime? date,
-    TimeOfDay? time,
-    String? receiptImagePath,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    String? payerType,
-    String? payerId,
-    bool? isActive,
-  }) {
-    return Payment(
-      id: id ?? this.id,
-      laborId: laborId ?? this.laborId,
-      vendorId: vendorId ?? this.vendorId,
-      orderId: orderId ?? this.orderId,
-      saleId: saleId ?? this.saleId,
-      laborName: laborName ?? this.laborName,
-      vendorName: vendorName ?? this.vendorName,
-      laborPhone: laborPhone ?? this.laborPhone,
-      laborRole: laborRole ?? this.laborRole,
-      amountPaid: amountPaid ?? this.amountPaid,
-      bonus: bonus ?? this.bonus,
-      deduction: deduction ?? this.deduction,
-      paymentMonth: paymentMonth ?? this.paymentMonth,
-      isFinalPayment: isFinalPayment ?? this.isFinalPayment,
-      paymentMethod: paymentMethod ?? this.paymentMethod,
-      description: description ?? this.description,
-      date: date ?? this.date,
-      time: time ?? this.time,
-      receiptImagePath: receiptImagePath ?? this.receiptImagePath,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      payerType: payerType ?? this.payerType,
-      payerId: payerId ?? this.payerId,
-      isActive: isActive ?? this.isActive,
-    );
-  }
-
-  String get timeText => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-
-  String get dateTimeText => '${date.day}/${date.month}/${date.year} at $timeText';
-
-  bool get hasReceipt => receiptImagePath != null && receiptImagePath!.isNotEmpty;
-
-  double get netAmount => amountPaid + bonus - deduction;
-
-  String get displayName {
-    if (laborName != null) return laborName!;
-    if (vendorName != null) return vendorName!;
-    return 'Unknown';
-  }
-
-  Color get paymentMethodColor {
-    switch (paymentMethod.toLowerCase()) {
-      case 'cash':
-        return Colors.green;
-      case 'bank_transfer':
-        return Colors.blue;
-      case 'mobile_payment':
-        return Colors.purple;
-      case 'check':
-        return Colors.orange;
-      case 'card':
-        return Colors.indigo;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData get paymentMethodIcon {
-    switch (paymentMethod.toLowerCase()) {
-      case 'cash':
-        return Icons.payments_rounded;
-      case 'bank_transfer':
-        return Icons.account_balance_rounded;
-      case 'mobile_payment':
-        return Icons.phone_android_rounded;
-      case 'check':
-        return Icons.receipt_long_rounded;
-      case 'card':
-        return Icons.credit_card_rounded;
-      default:
-        return Icons.payment_rounded;
-    }
-  }
-
-  String get statusText {
-    if (isFinalPayment) return 'Final Payment';
-    if (bonus > 0) return 'With Bonus';
-    if (deduction > 0) return 'With Deduction';
-    return 'Regular Payment';
-  }
-
-  Color get statusColor {
-    if (isFinalPayment) return Colors.green;
-    if (bonus > 0) return Colors.blue;
-    if (deduction > 0) return Colors.orange;
-    return Colors.grey;
-  }
-
-  factory Payment.fromJson(Map<String, dynamic> json) {
-    try {
-      // Safe date parsing with fallback
-      DateTime parseDate;
-      try {
-        final dateParts = (json['date'] as String).split('-');
-        if (dateParts.length == 3) {
-          parseDate = DateTime(int.parse(dateParts[0]), int.parse(dateParts[1]), int.parse(dateParts[2]));
-        } else {
-          parseDate = DateTime.now();
-        }
-      } catch (e) {
-        debugPrint('Error parsing date: $e, using current date');
-        parseDate = DateTime.now();
-      }
-
-      // Safe time parsing with fallback
-      TimeOfDay parseTime;
-      try {
-        final timeParts = (json['time'] as String).split(':');
-        if (timeParts.length == 2) {
-          parseTime = TimeOfDay(hour: int.parse(timeParts[0]), minute: int.parse(timeParts[1]));
-        } else {
-          parseTime = TimeOfDay.now();
-        }
-      } catch (e) {
-        debugPrint('Error parsing time: $e, using current time');
-        parseTime = TimeOfDay.now();
-      }
-
-      // Safe DateTime parsing with fallback
-      DateTime parseCreatedAt;
-      try {
-        parseCreatedAt = DateTime.parse(json['created_at']);
-      } catch (e) {
-        debugPrint('Error parsing created_at: $e, using current time');
-        parseCreatedAt = DateTime.now();
-      }
-
-      DateTime parseUpdatedAt;
-      try {
-        parseUpdatedAt = json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now();
-      } catch (e) {
-        debugPrint('Error parsing updated_at: $e, using current time');
-        parseUpdatedAt = DateTime.now();
-      }
-
-      return Payment(
-        id: json['id'] ?? '',
-        laborId: json['labor'],
-        vendorId: json['vendor'],
-        orderId: json['order'],
-        saleId: json['sale'],
-        laborName: json['labor_name'],
-        laborPhone: json['labor_phone'],
-        laborRole: json['labor_role'],
-        vendorName: json['vendor_name'],
-        amountPaid: double.tryParse(json['amount_paid']?.toString() ?? '0') ?? 0.0,
-        bonus: double.tryParse(json['bonus']?.toString() ?? '0') ?? 0.0,
-        deduction: double.tryParse(json['deduction']?.toString() ?? '0') ?? 0.0,
-        paymentMonth: json['payment_month'] ?? '',
-        isFinalPayment: json['is_final_payment'] ?? false,
-        paymentMethod: json['payment_method'] ?? '',
-        description: json['description'] ?? '',
-        date: parseDate,
-        time: parseTime,
-        receiptImagePath: json['receipt_image_path'],
-        createdAt: parseCreatedAt,
-        updatedAt: parseUpdatedAt,
-        payerType: json['payer_type'] ?? '',
-        payerId: json['payer_id'],
-        isActive: json['is_active'] ?? true,
-      );
-    } catch (e) {
-      debugPrint('Error parsing payment JSON: $e');
-      debugPrint('JSON data: $json');
-      rethrow;
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'labor': laborId,
-      'vendor': vendorId,
-      'order': orderId,
-      'sale': saleId,
-      'labor_name': laborName,
-      'labor_phone': laborPhone,
-      'labor_role': laborRole,
-      'vendor_name': vendorName,
-      'amount_paid': amountPaid,
-      'bonus': bonus,
-      'deduction': deduction,
-      'payment_month': paymentMonth,
-      'is_final_payment': isFinalPayment,
-      'payment_method': paymentMethod,
-      'description': description,
-      'date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-      'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-      'receipt_image_path': receiptImagePath,
-      'payer_type': payerType,
-      'payer_id': payerId,
-      'is_active': isActive,
-    };
-  }
-}
-
-// Labor model for dropdown selection
-class PaymentLabor {
-  final String id;
-  final String name;
-  final String phone;
-  final String role;
-  final double monthlySalary;
-  final double totalAdvancesTaken;
-  final double totalPaymentsMade;
-
-  PaymentLabor({
-    required this.id,
-    required this.name,
-    required this.phone,
-    required this.role,
-    required this.monthlySalary,
-    required this.totalAdvancesTaken,
-    required this.totalPaymentsMade,
-  });
-
-  double get remainingAmount => monthlySalary - totalAdvancesTaken - totalPaymentsMade;
-}
+import '../models/labor/labor_model.dart';
 
 class PaymentProvider extends ChangeNotifier {
-  List<Payment> _payments = [];
-  List<Payment> _filteredPayments = [];
-  List<PaymentLabor> _laborers = [];
-  String _searchQuery = '';
+  final PaymentService _paymentService = PaymentService();
+  final LaborService _laborService = LaborService();
+
+  // State variables
+  List<PaymentModel> _payments = [];
+  PaymentStatisticsResponse? _statistics;
+  PaymentSummaryResponse? _summary;
   bool _isLoading = false;
-  String? _errorMessage;
+  String? _error;
+  String? _success;
+  PaginationInfo? _pagination;
 
   // Filter state variables
   String? _selectedLaborId;
@@ -324,17 +33,24 @@ class PaymentProvider extends ChangeNotifier {
   bool? _isFinalPayment;
   String _sortBy = 'date';
   bool _sortAscending = false;
-  bool _showInactive = true;
+  bool _showInactive = false;
+  String _searchQuery = '';
 
-  final PaymentService _paymentService = PaymentService();
-  final LaborService _laborService = LaborService();
+  // Data lists
+  List<PaymentLabor> _laborers = [];
+  List<String> _payerTypes = ['LABOR', 'VENDOR', 'CUSTOMER', 'OTHER'];
+  List<String> _paymentMethods = ['CASH', 'BANK_TRANSFER', 'MOBILE_PAYMENT', 'CHECK', 'CARD', 'OTHER'];
+  List<LaborModel> _labors = [];
 
-  List<Payment> get payments => _filteredPayments;
-  List<Payment> get allPayments => _payments;
-  List<PaymentLabor> get laborers => _laborers;
-  String get searchQuery => _searchQuery;
+  // Getters
+  List<PaymentModel> get payments => _payments;
+  PaymentStatisticsResponse? get statistics => _statistics;
+  PaymentSummaryResponse? get summary => _summary;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  String? get error => _error;
+  String? get success => _success;
+  PaginationInfo? get pagination => _pagination;
+  List<LaborModel> get labors => _labors;
 
   // Filter getters
   String? get selectedLaborId => _selectedLaborId;
@@ -351,684 +67,540 @@ class PaymentProvider extends ChangeNotifier {
   String get sortBy => _sortBy;
   bool get sortAscending => _sortAscending;
   bool get showInactive => _showInactive;
+  String get searchQuery => _searchQuery;
 
-  // Payment methods
-  static const List<String> paymentMethods = ['CASH', 'BANK_TRANSFER', 'MOBILE_PAYMENT', 'CHECK', 'CARD', 'OTHER'];
+  // Data getters
+  List<PaymentLabor> get laborers => _laborers;
+  List<String> get payerTypes => _payerTypes;
+  List<String> get paymentMethods => _paymentMethods;
 
-  // Payer types
-  static const List<String> payerTypes = ['LABOR', 'VENDOR', 'CUSTOMER', 'OTHER'];
+  // Static lists for UI
+  static const List<String> staticPayerTypes = ['LABOR', 'VENDOR', 'CUSTOMER', 'OTHER'];
+  static const List<String> staticPaymentMethods = ['CASH', 'BANK_TRANSFER', 'MOBILE_PAYMENT', 'CHECK', 'CARD', 'OTHER'];
 
-  PaymentProvider() {
-    _initializeData();
-  }
+  // Computed properties
+  String? get errorMessage => _error;
+  bool get hasReceiptFilter => _hasReceipt != null;
+  bool get isFinalPaymentFilter => _isFinalPayment != null;
 
-  Future<void> _initializeData() async {
-    await Future.wait([_loadLaborers(), _loadPayments()]);
-  }
+  // Payment statistics (alias for statistics)
+  PaymentStatisticsResponse? get paymentStats => _statistics;
 
-  Future<void> _loadLaborers() async {
-    try {
-      final response = await _laborService.getLabors();
-      if (response.success && response.data != null) {
-        final labors = response.data!.labors;
-        debugPrint('Loading ${labors.length} laborers');
-        _laborers = labors
-            .map(
-              (labor) => PaymentLabor(
-                id: labor.id,
-                name: labor.name,
-                phone: labor.phoneNumber,
-                role: labor.designation,
-                monthlySalary: labor.salary,
-                totalAdvancesTaken: labor.totalAdvanceAmount,
-                totalPaymentsMade: labor.totalPaymentsAmount,
-              ),
-            )
-            .toList();
-        debugPrint('Loaded ${_laborers.length} laborers');
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint('Error loading laborers: $e');
-    }
-  }
+  // ===== PAYMENT MANAGEMENT =====
 
-  Future<void> refreshData() async {
-    await _initializeData();
-  }
+  /// Load payments with filtering
+  Future<void> loadPayments({PaymentFilterRequest? filter, bool refresh = false}) async {
+    if (!refresh && _payments.isNotEmpty) return;
 
-  Future<void> _loadPayments() async {
     _setLoading(true);
-    _clearError();
+    _clearMessages();
 
     try {
-      final response = await _paymentService.getPayments();
-
+      final response = await _paymentService.getPayments(filter: filter);
       if (response.success && response.data != null) {
-        final paymentsData = response.data!;
-        if (paymentsData['payments'] != null) {
-          final paymentsList = paymentsData['payments'] as List;
-          debugPrint('Loading ${paymentsList.length} payments');
-          try {
-            _payments = paymentsList.map((json) {
-              debugPrint('Parsing payment JSON: $json');
-              final payment = Payment.fromJson(json);
-              debugPrint('Parsed payment: ${payment.id} - ${payment.laborName}');
-              return payment;
-            }).toList();
-            _filteredPayments = List.from(_payments);
-            debugPrint('Loaded ${_payments.length} payments, filtered: ${_filteredPayments.length}');
-            notifyListeners();
-          } catch (e) {
-            debugPrint('Error parsing payments: $e');
-            _setError('Error parsing payment data: $e');
-          }
-        }
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _computeStatistics(); // Compute statistics after loading payments
+        _setSuccess(response.message);
       } else {
-        _setError(response.message ?? 'Failed to load payments');
+        _setError(response.message);
       }
     } catch (e) {
-      _setError('An error occurred while loading payments: $e');
+      _setError('Error loading payments: $e');
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> searchPayments(String query) async {
-    _searchQuery = query;
-
-    if (query.isEmpty) {
-      _filteredPayments = List.from(_payments);
-    } else {
-      _filteredPayments = _payments
-          .where(
-            (payment) =>
-                payment.id.toLowerCase().contains(query.toLowerCase()) ||
-                (payment.laborName?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                (payment.vendorName?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                (payment.laborPhone?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                (payment.laborRole?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                payment.paymentMethod.toLowerCase().contains(query.toLowerCase()) ||
-                payment.paymentMonth.toLowerCase().contains(query.toLowerCase()) ||
-                payment.description.toLowerCase().contains(query.toLowerCase()),
-          )
-          .toList();
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> addPayment({
-    required String? laborId,
-    required String? vendorId,
-    required String? orderId,
-    required String? saleId,
-    required double amountPaid,
-    double bonus = 0.0,
-    double deduction = 0.0,
-    required String paymentMonth,
-    bool isFinalPayment = false,
-    required String paymentMethod,
-    required String description,
-    required DateTime date,
-    required TimeOfDay time,
-    String? receiptImagePath,
-    required String payerType,
-    String? payerId,
-  }) async {
-    _setLoading(true);
-    _clearError();
-
+  /// Get payment by ID
+  Future<PaymentModel?> getPaymentById(String id) async {
     try {
-      final paymentData = {
-        'labor': laborId,
-        'vendor': vendorId,
-        'order': orderId,
-        'sale': saleId,
-        'amount_paid': amountPaid,
-        'bonus': bonus,
-        'deduction': deduction,
-        'payment_month': paymentMonth,
-        'is_final_payment': isFinalPayment,
-        'payment_method': paymentMethod,
-        'description': description,
-        'date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-        'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-        'receipt_image_path': receiptImagePath,
-        'payer_type': payerType,
-        'payer_id': payerId,
-      };
-
-      final response = await _paymentService.createPayment(paymentData);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
+      final response = await _paymentService.getPaymentById(id);
+      if (response.success && response.data != null) {
+        return response.data;
       } else {
-        _setError(response.message ?? 'Failed to create payment');
+        _setError(response.message);
+        return null;
       }
     } catch (e) {
-      _setError('An error occurred while creating payment: $e');
+      _setError('Error getting payment: $e');
+      return null;
+    }
+  }
+
+  /// Create new payment
+  Future<bool> createPayment(CreatePaymentRequest request) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.createPayment(request);
+      if (response.success && response.data != null) {
+        _payments.insert(0, response.data!);
+        _computeStatistics(); // Update statistics after creating payment
+        _setSuccess('Payment created successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error creating payment: $e');
+      return false;
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> updatePayment({
+  /// Update payment
+  Future<bool> updatePayment({
     required String id,
-    required String? laborId,
-    required String? vendorId,
-    required String? orderId,
-    required String? saleId,
-    required double amountPaid,
-    double bonus = 0.0,
-    double deduction = 0.0,
-    required String paymentMonth,
-    bool isFinalPayment = false,
-    required String paymentMethod,
-    required String description,
-    required DateTime date,
-    required TimeOfDay time,
-    String? receiptImagePath,
-    required String payerType,
-    String? payerId,
-  }) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final paymentData = {
-        'labor': laborId,
-        'vendor': vendorId,
-        'order': orderId,
-        'sale': saleId,
-        'amount_paid': amountPaid,
-        'bonus': bonus,
-        'deduction': deduction,
-        'payment_month': paymentMonth,
-        'is_final_payment': isFinalPayment,
-        'payment_method': paymentMethod,
-        'description': description,
-        'date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-        'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-        'receipt_image_path': receiptImagePath,
-        'payer_type': payerType,
-        'payer_id': payerId,
-      };
-
-      final response = await _paymentService.updatePayment(id, paymentData);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
-      } else {
-        _setError(response.message ?? 'Failed to update payment');
-      }
-    } catch (e) {
-      _setError('An error occurred while updating payment: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> deletePayment(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.deletePayment(id);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
-      } else {
-        _setError(response.message ?? 'Failed to delete payment');
-      }
-    } catch (e) {
-      _setError('An error occurred while deleting payment: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> softDeletePayment(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.softDeletePayment(id);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
-      } else {
-        _setError(response.message ?? 'Failed to soft delete payment');
-      }
-    } catch (e) {
-      _setError('An error occurred while soft deleting payment: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> restorePayment(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.restorePayment(id);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
-      } else {
-        _setError(response.message ?? 'Failed to restore payment');
-      }
-    } catch (e) {
-      _setError('An error occurred while restoring payment: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> markAsFinalPayment(String id) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.markAsFinalPayment(id);
-
-      if (response.success) {
-        await _loadPayments(); // Reload payments
-        searchPayments(_searchQuery); // Reapply search filter
-      } else {
-        _setError(response.message ?? 'Failed to mark payment as final');
-      }
-    } catch (e) {
-      _setError('An error occurred while marking payment as final: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // Additional payment methods
-  Future<void> getPaymentsByVendor(String vendorId) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsByVendor(vendorId);
-      if (response.success && response.data != null) {
-        // Handle vendor payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get vendor payments');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting vendor payments: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> getPaymentsByOrder(String orderId) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsByOrder(orderId);
-      if (response.success && response.data != null) {
-        // Handle order payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get order payments');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting order payments: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> getPaymentsBySale(String saleId) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsBySale(saleId);
-      if (response.success && response.data != null) {
-        // Handle sale payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get sale payments');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting sale payments: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> getPaymentsByMethod(String method) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsByMethod(method);
-      if (response.success && response.data != null) {
-        // Handle method payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get payments by method');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting payments by method: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> getPaymentsWithReceipts() async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsWithReceipts();
-      if (response.success && response.data != null) {
-        // Handle receipts payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get payments with receipts');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting payments with receipts: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> getPaymentsWithoutReceipts() async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      final response = await _paymentService.getPaymentsWithoutReceipts();
-      if (response.success && response.data != null) {
-        // Handle no receipts payments response
-        notifyListeners();
-      } else {
-        _setError(response.message ?? 'Failed to get payments without receipts');
-      }
-    } catch (e) {
-      _setError('An error occurred while getting payments without receipts: $e');
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> refreshPayments() async {
-    await _loadPayments();
-    searchPayments(_searchQuery);
-  }
-
-  Payment? getPaymentById(String id) {
-    try {
-      return _payments.firstWhere((payment) => payment.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  List<Payment> getPaymentsByLaborId(String laborId) {
-    return _payments.where((payment) => payment.laborId == laborId).toList();
-  }
-
-  List<Payment> getPaymentsByVendorId(String vendorId) {
-    return _payments.where((payment) => payment.vendorId == vendorId).toList();
-  }
-
-  List<Payment> getPaymentsByOrderId(String orderId) {
-    return _payments.where((payment) => payment.orderId == orderId).toList();
-  }
-
-  List<Payment> getPaymentsBySaleId(String saleId) {
-    return _payments.where((payment) => payment.saleId == saleId).toList();
-  }
-
-  PaymentLabor? getLaborById(String laborId) {
-    try {
-      return _laborers.firstWhere((labor) => labor.id == laborId);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Map<String, dynamic> get paymentStats {
-    final totalPayments = _payments.length;
-    final totalAmount = _payments.fold<double>(0, (sum, payment) => sum + payment.netAmount);
-    final totalBonus = _payments.fold<double>(0, (sum, payment) => sum + payment.bonus);
-    final totalDeductions = _payments.fold<double>(0, (sum, payment) => sum + payment.deduction);
-    final paymentsWithReceipts = _payments.where((payment) => payment.hasReceipt).length;
-    final finalPayments = _payments.where((payment) => payment.isFinalPayment).length;
-
-    final thisMonthPayments = _payments.where((payment) {
-      final now = DateTime.now();
-      return payment.date.month == now.month && payment.date.year == now.year;
-    }).length;
-
-    return {
-      'total': totalPayments,
-      'totalAmount': totalAmount.toStringAsFixed(0),
-      'totalBonus': totalBonus.toStringAsFixed(0),
-      'totalDeductions': totalDeductions.toStringAsFixed(0),
-      'withReceipts': paymentsWithReceipts,
-      'finalPayments': finalPayments,
-      'thisMonth': thisMonthPayments,
-    };
-  }
-
-  List<Payment> get recentPayments {
-    final recent = List<Payment>.from(_payments);
-    recent.sort((a, b) => b.date.compareTo(a.date));
-    return recent.take(10).toList();
-  }
-
-  List<Payment> get paymentsWithBonuses {
-    return _payments.where((payment) => payment.bonus > 0).toList();
-  }
-
-  List<Payment> get paymentsWithDeductions {
-    return _payments.where((payment) => payment.deduction > 0).toList();
-  }
-
-  List<Payment> get paymentsWithoutReceipts {
-    return _payments.where((payment) => !payment.hasReceipt).toList();
-  }
-
-  List<Payment> filterPayments({
     String? laborId,
     String? vendorId,
     String? orderId,
     String? saleId,
-    String? paymentMethod,
-    String? paymentMonth,
-    DateTime? fromDate,
-    DateTime? toDate,
-    double? minAmount,
-    double? maxAmount,
-    bool? hasReceipt,
+    required double amountPaid,
+    double? bonus,
+    double? deduction,
+    required DateTime paymentMonth,
     bool? isFinalPayment,
+    required String paymentMethod,
+    String? description,
+    required DateTime date,
+    required DateTime time,
+    String? receiptImagePath,
     String? payerType,
-  }) {
-    return _payments.where((payment) {
-      if (laborId != null && payment.laborId != laborId) return false;
-      if (vendorId != null && payment.vendorId != vendorId) return false;
-      if (orderId != null && payment.orderId != orderId) return false;
-      if (saleId != null && payment.saleId != saleId) return false;
-      if (paymentMethod != null && payment.paymentMethod != paymentMethod) return false;
-      if (paymentMonth != null && payment.paymentMonth != paymentMonth) return false;
-      if (fromDate != null && payment.date.isBefore(fromDate)) return false;
-      if (toDate != null && payment.date.isAfter(toDate)) return false;
-      if (minAmount != null && payment.netAmount < minAmount) return false;
-      if (maxAmount != null && payment.netAmount > maxAmount) return false;
-      if (hasReceipt != null && payment.hasReceipt != hasReceipt) return false;
-      if (isFinalPayment != null && payment.isFinalPayment != isFinalPayment) return false;
-      if (payerType != null && payment.payerType != payerType) return false;
-      return true;
-    }).toList();
-  }
+    String? payerId,
+  }) async {
+    _setLoading(true);
+    _clearMessages();
 
-  Map<String, List<Payment>> get paymentsByMethod {
-    final Map<String, List<Payment>> grouped = {};
-    for (final payment in _payments) {
-      grouped[payment.paymentMethod] = grouped[payment.paymentMethod] ?? [];
-      grouped[payment.paymentMethod]!.add(payment);
+    try {
+      // Convert DateTime to TimeOfDay for the request
+      final timeOfDay = TimeOfDay(hour: time.hour, minute: time.minute);
+
+      // Create UpdatePaymentRequest from parameters
+      final request = UpdatePaymentRequest(
+        laborId: laborId,
+        vendorId: vendorId,
+        orderId: orderId,
+        saleId: saleId,
+        amountPaid: amountPaid,
+        bonus: bonus ?? 0.0,
+        deduction: deduction ?? 0.0,
+        paymentMonth: paymentMonth,
+        isFinalPayment: isFinalPayment ?? false,
+        paymentMethod: paymentMethod,
+        description: description,
+        date: date,
+        time: timeOfDay,
+        receiptImagePath: receiptImagePath,
+        payerType: payerType ?? 'LABOR',
+        payerId: payerId,
+      );
+
+      final response = await _paymentService.updatePayment(id, request);
+      if (response.success && response.data != null) {
+        final index = _payments.indexWhere((p) => p.id == id);
+        if (index != -1) {
+          _payments[index] = response.data!;
+          _computeStatistics(); // Update statistics after updating payment
+          notifyListeners();
+        }
+        _setSuccess('Payment updated successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error updating payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
     }
-    return grouped;
   }
 
-  Map<String, List<Payment>> get paymentsByMonth {
-    final Map<String, List<Payment>> grouped = {};
-    for (final payment in _payments) {
-      grouped[payment.paymentMonth] = grouped[payment.paymentMonth] ?? [];
-      grouped[payment.paymentMonth]!.add(payment);
+  /// Delete payment
+  Future<bool> deletePayment(String id) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.deletePayment(id);
+      if (response.success) {
+        _payments.removeWhere((p) => p.id == id);
+        _computeStatistics(); // Update statistics after deleting payment
+        _setSuccess('Payment deleted successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error deleting payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
     }
-    return grouped;
   }
 
-  List<Map<String, dynamic>> exportPaymentData() {
-    return _payments
-        .map(
-          (payment) => {
-            'Payment ID': payment.id,
-            'Labor Name': payment.laborName ?? 'N/A',
-            'Vendor Name': payment.vendorName ?? 'N/A',
-            'Labor Phone': payment.laborPhone ?? 'N/A',
-            'Labor Role': payment.laborRole ?? 'N/A',
-            'Amount Paid': payment.amountPaid.toStringAsFixed(2),
-            'Bonus': payment.bonus.toStringAsFixed(2),
-            'Deduction': payment.deduction.toStringAsFixed(2),
-            'Net Amount': payment.netAmount.toStringAsFixed(2),
-            'Payment Month': payment.paymentMonth,
-            'Payment Method': payment.paymentMethod,
-            'Is Final Payment': payment.isFinalPayment ? 'Yes' : 'No',
-            'Description': payment.description,
-            'Date': payment.date.toString().split(' ')[0],
-            'Time': payment.timeText,
-            'Has Receipt': payment.hasReceipt ? 'Yes' : 'No',
-            'Status': payment.statusText,
-            'Payer Type': payment.payerType,
-          },
-        )
-        .toList();
-  }
+  /// Soft delete payment
+  Future<bool> softDeletePayment(String id) async {
+    _setLoading(true);
+    _clearMessages();
 
-  // Get payments that need attention (no receipt, high amounts, etc.)
-  List<Payment> get paymentsNeedingAttention {
-    return _payments.where((payment) {
-      return !payment.hasReceipt || payment.netAmount > 30000 || payment.deduction > 0;
-    }).toList();
-  }
-
-  // Monthly payment statistics
-  Map<int, Map<String, dynamic>> get monthlyPaymentStats {
-    final Map<int, List<Payment>> paymentsByMonth = {};
-
-    for (final payment in _payments) {
-      final month = payment.date.month;
-      paymentsByMonth[month] = paymentsByMonth[month] ?? [];
-      paymentsByMonth[month]!.add(payment);
+    try {
+      final response = await _paymentService.softDeletePayment(id);
+      if (response.success) {
+        final index = _payments.indexWhere((p) => p.id == id);
+        if (index != -1) {
+          _payments[index] = _payments[index].copyWith(isActive: false);
+          _computeStatistics(); // Update statistics after soft deleting payment
+          notifyListeners();
+        }
+        _setSuccess('Payment soft deleted successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error soft deleting payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
     }
-
-    return paymentsByMonth.map((month, payments) {
-      return MapEntry(month, {
-        'month': month,
-        'count': payments.length,
-        'totalAmount': payments.fold<double>(0, (sum, payment) => sum + payment.netAmount),
-        'totalBonus': payments.fold<double>(0, (sum, payment) => sum + payment.bonus),
-        'totalDeductions': payments.fold<double>(0, (sum, payment) => sum + payment.deduction),
-        'withReceipts': payments.where((p) => p.hasReceipt).length,
-        'finalPayments': payments.where((p) => p.isFinalPayment).length,
-      });
-    });
   }
 
-  // Helper methods
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
+  /// Restore payment
+  Future<bool> restorePayment(String id) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.restorePayment(id);
+      if (response.success) {
+        final index = _payments.indexWhere((p) => p.id == id);
+        if (index != -1) {
+          _payments[index] = _payments[index].copyWith(isActive: true);
+          _computeStatistics(); // Update statistics after restoring payment
+          notifyListeners();
+        }
+        _setSuccess('Payment restored successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error restoring payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  void _setError(String error) {
-    _errorMessage = error;
-    notifyListeners();
+  /// Search payments
+  Future<void> searchPayments(String query) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.searchPayments(query);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _computeStatistics(); // Update statistics after search
+        _setSuccess('Search completed');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error searching payments: $e');
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  void _clearError() {
-    _errorMessage = null;
-    notifyListeners();
+  /// Get payments by labor
+  Future<void> getPaymentsByLabor(String laborId) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.getPaymentsByLabor(laborId);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _setSuccess('Labor payments loaded');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading labor payments: $e');
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  void clearError() {
-    _clearError();
+  /// Get payments by vendor
+  Future<void> getPaymentsByVendor(String vendorId) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.getPaymentsByVendor(vendorId);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _setSuccess('Vendor payments loaded');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading vendor payments: $e');
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // Filter methods
-  Future<void> setLaborFilter(String? laborId) async {
+  /// Get payments by sale
+  Future<void> getPaymentsBySale(String saleId) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.getPaymentsBySale(saleId);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _setSuccess('Sale payments loaded');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading sale payments: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Get payments by date range
+  Future<void> getPaymentsByDateRange(DateTime startDate, DateTime endDate) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.getPaymentsByDateRange(startDate, endDate);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _setSuccess('Date range payments loaded');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading date range payments: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Get payments by method
+  Future<void> getPaymentsByMethod(String method) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.getPaymentsByMethod(method);
+      if (response.success && response.data != null) {
+        _payments = response.data!.payments;
+        _pagination = response.data!.pagination;
+        _setSuccess('Method payments loaded');
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError('Error loading method payments: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Mark payment as final
+  Future<bool> markAsFinalPayment(String id) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.markAsFinalPayment(id);
+      if (response.success) {
+        final index = _payments.indexWhere((p) => p.id == id);
+        if (index != -1) {
+          _payments[index] = _payments[index].copyWith(isFinalPayment: true);
+          notifyListeners();
+        }
+        _setSuccess('Payment marked as final');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error marking payment as final: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ===== PAYMENT PROCESSING =====
+
+  /// Process payment for sale
+  Future<bool> processSalePayment({
+    required String saleId,
+    required double amount,
+    required String paymentMethod,
+    String? reference,
+    String? notes,
+  }) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.processPayment(
+        saleId: saleId,
+        amount: amount,
+        paymentMethod: paymentMethod,
+        currency: 'PKR',
+        reference: reference,
+        notes: notes,
+      );
+
+      if (response.success) {
+        _setSuccess('Payment processed successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error processing payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Process split payment
+  Future<bool> processSplitPayment({
+    required String saleId,
+    required List<Map<String, dynamic>> splitDetails,
+    String? reference,
+    String? notes,
+  }) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _paymentService.processSplitPayment(
+        saleId: saleId,
+        splitDetails: splitDetails,
+        currency: 'PKR',
+        reference: reference,
+        notes: notes,
+      );
+
+      if (response.success) {
+        _setSuccess('Split payment processed successfully');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error processing split payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ===== FILTER METHODS =====
+
+  /// Set labor filter
+  void setLaborFilter(String? laborId) {
     _selectedLaborId = laborId;
-    await _applyFilters();
+    notifyListeners();
   }
 
-  Future<void> setPayerTypeFilter(String? payerType) async {
+  /// Set payer type filter
+  void setPayerTypeFilter(String? payerType) {
     _selectedPayerType = payerType;
-    await _applyFilters();
+    notifyListeners();
   }
 
-  Future<void> setPaymentMethodFilter(String? paymentMethod) async {
+  /// Set payment method filter
+  void setPaymentMethodFilter(String? paymentMethod) {
     _selectedPaymentMethod = paymentMethod;
-    await _applyFilters();
+    notifyListeners();
   }
 
-  Future<void> setDateRangeFilter(DateTime? dateFrom, DateTime? dateTo) async {
-    _dateFrom = dateFrom;
-    _dateTo = dateTo;
-    await _applyFilters();
+  /// Set date range filter
+  void setDateRangeFilter(DateTime? from, DateTime? to) {
+    _dateFrom = from;
+    _dateTo = to;
+    notifyListeners();
   }
 
-  Future<void> setPaymentMonthRangeFilter(DateTime? monthFrom, DateTime? monthTo) async {
-    _paymentMonthFrom = monthFrom;
-    _paymentMonthTo = monthTo;
-    await _applyFilters();
+  /// Set payment month range filter
+  void setPaymentMonthRangeFilter(DateTime? from, DateTime? to) {
+    _paymentMonthFrom = from;
+    _paymentMonthTo = to;
+    notifyListeners();
   }
 
-  Future<void> setAmountRangeFilter(double? minAmount, double? maxAmount) async {
-    _minAmount = minAmount;
-    _maxAmount = maxAmount;
-    await _applyFilters();
+  /// Set amount range filter
+  void setAmountRangeFilter(double? min, double? max) {
+    _minAmount = min;
+    _maxAmount = max;
+    notifyListeners();
   }
 
-  Future<void> setReceiptFilter(bool? hasReceipt) async {
+  /// Set receipt filter
+  void setReceiptFilter(bool? hasReceipt) {
     _hasReceipt = hasReceipt;
-    await _applyFilters();
+    notifyListeners();
   }
 
-  Future<void> setFinalPaymentFilter(bool? isFinalPayment) async {
-    _isFinalPayment = isFinalPayment;
-    await _applyFilters();
+  /// Set final payment filter
+  void setFinalPaymentFilter(bool? isFinal) {
+    _isFinalPayment = isFinal;
+    notifyListeners();
   }
 
-  Future<void> setSortOptions(String sortBy, bool sortAscending) async {
+  /// Set sort options
+  void setSortOptions(String sortBy, bool ascending) {
     _sortBy = sortBy;
-    _sortAscending = sortAscending;
-    await _applyFilters();
+    _sortAscending = ascending;
+    notifyListeners();
   }
 
-  Future<void> setShowInactiveFilter(bool showInactive) async {
-    _showInactive = showInactive;
-    await _applyFilters();
+  /// Set show inactive filter
+  void setShowInactiveFilter(bool show) {
+    _showInactive = show;
+    notifyListeners();
   }
 
-  Future<void> resetFilters() async {
+  /// Set search query
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  /// Reset all filters
+  void resetFilters() {
     _selectedLaborId = null;
     _selectedPayerType = null;
     _selectedPaymentMethod = null;
@@ -1042,101 +614,316 @@ class PaymentProvider extends ChangeNotifier {
     _isFinalPayment = null;
     _sortBy = 'date';
     _sortAscending = false;
-    _showInactive = true;
-    await _applyFilters();
+    _showInactive = false;
+    _searchQuery = '';
+    notifyListeners();
   }
 
-  Future<void> _applyFilters() async {
-    _filteredPayments = _payments.where((payment) {
-      // Labor filter
-      if (_selectedLaborId != null && payment.laborId != _selectedLaborId) {
+  // ===== UTILITY METHODS =====
+
+  /// Clear all messages
+  void _clearMessages() {
+    _error = null;
+    _success = null;
+    notifyListeners();
+  }
+
+  /// Set loading state
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  /// Set error message
+  void _setError(String message) {
+    _error = message;
+    notifyListeners();
+  }
+
+  /// Set success message
+  void _setSuccess(String message) {
+    _success = message;
+    notifyListeners();
+  }
+
+  /// Clear error
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+
+  /// Clear success
+  void clearSuccess() {
+    _success = null;
+    notifyListeners();
+  }
+
+  /// Refresh data
+  Future<void> refresh() async {
+    await loadPayments(refresh: true);
+  }
+
+  /// Initialize provider
+  Future<void> initialize() async {
+    await loadPayments(refresh: true);
+  }
+
+  /// Refresh data (alias for refresh)
+  Future<void> refreshData() async {
+    await refresh();
+  }
+
+  /// Add payment with individual parameters
+  Future<bool> addPayment({
+    String? laborId,
+    String? vendorId,
+    String? orderId,
+    String? saleId,
+    required String payerType,
+    String? payerId,
+    String? laborName,
+    String? laborPhone,
+    String? laborRole,
+    required double amountPaid,
+    double? bonus,
+    double? deduction,
+    required String paymentMonth,
+    bool? isFinalPayment,
+    required String paymentMethod,
+    String? description,
+    required DateTime date,
+    required TimeOfDay time,
+    String? receiptImagePath,
+  }) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      // Parse paymentMonth string to DateTime
+      final paymentMonthDateTime = DateTime.parse(paymentMonth);
+
+      // Create CreatePaymentRequest from parameters
+      final request = CreatePaymentRequest(
+        laborId: laborId,
+        vendorId: vendorId,
+        orderId: orderId,
+        saleId: saleId,
+        payerType: payerType,
+        payerId: payerId,
+        laborName: laborName,
+        laborPhone: laborPhone,
+        laborRole: laborRole,
+        amountPaid: amountPaid,
+        bonus: bonus ?? 0.0,
+        deduction: deduction ?? 0.0,
+        paymentMonth: paymentMonthDateTime,
+        isFinalPayment: isFinalPayment ?? false,
+        paymentMethod: paymentMethod,
+        description: description,
+        date: date,
+        time: time,
+        receiptImagePath: receiptImagePath,
+      );
+
+      final response = await _paymentService.createPayment(request);
+      if (response.success && response.data != null) {
+        _payments.insert(0, response.data!);
+        _computeStatistics(); // Update statistics after creating payment
+        _setSuccess('Payment created successfully');
+        return true;
+      } else {
+        _setError(response.message);
         return false;
       }
+    } catch (e) {
+      _setError('Error creating payment: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-      // Payer type filter
-      if (_selectedPayerType != null && payment.payerType != _selectedPayerType) {
-        return false;
-      }
+  /// Load laborers
+  Future<void> loadLaborers() async {
+    _setLoading(true);
+    _clearMessages();
 
-      // Payment method filter
-      if (_selectedPaymentMethod != null && payment.paymentMethod != _selectedPaymentMethod) {
-        return false;
+    try {
+      final response = await _laborService.getLabors();
+      if (response.success && response.data != null) {
+        _labors = response.data!.labors;
+        notifyListeners();
+      } else {
+        _setError(response.message);
       }
+    } catch (e) {
+      _setError('Error loading laborers: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-      // Date range filter
-      if (_dateFrom != null && payment.date.isBefore(_dateFrom!)) {
-        return false;
-      }
-      if (_dateTo != null && payment.date.isAfter(_dateTo!)) {
-        return false;
-      }
+  /// Compute statistics from loaded payments
+  void _computeStatistics() {
+    if (_payments.isEmpty) {
+      _statistics = null;
+      return;
+    }
 
-      // Payment month range filter
-      if (_paymentMonthFrom != null || _paymentMonthTo != null) {
-        try {
-          final paymentDate = DateTime.parse(payment.paymentMonth);
-          if (_paymentMonthFrom != null && paymentDate.isBefore(_paymentMonthFrom!)) {
-            return false;
-          }
-          if (_paymentMonthTo != null && paymentDate.isAfter(_paymentMonthTo!)) {
-            return false;
-          }
-        } catch (e) {
-          // If parsing fails, skip this filter
-        }
-      }
+    double totalAmountPaid = 0.0;
+    double totalBonus = 0.0;
+    double totalDeduction = 0.0;
+    int totalPayments = _payments.length;
 
-      // Amount range filter
-      if (_minAmount != null && payment.netAmount < _minAmount!) {
-        return false;
-      }
-      if (_maxAmount != null && payment.netAmount > _maxAmount!) {
-        return false;
-      }
+    // Initialize distribution maps
+    Map<String, int> payerTypeDistribution = {};
+    Map<String, int> paymentMethodDistribution = {};
+    Map<String, double> monthlyDistribution = {};
+    Map<String, double> dailyDistribution = {};
+    List<Map<String, dynamic>> recentPayments = [];
+    Map<String, double> topPayers = {};
 
-      // Receipt filter
-      if (_hasReceipt != null && payment.hasReceipt != _hasReceipt!) {
-        return false;
-      }
+    for (final payment in _payments) {
+      totalAmountPaid += payment.amountPaid;
+      totalBonus += payment.bonus ?? 0.0;
+      totalDeduction += payment.deduction ?? 0.0;
 
-      // Final payment filter
-      if (_isFinalPayment != null && payment.isFinalPayment != _isFinalPayment!) {
-        return false;
-      }
+      // Payer type distribution
+      final payerType = payment.payerType ?? 'LABOR';
+      payerTypeDistribution[payerType] = (payerTypeDistribution[payerType] ?? 0) + 1;
 
-      // Active/inactive filter
-      if (!_showInactive && !payment.isActive) {
-        return false;
-      }
+      // Payment method distribution
+      final paymentMethod = payment.paymentMethod;
+      paymentMethodDistribution[paymentMethod] = (paymentMethodDistribution[paymentMethod] ?? 0) + 1;
 
-      return true;
-    }).toList();
+      // Monthly distribution (by payment month)
+      final monthKey = '${payment.paymentMonth.year}-${payment.paymentMonth.month.toString().padLeft(2, '0')}';
+      monthlyDistribution[monthKey] = (monthlyDistribution[monthKey] ?? 0.0) + payment.amountPaid;
 
-    // Apply sorting
-    _filteredPayments.sort((a, b) {
-      int comparison = 0;
-      switch (_sortBy) {
-        case 'date':
-          comparison = a.date.compareTo(b.date);
-          break;
-        case 'amount_paid':
-          comparison = a.amountPaid.compareTo(b.amountPaid);
-          break;
-        case 'payment_month':
-          comparison = a.paymentMonth.compareTo(b.paymentMonth);
-          break;
-        case 'created_at':
-          comparison = a.createdAt.compareTo(b.createdAt);
-          break;
-        case 'labor_name':
-          comparison = (a.laborName ?? '').compareTo(b.laborName ?? '');
-          break;
-        default:
-          comparison = a.date.compareTo(b.date);
-      }
-      return _sortAscending ? comparison : -comparison;
-    });
+      // Daily distribution (by payment date)
+      final dayKey = '${payment.date.year}-${payment.date.month.toString().padLeft(2, '0')}-${payment.date.day.toString().padLeft(2, '0')}';
+      dailyDistribution[dayKey] = (dailyDistribution[dayKey] ?? 0.0) + payment.amountPaid;
+
+      // Top payers (by total amount)
+      final payerId = payment.payerId ?? payment.laborId ?? 'Unknown';
+      topPayers[payerId] = (topPayers[payerId] ?? 0.0) + payment.amountPaid;
+    }
+
+    // Get recent payments (last 5)
+    final sortedPayments = List<PaymentModel>.from(_payments)..sort((a, b) => b.date.compareTo(a.date));
+
+    recentPayments = sortedPayments
+        .take(5)
+        .map(
+          (payment) => {
+            'id': payment.id,
+            'amount': payment.amountPaid,
+            'date': payment.date.toIso8601String(),
+            'method': payment.paymentMethod,
+            'payer_type': payment.payerType ?? 'LABOR',
+          },
+        )
+        .toList();
+
+    // Sort top payers by amount
+    final sortedTopPayers = Map.fromEntries(topPayers.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
+    final top5Payers = Map.fromEntries(sortedTopPayers.entries.take(5));
+
+    final netAmount = totalAmountPaid + totalBonus - totalDeduction;
+
+    _statistics = PaymentStatisticsResponse(
+      totalPayments: totalPayments,
+      totalAmountPaid: totalAmountPaid,
+      totalBonus: totalBonus,
+      totalDeduction: totalDeduction,
+      netAmount: netAmount,
+      payerTypeDistribution: payerTypeDistribution,
+      paymentMethodDistribution: paymentMethodDistribution,
+      monthlyDistribution: monthlyDistribution,
+      dailyDistribution: dailyDistribution,
+      recentPayments: recentPayments,
+      topPayers: top5Payers,
+    );
 
     notifyListeners();
+  }
+
+  // ===== STATISTICS METHODS =====
+
+  /// Load payment statistics
+  Future<void> loadStatistics() async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      // If we have payments loaded, compute statistics from them
+      if (_payments.isNotEmpty) {
+        _computeStatistics();
+      } else {
+        // Load payments first, then compute statistics
+        await loadPayments(refresh: true);
+        _computeStatistics();
+      }
+    } catch (e) {
+      _setError('Error loading statistics: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Get this month's payments count
+  int getThisMonthPayments() {
+    if (_payments.isEmpty) return 0;
+
+    final now = DateTime.now();
+    final thisMonth = DateTime(now.year, now.month);
+
+    return _payments.where((payment) {
+      final paymentMonth = DateTime(payment.paymentMonth.year, payment.paymentMonth.month);
+      return paymentMonth.isAtSameMomentAs(thisMonth);
+    }).length;
+  }
+
+  /// Get this week's payments count
+  int getThisWeekPayments() {
+    if (_payments.isEmpty) return 0;
+
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    return _payments.where((payment) {
+      return payment.date.isAfter(startOfWeek.subtract(const Duration(days: 1))) && payment.date.isBefore(endOfWeek.add(const Duration(days: 1)));
+    }).length;
+  }
+
+  /// Get this month's total payment amount
+  double getThisMonthAmount() {
+    if (_payments.isEmpty) return 0.0;
+
+    final now = DateTime.now();
+    final thisMonth = DateTime(now.year, now.month);
+
+    return _payments
+        .where((payment) {
+          final paymentMonth = DateTime(payment.paymentMonth.year, payment.paymentMonth.month);
+          return paymentMonth.isAtSameMomentAs(thisMonth);
+        })
+        .fold(0.0, (sum, payment) => sum + payment.amountPaid);
+  }
+
+  /// Get this week's total payment amount
+  double getThisWeekAmount() {
+    if (_payments.isEmpty) return 0.0;
+
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    return _payments
+        .where((payment) {
+          return payment.date.isAfter(startOfWeek.subtract(const Duration(days: 1))) && payment.date.isBefore(endOfWeek.add(const Duration(days: 1)));
+        })
+        .fold(0.0, (sum, payment) => sum + payment.amountPaid);
   }
 }
