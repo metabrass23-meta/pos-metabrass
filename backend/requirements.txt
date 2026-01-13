@@ -34,3 +34,8 @@ reportlab
 # Testing
 factory-boy
 pytest-django
+
+# Real-time WebSockets
+channels
+daphne
+channels-redis

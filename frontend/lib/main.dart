@@ -62,7 +62,8 @@ void main() async {
 class MaqboolFabricApp extends StatelessWidget {
   const MaqboolFabricApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -102,10 +103,13 @@ class MaqboolFabricApp extends StatelessWidget {
             }
           });
 
-          // Initialize profit loss provider when first accessed
+          // Initialize profit loss provider when first accessed AND authenticated
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (profitLossProvider.profitLossHistory.isEmpty && !profitLossProvider.isLoading) {
-              profitLossProvider.initialize();
+            if (authProvider.state == AuthState.authenticated) {
+              if (profitLossProvider.profitLossHistory.isEmpty &&
+                  !profitLossProvider.isLoading) {
+                profitLossProvider.initialize();
+              }
             }
           });
 

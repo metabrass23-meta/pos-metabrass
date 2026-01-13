@@ -125,8 +125,10 @@ class SalesProvider extends ChangeNotifier {
 
   // Cart getters
   List<CartItem> get currentCart => _cartItems;
-  int get cartTotalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
-  double get cartSubtotal => _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+  int get cartTotalItems =>
+      _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  double get cartSubtotal =>
+      _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
   double get overallDiscount => _overallDiscount;
   double get cartGstAmount => _taxConfiguration.totalTaxAmount;
   double get cartTaxAmount => _taxConfiguration.totalTaxAmount;
@@ -145,8 +147,10 @@ class SalesProvider extends ChangeNotifier {
   // Computed getters
   bool get hasSales => _sales.isNotEmpty;
   int get salesCount => _sales.length;
-  double get totalRevenue => _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
-  double get totalTaxCollected => _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
+  double get totalRevenue =>
+      _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
+  double get totalTaxCollected =>
+      _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
 
   /// Load sales with current filters and pagination
   Future<void> loadSales({bool refresh = false}) async {
@@ -254,7 +258,9 @@ class SalesProvider extends ChangeNotifier {
     double itemDiscount = 0.0,
     String? customizationNotes,
   }) {
-    final existingItemIndex = _cartItems.indexWhere((item) => item.productId == productId);
+    final existingItemIndex = _cartItems.indexWhere(
+      (item) => item.productId == productId,
+    );
 
     if (existingItemIndex != -1) {
       // Update existing item
@@ -364,7 +370,11 @@ class SalesProvider extends ChangeNotifier {
   double get cartTotal => cartSubtotal + cartGstAmount - overallDiscount;
 
   /// Create sale from cart
-  Future<bool> createSaleFromCart({required String paymentMethod, required double amountPaid, String? notes}) async {
+  Future<bool> createSaleFromCart({
+    required String paymentMethod,
+    required double amountPaid,
+    String? notes,
+  }) async {
     if (_cartItems.isEmpty) {
       _setError('Cart is empty');
       return false;
@@ -598,8 +608,58 @@ class SalesProvider extends ChangeNotifier {
   /// Recalculate sale totals
   Future<bool> recalculateSaleTotals(String id) async {
     try {
-      final _sale = _sales.firstWhere((sale) => sale.id == id);
-      // TODO: Implement recalculation logic using the sale variable
+      final saleIndex = _sales.indexWhere((sale) => sale.id == id);
+      if (saleIndex == -1) {
+        _setError('Sale not found');
+        return false;
+      }
+
+      final sale = _sales[saleIndex];
+
+      // 1. Calculate Subtotal
+      final double subtotal = sale.saleItems.fold(
+        0.0,
+        (sum, item) => sum + item.lineTotal,
+      );
+
+      // 2. Recalculate Taxes
+      final Map<String, TaxConfigItem> newTaxes = {};
+      sale.taxConfiguration.taxes.forEach((key, item) {
+        final double newAmount = (subtotal * item.percentage) / 100;
+        newTaxes[key] = item.copyWith(amount: newAmount);
+      });
+
+      final newTaxConfiguration = sale.taxConfiguration.copyWith(
+        taxes: newTaxes,
+      );
+      final double taxAmount = newTaxConfiguration.totalTaxAmount;
+
+      // 3. Calculate Grand Total
+      final double grandTotal = subtotal + taxAmount - sale.overallDiscount;
+
+      // 4. Update Remaining Amount
+      final double remainingAmount = grandTotal - sale.amountPaid;
+
+      // 5. Check if fully paid
+      final bool isFullyPaid = remainingAmount <= 0;
+
+      // 6. Update Sale Model
+      final updatedSale = sale.copyWith(
+        subtotal: subtotal,
+        taxConfiguration: newTaxConfiguration,
+        taxAmount: taxAmount,
+        grandTotal: grandTotal,
+        remainingAmount: remainingAmount,
+        isFullyPaid: isFullyPaid,
+      );
+
+      // 7. Update State
+      _sales[saleIndex] = updatedSale;
+      if (_selectedSale?.id == id) {
+        _selectedSale = updatedSale;
+      }
+      notifyListeners();
+
       _setSuccess('Sale totals recalculated');
       return true;
     } catch (e) {
@@ -645,7 +705,12 @@ class SalesProvider extends ChangeNotifier {
 
   /// Initialize provider
   Future<void> initialize() async {
-    await Future.wait([loadSales(refresh: true), loadSalesStatistics(), loadCustomers(), loadProducts()]);
+    await Future.wait([
+      loadSales(refresh: true),
+      loadSalesStatistics(),
+      loadCustomers(),
+      loadProducts(),
+    ]);
   }
 
   // ===== BULK OPERATIONS =====
@@ -671,7 +736,10 @@ class SalesProvider extends ChangeNotifier {
   /// Bulk deactivate sales
   Future<bool> bulkDeactivateSales(List<String> saleIds) async {
     try {
-      final response = await _salesService.bulkActionSales(saleIds, 'deactivate');
+      final response = await _salesService.bulkActionSales(
+        saleIds,
+        'deactivate',
+      );
       if (response.success) {
         await loadSales(refresh: true);
         _setSuccess('${saleIds.length} sales deactivated successfully');
@@ -725,7 +793,10 @@ class SalesProvider extends ChangeNotifier {
   /// Bulk mark sales as paid
   Future<bool> bulkMarkPaidSales(List<String> saleIds) async {
     try {
-      final response = await _salesService.bulkActionSales(saleIds, 'mark_paid');
+      final response = await _salesService.bulkActionSales(
+        saleIds,
+        'mark_paid',
+      );
       if (response.success) {
         await loadSales(refresh: true);
         _setSuccess('${saleIds.length} sales marked as paid successfully');
@@ -797,7 +868,10 @@ class SalesProvider extends ChangeNotifier {
   /// Bulk recalculate sale totals
   Future<bool> bulkRecalculateTotals(List<String> saleIds) async {
     try {
-      final response = await _salesService.bulkActionSales(saleIds, 'recalculate');
+      final response = await _salesService.bulkActionSales(
+        saleIds,
+        'recalculate',
+      );
       if (response.success) {
         await loadSales(refresh: true);
         _setSuccess('${saleIds.length} sales totals recalculated successfully');
@@ -815,9 +889,18 @@ class SalesProvider extends ChangeNotifier {
   // ===== ADVANCED SALES FEATURES =====
 
   /// Add payment to sale
-  Future<bool> addPayment(String saleId, double amount, String method, {Map<String, dynamic>? splitDetails}) async {
+  Future<bool> addPayment(
+    String saleId,
+    double amount,
+    String method, {
+    Map<String, dynamic>? splitDetails,
+  }) async {
     try {
-      final response = await _salesService.addSalePayment(saleId, amount, method);
+      final response = await _salesService.addSalePayment(
+        saleId,
+        amount,
+        method,
+      );
       if (response.success) {
         await loadSales(refresh: true);
         _setSuccess('Payment added successfully');
@@ -935,7 +1018,11 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Update sale status with payment tracking
-  Future<bool> updateSaleStatusWithPayment(String saleId, String newStatus, {String? notes}) async {
+  Future<bool> updateSaleStatusWithPayment(
+    String saleId,
+    String newStatus, {
+    String? notes,
+  }) async {
     try {
       final response = await _salesService.updateSaleStatus(saleId, newStatus);
       if (response.success) {
@@ -953,7 +1040,10 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Handle split payments
-  Future<bool> handleSplitPayments(String saleId, Map<String, dynamic> splitDetails) async {
+  Future<bool> handleSplitPayments(
+    String saleId,
+    Map<String, dynamic> splitDetails,
+  ) async {
     try {
       final response = await _salesService.addPayment(saleId, 0.0, 'SPLIT');
       if (response.success) {
@@ -980,7 +1070,12 @@ class SalesProvider extends ChangeNotifier {
   }) async {
     try {
       // Step 1: Process payment
-      final paymentSuccess = await addPaymentWithWorkflow(saleId: saleId, amount: amount, method: paymentMethod, notes: notes);
+      final paymentSuccess = await addPaymentWithWorkflow(
+        saleId: saleId,
+        amount: amount,
+        method: paymentMethod,
+        notes: notes,
+      );
 
       if (!paymentSuccess) {
         return false;
@@ -988,7 +1083,11 @@ class SalesProvider extends ChangeNotifier {
 
       // Step 2: Update sale status if provided
       if (newStatus != null) {
-        final statusSuccess = await updateSaleStatusWithPayment(saleId, newStatus, notes: notes);
+        final statusSuccess = await updateSaleStatusWithPayment(
+          saleId,
+          newStatus,
+          notes: notes,
+        );
         if (!statusSuccess) {
           _setError('Payment processed but status update failed');
           return false;
@@ -1004,11 +1103,14 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Get payment workflow actions for a sale
-  List<String> getAvailablePaymentActions(Map<String, dynamic> workflowSummary) {
+  List<String> getAvailablePaymentActions(
+    Map<String, dynamic> workflowSummary,
+  ) {
     final actions = <String>[];
 
     if (workflowSummary['workflow_actions'] != null) {
-      final workflowActions = workflowSummary['workflow_actions'] as Map<String, dynamic>;
+      final workflowActions =
+          workflowSummary['workflow_actions'] as Map<String, dynamic>;
 
       if (workflowActions['can_add_payment'] == true) {
         actions.add('add_payment');
@@ -1048,7 +1150,8 @@ class SalesProvider extends ChangeNotifier {
   /// Get payment workflow progress
   double getPaymentWorkflowProgress(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
-      final paymentSummary = workflowSummary['payment_summary'] as Map<String, dynamic>;
+      final paymentSummary =
+          workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['payment_percentage'] as double? ?? 0.0;
     }
     return 0.0;
@@ -1057,14 +1160,20 @@ class SalesProvider extends ChangeNotifier {
   /// Check if payment workflow is complete
   bool isPaymentWorkflowComplete(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
-      final paymentSummary = workflowSummary['payment_summary'] as Map<String, dynamic>;
+      final paymentSummary =
+          workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['is_fully_paid'] as bool? ?? false;
     }
     return false;
   }
 
   /// Validate payment workflow data
-  bool validatePaymentWorkflow({required double amount, required String paymentMethod, required double saleTotal, double? previousAmountPaid = 0.0}) {
+  bool validatePaymentWorkflow({
+    required double amount,
+    required String paymentMethod,
+    required double saleTotal,
+    double? previousAmountPaid = 0.0,
+  }) {
     if (amount <= 0) return false;
     if (amount > saleTotal) return false;
     if (paymentMethod.isEmpty) return false;
@@ -1083,7 +1192,10 @@ class SalesProvider extends ChangeNotifier {
     try {
       final stats = await _salesService.getSalesStatistics();
       if (stats.success && stats.data != null) {
-        return {'total_revenue': stats.data!.totalRevenue, 'total_sales': stats.data!.totalSales};
+        return {
+          'total_revenue': stats.data!.totalRevenue,
+          'total_sales': stats.data!.totalSales,
+        };
       }
       return {};
     } catch (e) {
@@ -1097,7 +1209,10 @@ class SalesProvider extends ChangeNotifier {
     try {
       final stats = await _salesService.getSalesStatistics();
       if (stats.success && stats.data != null) {
-        return {'total_sales': stats.data!.totalSales, 'total_revenue': stats.data!.totalRevenue};
+        return {
+          'total_sales': stats.data!.totalSales,
+          'total_revenue': stats.data!.totalRevenue,
+        };
       }
       return {};
     } catch (e) {
@@ -1172,7 +1287,9 @@ class SalesProvider extends ChangeNotifier {
         // Update the sale with its items
         final saleIndex = _sales.indexWhere((sale) => sale.id == saleId);
         if (saleIndex != -1) {
-          _sales[saleIndex] = _sales[saleIndex].copyWith(saleItems: response.data!);
+          _sales[saleIndex] = _sales[saleIndex].copyWith(
+            saleItems: response.data!,
+          );
           notifyListeners();
         }
       }
@@ -1182,14 +1299,19 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Create sale item (Note: Sale items are typically created as part of sale creation)
-  Future<bool> createSaleItem(CreateSaleItemRequest request, String saleId) async {
+  Future<bool> createSaleItem(
+    CreateSaleItemRequest request,
+    String saleId,
+  ) async {
     try {
       final response = await _saleItemService.createSaleItem(request);
       if (response.success && response.data != null) {
         // Add the new item to the sale
         final saleIndex = _sales.indexWhere((sale) => sale.id == saleId);
         if (saleIndex != -1) {
-          _sales[saleIndex] = _sales[saleIndex].copyWith(saleItems: [..._sales[saleIndex].saleItems, response.data!]);
+          _sales[saleIndex] = _sales[saleIndex].copyWith(
+            saleItems: [..._sales[saleIndex].saleItems, response.data!],
+          );
           notifyListeners();
         }
         _setSuccess('Sale item created successfully');
@@ -1205,13 +1327,18 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Update sale item
-  Future<bool> updateSaleItem(String itemId, UpdateSaleItemRequest request) async {
+  Future<bool> updateSaleItem(
+    String itemId,
+    UpdateSaleItemRequest request,
+  ) async {
     try {
       final response = await _saleItemService.updateSaleItem(itemId, request);
       if (response.success && response.data != null) {
         // Update the item in the sale
         for (int i = 0; i < _sales.length; i++) {
-          final itemIndex = _sales[i].saleItems.indexWhere((item) => item.id == itemId);
+          final itemIndex = _sales[i].saleItems.indexWhere(
+            (item) => item.id == itemId,
+          );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
             updatedItems[itemIndex] = response.data!;
@@ -1239,7 +1366,9 @@ class SalesProvider extends ChangeNotifier {
       if (response.success) {
         // Remove the item from the sale
         for (int i = 0; i < _sales.length; i++) {
-          final itemIndex = _sales[i].saleItems.indexWhere((item) => item.id == itemId);
+          final itemIndex = _sales[i].saleItems.indexWhere(
+            (item) => item.id == itemId,
+          );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
             updatedItems.removeAt(itemIndex);

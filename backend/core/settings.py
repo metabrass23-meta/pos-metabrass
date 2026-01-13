@@ -1,15 +1,17 @@
 from pathlib import Path
 import os
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-8o5+g*(2=vwv@f#5*p^&71tb2@%*wi5gsc#l)p7t237=8w4bkb'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-default-key-change-me')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
+    'daphne',  # ASGI server, must be before django.contrib.staticfiles
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'channels',  # Django Channels
 
     'posapi',
     'categories',
@@ -70,22 +73,39 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
+# Database Configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'POS_DB',
-        'USER': 'postgres',
-        'PASSWORD': 'Admin123!',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DB_NAME', default='POS_DB'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default='Abdullah@1'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432', cast=int),
         'OPTIONS': {
-            'connect_timeout': 10,  # Connection timeout in seconds
-            'options': '-c statement_timeout=60000',  # Statement timeout in milliseconds (60 seconds)
-            'options': '-c idle_in_transaction_session_timeout=60000',  # Idle transaction timeout
+            'connect_timeout': 10,
+            'options': '-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000',
         },
     }
 }
+
+# Channels Layer Configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+# Uncomment below to use Redis in production
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 # Custom User Model
 AUTH_USER_MODEL = 'posapi.User'

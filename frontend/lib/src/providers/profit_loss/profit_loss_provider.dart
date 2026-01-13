@@ -20,7 +20,13 @@ class ProfitLossProvider extends ChangeNotifier {
   DateTime _customEndDate = DateTime.now();
 
   // Available period types
-  final List<String> _availablePeriodTypes = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
+  final List<String> _availablePeriodTypes = [
+    'daily',
+    'weekly',
+    'monthly',
+    'yearly',
+    'custom',
+  ];
 
   // Getters
   List<ProfitLossRecord> get profitLossHistory => _profitLossHistory;
@@ -55,12 +61,15 @@ class ProfitLossProvider extends ChangeNotifier {
 
   // Manual initialization method - call this when the app is ready
   Future<void> initialize() async {
+    if (_isLoading) return;
+
     try {
       await loadProfitLossRecords();
       await loadDashboardData();
       await _loadCurrentMonthData();
     } catch (e) {
       debugPrint('Error loading initial data: $e');
+      _setError(e.toString());
     }
   }
 
@@ -101,7 +110,12 @@ class ProfitLossProvider extends ChangeNotifier {
   }
 
   // Calculate profit and loss for a specific period
-  Future<void> calculateProfitLoss({required DateTime startDate, required DateTime endDate, required String periodType, String? notes}) async {
+  Future<void> calculateProfitLoss({
+    required DateTime startDate,
+    required DateTime endDate,
+    required String periodType,
+    String? notes,
+  }) async {
     _setLoading(true);
     clearError();
 
@@ -131,7 +145,9 @@ class ProfitLossProvider extends ChangeNotifier {
         _currentProfitLoss = response.data!;
 
         // Add to history if it's new
-        final existingIndex = _profitLossHistory.indexWhere((p) => p.id == response.data!.id);
+        final existingIndex = _profitLossHistory.indexWhere(
+          (p) => p.id == response.data!.id,
+        );
 
         if (existingIndex == -1) {
           _profitLossHistory.insert(0, response.data!);
@@ -145,7 +161,8 @@ class ProfitLossProvider extends ChangeNotifier {
 
         _setSuccess('Profit and loss calculated successfully');
       } else {
-        final errorMsg = response.message ?? 'Failed to calculate profit and loss';
+        final errorMsg =
+            response.message ?? 'Failed to calculate profit and loss';
         final errors = response.errors?.values.join(', ') ?? '';
         _setError('$errorMsg${errors.isNotEmpty ? ': $errors' : ''}');
       }
@@ -162,7 +179,9 @@ class ProfitLossProvider extends ChangeNotifier {
     clearError();
 
     try {
-      final response = await _profitLossService.getProfitLossRecords(params: params);
+      final response = await _profitLossService.getProfitLossRecords(
+        params: params,
+      );
 
       if (response.success && response.data != null) {
         _profitLossHistory = response.data!.records;
@@ -210,9 +229,15 @@ class ProfitLossProvider extends ChangeNotifier {
     try {
       // Load all data concurrently but handle individual failures gracefully
       await Future.wait([
-        loadProfitLossRecords().catchError((e) => debugPrint('Error loading records: $e')),
-        loadDashboardData().catchError((e) => debugPrint('Error loading dashboard: $e')),
-        loadProductProfitability().catchError((e) => debugPrint('Error loading profitability: $e')),
+        loadProfitLossRecords().catchError(
+          (e) => debugPrint('Error loading records: $e'),
+        ),
+        loadDashboardData().catchError(
+          (e) => debugPrint('Error loading dashboard: $e'),
+        ),
+        loadProductProfitability().catchError(
+          (e) => debugPrint('Error loading profitability: $e'),
+        ),
       ]);
     } catch (e) {
       debugPrint('Error during refresh: $e');
@@ -226,12 +251,18 @@ class ProfitLossProvider extends ChangeNotifier {
   }
 
   // Load product profitability
-  Future<void> loadProductProfitability({DateTime? startDate, DateTime? endDate}) async {
+  Future<void> loadProductProfitability({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     _setLoading(true);
     clearError();
 
     try {
-      final response = await _profitLossService.getProductProfitability(startDate: startDate, endDate: endDate);
+      final response = await _profitLossService.getProductProfitability(
+        startDate: startDate,
+        endDate: endDate,
+      );
 
       if (response.success && response.data != null) {
         _productProfitability = response.data!;
@@ -275,7 +306,11 @@ class ProfitLossProvider extends ChangeNotifier {
         startDate = DateTime(endDate.year, endDate.month, 1);
     }
 
-    await calculateProfitLoss(startDate: startDate, endDate: endDate, periodType: periodType.toUpperCase());
+    await calculateProfitLoss(
+      startDate: startDate,
+      endDate: endDate,
+      periodType: periodType.toUpperCase(),
+    );
 
     // Also refresh product profitability data for the new period
     await loadProductProfitability(startDate: startDate, endDate: endDate);
@@ -296,28 +331,44 @@ class ProfitLossProvider extends ChangeNotifier {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, now.day);
     final endDate = now;
-    await calculateProfitLoss(startDate: startDate, endDate: endDate, periodType: 'DAILY');
+    await calculateProfitLoss(
+      startDate: startDate,
+      endDate: endDate,
+      periodType: 'DAILY',
+    );
   }
 
   Future<void> _loadCurrentWeekData() async {
     final now = DateTime.now();
     final startDate = now.subtract(Duration(days: now.weekday - 1));
     final endDate = now;
-    await calculateProfitLoss(startDate: startDate, endDate: endDate, periodType: 'WEEKLY');
+    await calculateProfitLoss(
+      startDate: startDate,
+      endDate: endDate,
+      periodType: 'WEEKLY',
+    );
   }
 
   Future<void> _loadCurrentMonthData() async {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, 1);
     final endDate = now;
-    await calculateProfitLoss(startDate: startDate, endDate: endDate, periodType: 'MONTHLY');
+    await calculateProfitLoss(
+      startDate: startDate,
+      endDate: endDate,
+      periodType: 'MONTHLY',
+    );
   }
 
   Future<void> _loadCurrentYearData() async {
     final now = DateTime.now();
     final startDate = DateTime(now.year, 1, 1);
     final endDate = now;
-    await calculateProfitLoss(startDate: startDate, endDate: endDate, periodType: 'YEARLY');
+    await calculateProfitLoss(
+      startDate: startDate,
+      endDate: endDate,
+      periodType: 'YEARLY',
+    );
   }
 
   // Get comparison with previous period
@@ -329,12 +380,19 @@ class ProfitLossProvider extends ChangeNotifier {
       final previous = _profitLossHistory[1];
 
       final incomeChange = current.totalSalesIncome - previous.totalSalesIncome;
-      final expenseChange = current.totalExpensesCalculated - previous.totalExpensesCalculated;
+      final expenseChange =
+          current.totalExpensesCalculated - previous.totalExpensesCalculated;
       final profitChange = current.netProfit - previous.netProfit;
 
-      final incomeChangePercent = previous.totalSalesIncome > 0 ? (incomeChange / previous.totalSalesIncome) * 100 : 0.0;
-      final expenseChangePercent = previous.totalExpensesCalculated > 0 ? (expenseChange / previous.totalExpensesCalculated) * 100 : 0.0;
-      final profitChangePercent = previous.netProfit != 0 ? (profitChange / previous.netProfit.abs()) * 100 : 0.0;
+      final incomeChangePercent = previous.totalSalesIncome > 0
+          ? (incomeChange / previous.totalSalesIncome) * 100
+          : 0.0;
+      final expenseChangePercent = previous.totalExpensesCalculated > 0
+          ? (expenseChange / previous.totalExpensesCalculated) * 100
+          : 0.0;
+      final profitChangePercent = previous.netProfit != 0
+          ? (profitChange / previous.netProfit.abs()) * 100
+          : 0.0;
 
       return {
         'incomeChange': incomeChange,
@@ -377,7 +435,12 @@ class ProfitLossProvider extends ChangeNotifier {
           'percentage': _currentProfitLoss!.otherExpensesPercentage,
           'color': Colors.red,
         },
-        {'category': 'Zakat', 'amount': _currentProfitLoss!.totalZakat, 'percentage': _currentProfitLoss!.zakatPercentage, 'color': Colors.green},
+        {
+          'category': 'Zakat',
+          'amount': _currentProfitLoss!.totalZakat,
+          'percentage': _currentProfitLoss!.zakatPercentage,
+          'color': Colors.green,
+        },
       ];
     } catch (e) {
       debugPrint('Error getting expense breakdown: $e');
@@ -408,7 +471,9 @@ class ProfitLossProvider extends ChangeNotifier {
   // Get summary for a specific period type
   Future<ProfitLossSummary?> getSummary(String periodType) async {
     try {
-      final response = await _profitLossService.getProfitLossSummary(periodType: periodType);
+      final response = await _profitLossService.getProfitLossSummary(
+        periodType: periodType,
+      );
 
       if (response.success && response.data != null) {
         return response.data!;
@@ -456,7 +521,9 @@ class ProfitLossProvider extends ChangeNotifier {
       if (filePath != null) {
         // Open the exported file
         await ProfitLossExportService.openExportedFile(filePath);
-        _setSuccess('P&L Report exported successfully as ${exportFormat.toUpperCase()}');
+        _setSuccess(
+          'P&L Report exported successfully as ${exportFormat.toUpperCase()}',
+        );
       } else {
         _setError('Failed to export P&L report');
       }
@@ -487,7 +554,9 @@ class ProfitLossProvider extends ChangeNotifier {
     double averageProfit = 0.0;
     if (_profitLossHistory.isNotEmpty) {
       try {
-        averageProfit = _profitLossHistory.map((p) => p.netProfit).reduce((a, b) => a + b) / _profitLossHistory.length;
+        averageProfit =
+            _profitLossHistory.map((p) => p.netProfit).reduce((a, b) => a + b) /
+            _profitLossHistory.length;
       } catch (e) {
         debugPrint('Error calculating average profit: $e');
         averageProfit = 0.0;

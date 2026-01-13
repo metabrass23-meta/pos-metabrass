@@ -134,10 +134,12 @@ class Receipt(models.Model):
 8. **PDF Generation** - Invoice and receipt PDF creation
 
 ### **❌ What's NOT Implemented (As Requested):**
-1. **Return Policy** - No return/refund system (shop policy)
-2. **Payment Gateway** - No external payment processing
-3. **Delivery Status** - No delivery tracking system
-4. **Return Processing** - No return workflow
+1. **Payment Gateway** - No external payment processing
+2. **Delivery Status** - No delivery tracking system
+3. **Return Processing** - No return workflow
+
+### ✅ Additional Features:
+1. **Return System** - Full backend implementation for returns and refunds
 
 ## 🔗 **MODULE INTEGRATIONS**
 
