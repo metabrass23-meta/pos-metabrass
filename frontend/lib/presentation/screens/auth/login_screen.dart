@@ -7,6 +7,7 @@ import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 import '../../widgets/globals/text_button.dart';
 import '../../widgets/globals/text_field.dart';
+import '../../../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,68 +36,74 @@ class _LoginScreenState extends State<LoginScreen> {
       // Clear any previous errors
       authProvider.clearError();
 
-      authProvider.login(
-        _emailController.text.trim(),
-        _passwordController.text,
-      ).then((_) {
-        if (authProvider.state == AuthState.authenticated) {
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Welcome back! Login successful.',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize),
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-              ),
-              margin: EdgeInsets.all(context.mainPadding),
-            ),
-          );
+      authProvider
+          .login(_emailController.text.trim(), _passwordController.text)
+          .then((_) {
+            if (authProvider.state == AuthState.authenticated) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)!.loginSuccess,
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                  ),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('medium'),
+                    ),
+                  ),
+                  margin: EdgeInsets.all(context.mainPadding),
+                ),
+              );
 
-          // Navigate to dashboard after a short delay
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            if (mounted) {
-              Navigator.of(context).pushReplacementNamed('/dashboard');
+              // Navigate to dashboard after a short delay
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed('/dashboard');
+                }
+              });
+            } else if (authProvider.state == AuthState.error) {
+              // Error will be displayed by the Consumer widget below
+              // But also show a snackbar for immediate feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)!.loginFailed,
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                  ),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('medium'),
+                    ),
+                  ),
+                  margin: EdgeInsets.all(context.mainPadding),
+                ),
+              );
             }
+          })
+          .catchError((error) {
+            // Handle any unexpected errors
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.unexpectedError,
+                  style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                ),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('medium'),
+                  ),
+                ),
+                margin: EdgeInsets.all(context.mainPadding),
+              ),
+            );
           });
-        } else if (authProvider.state == AuthState.error) {
-          // Error will be displayed by the Consumer widget below
-          // But also show a snackbar for immediate feedback
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Login failed. Please check your credentials.',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize),
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-              ),
-              margin: EdgeInsets.all(context.mainPadding),
-            ),
-          );
-        }
-      }).catchError((error) {
-        // Handle any unexpected errors
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'An unexpected error occurred. Please try again.',
-              style: GoogleFonts.inter(fontSize: context.captionFontSize),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-            ),
-            margin: EdgeInsets.all(context.mainPadding),
-          ),
-        );
-      });
     }
   }
 
@@ -120,10 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.primaryMaroon,
-                    AppTheme.secondaryMaroon,
-                  ],
+                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
                 ),
               ),
               child: Center(
@@ -154,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: context.mainPadding),
 
                     Text(
-                      'Welcome Back to',
+                      AppLocalizations.of(context)!.welcomeBack,
                       style: GoogleFonts.inter(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w300,
@@ -165,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: context.smallPadding),
 
                     Text(
-                      'Maqbool Fashion',
+                      AppLocalizations.of(context)!.brandName,
                       style: GoogleFonts.playfairDisplay(
                         fontSize: context.headingFontSize,
                         fontWeight: FontWeight.w700,
@@ -177,9 +181,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: context.cardPadding),
 
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: context.mainPadding),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.mainPadding,
+                      ),
                       child: Text(
-                        'Crafting elegance for your most precious moments. \nExperience luxury redefined through our premium bridal and groom collections.',
+                        AppLocalizations.of(context)!.tagline,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
@@ -211,14 +217,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SingleChildScrollView(
                   padding: context.pagePadding,
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: context.maxContentWidth * 0.5),
+                    constraints: BoxConstraints(
+                      maxWidth: context.maxContentWidth * 0.5,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Sign In',
+                            AppLocalizations.of(context)!.signIn,
                             style: GoogleFonts.playfairDisplay(
                               fontSize: context.headingFontSize,
                               fontWeight: FontWeight.w600,
@@ -231,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: context.smallPadding),
 
                           Text(
-                            'Access your premium dashboard',
+                            AppLocalizations.of(context)!.accessDashboard,
                             style: GoogleFonts.inter(
                               fontSize: context.headerFontSize,
                               fontWeight: FontWeight.w400,
@@ -245,8 +253,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Email Field
                           PremiumTextField(
-                            label: 'Email Address',
-                            hint: 'Enter your email',
+                            label: AppLocalizations.of(context)!.emailAddress,
+                            hint: AppLocalizations.of(context)!.enterEmail,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.email_outlined,
@@ -254,7 +262,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value?.isEmpty ?? true) {
                                 return 'Please enter your email';
                               }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+                              if (!RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              ).hasMatch(value!)) {
                                 return 'Please enter a valid email address';
                               }
                               return null;
@@ -265,8 +275,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Password Field
                           PremiumTextField(
-                            label: 'Password',
-                            hint: 'Enter your password',
+                            label: AppLocalizations.of(context)!.password,
+                            hint: AppLocalizations.of(context)!.enterPassword,
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             prefixIcon: Icons.lock_outline,
@@ -303,19 +313,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                   SnackBar(
                                     content: Text(
                                       'Forgot password feature coming soon!',
-                                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.captionFontSize,
+                                      ),
                                     ),
                                     backgroundColor: AppTheme.primaryMaroon,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                      borderRadius: BorderRadius.circular(
+                                        context.borderRadius('medium'),
+                                      ),
                                     ),
                                     margin: EdgeInsets.all(context.mainPadding),
                                   ),
                                 );
                               },
                               child: Text(
-                                'Forgot Password?',
+                                AppLocalizations.of(context)!.forgotPassword,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   color: AppTheme.primaryMaroon,
@@ -331,8 +345,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           Consumer<AuthProvider>(
                             builder: (context, authProvider, child) {
                               return PremiumButton(
-                                text: 'Sign In',
-                                onPressed: authProvider.isLoading ? null : _handleLogin,
+                                text: AppLocalizations.of(context)!.signIn,
+                                onPressed: authProvider.isLoading
+                                    ? null
+                                    : _handleLogin,
                                 isLoading: authProvider.isLoading,
                                 height: context.buttonHeight / 1.5,
                               );
@@ -346,11 +362,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             builder: (context, authProvider, child) {
                               if (authProvider.errorMessage != null) {
                                 return Container(
-                                  margin: EdgeInsets.only(top: context.smallPadding),
+                                  margin: EdgeInsets.only(
+                                    top: context.smallPadding,
+                                  ),
                                   padding: EdgeInsets.all(context.cardPadding),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+                                    borderRadius: BorderRadius.circular(
+                                      context.borderRadius('medium'),
+                                    ),
                                     border: Border.all(
                                       color: Colors.red.shade200,
                                       width: 1.5,
@@ -364,7 +384,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ],
                                   ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Icon(
                                         Icons.error_outline,
@@ -374,7 +395,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       SizedBox(width: context.smallPadding),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Login Failed',
@@ -384,12 +406,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
-                                            SizedBox(height: context.smallPadding / 2),
+                                            SizedBox(
+                                              height: context.smallPadding / 2,
+                                            ),
                                             Text(
                                               authProvider.errorMessage!,
                                               style: GoogleFonts.inter(
                                                 color: Colors.red.shade600,
-                                                fontSize: context.captionFontSize,
+                                                fontSize:
+                                                    context.captionFontSize,
                                                 height: 1.4,
                                               ),
                                             ),
@@ -397,7 +422,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                       IconButton(
-                                        onPressed: () => authProvider.clearError(),
+                                        onPressed: () =>
+                                            authProvider.clearError(),
                                         icon: Icon(
                                           Icons.close,
                                           color: Colors.red.shade400,
@@ -423,7 +449,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Don't have an account? ",
+                                AppLocalizations.of(context)!.noAccount,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   color: Colors.grey[600],
@@ -434,7 +460,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.pushNamed(context, '/signup');
                                 },
                                 child: Text(
-                                  'Sign Up',
+                                  AppLocalizations.of(context)!.signUp,
                                   style: GoogleFonts.inter(
                                     fontSize: context.headerFontSize,
                                     color: AppTheme.primaryMaroon,

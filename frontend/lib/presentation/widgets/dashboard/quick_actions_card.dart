@@ -3,40 +3,44 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({super.key});
 
-  final List<Map<String, dynamic>> quickActions = const [
-    {
-      'title': 'New Order',
-      'subtitle': 'Create order',
-      'icon': Icons.add_shopping_cart_rounded,
-      'color': Colors.green,
-      'gradient': [Color(0xFF4CAF50), Color(0xFF45A049)],
-    },
-    {
-      'title': 'Add Product',
-      'subtitle': 'Manage inventory',
-      'icon': Icons.inventory_2_rounded,
-      'color': Colors.blue,
-      'gradient': [Color(0xFF2196F3), Color(0xFF1976D2)],
-    },
-    {
-      'title': 'Payment',
-      'subtitle': 'Process payment',
-      'icon': Icons.payment_rounded,
-      'color': Colors.purple,
-      'gradient': [Color(0xFF9C27B0), Color(0xFF7B1FA2)],
-    },
-    {
-      'title': 'Reports',
-      'subtitle': 'View analytics',
-      'icon': Icons.analytics_rounded,
-      'color': Colors.orange,
-      'gradient': [Color(0xFFFF9800), Color(0xFFF57C00)],
-    },
-  ];
+  List<Map<String, dynamic>> getQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      {
+        'title': l10n.newOrder,
+        'subtitle': l10n.createOrder,
+        'icon': Icons.add_shopping_cart_rounded,
+        'color': Colors.green,
+        'gradient': [const Color(0xFF4CAF50), const Color(0xFF45A049)],
+      },
+      {
+        'title': l10n.addProduct,
+        'subtitle': l10n.manageInventory,
+        'icon': Icons.inventory_2_rounded,
+        'color': Colors.blue,
+        'gradient': [const Color(0xFF2196F3), const Color(0xFF1976D2)],
+      },
+      {
+        'title': l10n.payment,
+        'subtitle': l10n.processPayment,
+        'icon': Icons.payment_rounded,
+        'color': Colors.purple,
+        'gradient': [const Color(0xFF9C27B0), const Color(0xFF7B1FA2)],
+      },
+      {
+        'title': l10n.reports,
+        'subtitle': l10n.viewAnalytics,
+        'icon': Icons.analytics_rounded,
+        'color': Colors.orange,
+        'gradient': [const Color(0xFFFFFF9800), const Color(0xFFFF57C00)],
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +79,7 @@ class QuickActionsCard extends StatelessWidget {
               SizedBox(width: 1.5.w),
 
               Text(
-                'Quick Actions',
+                AppLocalizations.of(context)!.quickActions,
                 style: GoogleFonts.inter(
                   fontSize: 2.2.sp,
                   fontWeight: FontWeight.w600,
@@ -97,9 +101,9 @@ class QuickActionsCard extends StatelessWidget {
               mainAxisSpacing: 1.5.h,
               childAspectRatio: 1.8,
             ),
-            itemCount: quickActions.length,
+            itemCount: getQuickActions(context).length,
             itemBuilder: (context, index) {
-              final action = quickActions[index];
+              final action = getQuickActions(context)[index];
               return _buildActionCard(action);
             },
           ),
@@ -144,11 +148,7 @@ class QuickActionsCard extends StatelessWidget {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(1.w),
                 ),
-                child: Icon(
-                  action['icon'],
-                  color: Colors.white,
-                  size: 2.5.sp,
-                ),
+                child: Icon(action['icon'], color: Colors.white, size: 2.5.sp),
               ),
 
               // Text

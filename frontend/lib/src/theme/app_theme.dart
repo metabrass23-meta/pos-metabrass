@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'dart:ui' show Locale;
 
 class AppTheme {
   // Color Palette
@@ -12,6 +13,18 @@ class AppTheme {
   static const Color charcoalGray = Color(0xFF2C2C2C);
   static const Color lightGray = Color(0xFFF5F5F5);
   static const Color shadowColor = Color(0x1A000000);
+
+  // Font Configuration - Customizable by customer
+  static String englishFontFamily = 'Inter';
+  static String urduFontFamily = 'Noto Nastaliq Urdu';
+
+  // Get font family based on locale
+  static String getFontFamily(Locale locale) {
+    if (locale.languageCode == 'ur') {
+      return urduFontFamily;
+    }
+    return englishFontFamily;
+  }
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -87,9 +100,14 @@ class AppTheme {
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(1.5.w), // Responsive border radius
+            borderRadius: BorderRadius.circular(
+              1.5.w,
+            ), // Responsive border radius
           ),
-          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 3.w), // Responsive padding
+          padding: EdgeInsets.symmetric(
+            vertical: 2.h,
+            horizontal: 3.w,
+          ), // Responsive padding
           textStyle: GoogleFonts.inter(
             fontSize: 1.8.sp, // Responsive font size
             fontWeight: FontWeight.w500,
@@ -102,8 +120,13 @@ class AppTheme {
         filled: true,
         fillColor: pureWhite,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(1.5.w), // Responsive border radius
-          borderSide: BorderSide(color: const Color(0xFFE0E0E0), width: 0.1.w), // Responsive border width
+          borderRadius: BorderRadius.circular(
+            1.5.w,
+          ), // Responsive border radius
+          borderSide: BorderSide(
+            color: const Color(0xFFE0E0E0),
+            width: 0.1.w,
+          ), // Responsive border width
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
@@ -111,13 +134,19 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
-          borderSide: BorderSide(color: primaryMaroon, width: 0.2.w), // Responsive border width
+          borderSide: BorderSide(
+            color: primaryMaroon,
+            width: 0.2.w,
+          ), // Responsive border width
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
           borderSide: BorderSide(color: Colors.red, width: 0.1.w),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w), // Responsive padding
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 2.h,
+          horizontal: 2.w,
+        ), // Responsive padding
         hintStyle: GoogleFonts.inter(
           color: const Color(0xFF9E9E9E),
           fontSize: 1.8.sp, // Responsive font size

@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 
 class LogoutDialogWidget extends StatefulWidget {
   final bool isExpanded;
@@ -22,28 +23,46 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+          ),
           backgroundColor: AppTheme.creamWhite,
           title: Row(
             children: [
-              Icon(Icons.logout_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(
+                Icons.logout_rounded,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Confirm Logout',
-                style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                AppLocalizations.of(context)!.confirmLogout,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: context.headerFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
           content: Text(
-            'Are you sure you want to logout from your account?',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600], height: 1.4),
+            AppLocalizations.of(context)!.logoutMessage,
+            style: GoogleFonts.inter(
+              fontSize: context.bodyFontSize,
+              color: Colors.grey[600],
+              height: 1.4,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
-                'Cancel',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                AppLocalizations.of(context)!.cancel,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Consumer<AuthProvider>(
@@ -61,15 +80,29 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                                   SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite)),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppTheme.pureWhite,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(width: context.smallPadding),
-                                  Text('Logging out...', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                                  Text(
+                                    AppLocalizations.of(context)!.loggingOut,
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.captionFontSize,
+                                    ),
+                                  ),
                                 ],
                               ),
                               backgroundColor: AppTheme.primaryMaroon,
                               behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  context.borderRadius('medium'),
+                                ),
+                              ),
                               margin: EdgeInsets.all(context.mainPadding),
                               duration: const Duration(seconds: 2),
                             ),
@@ -79,56 +112,93 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                             debugPrint('Logout completed successfully');
                             if (mounted) {
                               debugPrint('Navigating to /login');
-                              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login',
+                                (route) => false,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'Successfully logged out. See you soon!',
-                                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                                    AppLocalizations.of(context)!.logoutSuccess,
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.captionFontSize,
+                                    ),
                                   ),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      context.borderRadius('medium'),
+                                    ),
+                                  ),
                                   margin: EdgeInsets.all(context.mainPadding),
                                 ),
                               );
                             } else {
-                              debugPrint('Context not mounted, skipping navigation');
+                              debugPrint(
+                                'Context not mounted, skipping navigation',
+                              );
                             }
                           } catch (e) {
                             debugPrint('Logout error: $e');
                             if (mounted) {
                               debugPrint('Navigating to /login after error');
-                              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login',
+                                (route) => false,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Logged out locally due to an error.', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                                  content: Text(
+                                    AppLocalizations.of(context)!.logoutError,
+                                    style: GoogleFonts.inter(
+                                      fontSize: context.captionFontSize,
+                                    ),
+                                  ),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      context.borderRadius('medium'),
+                                    ),
+                                  ),
                                   margin: EdgeInsets.all(context.mainPadding),
                                 ),
                               );
                             } else {
-                              debugPrint('Context not mounted after error, skipping navigation');
+                              debugPrint(
+                                'Context not mounted after error, skipping navigation',
+                              );
                             }
                           }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryMaroon,
                     foregroundColor: AppTheme.pureWhite,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
+                    ),
                     elevation: 2,
                   ),
                   child: authProvider.isLoading
                       ? SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite)),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppTheme.pureWhite,
+                            ),
+                          ),
                         )
                       : Text(
                           'Logout',
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.inter(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                 );
               },
@@ -147,7 +217,11 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
         onTap: () => _showLogoutDialog(context),
         borderRadius: BorderRadius.circular(context.borderRadius()),
         child: Container(
-          padding: EdgeInsets.all(widget.isExpanded ? context.smallPadding / 1.5 : context.smallPadding),
+          padding: EdgeInsets.all(
+            widget.isExpanded
+                ? context.smallPadding / 1.5
+                : context.smallPadding,
+          ),
           decoration: BoxDecoration(
             color: Colors.red.withOpacity(0.15),
             borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -156,15 +230,27 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           child: widget.isExpanded
               ? Row(
                   children: [
-                    Icon(Icons.logout_rounded, color: Colors.red.shade300, size: context.iconSize('small')),
+                    Icon(
+                      Icons.logout_rounded,
+                      color: Colors.red.shade300,
+                      size: context.iconSize('small'),
+                    ),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Logout',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                      AppLocalizations.of(context)!.logout,
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.pureWhite,
+                      ),
                     ),
                   ],
                 )
-              : Icon(Icons.logout_rounded, color: Colors.red.shade300, size: context.iconSize('medium')),
+              : Icon(
+                  Icons.logout_rounded,
+                  color: Colors.red.shade300,
+                  size: context.iconSize('medium'),
+                ),
         ),
       ),
     );
@@ -177,52 +263,100 @@ class PremiumSidebar extends StatelessWidget {
   final Function(int) onMenuSelected;
   final VoidCallback onToggle;
 
-  const PremiumSidebar({super.key, required this.isExpanded, required this.selectedIndex, required this.onMenuSelected, required this.onToggle});
+  const PremiumSidebar({
+    super.key,
+    required this.isExpanded,
+    required this.selectedIndex,
+    required this.onMenuSelected,
+    required this.onToggle,
+  });
 
-  final List<Map<String, dynamic>> menuItems = const [
-    // Main Overview
-    {'icon': Icons.dashboard_rounded, 'title': 'Dashboard', 'badge': null},
+  // Menu items now use localized strings
+  List<Map<String, dynamic>> getMenuItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      // Main Overview
+      {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null},
 
-    // Core Business Operations
-    {'icon': Icons.point_of_sale_rounded, 'title': 'Sales', 'badge': '23'},
-    {'icon': Icons.shopping_bag_rounded, 'title': 'Orders', 'badge': '7'},
-    {'icon': Icons.list_alt_rounded, 'title': 'Order Items', 'badge': '24'},
+      // Core Business Operations
+      {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': '23'},
+      {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': '7'},
+      {'icon': Icons.list_alt_rounded, 'title': l10n.orders, 'badge': '24'},
 
-    // Inventory & Products
-    {'icon': Icons.inventory_2_rounded, 'title': 'Products', 'badge': '432'},
-    {'icon': Icons.category_rounded, 'title': 'Categories', 'badge': '11'},
+      // Inventory & Products
+      {
+        'icon': Icons.inventory_2_rounded,
+        'title': l10n.products,
+        'badge': '432',
+      },
+      {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': '11'},
 
-    // People & Relationships
-    {'icon': Icons.people_rounded, 'title': 'Customers', 'badge': '156'},
-    {'icon': Icons.store_rounded, 'title': 'Vendors', 'badge': '8'},
-    {'icon': Icons.engineering_rounded, 'title': 'Labor', 'badge': '14731'},
+      // People & Relationships
+      {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': '156'},
+      {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': '8'},
+      {
+        'icon': Icons.engineering_rounded,
+        'title': l10n.labor,
+        'badge': '14731',
+      },
 
-    // Financial Management
-    {'icon': Icons.account_balance_wallet_rounded, 'title': 'Receivables', 'badge': '15'},
-    {'icon': Icons.money_off_rounded, 'title': 'Payables', 'badge': '9'},
-    {'icon': Icons.payments_rounded, 'title': 'Advance', 'badge': '12'},
-    {'icon': Icons.payment_rounded, 'title': 'Payment', 'badge': '3'},
-    {'icon': Icons.account_balance_rounded, 'title': 'Expense', 'badge': '16'},
+      // Financial Management
+      {
+        'icon': Icons.account_balance_wallet_rounded,
+        'title': l10n.receivables,
+        'badge': '15',
+      },
+      {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': '9'},
+      {
+        'icon': Icons.payments_rounded,
+        'title': l10n.advancePayment,
+        'badge': '12',
+      },
+      {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': '3'},
+      {
+        'icon': Icons.account_balance_rounded,
+        'title': l10n.expenses,
+        'badge': '16',
+      },
 
-    // Special Accounts & Reports
-    {'icon': Icons.account_circle_rounded, 'title': 'Principal Account', 'badge': '0'},
-    {'icon': Icons.handshake_rounded, 'title': 'Zakat', 'badge': '4'},
-    {'icon': Icons.calculate_rounded, 'title': 'Profit/Loss', 'badge': null},
-    {'icon': Icons.receipt_rounded, 'title': 'Tax Management', 'badge': null},
+      // Special Accounts & Reports
+      {
+        'icon': Icons.account_circle_rounded,
+        'title': l10n.principalAccount,
+        'badge': '0',
+      },
+      {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': '4'},
+      {
+        'icon': Icons.calculate_rounded,
+        'title': l10n.profitLoss,
+        'badge': null,
+      },
+      {'icon': Icons.receipt_rounded, 'title': l10n.tax, 'badge': null},
 
-    // Management & Returns
-    {'icon': Icons.assignment_return_rounded, 'title': 'Return Management', 'badge': null},
-    {'icon': Icons.receipt_long_rounded, 'title': 'Invoice Management', 'badge': null},
-    {'icon': Icons.receipt_rounded, 'title': 'Receipt Management', 'badge': null},
+      // Management & Returns
+      {
+        'icon': Icons.assignment_return_rounded,
+        'title': l10n.returns,
+        'badge': null,
+      },
+      {
+        'icon': Icons.receipt_long_rounded,
+        'title': l10n.invoices,
+        'badge': null,
+      },
+      {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': null},
 
-    // System
-    {'icon': Icons.settings_rounded, 'title': 'Settings', 'badge': null},
-  ];
+      // System
+      {'icon': Icons.settings_rounded, 'title': l10n.settings, 'badge': null},
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: isExpanded ? context.sidebarExpandedWidth : context.sidebarCollapsedWidth,
+      width: isExpanded
+          ? context.sidebarExpandedWidth
+          : context.sidebarCollapsedWidth,
       height: 100.h,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -230,7 +364,13 @@ class PremiumSidebar extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
         ),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: context.shadowBlur(), offset: Offset(context.smallPadding / 2, 0))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(context.smallPadding / 2, 0),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -239,7 +379,10 @@ class PremiumSidebar extends StatelessWidget {
             padding: EdgeInsets.all(context.cardPadding / 2),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
+                bottom: BorderSide(
+                  color: AppTheme.pureWhite.withOpacity(0.1),
+                  width: 0.1.w,
+                ),
               ),
             ),
             child: Row(
@@ -259,7 +402,11 @@ class PremiumSidebar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(Icons.diamond_sharp, size: context.iconSize('medium'), color: AppTheme.primaryMaroon),
+                  child: Icon(
+                    Icons.diamond_sharp,
+                    size: context.iconSize('medium'),
+                    color: AppTheme.primaryMaroon,
+                  ),
                 ),
 
                 if (isExpanded) ...[
@@ -269,7 +416,7 @@ class PremiumSidebar extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Maqbool Fashion',
+                          AppLocalizations.of(context)!.brandName,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
@@ -278,7 +425,7 @@ class PremiumSidebar extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Premium POS',
+                          AppLocalizations.of(context)!.brandTagline,
                           style: GoogleFonts.inter(
                             fontSize: context.captionFontSize,
                             fontWeight: FontWeight.w300,
@@ -299,7 +446,9 @@ class PremiumSidebar extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(context.smallPadding / 2),
                       child: Icon(
-                        isExpanded ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                        isExpanded
+                            ? Icons.chevron_left_rounded
+                            : Icons.chevron_right_rounded,
                         color: AppTheme.pureWhite.withOpacity(0.9),
                         size: context.iconSize('medium'),
                       ),
@@ -312,108 +461,151 @@ class PremiumSidebar extends StatelessWidget {
 
           // Menu Items
           Expanded(
-            child: ListView.builder(
-              padding: context.sectionPadding / 4,
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                final isSelected = index == selectedIndex;
+            child: Builder(
+              builder: (context) {
+                final menuItems = getMenuItems(context);
+                return ListView.builder(
+                  padding: context.sectionPadding / 4,
+                  itemCount: menuItems.length,
+                  itemBuilder: (context, index) {
+                    final item = menuItems[index];
+                    final isSelected = index == selectedIndex;
 
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: isExpanded ? context.cardPadding / 4 : context.smallPadding,
-                    vertical: context.smallPadding / 3,
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => onMenuSelected(index),
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isExpanded ? context.cardPadding : context.smallPadding,
-                          vertical: context.cardPadding / 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppTheme.pureWhite.withOpacity(0.15) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: isSelected ? Border.all(color: AppTheme.pureWhite.withOpacity(0.3), width: 0.05.w) : null,
-                        ),
-                        child: Row(
-                          children: [
-                            // Icon
-                            Container(
-                              width: context.iconSize('large'),
-                              height: context.iconSize('large'),
-                              decoration: BoxDecoration(
-                                color: isSelected ? AppTheme.accentGold.withOpacity(0.2) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                              ),
-                              child: Icon(
-                                item['icon'],
-                                color: isSelected ? AppTheme.accentGold : AppTheme.pureWhite.withOpacity(0.8),
-                                size: context.iconSize('medium'),
-                              ),
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: isExpanded
+                            ? context.cardPadding / 4
+                            : context.smallPadding,
+                        vertical: context.smallPadding / 3,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => onMenuSelected(index),
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius(),
+                          ),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isExpanded
+                                  ? context.cardPadding
+                                  : context.smallPadding,
+                              vertical: context.cardPadding / 2,
                             ),
-
-                            if (isExpanded) ...[
-                              SizedBox(width: context.smallPadding),
-
-                              // Title
-                              Expanded(
-                                child: Text(
-                                  item['title'],
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                                    color: isSelected ? AppTheme.pureWhite : AppTheme.pureWhite.withOpacity(0.85),
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppTheme.pureWhite.withOpacity(0.15)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius(),
                               ),
-
-                              // Badge
-                              if (item['badge'] != null) ...[
+                              border: isSelected
+                                  ? Border.all(
+                                      color: AppTheme.pureWhite.withOpacity(
+                                        0.3,
+                                      ),
+                                      width: 0.05.w,
+                                    )
+                                  : null,
+                            ),
+                            child: Row(
+                              children: [
+                                // Icon
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                                  width: context.iconSize('large'),
+                                  height: context.iconSize('large'),
                                   decoration: BoxDecoration(
-                                    color: item['badge'] == '156'
-                                        ? Colors.blue.withOpacity(0.9)
-                                        : item['badge'] == '8'
-                                        ? Colors.green.withOpacity(0.9)
-                                        : item['badge'] == '7'
-                                        ? Colors.purple.withOpacity(0.9)
-                                        : item['badge'] == '15'
-                                        ? Colors.cyan.withOpacity(0.9)
-                                        : item['badge'] == '9'
-                                        ? Colors.red.withOpacity(0.9)
-                                        : item['badge'] == '16'
-                                        ? Colors.yellow.withOpacity(0.9)
-                                        : item['badge'] == '4'
-                                        ? Colors.pink.withOpacity(0.9)
-                                        : (item['badge'] == '5' || item['badge'] == '12' || item['badge'] == '23')
-                                        ? Colors.orange.withOpacity(0.9)
-                                        : AppTheme.accentGold.withOpacity(0.9),
-                                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                                  ),
-                                  child: Text(
-                                    item['badge'],
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.captionFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.pureWhite,
+                                    color: isSelected
+                                        ? AppTheme.accentGold.withOpacity(0.2)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(
+                                      context.borderRadius('small'),
                                     ),
                                   ),
+                                  child: Icon(
+                                    item['icon'],
+                                    color: isSelected
+                                        ? AppTheme.accentGold
+                                        : AppTheme.pureWhite.withOpacity(0.8),
+                                    size: context.iconSize('medium'),
+                                  ),
                                 ),
+
+                                if (isExpanded) ...[
+                                  SizedBox(width: context.smallPadding),
+
+                                  // Title
+                                  Expanded(
+                                    child: Text(
+                                      item['title'],
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.bodyFontSize,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                        color: isSelected
+                                            ? AppTheme.pureWhite
+                                            : AppTheme.pureWhite.withOpacity(
+                                                0.85,
+                                              ),
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Badge
+                                  if (item['badge'] != null) ...[
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: context.smallPadding,
+                                        vertical: context.smallPadding / 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: item['badge'] == '156'
+                                            ? Colors.blue.withOpacity(0.9)
+                                            : item['badge'] == '8'
+                                            ? Colors.green.withOpacity(0.9)
+                                            : item['badge'] == '7'
+                                            ? Colors.purple.withOpacity(0.9)
+                                            : item['badge'] == '15'
+                                            ? Colors.cyan.withOpacity(0.9)
+                                            : item['badge'] == '9'
+                                            ? Colors.red.withOpacity(0.9)
+                                            : item['badge'] == '16'
+                                            ? Colors.yellow.withOpacity(0.9)
+                                            : item['badge'] == '4'
+                                            ? Colors.pink.withOpacity(0.9)
+                                            : (item['badge'] == '5' ||
+                                                  item['badge'] == '12' ||
+                                                  item['badge'] == '23')
+                                            ? Colors.orange.withOpacity(0.9)
+                                            : AppTheme.accentGold.withOpacity(
+                                                0.9,
+                                              ),
+                                        borderRadius: BorderRadius.circular(
+                                          context.borderRadius('small'),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        item['badge'],
+                                        style: GoogleFonts.inter(
+                                          fontSize: context.captionFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppTheme.pureWhite,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ],
-                            ],
-                          ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 );
               },
             ),
@@ -424,7 +616,10 @@ class PremiumSidebar extends StatelessWidget {
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(color: AppTheme.pureWhite.withOpacity(0.1), width: 0.1.w),
+                top: BorderSide(
+                  color: AppTheme.pureWhite.withOpacity(0.1),
+                  width: 0.1.w,
+                ),
               ),
             ),
             child: Column(
@@ -440,8 +635,14 @@ class PremiumSidebar extends StatelessWidget {
                             radius: context.iconSize('medium') / 2,
                             backgroundColor: AppTheme.accentGold,
                             child: Text(
-                              user?.fullName.isNotEmpty == true ? user!.fullName[0].toUpperCase() : 'U',
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                              user?.fullName.isNotEmpty == true
+                                  ? user!.fullName[0].toUpperCase()
+                                  : 'U',
+                              style: GoogleFonts.inter(
+                                fontSize: context.bodyFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.primaryMaroon,
+                              ),
                             ),
                           ),
                           SizedBox(width: context.smallPadding),
@@ -451,7 +652,11 @@ class PremiumSidebar extends StatelessWidget {
                               children: [
                                 Text(
                                   user?.fullName ?? 'User',
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppTheme.pureWhite,
+                                  ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(

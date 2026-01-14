@@ -34,6 +34,8 @@ import 'package:frontend/src/theme/app_theme.dart';
 import 'package:frontend/src/utils/storage_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:frontend/l10n/app_localizations.dart';
 
 void main() async {
   // Ensure Flutter is initialized
@@ -122,6 +124,20 @@ class MaqboolFabricApp extends StatelessWidget {
                 darkTheme: AppTheme.darkTheme,
                 themeMode: ThemeMode.light,
                 navigatorKey: navigatorKey,
+
+                // Localization Configuration
+                locale: const Locale('ur'), // Set Urdu as default
+                supportedLocales: const [
+                  Locale('ur'), // Urdu
+                  Locale('en'), // English (fallback)
+                ],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+
                 initialRoute: '/',
                 routes: {
                   '/': (context) => const SplashScreen(),

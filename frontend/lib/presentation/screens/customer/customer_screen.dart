@@ -11,6 +11,7 @@ import '../../widgets/customer/customer_table.dart';
 import '../../widgets/customer/delete_customer_dialog.dart';
 import '../../widgets/customer/edit_customer_dialog.dart';
 import '../../widgets/customer/view_customer_dialog.dart';
+import '../../../l10n/app_localizations.dart';
 
 class CustomerPage extends StatefulWidget {
   const CustomerPage({super.key});
@@ -38,7 +39,11 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   void _showAddCustomerDialog() {
-    showDialog(context: context, barrierDismissible: false, builder: (context) => const AddCustomerDialog());
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AddCustomerDialog(),
+    );
   }
 
   void _showEditCustomerDialog(Customer customer) {
@@ -66,7 +71,11 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   void _showFilterDialog() {
-    showDialog(context: context, barrierDismissible: true, builder: (context) => CustomerFilterDialog());
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => CustomerFilterDialog(),
+    );
   }
 
   Future<void> _handleRefresh() async {
@@ -74,7 +83,10 @@ class _CustomerPageState extends State<CustomerPage> {
     await provider.refreshCustomers();
 
     if (provider.hasError) {
-      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh customers');
+      _showErrorSnackbar(
+        provider.errorMessage ??
+            AppLocalizations.of(context)!.failedToRefreshCustomers,
+      );
     }
   }
 
@@ -83,12 +95,20 @@ class _CustomerPageState extends State<CustomerPage> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
               ),
             ),
           ],
@@ -96,7 +116,9 @@ class _CustomerPageState extends State<CustomerPage> {
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -110,18 +132,28 @@ class _CustomerPageState extends State<CustomerPage> {
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+              Icon(
+                Icons.check_circle_rounded,
+                color: AppTheme.pureWhite,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customer data exported successfully',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                AppLocalizations.of(context)!.customerDataExported,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
               ),
             ],
           ),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
         ),
       );
     } catch (e) {
@@ -141,7 +173,10 @@ class _CustomerPageState extends State<CustomerPage> {
         builder: (context, provider, child) {
           // Show error state if API fails
           if (provider.hasError) {
-            return _buildErrorState(provider.errorMessage ?? 'Failed to load customers');
+            return _buildErrorState(
+              provider.errorMessage ??
+                  AppLocalizations.of(context)!.failedToRefreshCustomers,
+            );
           }
 
           // Show loading state
@@ -170,17 +205,29 @@ class _CustomerPageState extends State<CustomerPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
+              Icon(
+                Icons.screen_rotation_outlined,
+                size: 15.w,
+                color: Colors.grey[400],
+              ),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                AppLocalizations.of(context)!.screenTooSmall,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 6.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.charcoalGray,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                AppLocalizations.of(context)!.screenTooSmallMessage,
+                style: GoogleFonts.inter(
+                  fontSize: 3.sp,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -199,7 +246,7 @@ class _CustomerPageState extends State<CustomerPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Customer Management',
+                AppLocalizations.of(context)!.customerManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -209,8 +256,12 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Organize and manage your customer relationships with comprehensive tools',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                AppLocalizations.of(context)!.customerManagementDescription,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
               ),
             ],
           ),
@@ -228,7 +279,7 @@ class _CustomerPageState extends State<CustomerPage> {
       children: [
         // Page Title
         Text(
-          'Customer Management',
+          AppLocalizations.of(context)!.customerManagement,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -238,8 +289,12 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Organize and manage customer relationships',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          AppLocalizations.of(context)!.customerManagementShortDescription,
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey[600],
+          ),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -255,7 +310,7 @@ class _CustomerPageState extends State<CustomerPage> {
       children: [
         // Compact Page Title
         Text(
-          'Customers',
+          AppLocalizations.of(context)!.customers,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -265,8 +320,12 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage customer relationships',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          AppLocalizations.of(context)!.customerManagementShortDescription,
+          style: GoogleFonts.inter(
+            fontSize: context.bodyFontSize,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey[600],
+          ),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -279,7 +338,9 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildAddButton() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: Material(
@@ -288,14 +349,23 @@ class _CustomerPageState extends State<CustomerPage> {
           onTap: _showAddCustomerDialog,
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.5, vertical: context.cardPadding / 2),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.cardPadding * 0.5,
+              vertical: context.cardPadding / 2,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                Icon(
+                  Icons.add_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Customer',
+                  context.isTablet
+                      ? AppLocalizations.of(context)!.add
+                      : AppLocalizations.of(context)!.addCustomer,
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -315,13 +385,41 @@ class _CustomerPageState extends State<CustomerPage> {
     final stats = provider.customerStats;
     return Row(
       children: [
-        Expanded(child: _buildStatsCard('Total Customers', stats['total'].toString(), Icons.people_rounded, Colors.blue)),
+        Expanded(
+          child: _buildStatsCard(
+            AppLocalizations.of(context)!.totalCustomers,
+            stats['total'].toString(),
+            Icons.people_rounded,
+            Colors.blue,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('New This Month', stats['newThisMonth'].toString(), Icons.person_add_rounded, Colors.green)),
+        Expanded(
+          child: _buildStatsCard(
+            AppLocalizations.of(context)!.newThisMonth,
+            stats['newThisMonth'].toString(),
+            Icons.person_add_rounded,
+            Colors.green,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Total Sales', _getTotalSalesCount(provider), Icons.shopping_cart_rounded, AppTheme.primaryMaroon)),
+        Expanded(
+          child: _buildStatsCard(
+            AppLocalizations.of(context)!.totalSales,
+            _getTotalSalesCount(provider),
+            Icons.shopping_cart_rounded,
+            AppTheme.primaryMaroon,
+          ),
+        ),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Recent Buyers', stats['recentBuyers'].toString(), Icons.shopping_bag_rounded, Colors.orange)),
+        Expanded(
+          child: _buildStatsCard(
+            AppLocalizations.of(context)!.recentBuyers,
+            stats['recentBuyers'].toString(),
+            Icons.shopping_bag_rounded,
+            Colors.orange,
+          ),
+        ),
       ],
     );
   }
@@ -332,17 +430,45 @@ class _CustomerPageState extends State<CustomerPage> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.people_rounded, Colors.blue)),
+            Expanded(
+              child: _buildStatsCard(
+                AppLocalizations.of(context)!.total,
+                stats['total'].toString(),
+                Icons.people_rounded,
+                Colors.blue,
+              ),
+            ),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('New', stats['newThisMonth'].toString(), Icons.person_add_rounded, Colors.green)),
+            Expanded(
+              child: _buildStatsCard(
+                AppLocalizations.of(context)!.newCustomer,
+                stats['newThisMonth'].toString(),
+                Icons.person_add_rounded,
+                Colors.green,
+              ),
+            ),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Total Sales', _getTotalSalesCount(provider), Icons.shopping_cart_rounded, AppTheme.primaryMaroon)),
+            Expanded(
+              child: _buildStatsCard(
+                AppLocalizations.of(context)!.totalSales,
+                _getTotalSalesCount(provider),
+                Icons.shopping_cart_rounded,
+                AppTheme.primaryMaroon,
+              ),
+            ),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('Recent', stats['recentBuyers'].toString(), Icons.shopping_bag_rounded, Colors.orange)),
+            Expanded(
+              child: _buildStatsCard(
+                AppLocalizations.of(context)!.recent,
+                stats['recentBuyers'].toString(),
+                Icons.shopping_bag_rounded,
+                Colors.orange,
+              ),
+            ),
           ],
         ),
       ],
@@ -355,7 +481,13 @@ class _CustomerPageState extends State<CustomerPage> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(0, context.smallPadding),
+          ),
+        ],
       ),
       child: ResponsiveBreakpoints.responsive(
         context,
@@ -434,22 +566,41 @@ class _CustomerPageState extends State<CustomerPage> {
       child: TextField(
         controller: _searchController,
         onChanged: provider.searchCustomers,
-        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+        style: GoogleFonts.inter(
+          fontSize: context.bodyFontSize,
+          color: AppTheme.charcoalGray,
+        ),
         decoration: InputDecoration(
-          hintText: context.isTablet ? 'Search customers...' : 'Search customers by name, phone, email...',
-          hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
-          prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
+          hintText: context.isTablet
+              ? AppLocalizations.of(context)!.searchCustomersShortHint
+              : AppLocalizations.of(context)!.searchCustomersHint,
+          hintStyle: GoogleFonts.inter(
+            fontSize: context.bodyFontSize * 0.9,
+            color: Colors.grey[500],
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Colors.grey[500],
+            size: context.iconSize('medium'),
+          ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   onPressed: () {
                     _searchController.clear();
                     provider.clearSearch();
                   },
-                  icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: Colors.grey[500],
+                    size: context.iconSize('small'),
+                  ),
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: context.cardPadding / 2,
+            vertical: context.cardPadding / 2,
+          ),
         ),
       ),
     );
@@ -460,9 +611,16 @@ class _CustomerPageState extends State<CustomerPage> {
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
       decoration: BoxDecoration(
-        color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.1) : AppTheme.lightGray,
+        color: provider.showInactive
+            ? AppTheme.primaryMaroon.withOpacity(0.1)
+            : AppTheme.lightGray,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: provider.showInactive ? AppTheme.primaryMaroon.withOpacity(0.3) : Colors.grey.shade300, width: 1),
+        border: Border.all(
+          color: provider.showInactive
+              ? AppTheme.primaryMaroon.withOpacity(0.3)
+              : Colors.grey.shade300,
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: provider.toggleShowInactive,
@@ -472,17 +630,23 @@ class _CustomerPageState extends State<CustomerPage> {
           children: [
             Icon(
               provider.showInactive ? Icons.visibility : Icons.visibility_off,
-              color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+              color: provider.showInactive
+                  ? AppTheme.primaryMaroon
+                  : Colors.grey[600],
               size: context.iconSize('medium'),
             ),
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                provider.showInactive
+                    ? AppLocalizations.of(context)!.hideInactive
+                    : AppLocalizations.of(context)!.showInactive,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
-                  color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
+                  color: provider.showInactive
+                      ? AppTheme.primaryMaroon
+                      : Colors.grey[600],
                 ),
               ),
             ],
@@ -504,9 +668,16 @@ class _CustomerPageState extends State<CustomerPage> {
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
       decoration: BoxDecoration(
-        color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.1) : AppTheme.lightGray,
+        color: hasActiveFilters
+            ? AppTheme.accentGold.withOpacity(0.1)
+            : AppTheme.lightGray,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: hasActiveFilters ? AppTheme.accentGold.withOpacity(0.3) : Colors.grey.shade300, width: 1),
+        border: Border.all(
+          color: hasActiveFilters
+              ? AppTheme.accentGold.withOpacity(0.3)
+              : Colors.grey.shade300,
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: _showFilterDialog,
@@ -516,17 +687,23 @@ class _CustomerPageState extends State<CustomerPage> {
           children: [
             Icon(
               hasActiveFilters ? Icons.filter_alt : Icons.filter_list_rounded,
-              color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+              color: hasActiveFilters
+                  ? AppTheme.accentGold
+                  : AppTheme.primaryMaroon,
               size: context.iconSize('medium'),
             ),
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                hasActiveFilters ? 'Filters (${_getActiveFilterCount(provider)})' : 'Filter',
+                hasActiveFilters
+                    ? '${AppLocalizations.of(context)!.filter} (${_getActiveFilterCount(provider)})'
+                    : AppLocalizations.of(context)!.filter,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
-                  color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
+                  color: hasActiveFilters
+                      ? AppTheme.accentGold
+                      : AppTheme.primaryMaroon,
                 ),
               ),
             ],
@@ -543,7 +720,10 @@ class _CustomerPageState extends State<CustomerPage> {
       decoration: BoxDecoration(
         color: AppTheme.accentGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+        border: Border.all(
+          color: AppTheme.accentGold.withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: _handleExport,
@@ -551,12 +731,20 @@ class _CustomerPageState extends State<CustomerPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.download_rounded, color: AppTheme.accentGold, size: context.iconSize('medium')),
+            Icon(
+              Icons.download_rounded,
+              color: AppTheme.accentGold,
+              size: context.iconSize('medium'),
+            ),
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                'Export',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
+                AppLocalizations.of(context)!.export,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.accentGold,
+                ),
               ),
             ],
           ],
@@ -596,23 +784,39 @@ class _CustomerPageState extends State<CustomerPage> {
         children: [
           ...activeFilters.map(
             (filter) => Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding,
+                vertical: context.smallPadding / 2,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+                border: Border.all(
+                  color: AppTheme.primaryMaroon.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     filter,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.primaryMaroon,
+                    ),
                   ),
                   SizedBox(width: context.smallPadding / 2),
                   InkWell(
                     onTap: () => _clearSpecificFilter(filter, provider),
-                    child: Icon(Icons.close, size: context.iconSize('small'), color: AppTheme.primaryMaroon),
+                    child: Icon(
+                      Icons.close,
+                      size: context.iconSize('small'),
+                      color: AppTheme.primaryMaroon,
+                    ),
                   ),
                 ],
               ),
@@ -621,17 +825,26 @@ class _CustomerPageState extends State<CustomerPage> {
 
           // Clear All Filters Button
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding / 2,
+            ),
             decoration: BoxDecoration(
               color: Colors.red.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
               border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
             ),
             child: InkWell(
               onTap: provider.clearAllFilters,
               child: Text(
-                'Clear All',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
+                AppLocalizations.of(context)!.clearAll,
+                style: GoogleFonts.inter(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red[700],
+                ),
               ),
             ),
           ),
@@ -664,20 +877,36 @@ class _CustomerPageState extends State<CustomerPage> {
     return count;
   }
 
-  Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatsCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       height: context.statsCardHeight / 1.5,
       padding: EdgeInsets.all(context.cardPadding / 2),
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(0, context.smallPadding),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
+            ),
             child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
 
@@ -707,7 +936,11 @@ class _CustomerPageState extends State<CustomerPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -734,14 +967,22 @@ class _CustomerPageState extends State<CustomerPage> {
             Icon(Icons.error_outline, size: 10.w, color: Colors.red[400]),
             SizedBox(height: 2.h),
             Text(
-              'Error: $message',
-              style: GoogleFonts.inter(fontSize: 4.sp, fontWeight: FontWeight.w500, color: Colors.red[700]),
+              '${AppLocalizations.of(context)!.error}: $message',
+              style: GoogleFonts.inter(
+                fontSize: 4.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.red[700],
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.h),
             Text(
               'Please try again later or contact support.',
-              style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: GoogleFonts.inter(
+                fontSize: 3.sp,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -757,11 +998,18 @@ class _CustomerPageState extends State<CustomerPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 2.w),
+            CircularProgressIndicator(
+              color: AppTheme.primaryMaroon,
+              strokeWidth: 2.w,
+            ),
             SizedBox(height: 2.h),
             Text(
-              'Loading customers...',
-              style: GoogleFonts.inter(fontSize: 4.sp, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              AppLocalizations.of(context)!.loadingCustomers,
+              style: GoogleFonts.inter(
+                fontSize: 4.sp,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -780,14 +1028,22 @@ class _CustomerPageState extends State<CustomerPage> {
             Icon(Icons.search_off_rounded, size: 10.w, color: Colors.grey[400]),
             SizedBox(height: 2.h),
             Text(
-              'No customers found',
-              style: GoogleFonts.inter(fontSize: 4.sp, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+              AppLocalizations.of(context)!.noCustomersFound,
+              style: GoogleFonts.inter(
+                fontSize: 4.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.h),
             Text(
-              'Try adjusting your filters or adding new customers.',
-              style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              AppLocalizations.of(context)!.adjustFilters,
+              style: GoogleFonts.inter(
+                fontSize: 3.sp,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -818,7 +1074,9 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: context.mainPadding),
 
             // Responsive Stats Cards
-            context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider),
+            context.statsCardColumns == 2
+                ? _buildMobileStatsGrid(provider)
+                : _buildDesktopStatsRow(provider),
 
             SizedBox(height: context.cardPadding * 0.5),
 
@@ -832,7 +1090,11 @@ class _CustomerPageState extends State<CustomerPage> {
 
             // Enhanced Customer Table with View functionality
             Expanded(
-              child: EnhancedCustomerTable(onEdit: _showEditCustomerDialog, onDelete: _showDeleteCustomerDialog, onView: _showViewCustomerDialog),
+              child: EnhancedCustomerTable(
+                onEdit: _showEditCustomerDialog,
+                onDelete: _showDeleteCustomerDialog,
+                onView: _showViewCustomerDialog,
+              ),
             ),
           ],
         ),

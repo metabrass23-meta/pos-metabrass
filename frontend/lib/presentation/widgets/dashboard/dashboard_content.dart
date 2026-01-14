@@ -13,6 +13,7 @@ import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart'
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/stats_card.dart';
+import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -113,7 +114,7 @@ class DashboardContent extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Maqbool Fabrics POS',
+                          AppLocalizations.of(context)!.welcomeToPos,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headingFontSize,
                             fontWeight: FontWeight.w700,
@@ -123,7 +124,7 @@ class DashboardContent extends StatelessWidget {
                         ),
                         SizedBox(height: context.formFieldSpacing),
                         Text(
-                          'Crafting Excellence in Every Stitch - Your Premium Fashion Management System',
+                          AppLocalizations.of(context)!.welcomeTagline,
                           style: GoogleFonts.inter(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w300,
@@ -133,11 +134,23 @@ class DashboardContent extends StatelessWidget {
                         ),
                         SizedBox(height: context.formFieldSpacing * 2),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
-                          decoration: BoxDecoration(color: AppTheme.accentGold, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.cardPadding,
+                            vertical: context.smallPadding,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.accentGold,
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius('small'),
+                            ),
+                          ),
                           child: Text(
-                            'Today: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                            '${AppLocalizations.of(context)!.today}: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primaryMaroon,
+                            ),
                           ),
                         ),
                       ],
@@ -146,8 +159,15 @@ class DashboardContent extends StatelessWidget {
                   Container(
                     width: context.dialogWidth / 5,
                     height: context.dialogWidth / 5,
-                    decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.1), borderRadius: BorderRadius.circular(context.cardPadding)),
-                    child: Icon(Icons.diamond_sharp, size: context.iconSize('special'), color: AppTheme.accentGold),
+                    decoration: BoxDecoration(
+                      color: AppTheme.pureWhite.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.cardPadding),
+                    ),
+                    child: Icon(
+                      Icons.diamond_sharp,
+                      size: context.iconSize('special'),
+                      color: AppTheme.accentGold,
+                    ),
                   ),
                 ],
               ),
@@ -162,7 +182,10 @@ class DashboardContent extends StatelessWidget {
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     final cardCount = context.statsCardColumns.clamp(2, 4);
-                    final cardWidth = (constraints.maxWidth - context.cardPadding * (cardCount - 1)) / cardCount;
+                    final cardWidth =
+                        (constraints.maxWidth -
+                            context.cardPadding * (cardCount - 1)) /
+                        cardCount;
                     return Wrap(
                       spacing: context.cardPadding,
                       runSpacing: context.formFieldSpacing,
@@ -170,7 +193,7 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Total Sales',
+                            title: AppLocalizations.of(context)!.totalSales,
                             value: stats['totalSales']['value'],
                             change: stats['totalSales']['change'],
                             isPositive: stats['totalSales']['isPositive'],
@@ -181,7 +204,7 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Total Orders',
+                            title: AppLocalizations.of(context)!.totalOrders,
                             value: stats['totalOrders']['value'],
                             change: stats['totalOrders']['change'],
                             isPositive: stats['totalOrders']['isPositive'],
@@ -192,7 +215,9 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Active Customers',
+                            title: AppLocalizations.of(
+                              context,
+                            )!.activeCustomers,
                             value: stats['activeCustomers']['value'],
                             change: stats['activeCustomers']['change'],
                             isPositive: stats['activeCustomers']['isPositive'],
@@ -203,7 +228,7 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Active Vendors',
+                            title: AppLocalizations.of(context)!.activeVendors,
                             value: stats['activeVendors']['value'],
                             change: stats['activeVendors']['change'],
                             isPositive: stats['activeVendors']['isPositive'],
@@ -214,10 +239,11 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: 'Pending Returns',
+                            title: AppLocalizations.of(context)!.pendingReturns,
                             value: stats['pendingReturns']?['value'] ?? '0',
                             change: stats['pendingReturns']?['change'] ?? '0%',
-                            isPositive: stats['pendingReturns']?['isPositive'] ?? false,
+                            isPositive:
+                                stats['pendingReturns']?['isPositive'] ?? false,
                             icon: Icons.assignment_return_rounded,
                             color: Colors.orange,
                           ),
@@ -243,7 +269,10 @@ class DashboardContent extends StatelessWidget {
                       child: Column(
                         children: [
                           // Sales Chart
-                          SizedBox(height: context.chartHeight, child: const SalesChartCard()),
+                          SizedBox(
+                            height: context.chartHeight,
+                            child: const SalesChartCard(),
+                          ),
 
                           SizedBox(height: context.formFieldSpacing * 2),
 
@@ -256,7 +285,10 @@ class DashboardContent extends StatelessWidget {
                     SizedBox(width: context.cardPadding),
 
                     // Right Column
-                    Expanded(flex: context.tableColumnFlexes[1], child: const RecentOrdersCard()),
+                    Expanded(
+                      flex: context.tableColumnFlexes[1],
+                      child: const RecentOrdersCard(),
+                    ),
                   ],
                 );
               },
@@ -268,17 +300,28 @@ class DashboardContent extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(color: AppTheme.pureWhite, borderRadius: BorderRadius.circular(context.borderRadius())),
+              decoration: BoxDecoration(
+                color: AppTheme.pureWhite,
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.timeline_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('large')),
+                      Icon(
+                        Icons.timeline_outlined,
+                        color: AppTheme.primaryMaroon,
+                        size: context.iconSize('large'),
+                      ),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Recent Activity',
-                        style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        AppLocalizations.of(context)!.recentActivity,
+                        style: GoogleFonts.inter(
+                          fontSize: context.headerFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoalGray,
+                        ),
                       ),
                     ],
                   ),
@@ -288,7 +331,7 @@ class DashboardContent extends StatelessWidget {
                   // Activity Items
                   _buildActivityItem(
                     context,
-                    'New customer registered: Aisha Khan',
+                    '${AppLocalizations.of(context)!.newCustomerRegistered}: Aisha Khan',
                     'Premium customer from Karachi',
                     '15 minutes ago',
                     Icons.person_add_rounded,
@@ -296,7 +339,7 @@ class DashboardContent extends StatelessWidget {
                   ),
                   _buildActivityItem(
                     context,
-                    'New vendor registered: Ali Textiles',
+                    '${AppLocalizations.of(context)!.newVendorRegistered}: Ali Textiles',
                     'Muhammad Ali - Fabric Supplier',
                     '30 minutes ago',
                     Icons.store_rounded,
@@ -304,7 +347,7 @@ class DashboardContent extends StatelessWidget {
                   ),
                   _buildActivityItem(
                     context,
-                    'Customer purchase completed',
+                    AppLocalizations.of(context)!.customerPurchaseCompleted,
                     'Zara Sheikh - ₨ 120,000 Wedding Collection',
                     '2 hours ago',
                     Icons.shopping_bag_rounded,
@@ -312,7 +355,7 @@ class DashboardContent extends StatelessWidget {
                   ),
                   _buildActivityItem(
                     context,
-                    'Vendor delivery received',
+                    AppLocalizations.of(context)!.vendorDeliveryReceived,
                     'Khan Fabrics - Silk Materials',
                     '5 hours ago',
                     Icons.local_shipping_rounded,
@@ -335,7 +378,9 @@ class DashboardContent extends StatelessWidget {
                         padding: EdgeInsets.all(context.cardPadding),
                         decoration: BoxDecoration(
                           color: AppTheme.pureWhite,
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius(),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),
@@ -349,11 +394,17 @@ class DashboardContent extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.calendar_month_rounded, color: Colors.blue, size: context.iconSize('medium')),
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  color: Colors.blue,
+                                  size: context.iconSize('medium'),
+                                ),
                                 SizedBox(width: context.smallPadding),
                                 Flexible(
                                   child: Text(
-                                    'Monthly Performance',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.monthlyPerformance,
                                     style: GoogleFonts.inter(
                                       fontSize: context.headerFontSize,
                                       fontWeight: FontWeight.w600,
@@ -367,10 +418,34 @@ class DashboardContent extends StatelessWidget {
 
                             SizedBox(height: context.formFieldSpacing * 2),
 
-                            _buildMetricRow(context, 'Revenue Target', '₨ 3,00,000', '82%', Colors.blue),
-                            _buildMetricRow(context, 'Customer Growth', '200', '78%', Colors.indigo),
-                            _buildMetricRow(context, 'Vendor Partnerships', '25', '88%', Colors.teal),
-                            _buildMetricRow(context, 'Conversion Rate', '65%', '92%', Colors.orange),
+                            _buildMetricRow(
+                              context,
+                              AppLocalizations.of(context)!.revenueTarget,
+                              '₨ 3,00,000',
+                              '82%',
+                              Colors.blue,
+                            ),
+                            _buildMetricRow(
+                              context,
+                              AppLocalizations.of(context)!.customerGrowth,
+                              '200',
+                              '78%',
+                              Colors.indigo,
+                            ),
+                            _buildMetricRow(
+                              context,
+                              AppLocalizations.of(context)!.vendorPartnerships,
+                              '25',
+                              '88%',
+                              Colors.teal,
+                            ),
+                            _buildMetricRow(
+                              context,
+                              AppLocalizations.of(context)!.conversionRate,
+                              '65%',
+                              '92%',
+                              Colors.orange,
+                            ),
                           ],
                         ),
                       ),
@@ -384,7 +459,9 @@ class DashboardContent extends StatelessWidget {
                         padding: EdgeInsets.all(context.cardPadding),
                         decoration: BoxDecoration(
                           color: AppTheme.pureWhite,
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius(),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),
@@ -398,11 +475,15 @@ class DashboardContent extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.people_rounded, color: Colors.indigo, size: context.iconSize('medium')),
+                                Icon(
+                                  Icons.people_rounded,
+                                  color: Colors.indigo,
+                                  size: context.iconSize('medium'),
+                                ),
                                 SizedBox(width: context.smallPadding),
                                 Flexible(
                                   child: Text(
-                                    'Top Customers',
+                                    AppLocalizations.of(context)!.topCustomers,
                                     style: GoogleFonts.inter(
                                       fontSize: context.headerFontSize,
                                       fontWeight: FontWeight.w600,
@@ -416,10 +497,30 @@ class DashboardContent extends StatelessWidget {
 
                             SizedBox(height: context.formFieldSpacing * 2),
 
-                            _buildCustomerRow(context, 'Zara Sheikh', 'VIP Customer', 'Rs. 1,20,000'),
-                            _buildCustomerRow(context, 'Aisha Khan', 'Premium Customer', 'Rs. 85,000'),
-                            _buildCustomerRow(context, 'Hina Malik', 'Corporate Client', 'Rs. 95,000'),
-                            _buildCustomerRow(context, 'Fatima Ali', 'Regular Customer', 'Rs. 45,000'),
+                            _buildCustomerRow(
+                              context,
+                              'Zara Sheikh',
+                              AppLocalizations.of(context)!.vipCustomer,
+                              'Rs. 1,20,000',
+                            ),
+                            _buildCustomerRow(
+                              context,
+                              'Aisha Khan',
+                              AppLocalizations.of(context)!.premiumCustomer,
+                              'Rs. 85,000',
+                            ),
+                            _buildCustomerRow(
+                              context,
+                              'Hina Malik',
+                              AppLocalizations.of(context)!.corporateClient,
+                              'Rs. 95,000',
+                            ),
+                            _buildCustomerRow(
+                              context,
+                              'Fatima Ali',
+                              AppLocalizations.of(context)!.regularCustomer,
+                              'Rs. 45,000',
+                            ),
                           ],
                         ),
                       ),
@@ -436,7 +537,14 @@ class DashboardContent extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityItem(BuildContext context, String title, String subtitle, String time, IconData icon, Color color) {
+  Widget _buildActivityItem(
+    BuildContext context,
+    String title,
+    String subtitle,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       padding: EdgeInsets.all(context.cardPadding),
@@ -450,7 +558,12 @@ class DashboardContent extends StatelessWidget {
           Container(
             width: context.iconSize('large') * 1.5,
             height: context.iconSize('large') * 1.5,
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.iconSize('large') * 0.75)),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.iconSize('large') * 0.75,
+              ),
+            ),
             child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
 
@@ -462,11 +575,19 @@ class DashboardContent extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
                 Text(
                   subtitle,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -474,14 +595,24 @@ class DashboardContent extends StatelessWidget {
 
           Text(
             time,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize * 0.9, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+            style: GoogleFonts.inter(
+              fontSize: context.captionFontSize * 0.9,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[500],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMetricRow(BuildContext context, String label, String value, String percentage, Color color) {
+  Widget _buildMetricRow(
+    BuildContext context,
+    String label,
+    String value,
+    String percentage,
+    Color color,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       child: Row(
@@ -492,22 +623,42 @@ class DashboardContent extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
           ),
 
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding * 0.5),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.smallPadding,
+              vertical: context.smallPadding * 0.5,
+            ),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
+            ),
             child: Text(
               percentage,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+              style: GoogleFonts.inter(
+                fontSize: context.captionFontSize,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
           ),
         ],
@@ -515,7 +666,12 @@ class DashboardContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomerRow(BuildContext context, String name, String type, String totalSpent) {
+  Widget _buildCustomerRow(
+    BuildContext context,
+    String name,
+    String type,
+    String totalSpent,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       child: Row(
@@ -523,8 +679,17 @@ class DashboardContent extends StatelessWidget {
           Container(
             width: context.iconSize('medium') * 1.5,
             height: context.iconSize('medium') * 1.5,
-            decoration: BoxDecoration(color: Colors.indigo.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-            child: Icon(Icons.person_rounded, color: Colors.indigo, size: context.iconSize('small')),
+            decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
+            ),
+            child: Icon(
+              Icons.person_rounded,
+              color: Colors.indigo,
+              size: context.iconSize('small'),
+            ),
           ),
 
           SizedBox(width: context.smallPadding),
@@ -535,11 +700,19 @@ class DashboardContent extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: GoogleFonts.inter(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
                 Text(
                   '$type • $totalSpent',
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: GoogleFonts.inter(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -551,24 +724,24 @@ class DashboardContent extends StatelessWidget {
 
   Widget _buildPlaceholderContent(BuildContext context) {
     final List<String> pageNames = [
-      'Dashboard',
-      'Sales',
-      'Orders',
-      'Order Items',
-      'Products',
-      'Categories',
-      'Customers',
-      'Vendors',
-      'Labor',
-      'Receivables',
-      'Payables',
-      'Advance',
-      'Payment',
-      'Expense',
-      'Principal Account',
-      'Zakat',
-      'Profit/Loss',
-      'Settings',
+      AppLocalizations.of(context)!.dashboard,
+      AppLocalizations.of(context)!.sales,
+      AppLocalizations.of(context)!.orders,
+      AppLocalizations.of(context)!.orderItems,
+      AppLocalizations.of(context)!.products,
+      AppLocalizations.of(context)!.category,
+      AppLocalizations.of(context)!.customers,
+      AppLocalizations.of(context)!.vendor,
+      AppLocalizations.of(context)!.labor,
+      AppLocalizations.of(context)!.receivables,
+      AppLocalizations.of(context)!.payables,
+      AppLocalizations.of(context)!.advancePayment,
+      AppLocalizations.of(context)!.payments,
+      AppLocalizations.of(context)!.expenses,
+      AppLocalizations.of(context)!.principalAccount,
+      AppLocalizations.of(context)!.zakat,
+      AppLocalizations.of(context)!.profitLoss,
+      AppLocalizations.of(context)!.settings,
     ];
 
     return Container(
@@ -581,8 +754,12 @@ class DashboardContent extends StatelessWidget {
               width: context.dialogWidth * 0.5,
               height: context.dialogWidth * 0.5,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-                borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                gradient: const LinearGradient(
+                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+                ),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('large'),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: AppTheme.primaryMaroon.withOpacity(0.3),
@@ -591,22 +768,35 @@ class DashboardContent extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(Icons.construction_rounded, size: context.iconSize('xl'), color: AppTheme.pureWhite),
+              child: Icon(
+                Icons.construction_rounded,
+                size: context.iconSize('xl'),
+                color: AppTheme.pureWhite,
+              ),
             ),
 
             SizedBox(height: context.formFieldSpacing * 4),
 
             Text(
-              '${pageNames[selectedIndex]} Page',
-              style: GoogleFonts.playfairDisplay(fontSize: context.headingFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+              '${pageNames[selectedIndex]} ${AppLocalizations.of(context)!.page}',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: context.headingFontSize,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoalGray,
+              ),
             ),
 
             SizedBox(height: context.formFieldSpacing * 2),
 
             Text(
-              'This page is under construction.\nComing soon with amazing features!',
+              '${AppLocalizations.of(context)!.underConstruction}\n${AppLocalizations.of(context)!.comingSoon}',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600], height: 1.5),
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
             ),
 
             SizedBox(height: context.formFieldSpacing * 4),
@@ -615,13 +805,24 @@ class DashboardContent extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  Provider.of<DashboardProvider>(context, listen: false).selectMenu(0);
+                  Provider.of<DashboardProvider>(
+                    context,
+                    listen: false,
+                  ).selectMenu(0);
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.buttonHeight * 0.3),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.cardPadding,
+                    vertical: context.buttonHeight * 0.3,
+                  ),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppTheme.primaryMaroon,
+                        AppTheme.secondaryMaroon,
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(context.borderRadius()),
                     boxShadow: [
                       BoxShadow(
@@ -633,7 +834,11 @@ class DashboardContent extends StatelessWidget {
                   ),
                   child: Text(
                     'Back to Dashboard',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.pureWhite,
+                    ),
                   ),
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class RecentOrdersCard extends StatelessWidget {
   const RecentOrdersCard({super.key});
@@ -48,7 +49,7 @@ class RecentOrdersCard extends StatelessWidget {
 
               Expanded(
                 child: Text(
-                  'Recent Orders',
+                  AppLocalizations.of(context)!.recentOrders,
                   style: GoogleFonts.inter(
                     fontSize: 2.2.sp,
                     fontWeight: FontWeight.w600,
@@ -62,7 +63,7 @@ class RecentOrdersCard extends StatelessWidget {
                   // View all orders
                 },
                 child: Text(
-                  'View All',
+                  AppLocalizations.of(context)!.viewAll,
                   style: GoogleFonts.inter(
                     fontSize: 1.6.sp,
                     fontWeight: FontWeight.w500,
@@ -105,10 +106,7 @@ class RecentOrdersCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.lightGray.withOpacity(0.3),
         borderRadius: BorderRadius.circular(1.2.w),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 0.05.w,
-        ),
+        border: Border.all(color: Colors.grey.shade200, width: 0.05.w),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,10 +115,7 @@ class RecentOrdersCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 1.w,
-                  vertical: 0.5.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 0.5.h),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryMaroon.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(0.8.w),
@@ -138,10 +133,7 @@ class RecentOrdersCard extends StatelessWidget {
               const Spacer(),
 
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 1.w,
-                  vertical: 0.3.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 0.3.h),
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(0.8.w),
