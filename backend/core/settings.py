@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,7 +9,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-default-key-change-me
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# Update this to handle Railway's dynamic URLs
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
 INSTALLED_APPS = [
     'daphne',  # ASGI server, must be before django.contrib.staticfiles
@@ -45,8 +47,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+
     'corsheaders.middleware.CorsMiddleware',  # Move this to the top
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -76,19 +80,14 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # Database Configuration
+# Database Configuration
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='POS_DB'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default='Abdullah@1'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432', cast=int),
-        'OPTIONS': {
-            'connect_timeout': 10,
-            'options': '-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000',
-        },
-    }
+    'default': dj_database_url.config(
+        # This will prefer the 'DATABASE_URL' variable provided by Railway
+        default=config('DATABASE_URL', default=f"postgres://{config('DB_USER')}:{config('DB_PASSWORD')}@{config('DB_HOST')}:{config('DB_PORT')}/{config('DB_NAME')}"),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Channels Layer Configuration

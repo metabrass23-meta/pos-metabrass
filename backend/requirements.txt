@@ -5,6 +5,7 @@ django-cors-headers
 
 # Database
 psycopg2-binary
+dj-database-url
 
 # Data handling
 pandas
