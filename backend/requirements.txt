@@ -10,6 +10,9 @@ dj-database-url
 # Static files
 whitenoise
 
+# WSGI server
+gunicorn
+
 # Data handling
 pandas
 
