@@ -226,16 +226,15 @@ LOGGING = {
         },
     },
     'handlers': {
-        'advance_payments_file': {
+        # Changed from FileHandler to StreamHandler
+        'advance_payments_handler': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'advance_payments.log'),
+            'class': 'logging.StreamHandler', 
             'formatter': 'verbose',
         },
-        'expenses_file': {  
+        'expenses_handler': {  
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'expenses.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
         'console': {
@@ -246,12 +245,12 @@ LOGGING = {
     },
     'loggers': {
         'advance_payments': {
-            'handlers': ['advance_payments_file', 'console'],
+            'handlers': ['advance_payments_handler', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
         'expenses': {
-            'handlers': ['expenses_file', 'console'],
+            'handlers': ['expenses_handler', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
