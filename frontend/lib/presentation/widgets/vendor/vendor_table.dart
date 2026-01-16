@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'vendor_table_helpers.dart';
 
 class EnhancedVendorTable extends StatefulWidget {
@@ -200,6 +201,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
@@ -207,44 +209,44 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
         // Name
         Container(
           width: columnWidths[0],
-          child: _buildSortableHeaderCell(context, 'Name', 'name'),
+          child: _buildSortableHeaderCell(context, l10n.name, 'name'),
         ),
 
         // Business Name
         Container(
           width: columnWidths[1],
-          child: _buildSortableHeaderCell(context, 'Business Name', 'business_name'),
+          child: _buildSortableHeaderCell(context, l10n.businessName, 'business_name'),
         ),
 
         // Phone
         Container(
           width: columnWidths[2],
-          child: _buildHeaderCell(context, 'Phone'),
+          child: _buildHeaderCell(context, l10n.phone),
         ),
 
         // City/Area (responsive)
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[3],
-            child: _buildHeaderCell(context, 'Location'),
+            child: _buildHeaderCell(context, l10n.location),
           ),
 
         // Status
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 3 : 4],
-          child: _buildHeaderCell(context, 'Status'),
+          child: _buildHeaderCell(context, l10n.status),
         ),
 
         // Created At
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 4 : 5],
-          child: _buildSortableHeaderCell(context, 'Created', 'created_at'),
+          child: _buildSortableHeaderCell(context, l10n.created, 'created_at'),
         ),
 
         // Actions
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 5 : 6],
-          child: _buildHeaderCell(context, 'Actions'),
+          child: _buildHeaderCell(context, l10n.actions),
         ),
       ],
     );
@@ -484,6 +486,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
   }
 
   Widget _buildPaginationControls(BuildContext context, VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -499,7 +502,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
         children: [
           // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} vendors',
+            '${l10n.showing} ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} ${l10n.outOf} ${pagination.totalCount} ${l10n.vendor}',
             style: GoogleFonts.inter(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[600],
@@ -531,7 +534,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,

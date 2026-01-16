@@ -52,7 +52,6 @@ class BackgroundEffectsWidget extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Dynamic background pattern overlay
               Positioned.fill(
                 child: AnimatedBuilder(
                   animation: backgroundController,

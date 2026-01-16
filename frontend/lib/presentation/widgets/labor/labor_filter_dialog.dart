@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class EnhancedLaborFilterDialog extends StatefulWidget {
@@ -20,18 +21,15 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables
   String? _selectedCity;
   String? _selectedArea;
   bool _showInactive = false;
   String _searchQuery = '';
 
-  // Text controllers for custom inputs
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _areaController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  // Predefined options
   final List<String> _commonCities = [
     'Karachi',
     'Lahore',
@@ -73,12 +71,11 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    // Initialize with current filter values
     final provider = context.read<LaborProvider>();
     _selectedCity = provider.selectedCity;
     _selectedArea = provider.selectedArea;
     _showInactive = provider.showInactive;
-    _searchQuery = provider.searchQuery ?? ''; // Handle null case
+    _searchQuery = provider.searchQuery ?? '';
 
     _cityController.text = _selectedCity ?? '';
     _areaController.text = _selectedArea ?? '';
@@ -99,12 +96,10 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   void _handleApplyFilters() async {
     final provider = context.read<LaborProvider>();
 
-    // Update city, area, and search from text controllers
     final city = _cityController.text.trim().isEmpty ? null : _cityController.text.trim();
     final area = _areaController.text.trim().isEmpty ? null : _areaController.text.trim();
     final search = _searchController.text.trim();
 
-    // Apply filters using existing provider methods
     if (city != provider.selectedCity) {
       await provider.setCityFilter(city);
     }
@@ -181,6 +176,8 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -210,7 +207,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Labors',
+                  l10n.filterLabors,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -221,7 +218,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your labor list with filters',
+                    l10n.refineYourLaborList,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -259,28 +256,24 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Search Filter
             _buildFilterSection(
-              title: 'Search Labors',
+              title: AppLocalizations.of(context)!.searchLabors,
               icon: Icons.search_outlined,
               child: _buildSearchFilter(),
             ),
             SizedBox(height: context.cardPadding),
-            // Status Filter
             _buildFilterSection(
-              title: 'Labor Status',
+              title: AppLocalizations.of(context)!.laborStatus,
               icon: Icons.flag_outlined,
               child: _buildStatusFilter(),
             ),
             SizedBox(height: context.cardPadding),
-            // Location Filters
             _buildFilterSection(
-              title: 'Location',
+              title: AppLocalizations.of(context)!.location,
               icon: Icons.location_on_outlined,
               child: _buildLocationFilters(),
             ),
             SizedBox(height: context.mainPadding),
-            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -336,6 +329,8 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildSearchFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return TextFormField(
       controller: _searchController,
       style: GoogleFonts.inter(
@@ -343,7 +338,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         color: AppTheme.charcoalGray,
       ),
       decoration: InputDecoration(
-        hintText: 'Search by name, CNIC, phone, or designation',
+        hintText: l10n.searchByNameCnicPhoneDesignation,
         hintStyle: GoogleFonts.inter(
           fontSize: context.bodyFontSize,
           color: Colors.grey[500],
@@ -378,6 +373,8 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildStatusFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         CheckboxListTile(
@@ -388,7 +385,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
             });
           },
           title: Text(
-            'Show inactive labors only',
+            l10n.showInactiveLaborsOnly,
             style: GoogleFonts.inter(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w500,
@@ -416,7 +413,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Only deactivated labors will be shown',
+                    l10n.onlyDeactivatedLaborsWillBeShown,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       color: Colors.orange[700],
@@ -431,14 +428,15 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildLocationFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
-        // City Filter
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'City',
+              l10n.city,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -453,7 +451,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
-                hintText: 'Enter city name',
+                hintText: l10n.enterCityName,
                 hintStyle: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
@@ -501,12 +499,11 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
           ],
         ),
         SizedBox(height: context.cardPadding),
-        // Area Filter
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Area',
+              l10n.area,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -521,7 +518,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
-                hintText: 'Enter area name',
+                hintText: l10n.enterAreaName,
                 hintStyle: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
@@ -605,11 +602,13 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
@@ -617,7 +616,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Clear All Filters',
+          text: l10n.clearAllFilters,
           onPressed: _handleClearFilters,
           height: context.buttonHeight,
           icon: Icons.clear_all_rounded,
@@ -627,7 +626,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         ),
         SizedBox(height: context.smallPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleClose,
           height: context.buttonHeight,
           isOutlined: true,
@@ -639,11 +638,13 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -654,7 +655,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.clear_all_rounded,
@@ -667,7 +668,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,

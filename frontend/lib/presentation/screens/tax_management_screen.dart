@@ -7,7 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../src/models/sales/sale_model.dart';
 import '../../src/providers/tax_rates_provider.dart';
 import '../../src/theme/app_theme.dart';
-import '../widgets/globals/sidebar.dart';
+import '../../l10n/app_localizations.dart';
 import '../widgets/sales/tax_configuration_widget.dart';
 import '../../src/services/tax_rates_service.dart';
 
@@ -40,28 +40,23 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          PremiumSidebar(isExpanded: true, selectedIndex: 0, onMenuSelected: (index) {}, onToggle: () {}),
-          Expanded(child: _buildMainContent()),
-        ],
-      ),
+      backgroundColor: AppTheme.creamWhite,
+      body: _buildMainContent(),
     );
   }
 
   Widget _buildMainContent() {
-    return Container(
-      color: AppTheme.creamWhite,
-      child: Column(
-        children: [
-          _buildHeader(),
-          Expanded(child: _buildContent()),
-        ],
-      ),
+    return Column(
+      children: [
+        _buildHeader(),
+        Expanded(child: _buildContent()),
+      ],
     );
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: context.pagePadding,
       decoration: BoxDecoration(
@@ -77,11 +72,11 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tax Management',
+                  l10n.taxManagement,
                   style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 ),
                 Text(
-                  'Manage tax rates and configurations',
+                  l10n.taxManagementDescription,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
                 ),
               ],
@@ -94,6 +89,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildHeaderActions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         _buildSearchField(),
@@ -102,7 +99,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
           onPressed: () => _showAddTaxRateDialog(),
           icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
           label: Text(
-            'Add Tax Rate',
+            l10n.addTaxRate,
             style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
           ),
         ),
@@ -111,12 +108,14 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildSearchField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: 300,
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search tax rates...',
+          hintText: l10n.searchTaxRatesHint,
           prefixIcon: Icon(Icons.search_rounded, color: AppTheme.charcoalGray.withOpacity(0.5)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
@@ -172,6 +171,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildListHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -184,7 +185,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
       child: Row(
         children: [
           Text(
-            'Tax Rates',
+            l10n.taxRates,
             style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           const Spacer(),
@@ -195,13 +196,15 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildFilterChips() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<TaxRatesProvider>(
       builder: (context, provider, child) {
         return Wrap(
           spacing: context.smallPadding,
           children: [
             FilterChip(
-              label: Text('All'),
+              label: Text(l10n.all),
               selected: provider.taxTypeFilter == null && provider.isActiveFilter == null,
               onSelected: (selected) {
                 if (selected) {
@@ -213,7 +216,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               checkmarkColor: AppTheme.primaryMaroon,
             ),
             FilterChip(
-              label: Text('Active'),
+              label: Text(l10n.active),
               selected: provider.isActiveFilter == true,
               onSelected: (selected) {
                 provider.filterByActiveStatus(selected ? true : null);
@@ -222,7 +225,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               checkmarkColor: AppTheme.primaryMaroon,
             ),
             FilterChip(
-              label: Text('Inactive'),
+              label: Text(l10n.inactive),
               selected: provider.isActiveFilter == false,
               onSelected: (selected) {
                 provider.filterByActiveStatus(selected ? false : null);
@@ -262,6 +265,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -269,12 +274,12 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
           Icon(Icons.receipt_long_outlined, color: AppTheme.lightGray, size: 12.w),
           SizedBox(height: context.cardPadding),
           Text(
-            'No Tax Rates Found',
+            l10n.noTaxRatesFound,
             style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Add your first tax rate to get started',
+            l10n.addFirstTaxRate,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
           ),
           SizedBox(height: context.cardPadding),
@@ -282,7 +287,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
             onPressed: () => _showAddTaxRateDialog(),
             icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite),
             label: Text(
-              'Add Tax Rate',
+              l10n.addTaxRate,
               style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
             ),
           ),
@@ -292,6 +297,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildTaxRateCard(TaxRateModel taxRate) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding / 2),
       decoration: BoxDecoration(
@@ -361,7 +368,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
                     children: [
                       Icon(Icons.edit_rounded, color: AppTheme.primaryMaroon),
                       SizedBox(width: context.smallPadding),
-                      Text('Edit'),
+                      Text(l10n.edit),
                     ],
                   ),
                 ),
@@ -371,7 +378,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
                     children: [
                       Icon(taxRate.isActive ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: AppTheme.primaryMaroon),
                       SizedBox(width: context.smallPadding),
-                      Text(taxRate.isActive ? 'Deactivate' : 'Activate'),
+                      Text(taxRate.isActive ? l10n.deactivate : l10n.activate),
                     ],
                   ),
                 ),
@@ -381,7 +388,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
                     children: [
                       Icon(Icons.delete_rounded, color: Colors.red),
                       SizedBox(width: context.smallPadding),
-                      Text('Delete'),
+                      Text(l10n.delete),
                     ],
                   ),
                 ),
@@ -394,6 +401,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildPagination() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<TaxRatesProvider>(
       builder: (context, provider, child) {
         if (provider.totalPages <= 1) return const SizedBox.shrink();
@@ -411,7 +420,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Page ${provider.currentPage} of ${provider.totalPages}',
+                '${l10n.page} ${provider.currentPage} ${l10n.outOf} ${provider.totalPages}',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
               Row(
@@ -446,9 +455,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
           ),
           child: TaxConfigurationWidget(
             isEditable: false,
-            onConfigurationChanged: (config) {
-              // This is read-only in the management screen
-            },
+            onConfigurationChanged: (config) {},
           ),
         ),
         SizedBox(height: context.cardPadding),
@@ -458,6 +465,8 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildStatisticsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<TaxRatesProvider>(
       builder: (context, provider, child) {
         return Container(
@@ -471,17 +480,17 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Statistics',
+                l10n.statistics,
                 style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
               Row(
                 children: [
                   Expanded(
-                    child: _buildStatItem('Total Tax Rates', provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
+                    child: _buildStatItem(l10n.totalTaxRates, provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
                   ),
                   SizedBox(width: context.smallPadding),
-                  Expanded(child: _buildStatItem('Active Rates', provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green)),
+                  Expanded(child: _buildStatItem(l10n.activeRates, provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green)),
                 ],
               ),
             ],
@@ -555,21 +564,23 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   void _showDeleteTaxRateDialog(TaxRateModel taxRate) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Delete Tax Rate',
+          l10n.deleteTaxRate,
           style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         content: Text(
-          'Are you sure you want to delete "${taxRate.name}"? This action cannot be undone.',
+          '${l10n.deleteTaxRateConfirmation} "${taxRate.name}"? ${l10n.actionCannotBeUndone}',
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel', style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
+            child: Text(l10n.cancel, style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -577,7 +588,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: AppTheme.pureWhite),
-            child: Text('Delete', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+            child: Text(l10n.delete, style: GoogleFonts.inter(color: AppTheme.pureWhite)),
           ),
         ],
       ),
@@ -631,9 +642,11 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
       title: Text(
-        widget.taxRate == null ? 'Add Tax Rate' : 'Edit Tax Rate',
+        widget.taxRate == null ? l10n.addTaxRate : l10n.editTaxRate,
         style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
       ),
       content: Form(
@@ -645,12 +658,12 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Tax Name',
+                  labelText: l10n.taxName,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 ),
                 validator: (value) {
                   if (value?.isEmpty ?? true) {
-                    return 'Please enter a tax name';
+                    return l10n.pleaseEnterTaxName;
                   }
                   return null;
                 },
@@ -659,7 +672,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
               DropdownButtonFormField<String>(
                 value: _selectedTaxType,
                 decoration: InputDecoration(
-                  labelText: 'Tax Type',
+                  labelText: l10n.taxType,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 ),
                 items: ['GST', 'FED', 'WHT', 'ADDITIONAL', 'CUSTOM'].map((type) => DropdownMenuItem(value: type, child: Text(type))).toList(),
@@ -673,17 +686,17 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
               TextFormField(
                 controller: _percentageController,
                 decoration: InputDecoration(
-                  labelText: 'Tax Percentage (%)',
+                  labelText: l10n.taxPercentage,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value?.isEmpty ?? true) {
-                    return 'Please enter a tax percentage';
+                    return l10n.pleaseEnterTaxPercentage;
                   }
                   final percentage = double.tryParse(value!);
                   if (percentage == null || percentage < 0 || percentage > 100) {
-                    return 'Please enter a valid percentage (0-100)';
+                    return l10n.pleaseEnterValidPercentage;
                   }
                   return null;
                 },
@@ -692,7 +705,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  labelText: 'Description (Optional)',
+                  labelText: l10n.descriptionOptional,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 ),
                 maxLines: 2,
@@ -703,7 +716,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
                   Expanded(
                     child: CheckboxListTile(
                       title: Text(
-                        'Active',
+                        l10n.active,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                       value: _isActive,
@@ -724,11 +737,11 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel', style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
+          child: Text(l10n.cancel, style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
         ),
         ElevatedButton(
           onPressed: _saveTaxRate,
-          child: Text(widget.taxRate == null ? 'Add' : 'Update', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+          child: Text(widget.taxRate == null ? l10n.add : l10n.update, style: GoogleFonts.inter(color: AppTheme.pureWhite)),
         ),
       ],
     );
@@ -742,7 +755,6 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
       final description = _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim();
 
       if (widget.taxRate == null) {
-        // Create new tax rate
         final request = CreateTaxRateRequest(
           name: name,
           taxType: _selectedTaxType,
@@ -753,12 +765,11 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
         );
 
         final success = await provider.createTaxRate(request);
-        if (success) {
+        if (success && mounted) {
           widget.onSaved(widget.taxRate!);
           Navigator.of(context).pop();
         }
       } else {
-        // Update existing tax rate
         final request = UpdateTaxRateRequest(
           name: name,
           taxType: _selectedTaxType,
@@ -770,7 +781,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
         );
 
         final success = await provider.updateTaxRate(widget.taxRate!.id, request);
-        if (success) {
+        if (success && mounted) {
           widget.onSaved(widget.taxRate!);
           Navigator.of(context).pop();
         }

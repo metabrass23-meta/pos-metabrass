@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'order_table_helpers.dart';
 
 class EnhancedOrderTable extends StatefulWidget {
@@ -30,7 +31,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
     super.initState();
     _helpers = OrderTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
 
-    // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
@@ -64,13 +64,10 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
             return _helpers.buildErrorState(context, provider);
           }
 
-          // Check if there are no orders at all vs no search results
           if (provider.orders.isEmpty) {
-            // If there's a search query but no results, show "no search results" state
             if (provider.searchQuery.isNotEmpty) {
               return _helpers.buildNoSearchResultsState(context, provider);
             }
-            // If no orders at all, show the regular empty state
             return _helpers.buildEmptyState(context);
           }
 
@@ -79,7 +76,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -100,7 +96,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   ),
                 ),
 
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -124,7 +119,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   ),
                 ),
 
-                // Pagination Controls
                 if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
               ],
             ),
@@ -144,96 +138,85 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
     );
   }
 
-  // Fixed: Table width to match vendor table dimensions with proper calculation
   double _getTableWidth(BuildContext context) {
     final columnWidths = _getColumnWidths(context);
     final totalWidth = columnWidths.reduce((a, b) => a + b);
 
-    // Ensure minimum width for proper display
     final minWidth = ResponsiveBreakpoints.responsive(context, tablet: 1280.0, small: 1380.0, medium: 1480.0, large: 1580.0, ultrawide: 1680.0);
 
-    // Return the larger of calculated width or minimum width
     return totalWidth > minWidth ? totalWidth : minWidth;
   }
 
-  // Fixed: Column widths that properly handle all columns including Actions
   List<double> _getColumnWidths(BuildContext context) {
     if (context.shouldShowCompactLayout) {
       return [
-        100.0, // Order ID
-        180.0, // Customer Name
-        200.0, // Description
-        150.0, // Total Amount
-        120.0, // Status
-        140.0, // Delivery Date
-        280.0, // Actions
+        100.0,
+        180.0,
+        200.0,
+        150.0,
+        120.0,
+        140.0,
+        280.0,
       ];
     } else {
       return [
-        120.0, // Order ID
-        200.0, // Customer Name
-        250.0, // Description
-        180.0, // Total Amount
-        140.0, // Status
-        160.0, // Delivery Date
-        320.0, // Actions
+        120.0,
+        200.0,
+        250.0,
+        180.0,
+        140.0,
+        160.0,
+        320.0,
       ];
     }
   }
 
-  // Fixed: Show all columns in table header with consistent widths and constraints
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Order ID
         Container(
           width: columnWidths[0],
           constraints: BoxConstraints(maxWidth: columnWidths[0]),
-          child: _buildSortableHeaderCell(context, 'Order ID', 'id'),
+          child: _buildSortableHeaderCell(context, l10n.orderID, 'id'),
         ),
 
-        // Customer Name
         Container(
           width: columnWidths[1],
           constraints: BoxConstraints(maxWidth: columnWidths[1]),
-          child: _buildSortableHeaderCell(context, 'Customer', 'customer_name'),
+          child: _buildSortableHeaderCell(context, l10n.customer, 'customer_name'),
         ),
 
-        // Description
         Container(
           width: columnWidths[2],
           constraints: BoxConstraints(maxWidth: columnWidths[2]),
-          child: _buildHeaderCell(context, 'Description'),
+          child: _buildHeaderCell(context, l10n.description),
         ),
 
-        // Total Amount
         Container(
           width: columnWidths[3],
           constraints: BoxConstraints(maxWidth: columnWidths[3]),
-          child: _buildSortableHeaderCell(context, 'Amount', 'total_amount'),
+          child: _buildSortableHeaderCell(context, l10n.amount, 'total_amount'),
         ),
 
-        // Status
         Container(
           width: columnWidths[4],
           constraints: BoxConstraints(maxWidth: columnWidths[4]),
-          child: _buildHeaderCell(context, 'Status'),
+          child: _buildHeaderCell(context, l10n.status),
         ),
 
-        // Delivery Date
         Container(
           width: columnWidths[5],
           constraints: BoxConstraints(maxWidth: columnWidths[5]),
-          child: _buildSortableHeaderCell(context, 'Delivery', 'expected_delivery_date'),
+          child: _buildSortableHeaderCell(context, l10n.delivery, 'expected_delivery_date'),
         ),
 
-        // Actions - Consistent width with row and constraints
         Container(
           width: columnWidths[6],
           constraints: BoxConstraints(maxWidth: columnWidths[6]),
-          child: _buildHeaderCell(context, 'Actions'),
+          child: _buildHeaderCell(context, l10n.actions),
         ),
       ],
     );
@@ -282,9 +265,9 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
     );
   }
 
-  // Fixed: Show all columns in table rows with proper constraints and error handling
   Widget _buildTableRow(BuildContext context, OrderModel order, int index) {
     try {
+      final l10n = AppLocalizations.of(context)!;
       final columnWidths = _getColumnWidths(context);
 
       return Container(
@@ -295,7 +278,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
         child: Row(
           children: [
-            // Order ID Column
             Container(
               width: columnWidths[0],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -317,7 +299,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               ),
             ),
 
-            // Customer Name Column
             Container(
               width: columnWidths[1],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -326,14 +307,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order.customerName.isNotEmpty ? order.customerName : 'N/A',
+                    order.customerName.isNotEmpty ? order.customerName : l10n.notAvailable,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    order.customerPhone.isNotEmpty ? order.customerPhone : 'No phone',
+                    order.customerPhone.isNotEmpty ? order.customerPhone : l10n.noPhone,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -342,20 +323,18 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               ),
             ),
 
-            // Description Column
             Container(
               width: columnWidths[2],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               constraints: BoxConstraints(maxWidth: columnWidths[2]),
               child: Text(
-                order.description.isNotEmpty ? order.description : 'No description',
+                order.description.isNotEmpty ? order.description : l10n.noDescription,
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
 
-            // Total Amount Column
             Container(
               width: columnWidths[3],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -363,7 +342,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Show amount if available, otherwise show item count info
                   if (order.totalAmount > 0) ...[
                     Text(
                       'PKR ${order.totalAmount.toStringAsFixed(0)}',
@@ -374,7 +352,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                     if (order.remainingAmount > 0) ...[
                       SizedBox(height: context.smallPadding / 4),
                       Text(
-                        'Due: PKR ${order.remainingAmount.toStringAsFixed(0)}',
+                        '${l10n.due}: PKR ${order.remainingAmount.toStringAsFixed(0)}',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -382,14 +360,13 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                     ] else ...[
                       SizedBox(height: context.smallPadding / 4),
                       Text(
-                        'Fully Paid',
+                        l10n.fullyPaid,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.green),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ] else ...[
-                    // Show item count information when no amount
                     Builder(
                       builder: (context) {
                         final totalItems = order.orderSummary['total_items'] ?? 0;
@@ -400,14 +377,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${totalItems} item${totalItems == 1 ? '' : 's'}',
+                                '${totalItems} ${totalItems == 1 ? l10n.item : l10n.items}',
                                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: context.smallPadding / 4),
                               Text(
-                                'Qty: ${totalQuantity}',
+                                '${l10n.qty}: ${totalQuantity}',
                                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -419,14 +396,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'No items',
+                                l10n.noItems,
                                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: context.smallPadding / 4),
                               Text(
-                                'Add items to see total',
+                                l10n.addItemsToSeeTotal,
                                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -441,7 +418,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               ),
             ),
 
-            // Status Column
             Container(
               width: columnWidths[4],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -467,7 +443,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               ),
             ),
 
-            // Delivery Date Column
             Container(
               width: columnWidths[5],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -476,7 +451,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order.expectedDeliveryDate != null ? _helpers.formatDate(order.expectedDeliveryDate!) : 'No date',
+                    order.expectedDeliveryDate != null ? _helpers.formatDate(order.expectedDeliveryDate!) : l10n.noDate,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
@@ -487,14 +462,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   ),
                   if (order.isOverdue) ...[
                     Text(
-                      'OVERDUE',
+                      l10n.overdue,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ] else if (order.daysUntilDelivery != null && order.daysUntilDelivery! <= 3 && order.daysUntilDelivery! >= 0) ...[
                     Text(
-                      '${order.daysUntilDelivery} days',
+                      '${order.daysUntilDelivery} ${l10n.days}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -504,7 +479,6 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               ),
             ),
 
-            // Actions Column - Ensure it gets proper width with constraints
             Container(
               width: columnWidths[6],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -515,11 +489,11 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         ),
       );
     } catch (e) {
-      // Fallback row in case of error
+      final l10n = AppLocalizations.of(context)!;
       return Container(
         padding: EdgeInsets.all(context.cardPadding),
         child: Text(
-          'Error displaying order: ${e.toString()}',
+          '${l10n.errorDisplayingOrder}: ${e.toString()}',
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red),
         ),
       );
@@ -527,6 +501,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
   }
 
   Widget _buildPaginationControls(BuildContext context, OrderProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -540,24 +515,20 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
       ),
       child: Row(
         children: [
-          // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} orders',
+            '${l10n.showing} ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} ${l10n.outOf} ${pagination.totalCount} ${l10n.orders}',
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
 
-          // Pagination controls
           Row(
             children: [
-              // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
                 icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
 
-              // Page info
               Container(
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
                 decoration: BoxDecoration(
@@ -565,12 +536,11 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 
-              // Next button
               IconButton(
                 onPressed: pagination.hasNext ? provider.loadNextPage : null,
                 icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),

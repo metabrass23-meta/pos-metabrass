@@ -77,16 +77,13 @@ class _StatsCardState extends State<StatsCard>
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
-                  // Handle card tap
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()), // Responsive border radius
+                onTap: () {},
+                borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Container(
-                  padding: EdgeInsets.all(context.cardPadding), // Responsive padding
+                  padding: EdgeInsets.all(context.cardPadding),
                   decoration: BoxDecoration(
                     color: AppTheme.pureWhite,
-                    borderRadius: BorderRadius.circular(context.borderRadius()), // Responsive border radius
-
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
                     border: Border.all(
                       color: widget.color.withOpacity(0.1),
                       width: 0.05.w,
@@ -95,33 +92,32 @@ class _StatsCardState extends State<StatsCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: EdgeInsets.all(context.smallPadding), // Responsive padding
+                            padding: EdgeInsets.all(context.smallPadding),
                             decoration: BoxDecoration(
                               color: widget.color.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')), // Responsive border radius
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
                             ),
                             child: Icon(
                               widget.icon,
                               color: widget.color,
-                              size: context.iconSize('medium'), // Responsive icon size
+                              size: context.iconSize('medium'),
                             ),
                           ),
 
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding, // Responsive horizontal padding
-                              vertical: context.smallPadding * 0.5, // Responsive vertical padding
+                              horizontal: context.smallPadding,
+                              vertical: context.smallPadding * 0.5,
                             ),
                             decoration: BoxDecoration(
                               color: widget.isPositive
                                   ? Colors.green.withOpacity(0.1)
                                   : Colors.red.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')), // Responsive border radius
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -131,13 +127,13 @@ class _StatsCardState extends State<StatsCard>
                                       ? Icons.trending_up_rounded
                                       : Icons.trending_down_rounded,
                                   color: widget.isPositive ? Colors.green : Colors.red,
-                                  size: context.iconSize('small'), // Responsive icon size
+                                  size: context.iconSize('small'),
                                 ),
-                                SizedBox(width: context.smallPadding * 0.5), // Responsive spacing
+                                SizedBox(width: context.smallPadding * 0.5),
                                 Text(
                                   widget.change,
                                   style: GoogleFonts.inter(
-                                    fontSize: context.captionFontSize, // Responsive caption font
+                                    fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: widget.isPositive ? Colors.green : Colors.red,
                                   ),
@@ -148,40 +144,37 @@ class _StatsCardState extends State<StatsCard>
                         ],
                       ),
 
-                      SizedBox(height: context.formFieldSpacing * 2), // Responsive spacing
+                      SizedBox(height: context.formFieldSpacing * 2),
 
-                      // Value
                       Text(
                         widget.value,
                         style: GoogleFonts.playfairDisplay(
-                          fontSize: context.headingFontSize, // Responsive heading font
+                          fontSize: context.headingFontSize,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.charcoalGray,
                           letterSpacing: -0.5,
                         ),
                       ),
 
-                      SizedBox(height: context.formFieldSpacing * 0.5), // Responsive spacing
+                      SizedBox(height: context.formFieldSpacing * 0.5),
 
-                      // Title
                       Text(
                         widget.title,
                         style: GoogleFonts.inter(
-                          fontSize: context.subtitleFontSize, // Responsive subtitle font
+                          fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
                           letterSpacing: 0.2,
                         ),
                       ),
 
-                      SizedBox(height: context.formFieldSpacing), // Responsive spacing
+                      SizedBox(height: context.formFieldSpacing),
 
-                      // Progress Bar
                       Container(
-                        height: context.formFieldHeight * 0.1, // Responsive height
+                        height: context.formFieldHeight * 0.1,
                         decoration: BoxDecoration(
                           color: widget.color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')), // Responsive border radius
+                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
                         ),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
@@ -194,7 +187,7 @@ class _StatsCardState extends State<StatsCard>
                                   widget.color.withOpacity(0.7),
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')), // Responsive border radius
+                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
                             ),
                           ),
                         ),

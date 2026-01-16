@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PaymentTable extends StatelessWidget {
   final Function(PaymentModel) onEdit;
@@ -68,6 +69,8 @@ class PaymentTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveHeaderRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -79,18 +82,18 @@ class PaymentTable extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(flex: paymentColumnFlexes[0], child: _buildHeaderCell(context, 'ID')),
-        Expanded(flex: paymentColumnFlexes[1], child: _buildHeaderCell(context, context.isTablet ? 'Labor' : 'Labor Details')),
-        Expanded(flex: paymentColumnFlexes[2], child: _buildHeaderCell(context, 'Amount')),
-        if (!context.shouldShowCompactLayout) ...[Expanded(flex: paymentColumnFlexes[3], child: _buildHeaderCell(context, 'Payment Info'))],
+        Expanded(flex: paymentColumnFlexes[0], child: _buildHeaderCell(context, l10n.id)),
+        Expanded(flex: paymentColumnFlexes[1], child: _buildHeaderCell(context, context.isTablet ? l10n.labor : l10n.laborDetails)),
+        Expanded(flex: paymentColumnFlexes[2], child: _buildHeaderCell(context, l10n.amount)),
+        if (!context.shouldShowCompactLayout) ...[Expanded(flex: paymentColumnFlexes[3], child: _buildHeaderCell(context, l10n.paymentInfo))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(flex: paymentColumnFlexes[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Date & Time' : 'Date')),
+          Expanded(flex: paymentColumnFlexes[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? l10n.dateAndTime : l10n.date)),
         ],
-        if (context.shouldShowFullLayout) ...[Expanded(flex: paymentColumnFlexes[5], child: _buildHeaderCell(context, 'Receipt'))],
+        if (context.shouldShowFullLayout) ...[Expanded(flex: paymentColumnFlexes[5], child: _buildHeaderCell(context, l10n.receipt))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(flex: paymentColumnFlexes[6], child: _buildHeaderCell(context, 'Status')),
+          Expanded(flex: paymentColumnFlexes[6], child: _buildHeaderCell(context, l10n.status)),
         ],
-        Expanded(flex: paymentColumnFlexes[7], child: _buildHeaderCell(context, 'Actions')),
+        Expanded(flex: paymentColumnFlexes[7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -103,6 +106,8 @@ class PaymentTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveTableRow(BuildContext context, PaymentModel payment, int index) {
+    final l10n = AppLocalizations.of(context)!;
+
     final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -143,7 +148,7 @@ class PaymentTable extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  payment.laborName ?? 'N/A',
+                  payment.laborName ?? l10n.notAvailable,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -151,7 +156,7 @@ class PaymentTable extends StatelessWidget {
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    payment.laborRole ?? 'N/A',
+                    payment.laborRole ?? l10n.notAvailable,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -275,43 +280,43 @@ class PaymentTable extends StatelessWidget {
               child: Center(
                 child: payment.hasReceipt
                     ? Container(
-                        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('small')),
-                            SizedBox(width: context.smallPadding / 2),
-                            Text(
-                              'Available',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Container(
-                        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.receipt_long_outlined, color: Colors.red, size: context.iconSize('small')),
-                            SizedBox(width: context.smallPadding / 2),
-                            Text(
-                              'Missing',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
-                            ),
-                          ],
-                        ),
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('small')),
+                      SizedBox(width: context.smallPadding / 2),
+                      Text(
+                        l10n.available,
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                       ),
+                    ],
+                  ),
+                )
+                    : Container(
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.receipt_long_outlined, color: Colors.red, size: context.iconSize('small')),
+                      SizedBox(width: context.smallPadding / 2),
+                      Text(
+                        l10n.missing,
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             SizedBox(width: context.smallPadding),
@@ -368,6 +373,8 @@ class PaymentTable extends StatelessWidget {
   }
 
   Widget _buildCompactActions(BuildContext context, PaymentModel payment) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'edit') {
@@ -386,7 +393,7 @@ class PaymentTable extends StatelessWidget {
               Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Edit',
+                l10n.edit,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue),
               ),
             ],
@@ -403,7 +410,7 @@ class PaymentTable extends StatelessWidget {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                payment.hasReceipt ? 'View Receipt' : 'Add Receipt',
+                payment.hasReceipt ? l10n.viewReceipt : l10n.addReceipt,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: payment.hasReceipt ? Colors.green : Colors.orange),
               ),
             ],
@@ -416,7 +423,7 @@ class PaymentTable extends StatelessWidget {
               Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Delete',
+                l10n.delete,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
               ),
             ],
@@ -485,6 +492,8 @@ class PaymentTable extends StatelessWidget {
   }
 
   Widget _buildExpandedActions(BuildContext context, PaymentModel payment) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -503,7 +512,7 @@ class PaymentTable extends StatelessWidget {
                     Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Edit',
+                      l10n.edit,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                     ),
                   ],
@@ -536,7 +545,7 @@ class PaymentTable extends StatelessWidget {
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      payment.hasReceipt ? 'View' : 'Add',
+                      payment.hasReceipt ? l10n.view : l10n.add,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -566,7 +575,7 @@ class PaymentTable extends StatelessWidget {
                     Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Delete',
+                      l10n.delete,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
                     ),
                   ],
@@ -580,6 +589,8 @@ class PaymentTable extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -592,7 +603,7 @@ class PaymentTable extends StatelessWidget {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'No Payment Records Found',
+            l10n.noPaymentRecordsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -601,7 +612,7 @@ class PaymentTable extends StatelessWidget {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first payment record to track labor payments efficiently',
+              l10n.startByAddingFirstPaymentRecord,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -615,9 +626,7 @@ class PaymentTable extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
+                onTap: () {},
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
@@ -627,7 +636,7 @@ class PaymentTable extends StatelessWidget {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Payment',
+                        l10n.addFirstPayment,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,

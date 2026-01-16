@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'payment_receipt_content.dart';
 
 class ViewPaymentReceiptDialog extends StatefulWidget {
@@ -129,6 +130,8 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -155,7 +158,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.payment.hasReceipt ? 'Payment Receipt' : 'No Receipt Available',
+                  widget.payment.hasReceipt ? l10n.paymentReceipt : l10n.noReceiptAvailable,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -166,7 +169,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    widget.payment.hasReceipt ? 'View payment details and receipt' : 'Add receipt for this payment',
+                    widget.payment.hasReceipt ? l10n.viewPaymentDetailsAndReceipt : l10n.addReceiptForThisPayment,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,

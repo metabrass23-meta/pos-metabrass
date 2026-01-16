@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/advance payment/add_advance_payment_dialog.dart';
 import '../../widgets/advance payment/advance_payment_filter_dialog.dart';
 import '../../widgets/advance payment/advance_payment_table.dart';
@@ -27,7 +28,6 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   @override
   void initState() {
     super.initState();
-    // Load advance payment records and statistics when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<AdvancePaymentProvider>();
       provider.loadAdvancePayments();
@@ -113,7 +113,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               SizedBox(height: context.mainPadding),
               Consumer<AdvancePaymentProvider>(
                 builder: (context, provider, child) {
-                  // Show error message if there's an error
+                  final l10n = AppLocalizations.of(context)!;
+
                   if (provider.hasError) {
                     return Container(
                       padding: EdgeInsets.all(context.cardPadding),
@@ -129,7 +130,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                           SizedBox(width: context.smallPadding),
                           Expanded(
                             child: Text(
-                              provider.errorMessage ?? 'An error occurred',
+                              provider.errorMessage ?? l10n.unexpectedError,
                               style: GoogleFonts.inter(
                                 fontSize: context.bodyFontSize,
                                 color: Colors.red[700],
@@ -141,7 +142,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                               provider.clearError();
                               provider.loadAdvancePayments();
                             },
-                            child: Text('Retry'),
+                            child: Text(l10n.retry),
                           ),
                         ],
                       ),
@@ -171,6 +172,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -182,7 +185,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -192,7 +195,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -208,6 +211,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -215,7 +220,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Advance Payment Management',
+                l10n.advancePaymentManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -225,7 +230,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Track and manage labor advance payments efficiently',
+                l10n.advancePaymentManagementDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -241,11 +246,13 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Advance Payments',
+          l10n.advancePayments,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -255,7 +262,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage labor payments',
+          l10n.manageLaborPayments,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -269,11 +276,13 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payments',
+          l10n.payments,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -283,7 +292,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Advance payments',
+          l10n.advancePayments,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -297,6 +306,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -318,7 +329,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Payment',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.payment}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -335,12 +346,14 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildDesktopStatsRow(AdvancePaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.advancePaymentStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-            'Total Payments',
+            l10n.totalPayments,
             stats['total'].toString(),
             Icons.payment_rounded,
             Colors.blue,
@@ -349,7 +362,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Total Amount',
+            l10n.totalAmount,
             'PKR ${stats['totalAmount']}',
             Icons.attach_money_rounded,
             Colors.green,
@@ -358,7 +371,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'With Receipts',
+            l10n.withReceipts,
             stats['withReceipts'].toString(),
             Icons.receipt_rounded,
             Colors.purple,
@@ -367,7 +380,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'This Month',
+            l10n.thisMonth,
             stats['thisMonth'].toString(),
             Icons.calendar_month_rounded,
             Colors.orange,
@@ -378,18 +391,20 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildMobileStatsGrid(AdvancePaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.advancePaymentStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: _buildStatsCard('Total', stats['total'].toString(), Icons.payment_rounded, Colors.blue),
+              child: _buildStatsCard(l10n.total, stats['total'].toString(), Icons.payment_rounded, Colors.blue),
             ),
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'Amount',
+                l10n.amount,
                 'PKR ${stats['totalAmount']}',
                 Icons.attach_money_rounded,
                 Colors.green,
@@ -402,7 +417,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                'Receipts',
+                l10n.receipts,
                 stats['withReceipts'].toString(),
                 Icons.receipt_rounded,
                 Colors.purple,
@@ -411,7 +426,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'This Month',
+                l10n.thisMonth,
                 stats['thisMonth'].toString(),
                 Icons.calendar_month_rounded,
                 Colors.orange,
@@ -439,7 +454,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
       ),
       child: Consumer<AdvancePaymentProvider>(
         builder: (context, provider, child) {
-          // Show centered loading indicator when initially loading
+          final l10n = AppLocalizations.of(context)!;
+
           if (provider.isLoading && provider.advancePayments.isEmpty) {
             return Container(
               height: ResponsiveBreakpoints.responsive(
@@ -478,7 +494,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                     ),
                     SizedBox(height: context.smallPadding),
                     Text(
-                      'Loading advance payments...',
+                      l10n.loadingAdvancePayments,
                       style: GoogleFonts.inter(
                         fontSize: ResponsiveBreakpoints.responsive(
                           context,
@@ -498,7 +514,6 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
             );
           }
 
-          // Show search controls when not loading or when data is available
           return ResponsiveBreakpoints.responsive(
             context,
             tablet: _buildTabletSearchLayout(),
@@ -557,6 +572,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<AdvancePaymentProvider>(
@@ -568,8 +585,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
               hintText: context.isTablet
-                  ? 'Search payments...'
-                  : 'Search by ID, labor name, phone, role, or description...',
+                  ? '${l10n.search} ${l10n.payments}...'
+                  : l10n.searchAdvancePaymentsHint,
               hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(
                 Icons.search_rounded,
@@ -578,16 +595,16 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        provider.searchAdvancePayments('');
-                      },
-                      icon: Icon(
-                        Icons.clear_rounded,
-                        color: Colors.grey[500],
-                        size: context.iconSize('small'),
-                      ),
-                    )
+                onPressed: () {
+                  _searchController.clear();
+                  provider.searchAdvancePayments('');
+                },
+                icon: Icon(
+                  Icons.clear_rounded,
+                  color: Colors.grey[500],
+                  size: context.iconSize('small'),
+                ),
+              )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -602,6 +619,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -627,7 +646,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                   if (!context.isTablet) ...[
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Filter',
+                      l10n.filter,
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w500,
@@ -645,6 +664,8 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
   }
 
   Widget _buildRefreshButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<AdvancePaymentProvider>(
       builder: (context, provider, child) {
         return Container(
@@ -661,7 +682,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               await _handleRefresh();
               scaffoldMessenger.showSnackBar(
                 SnackBar(
-                  content: Text('Data refreshed successfully'),
+                  content: Text(l10n.dataRefreshedSuccessfully),
                   backgroundColor: AppTheme.primaryMaroon,
                 ),
               );
@@ -674,7 +695,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                 if (!context.isTablet) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Refresh',
+                    l10n.refresh,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w500,

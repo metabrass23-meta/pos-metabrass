@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteExpenseDialog extends StatefulWidget {
@@ -67,6 +68,8 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -78,7 +81,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Expense deleted successfully!',
+              l10n.expenseDeletedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -162,6 +165,8 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -193,7 +198,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Expense' : 'Delete Expense Record',
+                  context.shouldShowCompactLayout ? l10n.deleteExpense : l10n.deleteExpenseRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -204,7 +209,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.actionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -236,6 +241,8 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -273,8 +280,8 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
           SizedBox(height: context.mainPadding),
           Text(
             context.shouldShowCompactLayout
-                ? 'Are you sure you want to delete this expense record?'
-                : 'Are you absolutely sure you want to delete this expense record?',
+                ? l10n.confirmDeleteExpenseShort
+                : l10n.confirmDeleteExpenseLong,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
@@ -284,7 +291,6 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
 
-          // Expense Details Card
           Container(
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
@@ -297,7 +303,6 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
             ),
             child: Column(
               children: [
-                // Expense ID and Type Row
                 Row(
                   children: [
                     Container(
@@ -335,12 +340,11 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
 
                 SizedBox(height: context.smallPadding),
 
-                // Description Row
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Description:',
+                      '${l10n.description}:',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -363,7 +367,6 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
 
                 SizedBox(height: context.smallPadding),
 
-                // Amount and Withdrawal By Row
                 Row(
                   children: [
                     Expanded(
@@ -372,7 +375,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount:',
+                            '${l10n.amount}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -407,7 +410,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Withdrawal By:',
+                            '${l10n.withdrawalBy}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -462,7 +465,6 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
 
                 SizedBox(height: context.smallPadding),
 
-                // Date and Time Row
                 Row(
                   children: [
                     Expanded(
@@ -471,7 +473,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Date:',
+                            '${l10n.date}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -504,7 +506,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Time:',
+                            '${l10n.time}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -530,7 +532,6 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
 
           SizedBox(height: context.cardPadding),
 
-          // Warning Message
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
@@ -548,8 +549,8 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
                 Expanded(
                   child: Text(
                     context.shouldShowCompactLayout
-                        ? 'This will permanently delete the expense record.'
-                        : 'This will permanently delete the expense record and all associated data. This action cannot be undone.',
+                        ? l10n.deleteWarningShort
+                        : l10n.deleteWarningLong,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -577,11 +578,13 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -591,7 +594,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
         Consumer<ExpensesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Expense',
+              text: l10n.deleteExpense,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -605,12 +608,14 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -623,7 +628,7 @@ class _DeleteExpenseDialogState extends State<DeleteExpenseDialog> with SingleTi
           child: Consumer<ExpensesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

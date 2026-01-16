@@ -13,7 +13,7 @@ class DashboardProvider extends ChangeNotifier {
     'Products',
     'Labor',
     'Vendors',
-    'Customers', // Added Customers to menu titles
+    'Customers',
     'Advance',
     'Payment',
     'Sales',

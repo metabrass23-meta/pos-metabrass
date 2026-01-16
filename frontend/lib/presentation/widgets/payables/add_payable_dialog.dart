@@ -5,13 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/providers/vendor_provider.dart';
-
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../globals/drop_down.dart';
 import '../globals/custom_date_picker.dart';
+import '../../../l10n/app_localizations.dart';
 
 class AddPayableDialog extends StatefulWidget {
   const AddPayableDialog({super.key});
@@ -40,21 +40,16 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Priority options
   final List<String> _priorityOptions = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
 
-    // Load vendors for selection
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final vendorProvider = context.read<VendorProvider>();
       vendorProvider.loadVendors();
@@ -76,16 +71,17 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final amountBorrowed = double.parse(_amountBorrowedController.text.trim());
 
       if (_expectedRepaymentDate.isBefore(_dateBorrowed)) {
-        _showErrorSnackbar('Expected repayment date cannot be before date borrowed');
+        _showErrorSnackbar(l10n.expectedRepaymentDateCannotBeBeforeDateBorrowed);
         return;
       }
 
       final payablesProvider = Provider.of<PayablesProvider>(context, listen: false);
-
       final amountPaid = double.tryParse(_amountPaidController.text.trim()) ?? 0.0;
 
       final success = await payablesProvider.addPayable(
@@ -107,13 +103,15 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar('Failed to add payable. Please try again.');
+          _showErrorSnackbar(l10n.failedToAddPayablePleaseTryAgain);
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -121,7 +119,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Payable added successfully!',
+              l10n.payableAddedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -164,6 +162,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Future<void> _selectDateBorrowed() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _dateBorrowed,
       initialTime: const TimeOfDay(hour: 0, minute: 0),
@@ -177,7 +177,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           });
         }
       },
-      title: 'Select Borrowed Date',
+      title: l10n.selectBorrowedDate,
       minDate: DateTime.now().subtract(const Duration(days: 365)),
       maxDate: DateTime.now(),
       showTimeInline: false,
@@ -185,6 +185,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Future<void> _selectExpectedRepaymentDate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _expectedRepaymentDate,
       initialTime: const TimeOfDay(hour: 0, minute: 0),
@@ -195,7 +197,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           });
         }
       },
-      title: 'Select Expected Repayment Date',
+      title: l10n.selectExpectedRepaymentDate,
       minDate: _dateBorrowed.add(const Duration(days: 1)),
       maxDate: DateTime.now().add(const Duration(days: 365)),
       showTimeInline: false,
@@ -256,6 +258,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -278,7 +282,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Payable' : 'Add New Payable',
+                  context.shouldShowCompactLayout ? l10n.addPayable : l10n.addNewPayable,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -289,7 +293,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Record amount owed to creditor',
+                    l10n.recordAmountOwedToCreditor,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -372,6 +376,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildCreditorInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -388,40 +394,40 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               Icon(Icons.person_outline, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Creditor Information',
+                l10n.creditorInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Creditor Name',
-            hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter creditor full name',
+            label: l10n.creditorName,
+            hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterCreditorFullName,
             controller: _creditorNameController,
             prefixIcon: Icons.person_outline,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter creditor name';
-              if (value!.length < 2) return 'Name must be at least 2 characters';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterCreditorName;
+              if (value!.length < 2) return l10n.nameMustBeAtLeast2Characters;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Phone Number',
-            hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (+92XXXXXXXXXX)',
+            label: l10n.phone,
+            hint: context.shouldShowCompactLayout ? l10n.enterPhone : l10n.enterPhoneNumberWithFormat,
             controller: _creditorPhoneController,
             prefixIcon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter phone number';
-              if (!RegExp(r'^\+?[1-9]\d{1,14}$').hasMatch(value!)) return 'Please enter a valid phone number';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterPhoneNumber;
+              if (!RegExp(r'^\+?[1-9]\d{1,14}$').hasMatch(value!)) return l10n.pleaseEnterAValidPhoneNumber;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Email (Optional)',
-            hint: 'Enter creditor email address',
+            label: l10n.emailOptional,
+            hint: l10n.enterCreditorEmailAddress,
             controller: _creditorEmailController,
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
@@ -432,6 +438,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildAmountCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -448,30 +456,30 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               Icon(Icons.attach_money_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Details',
+                l10n.amountDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Amount Borrowed (PKR)',
-            hint: context.shouldShowCompactLayout ? 'Enter amount' : 'Enter amount borrowed from creditor',
+            label: l10n.amountBorrowedPKR,
+            hint: context.shouldShowCompactLayout ? l10n.enterAmount : l10n.enterAmountBorrowedFromCreditor,
             controller: _amountBorrowedController,
             prefixIcon: Icons.trending_up_rounded,
             keyboardType: TextInputType.number,
             onChanged: (value) => setState(() {}),
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter amount borrowed';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterAmountBorrowed;
               final amount = double.tryParse(value!);
-              if (amount == null || amount <= 0) return 'Please enter a valid amount';
+              if (amount == null || amount <= 0) return l10n.pleaseEnterAValidAmount;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Amount Paid (PKR)',
-            hint: 'Optional - if any amount already paid',
+            label: l10n.amountPaidPKR,
+            hint: l10n.optionalIfAnyAmountAlreadyPaid,
             controller: _amountPaidController,
             prefixIcon: Icons.trending_down_rounded,
             keyboardType: TextInputType.number,
@@ -479,15 +487,14 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final amountPaid = double.tryParse(value);
-                if (amountPaid == null || amountPaid < 0) return 'Please enter a valid amount';
+                if (amountPaid == null || amountPaid < 0) return l10n.pleaseEnterAValidAmount;
                 final amountBorrowed = double.tryParse(_amountBorrowedController.text) ?? 0;
-                if (amountPaid > amountBorrowed) return 'Cannot exceed amount borrowed';
+                if (amountPaid > amountBorrowed) return l10n.cannotExceedAmountBorrowed;
               }
               return null;
             },
           ),
           if (_amountBorrowedController.text.isNotEmpty) ...[
-            // Removed balanceRemaining check
             SizedBox(height: context.cardPadding),
             _buildBalancePreview(),
           ],
@@ -497,6 +504,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildDetailsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -513,21 +522,21 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               Icon(Icons.description_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Additional Details',
+                l10n.additionalDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Reason/Item',
-            hint: context.shouldShowCompactLayout ? 'Enter reason' : 'Enter reason for borrowing or item description',
+            label: l10n.reasonItem,
+            hint: context.shouldShowCompactLayout ? l10n.enterReason : l10n.enterReasonForBorrowingOrItemDescription,
             controller: _reasonOrItemController,
             prefixIcon: Icons.receipt_long_outlined,
             maxLines: 3,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter reason or item description';
-              if (value!.length < 5) return 'Description must be at least 5 characters';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterReasonOrItemDescription;
+              if (value!.length < 5) return l10n.descriptionMustBeAtLeast5Characters;
               return null;
             },
           ),
@@ -535,12 +544,12 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           Consumer<VendorProvider>(
             builder: (context, vendorProvider, child) {
               return PremiumDropdownField<String>(
-                label: 'Vendor (Optional)',
-                hint: 'Select vendor if creditor is a registered vendor',
+                label: l10n.vendorOptional,
+                hint: l10n.selectVendorIfCreditorIsARegisteredVendor,
                 items: [
-                  DropdownItem<String>(value: '', label: 'No vendor'),
+                  DropdownItem<String>(value: '', label: l10n.noVendor),
                   ...vendorProvider.vendors.map(
-                    (vendor) => DropdownItem<String>(value: vendor.id, label: vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name),
+                        (vendor) => DropdownItem<String>(value: vendor.id, label: vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name),
                   ),
                 ],
                 value: _selectedVendorId ?? '',
@@ -555,9 +564,9 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           ),
           SizedBox(height: context.cardPadding),
           PremiumDropdownField<String>(
-            label: 'Priority Level',
-            hint: 'Select priority level for this payable',
-            items: _priorityOptions.map((priority) => DropdownItem<String>(value: priority, label: priority)).toList(),
+            label: l10n.priorityLevel,
+            hint: l10n.selectPriorityLevelForThisPayable,
+            items: _priorityOptions.map((priority) => DropdownItem<String>(value: priority, label: _getPriorityLabel(context, priority))).toList(),
             value: _selectedPriority,
             onChanged: (value) {
               setState(() {
@@ -568,8 +577,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Notes (Optional)',
-            hint: context.shouldShowCompactLayout ? 'Enter notes' : 'Enter additional notes or payment history',
+            label: l10n.notesOptional,
+            hint: context.shouldShowCompactLayout ? l10n.enterNotes : l10n.enterAdditionalNotesOrPaymentHistory,
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
             maxLines: 3,
@@ -579,7 +588,26 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
     );
   }
 
+  String _getPriorityLabel(BuildContext context, String priority) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (priority) {
+      case 'LOW':
+        return l10n.low;
+      case 'MEDIUM':
+        return l10n.medium;
+      case 'HIGH':
+        return l10n.high;
+      case 'URGENT':
+        return l10n.urgent;
+      default:
+        return priority;
+    }
+  }
+
   Widget _buildDatesCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -596,7 +624,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               Icon(Icons.calendar_today_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Date Information',
+                l10n.dateInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -608,8 +636,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
                 child: GestureDetector(
                   onTap: _selectDateBorrowed,
                   child: PremiumTextField(
-                    label: 'Date Borrowed',
-                    hint: 'Select date',
+                    label: l10n.dateBorrowed,
+                    hint: l10n.selectDate,
                     controller: TextEditingController(text: '${_dateBorrowed.day}/${_dateBorrowed.month}/${_dateBorrowed.year}'),
                     prefixIcon: Icons.calendar_today,
                     enabled: false,
@@ -621,8 +649,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
                 child: GestureDetector(
                   onTap: _selectExpectedRepaymentDate,
                   child: PremiumTextField(
-                    label: 'Expected Repayment Date',
-                    hint: 'Select date',
+                    label: l10n.expectedRepaymentDate,
+                    hint: l10n.selectDate,
                     controller: TextEditingController(
                       text: '${_expectedRepaymentDate.day}/${_expectedRepaymentDate.month}/${_expectedRepaymentDate.year}',
                     ),
@@ -641,6 +669,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildBalancePreview() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -657,7 +687,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Balance Remaining',
+                  l10n.balanceRemaining,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
                 Text(
@@ -677,7 +707,9 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildDateInfoRow() {
+    final l10n = AppLocalizations.of(context)!;
     final daysDifference = _expectedRepaymentDate.difference(_dateBorrowed).inDays;
+
     return Container(
       padding: EdgeInsets.all(context.smallPadding),
       decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
@@ -687,7 +719,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
-              daysDifference > 0 ? 'Borrowing period: $daysDifference days' : 'Please select a valid repayment date',
+              daysDifference > 0 ? l10n.borrowingPeriodDays(daysDifference) : l10n.pleaseSelectAValidRepaymentDate,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700]),
             ),
           ),
@@ -697,6 +729,8 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (context.shouldShowCompactLayout) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -704,7 +738,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           Consumer<PayablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Payable',
+                text: l10n.addPayable,
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight,
@@ -715,7 +749,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           ),
           SizedBox(height: context.cardPadding),
           PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight,
@@ -729,7 +763,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
         children: [
           Expanded(
             child: PremiumButton(
-              text: 'Cancel',
+              text: l10n.cancel,
               onPressed: _handleCancel,
               isOutlined: true,
               height: context.buttonHeight / 1.5,
@@ -743,7 +777,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             child: Consumer<PayablesProvider>(
               builder: (context, provider, child) {
                 return PremiumButton(
-                  text: 'Add Payable',
+                  text: l10n.addPayable,
                   onPressed: provider.isLoading ? null : _handleSubmit,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight / 1.5,

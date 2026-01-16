@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class EnhancedCategoryTable extends StatefulWidget {
   final Function(Category) onEdit;
@@ -150,44 +151,39 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Category ID
-        // Container(
-        //   width: columnWidths[0],
-        //   child: _buildHeaderCell(context, 'Category ID'),
-        // ),
-
         // Name
         Container(
           width: columnWidths[1],
-          child: _buildHeaderCell(context, 'Name'),
+          child: _buildHeaderCell(context, l10n.name),
         ),
 
         // Description
         Container(
           width: columnWidths[2],
-          child: _buildHeaderCell(context, 'Description'),
+          child: _buildHeaderCell(context, l10n.notes),
         ),
 
         // Date Created
         Container(
           width: columnWidths[3],
-          child: _buildHeaderCell(context, 'Date Created'),
+          child: _buildHeaderCell(context, '${l10n.date} ${l10n.created}'),
         ),
 
         // Last Edited
         Container(
           width: columnWidths[4],
-          child: _buildHeaderCell(context, 'Last Edited'),
+          child: _buildHeaderCell(context, l10n.lastUpdated),
         ),
 
         // Actions
         Container(
           width: columnWidths[5],
-          child: _buildHeaderCell(context, 'Actions'),
+          child: _buildHeaderCell(context, l10n.actions),
         ),
       ],
     );
@@ -217,6 +213,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
   }
 
   Widget _buildTableRow(BuildContext context, Category category, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -234,31 +231,6 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Category ID
-          // Container(
-          //   width: columnWidths[0],
-          //   padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-          //   child: Container(
-          //     padding: EdgeInsets.symmetric(
-          //       horizontal: context.smallPadding / 2,
-          //       vertical: context.smallPadding / 4,
-          //     ),
-          //     decoration: BoxDecoration(
-          //       color: AppTheme.primaryMaroon.withOpacity(0.1),
-          //       borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          //     ),
-          //     child: Text(
-          //       category.id,
-          //       style: GoogleFonts.inter(
-          //         fontSize: context.captionFontSize,
-          //         fontWeight: FontWeight.w600,
-          //         color: AppTheme.primaryMaroon,
-          //       ),
-          //       textAlign: TextAlign.center,
-          //     ),
-          //   ),
-          // ),
-
           // Name
           Container(
             width: columnWidths[1],
@@ -300,7 +272,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
-                'No description',
+                l10n.notSpecified,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
@@ -451,6 +423,8 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -486,7 +460,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Categories Found',
+            '${l10n.noData} ${l10n.category}',
             style: GoogleFonts.inter(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -508,7 +482,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
               ),
             ),
             child: Text(
-              'Start by adding your first category to organize your products effectively',
+              '${l10n.add} ${l10n.category} ${l10n.products}',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
@@ -543,7 +517,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Category',
+                        '${l10n.add} ${l10n.category}',
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -567,26 +541,27 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
   }
 
   String _getRelativeDate(DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final targetDate = DateTime(date.year, date.month, date.day);
     final difference = today.difference(targetDate).inDays;
 
     if (difference == 0) {
-      return 'Today';
+      return l10n.today;
     } else if (difference == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference < 7) {
-      return '$difference days ago';
+      return '$difference ${l10n.daysAgo}';
     } else if (difference < 30) {
       final weeks = (difference / 7).floor();
-      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+      return weeks == 1 ? '1 ${l10n.weekAgo}' : '$weeks ${l10n.weeksAgo}';
     } else if (difference < 365) {
       final months = (difference / 30).floor();
-      return months == 1 ? '1 month ago' : '$months months ago';
+      return months == 1 ? '1 ${l10n.monthAgo}' : '$months ${l10n.monthsAgo}';
     } else {
       final years = (difference / 365).floor();
-      return years == 1 ? '1 year ago' : '$years years ago';
+      return years == 1 ? '1 ${l10n.yearAgo}' : '$years ${l10n.yearsAgo}';
     }
   }
 }

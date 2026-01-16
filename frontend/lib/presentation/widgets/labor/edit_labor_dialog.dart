@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../globals/drop_down.dart';
@@ -108,6 +109,8 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_isUpdating) return;
 
@@ -135,15 +138,15 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
 
         if (mounted) {
           if (success) {
-            _showSuccessSnackbar('Labor updated successfully!');
+            _showSuccessSnackbar(l10n.laborUpdatedSuccessfully);
             Navigator.of(context).pop();
           } else {
-            _showErrorSnackbar(provider.errorMessage ?? 'Failed to update labor');
+            _showErrorSnackbar(provider.errorMessage ?? l10n.failedToUpdateLabor);
           }
         }
       } catch (e) {
         if (mounted) {
-          _showErrorSnackbar('Error updating labor: ${e.toString()}');
+          _showErrorSnackbar('${l10n.errorUpdatingLabor}: ${e.toString()}');
         }
       } finally {
         if (mounted) {
@@ -216,12 +219,14 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isUpdating) return;
 
     await context.showSyncfusionDateTimePicker(
       initialDate: _selectedJoiningDate,
       initialTime: TimeOfDay.fromDateTime(_selectedJoiningDate),
-      title: 'Select Joining Date',
+      title: l10n.selectJoiningDate,
       minDate: DateTime(2000),
       maxDate: DateTime.now(),
       showTimeInline: false,
@@ -324,6 +329,8 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -349,7 +356,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Labor' : 'Edit Labor Details',
+                  context.shouldShowCompactLayout ? l10n.editLabor : l10n.editLaborDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -360,7 +367,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update worker information',
+                    l10n.updateWorkerInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -439,51 +446,53 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information', Icons.info_outline),
+        _buildSectionTitle(l10n.basicInformation, Icons.info_outline),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Full Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter worker\'s full name',
+          label: '${l10n.fullName} *',
+          hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterWorkerFullName,
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a name';
+              return l10n.pleaseEnterName;
             }
             if (value!.length < 2) {
-              return 'Name must be at least 2 characters';
+              return l10n.nameMustBeAtLeast2Characters;
             }
             if (value.length > 50) {
-              return 'Name must be less than 50 characters';
+              return l10n.nameMustBeLessThan50Characters;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'CNIC *',
-          hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
+          label: '${l10n.cnic} *',
+          hint: context.shouldShowCompactLayout ? l10n.enterCNIC : l10n.enterCNICFormat,
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a CNIC';
+              return l10n.pleaseEnterCNIC;
             }
             if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
-              return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+              return l10n.pleaseEnterValidCNIC;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Caste',
-          hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
+          label: l10n.caste,
+          hint: context.shouldShowCompactLayout ? l10n.enterCaste : l10n.enterCasteOptional,
           controller: _casteController,
           prefixIcon: Icons.group_outlined,
           enabled: !_isUpdating,
@@ -493,24 +502,26 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildContactInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Phone Number *',
-          hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (e.g., +923001234567)',
+          label: '${l10n.phoneNumber} *',
+          hint: context.shouldShowCompactLayout ? l10n.enterPhone : l10n.enterPhoneNumberFormat,
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a phone number';
+              return l10n.pleaseEnterPhoneNumber;
             }
             if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
-              return 'Please enter a valid phone number (+92XXXXXXXXXX)';
+              return l10n.pleaseEnterValidPhoneNumber;
             }
             return null;
           },
@@ -520,10 +531,12 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildLocationInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Location Information', Icons.location_on_outlined),
+        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
         SizedBox(height: context.cardPadding),
         ResponsiveBreakpoints.responsive(
           context,
@@ -538,22 +551,24 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildEmploymentInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Employment Information', Icons.work_outline),
+        _buildSectionTitle(l10n.employmentInformation, Icons.work_outline),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Designation *',
+          label: '${l10n.designation} *',
           hint: context.shouldShowCompactLayout
-              ? 'Enter designation'
-              : 'Enter job designation (e.g., Tailor, Operator)',
+              ? l10n.enterDesignation
+              : l10n.enterJobDesignation,
           controller: _designationController,
           prefixIcon: Icons.work_outline,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a designation';
+              return l10n.pleaseEnterDesignation;
             }
             return null;
           },
@@ -563,11 +578,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
           onTap: _isUpdating ? null : () => _selectDate(context),
           child: AbsorbPointer(
             child: PremiumTextField(
-              label: 'Joining Date *',
-              hint: 'Select joining date',
+              label: '${l10n.joiningDate} *',
+              hint: l10n.selectJoiningDate,
               controller: TextEditingController(
                 text:
-                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
+                '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
               ),
               prefixIcon: Icons.calendar_today,
               enabled: !_isUpdating,
@@ -576,64 +591,64 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Monthly Salary *',
-          hint: context.shouldShowCompactLayout ? 'Enter salary' : 'Enter monthly salary in PKR',
+          label: '${l10n.monthlySalary} *',
+          hint: context.shouldShowCompactLayout ? l10n.enterSalary : l10n.enterMonthlySalaryInPKR,
           controller: _salaryController,
           prefixIcon: Icons.account_balance_wallet_outlined,
           keyboardType: TextInputType.number,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a salary';
+              return l10n.pleaseEnterSalary;
             }
             if (double.tryParse(value!) == null || double.parse(value) <= 0) {
-              return 'Please enter a valid salary';
+              return l10n.pleaseEnterValidSalary;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumDropdownField<String>(
-          label: 'Gender *',
-          hint: context.shouldShowCompactLayout ? 'Select gender' : 'Select gender',
+          label: '${l10n.gender} *',
+          hint: context.shouldShowCompactLayout ? l10n.selectGender : l10n.selectGender,
           prefixIcon: Icons.person_pin_rounded,
           items: [
-            DropdownItem<String>(value: 'M', label: 'Male'),
-            DropdownItem<String>(value: 'F', label: 'Female'),
-            DropdownItem<String>(value: 'O', label: 'Other'),
+            DropdownItem<String>(value: 'M', label: l10n.male),
+            DropdownItem<String>(value: 'F', label: l10n.female),
+            DropdownItem<String>(value: 'O', label: l10n.other),
           ],
           value: _selectedGender,
           onChanged: _isUpdating
               ? null
               : (value) {
-                  setState(() {
-                    _selectedGender = value!;
-                  });
-                },
+            setState(() {
+              _selectedGender = value!;
+            });
+          },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please select a gender';
+              return l10n.pleaseSelectGender;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Age *',
-          hint: context.shouldShowCompactLayout ? 'Enter age' : 'Enter age (minimum 18 years)',
+          label: '${l10n.age} *',
+          hint: context.shouldShowCompactLayout ? l10n.enterAge : l10n.enterAgeMinimum18Years,
           controller: _ageController,
           prefixIcon: Icons.cake_outlined,
           keyboardType: TextInputType.number,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter an age';
+              return l10n.pleaseEnterAge;
             }
             if (int.tryParse(value!) == null || int.parse(value) < 18) {
-              return 'Age must be at least 18';
+              return l10n.ageMustBeAtLeast18;
             }
             if (int.parse(value) > 65) {
-              return 'Age must be less than 65';
+              return l10n.ageMustBeLessThan65;
             }
             return null;
           },
@@ -663,18 +678,20 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildCityField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'City *',
-          hint: 'Enter city',
+          label: '${l10n.city} *',
+          hint: l10n.enterCity,
           controller: _cityController,
           prefixIcon: Icons.location_city_outlined,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter city';
+              return l10n.pleaseEnterCity;
             }
             return null;
           },
@@ -687,10 +704,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-                  label: city,
-                  onTap: () => setState(() => _cityController.text = city),
-                ),
-              )
+              label: city,
+              onTap: () => setState(() => _cityController.text = city),
+            ),
+          )
               .toList(),
         ),
       ],
@@ -698,18 +715,20 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildAreaField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'Area *',
-          hint: 'Enter area',
+          label: '${l10n.area} *',
+          hint: l10n.enterArea,
           controller: _areaController,
           prefixIcon: Icons.map_outlined,
           enabled: !_isUpdating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter area';
+              return l10n.pleaseEnterArea;
             }
             return null;
           },
@@ -722,10 +741,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-                  label: area,
-                  onTap: () => setState(() => _areaController.text = area),
-                ),
-              )
+              label: area,
+              onTap: () => setState(() => _areaController.text = area),
+            ),
+          )
               .toList(),
         ),
       ],
@@ -733,13 +752,15 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<LaborProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Labor',
+              text: l10n.updateLabor,
               onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
               isLoading: _isUpdating || provider.isLoading,
               height: context.buttonHeight,
@@ -750,7 +771,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _isUpdating ? null : _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -762,11 +783,13 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _isUpdating ? null : _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -780,7 +803,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
           child: Consumer<LaborProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Labor',
+                text: l10n.updateLabor,
                 onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
                 isLoading: _isUpdating || provider.isLoading,
                 height: context.buttonHeight / 1.5,

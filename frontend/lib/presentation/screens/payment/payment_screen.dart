@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/payment/payment_filter_dialog.dart';
 import '../../widgets/payment/add_payment_dialog.dart';
 import '../../widgets/payment/enhanced_payment_table.dart';
@@ -26,11 +27,10 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
-    // Load payment records and statistics when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<PaymentProvider>();
       provider.loadPayments();
-      provider.loadStatistics(); // Add statistics loading;
+      provider.loadStatistics();
     });
   }
 
@@ -71,7 +71,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> _handleRefresh() async {
     final provider = context.read<PaymentProvider>();
     await provider.loadPayments();
-    await provider.loadStatistics(); // Also refresh statistics
+    await provider.loadStatistics();
   }
 
   void _handleFilterTap() {
@@ -80,6 +80,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!context.isMinimumSupported) {
       return _buildUnsupportedScreen();
     }
@@ -105,7 +107,6 @@ class _PaymentPageState extends State<PaymentPage> {
               SizedBox(height: context.mainPadding),
               Consumer<PaymentProvider>(
                 builder: (context, provider, child) {
-                  // Show error message if there's an error
                   if (provider.errorMessage != null) {
                     return Container(
                       padding: EdgeInsets.all(context.cardPadding),
@@ -121,7 +122,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           SizedBox(width: context.smallPadding),
                           Expanded(
                             child: Text(
-                              provider.errorMessage ?? 'An error occurred',
+                              provider.errorMessage ?? l10n.unexpectedError,
                               style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red[700]),
                             ),
                           ),
@@ -131,7 +132,7 @@ class _PaymentPageState extends State<PaymentPage> {
                               provider.loadPayments();
                               provider.loadStatistics();
                             },
-                            child: Text('Retry'),
+                            child: Text(l10n.retry),
                           ),
                         ],
                       ),
@@ -159,6 +160,8 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -170,13 +173,13 @@ class _PaymentPageState extends State<PaymentPage> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
@@ -188,6 +191,8 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -195,7 +200,7 @@ class _PaymentPageState extends State<PaymentPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Payment Management',
+                l10n.paymentManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -205,7 +210,7 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Track and manage labor salary payments efficiently',
+                l10n.paymentManagementDescription,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
@@ -217,11 +222,13 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payment Management',
+          l10n.paymentManagement,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -231,7 +238,7 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Track and manage salary payments',
+          l10n.trackManageSalaryPayments,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -241,11 +248,13 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payments',
+          l10n.payments,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -255,7 +264,7 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Track salary payments',
+          l10n.trackSalaryPayments,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -265,6 +274,8 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -283,7 +294,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Payment',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.payment}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -299,14 +310,15 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // Enhanced desktop stats row with comprehensive statistics
   Widget _buildDesktopStatsRow(PaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.paymentStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-            'Total Records',
+            l10n.totalRecords,
             stats?.totalPayments.toString() ?? '0',
             Icons.payments_rounded,
             Colors.blue,
@@ -315,7 +327,7 @@ class _PaymentPageState extends State<PaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'This Month',
+            l10n.thisMonth,
             provider.getThisMonthPayments().toString(),
             Icons.calendar_today_rounded,
             Colors.green,
@@ -324,7 +336,7 @@ class _PaymentPageState extends State<PaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Total Amount',
+            l10n.totalAmount,
             'PKR ${stats?.totalAmountPaid.toStringAsFixed(0) ?? '0'}',
             Icons.attach_money_rounded,
             Colors.purple,
@@ -333,7 +345,7 @@ class _PaymentPageState extends State<PaymentPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'This Week',
+            l10n.thisWeek,
             provider.getThisWeekPayments().toString(),
             Icons.date_range_rounded,
             Colors.orange,
@@ -343,16 +355,17 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // Enhanced mobile stats grid with comprehensive statistics
   Widget _buildMobileStatsGrid(PaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.paymentStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatsCard(
-                'Total',
+                l10n.total,
                 stats?.totalPayments.toString() ?? '0',
                 Icons.payments_rounded,
                 Colors.blue,
@@ -361,7 +374,7 @@ class _PaymentPageState extends State<PaymentPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'This Month',
+                l10n.thisMonth,
                 provider.getThisMonthPayments().toString(),
                 Icons.calendar_today_rounded,
                 Colors.green,
@@ -374,7 +387,7 @@ class _PaymentPageState extends State<PaymentPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                'Amount',
+                l10n.amount,
                 'PKR ${stats?.totalAmountPaid.toStringAsFixed(0) ?? '0'}',
                 Icons.attach_money_rounded,
                 Colors.purple,
@@ -383,7 +396,7 @@ class _PaymentPageState extends State<PaymentPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'This Week',
+                l10n.thisWeek,
                 provider.getThisWeekPayments().toString(),
                 Icons.date_range_rounded,
                 Colors.orange,
@@ -445,6 +458,8 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<PaymentProvider>(
@@ -454,7 +469,7 @@ class _PaymentPageState extends State<PaymentPage> {
             onChanged: provider.searchPayments,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet ? 'Search payments...' : 'Search by ID, labor name, payment method, month, or description...',
+              hintText: context.isTablet ? '${l10n.search} ${l10n.payments}...' : l10n.searchPaymentsHint,
               hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
@@ -476,6 +491,8 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -497,7 +514,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (!context.isTablet) ...[
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Filter',
+                      l10n.filter,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                     ),
                   ],
@@ -527,7 +544,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     if (!context.isTablet) ...[
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Refresh',
+                        l10n.refresh,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                       ),
                     ],

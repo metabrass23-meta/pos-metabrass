@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ZakatTableHelpers {
   final Function(Zakat) onEdit;
@@ -118,6 +119,8 @@ class ZakatTableHelpers {
 
   /// Build error state widget
   Widget buildErrorState(BuildContext context, ZakatProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -132,7 +135,7 @@ class ZakatTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Zakat Records',
+            l10n.failedToLoadZakatRecords,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -143,7 +146,7 @@ class ZakatTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.unexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -169,7 +172,7 @@ class ZakatTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -190,6 +193,8 @@ class ZakatTableHelpers {
 
   /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,7 +209,7 @@ class ZakatTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Zakat Records Found',
+            l10n.noZakatRecordsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -215,7 +220,7 @@ class ZakatTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first zakat record to track your contributions effectively',
+              l10n.startByAddingFirstZakatRecord,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -243,7 +248,7 @@ class ZakatTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Zakat Record',
+                        l10n.addFirstZakatRecord,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -271,16 +276,17 @@ class ZakatTableHelpers {
   }
 
   /// Get status text
-  String getStatusText(Zakat zakat) {
-    if (zakat.isArchived == true) return 'Archived';
-    if (zakat.isVerified == true) return 'Verified';
-    if (zakat.isActive == false) return 'Inactive';
-    return 'Active';
+  String getStatusText(Zakat zakat, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (zakat.isArchived == true) return l10n.archived;
+    if (zakat.isVerified == true) return l10n.verified;
+    if (zakat.isActive == false) return l10n.inactive;
+    return l10n.active;
   }
 
   /// Get zakat type icon based on beneficiary or amount
   IconData getZakatTypeIcon(Zakat zakat) {
-    // You can customize this logic based on your needs
     if (zakat.amount >= 100000) return Icons.star; // Large donation
     if (zakat.amount >= 50000) return Icons.diamond; // Medium donation
     if (zakat.amount >= 10000) return Icons.circle; // Small donation
@@ -325,7 +331,7 @@ class ZakatTableHelpers {
   /// Build status chip
   Widget buildStatusChip(BuildContext context, Zakat zakat) {
     final color = getStatusColor(zakat);
-    final text = getStatusText(zakat);
+    final text = getStatusText(zakat, context);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),

@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PaymentTableHelpers {
   final Function(PaymentModel) onEdit;
@@ -72,6 +73,8 @@ class PaymentTableHelpers {
 
   /// Build error state widget
   Widget buildErrorState(BuildContext context, PaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +89,7 @@ class PaymentTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Payments',
+            l10n.failedToLoadPayments,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -97,7 +100,7 @@ class PaymentTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.unexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -123,7 +126,7 @@ class PaymentTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -144,6 +147,8 @@ class PaymentTableHelpers {
 
   /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -158,7 +163,7 @@ class PaymentTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Payments Found',
+            l10n.noPaymentsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -169,7 +174,7 @@ class PaymentTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first payment record to track your transactions effectively',
+              l10n.startByAddingFirstPaymentToTrack,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -185,9 +190,7 @@ class PaymentTableHelpers {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
-                  // This will trigger the add payment dialog from parent
-                },
+                onTap: () {},
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
@@ -197,7 +200,7 @@ class PaymentTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Payment',
+                        l10n.addFirstPayment,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -261,11 +264,13 @@ class PaymentTableHelpers {
   }
 
   /// Get status text
-  String getStatusText(PaymentModel payment) {
-    if (payment.isFinalPayment) return 'Final Payment';
-    if (payment.bonus > 0) return 'With Bonus';
-    if (payment.deduction > 0) return 'With Deduction';
-    return 'Regular Payment';
+  String getStatusText(PaymentModel payment, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (payment.isFinalPayment) return l10n.finalPayment;
+    if (payment.bonus > 0) return l10n.withBonus;
+    if (payment.deduction > 0) return l10n.withDeduction;
+    return l10n.regularPayment;
   }
 
   /// Get labor initials for avatar
@@ -285,7 +290,7 @@ class PaymentTableHelpers {
   /// Build status chip
   Widget buildStatusChip(BuildContext context, PaymentModel payment) {
     final color = getStatusColor(payment);
-    final text = getStatusText(payment);
+    final text = getStatusText(payment, context);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),

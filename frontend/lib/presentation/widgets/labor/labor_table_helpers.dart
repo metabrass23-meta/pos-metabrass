@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/confirmation_dialog.dart';
 
 class LaborTableHelpers {
@@ -96,6 +97,7 @@ class LaborTableHelpers {
 
   /// Build quick action menu items based on labor state
   List<PopupMenuEntry<String>> _buildQuickActionMenuItems(BuildContext context, LaborModel labor) {
+    final l10n = AppLocalizations.of(context)!;
     final items = <PopupMenuEntry<String>>[];
 
     // Status change actions
@@ -107,7 +109,7 @@ class LaborTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Deactivate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -120,7 +122,7 @@ class LaborTableHelpers {
             children: [
               Icon(Icons.restore, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Restore', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.restore, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -146,50 +148,54 @@ class LaborTableHelpers {
 
   /// Handle soft delete (deactivate)
   Future<void> _handleSoftDelete(BuildContext context, LaborProvider provider, LaborModel labor) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Deactivate Labor',
-            message: 'Are you sure you want to deactivate ${labor.name}? This action can be reversed.',
-            actionText: 'Deactivate',
+            title: l10n.deactivateLabor,
+            message: l10n.areYouSureDeactivateLabor(labor.name),
+            actionText: l10n.deactivate,
             actionColor: Colors.orange,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.softDeleteLabor(labor.id);
       if (provider.hasError) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to deactivate labor');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToDeactivateLabor);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Labor deactivated successfully');
+        _showSuccessSnackbar(context, l10n.laborDeactivatedSuccessfully);
       }
     }
   }
 
   /// Handle restore labor
   Future<void> _handleRestore(BuildContext context, LaborProvider provider, LaborModel labor) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Restore Labor',
-            message: 'Are you sure you want to restore ${labor.name}?',
-            actionText: 'Restore',
+            title: l10n.restoreLabor,
+            message: l10n.areYouSureRestoreLabor(labor.name),
+            actionText: l10n.restore,
             actionColor: Colors.green,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.restoreLabor(labor.id);
       if (provider.hasError) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to restore labor');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToRestoreLabor);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Labor restored successfully');
+        _showSuccessSnackbar(context, l10n.laborRestoredSuccessfully);
       }
     }
   }
@@ -250,6 +256,8 @@ class LaborTableHelpers {
 
   /// Build error state widget
   Widget buildErrorState(BuildContext context, LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -281,7 +289,7 @@ class LaborTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Labors',
+            l10n.failedToLoadLabors,
             style: GoogleFonts.inter(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -303,7 +311,7 @@ class LaborTableHelpers {
               ),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.unexpectedErrorOccurred,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
@@ -343,7 +351,7 @@ class LaborTableHelpers {
                       ),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -364,6 +372,8 @@ class LaborTableHelpers {
 
   /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -395,7 +405,7 @@ class LaborTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Labors Found',
+            l10n.noLaborsFound,
             style: GoogleFonts.inter(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -417,7 +427,7 @@ class LaborTableHelpers {
               ),
             ),
             child: Text(
-              'Start by adding your first labor to manage your workforce effectively',
+              l10n.startByAddingFirstLabor,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
@@ -452,7 +462,7 @@ class LaborTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Labor',
+                        l10n.addFirstLabor,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,

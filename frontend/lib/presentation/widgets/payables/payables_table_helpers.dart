@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PayablesTableHelpers {
   final Function(Payable) onEdit;
@@ -72,6 +73,8 @@ class PayablesTableHelpers {
 
   /// Build error state widget
   Widget buildErrorState(BuildContext context, PayablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +89,7 @@ class PayablesTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Payables',
+            l10n.failedToLoadPayables,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -97,7 +100,7 @@ class PayablesTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.anUnexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -122,7 +125,7 @@ class PayablesTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -143,6 +146,8 @@ class PayablesTableHelpers {
 
   /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,7 +162,7 @@ class PayablesTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Payables Found',
+            l10n.noPayablesFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -168,7 +173,7 @@ class PayablesTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first payable record to track your borrowings effectively',
+              l10n.startByAddingYourFirstPayableRecordToTrackYourBorrowingsEffectively,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -196,7 +201,7 @@ class PayablesTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Payable Record',
+                        l10n.addFirstPayableRecord,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -224,11 +229,13 @@ class PayablesTableHelpers {
   }
 
   /// Get status text
-  String getStatusText(Payable payable) {
-    if (payable.isFullyPaid) return 'Fully Paid';
-    if (payable.isOverdueComputed) return 'Overdue';
-    if (payable.amountPaid > 0 && payable.balanceRemaining > 0) return 'Partially Paid';
-    return 'Pending';
+  String getStatusText(BuildContext context, Payable payable) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (payable.isFullyPaid) return l10n.fullyPaid;
+    if (payable.isOverdueComputed) return l10n.overdue;
+    if (payable.amountPaid > 0 && payable.balanceRemaining > 0) return l10n.partiallyPaid;
+    return l10n.pending;
   }
 
   /// Get priority color
@@ -263,7 +270,7 @@ class PayablesTableHelpers {
   /// Build status chip
   Widget buildStatusChip(BuildContext context, Payable payable) {
     final color = getStatusColor(payable);
-    final text = getStatusText(payable);
+    final text = getStatusText(context, payable);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
@@ -319,12 +326,14 @@ class PayablesTableHelpers {
 
   /// Build vendor badge
   Widget buildVendorBadge(BuildContext context, Payable payable) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (payable.vendorId == null) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
         decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
         child: Text(
-          'No Vendor',
+          l10n.noVendor,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
         ),
       );

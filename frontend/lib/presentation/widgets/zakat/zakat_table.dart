@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'zakat_table_helpers.dart';
 
 class EnhancedZakatTable extends StatefulWidget {
@@ -30,7 +31,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
     super.initState();
     _helpers = ZakatTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
 
-    // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
@@ -73,7 +73,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -94,7 +93,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                   ),
                 ),
 
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -118,7 +116,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                   ),
                 ),
 
-                // Pagination Controls
                 if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
               ],
             ),
@@ -167,38 +164,22 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Zakat ID
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Zakat ID', 'id')),
-
-        // Title
-        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, 'Title', 'name')),
-
-        // Beneficiary (responsive)
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.zakatId, 'id')),
+        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, l10n.title, 'name')),
         if (!context.shouldShowCompactLayout)
-          Container(width: columnWidths[2], child: _buildSortableHeaderCell(context, 'Beneficiary', 'beneficiary_name')),
-
-        // Description (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Description')),
-
-        // Notes (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Notes')),
-
-        // Amount
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 5], child: _buildSortableHeaderCell(context, 'Amount', 'amount')),
-
-        // Date
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 6], child: _buildSortableHeaderCell(context, 'Date', 'date')),
-
-        // Authority (hidden on compact layouts)
+          Container(width: columnWidths[2], child: _buildSortableHeaderCell(context, l10n.beneficiary, 'beneficiary_name')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.description)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.notes)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 5], child: _buildSortableHeaderCell(context, l10n.amount, 'amount')),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 6], child: _buildSortableHeaderCell(context, l10n.date, 'date')),
         if (!context.shouldShowCompactLayout)
-          Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, 'Authority', 'authorized_by')),
-
-        // Actions
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, 'Actions')),
+          Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, l10n.authority, 'authorized_by')),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -247,6 +228,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   }
 
   Widget _buildTableRow(BuildContext context, Zakat zakat, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -257,7 +239,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Zakat ID Column
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -277,7 +258,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
             ),
           ),
 
-          // Title Column
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -290,7 +270,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show beneficiary on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Row(
@@ -307,11 +286,10 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                       ),
                     ],
                   ),
-                  // Show notes on compact layouts if available
                   if (zakat.notes != null && zakat.notes!.isNotEmpty) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'Notes: ${zakat.notes}',
+                      '${l10n.notes}: ${zakat.notes}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -322,7 +300,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
             ),
           ),
 
-          // Beneficiary Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[2],
@@ -360,7 +337,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
             ),
 
-          // Description Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[3],
@@ -373,7 +349,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
             ),
 
-          // Notes Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[4],
@@ -382,7 +357,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    zakat.notes ?? 'No notes',
+                    zakat.notes ?? l10n.noNotes,
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -391,7 +366,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
             ),
 
-          // Amount Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 2 : 5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -410,7 +384,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
             ),
           ),
 
-          // Date Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -429,7 +402,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
             ),
           ),
 
-          // Authority Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[7],
@@ -444,7 +416,6 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
             ),
 
-          // Actions Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -456,6 +427,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   }
 
   Widget _buildPaginationControls(BuildContext context, ZakatProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -469,24 +441,24 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
       ),
       child: Row(
         children: [
-          // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} zakat records',
+            l10n.showingZakatRecords(
+              ((pagination.currentPage - 1) * pagination.pageSize) + 1,
+              pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
+              pagination.totalCount,
+            ),
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
 
-          // Pagination controls
           Row(
             children: [
-              // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
                 icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
 
-              // Page info
               Container(
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
                 decoration: BoxDecoration(
@@ -494,12 +466,11 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 
-              // Next button
               IconButton(
                 onPressed: pagination.hasNext ? provider.loadNextPage : null,
                 icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),

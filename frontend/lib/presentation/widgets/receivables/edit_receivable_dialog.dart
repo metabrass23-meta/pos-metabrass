@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -77,17 +78,19 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final amountGiven = double.parse(_amountGivenController.text.trim());
       final amountReturned = double.tryParse(_amountReturnedController.text.trim()) ?? 0.0;
 
       if (amountReturned > amountGiven) {
-        _showErrorSnackbar('Amount returned cannot exceed amount given');
+        _showErrorSnackbar(l10n.amountReturnedCannotExceedAmountGiven);
         return;
       }
 
       if (_expectedReturnDate.isBefore(_dateLent)) {
-        _showErrorSnackbar('Expected return date cannot be before date lent');
+        _showErrorSnackbar(l10n.expectedReturnDateCannotBeBeforeDateLent);
         return;
       }
 
@@ -113,6 +116,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -124,7 +129,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Receivable updated successfully!',
+              l10n.receivableUpdatedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -331,6 +336,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -362,7 +369,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Receivable' : 'Edit Receivable Details',
+                  context.shouldShowCompactLayout ? l10n.editReceivable : l10n.editReceivableDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -373,7 +380,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update receivable information',
+                    l10n.updateReceivableInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -424,6 +431,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -432,26 +441,26 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Debtor Name',
-              hint: isCompact ? 'Enter name' : 'Enter debtor full name',
+              label: l10n.debtorName,
+              hint: isCompact ? l10n.enterName : l10n.enterDebtorFullName,
               controller: _debtorNameController,
               prefixIcon: Icons.person_outline,
               validator: (value) {
-                if (value?.isEmpty ?? true) return 'Please enter debtor name';
-                if (value!.length < 2) return 'Name must be at least 2 characters';
+                if (value?.isEmpty ?? true) return l10n.pleaseEnterDebtorName;
+                if (value!.length < 2) return l10n.nameMustBeAtLeast2Characters;
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
-              label: 'Phone Number',
-              hint: isCompact ? 'Enter phone' : 'Enter phone number (+92XXXXXXXXXX)',
+              label: l10n.phone,
+              hint: isCompact ? l10n.enterPhone : l10n.enterPhoneNumber,
               controller: _debtorPhoneController,
               prefixIcon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
               validator: (value) {
-                if (value?.isEmpty ?? true) return 'Please enter phone number';
-                if (value!.length < 10) return 'Please enter a valid phone number';
+                if (value?.isEmpty ?? true) return l10n.pleaseEnterPhoneNumber;
+                if (value!.length < 10) return l10n.pleaseEnterValidPhoneNumber;
                 return null;
               },
             ),
@@ -460,16 +469,16 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
               children: [
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Amount Given (PKR)',
-                    hint: 'Enter amount',
+                    label: l10n.amountGivenPkr,
+                    hint: l10n.enterAmount,
                     controller: _amountGivenController,
                     prefixIcon: Icons.trending_up_rounded,
                     keyboardType: TextInputType.number,
                     onChanged: (value) => setState(() {}),
                     validator: (value) {
-                      if (value?.isEmpty ?? true) return 'Please enter amount';
+                      if (value?.isEmpty ?? true) return l10n.pleaseEnterAmount;
                       final amount = double.tryParse(value!);
-                      if (amount == null || amount <= 0) return 'Please enter valid amount';
+                      if (amount == null || amount <= 0) return l10n.pleaseEnterValidAmount;
                       return null;
                     },
                   ),
@@ -477,8 +486,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Amount Returned (PKR)',
-                    hint: 'Enter returned',
+                    label: l10n.amountReturnedPkr,
+                    hint: l10n.enterReturned,
                     controller: _amountReturnedController,
                     prefixIcon: Icons.trending_down_rounded,
                     keyboardType: TextInputType.number,
@@ -486,9 +495,9 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
                         final amountReturned = double.tryParse(value);
-                        if (amountReturned == null || amountReturned < 0) return 'Enter valid amount';
+                        if (amountReturned == null || amountReturned < 0) return l10n.enterValidAmount;
                         final amountGiven = double.tryParse(_amountGivenController.text) ?? 0;
-                        if (amountReturned > amountGiven) return 'Cannot exceed amount given';
+                        if (amountReturned > amountGiven) return l10n.cannotExceedAmountGiven;
                       }
                       return null;
                     },
@@ -517,7 +526,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        'Balance Remaining: PKR ${balanceRemaining.toStringAsFixed(0)}',
+                        '${l10n.balanceRemaining} PKR ${balanceRemaining.toStringAsFixed(0)}',
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -531,8 +540,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
             ],
             SizedBox(height: context.cardPadding),
             PremiumTextField(
-              label: 'Reason/Item',
-              hint: isCompact ? 'Reason for lending' : 'Enter reason for lending or item description',
+              label: l10n.reasonItem,
+              hint: isCompact ? l10n.reasonForLending : l10n.enterReasonForLendingOrItemDescription,
               controller: _reasonController,
               prefixIcon: Icons.assignment_outlined,
               maxLines: ResponsiveBreakpoints.responsive(
@@ -544,15 +553,15 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                 ultrawide: 6,
               ),
               validator: (value) {
-                if (value?.isEmpty ?? true) return 'Please enter reason or item';
-                if (value!.length < 5) return 'Please provide more details';
+                if (value?.isEmpty ?? true) return l10n.pleaseEnterReasonOrItem;
+                if (value!.length < 5) return l10n.pleaseProvideMoreDetails;
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
             PremiumTextField(
-              label: 'Notes (Optional)',
-              hint: isCompact ? 'Additional notes' : 'Enter additional notes or terms',
+              label: l10n.notesOptional,
+              hint: isCompact ? l10n.additionalNotes : l10n.enterAdditionalNotesOrTerms,
               controller: _notesController,
               prefixIcon: Icons.note_outlined,
               maxLines: ResponsiveBreakpoints.responsive(
@@ -571,8 +580,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                   child: GestureDetector(
                     onTap: _selectDateLent,
                     child: PremiumTextField(
-                      label: 'Date Lent',
-                      hint: 'Select date',
+                      label: l10n.dateLent,
+                      hint: l10n.selectDate,
                       controller: TextEditingController(
                           text: '${_dateLent.day}/${_dateLent.month}/${_dateLent.year}'),
                       prefixIcon: Icons.calendar_today,
@@ -585,8 +594,8 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                   child: GestureDetector(
                     onTap: _selectExpectedReturnDate,
                     child: PremiumTextField(
-                      label: 'Expected Return Date',
-                      hint: 'Select date',
+                      label: l10n.expectedReturnDate,
+                      hint: l10n.selectDate,
                       controller: TextEditingController(
                           text: '${_expectedReturnDate.day}/${_expectedReturnDate.month}/${_expectedReturnDate.year}'),
                       prefixIcon: Icons.event_available,
@@ -612,13 +621,15 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<ReceivablesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Receivable',
+              text: l10n.updateReceivable,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -629,7 +640,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -641,11 +652,13 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -658,7 +671,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
           child: Consumer<ReceivablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Receivable',
+                text: l10n.updateReceivable,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

@@ -15,11 +15,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeBack => 'Welcome Back to';
 
   @override
-  String get brandName => 'Maqbool Fashion';
+  String get brandName => 'Al Noor Fashion';
 
   @override
-  String get tagline =>
-      'Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.';
+  String get tagline => 'Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.';
 
   @override
   String get signIn => 'Sign In';
@@ -52,8 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Login failed. Please check your credentials.';
 
   @override
-  String get unexpectedError =>
-      'An unexpected error occurred. Please try again.';
+  String get unexpectedError => 'An unexpected error occurred. Please try again.';
 
   @override
   String get noAccount => 'Don\'t have an account?';
@@ -245,8 +243,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posSystem => 'Point of Sale System';
 
   @override
-  String get selectProductsManageSales =>
-      'Select products and manage sales transactions';
+  String get selectProductsManageSales => 'Select products and manage sales transactions';
 
   @override
   String get todaySales => 'Today Sales';
@@ -282,8 +279,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchProducts => 'Search products...';
 
   @override
-  String get searchProductsExpanded =>
-      'Search products by name, color, fabric...';
+  String get searchProductsExpanded => 'Search products by name, color, fabric...';
 
   @override
   String get filter => 'Filter';
@@ -292,8 +288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenTooSmall => 'Screen Too Small';
 
   @override
-  String get screenTooSmallMessage =>
-      'POS System requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.';
+  String get screenTooSmallMessage => 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.';
 
   @override
   String get all => 'All';
@@ -368,8 +363,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proceedToCheckout => 'Proceed to Checkout';
 
   @override
-  String get clearCartQuestion =>
-      'Are you sure you want to remove all items from the cart?';
+  String get clearCartQuestion => 'Are you sure you want to remove all items from the cart?';
 
   @override
   String get noProductsFound => 'No Products Found';
@@ -378,12 +372,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noProductsAvailable => 'No Products Available';
 
   @override
-  String get tryAdjustingSearch =>
-      'Try adjusting your search or filter criteria';
+  String get tryAdjustingSearch => 'Try adjusting your search or filter criteria';
 
   @override
-  String get addProductsToInventory =>
-      'Add products to your inventory to start selling';
+  String get addProductsToInventory => 'Add products to your inventory to start selling';
 
   @override
   String get clearFilters => 'Clear Filters';
@@ -395,8 +387,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get productsManagement => 'Products Management';
 
   @override
-  String get productManagementDescription =>
-      'Manage product inventory and details with comprehensive tools';
+  String get productManagementDescription => 'Manage product inventory and details with comprehensive tools';
 
   @override
   String get manageInventory => 'Manage inventory';
@@ -423,19 +414,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get value => 'Value';
 
   @override
-  String get searchProductsHint =>
-      'Search products by ID, name, color, fabric, or pieces...';
+  String get searchProductsHint => 'Search products by ID, name, color, fabric, or pieces...';
 
   @override
   String get customerManagement => 'Customer Management';
 
   @override
-  String get customerManagementDescription =>
-      'Organize and manage your customer relationships with comprehensive tools';
+  String get customerManagementDescription => 'Organize and manage your customer relationships with comprehensive tools';
 
   @override
-  String get customerManagementShortDescription =>
-      'Manage customer relationships';
+  String get customerManagementShortDescription => 'Manage customer relationships';
 
   @override
   String get addCustomer => 'Add Customer';
@@ -486,15 +474,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noCustomersFound => 'No customers found';
 
   @override
-  String get adjustFilters =>
-      'Try adjusting your filters or adding new customers.';
+  String get adjustFilters => 'Try adjusting your filters or adding new customers.';
 
   @override
   String get failedToRefreshCustomers => 'Failed to refresh customers';
 
   @override
-  String get logoutMessage =>
-      'Are you sure you want to logout from your account?';
+  String get logoutMessage => 'Are you sure you want to logout from your account?';
 
   @override
   String get logoutError => 'Logged out locally due to an error.';
@@ -506,8 +492,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeToPos => 'Welcome to Maqbool Fabrics POS';
 
   @override
-  String get welcomeTagline =>
-      'Crafting Excellence in Every Stitch - Your Premium Fashion Management System';
+  String get welcomeTagline => 'Crafting Excellence in Every Stitch - Your Premium Fashion Management System';
 
   @override
   String get today => 'Today';
@@ -585,7 +570,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newOrder => 'New Order';
 
   @override
-  String get createOrder => 'Create Order';
+  String get createOrder => 'Create order';
 
   @override
   String get processPayment => 'Process payment';
@@ -628,6 +613,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generated => 'Generated';
+
+  @override
+  String get created => 'Created';
 
   @override
   String get sent => 'Sent';
@@ -679,4 +667,3779 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get additionalReceiptNotes => 'Additional receipt notes (optional)';
+
+  @override
+  String get type => 'Type';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get lastUpdated => 'Last Updated';
+
+  @override
+  String get weekAgo => 'week ago';
+
+  @override
+  String get monthAgo => 'month ago';
+
+  @override
+  String get yearAgo => 'year ago';
+
+  @override
+  String get characters => 'characters';
+
+  @override
+  String get optional => 'optional';
+
+  @override
+  String get updated => 'Updated';
+
+  @override
+  String get popular => 'Popular';
+
+  @override
+  String get manageProductCategories => 'Manage product categories';
+
+  @override
+  String get searchCategoriesHint => 'Search categories by name, ID, or description';
+
+  @override
+  String get growth => 'Growth';
+
+  @override
+  String get cities => 'Cities';
+
+  @override
+  String get citiesCovered => 'Cities Covered';
+
+  @override
+  String get searchVendorsHint => 'Search vendors by name, business, CNIC, or phone';
+
+  @override
+  String get city => 'City';
+
+  @override
+  String get area => 'Area';
+
+  @override
+  String get pleaseFixErrors => 'Please fix the following errors';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get basicInformation => 'Basic Information';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get pleaseEnter => 'Please enter';
+
+  @override
+  String get mustBeAtLeast => 'must be at least';
+
+  @override
+  String get mustBeLessThan => 'must be less than';
+
+  @override
+  String get businessName => 'Business Name';
+
+  @override
+  String get cnic => 'CNIC';
+
+  @override
+  String get cnicFormat => 'XXXXX-XXXXXXX-X';
+
+  @override
+  String get pleaseEnterValid => 'Please enter a valid';
+
+  @override
+  String get contactInformation => 'Contact Information';
+
+  @override
+  String get phoneFormat => '+923001234567';
+
+  @override
+  String get locationInformation => 'Location Information';
+
+  @override
+  String get deletedPermanently => 'deleted permanently';
+
+  @override
+  String get deactivatedSuccessfully => 'deactivated successfully';
+
+  @override
+  String get failedToDelete => 'Failed to delete';
+
+  @override
+  String get pleaseConfirmAction => 'Please confirm that you understand this action';
+
+  @override
+  String get pleaseConfirmConsequences => 'Please confirm that you understand the consequences of permanent deletion';
+
+  @override
+  String get pleaseTypeVendorName => 'Please type the vendor name exactly to confirm permanent deletion';
+
+  @override
+  String get pleaseCompleteConfirmation => 'Please complete all confirmation steps';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get showing => 'Showing';
+
+  @override
+  String get outOf => 'of';
+
+  @override
+  String get refineVendorList => 'Refine your vendor list with filters';
+
+  @override
+  String get showInactiveVendorsOnly => 'Show inactive vendors only';
+
+  @override
+  String get onlyDeactivatedVendorsShown => 'Only deactivated vendors will be shown';
+
+  @override
+  String get applyFilters => 'Apply Filters';
+
+  @override
+  String get clearAllFilters => 'Clear All Filters';
+
+  @override
+  String get deactivate => 'Deactivate';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get areYouSureDeactivate => 'Are you sure you want to deactivate';
+
+  @override
+  String get actionCanBeReversed => 'This action can be reversed';
+
+  @override
+  String get failedToDeactivate => 'Failed to deactivate';
+
+  @override
+  String get areYouSureRestore => 'Are you sure you want to restore';
+
+  @override
+  String get failedToRestore => 'Failed to restore';
+
+  @override
+  String get restoredSuccessfully => 'restored successfully';
+
+  @override
+  String get failedToLoad => 'Failed to Load';
+
+  @override
+  String get noVendorsFound => 'No Vendors Found';
+
+  @override
+  String get startByAddingFirstVendor => 'Start by adding your first vendor to manage your suppliers effectively';
+
+  @override
+  String get firstVendor => 'First Vendor';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get information => 'Information';
+
+  @override
+  String get since => 'since';
+
+  @override
+  String get daysOld => 'days old';
+
+  @override
+  String get fullAddress => 'Full Address';
+
+  @override
+  String get activitySummary => 'Activity Summary';
+
+  @override
+  String get totalAmount => 'Total Amount';
+
+  @override
+  String get updatedSuccessfully => 'updated successfully';
+
+  @override
+  String get failedToUpdate => 'Failed to update';
+
+  @override
+  String get updating => 'updating';
+
+  @override
+  String get noChangesDetected => 'No changes detected';
+
+  @override
+  String get discardChanges => 'Discard Changes?';
+
+  @override
+  String get discardChangesMessage => 'You have unsaved changes. Are you sure you want to discard them?';
+
+  @override
+  String get continueEditing => 'Continue Editing';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get unsavedChanges => 'You have unsaved changes';
+
+  @override
+  String get modified => 'Modified';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get product => 'Product';
+
+  @override
+  String get newProduct => 'New Product';
+
+  @override
+  String get createNewProductEntry => 'Create a new product entry';
+
+  @override
+  String get detail => 'Detail';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get cost => 'Cost';
+
+  @override
+  String get costPriceCannotExceedSellingPrice => 'Cost price cannot exceed selling price';
+
+  @override
+  String get costPriceInfo => 'Setting cost price enables profit margin calculations and better financial analysis';
+
+  @override
+  String get qty => 'Qty';
+
+  @override
+  String get colorName => 'Color Name';
+
+  @override
+  String get fabricType => 'Fabric Type';
+
+  @override
+  String get fabricName => 'Fabric Name';
+
+  @override
+  String get pleaseSelectAtLeastOnePiece => 'Please select at least one piece';
+
+  @override
+  String get failedToAdd => 'Failed to add';
+
+  @override
+  String get addedSuccessfully => 'added successfully';
+
+  @override
+  String get select => 'Select';
+
+  @override
+  String get pleaseSelect => 'Please select';
+
+  @override
+  String get labors => 'Labors';
+
+  @override
+  String get laborManagement => 'Labor Management';
+
+  @override
+  String get laborManagementDescription => 'Organize and manage your labor workforce with comprehensive tools';
+
+  @override
+  String get organizeAndManageLaborWorkforce => 'Organize and manage labor workforce';
+
+  @override
+  String get manageLaborWorkforce => 'Manage labor workforce';
+
+  @override
+  String get failedToRefresh => 'Failed to refresh';
+
+  @override
+  String get preparingExport => 'Preparing export...';
+
+  @override
+  String get dataExportCompleted => 'data export completed successfully';
+
+  @override
+  String get newLabel => 'New';
+
+  @override
+  String get searchLaborsHint => 'Search labors by name, CNIC, phone, designation...';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get designation => 'Designation';
+
+  @override
+  String get caste => 'Caste';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get receivable => 'Receivable';
+
+  @override
+  String get receivablesManagement => 'Receivables Management';
+
+  @override
+  String get receivablesManagementDescription => 'Track and manage amounts lent to customers and suppliers';
+
+  @override
+  String get manageAmountsLent => 'Manage amounts lent';
+
+  @override
+  String get amountsLent => 'Amounts lent';
+
+  @override
+  String get amountLent => 'Amount Lent';
+
+  @override
+  String get amountReturned => 'Amount Returned';
+
+  @override
+  String get outstanding => 'Outstanding';
+
+  @override
+  String get returned => 'Returned';
+
+  @override
+  String get searchReceivablesHint => 'Search by debtor name, phone, reason, or notes...';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get id => 'ID';
+
+  @override
+  String get debtor => 'Debtor';
+
+  @override
+  String get debtorDetails => 'Debtor Details';
+
+  @override
+  String get amounts => 'Amounts';
+
+  @override
+  String get reasonItem => 'Reason/Item';
+
+  @override
+  String get dates => 'Dates';
+
+  @override
+  String get returnDate => 'Return Date';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get remaining => 'remaining';
+
+  @override
+  String get lent => 'Lent';
+
+  @override
+  String get daysOverdue => 'days overdue';
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get deleteText => 'Delete';
+
+  @override
+  String get noReceivablesFound => 'No Receivables Found';
+
+  @override
+  String get startByAddingFirstReceivable => 'Start by adding your first receivable record to track amounts lent to customers and suppliers';
+
+  @override
+  String get firstReceivable => 'First Receivable';
+
+  @override
+  String get deletePermanently => 'Delete Permanently';
+
+  @override
+  String get deactivateVendor => 'Deactivate Vendor';
+
+  @override
+  String get actionCannotBeUndone => 'This action cannot be undone';
+
+  @override
+  String get vendorCanBeRestoredLater => 'Vendor can be restored later';
+
+  @override
+  String get permanentDeletionWarning => 'Permanent Deletion Warning';
+
+  @override
+  String get deactivationNotice => 'Deactivation Notice';
+
+  @override
+  String get permanentDeletionWarningMessage => 'This will permanently remove all vendor data from the database. This action cannot be reversed.';
+
+  @override
+  String get deactivationNoticeMessage => 'This will deactivate the vendor but preserve all data. The vendor can be restored later if needed.';
+
+  @override
+  String get chooseDeletionType => 'Choose deletion type:';
+
+  @override
+  String get permanentDelete => 'Permanent Delete';
+
+  @override
+  String get removesFromDatabasePermanently => 'Removes from database permanently';
+
+  @override
+  String get hideButCanBeRestored => 'Hide but can be restored';
+
+  @override
+  String get vendorSince => 'Vendor since';
+
+  @override
+  String get days => 'days';
+
+  @override
+  String get understandPermanentDeletion => 'I understand this will permanently delete the vendor';
+
+  @override
+  String get understandDeactivation => 'I understand this will deactivate the vendor';
+
+  @override
+  String get understandActionCannotBeUndone => 'I understand this action cannot be undone and will affect related records';
+
+  @override
+  String get typeVendorNameToConfirm => 'Type the vendor name to confirm permanent deletion:';
+
+  @override
+  String get expected => 'Expected';
+
+  @override
+  String get payable => 'Payable';
+
+  @override
+  String get payablesManagement => 'Payables Management';
+
+  @override
+  String get payablesManagementDescription => 'Track and manage amounts owed to creditors efficiently';
+
+  @override
+  String get manageCreditorPayables => 'Manage creditor payables';
+
+  @override
+  String get creditorPayables => 'Creditor payables';
+
+  @override
+  String get totalPayables => 'Total Payables';
+
+  @override
+  String get totalBorrowed => 'Total Borrowed';
+
+  @override
+  String get totalPaid => 'Total Paid';
+
+  @override
+  String get balanceDue => 'Balance Due';
+
+  @override
+  String get borrowed => 'Borrowed';
+
+  @override
+  String get due => 'Due';
+
+  @override
+  String get searchPayablesHint => 'Search by ID, creditor name, phone, reason, or status...';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get paymentManagement => 'Payment Management';
+
+  @override
+  String get paymentManagementDescription => 'Track and manage labor salary payments efficiently';
+
+  @override
+  String get trackManageSalaryPayments => 'Track and manage salary payments';
+
+  @override
+  String get trackSalaryPayments => 'Track salary payments';
+
+  @override
+  String get totalRecords => 'Total Records';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get searchPaymentsHint => 'Search by ID, labor name, payment method, month, or description...';
+
+  @override
+  String get advancePaymentManagement => 'Advance Payment Management';
+
+  @override
+  String get advancePaymentManagementDescription => 'Track and manage labor advance payments efficiently';
+
+  @override
+  String get advancePayments => 'Advance Payments';
+
+  @override
+  String get manageLaborPayments => 'Manage labor payments';
+
+  @override
+  String get totalPayments => 'Total Payments';
+
+  @override
+  String get withReceipts => 'With Receipts';
+
+  @override
+  String get loadingAdvancePayments => 'Loading advance payments...';
+
+  @override
+  String get searchAdvancePaymentsHint => 'Search by ID, labor name, phone, role, or description...';
+
+  @override
+  String get dataRefreshedSuccessfully => 'Data refreshed successfully';
+
+  @override
+  String get expense => 'Expense';
+
+  @override
+  String get expensesManagement => 'Expenses Management';
+
+  @override
+  String get expensesManagementDescription => 'Track and manage business expenses efficiently';
+
+  @override
+  String get trackBusinessExpenses => 'Track business expenses';
+
+  @override
+  String get trackExpenses => 'Track expenses';
+
+  @override
+  String get thisYear => 'This Year';
+
+  @override
+  String get searchExpensesHint => 'Search expenses by ID, type, description, amount, or person...';
+
+  @override
+  String get zakatManagement => 'Zakat Management';
+
+  @override
+  String get zakatManagementDescription => 'Track and manage zakat contributions efficiently';
+
+  @override
+  String get trackZakatContributions => 'Track zakat contributions';
+
+  @override
+  String get trackContributions => 'Track contributions';
+
+  @override
+  String get searchZakatHint => 'Search zakat by ID, title, beneficiary, or amount...';
+
+  @override
+  String get profitLossStatement => 'Profit & Loss Statement';
+
+  @override
+  String get profitLossStatementDescription => 'Financial performance analysis and profitability tracking';
+
+  @override
+  String get profitLossShort => 'P&L';
+
+  @override
+  String get financialPerformanceAnalysis => 'Financial performance analysis';
+
+  @override
+  String get financialAnalysis => 'Financial analysis';
+
+  @override
+  String get period => 'Period';
+
+  @override
+  String get report => 'Report';
+
+  @override
+  String get preparing => 'Preparing';
+
+  @override
+  String get exportFailed => 'Export failed';
+
+  @override
+  String get calculatingProfitLoss => 'Calculating Profit & Loss...';
+
+  @override
+  String get noFinancialDataAvailable => 'No Financial Data Available';
+
+  @override
+  String get selectPeriodToViewAnalysis => 'Select a period to view profit and loss analysis';
+
+  @override
+  String get overview => 'Overview';
+
+  @override
+  String get expenseBreakdown => 'Expense Breakdown';
+
+  @override
+  String get ofExpenses => 'of expenses';
+
+  @override
+  String get totalExpenses => 'Total Expenses';
+
+  @override
+  String get profitable => 'PROFITABLE';
+
+  @override
+  String get loss => 'LOSS';
+
+  @override
+  String get refreshing => 'Refreshing...';
+
+  @override
+  String get clearErrors => 'Clear Errors';
+
+  @override
+  String get operationCompletedSuccessfully => 'Operation completed successfully';
+
+  @override
+  String get taxManagement => 'Tax Management';
+
+  @override
+  String get taxManagementDescription => 'Manage tax rates and configurations';
+
+  @override
+  String get addTaxRate => 'Add Tax Rate';
+
+  @override
+  String get searchTaxRatesHint => 'Search tax rates...';
+
+  @override
+  String get taxRates => 'Tax Rates';
+
+  @override
+  String get noTaxRatesFound => 'No Tax Rates Found';
+
+  @override
+  String get addFirstTaxRate => 'Add your first tax rate to get started';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get totalTaxRates => 'Total Tax Rates';
+
+  @override
+  String get activeRates => 'Active Rates';
+
+  @override
+  String get activate => 'Activate';
+
+  @override
+  String get deleteTaxRate => 'Delete Tax Rate';
+
+  @override
+  String get deleteTaxRateConfirmation => 'Are you sure you want to delete';
+
+  @override
+  String get editTaxRate => 'Edit Tax Rate';
+
+  @override
+  String get taxName => 'Tax Name';
+
+  @override
+  String get taxType => 'Tax Type';
+
+  @override
+  String get taxPercentage => 'Tax Percentage (%)';
+
+  @override
+  String get pleaseEnterTaxName => 'Please enter a tax name';
+
+  @override
+  String get pleaseEnterTaxPercentage => 'Please enter a tax percentage';
+
+  @override
+  String get pleaseEnterValidPercentage => 'Please enter a valid percentage (0-100)';
+
+  @override
+  String get descriptionOptional => 'Description (Optional)';
+
+  @override
+  String get returnManagement => 'Return Management';
+
+  @override
+  String get titleReceiptManagement => 'Receipt Management';
+
+  @override
+  String get receivableDetails => 'Receivable Details';
+
+  @override
+  String get viewCompleteReceivableInformation => 'View complete receivable information';
+
+  @override
+  String get debtorInformation => 'Debtor Information';
+
+  @override
+  String get amountBreakdown => 'Amount Breakdown';
+
+  @override
+  String get amountGiven => 'Amount Given:';
+
+  @override
+  String get balanceRemaining => 'Balance Remaining:';
+
+  @override
+  String get returnProgress => 'Return Progress';
+
+  @override
+  String get dateLent => 'Date Lent';
+
+  @override
+  String get expectedReturnDate => 'Expected Return Date';
+
+  @override
+  String get expectedReturn => 'Expected Return';
+
+  @override
+  String get transactionDetails => 'Transaction Details';
+
+  @override
+  String get editReceivable => 'Edit Receivable';
+
+  @override
+  String get editReceivableDetails => 'Edit Receivable Details';
+
+  @override
+  String get updateReceivableInformation => 'Update receivable information';
+
+  @override
+  String get debtorName => 'Debtor Name';
+
+  @override
+  String get enterName => 'Enter name';
+
+  @override
+  String get enterDebtorFullName => 'Enter debtor full name';
+
+  @override
+  String get pleaseEnterDebtorName => 'Please enter debtor name';
+
+  @override
+  String get nameMustBeAtLeast2Characters => 'Name must be at least 2 characters';
+
+  @override
+  String get enterPhone => 'Enter phone';
+
+  @override
+  String get enterPhoneNumber => 'Enter phone number (+92XXXXXXXXXX)';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'Please enter phone number';
+
+  @override
+  String get pleaseEnterValidPhoneNumber => 'Please enter a valid phone number';
+
+  @override
+  String get amountGivenPkr => 'Amount Given (PKR)';
+
+  @override
+  String get enterAmount => 'Enter amount';
+
+  @override
+  String get pleaseEnterAmount => 'Please enter amount';
+
+  @override
+  String get pleaseEnterValidAmount => 'Please enter valid amount';
+
+  @override
+  String get amountReturnedPkr => 'Amount Returned (PKR)';
+
+  @override
+  String get enterReturned => 'Enter returned';
+
+  @override
+  String get enterValidAmount => 'Enter valid amount';
+
+  @override
+  String get cannotExceedAmountGiven => 'Cannot exceed amount given';
+
+  @override
+  String get reasonForLending => 'Reason for lending';
+
+  @override
+  String get enterReasonForLendingOrItemDescription => 'Enter reason for lending or item description';
+
+  @override
+  String get pleaseEnterReasonOrItem => 'Please enter reason or item';
+
+  @override
+  String get pleaseProvideMoreDetails => 'Please provide more details';
+
+  @override
+  String get notesOptional => 'Notes (Optional)';
+
+  @override
+  String get additionalNotes => 'Additional notes';
+
+  @override
+  String get enterAdditionalNotesOrTerms => 'Enter additional notes or terms';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get updateReceivable => 'Update Receivable';
+
+  @override
+  String get receivableUpdatedSuccessfully => 'Receivable updated successfully!';
+
+  @override
+  String get amountReturnedCannotExceedAmountGiven => 'Amount returned cannot exceed amount given';
+
+  @override
+  String get expectedReturnDateCannotBeBeforeDateLent => 'Expected return date cannot be before date lent';
+
+  @override
+  String get addReceivable => 'Add Receivable';
+
+  @override
+  String get addNewReceivable => 'Add New Receivable';
+
+  @override
+  String get recordAmountLentToCustomerOrSupplier => 'Record amount lent to customer or supplier';
+
+  @override
+  String get amountDetails => 'Amount Details';
+
+  @override
+  String get enterAmountGivenToDebtor => 'Enter amount given to debtor';
+
+  @override
+  String get pleaseEnterAmountGiven => 'Please enter amount given';
+
+  @override
+  String get optionalIfAnyAmountAlreadyReturned => 'Optional - if any amount already returned';
+
+  @override
+  String get dateInformation => 'Date Information';
+
+  @override
+  String get lendingPeriod => 'Lending period:';
+
+  @override
+  String get pleaseSelectValidReturnDate => 'Please select a valid return date';
+
+  @override
+  String get receivableAddedSuccessfully => 'Receivable added successfully!';
+
+  @override
+  String get addLabor => 'Add Labor';
+
+  @override
+  String get addNewLabor => 'Add New Labor';
+
+  @override
+  String get createNewLaborRecord => 'Create a new labor record';
+
+  @override
+  String get fullNameRequired => 'Full Name *';
+
+  @override
+  String get enterWorkersFullName => 'Enter worker\'s full name';
+
+  @override
+  String get pleaseEnterName => 'Please enter a name';
+
+  @override
+  String get nameMustBeLessThan50Characters => 'Name must be less than 50 characters';
+
+  @override
+  String get cnicRequired => 'CNIC *';
+
+  @override
+  String get enterCnic => 'Enter CNIC';
+
+  @override
+  String get enterCnicFormat => 'Enter CNIC (e.g., 42101-1234567-1)';
+
+  @override
+  String get pleaseEnterCnic => 'Please enter a CNIC';
+
+  @override
+  String get pleaseEnterValidCnicFormat => 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+
+  @override
+  String get enterCaste => 'Enter caste';
+
+  @override
+  String get enterCasteOptional => 'Enter caste (optional)';
+
+  @override
+  String get phoneNumberRequired => 'Phone Number *';
+
+  @override
+  String get enterPhoneNumberFormat => 'Enter phone number (e.g., +923001234567)';
+
+  @override
+  String get pleaseEnterValidPhoneNumberFormat => 'Please enter a valid phone number (+92XXXXXXXXXX)';
+
+  @override
+  String get cityRequired => 'City *';
+
+  @override
+  String get enterCity => 'Enter city';
+
+  @override
+  String get pleaseEnterCity => 'Please enter city';
+
+  @override
+  String get areaRequired => 'Area *';
+
+  @override
+  String get enterArea => 'Enter area';
+
+  @override
+  String get pleaseEnterArea => 'Please enter area';
+
+  @override
+  String get employmentInformation => 'Employment Information';
+
+  @override
+  String get designationRequired => 'Designation *';
+
+  @override
+  String get enterDesignation => 'Enter designation';
+
+  @override
+  String get enterJobDesignation => 'Enter job designation (e.g., Tailor, Operator)';
+
+  @override
+  String get pleaseEnterDesignation => 'Please enter a designation';
+
+  @override
+  String get joiningDateRequired => 'Joining Date *';
+
+  @override
+  String get selectJoiningDate => 'Select joining date';
+
+  @override
+  String get monthlySalaryRequired => 'Monthly Salary *';
+
+  @override
+  String get enterSalary => 'Enter salary';
+
+  @override
+  String get enterMonthlySalaryInPkr => 'Enter monthly salary in PKR';
+
+  @override
+  String get pleaseEnterSalary => 'Please enter a salary';
+
+  @override
+  String get pleaseEnterValidSalary => 'Please enter a valid salary';
+
+  @override
+  String get genderRequired => 'Gender *';
+
+  @override
+  String get selectGender => 'Select gender';
+
+  @override
+  String get male => 'Male';
+
+  @override
+  String get female => 'Female';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get pleaseSelectGender => 'Please select a gender';
+
+  @override
+  String get ageRequired => 'Age *';
+
+  @override
+  String get enterAge => 'Enter age';
+
+  @override
+  String get enterAgeMinimum18Years => 'Enter age (minimum 18 years)';
+
+  @override
+  String get pleaseEnterAge => 'Please enter an age';
+
+  @override
+  String get ageMustBeAtLeast18 => 'Age must be at least 18';
+
+  @override
+  String get ageMustBeLessThan65 => 'Age must be less than 65';
+
+  @override
+  String get laborCreatedSuccessfully => 'Labor created successfully!';
+
+  @override
+  String get failedToCreateLabor => 'Failed to create labor';
+
+  @override
+  String get errorCreatingLabor => 'Error creating labor:';
+
+  @override
+  String get pleaseFixFollowingErrors => 'Please fix the following errors:';
+
+  @override
+  String get nameIsRequired => 'Name is required';
+
+  @override
+  String get cnicIsRequired => 'CNIC is required';
+
+  @override
+  String get phoneNumberIsRequired => 'Phone number is required';
+
+  @override
+  String get casteIsRequired => 'Caste is required';
+
+  @override
+  String get designationIsRequired => 'Designation is required';
+
+  @override
+  String get areaIsRequired => 'Area is required';
+
+  @override
+  String get cityIsRequired => 'City is required';
+
+  @override
+  String get genderIsRequired => 'Gender is required';
+
+  @override
+  String get joiningDateCannotBeInFuture => 'Joining date cannot be in the future';
+
+  @override
+  String get salaryIsRequired => 'Salary is required';
+
+  @override
+  String get pleaseEnterValidSalaryAmount => 'Please enter a valid salary amount';
+
+  @override
+  String get ageIsRequired => 'Age is required';
+
+  @override
+  String get pleaseEnterValidAge => 'Please enter a valid age';
+
+  @override
+  String get salary => 'Salary';
+
+  @override
+  String get joinedDate => 'Joined Date';
+
+  @override
+  String get recentLabel => 'RECENT';
+
+  @override
+  String get laborStatusUpdatedSuccessfully => 'Labor status updated successfully!';
+
+  @override
+  String get failedToUpdateLaborStatus => 'Failed to update labor status';
+
+  @override
+  String get errorUpdatingLaborStatus => 'Error updating labor status:';
+
+  @override
+  String get loadingLaborDetails => 'Loading labor details...';
+
+  @override
+  String get laborDetails => 'Labor Details';
+
+  @override
+  String get completeLaborInformation => 'Complete labor information';
+
+  @override
+  String get joined => 'Joined';
+
+  @override
+  String get daysExperience => 'days experience';
+
+  @override
+  String get years => 'years';
+
+  @override
+  String get age => 'Age';
+
+  @override
+  String get workInformation => 'Work Information';
+
+  @override
+  String get experience => 'Experience';
+
+  @override
+  String get joiningDate => 'Joining Date';
+
+  @override
+  String get financialInformation => 'Financial Information';
+
+  @override
+  String get monthlySalary => 'Monthly Salary';
+
+  @override
+  String get totalAdvances => 'Total Advances';
+
+  @override
+  String get remainingMonthlySalary => 'Remaining Monthly Salary';
+
+  @override
+  String get remainingAdvanceAmount => 'Remaining Advance Amount';
+
+  @override
+  String get totalAdvancesThisMonth => 'Total Advances This Month';
+
+  @override
+  String get paymentRecords => 'Payment Records';
+
+  @override
+  String get lastPayment => 'Last Payment';
+
+  @override
+  String get statusInformation => 'Status Information';
+
+  @override
+  String get createdBy => 'Created By';
+
+  @override
+  String get newLabor => 'New Labor';
+
+  @override
+  String get restoreLabor => 'Restore Labor';
+
+  @override
+  String get deactivateLabor => 'Deactivate Labor';
+
+  @override
+  String areYouSureDeactivateLabor(String name) {
+    return 'Are you sure you want to deactivate $name? This action can be reversed.';
+  }
+
+  @override
+  String areYouSureRestoreLabor(String name) {
+    return 'Are you sure you want to restore $name?';
+  }
+
+  @override
+  String get failedToDeactivateLabor => 'Failed to deactivate labor';
+
+  @override
+  String get laborDeactivatedSuccessfully => 'Labor deactivated successfully';
+
+  @override
+  String get failedToRestoreLabor => 'Failed to restore labor';
+
+  @override
+  String get laborRestoredSuccessfully => 'Labor restored successfully';
+
+  @override
+  String get failedToLoadLabors => 'Failed to Load Labors';
+
+  @override
+  String get unexpectedErrorOccurred => 'An unexpected error occurred';
+
+  @override
+  String get noLaborsFound => 'No Labors Found';
+
+  @override
+  String get startByAddingFirstLabor => 'Start by adding your first labor to manage your workforce effectively';
+
+  @override
+  String get addFirstLabor => 'Add First Labor';
+
+  @override
+  String get filterLabors => 'Filter Labors';
+
+  @override
+  String get refineYourLaborList => 'Refine your labor list with filters';
+
+  @override
+  String get searchLabors => 'Search Labors';
+
+  @override
+  String get laborStatus => 'Labor Status';
+
+  @override
+  String get searchByNameCnicPhoneDesignation => 'Search by name, CNIC, phone, or designation';
+
+  @override
+  String get showInactiveLaborsOnly => 'Show inactive labors only';
+
+  @override
+  String get onlyDeactivatedLaborsWillBeShown => 'Only deactivated labors will be shown';
+
+  @override
+  String get enterCityName => 'Enter city name';
+
+  @override
+  String get enterAreaName => 'Enter area name';
+
+  @override
+  String get principalAccountLedger => 'Principal Account Ledger';
+
+  @override
+  String get trackAllCashMovements => 'Track all cash movements and maintain financial balance';
+
+  @override
+  String get trackCashMovementsAndBalance => 'Track cash movements and balance';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get cashMovements => 'Cash movements';
+
+  @override
+  String get addEntry => 'Add Entry';
+
+  @override
+  String get addLedgerEntry => 'Add Ledger Entry';
+
+  @override
+  String get currentBalance => 'Current Balance';
+
+  @override
+  String get totalEntries => 'Total Entries';
+
+  @override
+  String get totalCredits => 'Total Credits';
+
+  @override
+  String get totalDebits => 'Total Debits';
+
+  @override
+  String get credits => 'Credits';
+
+  @override
+  String get debits => 'Debits';
+
+  @override
+  String get searchLedgerEntries => 'Search ledger entries...';
+
+  @override
+  String get searchByIdDescriptionAmount => 'Search by ID, description, amount, source module, or handler...';
+
+  @override
+  String get receivableDeletedSuccessfully => 'Receivable deleted successfully!';
+
+  @override
+  String get deleteReceivable => 'Delete Receivable';
+
+  @override
+  String get deleteReceivableRecord => 'Delete Receivable Record';
+
+  @override
+  String get thisActionCannotBeUndone => 'This action cannot be undone';
+
+  @override
+  String get areYouSureDeleteReceivable => 'Are you sure you want to delete this receivable?';
+
+  @override
+  String get areYouAbsolutelySureDeleteReceivable => 'Are you absolutely sure you want to delete this receivable record?';
+
+  @override
+  String get amountGivenLabel => 'Amount Given:';
+
+  @override
+  String get balanceRemainingLabel => 'Balance Remaining:';
+
+  @override
+  String get phoneLabel => 'Phone:';
+
+  @override
+  String get statusLabel => 'Status:';
+
+  @override
+  String get expectedReturnLabel => 'Expected Return:';
+
+  @override
+  String get daysOverdueLabel => 'Days Overdue:';
+
+  @override
+  String get reasonItemLabel => 'Reason/Item:';
+
+  @override
+  String get willPermanentlyDeleteReceivable => 'This will permanently delete the receivable record.';
+
+  @override
+  String get willPermanentlyDeleteReceivableAndData => 'This will permanently delete the receivable record and all associated data. This action cannot be undone.';
+
+  @override
+  String get filterAndSortProducts => 'Filter & Sort Products';
+
+  @override
+  String get refineYourProductList => 'Refine your product list with advanced filters';
+
+  @override
+  String get productCategory => 'Product Category';
+
+  @override
+  String get productAttributes => 'Product Attributes';
+
+  @override
+  String get stockLevel => 'Stock Level';
+
+  @override
+  String get priceRangePKR => 'Price Range (PKR)';
+
+  @override
+  String get sortOptions => 'Sort Options';
+
+  @override
+  String get allCategories => 'All Categories';
+
+  @override
+  String get allColors => 'All Colors';
+
+  @override
+  String get allFabrics => 'All Fabrics';
+
+  @override
+  String get allStockLevels => 'All Stock Levels';
+
+  @override
+  String get inStockHigh => 'In Stock (High)';
+
+  @override
+  String get mediumStock => 'Medium Stock';
+
+  @override
+  String get minPrice => 'Min Price';
+
+  @override
+  String get maxPrice => 'Max Price';
+
+  @override
+  String get noLimit => 'No limit';
+
+  @override
+  String get sortBy => 'Sort By';
+
+  @override
+  String get dateCreated => 'Date Created';
+
+  @override
+  String get dateUpdated => 'Date Updated';
+
+  @override
+  String get sortOrder => 'Sort Order';
+
+  @override
+  String get ascending => 'Ascending';
+
+  @override
+  String get descending => 'Descending';
+
+  @override
+  String get minPriceCannotBeGreaterThanMax => 'Minimum price cannot be greater than maximum price';
+
+  @override
+  String get filtersAppliedSuccessfully => 'Filters applied successfully';
+
+  @override
+  String get filtersCleared => 'Filters cleared';
+
+  @override
+  String get enterProductName => 'Enter product name';
+
+  @override
+  String get enterProductDetails => 'Enter product details';
+
+  @override
+  String get enterPrice => 'Enter price';
+
+  @override
+  String get enterQuantity => 'Enter quantity';
+
+  @override
+  String get enterColor => 'Enter color';
+
+  @override
+  String get enterFabric => 'Enter fabric';
+
+  @override
+  String get enterMinPrice => 'Enter minimum price';
+
+  @override
+  String get enterVendorName => 'Enter vendor name';
+
+  @override
+  String get enterBusinessName => 'Enter business name';
+
+  @override
+  String get enterCnicNumber => 'Enter CNIC number';
+
+  @override
+  String get enterPhoneWithCode => 'Enter phone (+92XXXXXXXXXX)';
+
+  @override
+  String get enterFullAddress => 'Enter full address';
+
+  @override
+  String get enterAdditionalNotes => 'Enter additional notes';
+
+  @override
+  String get addZakat => 'Add Zakat';
+
+  @override
+  String get addNewZakatRecord => 'Add New Zakat Record';
+
+  @override
+  String get recordYourZakatContribution => 'Record your zakat contribution';
+
+  @override
+  String get titleOptional => 'Title (Optional)';
+
+  @override
+  String get enterTitle => 'Enter title';
+
+  @override
+  String get enterZakatContributionTitle => 'Enter zakat contribution title';
+
+  @override
+  String get enterDescription => 'Enter description';
+
+  @override
+  String get enterDescriptionPurposeOfZakat => 'Enter description/purpose of zakat';
+
+  @override
+  String get pleaseEnterDescription => 'Please enter description';
+
+  @override
+  String get descriptionMustBeAtLeast5Characters => 'Description must be at least 5 characters';
+
+  @override
+  String get amountPkr => 'Amount (PKR)';
+
+  @override
+  String get enterZakatAmountInPkr => 'Enter zakat amount in PKR';
+
+  @override
+  String get pleaseEnterValidAmountGreaterThanZero => 'Please enter a valid amount greater than zero';
+
+  @override
+  String get beneficiaryName => 'Beneficiary Name';
+
+  @override
+  String get enterBeneficiaryName => 'Enter beneficiary name';
+
+  @override
+  String get enterNameOfRecipientBeneficiary => 'Enter name of recipient/beneficiary';
+
+  @override
+  String get pleaseEnterBeneficiaryName => 'Please enter beneficiary name';
+
+  @override
+  String get beneficiaryNameMustBeAtLeast2Characters => 'Beneficiary name must be at least 2 characters';
+
+  @override
+  String get beneficiaryContactOptional => 'Beneficiary Contact (Optional)';
+
+  @override
+  String get enterContact => 'Enter contact';
+
+  @override
+  String get enterBeneficiaryContactNumber => 'Enter beneficiary contact number';
+
+  @override
+  String get authorizedBy => 'Authorized By';
+
+  @override
+  String get selectAuthorizingPerson => 'Select authorizing person';
+
+  @override
+  String get pleaseSelectAuthorizedPerson => 'Please select an authorized person';
+
+  @override
+  String get dateAndTime => 'Date & Time';
+
+  @override
+  String get at => 'at';
+
+  @override
+  String get additionalNotesOptional => 'Additional Notes (Optional)';
+
+  @override
+  String get enterNotes => 'Enter notes';
+
+  @override
+  String get enterAdditionalNotesOrReligiousConsiderations => 'Enter additional notes or religious considerations';
+
+  @override
+  String get addZakatRecord => 'Add Zakat Record';
+
+  @override
+  String get zakatRecordAddedSuccessfully => 'Zakat record added successfully!';
+
+  @override
+  String get failedToAddZakatRecord => 'Failed to add zakat record';
+
+  @override
+  String get zakatContribution => 'Zakat Contribution';
+
+  @override
+  String get zakatId => 'Zakat ID';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get beneficiary => 'Beneficiary';
+
+  @override
+  String get authority => 'Authority';
+
+  @override
+  String get noNotes => 'No notes';
+
+  @override
+  String showingZakatRecords(int start, int end, int total) {
+    return 'Showing $start-$end of $total zakat records';
+  }
+
+  @override
+  String pageOfPages(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get filterZakatRecords => 'Filter Zakat Records';
+
+  @override
+  String get refineYourZakatList => 'Refine your zakat list with filters';
+
+  @override
+  String get searchZakatRecords => 'Search Zakat Records';
+
+  @override
+  String get recordStatus => 'Record Status';
+
+  @override
+  String get authorizationAuthority => 'Authorization Authority';
+
+  @override
+  String get dateRange => 'Date Range';
+
+  @override
+  String get searchByNameDescriptionBeneficiaryOrNotes => 'Search by name, description, beneficiary, or notes';
+
+  @override
+  String get showInactiveRecordsOnly => 'Show inactive records only';
+
+  @override
+  String get onlyDeactivatedZakatRecordsWillBeShown => 'Only deactivated zakat records will be shown';
+
+  @override
+  String get selectAuthorizationAuthority => 'Select Authorization Authority';
+
+  @override
+  String get clearAuthorityFilter => 'Clear Authority Filter';
+
+  @override
+  String get selectDateRange => 'Select Date Range';
+
+  @override
+  String get noDateRangeSelected => 'No date range selected';
+
+  @override
+  String get clearDateRange => 'Clear Date Range';
+
+  @override
+  String get selectStartDate => 'Select Start Date';
+
+  @override
+  String get selectEndDate => 'Select End Date';
+
+  @override
+  String get failedToLoadZakatRecords => 'Failed to Load Zakat Records';
+
+  @override
+  String get noZakatRecordsFound => 'No Zakat Records Found';
+
+  @override
+  String get startByAddingFirstZakatRecord => 'Start by adding your first zakat record to track your contributions effectively';
+
+  @override
+  String get addFirstZakatRecord => 'Add First Zakat Record';
+
+  @override
+  String get archived => 'Archived';
+
+  @override
+  String get verified => 'Verified';
+
+  @override
+  String get zakatDetails => 'Zakat Details';
+
+  @override
+  String get viewCompleteZakatContributionInformation => 'View complete zakat contribution information';
+
+  @override
+  String get zakatTitle => 'Zakat Title';
+
+  @override
+  String get zakatAmount => 'Zakat Amount';
+
+  @override
+  String get contributionAmount => 'Contribution Amount';
+
+  @override
+  String get beneficiaryInformation => 'Beneficiary Information';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get descriptionAndPurpose => 'Description & Purpose';
+
+  @override
+  String get authorizationAndStatus => 'Authorization & Status';
+
+  @override
+  String get editZakat => 'Edit Zakat';
+
+  @override
+  String get editZakatRecord => 'Edit Zakat Record';
+
+  @override
+  String get updateZakatInformation => 'Update zakat information';
+
+  @override
+  String get pleaseEnterTitle => 'Please enter title';
+
+  @override
+  String get zakatRecordUpdatedSuccessfully => 'Zakat record updated successfully!';
+
+  @override
+  String get failedToUpdateZakatRecord => 'Failed to update zakat record';
+
+  @override
+  String get updateZakat => 'Update Zakat';
+
+  @override
+  String get deleteZakat => 'Delete Zakat';
+
+  @override
+  String get deleteZakatRecord => 'Delete Zakat Record';
+
+  @override
+  String get zakatRecordDeletedSuccessfully => 'Zakat record deleted successfully!';
+
+  @override
+  String get failedToDeleteZakatRecord => 'Failed to delete zakat record';
+
+  @override
+  String get areYouSureYouWantToDeleteThisZakatRecord => 'Are you sure you want to delete this zakat record?';
+
+  @override
+  String get areYouAbsolutelySureYouWantToDeleteThisZakatRecord => 'Are you absolutely sure you want to delete this zakat record?';
+
+  @override
+  String get thisWillPermanentlyDeleteTheZakatRecord => 'This will permanently delete the zakat record.';
+
+  @override
+  String get thisWillPermanentlyDeleteTheZakatRecordAndAllAssociatedData => 'This will permanently delete the zakat record and all associated data. This action cannot be undone.';
+
+  @override
+  String get calculationSummary => 'Calculation Summary';
+
+  @override
+  String get costOfGoods => 'Cost of Goods';
+
+  @override
+  String get totalSalesRevenueForThePeriod => 'Total sales revenue for the period';
+
+  @override
+  String get directCostsOfProductsSold => 'Direct costs of products sold';
+
+  @override
+  String get incomeMinusCostOfGoodsSold => 'Income minus cost of goods sold';
+
+  @override
+  String get finalProfitAfterAllExpenses => 'Final profit after all expenses';
+
+  @override
+  String get totalSalesRevenue => 'Total sales revenue';
+
+  @override
+  String get directCosts => 'Direct costs';
+
+  @override
+  String get incomeMinusCogs => 'Income - COGS';
+
+  @override
+  String get finalProfit => 'Final profit';
+
+  @override
+  String get sourceRecordsBreakdown => 'Source Records Breakdown';
+
+  @override
+  String get salesRecords => 'Sales Records';
+
+  @override
+  String get laborPayments => 'Labor Payments';
+
+  @override
+  String get notAvailable => 'N/A';
+
+  @override
+  String get vendorPayments => 'Vendor Payments';
+
+  @override
+  String get otherExpenses => 'Other Expenses';
+
+  @override
+  String get vendors => 'Vendors';
+
+  @override
+  String get calculationFormula => 'Calculation Formula';
+
+  @override
+  String get stepOneGrossProfit => '1. Gross Profit';
+
+  @override
+  String get stepTwoTotalExpenses => '2. Total Expenses';
+
+  @override
+  String get laborPlusVendorPlusOtherPlusZakat => 'Labor + Vendor + Other + Zakat';
+
+  @override
+  String get stepThreeNetProfit => '3. Net Profit';
+
+  @override
+  String get grossProfitMinusTotalExpenses => 'Gross Profit - Total Expenses';
+
+  @override
+  String get grossProfitMargin => 'Gross Profit Margin';
+
+  @override
+  String get grossProfitDivideIncomeMultiply100 => 'Gross Profit / Income × 100';
+
+  @override
+  String get netProfitMargin => 'Net Profit Margin';
+
+  @override
+  String get netProfitDivideIncomeMultiply100 => 'Net Profit / Income × 100';
+
+  @override
+  String get periodInformation => 'Period Information';
+
+  @override
+  String get periodType => 'Period Type';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get to => 'To';
+
+  @override
+  String get noCalculationDataAvailable => 'No Calculation Data Available';
+
+  @override
+  String get calculationDetailsWillAppearHere => 'Calculation details will appear here once profit and loss data is available';
+
+  @override
+  String get loadingDashboardData => 'Loading dashboard data...';
+
+  @override
+  String get salesGrowth => 'Sales Growth';
+
+  @override
+  String get expenseGrowth => 'Expense Growth';
+
+  @override
+  String get profitGrowth => 'Profit Growth';
+
+  @override
+  String get increased => 'Increased';
+
+  @override
+  String get decreased => 'Decreased';
+
+  @override
+  String get noChange => 'No Change';
+
+  @override
+  String get currentMonth => 'Current Month';
+
+  @override
+  String get previousMonth => 'Previous Month';
+
+  @override
+  String get current => 'Current';
+
+  @override
+  String get previous => 'Previous';
+
+  @override
+  String get businessTrends => 'Business Trends';
+
+  @override
+  String get salesTrend => 'Sales Trend';
+
+  @override
+  String get profitTrend => 'Profit Trend';
+
+  @override
+  String get increasing => 'Increasing';
+
+  @override
+  String get decreasing => 'Decreasing';
+
+  @override
+  String get stable => 'Stable';
+
+  @override
+  String get income => 'Income';
+
+  @override
+  String get grossProfit => 'Gross Profit';
+
+  @override
+  String get netProfit => 'Net Profit';
+
+  @override
+  String get profit => 'Profit';
+
+  @override
+  String get exportFormat => 'Export Format';
+
+  @override
+  String get chooseTheFormatForYourProfitAndLossReport => 'Choose the format for your Profit & Loss report:';
+
+  @override
+  String get pdfReport => 'PDF Report';
+
+  @override
+  String get professionalDocumentWithChartsAndFormatting => 'Professional document with charts and formatting';
+
+  @override
+  String get excelSpreadsheet => 'Excel Spreadsheet';
+
+  @override
+  String get dataInSpreadsheetFormatForAnalysis => 'Data in spreadsheet format for analysis';
+
+  @override
+  String get totalIncome => 'Total Income';
+
+  @override
+  String get profitMargin => 'Profit Margin';
+
+  @override
+  String get netLoss => 'Net Loss';
+
+  @override
+  String get daily => 'Daily';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get yearly => 'Yearly';
+
+  @override
+  String get custom => 'Custom';
+
+  @override
+  String get applyRange => 'Apply Range';
+
+  @override
+  String get productProfitabilityAnalysis => 'Product Profitability Analysis';
+
+  @override
+  String analyzingProductsAcrossDifferentCategories(int count) {
+    return 'Analyzing $count products across different categories';
+  }
+
+  @override
+  String productsCount(int count) {
+    return '$count Products';
+  }
+
+  @override
+  String get rank => 'Rank';
+
+  @override
+  String get unitsSold => 'Units Sold';
+
+  @override
+  String get marginPercent => 'Margin %';
+
+  @override
+  String get sortDescending => 'Sort Descending';
+
+  @override
+  String get sortAscending => 'Sort Ascending';
+
+  @override
+  String get summaryStatistics => 'Summary Statistics';
+
+  @override
+  String get totalRevenue => 'Total Revenue';
+
+  @override
+  String get totalProfit => 'Total Profit';
+
+  @override
+  String get totalCost => 'Total Cost';
+
+  @override
+  String get avgProfitMargin => 'Avg Profit Margin';
+
+  @override
+  String get profitableProducts => 'Profitable Products';
+
+  @override
+  String get units => 'Units';
+
+  @override
+  String get loadingProductData => 'Loading Product Data...';
+
+  @override
+  String get pleaseWaitWhileWeFetchTheLatestProfitabilityInformation => 'Please wait while we fetch the latest profitability information.';
+
+  @override
+  String get errorLoadingData => 'Error Loading Data';
+
+  @override
+  String get anUnexpectedErrorOccurredWhileLoadingProductData => 'An unexpected error occurred while loading product data.';
+
+  @override
+  String get dismiss => 'Dismiss';
+
+  @override
+  String get productProfitabilityDataIsBeingLoaded => 'Product profitability data is being loaded.\nThis includes revenue, costs, profit margins, and rankings.';
+
+  @override
+  String get refreshData => 'Refresh Data';
+
+  @override
+  String get addPayable => 'Add Payable';
+
+  @override
+  String get addNewPayable => 'Add New Payable';
+
+  @override
+  String get recordAmountOwedToCreditor => 'Record amount owed to creditor';
+
+  @override
+  String get creditorInformation => 'Creditor Information';
+
+  @override
+  String get creditorName => 'Creditor Name';
+
+  @override
+  String get enterCreditorFullName => 'Enter creditor full name';
+
+  @override
+  String get pleaseEnterCreditorName => 'Please enter creditor name';
+
+  @override
+  String get enterPhoneNumberWithFormat => 'Enter phone number (+92XXXXXXXXXX)';
+
+  @override
+  String get pleaseEnterAValidPhoneNumber => 'Please enter a valid phone number';
+
+  @override
+  String get emailOptional => 'Email (Optional)';
+
+  @override
+  String get enterCreditorEmailAddress => 'Enter creditor email address';
+
+  @override
+  String get amountBorrowedPKR => 'Amount Borrowed (PKR)';
+
+  @override
+  String get enterAmountBorrowedFromCreditor => 'Enter amount borrowed from creditor';
+
+  @override
+  String get pleaseEnterAmountBorrowed => 'Please enter amount borrowed';
+
+  @override
+  String get pleaseEnterAValidAmount => 'Please enter a valid amount';
+
+  @override
+  String get amountPaidPKR => 'Amount Paid (PKR)';
+
+  @override
+  String get optionalIfAnyAmountAlreadyPaid => 'Optional - if any amount already paid';
+
+  @override
+  String get cannotExceedAmountBorrowed => 'Cannot exceed amount borrowed';
+
+  @override
+  String get additionalDetails => 'Additional Details';
+
+  @override
+  String get enterReasonForBorrowingOrItemDescription => 'Enter reason for borrowing or item description';
+
+  @override
+  String get pleaseEnterReasonOrItemDescription => 'Please enter reason or item description';
+
+  @override
+  String get vendorOptional => 'Vendor (Optional)';
+
+  @override
+  String get selectVendorIfCreditorIsARegisteredVendor => 'Select vendor if creditor is a registered vendor';
+
+  @override
+  String get noVendor => 'No vendor';
+
+  @override
+  String get priorityLevel => 'Priority Level';
+
+  @override
+  String get selectPriorityLevelForThisPayable => 'Select priority level for this payable';
+
+  @override
+  String get low => 'Low';
+
+  @override
+  String get medium => 'Medium';
+
+  @override
+  String get high => 'High';
+
+  @override
+  String get urgent => 'Urgent';
+
+  @override
+  String get enterAdditionalNotesOrPaymentHistory => 'Enter additional notes or payment history';
+
+  @override
+  String get dateBorrowed => 'Date Borrowed';
+
+  @override
+  String get expectedRepaymentDate => 'Expected Repayment Date';
+
+  @override
+  String get selectBorrowedDate => 'Select Borrowed Date';
+
+  @override
+  String get selectExpectedRepaymentDate => 'Select Expected Repayment Date';
+
+  @override
+  String borrowingPeriodDays(int days) {
+    return 'Borrowing period: $days days';
+  }
+
+  @override
+  String get pleaseSelectAValidRepaymentDate => 'Please select a valid repayment date';
+
+  @override
+  String get expectedRepaymentDateCannotBeBeforeDateBorrowed => 'Expected repayment date cannot be before date borrowed';
+
+  @override
+  String get failedToAddPayablePleaseTryAgain => 'Failed to add payable. Please try again.';
+
+  @override
+  String get payableAddedSuccessfully => 'Payable added successfully!';
+
+  @override
+  String get enterReason => 'Enter reason';
+
+  @override
+  String get deletePayable => 'Delete Payable';
+
+  @override
+  String get deletePayableRecord => 'Delete Payable Record';
+
+  @override
+  String get areYouSureYouWantToDeleteThisPayable => 'Are you sure you want to delete this payable?';
+
+  @override
+  String get areYouAbsolutelySureYouWantToDeleteThisPayableRecord => 'Are you absolutely sure you want to delete this payable record?';
+
+  @override
+  String get amountBorrowed => 'Amount Borrowed';
+
+  @override
+  String get expectedRepayment => 'Expected Repayment';
+
+  @override
+  String daysCount(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get thisWillPermanentlyDeleteThePayableRecord => 'This will permanently delete the payable record.';
+
+  @override
+  String get thisWillPermanentlyDeleteThePayableRecordAndAllAssociatedData => 'This will permanently delete the payable record and all associated data. This action cannot be undone.';
+
+  @override
+  String get payableDeletedSuccessfully => 'Payable deleted successfully!';
+
+  @override
+  String get editPayable => 'Edit Payable';
+
+  @override
+  String get editPayableDetails => 'Edit Payable Details';
+
+  @override
+  String get updatePayableInformation => 'Update payable information';
+
+  @override
+  String get enterCreditorEmail => 'Enter creditor email';
+
+  @override
+  String get additionalAmountToPayPKR => 'Additional Amount to Pay (PKR)';
+
+  @override
+  String get enterAdditionalAmount => 'Enter additional amount';
+
+  @override
+  String get totalPaymentCannotExceedAmountBorrowed => 'Total payment cannot exceed amount borrowed';
+
+  @override
+  String get paymentSummary => 'Payment Summary';
+
+  @override
+  String get currentPaid => 'Current Paid';
+
+  @override
+  String get additionalPayment => 'Additional Payment';
+
+  @override
+  String get totalAfterUpdate => 'Total After Update';
+
+  @override
+  String get reasonForBorrowing => 'Reason for borrowing';
+
+  @override
+  String get updatePayable => 'Update Payable';
+
+  @override
+  String get amountPaidCannotExceedAmountBorrowed => 'Amount paid cannot exceed amount borrowed';
+
+  @override
+  String get payableUpdatedSuccessfully => 'Payable updated successfully!';
+
+  @override
+  String get payableId => 'Payable ID';
+
+  @override
+  String get creditor => 'Creditor';
+
+  @override
+  String showingPayableRecords(int start, int end, int total) {
+    return 'Showing $start-$end of $total payable records';
+  }
+
+  @override
+  String get priority => 'Priority';
+
+  @override
+  String get filterPayables => 'Filter Payables';
+
+  @override
+  String get applyFiltersToFindSpecificPayables => 'Apply filters to find specific payables';
+
+  @override
+  String get searchByCreditorNameReasonNotes => 'Search by creditor name, reason, notes...';
+
+  @override
+  String get statusAndPriority => 'Status & Priority';
+
+  @override
+  String get selectStatus => 'Select status';
+
+  @override
+  String get paidStatus => 'Paid';
+
+  @override
+  String get partiallyPaid => 'Partially Paid';
+
+  @override
+  String get selectPriority => 'Select priority';
+
+  @override
+  String get allPriorities => 'All Priorities';
+
+  @override
+  String get selectVendor => 'Select vendor';
+
+  @override
+  String get allVendors => 'All Vendors';
+
+  @override
+  String get dateRanges => 'Date Ranges';
+
+  @override
+  String get dueAfter => 'Due After';
+
+  @override
+  String get dueBefore => 'Due Before';
+
+  @override
+  String get borrowedAfter => 'Borrowed After';
+
+  @override
+  String get borrowedBefore => 'Borrowed Before';
+
+  @override
+  String get creditorDetails => 'Creditor Details';
+
+  @override
+  String get repaymentDate => 'Repayment Date';
+
+  @override
+  String pkrRemaining(String amount) {
+    return 'PKR $amount remaining';
+  }
+
+  @override
+  String daysOverdueCount(int count) {
+    return '$count days overdue';
+  }
+
+  @override
+  String get noPayablesFound => 'No Payables Found';
+
+  @override
+  String get startByAddingYourFirstPayableRecord => 'Start by adding your first payable record to track amounts borrowed from suppliers and creditors';
+
+  @override
+  String get addFirstPayable => 'Add First Payable';
+
+  @override
+  String get failedToLoadPayables => 'Failed to Load Payables';
+
+  @override
+  String get anUnexpectedErrorOccurred => 'An unexpected error occurred';
+
+  @override
+  String get startByAddingYourFirstPayableRecordToTrackYourBorrowingsEffectively => 'Start by adding your first payable record to track your borrowings effectively';
+
+  @override
+  String get addFirstPayableRecord => 'Add First Payable Record';
+
+  @override
+  String get fullyPaid => 'Fully Paid';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get payableDetails => 'Payable Details';
+
+  @override
+  String get viewCompletePayableInformation => 'View complete payable information';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get amountPaid => 'Amount Paid';
+
+  @override
+  String get paymentProgress => 'Payment Progress';
+
+  @override
+  String get notUpdated => 'Not updated';
+
+  @override
+  String get productName => 'Product Name';
+
+  @override
+  String get costPrice => 'Cost Price';
+
+  @override
+  String get color => 'Color';
+
+  @override
+  String get fabric => 'Fabric';
+
+  @override
+  String get stockStatus => 'Stock Status';
+
+  @override
+  String get pieces => 'Pieces';
+
+  @override
+  String get createdDate => 'Created Date';
+
+  @override
+  String get noDetails => 'No details';
+
+  @override
+  String get noPieces => 'No pieces';
+
+  @override
+  String get noProductRecordsFound => 'No Product Records Found';
+
+  @override
+  String get startByAddingYourFirstProductToManageInventoryEfficiently => 'Start by adding your first product to manage inventory efficiently';
+
+  @override
+  String get addFirstProduct => 'Add First Product';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get oneWeekAgo => '1 week ago';
+
+  @override
+  String weeksAgo(int count) {
+    return '$count weeks ago';
+  }
+
+  @override
+  String get oneMonthAgo => '1 month ago';
+
+  @override
+  String monthsAgo(int count) {
+    return '$count months ago';
+  }
+
+  @override
+  String get oneYearAgo => '1 year ago';
+
+  @override
+  String yearsAgo(int count) {
+    return '$count years ago';
+  }
+
+  @override
+  String get productDetails => 'Product Details';
+
+  @override
+  String get viewCompleteProductInformation => 'View complete product information';
+
+  @override
+  String get unnamedProduct => 'Unnamed Product';
+
+  @override
+  String get noDetailsProvided => 'No details provided';
+
+  @override
+  String get setCostPriceToCalculateProfitMargin => 'Set cost price to calculate profit margin';
+
+  @override
+  String unitsCount(int count) {
+    return '$count units';
+  }
+
+  @override
+  String get unknown => 'Unknown';
+
+  @override
+  String get productPieces => 'Product Pieces';
+
+  @override
+  String get noPiecesSpecified => 'No pieces specified';
+
+  @override
+  String get productActive => 'Product Active';
+
+  @override
+  String get editProduct => 'Edit Product';
+
+  @override
+  String get editProductDetails => 'Edit Product Details';
+
+  @override
+  String get updateProductInformation => 'Update product information';
+
+  @override
+  String get productUpdatedSuccessfully => 'Product updated successfully!';
+
+  @override
+  String get failedToUpdateProduct => 'Failed to update product';
+
+  @override
+  String get productDetail => 'Product Detail';
+
+  @override
+  String get enterDetails => 'Enter details';
+
+  @override
+  String get enterProductDescriptionDetails => 'Enter product description/details';
+
+  @override
+  String get pleaseEnterProductDetails => 'Please enter product details';
+
+  @override
+  String get productDetailMustBeAtLeast5Characters => 'Product detail must be at least 5 characters';
+
+  @override
+  String get enterPricePkr => 'Enter price (PKR)';
+
+  @override
+  String get pleaseEnterPrice => 'Please enter price';
+
+  @override
+  String get pleaseEnterValidPrice => 'Please enter a valid price';
+
+  @override
+  String get enterCost => 'Enter cost';
+
+  @override
+  String get enterCostPricePkrOptional => 'Enter cost price (PKR) - Optional';
+
+  @override
+  String get pleaseEnterValidCostPrice => 'Please enter a valid cost price';
+
+  @override
+  String get enterQty => 'Enter qty';
+
+  @override
+  String get pleaseEnterQuantity => 'Please enter quantity';
+
+  @override
+  String get pleaseEnterValidQuantity => 'Please enter a valid quantity';
+
+  @override
+  String get loadingCategories => 'Loading categories...';
+
+  @override
+  String get noCategoriesAvailablePleaseAddCategoriesFirst => 'No categories available. Please add categories first.';
+
+  @override
+  String get noId => 'No ID';
+
+  @override
+  String get selectCategory => 'Select category';
+
+  @override
+  String get selectProductCategory => 'Select product category';
+
+  @override
+  String get pleaseSelectCategory => 'Please select a category';
+
+  @override
+  String get enterColorName => 'Enter color name (e.g., Red, Blue, Turquoise)';
+
+  @override
+  String get pleaseEnterColor => 'Please enter a color';
+
+  @override
+  String get colorNameMustBeAtLeast2Characters => 'Color name must be at least 2 characters';
+
+  @override
+  String get enterFabricType => 'Enter fabric type (e.g., Cotton, Silk, Chiffon)';
+
+  @override
+  String get pleaseEnterFabric => 'Please enter a fabric';
+
+  @override
+  String get fabricNameMustBeAtLeast2Characters => 'Fabric name must be at least 2 characters';
+
+  @override
+  String get productNameMustBeAtLeast2Characters => 'Product name must be at least 2 characters';
+
+  @override
+  String get pleaseEnterProductName => 'Please enter a product name';
+
+  @override
+  String get updateProduct => 'Update Product';
+
+  @override
+  String get addPayment => 'Add Payment';
+
+  @override
+  String get addLaborPayment => 'Add Labor Payment';
+
+  @override
+  String get recordNewPaymentWithReceipt => 'Record new payment to labor with receipt';
+
+  @override
+  String get paymentAddedSuccessfully => 'Payment added successfully!';
+
+  @override
+  String get pleaseSelectAtLeastOneEntity => 'Please select at least one entity (labor, vendor, order, or sale)';
+
+  @override
+  String get pleaseSelectPaymentMethod => 'Please select a payment method';
+
+  @override
+  String get pleaseSelectPaymentMonth => 'Please select a payment month';
+
+  @override
+  String netAmountCannotExceedRemaining(String amount) {
+    return 'Net amount cannot exceed remaining amount of PKR $amount';
+  }
+
+  @override
+  String get paymentAmount => 'Payment Amount';
+
+  @override
+  String get paymentDetails => 'Payment Details';
+
+  @override
+  String get receiptImageOptional => 'Receipt Image (Optional)';
+
+  @override
+  String get uploadReceiptForBetterRecordKeeping => 'Upload receipt image for better record keeping';
+
+  @override
+  String get entityType => 'Entity Type';
+
+  @override
+  String get selectEntityType => 'Select entity type';
+
+  @override
+  String get pleaseSelectEntityType => 'Please select entity type';
+
+  @override
+  String get selectLabor => 'Select Labor';
+
+  @override
+  String get chooseLaborForPayment => 'Choose labor for payment';
+
+  @override
+  String get pleaseSelectLabor => 'Please select a labor';
+
+  @override
+  String get vendorId => 'Vendor ID';
+
+  @override
+  String get pleaseEnterVendorId => 'Please enter vendor ID';
+
+  @override
+  String get customerType => 'Customer Type';
+
+  @override
+  String get selectCustomerType => 'Select customer type';
+
+  @override
+  String get order => 'Order';
+
+  @override
+  String get sale => 'Sale';
+
+  @override
+  String enterOrderSaleId(String type) {
+    return 'Enter $type ID';
+  }
+
+  @override
+  String get paymentMonth => 'Payment Month';
+
+  @override
+  String get selectPaymentMonth => 'Select payment month';
+
+  @override
+  String get paymentAmountPkr => 'Payment Amount (PKR)';
+
+  @override
+  String get enterPaymentAmountPkr => 'Enter payment amount (PKR)';
+
+  @override
+  String get pleaseEnterPaymentAmount => 'Please enter payment amount';
+
+  @override
+  String get bonusPkr => 'Bonus (PKR)';
+
+  @override
+  String get optionalBonus => 'Optional bonus';
+
+  @override
+  String get pleaseEnterValidBonusAmount => 'Please enter a valid bonus amount';
+
+  @override
+  String get deductionPkr => 'Deduction (PKR)';
+
+  @override
+  String get optionalDeduction => 'Optional deduction';
+
+  @override
+  String get pleaseEnterValidDeductionAmount => 'Please enter a valid deduction amount';
+
+  @override
+  String get enterPaymentDescriptionOrNotes => 'Enter payment description or notes';
+
+  @override
+  String get selectTime => 'Select time';
+
+  @override
+  String get finalPaymentForMonth => 'Final Payment for Month';
+
+  @override
+  String get thisCompletesPaymentForSelectedMonth => 'This completes the payment for the selected month';
+
+  @override
+  String get markThisAsFinalPaymentForMonth => 'Mark this as the final payment for the month';
+
+  @override
+  String get netPaymentAmount => 'Net Payment Amount';
+
+  @override
+  String remainingAfterPayment(String amount) {
+    return 'Remaining after payment: PKR $amount';
+  }
+
+  @override
+  String get paymentReceiptOptional => 'Payment Receipt (Optional)';
+
+  @override
+  String get selectPaymentMethod => 'Select payment method';
+
+  @override
+  String get enter => 'Enter';
+
+  @override
+  String get editPayment => 'Edit Payment';
+
+  @override
+  String get editPaymentDetails => 'Edit Payment Details';
+
+  @override
+  String get updatePaymentInformation => 'Update payment information';
+
+  @override
+  String get paymentUpdatedSuccessfully => 'Payment updated successfully!';
+
+  @override
+  String netAmountCannotExceedAvailable(String amount) {
+    return 'Net amount cannot exceed available amount of PKR $amount';
+  }
+
+  @override
+  String get selectLaborForPayment => 'Select labor for payment';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String get enterValidBonus => 'Enter valid bonus';
+
+  @override
+  String get enterValidDeduction => 'Enter valid deduction';
+
+  @override
+  String get netAmount => 'Net Amount';
+
+  @override
+  String get receiptImageSelected => 'Receipt image selected';
+
+  @override
+  String get tapToSelectReceiptImage => 'Tap to select receipt image';
+
+  @override
+  String get updatePayment => 'Update Payment';
+
+  @override
+  String get paymentId => 'Payment ID';
+
+  @override
+  String get desc => 'Desc';
+
+  @override
+  String get noDescription => 'No description';
+
+  @override
+  String get net => 'Net';
+
+  @override
+  String get paymentFilters => 'Payment Filters';
+
+  @override
+  String get searchByLaborVendorDescription => 'Search by labor name, vendor, description...';
+
+  @override
+  String get entityFilters => 'Entity Filters';
+
+  @override
+  String get allLabors => 'All Labors';
+
+  @override
+  String get payerType => 'Payer Type';
+
+  @override
+  String get selectPayerType => 'Select payer type';
+
+  @override
+  String get allTypes => 'All Types';
+
+  @override
+  String get allMethods => 'All Methods';
+
+  @override
+  String get finalPayment => 'Final Payment';
+
+  @override
+  String get selectFinalPaymentStatus => 'Select final payment status';
+
+  @override
+  String get finalOnly => 'Final Only';
+
+  @override
+  String get partialOnly => 'Partial Only';
+
+  @override
+  String get hasReceipt => 'Has Receipt';
+
+  @override
+  String get selectReceiptStatus => 'Select receipt status';
+
+  @override
+  String get withReceipt => 'With Receipt';
+
+  @override
+  String get withoutReceipt => 'Without Receipt';
+
+  @override
+  String get selectVisibility => 'Select visibility';
+
+  @override
+  String get showAll => 'Show All';
+
+  @override
+  String get activeOnly => 'Active Only';
+
+  @override
+  String get paymentDateFrom => 'Payment Date From';
+
+  @override
+  String get paymentDateTo => 'Payment Date To';
+
+  @override
+  String get paymentMonthFrom => 'Payment Month From';
+
+  @override
+  String get paymentMonthTo => 'Payment Month To';
+
+  @override
+  String get amountRangePkr => 'Amount Range (PKR)';
+
+  @override
+  String get minimumAmount => 'Minimum Amount';
+
+  @override
+  String get maximumAmount => 'Maximum Amount';
+
+  @override
+  String get selectSortField => 'Select sort field';
+
+  @override
+  String get paymentDate => 'Payment Date';
+
+  @override
+  String get laborName => 'Labor Name';
+
+  @override
+  String get selectSortOrder => 'Select sort order';
+
+  @override
+  String get receiptImage => 'Receipt Image';
+
+  @override
+  String get paymentReceipt => 'Payment Receipt';
+
+  @override
+  String get baseAmount => 'Base Amount';
+
+  @override
+  String get bonus => 'Bonus';
+
+  @override
+  String get deduction => 'Deduction';
+
+  @override
+  String get noReceiptAvailable => 'No Receipt Available';
+
+  @override
+  String get noReceiptAvailableShort => 'No receipt available. Add one for better records.';
+
+  @override
+  String get noReceiptAvailableLong => 'No receipt image was uploaded for this payment. Consider adding a receipt for better record keeping.';
+
+  @override
+  String get addReceiptImage => 'Add Receipt Image';
+
+  @override
+  String get receiptUploadedSaveToUpdate => 'Receipt uploaded! Please save the payment to update.';
+
+  @override
+  String get paymentInfo => 'Payment Info';
+
+  @override
+  String get receipt => 'Receipt';
+
+  @override
+  String get missing => 'Missing';
+
+  @override
+  String get viewReceipt => 'View Receipt';
+
+  @override
+  String get addReceipt => 'Add Receipt';
+
+  @override
+  String get noPaymentRecordsFound => 'No Payment Records Found';
+
+  @override
+  String get startByAddingFirstPaymentRecord => 'Start by adding your first payment record to track labor payments efficiently';
+
+  @override
+  String get addFirstPayment => 'Add First Payment';
+
+  @override
+  String get failedToLoadPayments => 'Failed to Load Payments';
+
+  @override
+  String get noPaymentsFound => 'No Payments Found';
+
+  @override
+  String get startByAddingFirstPaymentToTrack => 'Start by adding your first payment record to track your transactions effectively';
+
+  @override
+  String get withBonus => 'With Bonus';
+
+  @override
+  String get withDeduction => 'With Deduction';
+
+  @override
+  String get regularPayment => 'Regular Payment';
+
+  @override
+  String get viewPaymentDetails => 'View Payment Details';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get paymentInformation => 'Payment Information';
+
+  @override
+  String get payerInformation => 'Payer Information';
+
+  @override
+  String get payerId => 'Payer ID';
+
+  @override
+  String get orderId => 'Order ID';
+
+  @override
+  String get saleId => 'Sale ID';
+
+  @override
+  String get isFinalPayment => 'Is Final Payment';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get systemInformation => 'System Information';
+
+  @override
+  String get amountIsRequired => 'Amount is required';
+
+  @override
+  String get invalidAmount => 'Invalid amount';
+
+  @override
+  String get paymentMethodIsRequired => 'Payment method is required';
+
+  @override
+  String get payerTypeIsRequired => 'Payer type is required';
+
+  @override
+  String get receiptAvailable => 'Receipt Available';
+
+  @override
+  String get failedToUpdatePayment => 'Failed to update payment';
+
+  @override
+  String get errorUpdatingPayment => 'Error updating payment';
+
+  @override
+  String get january => 'January';
+
+  @override
+  String get february => 'February';
+
+  @override
+  String get march => 'March';
+
+  @override
+  String get april => 'April';
+
+  @override
+  String get may => 'May';
+
+  @override
+  String get june => 'June';
+
+  @override
+  String get july => 'July';
+
+  @override
+  String get august => 'August';
+
+  @override
+  String get september => 'September';
+
+  @override
+  String get october => 'October';
+
+  @override
+  String get november => 'November';
+
+  @override
+  String get december => 'December';
+
+  @override
+  String get viewPaymentDetailsAndReceipt => 'View payment details and receipt';
+
+  @override
+  String get addReceiptForThisPayment => 'Add receipt for this payment';
+
+  @override
+  String get laborRole => 'Labor Role';
+
+  @override
+  String get laborPhone => 'Labor Phone';
+
+  @override
+  String get paymentDeletedSuccessfully => 'Payment deleted successfully!';
+
+  @override
+  String get deletePayment => 'Delete Payment';
+
+  @override
+  String get deletePaymentRecord => 'Delete Payment Record';
+
+  @override
+  String get areYouSureDeletePayment => 'Are you sure you want to delete this payment?';
+
+  @override
+  String get areYouAbsolutelySureDeletePayment => 'Are you absolutely sure you want to delete this payment record?';
+
+  @override
+  String get thisWillPermanentlyDeletePayment => 'This will permanently delete the payment record.';
+
+  @override
+  String get thisWillPermanentlyDeletePaymentLong => 'This will permanently delete the payment record and all associated data. This action cannot be undone.';
+
+  @override
+  String get failedToDeleteProduct => 'Failed to delete product';
+
+  @override
+  String get productDeletedPermanently => 'Product deleted permanently!';
+
+  @override
+  String get productDeactivatedSuccessfully => 'Product deactivated successfully!';
+
+  @override
+  String get productCanBeRestoredLater => 'Product can be restored later';
+
+  @override
+  String get completelyRemovesFromDatabase => 'Completely removes from database';
+
+  @override
+  String get hidesButCanBeRestored => 'Hides but can be restored';
+
+  @override
+  String get totalInventoryValue => 'Total Inventory Value';
+
+  @override
+  String get iUnderstandPermanentDelete => 'I understand this will permanently delete the product and cannot be undone';
+
+  @override
+  String get iUnderstandDeactivate => 'I understand this will deactivate the product';
+
+  @override
+  String get deactivateProduct => 'Deactivate Product';
+
+  @override
+  String get editOrder => 'Edit Order';
+
+  @override
+  String get updateOrderInformation => 'Update order information';
+
+  @override
+  String get orderUpdatedSuccessfully => 'Order updated successfully!';
+
+  @override
+  String get orderUpdateFailed => 'Order Update Failed';
+
+  @override
+  String get invalidStatusTransition => 'Invalid Status Transition';
+
+  @override
+  String get cannotChangeStatusFrom => 'You cannot change the status from';
+
+  @override
+  String get validNextStatusesAre => 'Valid next statuses are';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get serverErrorOccurred => 'Server error occurred. Please try again or contact support.';
+
+  @override
+  String get invalidStatusSelected => 'Invalid status selected. Please choose a valid status.';
+
+  @override
+  String get invalidDateFormat => 'Invalid date format. Please select a valid delivery date.';
+
+  @override
+  String get deliveryDateCannotBeBeforeOrderDate => 'Delivery date cannot be before the order date.';
+
+  @override
+  String get advancePaymentCannotExceedTotal => 'Advance payment cannot exceed the total order amount.';
+
+  @override
+  String get orderCannotBeModified => 'This order cannot be modified in its current status.';
+
+  @override
+  String get orderCannotHaveStatusChanged => 'This order cannot have its status changed.';
+
+  @override
+  String get invalidStatusTransitionFrom => 'Invalid status transition. From';
+
+  @override
+  String get youCanOnlyChangeTo => 'you can only change to';
+
+  @override
+  String get customerInformation => 'Customer Information';
+
+  @override
+  String get customerSince => 'Customer since';
+
+  @override
+  String get orderDetails => 'Order Details';
+
+  @override
+  String get orderDescription => 'Order Description';
+
+  @override
+  String get describeOrderDetails => 'Describe the order details (e.g., products, specifications)';
+
+  @override
+  String get pleaseEnterOrderDescription => 'Please enter order description';
+
+  @override
+  String get descriptionMustBeAtLeast10Characters => 'Description must be at least 10 characters';
+
+  @override
+  String get descriptionMustBeLessThan500Characters => 'Description must be less than 500 characters';
+
+  @override
+  String get orderStatus => 'Order Status';
+
+  @override
+  String get currentStatus => 'Current Status';
+
+  @override
+  String get validNextStatuses => 'Valid next statuses';
+
+  @override
+  String get totalAmountPKR => 'Total Amount (PKR)';
+
+  @override
+  String get totalOrderAmount => 'Total order amount';
+
+  @override
+  String get advancePaymentPKR => 'Advance Payment (PKR)';
+
+  @override
+  String get enterAdvancePaymentAmount => 'Enter advance payment amount';
+
+  @override
+  String get pleaseEnterAdvancePayment => 'Please enter advance payment';
+
+  @override
+  String get remainingAmountPKR => 'Remaining Amount (PKR)';
+
+  @override
+  String get remainingAmountToBePaid => 'Remaining amount to be paid';
+
+  @override
+  String get deliveryInformation => 'Delivery Information';
+
+  @override
+  String get orderDate => 'Order Date';
+
+  @override
+  String get dateWhenOrderWasPlaced => 'Date when order was placed';
+
+  @override
+  String get selectExpectedDeliveryDate => 'Select Expected Delivery Date';
+
+  @override
+  String get expectedDelivery => 'Expected Delivery';
+
+  @override
+  String get updateOrder => 'Update Order';
+
+  @override
+  String get inProduction => 'In Production';
+
+  @override
+  String get ready => 'Ready';
+
+  @override
+  String get orderItemsManagement => 'Order Items Management';
+
+  @override
+  String get searchOrderItemsByProductDescriptionOrNotes => 'Search order items by product, description, or notes...';
+
+  @override
+  String get addItem => 'Add Item';
+
+  @override
+  String get totalItems => 'Total Items';
+
+  @override
+  String get activeItems => 'Active Items';
+
+  @override
+  String get totalQuantity => 'Total Quantity';
+
+  @override
+  String get loadingOrderItems => 'Loading order items...';
+
+  @override
+  String get errorLoadingOrderItems => 'Error Loading Order Items';
+
+  @override
+  String get noOrderItemsFound => 'No Order Items Found';
+
+  @override
+  String get orderDoesntHaveItemsYet => 'This order doesn\'t have any items yet. Add your first order item to get started.';
+
+  @override
+  String get addFirstItem => 'Add First Item';
+
+  @override
+  String get activeSearch => 'Active Search';
+
+  @override
+  String get clearSearch => 'Clear Search';
+
+  @override
+  String get orderItemsRefreshedSuccessfully => 'Order items refreshed successfully';
+
+  @override
+  String get advancePaymentCannotBeNegative => 'Advance payment cannot be negative';
+
+  @override
+  String get orderID => 'Order ID';
+
+  @override
+  String get delivery => 'Delivery';
+
+  @override
+  String get noPhone => 'No phone';
+
+  @override
+  String get item => 'item';
+
+  @override
+  String get noItems => 'No items';
+
+  @override
+  String get addItemsToSeeTotal => 'Add items to see total';
+
+  @override
+  String get noDate => 'No date';
+
+  @override
+  String get errorDisplayingOrder => 'Error displaying order';
+
+  @override
+  String get confirmOrder => 'Confirm Order';
+
+  @override
+  String get cancelOrder => 'Cancel Order';
+
+  @override
+  String get startProduction => 'Start Production';
+
+  @override
+  String get markAsReady => 'Mark as Ready';
+
+  @override
+  String get markAsDelivered => 'Mark as Delivered';
+
+  @override
+  String get changeOrderStatus => 'Change Order Status';
+
+  @override
+  String get areYouSureChangeStatusTo => 'Are you sure you want to change the status of order';
+
+  @override
+  String get changeStatus => 'Change Status';
+
+  @override
+  String get failedToUpdateOrderStatus => 'Failed to update order status';
+
+  @override
+  String get orderStatusUpdatedTo => 'Order status updated to';
+
+  @override
+  String get successfully => 'successfully';
+
+  @override
+  String get deactivateOrder => 'Deactivate Order';
+
+  @override
+  String get areYouSureDeactivateOrder => 'Are you sure you want to deactivate order';
+
+  @override
+  String get thisActionCanBeReversed => 'This action can be reversed.';
+
+  @override
+  String get failedToDeactivateOrder => 'Failed to deactivate order';
+
+  @override
+  String get orderDeactivatedSuccessfully => 'Order deactivated successfully';
+
+  @override
+  String get restoreOrder => 'Restore Order';
+
+  @override
+  String get areYouSureRestoreOrder => 'Are you sure you want to restore order';
+
+  @override
+  String get failedToRestoreOrder => 'Failed to restore order';
+
+  @override
+  String get orderRestoredSuccessfully => 'Order restored successfully';
+
+  @override
+  String get failedToLoadOrders => 'Failed to Load Orders';
+
+  @override
+  String get noOrdersFound => 'No Orders Found';
+
+  @override
+  String get startManagingCustomerOrders => 'Start managing your customer orders by creating your first order. Track deliveries, manage payments, and keep customers informed.';
+
+  @override
+  String get createNewOrder => 'Create New Order';
+
+  @override
+  String get noOrdersMatchSearch => 'No orders match your search criteria';
+
+  @override
+  String get tryAdjustingSearchTerms => 'Try adjusting your search terms or filters to find what you\'re looking for.';
+
+  @override
+  String get selectProduct => 'Select Product';
+
+  @override
+  String get selectProductForOrder => 'Select Product for Order';
+
+  @override
+  String get chooseProductToAddToOrder => 'Choose a product to add to the order';
+
+  @override
+  String get pleaseSelectProduct => 'Please select a product';
+
+  @override
+  String get searchProductsShort => 'Search products';
+
+  @override
+  String get searchProductsByNameFabricOrColor => 'Search products by name, fabric, or color...';
+
+  @override
+  String get availableProducts => 'Available Products';
+
+  @override
+  String get tryAdjustingYourSearchTerms => 'Try adjusting your search terms';
+
+  @override
+  String get selectedProductDetails => 'Selected Product Details';
+
+  @override
+  String get customizationNotesOptional => 'Customization Notes (Optional)';
+
+  @override
+  String get specialInstructionsOrCustomizationNotes => 'Special instructions or customization notes';
+
+  @override
+  String get notesMustBeLessThan500Characters => 'Notes must be less than 500 characters';
+
+  @override
+  String get pleaseEnterValidNumber => 'Please enter a valid number';
+
+  @override
+  String get quantityMustBeGreaterThanZero => 'Quantity must be greater than 0';
+
+  @override
+  String get only => 'Only';
+
+  @override
+  String get unitsAvailable => 'units available';
+
+  @override
+  String get addToOrder => 'Add to Order';
+
+  @override
+  String get viewOrder => 'View Order';
+
+  @override
+  String get completeOrderInformation => 'Complete order information';
+
+  @override
+  String get orderInformation => 'Order Information';
+
+  @override
+  String get paymentPercentage => 'Payment Percentage';
+
+  @override
+  String get orderItemsManagedSeparately => 'Order items are managed separately. Use the Order Items module to view and manage products in this order.';
+
+  @override
+  String get daysSinceOrdered => 'Days Since Ordered';
+
+  @override
+  String get daysUntilDelivery => 'Days Until Delivery';
+
+  @override
+  String get isOverdue => 'Is Overdue';
+
+  @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
+  String get conversionStatus => 'Conversion Status';
+
+  @override
+  String get convertedSalesAmount => 'Converted Sales Amount';
+
+  @override
+  String get conversionDate => 'Conversion Date';
+
+  @override
+  String get isActive => 'Is Active';
+
+  @override
+  String get createdAt => 'Created At';
+
+  @override
+  String get customerName => 'Customer Name';
+
+  @override
+  String get editLabor => 'Edit Labor';
+
+  @override
+  String get editLaborDetails => 'Edit Labor Details';
+
+  @override
+  String get updateWorkerInformation => 'Update worker information';
+
+  @override
+  String get laborUpdatedSuccessfully => 'Labor updated successfully!';
+
+  @override
+  String get failedToUpdateLabor => 'Failed to update labor';
+
+  @override
+  String get errorUpdatingLabor => 'Error updating labor';
+
+  @override
+  String get updateLabor => 'Update Labor';
+
+  @override
+  String get enterWorkerFullName => 'Enter worker\'s full name';
+
+  @override
+  String get enterCNIC => 'Enter CNIC';
+
+  @override
+  String get enterCNICFormat => 'Enter CNIC (e.g., 42101-1234567-1)';
+
+  @override
+  String get pleaseEnterCNIC => 'Please enter a CNIC';
+
+  @override
+  String get pleaseEnterValidCNIC => 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+
+  @override
+  String get enterMonthlySalaryInPKR => 'Enter monthly salary in PKR';
+
+  @override
+  String get laborCanBeRestoredLater => 'Labor can be restored later';
+
+  @override
+  String get laborID => 'Labor ID';
+
+  @override
+  String get iUnderstandActionCannotBeUndone => 'I understand this action cannot be undone and will affect related records';
+
+  @override
+  String get typeLaborNameToConfirm => 'Type the labor name to confirm permanent deletion:';
+
+  @override
+  String get laborDeletedPermanently => 'Labor deleted permanently!';
+
+  @override
+  String get failedToDeleteLabor => 'Failed to delete labor';
+
+  @override
+  String get pleaseConfirmYouUnderstandThisAction => 'Please confirm that you understand this action';
+
+  @override
+  String get pleaseConfirmYouUnderstandConsequences => 'Please confirm that you understand the consequences of permanent deletion';
+
+  @override
+  String get pleaseTypeLaborNameExactly => 'Please type the labor name exactly to confirm permanent deletion';
+
+  @override
+  String get pleaseCompleteAllConfirmationSteps => 'Please complete all confirmation steps';
+
+  @override
+  String get country => 'Country';
+
+  @override
+  String get pleaseTryAgainOrContactSupport => 'Please try again later or contact support.';
+
+  @override
+  String get failedToDeleteCategory => 'Failed to delete category';
+
+  @override
+  String get categoryDeletedPermanently => 'Category deleted permanently!';
+
+  @override
+  String get categoryDeactivatedSuccessfully => 'Category deactivated successfully!';
+
+  @override
+  String get deactivateCategory => 'Deactivate Category';
+
+  @override
+  String get categoryCanBeRestoredLater => 'Category can be restored later';
+
+  @override
+  String get iUnderstandPermanentDeleteCategory => 'I understand this will permanently delete the category and cannot be undone';
+
+  @override
+  String get iUnderstandDeactivateCategory => 'I understand this will deactivate the category';
+
+  @override
+  String get categoryUpdatedSuccessfully => 'Category updated successfully!';
+
+  @override
+  String get editCategory => 'Edit Category';
+
+  @override
+  String get updateCategoryInformation => 'Update category information';
+
+  @override
+  String get categoryName => 'Category Name';
+
+  @override
+  String get enterCategoryName => 'Enter category name';
+
+  @override
+  String get enterCategoryNameHint => 'Enter category name (e.g., Bridal Dresses)';
+
+  @override
+  String get pleaseEnterCategoryName => 'Please enter a category name';
+
+  @override
+  String get categoryNameMinLength => 'Category name must be at least 2 characters';
+
+  @override
+  String get categoryNameMaxLength => 'Category name must be less than 50 characters';
+
+  @override
+  String get enterDescriptionOptional => 'Enter description (optional)';
+
+  @override
+  String get enterCategoryDescriptionOptional => 'Enter category description (optional)';
+
+  @override
+  String get descriptionMaxLength => 'Description must be less than 200 characters';
+
+  @override
+  String get updateCategory => 'Update Category';
+
+  @override
+  String get goodMorning => 'Good Morning';
+
+  @override
+  String get goodAfternoon => 'Good Afternoon';
+
+  @override
+  String get goodEvening => 'Good Evening';
+
+  @override
+  String get searchPlaceholder => 'Search products, orders, customers...';
+
+  @override
+  String get addNew => 'Add New';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get inProgress => 'In Progress';
+
+  @override
+  String get lastSixMonthsPerformance => 'Last 6 months performance';
+
+  @override
+  String get sixMonths => '6M';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get activeProducts => 'Active Products';
+
+  @override
+  String get dailySales => 'Daily Sales';
+
+  @override
+  String get monthlySales => 'Monthly Sales';
+
+  @override
+  String get addExpense => 'Add Expense';
+
+  @override
+  String get addNewExpense => 'Add New Expense';
+
+  @override
+  String get recordNewExpenseEntry => 'Record a new expense entry';
+
+  @override
+  String get enterExpense => 'Enter expense';
+
+  @override
+  String get enterExpenseTypeCategory => 'Enter expense type/category';
+
+  @override
+  String get pleaseEnterExpenseType => 'Please enter expense type';
+
+  @override
+  String get expenseMinLength => 'Expense must be at least 2 characters';
+
+  @override
+  String get enterExpenseDescription => 'Enter expense description/details';
+
+  @override
+  String get descriptionMinLength => 'Description must be at least 5 characters';
+
+  @override
+  String get enterAmountPKR => 'Enter amount (PKR)';
+
+  @override
+  String get withdrawalBy => 'Withdrawal By';
+
+  @override
+  String get selectWhoMadeWithdrawal => 'Select who made the withdrawal';
+
+  @override
+  String get pleaseSelectWhoMadeWithdrawal => 'Please select who made the withdrawal';
+
+  @override
+  String get selectDateTime => 'Select Date & Time';
+
+  @override
+  String get selectExpenseDateTime => 'Select Expense Date & Time';
+
+  @override
+  String get expenseAddedSuccessfully => 'Expense added successfully!';
+
+  @override
+  String get deleteExpense => 'Delete Expense';
+
+  @override
+  String get deleteExpenseRecord => 'Delete Expense Record';
+
+  @override
+  String get confirmDeleteExpenseShort => 'Are you sure you want to delete this expense record?';
+
+  @override
+  String get confirmDeleteExpenseLong => 'Are you absolutely sure you want to delete this expense record?';
+
+  @override
+  String get deleteWarningShort => 'This will permanently delete the expense record.';
+
+  @override
+  String get deleteWarningLong => 'This will permanently delete the expense record and all associated data. This action cannot be undone.';
+
+  @override
+  String get expenseDeletedSuccessfully => 'Expense deleted successfully!';
+
+  @override
+  String get editExpense => 'Edit Expense';
+
+  @override
+  String get editExpenseRecord => 'Edit Expense Record';
+
+  @override
+  String get updateExpenseInformation => 'Update expense information';
+
+  @override
+  String get updateExpense => 'Update Expense';
+
+  @override
+  String get expenseUpdatedSuccessfully => 'Expense updated successfully!';
+
+  @override
+  String get pleaseAcceptTerms => 'Please accept the terms and conditions';
+
+  @override
+  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to Al Noor Fashion.';
+
+  @override
+  String get registrationFailedMessage => 'Registration failed. Please check the details below.';
+
+  @override
+  String get joinOur => 'Join Our';
+
+  @override
+  String get premiumFamily => 'Premium Family';
+
+  @override
+  String get signupWelcomeMessage => 'Begin your journey with us and discover the epitome of luxury fashion. \nCreate your account to access exclusive collections and personalized service.';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get joinExclusiveCommunity => 'Join our exclusive community';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get pleaseEnterFullName => 'Please enter your full name';
+
+  @override
+  String get nameMinLength => 'Name must be at least 2 characters';
+
+  @override
+  String get enterYourEmail => 'Enter your email';
+
+  @override
+  String get pleaseEnterEmail => 'Please enter your email';
+
+  @override
+  String get pleaseEnterValidEmail => 'Please enter a valid email address';
+
+  @override
+  String get createStrongPassword => 'Create a strong password';
+
+  @override
+  String get pleaseEnterPassword => 'Please enter a password';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 8 characters';
+
+  @override
+  String get passwordMustContain => 'Password must contain uppercase, lowercase, and number';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get reenterPassword => 'Re-enter your password';
+
+  @override
+  String get pleaseConfirmPassword => 'Please confirm your password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get iAgreeToThe => 'I agree to the ';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get and => ' and ';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get registrationFailed => 'Registration Failed';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get filterExpenseRecords => 'Filter Expense Records';
+
+  @override
+  String get refineExpenseList => 'Refine your expense list with filters';
+
+  @override
+  String get searchExpenseRecords => 'Search Expense Records';
+
+  @override
+  String get searchByExpenseHint => 'Search by expense name, description, or amount';
+
+  @override
+  String get expenseCategory => 'Expense Category';
+
+  @override
+  String get enterExpenseCategory => 'Enter expense category';
+
+  @override
+  String get selectWithdrawalAuthority => 'Select Withdrawal Authority';
+
+  @override
+  String get clearWithdrawalFilter => 'Clear Withdrawal Filter';
+
+  @override
+  String get expenseId => 'Expense ID';
+
+  @override
+  String get noExpenseRecordsFound => 'No Expense Records Found';
+
+  @override
+  String get startAddingFirstExpense => 'Start by adding your first expense record to track business spending';
+
+  @override
+  String get addFirstExpense => 'Add First Expense';
+
+  @override
+  String get errorLoadingExpenses => 'Error loading expenses';
+
+  @override
+  String get pleaseTryAgainLater => 'Please try again later or check your internet connection.';
+
+  @override
+  String get retryLoading => 'Retry Loading';
 }

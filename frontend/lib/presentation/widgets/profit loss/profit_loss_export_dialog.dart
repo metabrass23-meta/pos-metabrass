@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossExportDialog extends StatelessWidget {
   const ProfitLossExportDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
       title: Row(
@@ -15,7 +18,7 @@ class ProfitLossExportDialog extends StatelessWidget {
           Icon(Icons.download_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Text(
-            'Export Format',
+            l10n.exportFormat,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
         ],
@@ -24,26 +27,26 @@ class ProfitLossExportDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Choose the format for your Profit & Loss report:',
+            l10n.chooseTheFormatForYourProfitAndLossReport,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
           SizedBox(height: context.cardPadding),
           _buildExportOption(
             context,
-            'PDF Report',
-            'Professional document with charts and formatting',
+            l10n.pdfReport,
+            l10n.professionalDocumentWithChartsAndFormatting,
             Icons.picture_as_pdf_rounded,
             Colors.red,
-            () => Navigator.of(context).pop('pdf'),
+                () => Navigator.of(context).pop('pdf'),
           ),
           SizedBox(height: context.smallPadding),
           _buildExportOption(
             context,
-            'Excel Spreadsheet',
-            'Data in spreadsheet format for analysis',
+            l10n.excelSpreadsheet,
+            l10n.dataInSpreadsheetFormatForAnalysis,
             Icons.table_chart_rounded,
             Colors.green,
-            () => Navigator.of(context).pop('xlsx'),
+                () => Navigator.of(context).pop('xlsx'),
           ),
         ],
       ),
@@ -51,7 +54,7 @@ class ProfitLossExportDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            'Cancel',
+            l10n.cancel,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),

@@ -4,12 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class SalesChartCard extends StatelessWidget {
   const SalesChartCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 35.h,
       padding: EdgeInsets.all(2.w),
@@ -27,7 +30,6 @@ class SalesChartCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               Container(
@@ -50,7 +52,7 @@ class SalesChartCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Sales Overview',
+                      l10n.salesOverview,
                       style: GoogleFonts.inter(
                         fontSize: 2.2.sp,
                         fontWeight: FontWeight.w600,
@@ -58,7 +60,7 @@ class SalesChartCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Last 6 months performance',
+                      l10n.lastSixMonthsPerformance,
                       style: GoogleFonts.inter(
                         fontSize: 1.5.sp,
                         fontWeight: FontWeight.w400,
@@ -69,7 +71,6 @@ class SalesChartCard extends StatelessWidget {
                 ),
               ),
 
-              // Time Period Selector
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 1.5.w, vertical: 0.8.h),
                 decoration: BoxDecoration(
@@ -77,7 +78,7 @@ class SalesChartCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(1.w),
                 ),
                 child: Text(
-                  '6M',
+                  l10n.sixMonths,
                   style: GoogleFonts.inter(
                     fontSize: 1.5.sp,
                     fontWeight: FontWeight.w600,
@@ -90,7 +91,6 @@ class SalesChartCard extends StatelessWidget {
 
           SizedBox(height: 3.h),
 
-          // Chart Area
           Expanded(
             child: Consumer<DashboardProvider>(
               builder: (context, provider, child) {
@@ -106,13 +106,12 @@ class SalesChartCard extends StatelessWidget {
 
           SizedBox(height: 2.h),
 
-          // Chart Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegendItem('Sales', AppTheme.primaryMaroon),
+              _buildLegendItem(l10n.sales, AppTheme.primaryMaroon),
               SizedBox(width: 3.w),
-              _buildLegendItem('Target', AppTheme.accentGold),
+              _buildLegendItem(l10n.target, AppTheme.accentGold),
             ],
           ),
         ],
@@ -190,7 +189,6 @@ class SalesChartPainter extends CustomPainter {
         gradientPath.lineTo(x, y);
       }
 
-      // Draw data points
       canvas.drawCircle(
         Offset(x, y),
         4,
@@ -199,7 +197,6 @@ class SalesChartPainter extends CustomPainter {
           ..style = PaintingStyle.fill,
       );
 
-      // Draw white border around points
       canvas.drawCircle(
         Offset(x, y),
         4,
@@ -210,14 +207,11 @@ class SalesChartPainter extends CustomPainter {
       );
     }
 
-    // Complete gradient path
     gradientPath.lineTo(size.width, size.height);
     gradientPath.close();
 
-    // Draw gradient fill
     canvas.drawPath(gradientPath, gradientPaint);
 
-    // Draw line
     canvas.drawPath(path, paint);
   }
 

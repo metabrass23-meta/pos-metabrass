@@ -26,7 +26,6 @@ class PremiumProgressWidget extends StatelessWidget {
       builder: (context, child) {
         return Column(
           children: [
-            // Progress container with advanced styling
             Container(
               width: ResponsiveBreakpoints.responsive(
                 context,

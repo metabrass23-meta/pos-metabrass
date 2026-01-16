@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/vendor/vendor_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -145,9 +146,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (!_hasChanges) {
-        _showInfoSnackbar('No changes detected');
+        _showInfoSnackbar(l10n.noChangesDetected);
         return;
       }
 
@@ -168,13 +171,15 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? 'Failed to update vendor');
+          _showErrorSnackbar(provider.errorMessage ?? '${l10n.failedToUpdate} ${l10n.vendor}');
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -182,7 +187,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Vendor updated successfully!',
+              '${l10n.vendor} ${l10n.updatedSuccessfully}!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -252,14 +257,16 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   void _handleCancel() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_hasChanges) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Discard Changes?'),
-          content: Text('You have unsaved changes. Are you sure you want to discard them?'),
+          title: Text(l10n.discardChanges),
+          content: Text(l10n.discardChangesMessage),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text('Continue Editing')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.continueEditing)),
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close confirmation dialog
@@ -267,7 +274,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                   Navigator.of(context).pop(); // Close edit dialog
                 });
               },
-              child: Text('Discard', style: TextStyle(color: Colors.red)),
+              child: Text(l10n.discard, style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -330,6 +337,8 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -361,7 +370,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Vendor' : 'Edit Vendor Details',
+                  context.shouldShowCompactLayout
+                      ? '${l10n.edit} ${l10n.vendor}'
+                      : '${l10n.edit} ${l10n.vendor} ${l10n.details}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -372,7 +383,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    _hasChanges ? 'You have unsaved changes' : 'Update vendor information',
+                    _hasChanges ? l10n.unsavedChanges : '${l10n.update} ${l10n.vendor} ${l10n.information}',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -399,7 +410,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                   Icon(Icons.circle, color: Colors.orange, size: 8),
                   SizedBox(width: context.smallPadding / 2),
                   Text(
-                    'Modified',
+                    l10n.modified,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -482,27 +493,31 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information', Icons.info_outline),
+        _buildSectionTitle(l10n.basicInformation, Icons.info_outline),
         SizedBox(height: context.cardPadding),
 
         // Vendor Name
         PremiumTextField(
-          label: 'Vendor Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter vendor\'s full name',
+          label: '${l10n.vendor} ${l10n.name} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.name}'
+              : '${l10n.enterEmail} ${l10n.vendor} ${l10n.fullName}',
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter vendor name';
+              return '${l10n.pleaseEnter} ${l10n.vendor} ${l10n.name}';
             }
             if (value!.length < 2) {
-              return 'Name must be at least 2 characters';
+              return '${l10n.name} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
             }
             if (value.length > 100) {
-              return 'Name must be less than 100 characters';
+              return '${l10n.name} ${l10n.mustBeLessThan} 100 ${l10n.characters}';
             }
             return null;
           },
@@ -511,19 +526,21 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
 
         // Business Name
         PremiumTextField(
-          label: 'Business Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter business name' : 'Enter business/company name',
+          label: '${l10n.businessName} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.businessName}'
+              : '${l10n.enterEmail} ${l10n.businessName}',
           controller: _businessNameController,
           prefixIcon: Icons.business_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter business name';
+              return '${l10n.pleaseEnter} ${l10n.businessName}';
             }
             if (value!.length < 2) {
-              return 'Business name must be at least 2 characters';
+              return '${l10n.businessName} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
             }
             if (value.length > 200) {
-              return 'Business name must be less than 200 characters';
+              return '${l10n.businessName} ${l10n.mustBeLessThan} 200 ${l10n.characters}';
             }
             return null;
           },
@@ -532,16 +549,18 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
 
         // CNIC
         PremiumTextField(
-          label: 'CNIC *',
-          hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
+          label: '${l10n.cnic} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.cnic}'
+              : '${l10n.enterEmail} ${l10n.cnic} (${l10n.cnicFormat})',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter CNIC';
+              return '${l10n.pleaseEnter} ${l10n.cnic}';
             }
             if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
-              return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+              return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
             }
             return null;
           },
@@ -551,25 +570,29 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildContactInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
         SizedBox(height: context.cardPadding),
 
         // Phone Number
         PremiumTextField(
-          label: 'Phone Number *',
-          hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number',
+          label: '${l10n.phone} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.phone}'
+              : '${l10n.enterEmail} ${l10n.phone}',
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter phone number';
+              return '${l10n.pleaseEnter} ${l10n.phone}';
             }
             if (value!.length < 10) {
-              return 'Please enter a valid phone number';
+              return '${l10n.pleaseEnterValid} ${l10n.phone}';
             }
             return null;
           },
@@ -579,10 +602,12 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildLocationInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Location Information', Icons.location_on_outlined),
+        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
         SizedBox(height: context.cardPadding),
 
         // City and Area Row/Column
@@ -619,17 +644,19 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildCityField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'City *',
-          hint: 'Enter city',
+          label: '${l10n.city} *',
+          hint: '${l10n.enterEmail} ${l10n.city}',
           controller: _cityController,
           prefixIcon: Icons.location_city_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter city';
+              return '${l10n.pleaseEnter} ${l10n.city}';
             }
             return null;
           },
@@ -642,10 +669,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-                  label: city,
-                  onTap: () => setState(() => _cityController.text = city),
-                ),
-              )
+              label: city,
+              onTap: () => setState(() => _cityController.text = city),
+            ),
+          )
               .toList(),
         ),
       ],
@@ -653,17 +680,19 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildAreaField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'Area *',
-          hint: 'Enter area',
+          label: '${l10n.area} *',
+          hint: '${l10n.enterEmail} ${l10n.area}',
           controller: _areaController,
           prefixIcon: Icons.map_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter area';
+              return '${l10n.pleaseEnter} ${l10n.area}';
             }
             return null;
           },
@@ -676,10 +705,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-                  label: area,
-                  onTap: () => setState(() => _areaController.text = area),
-                ),
-              )
+              label: area,
+              onTap: () => setState(() => _areaController.text = area),
+            ),
+          )
               .toList(),
         ),
       ],
@@ -727,13 +756,15 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<VendorProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Vendor',
+              text: '${l10n.update} ${l10n.vendor}',
               onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -744,7 +775,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -756,11 +787,13 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -774,7 +807,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           child: Consumer<VendorProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Vendor',
+                text: '${l10n.update} ${l10n.vendor}',
                 onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

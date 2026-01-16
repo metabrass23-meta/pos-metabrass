@@ -402,11 +402,8 @@ class PremiumSidebar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.diamond_sharp,
-                    size: context.iconSize('medium'),
-                    color: AppTheme.primaryMaroon,
-                  ),
+                  child: Image.asset('assets/images/logo.png'),
+
                 ),
 
                 if (isExpanded) ...[
@@ -679,7 +676,6 @@ class PremiumSidebar extends StatelessWidget {
                     },
                   ),
                 ] else ...[
-                  // Collapsed state - just logout icon
                   LogoutDialogWidget(isExpanded: false),
                 ],
               ],

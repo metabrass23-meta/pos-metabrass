@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -65,17 +66,19 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final amountGiven = double.parse(_amountGivenController.text.trim());
       final amountReturned = double.tryParse(_amountReturnedController.text.trim()) ?? 0.0;
 
       if (amountReturned > amountGiven) {
-        _showErrorSnackbar('Amount returned cannot exceed amount given');
+        _showErrorSnackbar(l10n.amountReturnedCannotExceedAmountGiven);
         return;
       }
 
       if (_expectedReturnDate.isBefore(_dateLent)) {
-        _showErrorSnackbar('Expected return date cannot be before date lent');
+        _showErrorSnackbar(l10n.expectedReturnDateCannotBeBeforeDateLent);
         return;
       }
 
@@ -100,6 +103,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -111,7 +116,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Receivable added successfully!',
+              l10n.receivableAddedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -189,7 +194,6 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
     if (picked != null && picked != _dateLent) {
       setState(() {
         _dateLent = picked;
-        // Update expected return date to be at least 1 day after date lent
         if (_expectedReturnDate.isBefore(_dateLent.add(const Duration(days: 1)))) {
           _expectedReturnDate = _dateLent.add(const Duration(days: 30));
         }
@@ -294,6 +298,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -325,7 +331,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Receivable' : 'Add New Receivable',
+                  context.shouldShowCompactLayout ? l10n.addReceivable : l10n.addNewReceivable,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -336,7 +342,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Record amount lent to customer or supplier',
+                    l10n.recordAmountLentToCustomerOrSupplier,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -423,6 +429,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildDebtorInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -449,7 +457,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Debtor Information',
+                l10n.debtorInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -460,26 +468,26 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Debtor Name',
-            hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter debtor full name',
+            label: l10n.debtorName,
+            hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterDebtorFullName,
             controller: _debtorNameController,
             prefixIcon: Icons.person_outline,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter debtor name';
-              if (value!.length < 2) return 'Name must be at least 2 characters';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterDebtorName;
+              if (value!.length < 2) return l10n.nameMustBeAtLeast2Characters;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Phone Number',
-            hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (+92XXXXXXXXXX)',
+            label: l10n.phone,
+            hint: context.shouldShowCompactLayout ? l10n.enterPhone : l10n.enterPhoneNumber,
             controller: _debtorPhoneController,
             prefixIcon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter phone number';
-              if (value!.length < 10) return 'Please enter a valid phone number';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterPhoneNumber;
+              if (value!.length < 10) return l10n.pleaseEnterValidPhoneNumber;
               return null;
             },
           ),
@@ -489,6 +497,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildAmountCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -515,7 +525,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Details',
+                l10n.amountDetails,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -526,23 +536,23 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Amount Given (PKR)',
-            hint: context.shouldShowCompactLayout ? 'Enter amount' : 'Enter amount given to debtor',
+            label: l10n.amountGivenPkr,
+            hint: context.shouldShowCompactLayout ? l10n.enterAmount : l10n.enterAmountGivenToDebtor,
             controller: _amountGivenController,
             prefixIcon: Icons.trending_up_rounded,
             keyboardType: TextInputType.number,
             onChanged: (value) => setState(() {}),
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter amount given';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterAmountGiven;
               final amount = double.tryParse(value!);
-              if (amount == null || amount <= 0) return 'Please enter a valid amount';
+              if (amount == null || amount <= 0) return l10n.pleaseEnterValidAmount;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Amount Returned (PKR)',
-            hint: 'Optional - if any amount already returned',
+            label: l10n.amountReturnedPkr,
+            hint: l10n.optionalIfAnyAmountAlreadyReturned,
             controller: _amountReturnedController,
             prefixIcon: Icons.trending_down_rounded,
             keyboardType: TextInputType.number,
@@ -550,9 +560,9 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final amountReturned = double.tryParse(value);
-                if (amountReturned == null || amountReturned < 0) return 'Please enter a valid amount';
+                if (amountReturned == null || amountReturned < 0) return l10n.pleaseEnterValidAmount;
                 final amountGiven = double.tryParse(_amountGivenController.text) ?? 0;
-                if (amountReturned > amountGiven) return 'Cannot exceed amount given';
+                if (amountReturned > amountGiven) return l10n.cannotExceedAmountGiven;
               }
               return null;
             },
@@ -567,6 +577,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildDetailsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -593,7 +605,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Transaction Details',
+                l10n.transactionDetails,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -604,8 +616,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Reason/Item',
-            hint: context.shouldShowCompactLayout ? 'Reason for lending' : 'Enter reason for lending or item description',
+            label: l10n.reasonItem,
+            hint: context.shouldShowCompactLayout ? l10n.reasonForLending : l10n.enterReasonForLendingOrItemDescription,
             controller: _reasonController,
             prefixIcon: Icons.assignment_outlined,
             maxLines: ResponsiveBreakpoints.responsive(
@@ -617,15 +629,15 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               ultrawide: 3,
             ),
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter reason or item';
-              if (value!.length < 5) return 'Please provide more details';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterReasonOrItem;
+              if (value!.length < 5) return l10n.pleaseProvideMoreDetails;
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Notes (Optional)',
-            hint: context.shouldShowCompactLayout ? 'Additional notes' : 'Enter additional notes or terms',
+            label: l10n.notesOptional,
+            hint: context.shouldShowCompactLayout ? l10n.additionalNotes : l10n.enterAdditionalNotesOrTerms,
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
             maxLines: ResponsiveBreakpoints.responsive(
@@ -643,6 +655,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildDatesCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -669,7 +683,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Date Information',
+                l10n.dateInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -685,8 +699,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
                 child: GestureDetector(
                   onTap: _selectDateLent,
                   child: PremiumTextField(
-                    label: 'Date Lent',
-                    hint: 'Select date',
+                    label: l10n.dateLent,
+                    hint: l10n.selectDate,
                     controller: TextEditingController(
                       text: '${_dateLent.day}/${_dateLent.month}/${_dateLent.year}',
                     ),
@@ -700,8 +714,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
                 child: GestureDetector(
                   onTap: _selectExpectedReturnDate,
                   child: PremiumTextField(
-                    label: 'Expected Return Date',
-                    hint: 'Select date',
+                    label: l10n.expectedReturnDate,
+                    hint: l10n.selectDate,
                     controller: TextEditingController(
                       text: '${_expectedReturnDate.day}/${_expectedReturnDate.month}/${_expectedReturnDate.year}',
                     ),
@@ -720,6 +734,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildBalancePreview() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -742,7 +758,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Balance Remaining',
+                  l10n.balanceRemaining,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
@@ -766,7 +782,9 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildDateInfoRow() {
+    final l10n = AppLocalizations.of(context)!;
     final daysDifference = _expectedReturnDate.difference(_dateLent).inDays;
+
     return Container(
       padding: EdgeInsets.all(context.smallPadding),
       decoration: BoxDecoration(
@@ -784,8 +802,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           Expanded(
             child: Text(
               daysDifference > 0
-                  ? 'Lending period: $daysDifference days'
-                  : 'Please select a valid return date',
+                  ? '${l10n.lendingPeriod} $daysDifference ${l10n.days}'
+                  : l10n.pleaseSelectValidReturnDate,
               style: GoogleFonts.inter(
                 fontSize: context.captionFontSize,
                 color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700],
@@ -798,6 +816,8 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (context.shouldShowCompactLayout) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -805,7 +825,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           Consumer<ReceivablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Receivable',
+                text: l10n.addReceivable,
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight,
@@ -816,7 +836,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
           PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight,
@@ -830,7 +850,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
         children: [
           Expanded(
             child: PremiumButton(
-              text: 'Cancel',
+              text: l10n.cancel,
               onPressed: _handleCancel,
               isOutlined: true,
               height: context.buttonHeight / 1.5,
@@ -844,7 +864,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
             child: Consumer<ReceivablesProvider>(
               builder: (context, provider, child) {
                 return PremiumButton(
-                  text: 'Add Receivable',
+                  text: l10n.addReceivable,
                   onPressed: provider.isLoading ? null : _handleSubmit,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight / 1.5,

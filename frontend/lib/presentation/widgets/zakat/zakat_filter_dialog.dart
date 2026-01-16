@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import 'dart:async';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
 
@@ -21,7 +22,6 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables
   String? _selectedBeneficiary;
   String? _selectedAuthority;
   DateTime? _dateFrom;
@@ -29,11 +29,9 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   bool _showInactiveOnly = false;
   String _searchQuery = '';
 
-  // Text controllers for custom inputs
   final TextEditingController _beneficiaryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  // Predefined options
   final List<String> _authorityOptions = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
 
   final List<String> _commonBeneficiaries = ['Esha', 'Faatima', 'sadfg', 'Family', 'Orphanage', 'Mosque', 'School', 'Hospital'];
@@ -47,7 +45,6 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Initialize with current filter values
     final provider = context.read<ZakatProvider>();
     _selectedBeneficiary = provider.selectedBeneficiary;
     _selectedAuthority = provider.selectedAuthority;
@@ -73,11 +70,9 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   void _handleApplyFilters() async {
     final provider = context.read<ZakatProvider>();
 
-    // Update beneficiary and search from text controllers
     final beneficiary = _beneficiaryController.text.trim().isEmpty ? null : _beneficiaryController.text.trim();
     final search = _searchController.text.trim();
 
-    // Apply filters using existing provider methods
     if (beneficiary != provider.selectedBeneficiary) {
       await provider.setBeneficiaryFilter(beneficiary);
     }
@@ -110,21 +105,21 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Future<void> _selectDateRange() async {
-    // Select start date using custom date picker
+    final l10n = AppLocalizations.of(context)!;
+
     final startDate = await _selectCustomDate(
       context: context,
       initialDate: _dateFrom ?? DateTime.now(),
-      title: 'Select Start Date',
+      title: l10n.selectStartDate,
       minDate: DateTime(2000),
       maxDate: DateTime.now(),
     );
 
     if (startDate != null) {
-      // Select end date using custom date picker
       final endDate = await _selectCustomDate(
         context: context,
         initialDate: _dateTo ?? startDate,
-        title: 'Select End Date',
+        title: l10n.selectEndDate,
         minDate: startDate,
         maxDate: DateTime.now(),
       );
@@ -160,7 +155,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           title: title,
           minDate: minDate,
           maxDate: maxDate,
-          showTimeInline: false, // Only show date picker for range selection
+          showTimeInline: false,
         );
       },
     );
@@ -205,6 +200,8 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -229,7 +226,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Zakat Records',
+                  l10n.filterZakatRecords,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -240,7 +237,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your zakat list with filters',
+                    l10n.refineYourZakatList,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -269,38 +266,34 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Search Filter
-            _buildFilterSection(title: 'Search Zakat Records', icon: Icons.search_outlined, child: _buildSearchFilter()),
+            _buildFilterSection(title: l10n.searchZakatRecords, icon: Icons.search_outlined, child: _buildSearchFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Status Filter
-            _buildFilterSection(title: 'Record Status', icon: Icons.flag_outlined, child: _buildStatusFilter()),
+            _buildFilterSection(title: l10n.recordStatus, icon: Icons.flag_outlined, child: _buildStatusFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Beneficiary Filter
-            _buildFilterSection(title: 'Beneficiary', icon: Icons.person_outline, child: _buildBeneficiaryFilter()),
+            _buildFilterSection(title: l10n.beneficiary, icon: Icons.person_outline, child: _buildBeneficiaryFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Authority Filter
-            _buildFilterSection(title: 'Authorization Authority', icon: Icons.verified_user_outlined, child: _buildAuthorityFilter()),
+            _buildFilterSection(title: l10n.authorizationAuthority, icon: Icons.verified_user_outlined, child: _buildAuthorityFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Date Range Filter
-            _buildFilterSection(title: 'Date Range', icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
+            _buildFilterSection(title: l10n.dateRange, icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
 
             SizedBox(height: context.mainPadding),
 
-            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -344,11 +337,13 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildSearchFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return TextFormField(
       controller: _searchController,
       style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
-        hintText: 'Search by name, description, beneficiary, or notes',
+        hintText: l10n.searchByNameDescriptionBeneficiaryOrNotes,
         hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
@@ -370,6 +365,8 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildStatusFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         CheckboxListTile(
@@ -380,7 +377,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             });
           },
           title: Text(
-            'Show inactive records only',
+            l10n.showInactiveRecordsOnly,
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           activeColor: AppTheme.primaryMaroon,
@@ -397,7 +394,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Only deactivated zakat records will be shown',
+                    l10n.onlyDeactivatedZakatRecordsWillBeShown,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.orange[700]),
                   ),
                 ),
@@ -409,13 +406,15 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildBeneficiaryFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         TextFormField(
           controller: _beneficiaryController,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
           decoration: InputDecoration(
-            hintText: 'Enter beneficiary name',
+            hintText: l10n.enterBeneficiaryName,
             hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
             prefixIcon: Icon(Icons.person_outline, color: Colors.grey[500], size: context.iconSize('medium')),
             border: OutlineInputBorder(
@@ -447,15 +446,17 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildAuthorityFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Text(
-          'Select Authorization Authority',
+          l10n.selectAuthorizationAuthority,
           style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         ...(_authorityOptions.map(
-          (authority) => RadioListTile<String>(
+              (authority) => RadioListTile<String>(
             value: authority,
             groupValue: _selectedAuthority,
             onChanged: (value) {
@@ -471,7 +472,6 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             dense: true,
           ),
         )),
-        // Option to clear authority filter
         TextButton.icon(
           onPressed: () {
             setState(() {
@@ -480,7 +480,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           },
           icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
           label: Text(
-            'Clear Authority Filter',
+            l10n.clearAuthorityFilter,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
@@ -489,6 +489,8 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildDateRangeFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
@@ -511,7 +513,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                           Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            'Select Date Range',
+                            l10n.selectDateRange,
                             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                           ),
                         ],
@@ -520,7 +522,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                       Text(
                         _dateFrom != null && _dateTo != null
                             ? '${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year} - ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}'
-                            : 'No date range selected',
+                            : l10n.noDateRangeSelected,
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
@@ -547,7 +549,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                   },
                   icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
                   label: Text(
-                    'Clear Date Range',
+                    l10n.clearDateRange,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red[600]),
                   ),
                 ),
@@ -579,11 +581,13 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
@@ -591,7 +595,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Clear All Filters',
+          text: l10n.clearAllFilters,
           onPressed: _handleClearFilters,
           height: context.buttonHeight,
           icon: Icons.clear_all_rounded,
@@ -601,7 +605,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         ),
         SizedBox(height: context.smallPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleClose,
           height: context.buttonHeight,
           isOutlined: true,
@@ -613,11 +617,13 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -628,7 +634,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.clear_all_rounded,
@@ -641,7 +647,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,

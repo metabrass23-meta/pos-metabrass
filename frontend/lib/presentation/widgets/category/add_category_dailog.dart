@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,6 +78,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -87,8 +90,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               size: context.iconSize('medium'),
             ),
             SizedBox(width: context.smallPadding),
-            Text(
-              'Category added successfully!',
+            Text('${l10n.category} ${l10n.success}!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -128,13 +130,13 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                 constraints: BoxConstraints(
                   maxWidth: ResponsiveBreakpoints.responsive(
                     context,
-                      tablet: 85.w,   // 95% width on tablets
-                      small: 80.w,    // 90% width on small screens
-                      medium: 70.w,   // 80% width on medium screens
-                      large: 60.w,    // 70% width on large screens
-                      ultrawide: 50.w, // 60% width on ultrawide
-                    ),
-                    maxHeight: 70.h, // Maximum 90% of screen height
+                    tablet: 85.w,   // 95% width on tablets
+                    small: 80.w,    // 90% width on small screens
+                    medium: 70.w,   // 80% width on medium screens
+                    large: 60.w,    // 70% width on large screens
+                    ultrawide: 50.w, // 60% width on ultrawide
+                  ),
+                  maxHeight: 70.h, // Maximum 90% of screen height
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -195,6 +197,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -228,7 +232,9 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Category' : 'Add New Category',
+                  context.shouldShowCompactLayout
+                      ? '${l10n.add} ${l10n.category}'
+                      : '${l10n.add} ${l10n.newCustomer} ${l10n.category}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -239,7 +245,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new product category',
+                    '${l10n.createOrder} ${l10n.products} ${l10n.category}',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -272,6 +278,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -281,21 +289,21 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
           children: [
             // Category Name Field
             PremiumTextField(
-              label: 'Category Name',
+              label: '${l10n.category} ${l10n.name}',
               hint: isCompact
-                  ? 'Enter category name'
-                  : 'Enter category name (e.g., Bridal Dresses)',
+                  ? '${l10n.category} ${l10n.name}'
+                  : '${l10n.category} ${l10n.name} ${l10n.enterEmail}',
               controller: _nameController,
               prefixIcon: Icons.label_outline,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a category name';
+                  return '${l10n.category} ${l10n.name}';
                 }
                 if (value!.length < 2) {
-                  return 'Category name must be at least 2 characters';
+                  return '${l10n.category} ${l10n.name} 2 ${l10n.characters}';
                 }
                 if (value.length > 50) {
-                  return 'Category name must be less than 50 characters';
+                  return '${l10n.category} ${l10n.name} 50 ${l10n.characters}';
                 }
                 return null;
               },
@@ -305,10 +313,10 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
 
             // Description Field with responsive lines
             PremiumTextField(
-              label: 'Description',
+              label: l10n.notes,
               hint: isCompact
-                  ? 'Enter description (optional)'
-                  : 'Enter category description (optional)',
+                  ? '${l10n.notes} (${l10n.optional})'
+                  : '${l10n.category} ${l10n.notes} (${l10n.optional})',
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: ResponsiveBreakpoints.responsive(
@@ -321,7 +329,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
               ),
               validator: (value) {
                 if (value != null && value.length > 200) {
-                  return 'Description must be less than 200 characters';
+                  return '${l10n.notes} 200 ${l10n.characters}';
                 }
                 return null;
               },
@@ -336,7 +344,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                '${_descriptionController.text.length}/200 characters',
+                '${_descriptionController.text.length}/200 ${l10n.characters}',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
@@ -365,6 +373,8 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -372,7 +382,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
         Consumer<CategoryProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Category',
+              text: '${l10n.add} ${l10n.category}',
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -385,7 +395,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
 
         // Cancel Button (full width)
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -397,12 +407,14 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         // Cancel Button
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -418,7 +430,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog>
           child: Consumer<CategoryProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Category',
+                text: '${l10n.add} ${l10n.category}',
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

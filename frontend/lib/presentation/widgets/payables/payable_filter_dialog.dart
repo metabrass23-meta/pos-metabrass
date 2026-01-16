@@ -10,6 +10,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
 import '../globals/drop_down.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PayableFilterDialog extends StatefulWidget {
   const PayableFilterDialog({super.key});
@@ -135,6 +136,42 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
     });
   }
 
+  String _getStatusLabel(BuildContext context, String status) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (status) {
+      case 'ACTIVE':
+        return l10n.active;
+      case 'PAID':
+        return l10n.paidStatus;
+      case 'OVERDUE':
+        return l10n.overdue;
+      case 'PARTIALLY_PAID':
+        return l10n.partiallyPaid;
+      case 'CANCELLED':
+        return l10n.cancelled;
+      default:
+        return status;
+    }
+  }
+
+  String _getPriorityLabel(BuildContext context, String priority) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (priority) {
+      case 'LOW':
+        return l10n.low;
+      case 'MEDIUM':
+        return l10n.medium;
+      case 'HIGH':
+        return l10n.high;
+      case 'URGENT':
+        return l10n.urgent;
+      default:
+        return priority;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -175,6 +212,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -197,7 +236,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Payables',
+                  l10n.filterPayables,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -208,7 +247,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Apply filters to find specific payables',
+                    l10n.applyFiltersToFindSpecificPayables,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -258,6 +297,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -269,14 +310,14 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Search',
+            l10n.search,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search by creditor name, reason, notes...',
+              hintText: l10n.searchByCreditorNameReasonNotes,
               prefixIcon: Icon(Icons.search, color: AppTheme.primaryMaroon),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
             ),
@@ -287,6 +328,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildStatusPrioritySection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -298,7 +341,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Status & Priority',
+            l10n.statusAndPriority,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -306,11 +349,11 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Status',
-                  hint: 'Select status',
+                  label: l10n.status,
+                  hint: l10n.selectStatus,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All Statuses'),
-                    ..._statusOptions.map((status) => DropdownItem<String>(value: status, label: status)),
+                    DropdownItem<String>(value: _allValue, label: l10n.allStatuses),
+                    ..._statusOptions.map((status) => DropdownItem<String>(value: status, label: _getStatusLabel(context, status))),
                   ],
                   value: _selectedStatus,
                   onChanged: (value) {
@@ -323,11 +366,11 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Priority',
-                  hint: 'Select priority',
+                  label: l10n.priority,
+                  hint: l10n.selectPriority,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All Priorities'),
-                    ..._priorityOptions.map((priority) => DropdownItem<String>(value: priority, label: priority)),
+                    DropdownItem<String>(value: _allValue, label: l10n.allPriorities),
+                    ..._priorityOptions.map((priority) => DropdownItem<String>(value: priority, label: _getPriorityLabel(context, priority))),
                   ],
                   value: _selectedPriority,
                   onChanged: (value) {
@@ -345,6 +388,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildVendorSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<VendorProvider>(
       builder: (context, vendorProvider, child) {
         return Container(
@@ -358,17 +403,17 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Vendor',
+                l10n.vendor,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
               PremiumDropdownField<String>(
-                label: 'Vendor',
-                hint: 'Select vendor',
+                label: l10n.vendor,
+                hint: l10n.selectVendor,
                 items: [
-                  DropdownItem<String>(value: _allValue, label: 'All Vendors'),
+                  DropdownItem<String>(value: _allValue, label: l10n.allVendors),
                   ...vendorProvider.vendors.map(
-                    (vendor) => DropdownItem<String>(value: vendor.id, label: vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name),
+                        (vendor) => DropdownItem<String>(value: vendor.id, label: vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name),
                   ),
                 ],
                 value: _selectedVendor,
@@ -386,6 +431,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildDateRangeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -397,7 +444,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Date Ranges',
+            l10n.dateRanges,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -405,7 +452,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Due After',
+                  label: l10n.dueAfter,
                   selectedDate: _dueAfter,
                   onDateSelected: (date) {
                     setState(() {
@@ -419,7 +466,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Due Before',
+                  label: l10n.dueBefore,
                   selectedDate: _dueBefore,
                   onDateSelected: (date) {
                     setState(() {
@@ -437,7 +484,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Borrowed After',
+                  label: l10n.borrowedAfter,
                   selectedDate: _borrowedAfter,
                   onDateSelected: (date) {
                     setState(() {
@@ -451,7 +498,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Borrowed Before',
+                  label: l10n.borrowedBefore,
                   selectedDate: _borrowedBefore,
                   onDateSelected: (date) {
                     setState(() {
@@ -476,6 +523,8 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
     required DateTime firstDate,
     required DateTime lastDate,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -492,7 +541,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               onDateTimeSelected: (date, time) {
                 onDateSelected(date);
               },
-              title: 'Select Date',
+              title: l10n.selectDate,
               minDate: firstDate,
               maxDate: lastDate,
               showTimeInline: false,
@@ -512,7 +561,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
                   child: Text(
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
-                        : 'Select date',
+                        : l10n.selectDate,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
@@ -528,11 +577,13 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             backgroundColor: Colors.grey.shade300,
             textColor: AppTheme.charcoalGray,
@@ -541,7 +592,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             backgroundColor: AppTheme.primaryMaroon,
             textColor: AppTheme.pureWhite,

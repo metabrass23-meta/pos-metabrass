@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'labor_table_helpers.dart';
 
 class EnhancedLaborTable extends StatefulWidget {
@@ -79,7 +80,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -101,8 +101,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                     ),
                   ),
                 ),
-
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -125,8 +123,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                     ),
                   ),
                 ),
-
-                // Pagination Controls
                 if (provider.paginationInfo != null &&
                     provider.paginationInfo!.totalPages > 1)
                   _buildPaginationControls(context, provider),
@@ -203,64 +199,48 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Name
         Container(
           width: columnWidths[0],
-          child: _buildSortableHeaderCell(context, 'Name', 'name'),
+          child: _buildSortableHeaderCell(context, l10n.name, 'name'),
         ),
-
-        // Phone
         Container(
           width: columnWidths[1],
-          child: _buildHeaderCell(context, 'Phone'),
+          child: _buildHeaderCell(context, l10n.phone),
         ),
-
-        // CNIC
         Container(
           width: columnWidths[2],
-          child: _buildHeaderCell(context, 'CNIC'),
+          child: _buildHeaderCell(context, l10n.cnic),
         ),
-
-        // Designation
         Container(
           width: columnWidths[3],
-          child: _buildSortableHeaderCell(context, 'Designation', 'designation'),
+          child: _buildSortableHeaderCell(context, l10n.designation, 'designation'),
         ),
-
-        // Salary (hidden on compact layouts)
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[4],
-            child: _buildSortableHeaderCell(context, 'Salary', 'salary'),
+            child: _buildSortableHeaderCell(context, l10n.salary, 'salary'),
           ),
-
-        // City (hidden on compact layouts)
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[5],
-            child: _buildSortableHeaderCell(context, 'City', 'city'),
+            child: _buildSortableHeaderCell(context, l10n.city, 'city'),
           ),
-
-        // Status
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
-          child: _buildHeaderCell(context, 'Status'),
+          child: _buildHeaderCell(context, l10n.status),
         ),
-
-        // Joined Date
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
-          child: _buildSortableHeaderCell(context, 'Joined Date', 'joining_date'),
+          child: _buildSortableHeaderCell(context, l10n.joinedDate, 'joining_date'),
         ),
-
-        // Actions
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 6 : 8],
-          child: _buildHeaderCell(context, 'Actions'),
+          child: _buildHeaderCell(context, l10n.actions),
         ),
       ],
     );
@@ -317,6 +297,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
   }
 
   Widget _buildTableRow(BuildContext context, LaborModel labor, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -334,7 +315,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Name Column
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -363,7 +343,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'NEW',
+                            l10n.newLabel,
                             style: GoogleFonts.inter(
                               fontSize: 8,
                               fontWeight: FontWeight.w600,
@@ -380,7 +360,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'RECENT',
+                            l10n.recentLabel,
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -395,8 +375,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               ],
             ),
           ),
-
-          // Phone Column
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -411,8 +389,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // CNIC Column
           Container(
             width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -427,8 +403,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // Designation Column
           Container(
             width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -443,8 +417,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // Salary Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[4],
@@ -458,8 +430,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                 ),
               ),
             ),
-
-          // City Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[5],
@@ -475,8 +445,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-
-          // Status Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -493,7 +461,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                 ),
               ),
               child: Text(
-                labor.isActive ? 'Active' : 'Inactive',
+                labor.isActive ? l10n.active : l10n.inactive,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
@@ -503,8 +471,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               ),
             ),
           ),
-
-          // Joined Date Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -530,8 +496,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               ],
             ),
           ),
-
-          // Actions Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 6 : 8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -543,6 +507,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
   }
 
   Widget _buildPaginationControls(BuildContext context, LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -556,21 +521,16 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
       ),
       child: Row(
         children: [
-          // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} labors',
+            '${l10n.showing} ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} ${l10n.outOf} ${pagination.totalCount} ${l10n.labors}',
             style: GoogleFonts.inter(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[600],
             ),
           ),
-
           const Spacer(),
-
-          // Pagination controls
           Row(
             children: [
-              // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
                 icon: Icon(
@@ -578,8 +538,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                   color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400],
                 ),
               ),
-
-              // Page info
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.cardPadding,
@@ -590,7 +548,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
@@ -598,8 +556,6 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                   ),
                 ),
               ),
-
-              // Next button
               IconButton(
                 onPressed: pagination.hasNext ? provider.loadNextPage : null,
                 icon: Icon(

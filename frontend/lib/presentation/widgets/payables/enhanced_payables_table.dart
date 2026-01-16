@@ -7,6 +7,7 @@ import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'payables_table_helpers.dart';
+import '../../../l10n/app_localizations.dart';
 
 class EnhancedPayablesTable extends StatefulWidget {
   final Function(Payable) onEdit;
@@ -167,42 +168,43 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
         // Payable ID
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Payable ID', 'id')),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.payableId, 'id')),
 
         // Creditor
-        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, 'Creditor', 'creditor_name')),
+        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, l10n.creditor, 'creditor_name')),
 
         // Reason/Item (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Reason/Item')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.reasonItem)),
 
         // Vendor (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Vendor')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.vendor)),
 
         // Notes (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Notes')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.notes)),
 
         // Amount
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 2 : 5],
-          child: _buildSortableHeaderCell(context, 'Amount', 'amount_borrowed'),
+          child: _buildSortableHeaderCell(context, l10n.amount, 'amount_borrowed'),
         ),
 
         // Date
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 3 : 6],
-          child: _buildSortableHeaderCell(context, 'Due Date', 'expected_repayment_date'),
+          child: _buildSortableHeaderCell(context, l10n.dueDate, 'expected_repayment_date'),
         ),
 
         // Priority (hidden on compact layouts)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, 'Priority', 'priority')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, l10n.priority, 'priority')),
 
         // Actions
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -251,6 +253,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
   }
 
   Widget _buildTableRow(BuildContext context, Payable payable, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -308,7 +311,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   if (payable.notes != null && payable.notes!.isNotEmpty) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'Notes: ${payable.notes}',
+                      '${l10n.notes}: ${payable.notes}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -346,7 +349,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               width: columnWidths[4],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
-                payable.notes ?? 'No notes',
+                payable.notes ?? l10n.noNotes,
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -376,7 +379,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                 if (payable.amountPaid > 0) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    'Paid: ${payable.formattedAmountPaid}',
+                    '${l10n.paid}: ${payable.formattedAmountPaid}',
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[600]),
                   ),
                 ],
@@ -396,7 +399,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
-                  context.shouldShowCompactLayout ? payable.relativeExpectedRepaymentDate : payable.repaymentStatus ?? 'Due',
+                  context.shouldShowCompactLayout ? payable.relativeExpectedRepaymentDate : (payable.repaymentStatus ?? l10n.due),
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
@@ -430,6 +433,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
   }
 
   Widget _buildPaginationControls(BuildContext context, PayablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -445,7 +449,11 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
         children: [
           // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} payable records',
+            l10n.showingPayableRecords(
+              ((pagination.currentPage - 1) * pagination.pageSize) + 1,
+              pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
+              pagination.totalCount,
+            ),
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
@@ -468,7 +476,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),

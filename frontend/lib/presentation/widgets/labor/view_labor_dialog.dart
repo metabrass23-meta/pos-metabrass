@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
@@ -93,6 +94,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   void _handleStatusChange(bool newStatus) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         _isLoadingDetails = true;
@@ -102,13 +105,13 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
       final success = newStatus ? await provider.restoreLabor(widget.labor.id) : await provider.softDeleteLabor(widget.labor.id);
 
       if (success) {
-        _showSuccessSnackbar('Labor status updated successfully!');
-        Navigator.of(context).pop(); // Close dialog to refresh data
+        _showSuccessSnackbar(l10n.laborStatusUpdatedSuccessfully);
+        Navigator.of(context).pop();
       } else {
-        _showErrorSnackbar('Failed to update labor status');
+        _showErrorSnackbar(l10n.failedToUpdateLaborStatus);
       }
     } catch (e) {
-      _showErrorSnackbar('Error updating labor status: ${e.toString()}');
+      _showErrorSnackbar('${l10n.errorUpdatingLaborStatus} ${e.toString()}');
     } finally {
       setState(() {
         _isLoadingDetails = false;
@@ -143,12 +146,12 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                 child: _isLoadingDetails
                     ? _buildLoadingState()
                     : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildHeader(),
-                          Flexible(child: _buildContent()),
-                        ],
-                      ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(),
+                    Flexible(child: _buildContent()),
+                  ],
+                ),
               ),
             ),
           ),
@@ -158,6 +161,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildLoadingState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 400,
       child: Column(
@@ -166,7 +171,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
           CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
           SizedBox(height: context.cardPadding),
           Text(
-            'Loading labor details...',
+            l10n.loadingLaborDetails,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
         ],
@@ -175,6 +180,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -197,7 +204,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Labor Details',
+                  l10n.laborDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -208,7 +215,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Complete labor information',
+                    l10n.completeLaborInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -271,6 +278,8 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildLaborProfileCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -310,7 +319,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Joined ${_formatDate(widget.labor.joiningDate)}',
+                      '${l10n.joined} ${_formatDate(widget.labor.joiningDate)}',
                       style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
@@ -321,7 +330,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                     Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      '${widget.labor.workExperienceDays} days experience (${widget.labor.workExperienceYears.toStringAsFixed(1)} years)',
+                      '${widget.labor.workExperienceDays} ${l10n.daysExperience} (${widget.labor.workExperienceYears.toStringAsFixed(1)} ${l10n.years})',
                       style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
@@ -335,89 +344,97 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildContactInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Contact Information',
+      title: l10n.contactInformation,
       icon: Icons.contact_phone,
       color: Colors.orange,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Phone', widget.labor.formattedPhone, Icons.phone),
+          _buildInfoRow(l10n.phone, widget.labor.formattedPhone, Icons.phone),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('CNIC', widget.labor.cnic, Icons.credit_card),
+          _buildInfoRow(l10n.cnic, widget.labor.cnic, Icons.credit_card),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Gender', widget.labor.genderDisplay, Icons.person),
+          _buildInfoRow(l10n.gender, widget.labor.genderDisplay, Icons.person),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Age', '${widget.labor.age} years', Icons.cake),
+          _buildInfoRow(l10n.age, '${widget.labor.age} ${l10n.years}', Icons.cake),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Caste', widget.labor.caste, Icons.group),
+          _buildInfoRow(l10n.caste, widget.labor.caste, Icons.group),
         ],
       ),
     );
   }
 
   Widget _buildWorkInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Work Information',
+      title: l10n.workInformation,
       icon: Icons.work,
       color: Colors.purple,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Designation', widget.labor.designation, Icons.work_outline),
+          _buildInfoRow(l10n.designation, widget.labor.designation, Icons.work_outline),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Salary', 'PKR ${widget.labor.salary.toStringAsFixed(0)}', Icons.attach_money),
+          _buildInfoRow(l10n.salary, 'PKR ${widget.labor.salary.toStringAsFixed(0)}', Icons.attach_money),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Joining Date', _formatDate(widget.labor.joiningDate), Icons.calendar_today),
+          _buildInfoRow(l10n.joiningDate, _formatDate(widget.labor.joiningDate), Icons.calendar_today),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Experience', '${widget.labor.workExperienceYears.toStringAsFixed(1)} years', Icons.timeline),
+          _buildInfoRow(l10n.experience, '${widget.labor.workExperienceYears.toStringAsFixed(1)} ${l10n.years}', Icons.timeline),
         ],
       ),
     );
   }
 
   Widget _buildLocationCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Location',
+      title: l10n.location,
       icon: Icons.location_on,
       color: Colors.teal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('City', widget.labor.city, Icons.location_city),
+          _buildInfoRow(l10n.city, widget.labor.city, Icons.location_city),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Area', widget.labor.area, Icons.map),
+          _buildInfoRow(l10n.area, widget.labor.area, Icons.map),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Full Address', widget.labor.fullAddress, Icons.home),
+          _buildInfoRow(l10n.fullAddress, widget.labor.fullAddress, Icons.home),
         ],
       ),
     );
   }
 
   Widget _buildFinancialCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Financial Information',
+      title: l10n.financialInformation,
       icon: Icons.account_balance_wallet,
       color: Colors.green,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Monthly Salary', 'PKR ${widget.labor.salary.toStringAsFixed(0)}', Icons.attach_money),
+          _buildInfoRow(l10n.monthlySalary, 'PKR ${widget.labor.salary.toStringAsFixed(0)}', Icons.attach_money),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Total Advances', 'PKR ${widget.labor.totalAdvanceAmount.toStringAsFixed(2)}', Icons.payment),
+          _buildInfoRow(l10n.totalAdvances, 'PKR ${widget.labor.totalAdvanceAmount.toStringAsFixed(2)}', Icons.payment),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Total Payments', 'PKR ${widget.labor.totalPaymentsAmount.toStringAsFixed(2)}', Icons.receipt),
+          _buildInfoRow(l10n.totalPayments, 'PKR ${widget.labor.totalPaymentsAmount.toStringAsFixed(2)}', Icons.receipt),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Remaining Monthly Salary', 'PKR ${widget.labor.remainingMonthlySalary.toStringAsFixed(2)}', Icons.account_balance),
+          _buildInfoRow(l10n.remainingMonthlySalary, 'PKR ${widget.labor.remainingMonthlySalary.toStringAsFixed(2)}', Icons.account_balance),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Remaining Advance Amount', 'PKR ${widget.labor.remainingAdvanceAmount.toStringAsFixed(2)}', Icons.account_balance_wallet),
+          _buildInfoRow(l10n.remainingAdvanceAmount, 'PKR ${widget.labor.remainingAdvanceAmount.toStringAsFixed(2)}', Icons.account_balance_wallet),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Total Advances This Month', 'PKR ${widget.labor.totalAdvancesAmount.toStringAsFixed(2)}', Icons.payment),
+          _buildInfoRow(l10n.totalAdvancesThisMonth, 'PKR ${widget.labor.totalAdvancesAmount.toStringAsFixed(2)}', Icons.payment),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Payment Records', '${widget.labor.paymentsCount} payments', Icons.history),
+          _buildInfoRow(l10n.paymentRecords, '${widget.labor.paymentsCount} ${l10n.payments}', Icons.history),
           if (widget.labor.lastPaymentDate != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildInfoRow('Last Payment', _formatDate(widget.labor.lastPaymentDate!), Icons.schedule),
+            _buildInfoRow(l10n.lastPayment, _formatDate(widget.labor.lastPaymentDate!), Icons.schedule),
           ],
         ],
       ),
@@ -425,27 +442,29 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildStatusCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Status Information',
+      title: l10n.statusInformation,
       icon: Icons.info,
       color: _getStatusColor(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Status', widget.labor.isActive ? 'Active' : 'Inactive', Icons.flag),
+          _buildInfoRow(l10n.status, widget.labor.isActive ? l10n.active : l10n.inactive, Icons.flag),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Created', _formatDate(widget.labor.createdAt), Icons.schedule),
+          _buildInfoRow(l10n.created, _formatDate(widget.labor.createdAt), Icons.schedule),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Last Updated', _formatDate(widget.labor.updatedAt), Icons.update),
+          _buildInfoRow(l10n.lastUpdated, _formatDate(widget.labor.updatedAt), Icons.update),
           if (widget.labor.createdBy != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildInfoRow('Created By', widget.labor.createdBy!, Icons.person),
+            _buildInfoRow(l10n.createdBy, widget.labor.createdBy!, Icons.person),
           ],
           SizedBox(height: context.smallPadding),
           Row(
             children: [
-              if (widget.labor.isNewLabor) _buildStatusBadge('New Labor', Colors.green),
-              if (widget.labor.isRecentLabor) _buildStatusBadge('Recent', Colors.blue),
+              if (widget.labor.isNewLabor) _buildStatusBadge(l10n.newLabor, Colors.green),
+              if (widget.labor.isRecentLabor) _buildStatusBadge(l10n.recent, Colors.blue),
             ],
           ),
         ],
@@ -528,12 +547,14 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildCompactActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!widget.labor.isActive)
           PremiumButton(
-            text: 'Restore Labor',
+            text: l10n.restoreLabor,
             onPressed: () => _handleStatusChange(true),
             height: context.buttonHeight,
             icon: Icons.restore,
@@ -541,7 +562,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
           ),
         if (!widget.labor.isActive) SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Close',
+          text: l10n.close,
           onPressed: _handleClose,
           height: context.buttonHeight,
           isOutlined: true,
@@ -553,11 +574,13 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
   }
 
   Widget _buildDesktopActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Close',
+            text: l10n.close,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -569,7 +592,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
           SizedBox(width: context.cardPadding),
           Expanded(
             child: PremiumButton(
-              text: 'Restore Labor',
+              text: l10n.restoreLabor,
               onPressed: () => _handleStatusChange(true),
               height: context.buttonHeight / 1.5,
               icon: Icons.restore,

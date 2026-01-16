@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossCalculationDetails extends StatelessWidget {
   const ProfitLossCalculationDetails({super.key});
@@ -20,22 +21,12 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Calculation Summary
             _buildCalculationSummary(context, provider.currentProfitLoss!),
-
             SizedBox(height: context.cardPadding),
-
-            // Source Records Breakdown
             _buildSourceRecordsBreakdown(context, provider.currentProfitLoss!),
-
             SizedBox(height: context.cardPadding),
-
-            // Calculation Formula
             _buildCalculationFormula(context, provider.currentProfitLoss!),
-
             SizedBox(height: context.cardPadding),
-
-            // Period Information
             _buildPeriodInformation(context, provider.currentProfitLoss!),
           ],
         );
@@ -44,6 +35,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildCalculationSummary(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -59,7 +52,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Icon(Icons.calculate_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Calculation Summary',
+                l10n.calculationSummary,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -80,49 +73,51 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildDesktopCalculationSummary(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildCalculationCard(
             context,
-            'Income',
+            l10n.income,
             profitLoss.formattedTotalIncome,
             Icons.trending_up_rounded,
             Colors.green,
-            'Total sales revenue for the period',
+            l10n.totalSalesRevenueForThePeriod,
           ),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildCalculationCard(
             context,
-            'Cost of Goods',
+            l10n.costOfGoods,
             'PKR ${profitLoss.totalCostOfGoodsSold.toStringAsFixed(0)}',
             Icons.inventory_2_rounded,
             Colors.orange,
-            'Direct costs of products sold',
+            l10n.directCostsOfProductsSold,
           ),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildCalculationCard(
             context,
-            'Gross Profit',
+            l10n.grossProfit,
             profitLoss.formattedGrossProfit,
             Icons.analytics_rounded,
             profitLoss.grossProfit > 0 ? Colors.green : Colors.red,
-            'Income minus cost of goods sold',
+            l10n.incomeMinusCostOfGoodsSold,
           ),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildCalculationCard(
             context,
-            'Net Profit',
+            l10n.netProfit,
             profitLoss.formattedNetProfit,
             Icons.account_balance_wallet_rounded,
             profitLoss.isProfitable ? Colors.green : Colors.red,
-            'Final profit after all expenses',
+            l10n.finalProfitAfterAllExpenses,
           ),
         ),
       ],
@@ -130,6 +125,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildMobileCalculationSummary(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
@@ -137,22 +134,22 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildCalculationCard(
                 context,
-                'Income',
+                l10n.income,
                 profitLoss.formattedTotalIncome,
                 Icons.trending_up_rounded,
                 Colors.green,
-                'Total sales revenue',
+                l10n.totalSalesRevenue,
               ),
             ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: _buildCalculationCard(
                 context,
-                'Cost of Goods',
+                l10n.costOfGoods,
                 'PKR ${profitLoss.totalCostOfGoodsSold.toStringAsFixed(0)}',
                 Icons.inventory_2_rounded,
                 Colors.orange,
-                'Direct costs',
+                l10n.directCosts,
               ),
             ),
           ],
@@ -163,22 +160,22 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildCalculationCard(
                 context,
-                'Gross Profit',
+                l10n.grossProfit,
                 profitLoss.formattedGrossProfit,
                 Icons.analytics_rounded,
                 profitLoss.grossProfit > 0 ? Colors.green : Colors.red,
-                'Income - COGS',
+                l10n.incomeMinusCogs,
               ),
             ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: _buildCalculationCard(
                 context,
-                'Net Profit',
+                l10n.netProfit,
                 profitLoss.formattedNetProfit,
                 Icons.account_balance_wallet_rounded,
                 profitLoss.isProfitable ? Colors.green : Colors.red,
-                'Final profit',
+                l10n.finalProfit,
               ),
             ),
           ],
@@ -228,6 +225,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildSourceRecordsBreakdown(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -243,7 +242,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Icon(Icons.source_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Source Records Breakdown',
+                l10n.sourceRecordsBreakdown,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -264,12 +263,14 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildDesktopSourceBreakdown(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildSourceRecordCard(
             context,
-            'Sales Records',
+            l10n.salesRecords,
             profitLoss.totalProductsSold.toString(),
             'PKR ${profitLoss.totalSalesIncome.toStringAsFixed(0)}',
             Icons.receipt_long_rounded,
@@ -280,8 +281,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         Expanded(
           child: _buildSourceRecordCard(
             context,
-            'Labor Payments',
-            'N/A', // Count not available in current model
+            l10n.laborPayments,
+            l10n.notAvailable,
             'PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)}',
             Icons.people_rounded,
             Colors.blue,
@@ -291,8 +292,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         Expanded(
           child: _buildSourceRecordCard(
             context,
-            'Vendor Payments',
-            'N/A', // Count not available in current model
+            l10n.vendorPayments,
+            l10n.notAvailable,
             'PKR ${profitLoss.totalVendorPayments.toStringAsFixed(0)}',
             Icons.store_rounded,
             Colors.orange,
@@ -301,8 +302,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         Expanded(
           child: _buildSourceRecordCard(
             context,
-            'Other Expenses',
-            'N/A', // Count not available in current model
+            l10n.otherExpenses,
+            l10n.notAvailable,
             'PKR ${profitLoss.totalExpenses.toStringAsFixed(0)}',
             Icons.receipt_long_rounded,
             Colors.red,
@@ -313,6 +314,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildMobileSourceBreakdown(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
@@ -320,7 +323,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildSourceRecordCard(
                 context,
-                'Sales',
+                l10n.sales,
                 profitLoss.totalProductsSold.toString(),
                 'PKR ${profitLoss.totalSalesIncome.toStringAsFixed(0)}',
                 Icons.receipt_long_rounded,
@@ -331,8 +334,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildSourceRecordCard(
                 context,
-                'Labor',
-                'N/A',
+                l10n.labor,
+                l10n.notAvailable,
                 'PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)}',
                 Icons.people_rounded,
                 Colors.blue,
@@ -346,8 +349,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildSourceRecordCard(
                 context,
-                'Vendors',
-                'N/A',
+                l10n.vendors,
+                l10n.notAvailable,
                 'PKR ${profitLoss.totalVendorPayments.toStringAsFixed(0)}',
                 Icons.store_rounded,
                 Colors.orange,
@@ -357,8 +360,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
             Expanded(
               child: _buildSourceRecordCard(
                 context,
-                'Expenses',
-                'N/A',
+                l10n.expenses,
+                l10n.notAvailable,
                 'PKR ${profitLoss.totalExpenses.toStringAsFixed(0)}',
                 Icons.receipt_long_rounded,
                 Colors.red,
@@ -405,6 +408,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildCalculationFormula(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -420,7 +425,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Icon(Icons.functions_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Calculation Formula',
+                l10n.calculationFormula,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -429,8 +434,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
 
           _buildFormulaStep(
             context,
-            '1. Gross Profit',
-            'Income - Cost of Goods Sold',
+            l10n.stepOneGrossProfit,
+            l10n.incomeMinusCostOfGoodsSold,
             'PKR ${profitLoss.totalSalesIncome.toStringAsFixed(0)} - PKR ${profitLoss.totalCostOfGoodsSold.toStringAsFixed(0)} = ${profitLoss.formattedGrossProfit}',
             Colors.green,
           ),
@@ -439,8 +444,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
 
           _buildFormulaStep(
             context,
-            '2. Total Expenses',
-            'Labor + Vendor + Other + Zakat',
+            l10n.stepTwoTotalExpenses,
+            l10n.laborPlusVendorPlusOtherPlusZakat,
             'PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)} + PKR ${profitLoss.totalVendorPayments.toStringAsFixed(0)} + PKR ${profitLoss.totalExpenses.toStringAsFixed(0)} + PKR ${profitLoss.totalZakat.toStringAsFixed(0)} = ${profitLoss.formattedTotalExpenses}',
             Colors.red,
           ),
@@ -449,23 +454,22 @@ class ProfitLossCalculationDetails extends StatelessWidget {
 
           _buildFormulaStep(
             context,
-            '3. Net Profit',
-            'Gross Profit - Total Expenses',
+            l10n.stepThreeNetProfit,
+            l10n.grossProfitMinusTotalExpenses,
             '${profitLoss.formattedGrossProfit} - ${profitLoss.formattedTotalExpenses} = ${profitLoss.formattedNetProfit}',
             profitLoss.isProfitable ? Colors.green : Colors.red,
           ),
 
           SizedBox(height: context.cardPadding),
 
-          // Profit Margins
           Row(
             children: [
               Expanded(
                 child: _buildMarginCard(
                   context,
-                  'Gross Profit Margin',
+                  l10n.grossProfitMargin,
                   profitLoss.formattedGrossProfitMargin,
-                  'Gross Profit / Income × 100',
+                  l10n.grossProfitDivideIncomeMultiply100,
                   Colors.green,
                 ),
               ),
@@ -473,9 +477,9 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Expanded(
                 child: _buildMarginCard(
                   context,
-                  'Net Profit Margin',
+                  l10n.netProfitMargin,
                   profitLoss.formattedProfitMargin,
-                  'Net Profit / Income × 100',
+                  l10n.netProfitDivideIncomeMultiply100,
                   profitLoss.isProfitable ? Colors.green : Colors.red,
                 ),
               ),
@@ -547,6 +551,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildPeriodInformation(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -562,7 +568,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Icon(Icons.calendar_today_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Period Information',
+                l10n.periodInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -583,18 +589,20 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildDesktopPeriodInfo(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        Expanded(child: _buildPeriodInfoCard(context, 'Period Type', profitLoss.periodTypeDisplay, Icons.schedule_rounded, AppTheme.primaryMaroon)),
+        Expanded(child: _buildPeriodInfoCard(context, l10n.periodType, profitLoss.periodTypeDisplay, Icons.schedule_rounded, AppTheme.primaryMaroon)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildPeriodInfoCard(context, 'Start Date', _formatDate(profitLoss.startDate), Icons.calendar_today_rounded, Colors.blue)),
+        Expanded(child: _buildPeriodInfoCard(context, l10n.startDate, _formatDate(profitLoss.startDate), Icons.calendar_today_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildPeriodInfoCard(context, 'End Date', _formatDate(profitLoss.endDate), Icons.calendar_today_rounded, Colors.blue)),
+        Expanded(child: _buildPeriodInfoCard(context, l10n.endDate, _formatDate(profitLoss.endDate), Icons.calendar_today_rounded, Colors.blue)),
         Expanded(
           child: _buildPeriodInfoCard(
             context,
-            'Status',
-            profitLoss.isProfitable ? 'Profitable' : 'Loss',
+            l10n.status,
+            profitLoss.isProfitable ? l10n.profitable : l10n.loss,
             Icons.trending_up_rounded,
             profitLoss.isProfitable ? Colors.green : Colors.red,
           ),
@@ -604,17 +612,19 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildMobilePeriodInfo(BuildContext context, dynamic profitLoss) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildPeriodInfoCard(context, 'Period', profitLoss.periodTypeDisplay, Icons.schedule_rounded, AppTheme.primaryMaroon)),
+            Expanded(child: _buildPeriodInfoCard(context, l10n.period, profitLoss.periodTypeDisplay, Icons.schedule_rounded, AppTheme.primaryMaroon)),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: _buildPeriodInfoCard(
                 context,
-                'Status',
-                profitLoss.isProfitable ? 'Profitable' : 'Loss',
+                l10n.status,
+                profitLoss.isProfitable ? l10n.profitable : l10n.loss,
                 Icons.trending_up_rounded,
                 profitLoss.isProfitable ? Colors.green : Colors.red,
               ),
@@ -624,9 +634,9 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         SizedBox(height: context.smallPadding),
         Row(
           children: [
-            Expanded(child: _buildPeriodInfoCard(context, 'From', _formatDate(profitLoss.startDate), Icons.calendar_today_rounded, Colors.blue)),
+            Expanded(child: _buildPeriodInfoCard(context, l10n.from, _formatDate(profitLoss.startDate), Icons.calendar_today_rounded, Colors.blue)),
             SizedBox(width: context.smallPadding),
-            Expanded(child: _buildPeriodInfoCard(context, 'To', _formatDate(profitLoss.endDate), Icons.calendar_today_rounded, Colors.blue)),
+            Expanded(child: _buildPeriodInfoCard(context, l10n.to, _formatDate(profitLoss.endDate), Icons.calendar_today_rounded, Colors.blue)),
           ],
         ),
       ],
@@ -668,6 +678,8 @@ class ProfitLossCalculationDetails extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -680,12 +692,12 @@ class ProfitLossCalculationDetails extends StatelessWidget {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'No Calculation Data Available',
+            l10n.noCalculationDataAvailable,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Calculation details will appear here once profit and loss data is available',
+            l10n.calculationDetailsWillAppearHere,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),

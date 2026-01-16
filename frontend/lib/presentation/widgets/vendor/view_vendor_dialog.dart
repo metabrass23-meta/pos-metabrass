@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
@@ -129,6 +130,8 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   void _handleStatusChange(String newStatus) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         _isLoadingDetails = true;
@@ -146,13 +149,13 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
       );
 
       if (success) {
-        _showSuccessSnackbar('Vendor status updated successfully!');
+        _showSuccessSnackbar('${l10n.vendor} ${l10n.status} ${l10n.updatedSuccessfully}!');
         Navigator.of(context).pop(); // Close dialog to refresh data
       } else {
-        _showErrorSnackbar('Failed to update vendor status');
+        _showErrorSnackbar('${l10n.failedToUpdate} ${l10n.vendor} ${l10n.status}');
       }
     } catch (e) {
-      _showErrorSnackbar('Error updating vendor status: ${e.toString()}');
+      _showErrorSnackbar('${l10n.error} ${l10n.updating} ${l10n.vendor} ${l10n.status}: ${e.toString()}');
     } finally {
       setState(() {
         _isLoadingDetails = false;
@@ -215,6 +218,8 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildLoadingState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 400,
       child: Column(
@@ -226,7 +231,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'Loading vendor details...',
+            '${l10n.loading} ${l10n.vendor} ${l10n.details}...',
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w500,
@@ -239,6 +244,8 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -270,7 +277,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Vendor Details',
+                  '${l10n.vendor} ${l10n.details}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -281,7 +288,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Complete vendor information',
+                    '${l10n.complete} ${l10n.vendor} ${l10n.information}',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -358,6 +365,8 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildVendorProfileCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -408,7 +417,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Vendor since ${widget.vendor.formattedCreatedAt}',
+                      '${l10n.vendor} ${l10n.since} ${widget.vendor.formattedCreatedAt}',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
@@ -426,7 +435,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      '${widget.vendor.vendorAgeDays} days old (${widget.vendor.relativeCreatedAt})',
+                      '${widget.vendor.vendorAgeDays} ${l10n.daysOld} (${widget.vendor.relativeCreatedAt})',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
@@ -443,56 +452,64 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildContactInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Contact Information',
+      title: l10n.contactInformation,
       icon: Icons.contact_phone,
       color: Colors.orange,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Phone', widget.vendor.formattedPhone, Icons.phone),
+          _buildInfoRow(l10n.phone, widget.vendor.formattedPhone, Icons.phone),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('CNIC', widget.vendor.cnic, Icons.credit_card),
+          _buildInfoRow(l10n.cnic, widget.vendor.cnic, Icons.credit_card),
         ],
       ),
     );
   }
 
   Widget _buildLocationCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Location',
+      title: l10n.location,
       icon: Icons.location_on,
       color: Colors.teal,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('City', widget.vendor.city, Icons.location_city),
+          _buildInfoRow(l10n.city, widget.vendor.city, Icons.location_city),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Area', widget.vendor.area, Icons.map),
+          _buildInfoRow(l10n.area, widget.vendor.area, Icons.map),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Full Address', widget.vendor.fullAddress, Icons.home),
+          _buildInfoRow(l10n.fullAddress, widget.vendor.fullAddress, Icons.home),
         ],
       ),
     );
   }
 
   Widget _buildStatusCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _buildInfoCard(
-      title: 'Status Information',
+      title: '${l10n.status} ${l10n.information}',
       icon: Icons.info,
       color: _getStatusColor(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Status', widget.vendor.statusDisplayName, Icons.flag),
+          _buildInfoRow(l10n.status, widget.vendor.statusDisplayName, Icons.flag),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Active Since', widget.vendor.formattedCreatedAt, Icons.schedule),
+          _buildInfoRow('${l10n.active} ${l10n.since}', widget.vendor.formattedCreatedAt, Icons.schedule),
         ],
       ),
     );
   }
 
   Widget _buildActivityCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -512,7 +529,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Activity Summary',
+                l10n.activitySummary,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -529,7 +546,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total Orders',
+                      l10n.totalOrders,
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
@@ -553,7 +570,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total Amount',
+                      l10n.totalAmount,
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
@@ -644,10 +661,12 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
   }
 
   Widget _buildCloseButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Align(
       alignment: Alignment.centerRight,
       child: PremiumButton(
-        text: 'Close',
+        text: l10n.close,
         onPressed: _handleClose,
         height: context.buttonHeight / 1.5,
         isOutlined: true,

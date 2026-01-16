@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../src/data/profit_loss_data.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossMetricsSection extends StatelessWidget {
   const ProfitLossMetricsSection({super.key});
@@ -31,12 +32,14 @@ class ProfitLossMetricsSection extends StatelessWidget {
   }
 
   Widget _buildDesktopMetrics(BuildContext context, ProfitLossData data, Map<String, dynamic> comparison) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildMetricCard(
             context,
-            'Total Income',
+            l10n.totalIncome,
             data.formattedTotalIncome,
             Icons.trending_up_rounded,
             Colors.green,
@@ -48,7 +51,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
         Expanded(
           child: _buildMetricCard(
             context,
-            'Total Expenses',
+            l10n.totalExpenses,
             data.formattedTotalExpenses,
             Icons.trending_down_rounded,
             Colors.red,
@@ -69,7 +72,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
         Expanded(
           child: _buildMetricCard(
             context,
-            'Profit Margin',
+            l10n.profitMargin,
             data.formattedProfitMargin,
             Icons.percent_rounded,
             data.isProfitable ? Colors.green : Colors.red,
@@ -80,9 +83,10 @@ class ProfitLossMetricsSection extends StatelessWidget {
   }
 
   Widget _buildMobileMetrics(BuildContext context, ProfitLossData data, Map<String, dynamic> comparison) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
-        // Profit Card - Full Width
         _buildProfitCard(
           context,
           data,
@@ -93,13 +97,12 @@ class ProfitLossMetricsSection extends StatelessWidget {
 
         SizedBox(height: context.smallPadding),
 
-        // Income and Expenses Row
         Row(
           children: [
             Expanded(
               child: _buildMetricCard(
                 context,
-                'Income',
+                l10n.income,
                 data.formattedTotalIncome,
                 Icons.trending_up_rounded,
                 Colors.green,
@@ -111,7 +114,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
             Expanded(
               child: _buildMetricCard(
                 context,
-                'Expenses',
+                l10n.expenses,
                 data.formattedTotalExpenses,
                 Icons.trending_down_rounded,
                 Colors.red,
@@ -124,10 +127,9 @@ class ProfitLossMetricsSection extends StatelessWidget {
 
         SizedBox(height: context.smallPadding),
 
-        // Profit Margin - Full Width
         _buildMetricCard(
           context,
-          'Profit Margin',
+          l10n.profitMargin,
           data.formattedProfitMargin,
           Icons.percent_rounded,
           data.isProfitable ? Colors.green : Colors.red,
@@ -140,15 +142,15 @@ class ProfitLossMetricsSection extends StatelessWidget {
   }
 
   Widget _buildMetricCard(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-    Color color, [
-    double? changePercent,
-    bool? isPositive,
-    bool isFullWidth = false,
-  ]) {
+      BuildContext context,
+      String title,
+      String value,
+      IconData icon,
+      Color color, [
+        double? changePercent,
+        bool? isPositive,
+        bool isFullWidth = false,
+      ]) {
     return Container(
       width: isFullWidth ? double.infinity : null,
       padding: EdgeInsets.all(context.smallPadding),
@@ -213,6 +215,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
   }
 
   Widget _buildProfitCard(BuildContext context, ProfitLossData data, [double? changePercent, bool? isPositive, bool isFullWidth = false]) {
+    final l10n = AppLocalizations.of(context)!;
     final color = data.isProfitable ? Colors.green : Colors.red;
 
     return Container(
@@ -267,7 +270,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
-            data.isProfitable ? 'Net Profit' : 'Net Loss',
+            data.isProfitable ? l10n.netProfit : l10n.netLoss,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite.withOpacity(0.9)),
           ),
         ],

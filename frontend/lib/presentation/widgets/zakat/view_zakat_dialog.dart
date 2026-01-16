@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class ViewZakatDetailsDialog extends StatefulWidget {
@@ -154,6 +155,8 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -185,7 +188,7 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Zakat Details',
+                  l10n.zakatDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -196,7 +199,7 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete zakat contribution information',
+                    l10n.viewCompleteZakatContributionInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -247,35 +250,30 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Title Information Card
           ZakatDetailCards.buildTitleInfoCard(context, widget.zakat, isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Amount Details Card
           ZakatDetailCards.buildAmountDetailsCard(context, widget.zakat, isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Beneficiary Information Card
           ZakatDetailCards.buildBeneficiaryInfoCard(context, widget.zakat, isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Date and Time Information Card
           ZakatDetailCards.buildDateTimeInfoCard(context, widget.zakat, isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Description Card
           ZakatDetailCards.buildDescriptionCard(context, widget.zakat, isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Authorization and Status Card
           ZakatDetailCards.buildAuthorizationStatusCard(context, widget.zakat, isCompact),
 
-          // Notes Card (if available)
           if (widget.zakat.notes != null && widget.zakat.notes!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             ZakatDetailCards.buildNotesCard(context, widget.zakat, isCompact),
@@ -283,11 +281,10 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
 
           SizedBox(height: context.mainPadding),
 
-          // Close Button
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: l10n.close,
               onPressed: _handleClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -302,8 +299,10 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
 }
 
 class ZakatDetailCards {
-  
+
   static Widget buildTitleInfoCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -323,7 +322,7 @@ class ZakatDetailCards {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Zakat Title',
+                l10n.zakatTitle,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -355,6 +354,8 @@ class ZakatDetailCards {
   }
 
   static Widget buildAmountDetailsCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -373,7 +374,7 @@ class ZakatDetailCards {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Zakat Amount',
+                l10n.zakatAmount,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -399,7 +400,7 @@ class ZakatDetailCards {
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
-                  'Contribution Amount',
+                  l10n.contributionAmount,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
@@ -424,6 +425,8 @@ class ZakatDetailCards {
   }
 
   static Widget buildBeneficiaryInfoCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -443,7 +446,7 @@ class ZakatDetailCards {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Beneficiary Information',
+                l10n.beneficiaryInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -496,7 +499,7 @@ class ZakatDetailCards {
                               color: Colors.blue[700],
                             ),
                           ),
-                          if (zakat.beneficiaryContact != null && 
+                          if (zakat.beneficiaryContact != null &&
                               zakat.beneficiaryContact!.isNotEmpty) ...[
                             SizedBox(height: context.smallPadding / 2),
                             Row(
@@ -543,6 +546,8 @@ class ZakatDetailCards {
   }
 
   static Widget _buildDateTimeInfoCompact(BuildContext context, Zakat zakat) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -560,7 +565,7 @@ class ZakatDetailCards {
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date',
+                    l10n.date,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -606,7 +611,7 @@ class ZakatDetailCards {
                   Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.orange),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Time',
+                    l10n.time,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -632,6 +637,8 @@ class ZakatDetailCards {
   }
 
   static Widget _buildDateTimeInfoExpanded(BuildContext context, Zakat zakat) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -649,7 +656,7 @@ class ZakatDetailCards {
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date',
+                      l10n.date,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -681,53 +688,54 @@ class ZakatDetailCards {
           ),
         ),
         SizedBox(width: context.cardPadding),
-
-Expanded(
-  child: Container(
-    padding: EdgeInsets.all(context.cardPadding),
-    decoration: BoxDecoration(
-      color: Colors.orange.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(context.borderRadius()),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              size: context.iconSize('small'),
-              color: Colors.orange,
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(context.cardPadding),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            SizedBox(width: context.smallPadding),
-            Text(
-              'Time',
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: context.iconSize('small'),
+                      color: Colors.orange,
+                    ),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      l10n.time,
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 2),
+                Text(
+                  zakat.formattedTime,
+                  style: GoogleFonts.inter(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        SizedBox(height: context.smallPadding / 2),
-        Text(
-          zakat.formattedTime,
-          style: GoogleFonts.inter(
-            fontSize: context.bodyFontSize,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.charcoalGray,
           ),
         ),
-      ],
-    ),
-  ),
-)
       ],
     );
   }
 
   static Widget buildDescriptionCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -746,7 +754,7 @@ Expanded(
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Description & Purpose',
+                l10n.descriptionAndPurpose,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -780,6 +788,8 @@ Expanded(
   }
 
   static Widget buildNotesCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -799,7 +809,7 @@ Expanded(
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Additional Notes',
+                l10n.additionalNotes,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -832,6 +842,8 @@ Expanded(
   }
 
   static Widget buildAuthorizationStatusCard(BuildContext context, Zakat zakat, bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -851,7 +863,7 @@ Expanded(
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Authorization & Status',
+                l10n.authorizationAndStatus,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -903,13 +915,15 @@ Expanded(
   }
 
   static Widget _buildAuthStatusCompact(BuildContext context, Zakat zakat) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Authorized By:',
+              '${l10n.authorizedBy}:',
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
@@ -950,11 +964,13 @@ Expanded(
   }
 
   static Widget _buildAuthStatusExpanded(BuildContext context, Zakat zakat) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Authorized By:',
+          '${l10n.authorizedBy}:',
           style: GoogleFonts.inter(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,

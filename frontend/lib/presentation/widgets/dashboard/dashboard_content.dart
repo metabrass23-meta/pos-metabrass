@@ -163,11 +163,7 @@ class DashboardContent extends StatelessWidget {
                       color: AppTheme.pureWhite.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(context.cardPadding),
                     ),
-                    child: Icon(
-                      Icons.diamond_sharp,
-                      size: context.iconSize('special'),
-                      color: AppTheme.accentGold,
-                    ),
+                    child: Image.asset('assets/images/logo.png'),
                   ),
                 ],
               ),

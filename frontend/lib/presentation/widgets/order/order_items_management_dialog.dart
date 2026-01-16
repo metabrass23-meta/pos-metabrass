@@ -10,6 +10,7 @@ import '../../../src/providers/order_item_provider.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/services/order_item_service.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../order_item/add_order_item_dialog.dart';
 import '../order_item/delete_order_item_dialog.dart';
 import '../order_item/edit_order_item_dialog.dart';
@@ -30,7 +31,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   late OrderItemProvider _orderItemProvider;
   late OrderItemService _orderItemService;
   List<OrderItemModel> _orderItems = [];
-  List<OrderItemModel> _originalOrderItems = []; // Keep original list for local filtering
+  List<OrderItemModel> _originalOrderItems = [];
   bool _isLoading = false;
   String? _errorMessage;
   String _searchQuery = '';
@@ -46,7 +47,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Refresh data when dependencies change (e.g., when dialog is opened)
     if (_orderItems.isEmpty && !_isLoading) {
       _loadOrderItems();
     }
@@ -55,7 +55,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   @override
   void didUpdateWidget(OrderItemsManagementDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Refresh data if the order changes
     if (oldWidget.order.id != widget.order.id) {
       _loadOrderItems();
     }
@@ -67,7 +66,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     super.dispose();
   }
 
-  /// Load order items from API
   Future<void> _loadOrderItems() async {
     setState(() {
       _isLoading = true;
@@ -77,11 +75,10 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     try {
       debugPrint('🔍 Loading order items for order ID: ${widget.order.id}');
 
-      // Use the API service to get order items for this specific order
       final response = await _orderItemService.getOrderItems(
         orderId: widget.order.id,
         page: 1,
-        pageSize: 100, // Get all items for this order
+        pageSize: 100,
       );
 
       debugPrint('📡 API Response: success=${response.success}, message=${response.message}');
@@ -90,11 +87,10 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
         debugPrint('✅ Order items loaded: ${response.data!.orderItems.length} items found');
         setState(() {
           _orderItems = response.data!.orderItems;
-          _originalOrderItems = List.from(response.data!.orderItems); // Keep original for local filtering
+          _originalOrderItems = List.from(response.data!.orderItems);
           _isLoading = false;
         });
 
-        // Also update the provider cache for consistency
         _orderItemProvider.refreshCache();
       } else {
         debugPrint('❌ Failed to load order items: ${response.message}');
@@ -112,7 +108,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     }
   }
 
-  /// Show add order item dialog
   void _showAddOrderItemDialog() {
     debugPrint('➕ Opening Add Order Item Dialog');
     showDialog(
@@ -120,13 +115,11 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       barrierDismissible: false,
       builder: (context) => AddOrderItemDialog(initialOrderId: widget.order.id),
     ).then((_) {
-      // Sync order data after the dialog is closed
       debugPrint('➕ Add Order Item Dialog closed, syncing data');
       _syncOrderData();
     });
   }
 
-  /// Show edit order item dialog
   void _showEditOrderItemDialog(OrderItemModel orderItem) {
     debugPrint('✏️ Opening Edit Order Item Dialog for item: ${orderItem.id}');
     showDialog(
@@ -134,13 +127,11 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       barrierDismissible: false,
       builder: (context) => EditOrderItemDialog(orderItem: orderItem),
     ).then((_) {
-      // Sync order data after the dialog is closed
       debugPrint('✏️ Edit Order Item Dialog closed, syncing data');
       _syncOrderData();
     });
   }
 
-  /// Show delete order item dialog
   void _showDeleteOrderItemDialog(OrderItemModel orderItem) {
     debugPrint('🗑️ Opening Delete Order Item Dialog for item: ${orderItem.id}');
     showDialog(
@@ -148,13 +139,11 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       barrierDismissible: false,
       builder: (context) => DeleteOrderItemDialog(orderItem: orderItem),
     ).then((_) {
-      // Sync order data after the dialog is closed
       debugPrint('🗑️ Delete Order Item Dialog closed, syncing data');
       _syncOrderData();
     });
   }
 
-  /// Show view order item dialog
   void _showViewOrderItemDialog(OrderItemModel orderItem) {
     debugPrint('👁️ Opening View Order Item Dialog for item: ${orderItem.id}');
     showDialog(
@@ -164,7 +153,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     );
   }
 
-  /// Search order items using API for better performance
   Future<void> _searchOrderItems(String query) async {
     if (query.isEmpty) {
       await _loadOrderItems();
@@ -182,7 +170,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       if (response.success && response.data != null) {
         setState(() {
           _orderItems = response.data!.orderItems;
-          _originalOrderItems = List.from(response.data!.orderItems); // Update original list too
+          _originalOrderItems = List.from(response.data!.orderItems);
           _isLoading = false;
         });
         debugPrint('🔍 Search completed: ${_orderItems.length} items found');
@@ -202,22 +190,16 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     }
   }
 
-  /// Handle order items table refresh
   Future<void> _handleTableRefresh() async {
     debugPrint('🔄 Table refresh requested');
     await _syncOrderData();
   }
 
-  /// Sync order items and refresh parent order data
   Future<void> _syncOrderData() async {
     try {
-      // Refresh order items
       await _loadOrderItems();
 
-      // Also refresh the parent order data to get updated totals
-      // This will trigger a refresh in the parent order table
       if (mounted) {
-        // Notify parent to refresh order data
         final orderProvider = Provider.of<OrderProvider>(context, listen: false);
         await orderProvider.refreshOrders();
 
@@ -228,7 +210,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     }
   }
 
-  /// Handle search with debouncing for better performance
   void _handleSearch(String query) {
     setState(() {
       _searchQuery = query;
@@ -237,15 +218,12 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     debugPrint('🔍 Search query: "$_searchQuery" (length: ${_searchQuery.length})');
 
     if (_searchQuery.isEmpty) {
-      // If search is empty, restore original list
       setState(() {
         _orderItems = List.from(_originalOrderItems);
       });
     } else if (_searchQuery.length >= 3) {
-      // Only search API if query is 3+ characters
       _searchOrderItems(_searchQuery);
     } else {
-      // For short queries, filter locally
       final filteredItems = _originalOrderItems.where((item) {
         return item.productName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             item.customizationNotes.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -259,9 +237,9 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
     }
   }
 
-  /// Handle refresh button click
   Future<void> _handleRefresh() async {
-    // Clear search when refreshing
+    final l10n = AppLocalizations.of(context)!;
+
     if (_searchQuery.isNotEmpty) {
       _searchController.clear();
       _searchQuery = '';
@@ -277,7 +255,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order items refreshed successfully',
+                l10n.orderItemsRefreshedSuccessfully,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ],
@@ -292,13 +270,13 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   String _getOrderDisplayName() {
-    // Create a user-friendly order identifier
+    final l10n = AppLocalizations.of(context)!;
     final orderNumber = widget.order.id.substring(0, 8);
     final customerName = widget.order.customerName;
     final orderDate =
         '${widget.order.dateOrdered.day.toString().padLeft(2, '0')}/${widget.order.dateOrdered.month.toString().padLeft(2, '0')}/${widget.order.dateOrdered.year}';
 
-    return 'Order #$orderNumber - $customerName ($orderDate)';
+    return '${l10n.order} #$orderNumber - $customerName ($orderDate)';
   }
 
   @override
@@ -315,19 +293,10 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
         ),
         child: Column(
           children: [
-            // Header
             _buildHeader(),
-
-            // Search and Actions Section
             _buildSearchSection(),
-
-            // Active Search Section (show when search is active)
             if (_searchQuery.isNotEmpty) _buildActiveSearchSection(),
-
-            // Stats Section
             _buildStatsSection(),
-
-            // Order Items Table
             Expanded(child: _buildOrderItemsTable()),
           ],
         ),
@@ -336,6 +305,8 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 1.5),
       decoration: BoxDecoration(
@@ -348,13 +319,12 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       ),
       child: Row(
         children: [
-          // Order Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Order Items Management',
+                  l10n.orderItemsManagement,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headingFontSize / 2,
                     fontWeight: FontWeight.w700,
@@ -369,7 +339,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                 ),
                 SizedBox(height: context.smallPadding / 4),
                 Text(
-                  'Status: ${_getStatusText(widget.order.status)} • Total: PKR ${widget.order.totalAmount.toStringAsFixed(0)}',
+                  '${l10n.status}: ${_getStatusText(widget.order.status)} • ${l10n.total}: PKR ${widget.order.totalAmount.toStringAsFixed(0)}',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 if (kDebugMode) ...[
@@ -382,8 +352,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               ],
             ),
           ),
-
-          // Close Button
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(Icons.close_rounded, color: Colors.grey[600], size: context.iconSize('large')),
@@ -394,6 +362,8 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 3),
       decoration: BoxDecoration(
@@ -402,7 +372,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       ),
       child: Row(
         children: [
-          // Search Bar
           Expanded(
             flex: 3,
             child: SizedBox(
@@ -412,17 +381,17 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                 onChanged: _handleSearch,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 decoration: InputDecoration(
-                  hintText: 'Search order items by product, description, or notes...',
+                  hintText: l10n.searchOrderItemsByProductDescriptionOrNotes,
                   hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                   prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _handleSearch('');
-                          },
-                          icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
-                        )
+                    onPressed: () {
+                      _searchController.clear();
+                      _handleSearch('');
+                    },
+                    icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
+                  )
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -436,7 +405,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
 
           SizedBox(width: context.cardPadding),
 
-          // Add Order Item Button
           Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -455,7 +423,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add Item',
+                        l10n.addItem,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -472,7 +440,6 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
 
           SizedBox(width: context.smallPadding),
 
-          // Refresh Button
           Container(
             height: context.buttonHeight / 1.5,
             padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -490,7 +457,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                   Icon(Icons.refresh_rounded, color: Colors.grey[600], size: context.iconSize('medium')),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Refresh',
+                    l10n.refresh,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
@@ -503,6 +470,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   Widget _buildStatsSection() {
+    final l10n = AppLocalizations.of(context)!;
     final totalItems = _orderItems.length;
     final totalQuantity = _orderItems.fold<int>(0, (sum, item) => sum + item.quantity);
     final totalValue = _orderItems.fold<double>(0.0, (sum, item) => sum + item.lineTotal);
@@ -516,13 +484,13 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
       ),
       child: Row(
         children: [
-          Expanded(child: _buildStatsCard('Total Items', totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
+          Expanded(child: _buildStatsCard(l10n.totalItems, totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
           SizedBox(width: context.cardPadding / 2),
-          Expanded(child: _buildStatsCard('Active Items', activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
+          Expanded(child: _buildStatsCard(l10n.activeItems, activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
           SizedBox(width: context.cardPadding / 2),
-          Expanded(child: _buildStatsCard('Total Quantity', totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
+          Expanded(child: _buildStatsCard(l10n.totalQuantity, totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
           SizedBox(width: context.cardPadding / 2),
-          Expanded(child: _buildStatsCard('Total Value', 'PKR ${totalValue.toStringAsFixed(0)}', Icons.attach_money_rounded, Colors.orange)),
+          Expanded(child: _buildStatsCard(l10n.totalValue, 'PKR ${totalValue.toStringAsFixed(0)}', Icons.attach_money_rounded, Colors.orange)),
         ],
       ),
     );
@@ -584,6 +552,8 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   Widget _buildOrderItemsTable() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isLoading) {
       return Center(
         child: Column(
@@ -596,7 +566,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             ),
             SizedBox(height: context.mainPadding),
             Text(
-              'Loading order items...',
+              l10n.loadingOrderItems,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
           ],
@@ -612,7 +582,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             Icon(Icons.error_outline, size: context.iconSize('xl'), color: Colors.red[400]),
             SizedBox(height: context.mainPadding),
             Text(
-              'Error Loading Order Items',
+              l10n.errorLoadingOrderItems,
               style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
@@ -625,7 +595,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             ElevatedButton.icon(
               onPressed: _loadOrderItems,
               icon: Icon(Icons.refresh_rounded, color: AppTheme.pureWhite),
-              label: Text('Retry'),
+              label: Text(l10n.retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
@@ -645,12 +615,12 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             Icon(Icons.inventory_2_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
             SizedBox(height: context.mainPadding),
             Text(
-              'No Order Items Found',
+              l10n.noOrderItemsFound,
               style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
             Text(
-              'This order doesn\'t have any items yet. Add your first order item to get started.',
+              l10n.orderDoesntHaveItemsYet,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -658,7 +628,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             ElevatedButton.icon(
               onPressed: _showAddOrderItemDialog,
               icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite),
-              label: Text('Add First Item'),
+              label: Text(l10n.addFirstItem),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
@@ -683,24 +653,27 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   }
 
   String _getStatusText(OrderStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Pending';
+        return l10n.pending;
       case OrderStatus.CONFIRMED:
-        return 'Confirmed';
+        return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return 'In Production';
+        return l10n.inProduction;
       case OrderStatus.READY:
-        return 'Ready';
+        return l10n.ready;
       case OrderStatus.DELIVERED:
-        return 'Delivered';
+        return l10n.delivered;
       case OrderStatus.CANCELLED:
-        return 'Cancelled';
+        return l10n.cancelled;
     }
   }
 
-  /// Build active search section showing current search with clear option
   Widget _buildActiveSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 3),
       decoration: BoxDecoration(
@@ -712,7 +685,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
           Icon(Icons.search_rounded, color: Colors.green, size: context.iconSize('small')),
           SizedBox(width: context.smallPadding),
           Text(
-            'Active Search: "${_searchQuery}"',
+            '${l10n.activeSearch}: "$_searchQuery"',
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
           ),
           const Spacer(),
@@ -735,7 +708,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                   Icon(Icons.clear_rounded, color: Colors.red[700], size: context.iconSize('small')),
                   SizedBox(width: context.smallPadding / 2),
                   Text(
-                    'Clear Search',
+                    l10n.clearSearch,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
                   ),
                 ],

@@ -148,11 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.diamond_sharp,
-                        size: context.iconSize('special'),
-                        color: AppTheme.primaryMaroon,
-                      ),
+                      child: Image.asset('assets/images/logo.png'),
+
                     ),
 
                     SizedBox(height: context.mainPadding),

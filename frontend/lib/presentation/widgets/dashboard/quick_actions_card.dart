@@ -37,13 +37,15 @@ class QuickActionsCard extends StatelessWidget {
         'subtitle': l10n.viewAnalytics,
         'icon': Icons.analytics_rounded,
         'color': Colors.orange,
-        'gradient': [const Color(0xFFFFFF9800), const Color(0xFFFF57C00)],
+        'gradient': [const Color(0xFFFF9800), const Color(0xFFF57C00)],
       },
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
@@ -60,7 +62,6 @@ class QuickActionsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               Container(
@@ -79,7 +80,7 @@ class QuickActionsCard extends StatelessWidget {
               SizedBox(width: 1.5.w),
 
               Text(
-                AppLocalizations.of(context)!.quickActions,
+                l10n.quickActions,
                 style: GoogleFonts.inter(
                   fontSize: 2.2.sp,
                   fontWeight: FontWeight.w600,
@@ -91,7 +92,6 @@ class QuickActionsCard extends StatelessWidget {
 
           SizedBox(height: 2.h),
 
-          // Actions Grid
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -116,9 +116,7 @@ class QuickActionsCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          // Handle action tap
-        },
+        onTap: () {},
         borderRadius: BorderRadius.circular(1.5.w),
         child: Container(
           padding: EdgeInsets.all(1.5.w),
@@ -141,7 +139,6 @@ class QuickActionsCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Icon
               Container(
                 padding: EdgeInsets.all(0.8.w),
                 decoration: BoxDecoration(
@@ -151,7 +148,6 @@ class QuickActionsCard extends StatelessWidget {
                 child: Icon(action['icon'], color: Colors.white, size: 2.5.sp),
               ),
 
-              // Text
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

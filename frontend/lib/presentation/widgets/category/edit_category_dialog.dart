@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -69,6 +70,8 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<CategoryProvider>(context, listen: false);
 
@@ -86,6 +89,8 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -97,7 +102,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Category updated successfully!',
+              l10n.categoryUpdatedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -173,6 +178,8 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -206,7 +213,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Category' : 'Edit Category',
+                  l10n.editCategory,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -217,7 +224,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update category information',
+                    l10n.updateCategoryInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -229,7 +236,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
             ),
           ),
 
-          // Category ID Badge
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.smallPadding,
@@ -272,6 +278,8 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   Widget _buildFormContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -279,23 +287,22 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Category Name Field
             PremiumTextField(
-              label: 'Category Name',
+              label: l10n.categoryName,
               hint: context.shouldShowCompactLayout
-                  ? 'Enter category name'
-                  : 'Enter category name (e.g., Bridal Dresses)',
+                  ? l10n.enterCategoryName
+                  : l10n.enterCategoryNameHint,
               controller: _nameController,
               prefixIcon: Icons.label_outline,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a category name';
+                  return l10n.pleaseEnterCategoryName;
                 }
                 if (value!.length < 2) {
-                  return 'Category name must be at least 2 characters';
+                  return l10n.categoryNameMinLength;
                 }
                 if (value.length > 50) {
-                  return 'Category name must be less than 50 characters';
+                  return l10n.categoryNameMaxLength;
                 }
                 return null;
               },
@@ -303,12 +310,11 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
             SizedBox(height: context.cardPadding),
 
-            // Description Field
             PremiumTextField(
-              label: 'Description',
+              label: l10n.description,
               hint: context.shouldShowCompactLayout
-                  ? 'Enter description (optional)'
-                  : 'Enter category description (optional)',
+                  ? l10n.enterDescriptionOptional
+                  : l10n.enterCategoryDescriptionOptional,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: ResponsiveBreakpoints.responsive(
@@ -321,7 +327,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
               ),
               validator: (value) {
                 if (value != null && value.length > 200) {
-                  return 'Description must be less than 200 characters';
+                  return l10n.descriptionMaxLength;
                 }
                 return null;
               },
@@ -332,11 +338,10 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
             SizedBox(height: context.smallPadding),
 
-            // Character Count
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                '${_descriptionController.text.length}/200 characters',
+                '${_descriptionController.text.length}/200 ${l10n.characters}',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
@@ -349,7 +354,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
             SizedBox(height: context.smallPadding),
 
-            // Last Updated Info
             Container(
               padding: EdgeInsets.all(context.smallPadding),
               decoration: BoxDecoration(
@@ -366,7 +370,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Text(
-                      'Last updated: ${_formatDateTime(widget.category.lastEdited)}',
+                      '${l10n.lastUpdated}: ${_formatDateTime(widget.category.lastEdited)}',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w400,
@@ -380,7 +384,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
             SizedBox(height: context.mainPadding),
 
-            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -396,14 +399,15 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Update Button (full width)
         Consumer<CategoryProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Category',
+              text: l10n.updateCategory,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -415,9 +419,8 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
         SizedBox(height: context.cardPadding),
 
-        // Cancel Button (full width)
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -429,12 +432,13 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        // Cancel Button
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -445,12 +449,11 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
 
         SizedBox(width: context.cardPadding),
 
-        // Update Button
         Expanded(
           child: Consumer<CategoryProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Category',
+                text: l10n.updateCategory,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

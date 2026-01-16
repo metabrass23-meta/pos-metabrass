@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -21,7 +22,6 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter controllers
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
@@ -32,7 +32,6 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   String _selectedSortBy = 'name';
   String _selectedSortOrder = 'asc';
 
-  // Predefined options
   final List<String> _sortByOptions = ['name', 'price', 'quantity', 'created_at', 'updated_at'];
   final List<String> _sortOrderOptions = ['asc', 'desc'];
   final List<String> _stockLevelOptions = ['HIGH_STOCK', 'MEDIUM_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'];
@@ -41,7 +40,6 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   void initState() {
     super.initState();
 
-    // Initialize with current filters
     final currentFilters = context.read<ProductProvider>().currentFilters;
     _selectedCategoryId = currentFilters.categoryId;
     _selectedColor = currentFilters.color;
@@ -72,14 +70,14 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   void _handleApplyFilters() {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<ProductProvider>();
 
-    // Validate price range
     final minPrice = _minPriceController.text.isNotEmpty ? double.tryParse(_minPriceController.text) : null;
     final maxPrice = _maxPriceController.text.isNotEmpty ? double.tryParse(_maxPriceController.text) : null;
 
     if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
-      _showErrorSnackbar('Minimum price cannot be greater than maximum price');
+      _showErrorSnackbar(l10n.minPriceCannotBeGreaterThanMax);
       return;
     }
 
@@ -95,11 +93,13 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     );
 
     provider.applyFilters(filters);
-    _showSuccessSnackbar('Filters applied successfully');
+    _showSuccessSnackbar(l10n.filtersAppliedSuccessfully);
     Navigator.of(context).pop();
   }
 
   void _handleClearFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _selectedCategoryId = null;
       _selectedColor = null;
@@ -112,7 +112,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     });
 
     context.read<ProductProvider>().clearFilters();
-    _showSuccessSnackbar('Filters cleared');
+    _showSuccessSnackbar(l10n.filtersCleared);
     Navigator.of(context).pop();
   }
 
@@ -203,6 +203,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -225,7 +227,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter & Sort Products',
+                  l10n.filterAndSortProducts,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -236,7 +238,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your product list with advanced filters',
+                    l10n.refineYourProductList,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -264,38 +266,24 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Category Filter
-            _buildFilterSection(title: 'Product Category', icon: Icons.category_outlined, child: _buildCategoryFilter()),
-
+            _buildFilterSection(title: l10n.productCategory, icon: Icons.category_outlined, child: _buildCategoryFilter()),
             SizedBox(height: context.cardPadding),
-
-            // Color and Fabric Filters
-            _buildFilterSection(title: 'Product Attributes', icon: Icons.palette_outlined, child: _buildAttributeFilters()),
-
+            _buildFilterSection(title: l10n.productAttributes, icon: Icons.palette_outlined, child: _buildAttributeFilters()),
             SizedBox(height: context.cardPadding),
-
-            // Stock Level Filter
-            _buildFilterSection(title: 'Stock Level', icon: Icons.inventory_rounded, child: _buildStockLevelFilter()),
-
+            _buildFilterSection(title: l10n.stockLevel, icon: Icons.inventory_rounded, child: _buildStockLevelFilter()),
             SizedBox(height: context.cardPadding),
-
-            // Price Range Filter
-            _buildFilterSection(title: 'Price Range (PKR)', icon: Icons.attach_money_rounded, child: _buildPriceRangeFilter()),
-
+            _buildFilterSection(title: l10n.priceRangePKR, icon: Icons.attach_money_rounded, child: _buildPriceRangeFilter()),
             SizedBox(height: context.cardPadding),
-
-            // Sort Options
-            _buildFilterSection(title: 'Sort Options', icon: Icons.sort_rounded, child: _buildSortOptionsFilter()),
-
+            _buildFilterSection(title: l10n.sortOptions, icon: Icons.sort_rounded, child: _buildSortOptionsFilter()),
             SizedBox(height: context.mainPadding),
-
-            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -339,6 +327,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildCategoryFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ProductProvider>(
       builder: (context, provider, child) {
         return Wrap(
@@ -346,7 +336,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           runSpacing: context.smallPadding / 2,
           children: [
             _buildFilterChip(
-              label: 'All Categories',
+              label: l10n.allCategories,
               isSelected: _selectedCategoryId == null,
               onTap: () => setState(() => _selectedCategoryId = null),
             ),
@@ -354,11 +344,11 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
                 .where((category) => category.isActive)
                 .map(
                   (category) => _buildFilterChip(
-                    label: category.name,
-                    isSelected: _selectedCategoryId == category.id,
-                    onTap: () => setState(() => _selectedCategoryId = category.id),
-                  ),
-                ),
+                label: category.name,
+                isSelected: _selectedCategoryId == category.id,
+                onTap: () => setState(() => _selectedCategoryId = category.id),
+              ),
+            ),
           ],
         );
       },
@@ -366,14 +356,15 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildAttributeFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ProductProvider>(
       builder: (context, provider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Color Filter
             Text(
-              'Color',
+              l10n.color,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
@@ -381,17 +372,15 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               spacing: context.smallPadding,
               runSpacing: context.smallPadding / 2,
               children: [
-                _buildFilterChip(label: 'All Colors', isSelected: _selectedColor == null, onTap: () => setState(() => _selectedColor = null)),
+                _buildFilterChip(label: l10n.allColors, isSelected: _selectedColor == null, onTap: () => setState(() => _selectedColor = null)),
                 ...provider.availableColors.map(
-                  (color) => _buildFilterChip(label: color, isSelected: _selectedColor == color, onTap: () => setState(() => _selectedColor = color)),
+                      (color) => _buildFilterChip(label: color, isSelected: _selectedColor == color, onTap: () => setState(() => _selectedColor = color)),
                 ),
               ],
             ),
             SizedBox(height: context.cardPadding),
-
-            // Fabric Filter
             Text(
-              'Fabric',
+              l10n.fabric,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
@@ -399,9 +388,9 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               spacing: context.smallPadding,
               runSpacing: context.smallPadding / 2,
               children: [
-                _buildFilterChip(label: 'All Fabrics', isSelected: _selectedFabric == null, onTap: () => setState(() => _selectedFabric = null)),
+                _buildFilterChip(label: l10n.allFabrics, isSelected: _selectedFabric == null, onTap: () => setState(() => _selectedFabric = null)),
                 ...provider.availableFabrics.map(
-                  (fabric) =>
+                      (fabric) =>
                       _buildFilterChip(label: fabric, isSelected: _selectedFabric == fabric, onTap: () => setState(() => _selectedFabric = fabric)),
                 ),
               ],
@@ -413,28 +402,30 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildStockLevelFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Wrap(
       spacing: context.smallPadding,
       runSpacing: context.smallPadding / 2,
       children: [
-        _buildFilterChip(label: 'All Stock Levels', isSelected: _selectedStockLevel == null, onTap: () => setState(() => _selectedStockLevel = null)),
+        _buildFilterChip(label: l10n.allStockLevels, isSelected: _selectedStockLevel == null, onTap: () => setState(() => _selectedStockLevel = null)),
         _buildFilterChip(
-          label: 'In Stock (High)',
+          label: l10n.inStockHigh,
           isSelected: _selectedStockLevel == 'HIGH_STOCK',
           onTap: () => setState(() => _selectedStockLevel = 'HIGH_STOCK'),
         ),
         _buildFilterChip(
-          label: 'Medium Stock',
+          label: l10n.mediumStock,
           isSelected: _selectedStockLevel == 'MEDIUM_STOCK',
           onTap: () => setState(() => _selectedStockLevel = 'MEDIUM_STOCK'),
         ),
         _buildFilterChip(
-          label: 'Low Stock',
+          label: l10n.lowStock,
           isSelected: _selectedStockLevel == 'LOW_STOCK',
           onTap: () => setState(() => _selectedStockLevel = 'LOW_STOCK'),
         ),
         _buildFilterChip(
-          label: 'Out of Stock',
+          label: l10n.outOfStock,
           isSelected: _selectedStockLevel == 'OUT_OF_STOCK',
           onTap: () => setState(() => _selectedStockLevel = 'OUT_OF_STOCK'),
         ),
@@ -443,6 +434,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildPriceRangeFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -450,7 +443,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           children: [
             Expanded(
               child: PremiumTextField(
-                label: 'Min Price',
+                label: l10n.minPrice,
                 hint: '0',
                 controller: _minPriceController,
                 prefixIcon: Icons.attach_money_rounded,
@@ -460,8 +453,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             SizedBox(width: context.cardPadding),
             Expanded(
               child: PremiumTextField(
-                label: 'Max Price',
-                hint: 'No limit',
+                label: l10n.maxPrice,
+                hint: l10n.noLimit,
                 controller: _maxPriceController,
                 prefixIcon: Icons.attach_money_rounded,
                 keyboardType: TextInputType.number,
@@ -474,12 +467,13 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildSortOptionsFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Sort By
         Text(
-          'Sort By',
+          l10n.sortBy,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
@@ -487,26 +481,24 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           spacing: context.smallPadding,
           runSpacing: context.smallPadding / 2,
           children: [
-            _buildFilterChip(label: 'Name', isSelected: _selectedSortBy == 'name', onTap: () => setState(() => _selectedSortBy = 'name')),
-            _buildFilterChip(label: 'Price', isSelected: _selectedSortBy == 'price', onTap: () => setState(() => _selectedSortBy = 'price')),
-            _buildFilterChip(label: 'Quantity', isSelected: _selectedSortBy == 'quantity', onTap: () => setState(() => _selectedSortBy = 'quantity')),
+            _buildFilterChip(label: l10n.name, isSelected: _selectedSortBy == 'name', onTap: () => setState(() => _selectedSortBy = 'name')),
+            _buildFilterChip(label: l10n.price, isSelected: _selectedSortBy == 'price', onTap: () => setState(() => _selectedSortBy = 'price')),
+            _buildFilterChip(label: l10n.quantity, isSelected: _selectedSortBy == 'quantity', onTap: () => setState(() => _selectedSortBy = 'quantity')),
             _buildFilterChip(
-              label: 'Date Created',
+              label: l10n.dateCreated,
               isSelected: _selectedSortBy == 'created_at',
               onTap: () => setState(() => _selectedSortBy = 'created_at'),
             ),
             _buildFilterChip(
-              label: 'Date Updated',
+              label: l10n.dateUpdated,
               isSelected: _selectedSortBy == 'updated_at',
               onTap: () => setState(() => _selectedSortBy = 'updated_at'),
             ),
           ],
         ),
         SizedBox(height: context.cardPadding),
-
-        // Sort Order
         Text(
-          'Sort Order',
+          l10n.sortOrder,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
@@ -514,8 +506,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           spacing: context.smallPadding,
           runSpacing: context.smallPadding / 2,
           children: [
-            _buildFilterChip(label: 'Ascending', isSelected: _selectedSortOrder == 'asc', onTap: () => setState(() => _selectedSortOrder = 'asc')),
-            _buildFilterChip(label: 'Descending', isSelected: _selectedSortOrder == 'desc', onTap: () => setState(() => _selectedSortOrder = 'desc')),
+            _buildFilterChip(label: l10n.ascending, isSelected: _selectedSortOrder == 'asc', onTap: () => setState(() => _selectedSortOrder = 'asc')),
+            _buildFilterChip(label: l10n.descending, isSelected: _selectedSortOrder == 'desc', onTap: () => setState(() => _selectedSortOrder = 'desc')),
           ],
         ),
       ],
@@ -546,11 +538,13 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
@@ -558,7 +552,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Clear All Filters',
+          text: l10n.clearAllFilters,
           onPressed: _handleClearFilters,
           height: context.buttonHeight,
           icon: Icons.clear_all_rounded,
@@ -568,7 +562,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         ),
         SizedBox(height: context.smallPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           isOutlined: true,
@@ -580,11 +574,13 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -595,7 +591,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.clear_all_rounded,
@@ -608,7 +604,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,

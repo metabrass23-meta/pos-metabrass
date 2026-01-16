@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/models/customer/customer_model.dart';
@@ -177,14 +178,16 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedCustomer == null) {
-        _showErrorSnackbar('Please select a customer');
+        _showErrorSnackbar(l10n.pleaseSelectSale);
         return;
       }
 
       if (_orderItems.isEmpty) {
-        _showErrorSnackbar('Please add at least one product to the order');
+        _showErrorSnackbar(l10n.addProductsToStartSale);
         return;
       }
 
@@ -205,30 +208,34 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           await _animationController.reverse();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(_getUserFriendlyErrorMessage(provider.errorMessage ?? 'Failed to create order'));
+          _showErrorSnackbar(_getUserFriendlyErrorMessage(provider.errorMessage ?? l10n.error));
         }
       }
     }
   }
 
   String _getUserFriendlyErrorMessage(String errorMessage) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (errorMessage.contains('Invalid customer')) {
-      return 'Please select a valid customer for this order.';
+      return l10n.pleaseSelectSale;
     } else if (errorMessage.contains('Date has wrong format')) {
-      return 'Invalid date format. Please select a valid delivery date.';
+      return '${l10n.dueDate} ${l10n.error}';
     } else if (errorMessage.contains('cannot be before order date')) {
-      return 'Delivery date cannot be before the order date.';
+      return '${l10n.dueDate} ${l10n.error}';
     } else if (errorMessage.contains('cannot be negative')) {
-      return 'Advance payment cannot be negative.';
+      return '${l10n.advancePayment} ${l10n.error}';
     } else if (errorMessage.contains('not active')) {
-      return 'The selected customer is not active. Please choose another customer.';
+      return l10n.pleaseSelectSale;
     } else if (errorMessage.contains('not a valid choice')) {
-      return 'Invalid status selected. Please choose a valid status.';
+      return '${l10n.status} ${l10n.error}';
     }
     return errorMessage;
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -236,7 +243,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Order created successfully!',
+              '${l10n.orders} ${l10n.success}!',
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -281,6 +288,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -328,6 +337,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildEnhancedHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -357,7 +368,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Order' : 'Add New Order',
+                  context.shouldShowCompactLayout ? l10n.newOrder : '${l10n.add} ${l10n.orders}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -368,7 +379,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new customer order',
+                    l10n.createOrder,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -400,6 +411,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildProgressIndicator() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.cardPadding,
@@ -416,11 +429,11 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
       ),
       child: Row(
         children: [
-          _buildStepIndicator(0, 'Details', Icons.info_outline),
+          _buildStepIndicator(0, l10n.info, Icons.info_outline),
           _buildStepConnector(0),
-          _buildStepIndicator(1, 'Products', Icons.shopping_bag_outlined),
+          _buildStepIndicator(1, l10n.products, Icons.shopping_bag_outlined),
           _buildStepConnector(1),
-          _buildStepIndicator(2, 'Review', Icons.check_circle_outline),
+          _buildStepIndicator(2, l10n.view, Icons.check_circle_outline),
         ],
       ),
     );
@@ -514,13 +527,15 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildStep1CustomerDetails() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       controller: _scrollController,
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStepTitle('Customer & Order Details', Icons.person_outline),
+          _buildStepTitle('${l10n.customer} & ${l10n.orders}', Icons.person_outline),
           SizedBox(height: context.cardPadding),
 
           // Customer Selection Card
@@ -528,13 +543,13 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Select Customer', Icons.person_search_rounded),
+                _buildSectionTitle(l10n.selectCustomer, Icons.person_search_rounded),
                 SizedBox(height: context.cardPadding),
                 Consumer<CustomerProvider>(
                   builder: (context, customerProvider, child) {
                     return PremiumDropdownField<Customer>(
-                      label: 'Customer *',
-                      hint: 'Choose a customer for this order',
+                      label: '${l10n.customer} *',
+                      hint: l10n.selectCustomer,
                       items: customerProvider.customers
                           .map((customer) => DropdownItem<Customer>(
                           value: customer,
@@ -545,7 +560,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       onChanged: _handleCustomerChange,
                       validator: (value) {
                         if (value == null) {
-                          return 'Please select a customer';
+                          return l10n.pleaseSelectSale;
                         }
                         return null;
                       },
@@ -569,23 +584,23 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Order Information', Icons.description_outlined),
+                _buildSectionTitle(l10n.info, Icons.description_outlined),
                 SizedBox(height: context.cardPadding),
                 PremiumTextField(
-                  label: 'Order Description *',
-                  hint: 'Describe the order details, specifications, or requirements',
+                  label: '${l10n.notes} *',
+                  hint: l10n.additionalReceiptNotes,
                   controller: _descriptionController,
                   prefixIcon: Icons.description_outlined,
                   maxLines: context.shouldShowCompactLayout ? 3 : 4,
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter order description';
+                      return l10n.pleaseSelectSale;
                     }
                     if (value!.length < 10) {
-                      return 'Description must be at least 10 characters';
+                      return '${l10n.notes} 10 ${l10n.items}';
                     }
                     if (value.length > 500) {
-                      return 'Description must be less than 500 characters';
+                      return '${l10n.notes} 500 ${l10n.items}';
                     }
                     return null;
                   },
@@ -594,7 +609,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                 SizedBox(height: context.cardPadding),
 
                 Text(
-                  'Order Status',
+                  l10n.status,
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -616,19 +631,21 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildStep2ProductSelection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStepTitle('Product Selection', Icons.shopping_cart_outlined),
+          _buildStepTitle(l10n.products, Icons.shopping_cart_outlined),
           SizedBox(height: context.cardPadding),
 
           _buildFormCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Add Products', Icons.add_shopping_cart),
+                _buildSectionTitle('${l10n.add} ${l10n.products}', Icons.add_shopping_cart),
                 SizedBox(height: context.cardPadding),
 
                 SizedBox(
@@ -641,7 +658,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                         size: context.iconSize('medium')
                     ),
                     label: Text(
-                      'Add Products to Order',
+                      '${l10n.add} ${l10n.products}',
                       style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600
@@ -674,7 +691,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       ),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Selected Products (${_orderItems.length})',
+                        '${l10n.products} (${_orderItems.length})',
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -702,24 +719,24 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Financial Details', Icons.account_balance_wallet_outlined),
+                  _buildSectionTitle(l10n.payment, Icons.account_balance_wallet_outlined),
                   SizedBox(height: context.cardPadding),
 
                   PremiumTextField(
-                    label: 'Total Amount (PKR) *',
-                    hint: 'Total order amount',
+                    label: '${l10n.total} ${l10n.amount} (PKR) *',
+                    hint: l10n.amount,
                     controller: _totalAmountController,
                     prefixIcon: Icons.attach_money_rounded,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
-                        return 'Please enter total amount';
+                        return l10n.paidAmount;
                       }
                       if (double.tryParse(value!) == null) {
-                        return 'Please enter a valid amount';
+                        return l10n.amount;
                       }
                       if (double.parse(value) <= 0) {
-                        return 'Amount must be greater than 0';
+                        return '${l10n.amount} > 0';
                       }
                       return null;
                     },
@@ -728,23 +745,23 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                   SizedBox(height: context.cardPadding),
 
                   PremiumTextField(
-                    label: 'Advance Payment (PKR)',
-                    hint: 'Enter advance payment (optional)',
+                    label: '${l10n.advancePayment} (PKR)',
+                    hint: l10n.advancePayment,
                     controller: _advancePaymentController,
                     prefixIcon: Icons.payment_rounded,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
                         if (double.tryParse(value) == null) {
-                          return 'Please enter a valid amount';
+                          return l10n.amount;
                         }
                         final advance = double.parse(value);
                         final total = double.tryParse(_totalAmountController.text) ?? 0;
                         if (advance < 0) {
-                          return 'Advance payment cannot be negative';
+                          return '${l10n.advancePayment} ${l10n.error}';
                         }
                         if (advance > total) {
-                          return 'Advance payment cannot exceed total amount';
+                          return '${l10n.advancePayment} ${l10n.error}';
                         }
                       }
                       return null;
@@ -760,12 +777,14 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildStep3ReviewOrder() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStepTitle('Review & Confirm', Icons.check_circle_outline),
+          _buildStepTitle('${l10n.view} & ${l10n.confirm}', Icons.check_circle_outline),
           SizedBox(height: context.cardPadding),
 
           // Order Summary Card
@@ -773,31 +792,31 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Order Summary', Icons.summarize_outlined),
+                _buildSectionTitle(l10n.salesOverview, Icons.summarize_outlined),
                 SizedBox(height: context.cardPadding),
 
                 if (_selectedCustomer != null) ...[
-                  _buildSummaryRow('Customer', _selectedCustomer!.name, Icons.person),
-                  _buildSummaryRow('Phone', _selectedCustomer!.phone, Icons.phone),
-                  _buildSummaryRow('Email', _selectedCustomer!.email, Icons.email),
+                  _buildSummaryRow(l10n.customer, _selectedCustomer!.name, Icons.person),
+                  _buildSummaryRow(l10n.phone, _selectedCustomer!.phone, Icons.phone),
+                  _buildSummaryRow(l10n.email, _selectedCustomer!.email, Icons.email),
                   Divider(height: context.cardPadding * 2),
                 ],
 
-                _buildSummaryRow('Description', _descriptionController.text, Icons.description),
-                _buildSummaryRow('Status', _getStatusText(_selectedStatus), Icons.info,
+                _buildSummaryRow(l10n.notes, _descriptionController.text, Icons.description),
+                _buildSummaryRow(l10n.status, _getStatusText(_selectedStatus), Icons.info,
                     valueColor: _getStatusColor(_selectedStatus)),
-                _buildSummaryRow('Products', '${_orderItems.length} items', Icons.shopping_bag),
-                _buildSummaryRow('Total Amount', 'PKR ${_totalAmount.toStringAsFixed(2)}', Icons.attach_money,
+                _buildSummaryRow(l10n.products, '${_orderItems.length} ${l10n.items}', Icons.shopping_bag),
+                _buildSummaryRow('${l10n.total} ${l10n.amount}', 'PKR ${_totalAmount.toStringAsFixed(2)}', Icons.attach_money,
                     valueColor: AppTheme.primaryMaroon, isBold: true),
 
                 if (_advancePaymentController.text.isNotEmpty) ...[
-                  _buildSummaryRow('Advance Payment',
+                  _buildSummaryRow(l10n.advancePayment,
                       'PKR ${double.tryParse(_advancePaymentController.text)?.toStringAsFixed(2) ?? '0.00'}',
                       Icons.payment),
                 ],
 
                 if (_selectedDeliveryDate != null) ...[
-                  _buildSummaryRow('Expected Delivery',
+                  _buildSummaryRow(l10n.dueDate,
                       '${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}',
                       Icons.calendar_today),
                 ],
@@ -812,7 +831,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Delivery Information', Icons.local_shipping_outlined),
+                _buildSectionTitle(l10n.delivered, Icons.local_shipping_outlined),
                 SizedBox(height: context.cardPadding),
 
                 InkWell(
@@ -820,7 +839,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     await context.showSyncfusionDateTimePicker(
                       initialDate: _selectedDeliveryDate ?? DateTime.now().add(const Duration(days: 1)),
                       initialTime: TimeOfDay.now(),
-                      title: 'Select Expected Delivery Date',
+                      title: l10n.dueDate,
                       minDate: DateTime.now(),
                       maxDate: DateTime.now().add(const Duration(days: 365)),
                       showTimeInline: false,
@@ -848,8 +867,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                         Expanded(
                           child: Text(
                             _selectedDeliveryDate != null
-                                ? 'Expected Delivery: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
-                                : 'Select Expected Delivery Date (Optional)',
+                                ? '${l10n.dueDate}: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
+                                : l10n.dueDate,
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               color: _selectedDeliveryDate != null
@@ -1017,8 +1036,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     ),
                   ],
                 ),
-                if (!context.shouldShowCompactLayout) ...[
-                  SizedBox(height: context.smallPadding),
+                if (!context.shouldShowCompactLayout) ...[ SizedBox(height: context.smallPadding),
                   Row(
                     children: [
                       Icon(Icons.phone, size: 14, color: AppTheme.lightGray),
@@ -1099,6 +1117,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildProductCard(OrderItemModel item) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: EdgeInsets.only(bottom: context.smallPadding),
       padding: EdgeInsets.all(context.cardPadding),
@@ -1155,7 +1175,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       ),
                       child: Text(
-                        'Qty: ${item.quantity}',
+                        '${l10n.quantity}: ${item.quantity}',
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
@@ -1165,7 +1185,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     ),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'PKR ${item.unitPrice.toStringAsFixed(2)} each',
+                      'PKR ${item.unitPrice.toStringAsFixed(2)}',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[700],
@@ -1176,7 +1196,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                 if (item.customizationNotes.isNotEmpty) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Notes: ${item.customizationNotes}',
+                    '${l10n.notes}: ${item.customizationNotes}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       color: Colors.grey[600],
@@ -1233,6 +1253,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildTotalAmountCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -1259,7 +1281,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Total Amount:',
+                '${l10n.total} ${l10n.amount}:',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -1282,6 +1304,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildEmptyProductsState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding * 2),
       decoration: BoxDecoration(
@@ -1298,7 +1322,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'No Products Selected',
+            l10n.noProductsFound,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
@@ -1307,7 +1331,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Click "Add Products to Order" to start building your order.',
+            l10n.addProductsToStartSale,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
@@ -1355,6 +1379,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   Widget _buildNavigationButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -1371,7 +1397,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           if (_currentStep > 0) ...[
             Expanded(
               child: PremiumButton(
-                text: 'Previous',
+                text: l10n.cancel,
                 onPressed: _previousStep,
                 isOutlined: true,
                 height: context.buttonHeight,
@@ -1387,7 +1413,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             flex: _currentStep == 0 ? 1 : 2,
             child: _currentStep < 2
                 ? PremiumButton(
-              text: _currentStep == 0 ? 'Next: Products' : 'Next: Review',
+              text: _currentStep == 0 ? '${l10n.products}' : l10n.view,
               onPressed: _canProceedToNextStep() ? _nextStep : null,
               height: context.buttonHeight,
               backgroundColor: AppTheme.primaryMaroon,
@@ -1396,7 +1422,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                 : Consumer<OrderProvider>(
               builder: (context, provider, child) {
                 return PremiumButton(
-                  text: 'Create Order',
+                  text: l10n.createOrder,
                   onPressed: provider.isLoading ? null : _handleSubmit,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight,
@@ -1430,19 +1456,21 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   String _getStatusText(OrderStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Pending';
+        return l10n.draft;
       case OrderStatus.CONFIRMED:
-        return 'Confirmed';
+        return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return 'In Production';
+        return l10n.processPayment;
       case OrderStatus.READY:
-        return 'Ready';
+        return l10n.status;
       case OrderStatus.DELIVERED:
-        return 'Delivered';
+        return l10n.delivered;
       case OrderStatus.CANCELLED:
-        return 'Cancelled';
+        return l10n.cancelled;
     }
   }
 
@@ -1464,6 +1492,8 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
   }
 
   void _showProductSelectionDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       barrierDismissible: true,
@@ -1533,7 +1563,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               children: [
                 Icon(Icons.check_circle, color: AppTheme.pureWhite),
                 SizedBox(width: context.smallPadding),
-                Text('${product.name} added to order'),
+                Text('${product.name} ${l10n.add}'),
               ],
             ),
             backgroundColor: Colors.green,

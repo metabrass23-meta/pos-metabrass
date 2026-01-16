@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossDashboardSection extends StatelessWidget {
   const ProfitLossDashboardSection({super.key});
@@ -32,6 +33,8 @@ class ProfitLossDashboardSection extends StatelessWidget {
   }
 
   Widget _buildLoadingState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -39,7 +42,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
           CircularProgressIndicator(color: AppTheme.primaryMaroon),
           SizedBox(height: context.cardPadding),
           Text(
-            'Loading dashboard data...',
+            l10n.loadingDashboardData,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
           ),
         ],
@@ -50,17 +53,16 @@ class ProfitLossDashboardSection extends StatelessWidget {
   Widget _buildDesktopDashboard(BuildContext context, dynamic dashboard) {
     return Column(
       children: [
-        // Growth Metrics Row
         Row(
           children: [
             Expanded(
-              child: _buildGrowthMetricCard(context, 'Sales Growth', dashboard.growthMetrics.salesGrowth, Icons.trending_up_rounded, Colors.green),
+              child: _buildGrowthMetricCard(context, 'salesGrowth', dashboard.growthMetrics.salesGrowth, Icons.trending_up_rounded, Colors.green),
             ),
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildGrowthMetricCard(
                 context,
-                'Expense Growth',
+                'expenseGrowth',
                 dashboard.growthMetrics.expenseGrowth,
                 Icons.trending_down_rounded,
                 Colors.red,
@@ -70,7 +72,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
             Expanded(
               child: _buildGrowthMetricCard(
                 context,
-                'Profit Growth',
+                'profitGrowth',
                 dashboard.growthMetrics.profitGrowth,
                 Icons.analytics_rounded,
                 AppTheme.primaryMaroon,
@@ -81,18 +83,16 @@ class ProfitLossDashboardSection extends StatelessWidget {
 
         SizedBox(height: context.cardPadding),
 
-        // Period Comparison Row
         Row(
           children: [
-            Expanded(child: _buildPeriodComparisonCard(context, 'Current Month', dashboard.currentMonth, true)),
+            Expanded(child: _buildPeriodComparisonCard(context, 'currentMonth', dashboard.currentMonth, true)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildPeriodComparisonCard(context, 'Previous Month', dashboard.previousMonth, false)),
+            Expanded(child: _buildPeriodComparisonCard(context, 'previousMonth', dashboard.previousMonth, false)),
           ],
         ),
 
         SizedBox(height: context.cardPadding),
 
-        // Trends and Expense Breakdown
         Row(
           children: [
             Expanded(flex: 2, child: _buildTrendsCard(context, dashboard.trends)),
@@ -107,22 +107,12 @@ class ProfitLossDashboardSection extends StatelessWidget {
   Widget _buildTabletDashboard(BuildContext context, dynamic dashboard) {
     return Column(
       children: [
-        // Growth Metrics
         _buildGrowthMetricsRow(context, dashboard.growthMetrics),
-
         SizedBox(height: context.cardPadding),
-
-        // Period Comparison
         _buildPeriodComparisonRow(context, dashboard.currentMonth, dashboard.previousMonth),
-
         SizedBox(height: context.cardPadding),
-
-        // Trends
         _buildTrendsCard(context, dashboard.trends),
-
         SizedBox(height: context.cardPadding),
-
-        // Expense Breakdown
         _buildExpenseBreakdownCard(context, dashboard.expenseBreakdown),
       ],
     );
@@ -131,22 +121,12 @@ class ProfitLossDashboardSection extends StatelessWidget {
   Widget _buildMobileDashboard(BuildContext context, dynamic dashboard) {
     return Column(
       children: [
-        // Growth Metrics
         _buildGrowthMetricsRow(context, dashboard.growthMetrics),
-
         SizedBox(height: context.cardPadding),
-
-        // Period Comparison
         _buildPeriodComparisonRow(context, dashboard.currentMonth, dashboard.previousMonth),
-
         SizedBox(height: context.cardPadding),
-
-        // Trends
         _buildTrendsCard(context, dashboard.trends),
-
         SizedBox(height: context.cardPadding),
-
-        // Expense Breakdown
         _buildExpenseBreakdownCard(context, dashboard.expenseBreakdown),
       ],
     );
@@ -155,11 +135,11 @@ class ProfitLossDashboardSection extends StatelessWidget {
   Widget _buildGrowthMetricsRow(BuildContext context, dynamic growthMetrics) {
     return Row(
       children: [
-        Expanded(child: _buildGrowthMetricCard(context, 'Sales', growthMetrics.salesGrowth, Icons.trending_up_rounded, Colors.green)),
+        Expanded(child: _buildGrowthMetricCard(context, 'sales', growthMetrics.salesGrowth, Icons.trending_up_rounded, Colors.green)),
         SizedBox(width: context.smallPadding),
-        Expanded(child: _buildGrowthMetricCard(context, 'Expenses', growthMetrics.expenseGrowth, Icons.trending_down_rounded, Colors.red)),
+        Expanded(child: _buildGrowthMetricCard(context, 'expenses', growthMetrics.expenseGrowth, Icons.trending_down_rounded, Colors.red)),
         SizedBox(width: context.smallPadding),
-        Expanded(child: _buildGrowthMetricCard(context, 'Profit', growthMetrics.profitGrowth, Icons.analytics_rounded, AppTheme.primaryMaroon)),
+        Expanded(child: _buildGrowthMetricCard(context, 'profit', growthMetrics.profitGrowth, Icons.analytics_rounded, AppTheme.primaryMaroon)),
       ],
     );
   }
@@ -167,16 +147,41 @@ class ProfitLossDashboardSection extends StatelessWidget {
   Widget _buildPeriodComparisonRow(BuildContext context, dynamic currentMonth, dynamic previousMonth) {
     return Row(
       children: [
-        Expanded(child: _buildPeriodComparisonCard(context, 'Current', currentMonth, true)),
+        Expanded(child: _buildPeriodComparisonCard(context, 'current', currentMonth, true)),
         SizedBox(width: context.smallPadding),
-        Expanded(child: _buildPeriodComparisonCard(context, 'Previous', previousMonth, false)),
+        Expanded(child: _buildPeriodComparisonCard(context, 'previous', previousMonth, false)),
       ],
     );
   }
 
-  Widget _buildGrowthMetricCard(BuildContext context, String title, double growth, IconData icon, Color color) {
+  Widget _buildGrowthMetricCard(BuildContext context, String titleKey, double growth, IconData icon, Color color) {
+    final l10n = AppLocalizations.of(context)!;
     final isPositive = growth > 0;
     final isNegative = growth < 0;
+
+    String title;
+    switch (titleKey) {
+      case 'salesGrowth':
+        title = l10n.salesGrowth;
+        break;
+      case 'expenseGrowth':
+        title = l10n.expenseGrowth;
+        break;
+      case 'profitGrowth':
+        title = l10n.profitGrowth;
+        break;
+      case 'sales':
+        title = l10n.sales;
+        break;
+      case 'expenses':
+        title = l10n.expenses;
+        break;
+      case 'profit':
+        title = l10n.profit;
+        break;
+      default:
+        title = titleKey;
+    }
 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
@@ -230,10 +235,10 @@ class ProfitLossDashboardSection extends StatelessWidget {
               SizedBox(width: context.smallPadding / 2),
               Text(
                 isPositive
-                    ? 'Increased'
+                    ? l10n.increased
                     : isNegative
-                    ? 'Decreased'
-                    : 'No Change',
+                    ? l10n.decreased
+                    : l10n.noChange,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   color: isPositive
@@ -250,7 +255,27 @@ class ProfitLossDashboardSection extends StatelessWidget {
     );
   }
 
-  Widget _buildPeriodComparisonCard(BuildContext context, String title, dynamic periodData, bool isCurrent) {
+  Widget _buildPeriodComparisonCard(BuildContext context, String titleKey, dynamic periodData, bool isCurrent) {
+    final l10n = AppLocalizations.of(context)!;
+
+    String title;
+    switch (titleKey) {
+      case 'currentMonth':
+        title = l10n.currentMonth;
+        break;
+      case 'previousMonth':
+        title = l10n.previousMonth;
+        break;
+      case 'current':
+        title = l10n.current;
+        break;
+      case 'previous':
+        title = l10n.previous;
+        break;
+      default:
+        title = titleKey;
+    }
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -277,32 +302,30 @@ class ProfitLossDashboardSection extends StatelessWidget {
           ),
           SizedBox(height: context.cardPadding),
 
-          // Sales Income
-          _buildMetricRow(context, 'Sales', 'PKR ${periodData.salesIncome.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
+          _buildMetricRow(context, l10n.sales, 'PKR ${periodData.salesIncome.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
           SizedBox(height: context.smallPadding),
 
-          // Expenses
-          _buildMetricRow(context, 'Expenses', 'PKR ${periodData.totalExpenses.toStringAsFixed(0)}', Icons.trending_down_rounded, Colors.red),
+          _buildMetricRow(context, l10n.expenses, 'PKR ${periodData.totalExpenses.toStringAsFixed(0)}', Icons.trending_down_rounded, Colors.red),
           SizedBox(height: context.smallPadding),
 
-          // Net Profit
           _buildMetricRow(
             context,
-            'Net Profit',
+            l10n.netProfit,
             'PKR ${periodData.netProfit.toStringAsFixed(0)}',
             Icons.analytics_rounded,
             periodData.netProfit > 0 ? Colors.green : Colors.red,
           ),
           SizedBox(height: context.smallPadding),
 
-          // Products Sold
-          _buildMetricRow(context, 'Products', periodData.productsSold.toString(), Icons.inventory_2_rounded, AppTheme.primaryMaroon),
+          _buildMetricRow(context, l10n.products, periodData.productsSold.toString(), Icons.inventory_2_rounded, AppTheme.primaryMaroon),
         ],
       ),
     );
   }
 
   Widget _buildTrendsCard(BuildContext context, dynamic trends) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -318,22 +341,24 @@ class ProfitLossDashboardSection extends StatelessWidget {
               Icon(Icons.trending_up_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Business Trends',
+                l10n.businessTrends,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildTrendIndicator(context, 'Sales Trend', trends.salesTrend, Icons.trending_up_rounded),
+          _buildTrendIndicator(context, l10n.salesTrend, trends.salesTrend, Icons.trending_up_rounded),
           SizedBox(height: context.smallPadding),
-          _buildTrendIndicator(context, 'Profit Trend', trends.profitTrend, Icons.analytics_rounded),
+          _buildTrendIndicator(context, l10n.profitTrend, trends.profitTrend, Icons.analytics_rounded),
         ],
       ),
     );
   }
 
   Widget _buildTrendIndicator(BuildContext context, String label, String trend, IconData icon) {
+    final l10n = AppLocalizations.of(context)!;
+
     Color color;
     IconData trendIcon;
     String status;
@@ -342,17 +367,17 @@ class ProfitLossDashboardSection extends StatelessWidget {
       case 'increasing':
         color = Colors.green;
         trendIcon = Icons.arrow_upward;
-        status = 'Increasing';
+        status = l10n.increasing;
         break;
       case 'decreasing':
         color = Colors.red;
         trendIcon = Icons.arrow_downward;
-        status = 'Decreasing';
+        status = l10n.decreasing;
         break;
       default:
         color = Colors.orange;
         trendIcon = Icons.remove;
-        status = 'Stable';
+        status = l10n.stable;
     }
 
     return Row(
@@ -376,6 +401,8 @@ class ProfitLossDashboardSection extends StatelessWidget {
   }
 
   Widget _buildExpenseBreakdownCard(BuildContext context, dynamic expenseBreakdown) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -391,20 +418,20 @@ class ProfitLossDashboardSection extends StatelessWidget {
               Icon(Icons.pie_chart_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Expense Breakdown',
+                l10n.expenseBreakdown,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildExpenseItem(context, 'Labor Payments', expenseBreakdown.laborPayments, Icons.people_rounded, Colors.blue),
+          _buildExpenseItem(context, l10n.laborPayments, expenseBreakdown.laborPayments, Icons.people_rounded, Colors.blue),
           SizedBox(height: context.smallPadding),
-          _buildExpenseItem(context, 'Vendor Payments', expenseBreakdown.vendorPayments, Icons.store_rounded, Colors.orange),
+          _buildExpenseItem(context, l10n.vendorPayments, expenseBreakdown.vendorPayments, Icons.store_rounded, Colors.orange),
           SizedBox(height: context.smallPadding),
-          _buildExpenseItem(context, 'Other Expenses', expenseBreakdown.otherExpenses, Icons.receipt_long_rounded, Colors.red),
+          _buildExpenseItem(context, l10n.otherExpenses, expenseBreakdown.otherExpenses, Icons.receipt_long_rounded, Colors.red),
           SizedBox(height: context.smallPadding),
-          _buildExpenseItem(context, 'Zakat', expenseBreakdown.zakat, Icons.volunteer_activism_rounded, Colors.green),
+          _buildExpenseItem(context, l10n.zakat, expenseBreakdown.zakat, Icons.volunteer_activism_rounded, Colors.green),
         ],
       ),
     );

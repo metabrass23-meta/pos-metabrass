@@ -8,6 +8,7 @@ import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/image_upload.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ViewPaymentDialog extends StatefulWidget {
   final PaymentModel payment;
@@ -41,7 +42,6 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
     _selectedPayerType = widget.payment.payerType;
     _isFinalPayment = widget.payment.isFinalPayment;
 
-    // Initialize controllers
     _amountController.text = widget.payment.amountPaid.toString();
     _bonusController.text = widget.payment.bonus.toString();
     _deductionController.text = widget.payment.deduction.toString();
@@ -57,8 +57,13 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
     super.dispose();
   }
 
-  String _formatPaymentMonth(DateTime paymentMonth) {
-    final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  String _formatPaymentMonth(BuildContext context, DateTime paymentMonth) {
+    final l10n = AppLocalizations.of(context)!;
+    final monthNames = [
+      l10n.january, l10n.february, l10n.march, l10n.april,
+      l10n.may, l10n.june, l10n.july, l10n.august,
+      l10n.september, l10n.october, l10n.november, l10n.december
+    ];
     return '${monthNames[paymentMonth.month - 1]} ${paymentMonth.year}';
   }
 
@@ -100,6 +105,8 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(context.cardPadding),
@@ -114,7 +121,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
-              _isEditing ? 'Edit Payment' : 'View Payment Details',
+              _isEditing ? l10n.editPayment : l10n.viewPaymentDetails,
               style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
@@ -128,6 +135,8 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildActions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -141,7 +150,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             TextButton(
               onPressed: () => setState(() => _isEditing = false),
               child: Text(
-                'Cancel',
+                l10n.cancel,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
             ),
@@ -154,7 +163,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
               ),
               child: Text(
-                'Save Changes',
+                l10n.saveChanges,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
               ),
             ),
@@ -162,7 +171,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             TextButton(
               onPressed: () => setState(() => _isEditing = true),
               child: Text(
-                'Edit',
+                l10n.edit,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.primaryMaroon),
               ),
             ),
@@ -175,7 +184,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
               ),
               child: Text(
-                'Close',
+                l10n.close,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
               ),
             ),
@@ -186,92 +195,88 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildViewContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Payment ID and Status
-        _buildInfoSection('Payment Information', [
-          _buildInfoRow('Payment ID', widget.payment.id.substring(0, 8)),
-          _buildInfoRow('Status', widget.payment.isActive ? 'Active' : 'Inactive'),
-          _buildInfoRow('Created', _formatDateTime(widget.payment.createdAt)),
-          if (widget.payment.createdAt != widget.payment.updatedAt) _buildInfoRow('Last Updated', _formatDateTime(widget.payment.updatedAt)),
+        _buildInfoSection(l10n.paymentInformation, [
+          _buildInfoRow(l10n.paymentId, widget.payment.id.substring(0, 8)),
+          _buildInfoRow(l10n.status, widget.payment.isActive ? l10n.active : l10n.inactive),
+          _buildInfoRow(l10n.created, _formatDateTime(widget.payment.createdAt)),
+          if (widget.payment.createdAt != widget.payment.updatedAt) _buildInfoRow(l10n.lastUpdated, _formatDateTime(widget.payment.updatedAt)),
         ]),
 
         SizedBox(height: context.cardPadding),
 
-        // Payer Information
-        _buildInfoSection('Payer Information', [
-          _buildInfoRow('Payer Type', widget.payment.payerType.toUpperCase()),
-          if (widget.payment.payerId != null) _buildInfoRow('Payer ID', widget.payment.payerId!),
+        _buildInfoSection(l10n.payerInformation, [
+          _buildInfoRow(l10n.payerType, widget.payment.payerType.toUpperCase()),
+          if (widget.payment.payerId != null) _buildInfoRow(l10n.payerId, widget.payment.payerId!),
           if (widget.payment.laborName != null && widget.payment.laborName!.isNotEmpty) ...[
-            _buildInfoRow('Labor Name', widget.payment.laborName!),
-            if (widget.payment.laborRole != null) _buildInfoRow('Labor Role', widget.payment.laborRole!),
-            if (widget.payment.laborPhone != null) _buildInfoRow('Labor Phone', widget.payment.laborPhone!),
+            _buildInfoRow(l10n.laborName, widget.payment.laborName!),
+            if (widget.payment.laborRole != null) _buildInfoRow(l10n.laborRole, widget.payment.laborRole!),
+            if (widget.payment.laborPhone != null) _buildInfoRow(l10n.laborPhone, widget.payment.laborPhone!),
           ],
-          if (widget.payment.vendorId != null) _buildInfoRow('Vendor ID', widget.payment.vendorId!),
-          if (widget.payment.orderId != null) _buildInfoRow('Order ID', widget.payment.orderId!),
-          if (widget.payment.saleId != null) _buildInfoRow('Sale ID', widget.payment.saleId!),
+          if (widget.payment.vendorId != null) _buildInfoRow(l10n.vendorId, widget.payment.vendorId!),
+          if (widget.payment.orderId != null) _buildInfoRow(l10n.orderId, widget.payment.orderId!),
+          if (widget.payment.saleId != null) _buildInfoRow(l10n.saleId, widget.payment.saleId!),
         ]),
 
         SizedBox(height: context.cardPadding),
 
-        // Payment Details
-        _buildInfoSection('Payment Details', [
-          _buildInfoRow('Amount Paid', 'PKR ${widget.payment.amountPaid.toStringAsFixed(2)}'),
-          if (widget.payment.bonus > 0) _buildInfoRow('Bonus', 'PKR ${widget.payment.bonus.toStringAsFixed(2)}'),
-          if (widget.payment.deduction > 0) _buildInfoRow('Deduction', 'PKR ${widget.payment.deduction.toStringAsFixed(2)}'),
-          _buildInfoRow('Net Amount', 'PKR ${widget.payment.netAmount.toStringAsFixed(2)}'),
-          _buildInfoRow('Payment Method', _formatPaymentMethod(widget.payment.paymentMethod)),
-          _buildInfoRow('Payment Month', _formatPaymentMonth(widget.payment.paymentMonth)),
-          _buildInfoRow('Is Final Payment', widget.payment.isFinalPayment ? 'Yes' : 'No'),
+        _buildInfoSection(l10n.paymentDetails, [
+          _buildInfoRow(l10n.amountPaid, 'PKR ${widget.payment.amountPaid.toStringAsFixed(2)}'),
+          if (widget.payment.bonus > 0) _buildInfoRow(l10n.bonus, 'PKR ${widget.payment.bonus.toStringAsFixed(2)}'),
+          if (widget.payment.deduction > 0) _buildInfoRow(l10n.deduction, 'PKR ${widget.payment.deduction.toStringAsFixed(2)}'),
+          _buildInfoRow(l10n.netAmount, 'PKR ${widget.payment.netAmount.toStringAsFixed(2)}'),
+          _buildInfoRow(l10n.paymentMethod, _formatPaymentMethod(widget.payment.paymentMethod)),
+          _buildInfoRow(l10n.paymentMonth, _formatPaymentMonth(context, widget.payment.paymentMonth)),
+          _buildInfoRow(l10n.isFinalPayment, widget.payment.isFinalPayment ? l10n.yes : l10n.no),
         ]),
 
         SizedBox(height: context.cardPadding),
 
-        // Date and Time
-        _buildInfoSection('Date & Time', [
-          _buildInfoRow('Date', '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}'),
-          _buildInfoRow('Time', '${widget.payment.time.hour.toString().padLeft(2, '0')}:${widget.payment.time.minute.toString().padLeft(2, '0')}'),
+        _buildInfoSection(l10n.dateAndTime, [
+          _buildInfoRow(l10n.date, '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}'),
+          _buildInfoRow(l10n.time, '${widget.payment.time.hour.toString().padLeft(2, '0')}:${widget.payment.time.minute.toString().padLeft(2, '0')}'),
         ]),
 
         SizedBox(height: context.cardPadding),
 
-        // Description
         if (widget.payment.description != null && widget.payment.description!.isNotEmpty) ...[
-          _buildInfoSection('Description', [_buildInfoRow('Details', widget.payment.description!, isMultiline: true)]),
+          _buildInfoSection(l10n.description, [_buildInfoRow(l10n.details, widget.payment.description!, isMultiline: true)]),
           SizedBox(height: context.cardPadding),
         ],
 
-        // Receipt Image
         if (widget.payment.receiptImagePath != null && widget.payment.receiptImagePath!.isNotEmpty) ...[
-          _buildInfoSection('Receipt', [_buildReceiptSection()]),
+          _buildInfoSection(l10n.receipt, [_buildReceiptSection()]),
         ],
 
-        // Created By
         if (widget.payment.createdBy != null) ...[
           SizedBox(height: context.cardPadding),
-          _buildInfoSection('System Information', [_buildInfoRow('Created By', widget.payment.createdBy!)]),
+          _buildInfoSection(l10n.systemInformation, [_buildInfoRow(l10n.createdBy, widget.payment.createdBy!)]),
         ],
       ],
     );
   }
 
   Widget _buildEditForm() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Basic Information
-          _buildFormSection('Basic Information', [
+          _buildFormSection(l10n.basicInformation, [
             _buildTextField(
               controller: _amountController,
-              label: 'Amount Paid',
+              label: l10n.amountPaid,
               prefix: 'PKR',
               keyboardType: TextInputType.number,
               validator: (value) {
-                if (value == null || value.isEmpty) return 'Amount is required';
-                if (double.tryParse(value) == null) return 'Invalid amount';
+                if (value == null || value.isEmpty) return l10n.amountIsRequired;
+                if (double.tryParse(value) == null) return l10n.invalidAmount;
                 return null;
               },
             ),
@@ -279,45 +284,44 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(controller: _bonusController, label: 'Bonus', prefix: 'PKR', keyboardType: TextInputType.number),
+                  child: _buildTextField(controller: _bonusController, label: l10n.bonus, prefix: 'PKR', keyboardType: TextInputType.number),
                 ),
                 SizedBox(width: context.smallPadding),
                 Expanded(
-                  child: _buildTextField(controller: _deductionController, label: 'Deduction', prefix: 'PKR', keyboardType: TextInputType.number),
+                  child: _buildTextField(controller: _deductionController, label: l10n.deduction, prefix: 'PKR', keyboardType: TextInputType.number),
                 ),
               ],
             ),
             SizedBox(height: context.smallPadding),
-            _buildTextField(controller: _descriptionController, label: 'Description', maxLines: 3),
+            _buildTextField(controller: _descriptionController, label: l10n.description, maxLines: 3),
           ]),
 
           SizedBox(height: context.cardPadding),
 
-          // Payment Details
-          _buildFormSection('Payment Details', [
+          _buildFormSection(l10n.paymentDetails, [
             _buildDropdownField(
-              label: 'Payment Method',
+              label: l10n.paymentMethod,
               value: _selectedPaymentMethod,
               items: PaymentProvider.staticPaymentMethods,
               onChanged: (value) => setState(() => _selectedPaymentMethod = value),
-              validator: (value) => value == null ? 'Payment method is required' : null,
+              validator: (value) => value == null ? l10n.paymentMethodIsRequired : null,
             ),
             SizedBox(height: context.smallPadding),
             Row(
               children: [
                 Expanded(
                   child: _buildDropdownField(
-                    label: 'Payer Type',
+                    label: l10n.payerType,
                     value: _selectedPayerType,
                     items: PaymentProvider.staticPayerTypes,
                     onChanged: (value) => setState(() => _selectedPayerType = value),
-                    validator: (value) => value == null ? 'Payer type is required' : null,
+                    validator: (value) => value == null ? l10n.payerTypeIsRequired : null,
                   ),
                 ),
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: CheckboxListTile(
-                    title: Text('Final Payment', style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
+                    title: Text(l10n.finalPayment, style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
                     value: _isFinalPayment,
                     onChanged: (value) => setState(() => _isFinalPayment = value ?? false),
                     contentPadding: EdgeInsets.zero,
@@ -329,8 +333,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
 
           SizedBox(height: context.cardPadding),
 
-          // Date and Time
-          _buildFormSection('Date & Time', [
+          _buildFormSection(l10n.dateAndTime, [
             Row(
               children: [
                 Expanded(child: _buildDateField()),
@@ -342,14 +345,11 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
 
           SizedBox(height: context.cardPadding),
 
-          // Receipt
-          _buildFormSection('Receipt', [
+          _buildFormSection(l10n.receipt, [
             ResponsiveImageUploadWidget(
               initialImagePath: widget.payment.receiptImagePath,
-              onImageChanged: (imagePath) {
-                // Handle image change
-              },
-              label: 'Receipt Image',
+              onImageChanged: (imagePath) {},
+              label: l10n.receiptImage,
               context: context,
             ),
           ]),
@@ -433,11 +433,13 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildDateField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date',
+          l10n.date,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
@@ -471,11 +473,13 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildTimeField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Time',
+          l10n.time,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
@@ -555,6 +559,8 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   Widget _buildReceiptSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -575,7 +581,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             Icon(Icons.receipt_long, color: Colors.purple, size: context.iconSize('small')),
             SizedBox(width: context.smallPadding / 2),
             Text(
-              'Receipt Available',
+              l10n.receiptAvailable,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
             ),
           ],
@@ -603,28 +609,29 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
   }
 
   String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    final l10n = AppLocalizations.of(context)!;
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${l10n.at} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   void _saveChanges() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState!.validate()) {
       try {
         final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
 
-        // Parse and validate required fields
         final amountPaid = double.tryParse(_amountController.text);
         if (amountPaid == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid amount'), backgroundColor: Colors.red));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.invalidAmount), backgroundColor: Colors.red));
           return;
         }
 
         final paymentMethod = _selectedPaymentMethod;
         if (paymentMethod == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select payment method'), backgroundColor: Colors.red));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectPaymentMethod), backgroundColor: Colors.red));
           return;
         }
 
-        // Convert TimeOfDay to DateTime for backend compatibility
         final timeDateTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
 
         final success = await paymentProvider.updatePayment(
@@ -636,18 +643,18 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
           date: _selectedDate,
           time: timeDateTime,
           paymentMethod: paymentMethod,
-          paymentMonth: widget.payment.paymentMonth, // Keep original payment month
+          paymentMonth: widget.payment.paymentMonth,
           isFinalPayment: _isFinalPayment,
         );
 
         if (success) {
           setState(() => _isEditing = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment updated successfully'), backgroundColor: Colors.green));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.paymentUpdatedSuccessfully), backgroundColor: Colors.green));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update payment'), backgroundColor: Colors.red));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.failedToUpdatePayment), backgroundColor: Colors.red));
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating payment: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.errorUpdatingPayment}: $e'), backgroundColor: Colors.red));
       }
     }
   }

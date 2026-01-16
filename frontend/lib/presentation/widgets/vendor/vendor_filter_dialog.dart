@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class VendorFilterDialog extends StatefulWidget {
@@ -175,6 +176,8 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -202,7 +205,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Vendors',
+                  '${l10n.filter} ${l10n.vendor}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -213,7 +216,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your vendor list with filters',
+                    l10n.refineVendorList,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -242,6 +245,8 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
@@ -250,7 +255,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           children: [
             // Search Filter
             _buildFilterSection(
-              title: 'Search Vendors',
+              title: '${l10n.search} ${l10n.vendor}',
               icon: Icons.search_outlined,
               child: _buildSearchFilter(),
             ),
@@ -259,7 +264,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
 
             // Status Filter
             _buildFilterSection(
-              title: 'Vendor Status',
+              title: '${l10n.vendor} ${l10n.status}',
               icon: Icons.flag_outlined,
               child: _buildStatusFilter(),
             ),
@@ -268,7 +273,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
 
             // Location Filters
             _buildFilterSection(
-              title: 'Location',
+              title: l10n.location,
               icon: Icons.location_on_outlined,
               child: _buildLocationFilters(),
             ),
@@ -323,11 +328,13 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildSearchFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return TextFormField(
       controller: _searchController,
       style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
-        hintText: 'Search by name, business name, phone, or CNIC',
+        hintText: l10n.searchVendorsHint,
         hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
@@ -352,6 +359,8 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildStatusFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         CheckboxListTile(
@@ -362,7 +371,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
             });
           },
           title: Text(
-            'Show inactive vendors only',
+            l10n.showInactiveVendorsOnly,
             style: GoogleFonts.inter(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w500,
@@ -386,7 +395,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Only deactivated vendors will be shown',
+                    l10n.onlyDeactivatedVendorsShown,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.orange[700]),
                   ),
                 ),
@@ -398,6 +407,8 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildLocationFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         // City Filter
@@ -405,7 +416,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'City',
+              l10n.city,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -417,7 +428,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               controller: _cityController,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
-                hintText: 'Enter city name',
+                hintText: '${l10n.enterEmail} ${l10n.city}',
                 hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.location_city_outlined,
@@ -450,10 +461,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               children: _commonCities
                   .map(
                     (city) => _buildQuickSelectChip(
-                      label: city,
-                      onTap: () => setState(() => _cityController.text = city),
-                    ),
-                  )
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
                   .toList(),
             ),
           ],
@@ -466,7 +477,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Area',
+              l10n.area,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -478,7 +489,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               controller: _areaController,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
-                hintText: 'Enter area name',
+                hintText: '${l10n.enterEmail} ${l10n.area}',
                 hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.map_outlined,
@@ -511,10 +522,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               children: _commonAreas
                   .map(
                     (area) => _buildQuickSelectChip(
-                      label: area,
-                      onTap: () => setState(() => _areaController.text = area),
-                    ),
-                  )
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
                   .toList(),
             ),
           ],
@@ -547,11 +558,13 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
@@ -559,7 +572,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Clear All Filters',
+          text: l10n.clearAllFilters,
           onPressed: _handleClearFilters,
           height: context.buttonHeight,
           icon: Icons.clear_all_rounded,
@@ -569,7 +582,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
         ),
         SizedBox(height: context.smallPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleClose,
           height: context.buttonHeight,
           isOutlined: true,
@@ -581,11 +594,13 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -596,7 +611,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.clear_all_rounded,
@@ -609,7 +624,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,

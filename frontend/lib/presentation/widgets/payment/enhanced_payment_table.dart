@@ -7,6 +7,7 @@ import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'payment_table_helpers.dart';
+import '../../../l10n/app_localizations.dart';
 
 class EnhancedPaymentTable extends StatefulWidget {
   final Function(PaymentModel) onEdit;
@@ -30,7 +31,6 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
     super.initState();
     _helpers = PaymentTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onViewReceipt: widget.onViewReceipt);
 
-    // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
@@ -73,7 +73,6 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -94,7 +93,6 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                   ),
                 ),
 
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -163,33 +161,19 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Payment ID
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, 'Payment ID')),
-
-        // Labor Name
-        Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Labor')),
-
-        // Labor Details (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Labor Details')),
-
-        // Description (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Description')),
-
-        // Amount
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildHeaderCell(context, 'Amount')),
-
-        // Date
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildHeaderCell(context, 'Date')),
-
-        // Payment Method (hidden on compact layouts)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Payment Method')),
-
-        // Actions
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.paymentId)),
+        Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.labor)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.laborDetails)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.description)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildHeaderCell(context, l10n.amount)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildHeaderCell(context, l10n.date)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.paymentMethod)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -202,6 +186,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
   }
 
   Widget _buildTableRow(BuildContext context, PaymentModel payment, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -240,12 +225,11 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  payment.laborName ?? 'N/A',
+                  payment.laborName ?? l10n.notAvailable,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show labor details on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Row(
@@ -254,7 +238,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                       SizedBox(width: context.smallPadding / 2),
                       Expanded(
                         child: Text(
-                          payment.laborRole ?? 'N/A',
+                          payment.laborRole ?? l10n.notAvailable,
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -262,11 +246,10 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                       ),
                     ],
                   ),
-                  // Show description on compact layouts if available
                   if (payment.description?.isNotEmpty == true) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'Desc: ${payment.description}',
+                      '${l10n.desc}: ${payment.description}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -294,7 +277,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              payment.laborRole ?? 'N/A',
+                              payment.laborRole ?? l10n.notAvailable,
                               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -321,7 +304,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               width: columnWidths[3],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
-                payment.description?.isNotEmpty == true ? payment.description! : 'No description',
+                payment.description?.isNotEmpty == true ? payment.description! : l10n.noDescription,
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -349,7 +332,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                   if (payment.bonus > 0 || payment.deduction > 0) ...[
                     SizedBox(height: 2),
                     Text(
-                      'Net: PKR ${payment.netAmount.toStringAsFixed(0)}',
+                      '${l10n.net}: PKR ${payment.netAmount.toStringAsFixed(0)}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       textAlign: TextAlign.center,
                     ),

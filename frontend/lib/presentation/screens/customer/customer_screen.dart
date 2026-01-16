@@ -26,7 +26,6 @@ class _CustomerPageState extends State<CustomerPage> {
   @override
   void initState() {
     super.initState();
-    // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CustomerProvider>().refreshCustomers();
     });
@@ -124,6 +123,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   void _handleExport() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = context.read<CustomerProvider>();
       await provider.exportData();
@@ -139,7 +140,7 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                AppLocalizations.of(context)!.customerDataExported,
+                l10n.customerDataExported,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -157,7 +158,7 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
       );
     } catch (e) {
-      _showErrorSnackbar('Failed to export data: ${e.toString()}');
+      _showErrorSnackbar('${l10n.failedToExportData}: ${e.toString()}');
     }
   }
 
@@ -171,7 +172,6 @@ class _CustomerPageState extends State<CustomerPage> {
       backgroundColor: AppTheme.creamWhite,
       body: Consumer<CustomerProvider>(
         builder: (context, provider, child) {
-          // Show error state if API fails
           if (provider.hasError) {
             return _buildErrorState(
               provider.errorMessage ??
@@ -179,17 +179,14 @@ class _CustomerPageState extends State<CustomerPage> {
             );
           }
 
-          // Show loading state
           if (provider.isLoading && provider.customers.isEmpty) {
             return _buildLoadingState();
           }
 
-          // Show empty state if no customers
           if (!provider.isLoading && provider.customers.isEmpty) {
             return _buildEmptyState();
           }
 
-          // Show normal content
           return _buildNormalContent(provider);
         },
       ),
@@ -197,6 +194,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -212,7 +211,7 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(height: 3.h),
               Text(
-                AppLocalizations.of(context)!.screenTooSmall,
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -222,7 +221,7 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                AppLocalizations.of(context)!.screenTooSmallMessage,
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -238,15 +237,16 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppLocalizations.of(context)!.customerManagement,
+                l10n.customerManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -256,7 +256,7 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                AppLocalizations.of(context)!.customerManagementDescription,
+                l10n.customerManagementDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -267,19 +267,19 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
 
-        // Add Customer Button
         _buildAddButton(),
       ],
     );
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Page Title
         Text(
-          AppLocalizations.of(context)!.customerManagement,
+          l10n.customerManagement,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -289,7 +289,7 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          AppLocalizations.of(context)!.customerManagementShortDescription,
+          l10n.customerManagementShortDescription,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -298,19 +298,19 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding),
 
-        // Add Customer Button (full width on tablet)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Compact Page Title
         Text(
-          AppLocalizations.of(context)!.customers,
+          l10n.customers,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -320,7 +320,7 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          AppLocalizations.of(context)!.customerManagementShortDescription,
+          l10n.customerManagementShortDescription,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -329,13 +329,14 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         SizedBox(height: context.cardPadding),
 
-        // Add Customer Button (full width)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -363,9 +364,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet
-                      ? AppLocalizations.of(context)!.add
-                      : AppLocalizations.of(context)!.addCustomer,
+                  context.isTablet ? l10n.add : l10n.addCustomer,
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -382,12 +381,14 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildDesktopStatsRow(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.customerStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-            AppLocalizations.of(context)!.totalCustomers,
+            l10n.totalCustomers,
             stats['total'].toString(),
             Icons.people_rounded,
             Colors.blue,
@@ -396,7 +397,7 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            AppLocalizations.of(context)!.newThisMonth,
+            l10n.newThisMonth,
             stats['newThisMonth'].toString(),
             Icons.person_add_rounded,
             Colors.green,
@@ -405,7 +406,7 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            AppLocalizations.of(context)!.totalSales,
+            l10n.totalSales,
             _getTotalSalesCount(provider),
             Icons.shopping_cart_rounded,
             AppTheme.primaryMaroon,
@@ -414,7 +415,7 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            AppLocalizations.of(context)!.recentBuyers,
+            l10n.recentBuyers,
             stats['recentBuyers'].toString(),
             Icons.shopping_bag_rounded,
             Colors.orange,
@@ -425,14 +426,16 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildMobileStatsGrid(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.customerStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatsCard(
-                AppLocalizations.of(context)!.total,
+                l10n.total,
                 stats['total'].toString(),
                 Icons.people_rounded,
                 Colors.blue,
@@ -441,7 +444,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                AppLocalizations.of(context)!.newCustomer,
+                l10n.newCustomer,
                 stats['newThisMonth'].toString(),
                 Icons.person_add_rounded,
                 Colors.green,
@@ -454,7 +457,7 @@ class _CustomerPageState extends State<CustomerPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                AppLocalizations.of(context)!.totalSales,
+                l10n.totalSales,
                 _getTotalSalesCount(provider),
                 Icons.shopping_cart_rounded,
                 AppTheme.primaryMaroon,
@@ -463,7 +466,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                AppLocalizations.of(context)!.recent,
+                l10n.recent,
                 stats['recentBuyers'].toString(),
                 Icons.shopping_bag_rounded,
                 Colors.orange,
@@ -503,22 +506,18 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildDesktopSearchLayout(CustomerProvider provider) {
     return Row(
       children: [
-        // Search Bar
         Expanded(flex: 3, child: _buildSearchBar(provider)),
 
         SizedBox(width: context.cardPadding),
 
-        // Show Inactive Toggle
         Expanded(flex: 1, child: _buildShowInactiveToggle(provider)),
 
         SizedBox(width: context.smallPadding),
 
-        // Filter Button
         Expanded(flex: 1, child: _buildFilterButton(provider)),
 
         SizedBox(width: context.smallPadding),
 
-        // Export Button
         Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
@@ -561,6 +560,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildSearchBar(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: TextField(
@@ -572,8 +573,8 @@ class _CustomerPageState extends State<CustomerPage> {
         ),
         decoration: InputDecoration(
           hintText: context.isTablet
-              ? AppLocalizations.of(context)!.searchCustomersShortHint
-              : AppLocalizations.of(context)!.searchCustomersHint,
+              ? l10n.searchCustomersShortHint
+              : l10n.searchCustomersHint,
           hintStyle: GoogleFonts.inter(
             fontSize: context.bodyFontSize * 0.9,
             color: Colors.grey[500],
@@ -585,16 +586,16 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    provider.clearSearch();
-                  },
-                  icon: Icon(
-                    Icons.clear_rounded,
-                    color: Colors.grey[500],
-                    size: context.iconSize('small'),
-                  ),
-                )
+            onPressed: () {
+              _searchController.clear();
+              provider.clearSearch();
+            },
+            icon: Icon(
+              Icons.clear_rounded,
+              color: Colors.grey[500],
+              size: context.iconSize('small'),
+            ),
+          )
               : null,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
@@ -607,6 +608,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildShowInactiveToggle(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -639,8 +642,8 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 provider.showInactive
-                    ? AppLocalizations.of(context)!.hideInactive
-                    : AppLocalizations.of(context)!.showInactive,
+                    ? l10n.hideInactive
+                    : l10n.showInactive,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -657,12 +660,14 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildFilterButton(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     final hasActiveFilters =
         provider.selectedStatus != null ||
-        provider.selectedType != null ||
-        provider.selectedCity != null ||
-        provider.selectedCountry != null ||
-        provider.verificationFilter != null;
+            provider.selectedType != null ||
+            provider.selectedCity != null ||
+            provider.selectedCountry != null ||
+            provider.verificationFilter != null;
 
     return Container(
       height: context.buttonHeight / 1.5,
@@ -696,8 +701,8 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 hasActiveFilters
-                    ? '${AppLocalizations.of(context)!.filter} (${_getActiveFilterCount(provider)})'
-                    : AppLocalizations.of(context)!.filter,
+                    ? '${l10n.filter} (${_getActiveFilterCount(provider)})'
+                    : l10n.filter,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -714,6 +719,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildExportButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -739,7 +746,7 @@ class _CustomerPageState extends State<CustomerPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                AppLocalizations.of(context)!.export,
+                l10n.export,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -754,22 +761,23 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildActiveFilters(CustomerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final activeFilters = <String>[];
 
     if (provider.selectedStatus != null) {
-      activeFilters.add('Status: ${provider.selectedStatus}');
+      activeFilters.add('${l10n.status}: ${provider.selectedStatus}');
     }
     if (provider.selectedType != null) {
-      activeFilters.add('Type: ${provider.selectedType}');
+      activeFilters.add('${l10n.type}: ${provider.selectedType}');
     }
     if (provider.selectedCity != null) {
-      activeFilters.add('City: ${provider.selectedCity}');
+      activeFilters.add('${l10n.city}: ${provider.selectedCity}');
     }
     if (provider.selectedCountry != null) {
-      activeFilters.add('Country: ${provider.selectedCountry}');
+      activeFilters.add('${l10n.country}: ${provider.selectedCountry}');
     }
     if (provider.verificationFilter != null) {
-      activeFilters.add('Verified: ${provider.verificationFilter}');
+      activeFilters.add('${l10n.verified}: ${provider.verificationFilter}');
     }
 
     if (activeFilters.isEmpty) {
@@ -783,7 +791,7 @@ class _CustomerPageState extends State<CustomerPage> {
         runSpacing: context.smallPadding / 2,
         children: [
           ...activeFilters.map(
-            (filter) => Container(
+                (filter) => Container(
               padding: EdgeInsets.symmetric(
                 horizontal: context.smallPadding,
                 vertical: context.smallPadding / 2,
@@ -823,7 +831,6 @@ class _CustomerPageState extends State<CustomerPage> {
             ),
           ),
 
-          // Clear All Filters Button
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.smallPadding,
@@ -839,7 +846,7 @@ class _CustomerPageState extends State<CustomerPage> {
             child: InkWell(
               onTap: provider.clearAllFilters,
               child: Text(
-                AppLocalizations.of(context)!.clearAll,
+                l10n.clearAll,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -854,15 +861,17 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   void _clearSpecificFilter(String filterText, CustomerProvider provider) {
-    if (filterText.startsWith('Status:')) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (filterText.startsWith('${l10n.status}:')) {
       provider.setStatusFilter(null);
-    } else if (filterText.startsWith('Type:')) {
+    } else if (filterText.startsWith('${l10n.type}:')) {
       provider.setTypeFilter(null);
-    } else if (filterText.startsWith('City:')) {
+    } else if (filterText.startsWith('${l10n.city}:')) {
       provider.setCityFilter(null);
-    } else if (filterText.startsWith('Country:')) {
+    } else if (filterText.startsWith('${l10n.country}:')) {
       provider.setCountryFilter(null);
-    } else if (filterText.startsWith('Verified:')) {
+    } else if (filterText.startsWith('${l10n.verified}:')) {
       provider.setVerificationFilter(null);
     }
   }
@@ -878,11 +887,11 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildStatsCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
+      String title,
+      String value,
+      IconData icon,
+      Color color,
+      ) {
     return Container(
       height: context.statsCardHeight / 1.5,
       padding: EdgeInsets.all(context.cardPadding / 2),
@@ -958,6 +967,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildErrorState(String message) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -967,7 +978,7 @@ class _CustomerPageState extends State<CustomerPage> {
             Icon(Icons.error_outline, size: 10.w, color: Colors.red[400]),
             SizedBox(height: 2.h),
             Text(
-              '${AppLocalizations.of(context)!.error}: $message',
+              '${l10n.error}: $message',
               style: GoogleFonts.inter(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
@@ -977,7 +988,7 @@ class _CustomerPageState extends State<CustomerPage> {
             ),
             SizedBox(height: 1.h),
             Text(
-              'Please try again later or contact support.',
+              l10n.pleaseTryAgainOrContactSupport,
               style: GoogleFonts.inter(
                 fontSize: 3.sp,
                 fontWeight: FontWeight.w400,
@@ -992,6 +1003,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildLoadingState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -1004,7 +1017,7 @@ class _CustomerPageState extends State<CustomerPage> {
             ),
             SizedBox(height: 2.h),
             Text(
-              AppLocalizations.of(context)!.loadingCustomers,
+              l10n.loadingCustomers,
               style: GoogleFonts.inter(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
@@ -1019,6 +1032,8 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -1028,7 +1043,7 @@ class _CustomerPageState extends State<CustomerPage> {
             Icon(Icons.search_off_rounded, size: 10.w, color: Colors.grey[400]),
             SizedBox(height: 2.h),
             Text(
-              AppLocalizations.of(context)!.noCustomersFound,
+              l10n.noCustomersFound,
               style: GoogleFonts.inter(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
@@ -1038,7 +1053,7 @@ class _CustomerPageState extends State<CustomerPage> {
             ),
             SizedBox(height: 1.h),
             Text(
-              AppLocalizations.of(context)!.adjustFilters,
+              l10n.adjustFilters,
               style: GoogleFonts.inter(
                 fontSize: 3.sp,
                 fontWeight: FontWeight.w400,
@@ -1061,7 +1076,6 @@ class _CustomerPageState extends State<CustomerPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Responsive Header Section
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildTabletHeader(),
@@ -1073,22 +1087,18 @@ class _CustomerPageState extends State<CustomerPage> {
 
             SizedBox(height: context.mainPadding),
 
-            // Responsive Stats Cards
             context.statsCardColumns == 2
                 ? _buildMobileStatsGrid(provider)
                 : _buildDesktopStatsRow(provider),
 
             SizedBox(height: context.cardPadding * 0.5),
 
-            // Responsive Search Section
             _buildSearchSection(provider),
 
             SizedBox(height: context.cardPadding * 0.5),
 
-            // Active Filters Display
             _buildActiveFilters(provider),
 
-            // Enhanced Customer Table with View functionality
             Expanded(
               child: EnhancedCustomerTable(
                 onEdit: _showEditCustomerDialog,

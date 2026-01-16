@@ -7,6 +7,7 @@ import '../../../src/providers/order_provider.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DeleteOrderDialog extends StatefulWidget {
   final OrderModel order;
@@ -49,6 +50,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_validateDeletion()) {
       _showValidationError();
       return;
@@ -62,7 +65,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
         _showSuccessSnackbar();
         Navigator.of(context).pop();
       } else {
-        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete order');
+        _showErrorSnackbar(provider.errorMessage ?? '${l10n.delete} ${l10n.error}');
       }
     }
   }
@@ -72,20 +75,23 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   void _showValidationError() {
+    final l10n = AppLocalizations.of(context)!;
     String message;
+
     if (!_confirmationChecked) {
-      message = 'Please confirm that you understand this action';
+      message = l10n.confirm;
     } else if (_confirmationText.toLowerCase().trim() != widget.order.id.toLowerCase().trim()) {
-      message = 'Please type the order ID exactly to confirm deletion';
+      message = '${l10n.pleaseSelectSale} ID';
     } else {
-      message = 'Please complete all confirmation steps';
+      message = l10n.confirm;
     }
 
     _showSnackbar(message, Colors.orange, Icons.warning_outlined);
   }
 
   void _showSuccessSnackbar() {
-    _showSnackbar('Order deleted successfully!', Colors.green, Icons.check_circle_rounded);
+    final l10n = AppLocalizations.of(context)!;
+    _showSnackbar('${l10n.orders} ${l10n.receiptDeletedSuccessfully}!', Colors.green, Icons.check_circle_rounded);
   }
 
   void _showErrorSnackbar(String message) {
@@ -165,6 +171,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -187,7 +195,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Delete Order',
+                  '${l10n.delete} ${l10n.orders}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -198,7 +206,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.warning,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -258,6 +266,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildWarningMessage() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -274,12 +284,12 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Deletion Warning',
+                  '${l10n.delete} ${l10n.warning}',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
-                  'This will permanently remove all order data from the database. This action cannot be reversed.',
+                  l10n.logoutMessage,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.4),
                 ),
               ],
@@ -291,6 +301,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildOrderDetailsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -365,7 +377,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                 Icon(Icons.shopping_cart, color: Colors.blue, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  'Order created: ${_formatDate(widget.order.createdAt)}',
+                  '${l10n.orders} ${l10n.created}: ${_formatDate(widget.order.createdAt)}',
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                 ),
               ],
@@ -377,6 +389,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildImpactWarning() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -392,14 +406,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               Icon(Icons.info_rounded, color: Colors.amber[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Impact Assessment',
+                l10n.info,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            '• All order data will be permanently removed\n• Associated customer records will remain unaffected\n• Payment records will be anonymized\n• This action cannot be undone',
+            '• ${l10n.noData}\n• ${l10n.customers} ${l10n.status}\n• ${l10n.payments} ${l10n.status}\n• ${l10n.warning}',
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.5),
           ),
         ],
@@ -408,6 +422,8 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildConfirmationSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -422,7 +438,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               });
             },
             title: Text(
-              'I understand this will permanently delete the order and cannot be undone',
+              '${l10n.confirm} ${l10n.delete} ${l10n.orders}',
               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
             ),
             activeColor: Colors.red,
@@ -431,11 +447,16 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'Type the order ID to confirm permanent deletion:',
+            '${l10n.pleaseSelectSale} ID ${l10n.confirm}:',
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
           ),
           SizedBox(height: context.smallPadding),
           Container(
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite,
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+              border: Border.all(color: Colors.red.withOpacity(0.3)),
+            ),
             child: TextFormField(
               controller: _confirmationController,
               onChanged: (value) {
@@ -454,7 +475,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Expected: ${widget.order.id}',
+            '${l10n.notSpecified}: ${widget.order.id}',
             style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600], fontStyle: FontStyle.italic),
           ),
         ],
@@ -463,11 +484,13 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -477,7 +500,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
         Consumer<OrderProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Order',
+              text: '${l10n.delete} ${l10n.orders}',
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -491,12 +514,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -509,7 +534,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
           child: Consumer<OrderProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
@@ -538,19 +563,21 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
   }
 
   String _getStatusText(OrderStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Pending';
+        return l10n.draft;
       case OrderStatus.CONFIRMED:
-        return 'Confirmed';
+        return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return 'In Production';
+        return l10n.processPayment;
       case OrderStatus.READY:
-        return 'Ready';
+        return l10n.status;
       case OrderStatus.DELIVERED:
-        return 'Delivered';
+        return l10n.delivered;
       case OrderStatus.CANCELLED:
-        return 'Cancelled';
+        return l10n.cancelled;
     }
   }
 }

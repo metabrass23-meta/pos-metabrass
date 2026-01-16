@@ -9,6 +9,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/drop_down.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import '../../../l10n/app_localizations.dart';
 
 class EditProductDialog extends StatefulWidget {
   final Product product;
@@ -24,7 +25,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   late TextEditingController _nameController;
   late TextEditingController _detailController;
   late TextEditingController _priceController;
-  late TextEditingController _costPriceController; // Added cost price controller
+  late TextEditingController _costPriceController;
   late TextEditingController _quantityController;
   late TextEditingController _colorController;
   late TextEditingController _fabricController;
@@ -42,12 +43,11 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     _nameController = TextEditingController(text: widget.product.name);
     _detailController = TextEditingController(text: widget.product.detail);
     _priceController = TextEditingController(text: widget.product.price.toString());
-    _costPriceController = TextEditingController(text: widget.product.costPrice?.toString() ?? ''); // Initialize cost price
+    _costPriceController = TextEditingController(text: widget.product.costPrice?.toString() ?? '');
     _quantityController = TextEditingController(text: widget.product.quantity.toString());
     _colorController = TextEditingController(text: widget.product.color);
     _fabricController = TextEditingController(text: widget.product.fabric);
 
-    // FIXED: Initialize category ID - handle case where API only returns category_name
     _selectedCategoryId = widget.product.categoryId;
     _selectedPieces = List.from(widget.product.pieces);
 
@@ -59,17 +59,14 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
 
     _animationController.forward();
 
-    // FIXED: Load categories and find the correct category ID
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadCategoriesAndSetSelected();
     });
   }
 
-  // FIXED: Method to load categories and set the correct selected category
   Future<void> _loadCategoriesAndSetSelected() async {
     final provider = Provider.of<ProductProvider>(context, listen: false);
 
-    // Load categories if not already loaded
     if (provider.categories.isEmpty) {
       await provider.loadCategories();
     }
@@ -79,7 +76,6 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     }
   }
 
-  // FIXED: Method to set the selected category based on available data
   void _setSelectedCategory() {
     final provider = Provider.of<ProductProvider>(context, listen: false);
 
@@ -93,7 +89,6 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
 
     String? foundCategoryId;
 
-    // First try: Use categoryId if available
     if (widget.product.categoryId != null && widget.product.categoryId!.isNotEmpty) {
       final categoryExists = provider.categories.any((cat) => cat.id == widget.product.categoryId && cat.isActive);
 
@@ -103,11 +98,10 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
       }
     }
 
-    // Second try: Find by category name if ID didn't work
     if (foundCategoryId == null && widget.product.categoryName != null && widget.product.categoryName!.isNotEmpty) {
       try {
         final categoryByName = provider.categories.firstWhere(
-          (cat) => cat.name.toLowerCase() == widget.product.categoryName!.toLowerCase() && cat.isActive,
+              (cat) => cat.name.toLowerCase() == widget.product.categoryName!.toLowerCase() && cat.isActive,
         );
         foundCategoryId = categoryByName.id;
         print('✅ Found category by name: ${widget.product.categoryName} -> $foundCategoryId');
@@ -116,14 +110,12 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
       }
     }
 
-    // Third try: Default to first active category if nothing found
     if (foundCategoryId == null && provider.categories.isNotEmpty) {
       final firstActiveCategory = provider.categories.firstWhere((cat) => cat.isActive, orElse: () => provider.categories.first);
       foundCategoryId = firstActiveCategory.id;
       print('⚠️ Using default category: ${firstActiveCategory.name} -> $foundCategoryId');
     }
 
-    // Update the selected category
     if (foundCategoryId != null && _selectedCategoryId != foundCategoryId) {
       setState(() {
         _selectedCategoryId = foundCategoryId;
@@ -148,9 +140,11 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedPieces.isEmpty) {
-        _showErrorSnackbar('Please select at least one piece');
+        _showErrorSnackbar(l10n.pleaseSelectAtLeastOnePiece);
         return;
       }
 
@@ -163,7 +157,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
         price: double.parse(_priceController.text.trim()),
         costPrice: _costPriceController.text.trim().isNotEmpty
             ? double.parse(_costPriceController.text.trim())
-            : null, // Parse cost price if provided
+            : null,
         color: _colorController.text.trim(),
         fabric: _fabricController.text.trim(),
         pieces: _selectedPieces,
@@ -176,13 +170,15 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(productProvider.errorMessage ?? 'Failed to update product');
+          _showErrorSnackbar(productProvider.errorMessage ?? l10n.failedToUpdateProduct);
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -190,7 +186,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Product updated successfully!',
+              l10n.productUpdatedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -268,6 +264,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -290,7 +288,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Product' : 'Edit Product Details',
+                  context.shouldShowCompactLayout ? l10n.editProduct : l10n.editProductDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -301,7 +299,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update product information',
+                    l10n.updateProductInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -338,6 +336,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   }
 
   Widget _buildFormContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -346,16 +346,16 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Product Name',
-              hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter product name',
+              label: l10n.productName,
+              hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterProductName,
               controller: _nameController,
               prefixIcon: Icons.label_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a product name';
+                  return l10n.pleaseEnterProductName;
                 }
                 if (value!.length < 2) {
-                  return 'Product name must be at least 2 characters';
+                  return l10n.productNameMustBeAtLeast2Characters;
                 }
                 return null;
               },
@@ -363,17 +363,17 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Product Detail',
-              hint: context.shouldShowCompactLayout ? 'Enter details' : 'Enter product description/details',
+              label: l10n.productDetail,
+              hint: context.shouldShowCompactLayout ? l10n.enterDetails : l10n.enterProductDescriptionDetails,
               controller: _detailController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter product details';
+                  return l10n.pleaseEnterProductDetails;
                 }
                 if (value!.length < 5) {
-                  return 'Product detail must be at least 5 characters';
+                  return l10n.productDetailMustBeAtLeast5Characters;
                 }
                 return null;
               },
@@ -384,18 +384,18 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               children: [
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Price',
-                    hint: context.shouldShowCompactLayout ? 'Enter price' : 'Enter price (PKR)',
+                    label: l10n.price,
+                    hint: context.shouldShowCompactLayout ? l10n.enterPrice : l10n.enterPricePkr,
                     controller: _priceController,
                     prefixIcon: Icons.attach_money_rounded,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
-                        return 'Please enter price';
+                        return l10n.pleaseEnterPrice;
                       }
                       final price = double.tryParse(value!);
                       if (price == null || price <= 0) {
-                        return 'Please enter a valid price';
+                        return l10n.pleaseEnterValidPrice;
                       }
                       return null;
                     },
@@ -404,8 +404,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Cost Price',
-                    hint: context.shouldShowCompactLayout ? 'Enter cost' : 'Enter cost price (PKR) - Optional',
+                    label: l10n.costPrice,
+                    hint: context.shouldShowCompactLayout ? l10n.enterCost : l10n.enterCostPricePkrOptional,
                     controller: _costPriceController,
                     prefixIcon: Icons.shopping_cart_outlined,
                     keyboardType: TextInputType.number,
@@ -413,11 +413,11 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                       if (value?.isNotEmpty ?? false) {
                         final costPrice = double.tryParse(value!);
                         if (costPrice == null || costPrice < 0) {
-                          return 'Please enter a valid cost price';
+                          return l10n.pleaseEnterValidCostPrice;
                         }
                         final price = double.tryParse(_priceController.text);
                         if (price != null && costPrice > price) {
-                          return 'Cost price cannot exceed selling price';
+                          return l10n.costPriceCannotExceedSellingPrice;
                         }
                       }
                       return null;
@@ -443,7 +443,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                     SizedBox(width: context.smallPadding / 2),
                     Flexible(
                       child: Text(
-                        'Setting cost price enables profit margin calculations and better financial analysis',
+                        l10n.costPriceInfo,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                       ),
                     ),
@@ -457,33 +457,31 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               children: [
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Quantity',
-                    hint: context.shouldShowCompactLayout ? 'Enter qty' : 'Enter quantity',
+                    label: l10n.quantity,
+                    hint: context.shouldShowCompactLayout ? l10n.enterQty : l10n.enterQuantity,
                     controller: _quantityController,
                     prefixIcon: Icons.inventory_2_outlined,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
-                        return 'Please enter quantity';
+                        return l10n.pleaseEnterQuantity;
                       }
                       final quantity = int.tryParse(value!);
                       if (quantity == null || quantity < 0) {
-                        return 'Please enter a valid quantity';
+                        return l10n.pleaseEnterValidQuantity;
                       }
                       return null;
                     },
                   ),
                 ),
                 SizedBox(width: context.cardPadding),
-                Expanded(child: Container()), // Empty container for spacing
+                Expanded(child: Container()),
               ],
             ),
             SizedBox(height: context.cardPadding),
 
-            // FIXED: Category Selection with proper debugging and state management
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
-                // Show loading indicator while categories are being loaded
                 if (provider.categories.isEmpty && provider.isLoading) {
                   return Container(
                     padding: EdgeInsets.all(context.cardPadding),
@@ -492,7 +490,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryMaroon)),
                         SizedBox(width: context.smallPadding),
                         Text(
-                          'Loading categories...',
+                          l10n.loadingCategories,
                           style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
                         ),
                       ],
@@ -500,7 +498,6 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                   );
                 }
 
-                // Show message if no categories available
                 if (provider.categories.isEmpty && !provider.isLoading) {
                   return Container(
                     padding: EdgeInsets.all(context.cardPadding),
@@ -515,7 +512,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         SizedBox(width: context.smallPadding),
                         Expanded(
                           child: Text(
-                            'No categories available. Please add categories first.',
+                            l10n.noCategoriesAvailablePleaseAddCategoriesFirst,
                             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.orange[700]),
                           ),
                         ),
@@ -524,7 +521,6 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                   );
                 }
 
-                // FIXED: Debug info - remove this in production
                 print('🎯 Rendering dropdown. Selected: $_selectedCategoryId');
                 print('📋 Available categories: ${provider.categories.map((c) => '${c.name}(${c.id})').join(', ')}');
 
@@ -533,7 +529,6 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // FIXED: Show current product category info for debugging
                     if (widget.product.categoryName != null) ...[
                       Container(
                         padding: EdgeInsets.all(context.smallPadding),
@@ -542,7 +537,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                           borderRadius: BorderRadius.circular(context.borderRadius('small')),
                         ),
                         child: Text(
-                          'Product Category: ${widget.product.categoryName} ${widget.product.categoryId != null ? '(ID: ${widget.product.categoryId})' : '(No ID)'}',
+                          '${l10n.productCategory}: ${widget.product.categoryName} ${widget.product.categoryId != null ? '(ID: ${widget.product.categoryId})' : '(${l10n.noId})'}',
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
                         ),
                       ),
@@ -550,8 +545,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                     ],
 
                     PremiumDropdownField<String>(
-                      label: 'Category',
-                      hint: context.shouldShowCompactLayout ? 'Select category' : 'Select product category',
+                      label: l10n.category,
+                      hint: context.shouldShowCompactLayout ? l10n.selectCategory : l10n.selectProductCategory,
                       prefixIcon: Icons.category_outlined,
                       items: activeCategories.map((category) => DropdownItem<String>(value: category.id, label: category.name)).toList(),
                       value: _selectedCategoryId,
@@ -563,7 +558,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                       },
                       validator: (value) {
                         if (value == null) {
-                          return 'Please select a category';
+                          return l10n.pleaseSelectCategory;
                         }
                         return null;
                       },
@@ -574,50 +569,47 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             ),
             SizedBox(height: context.cardPadding),
 
-            // Color Input Field
             PremiumTextField(
-              label: 'Color',
-              hint: context.shouldShowCompactLayout ? 'Enter color' : 'Enter color name (e.g., Red, Blue, Turquoise)',
+              label: l10n.color,
+              hint: context.shouldShowCompactLayout ? l10n.enterColor : l10n.enterColorName,
               controller: _colorController,
               prefixIcon: Icons.color_lens_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a color';
+                  return l10n.pleaseEnterColor;
                 }
                 if (value!.length < 2) {
-                  return 'Color name must be at least 2 characters';
+                  return l10n.colorNameMustBeAtLeast2Characters;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Fabric Input Field
             PremiumTextField(
-              label: 'Fabric',
-              hint: context.shouldShowCompactLayout ? 'Enter fabric' : 'Enter fabric type (e.g., Cotton, Silk, Chiffon)',
+              label: l10n.fabric,
+              hint: context.shouldShowCompactLayout ? l10n.enterFabric : l10n.enterFabricType,
               controller: _fabricController,
               prefixIcon: Icons.texture_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a fabric';
+                  return l10n.pleaseEnterFabric;
                 }
                 if (value!.length < 2) {
-                  return 'Fabric name must be at least 2 characters';
+                  return l10n.fabricNameMustBeAtLeast2Characters;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Pieces Selection
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pieces',
+                      l10n.pieces,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding),
@@ -662,7 +654,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                     if (_selectedPieces.isEmpty) ...[
                       SizedBox(height: context.smallPadding / 2),
                       Text(
-                        'Please select at least one piece',
+                        l10n.pleaseSelectAtLeastOnePiece,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
@@ -687,13 +679,15 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<ProductProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Product',
+              text: l10n.updateProduct,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -704,7 +698,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -716,11 +710,13 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -733,7 +729,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
           child: Consumer<ProductProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Product',
+                text: l10n.updateProduct,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

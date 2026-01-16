@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/expenses/add_expense_dialog.dart';
 import '../../widgets/expenses/delete_expense_dialog.dart';
 import '../../widgets/expenses/edit_expense_dialog.dart';
@@ -27,7 +28,6 @@ class _ExpensesPageState extends State<ExpensesPage> {
   @override
   void initState() {
     super.initState();
-    // Load expense records and statistics when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<ExpensesProvider>();
       provider.loadExpenseRecords();
@@ -106,7 +106,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
               SizedBox(height: context.mainPadding),
               Consumer<ExpensesProvider>(
                 builder: (context, provider, child) {
-                  // Show error message if there's an error
+                  final l10n = AppLocalizations.of(context)!;
+
                   if (provider.hasError) {
                     return Container(
                       padding: EdgeInsets.all(context.cardPadding),
@@ -122,7 +123,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                           SizedBox(width: context.smallPadding),
                           Expanded(
                             child: Text(
-                              provider.errorMessage ?? 'An error occurred',
+                              provider.errorMessage ?? l10n.unexpectedError,
                               style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red[700]),
                             ),
                           ),
@@ -131,7 +132,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                               provider.clearError();
                               provider.loadExpenseRecords();
                             },
-                            child: Text('Retry'),
+                            child: Text(l10n.retry),
                           ),
                         ],
                       ),
@@ -155,6 +156,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -166,13 +169,13 @@ class _ExpensesPageState extends State<ExpensesPage> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
@@ -184,15 +187,16 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        // Page Title
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Expenses Management',
+                l10n.expensesManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -202,26 +206,25 @@ class _ExpensesPageState extends State<ExpensesPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Track and manage business expenses efficiently',
+                l10n.expensesManagementDescription,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
         ),
-
-        // Add Expense Button
         _buildAddButton(),
       ],
     );
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Page Title
         Text(
-          'Expenses Management',
+          l10n.expensesManagement,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -231,24 +234,23 @@ class _ExpensesPageState extends State<ExpensesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Track business expenses',
+          l10n.trackBusinessExpenses,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-
-        // Add Expense Button (full width on tablet)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Compact Page Title
         Text(
-          'Expenses',
+          l10n.expenses,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -258,18 +260,18 @@ class _ExpensesPageState extends State<ExpensesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Track expenses',
+          l10n.trackExpenses,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
-
-        // Add Expense Button (full width)
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -288,7 +290,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Expense',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.expense}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -305,37 +307,41 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildDesktopStatsRow(ExpensesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.expenseStats;
+
     return Row(
       children: [
-        Expanded(child: _buildStatsCard('Total Records', stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
+        Expanded(child: _buildStatsCard(l10n.totalRecords, stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('This Year', stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
+        Expanded(child: _buildStatsCard(l10n.thisYear, stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Total Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
+        Expanded(child: _buildStatsCard(l10n.totalAmount, 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('This Week', stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
+        Expanded(child: _buildStatsCard(l10n.thisWeek, stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
       ],
     );
   }
 
   Widget _buildMobileStatsGrid(ExpensesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.expenseStats;
+
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Total', stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
+            Expanded(child: _buildStatsCard(l10n.total, stats['total'].toString(), Icons.receipt_long_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('This Year', stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard(l10n.thisYear, stats['thisMonth'].toString(), Icons.calendar_today_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Amount', 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
+            Expanded(child: _buildStatsCard(l10n.amount, 'PKR ${stats['totalAmount']}', Icons.attach_money_rounded, Colors.purple)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('This Week', stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
+            Expanded(child: _buildStatsCard(l10n.thisWeek, stats['thisWeek'].toString(), Icons.date_range_rounded, Colors.orange)),
           ],
         ),
       ],
@@ -406,6 +412,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<ExpensesProvider>(
@@ -415,17 +423,17 @@ class _ExpensesPageState extends State<ExpensesPage> {
             onChanged: provider.searchExpenses,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet ? 'Search expenses...' : 'Search expenses by ID, type, description, amount, or person...',
+              hintText: context.isTablet ? '${l10n.search} ${l10n.expenses}...' : l10n.searchExpensesHint,
               hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: provider.searchQuery.isNotEmpty
                   ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        provider.searchExpenses('');
-                      },
-                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
-                    )
+                onPressed: () {
+                  _searchController.clear();
+                  provider.searchExpenses('');
+                },
+                icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+              )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
@@ -437,6 +445,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return InkWell(
       onTap: _handleFilterTap,
       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -455,7 +465,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                'Filter',
+                l10n.filter,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
               ),
             ],
@@ -466,6 +476,8 @@ class _ExpensesPageState extends State<ExpensesPage> {
   }
 
   Widget _buildRefreshButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ExpensesProvider>(
       builder: (context, provider, child) {
         return InkWell(
@@ -488,7 +500,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 if (!context.isTablet) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Refresh',
+                    l10n.refresh,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                   ),
                 ],
@@ -516,9 +528,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Icon(icon, color: color, size: context.iconSize('medium')),
           ),
-
           SizedBox(width: context.cardPadding),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

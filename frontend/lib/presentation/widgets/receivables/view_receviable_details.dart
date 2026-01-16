@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class ViewReceivableDetailsDialog extends StatefulWidget {
@@ -62,6 +63,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -154,6 +157,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -185,7 +190,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Receivable Details',
+                  l10n.receivableDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -196,7 +201,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete receivable information',
+                    l10n.viewCompleteReceivableInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -247,36 +252,27 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Debtor Information Card
           _buildDebtorInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Amount Details Card
           _buildAmountDetailsCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Status and Progress Card
           _buildStatusCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Date Information Card
           _buildDateInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Reason and Notes Card
           _buildReasonNotesCard(isCompact),
           SizedBox(height: context.mainPadding),
-
-          // Close Button
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: l10n.close,
               onPressed: _handleClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -290,6 +286,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildDebtorInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -309,7 +307,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Debtor Information',
+                l10n.debtorInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -333,11 +331,13 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildDebtorInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Name',
+          l10n.name,
           style: GoogleFonts.inter(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
@@ -354,7 +354,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
         ),
         SizedBox(height: context.cardPadding),
         Text(
-          'Phone Number',
+          l10n.phone,
           style: GoogleFonts.inter(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
@@ -374,6 +374,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildDebtorInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -381,7 +383,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Name',
+                l10n.name,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -404,7 +406,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Phone Number',
+                l10n.phone,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -427,6 +429,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildAmountDetailsCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -445,7 +449,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Breakdown',
+                l10n.amountBreakdown,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -459,7 +463,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Amount Given:',
+                l10n.amountGiven,
                 style: GoogleFonts.inter(
                   fontSize: context.subtitleFontSize,
                   color: Colors.grey[700],
@@ -481,7 +485,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Amount Returned:',
+                  l10n.amountReturned,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     color: Colors.grey[700],
@@ -509,7 +513,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Balance Remaining:',
+                l10n.balanceRemaining,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -532,6 +536,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildStatusCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -565,7 +571,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Status',
+                      l10n.status,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -594,7 +600,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                   ),
                   child: Text(
-                    '${widget.receivable.daysOverdue} days overdue',
+                    '${widget.receivable.daysOverdue} ${l10n.daysOverdue}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -613,7 +619,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Return Progress',
+                      l10n.returnProgress,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -657,6 +663,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildDateInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -674,7 +682,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date Lent',
+                    l10n.dateLent,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -711,7 +719,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   Icon(Icons.event_available, size: context.iconSize('small'), color: Colors.orange),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Expected Return Date',
+                    l10n.expectedReturnDate,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -737,6 +745,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildDateInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -754,7 +764,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date Lent',
+                      l10n.dateLent,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -792,7 +802,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     Icon(Icons.event_available, size: context.iconSize('small'), color: Colors.orange),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Expected Return',
+                      l10n.expectedReturn,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -819,6 +829,8 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
   }
 
   Widget _buildReasonNotesCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -837,7 +849,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Transaction Details',
+                l10n.transactionDetails,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -848,7 +860,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'Reason/Item:',
+            l10n.reasonItem,
             style: GoogleFonts.inter(
               fontSize: context.captionFontSize,
               fontWeight: FontWeight.w500,
@@ -867,7 +879,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
           if (widget.receivable.notes != null && widget.receivable.notes!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             Text(
-              'Notes:',
+              l10n.notes,
               style: GoogleFonts.inter(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w500,
@@ -892,7 +904,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Created:',
+                      l10n.created,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -914,7 +926,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Last Updated:',
+                      l10n.lastUpdated,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,

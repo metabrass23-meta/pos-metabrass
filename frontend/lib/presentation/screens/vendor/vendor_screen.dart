@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/vendor/add_vendor_dialog.dart';
 import '../../widgets/vendor/delete_vendor_dialog.dart';
 import '../../widgets/vendor/edit_vendor_dialog.dart';
@@ -79,11 +80,12 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Future<void> _handleRefresh() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<VendorProvider>();
     await provider.refreshVendors();
 
     if (provider.hasError) {
-      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh vendors');
+      _showErrorSnackbar(provider.errorMessage ?? '${l10n.error} ${l10n.vendor}');
     }
   }
 
@@ -121,6 +123,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   void _handleExport() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = context.read<VendorProvider>();
 
@@ -139,7 +143,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Preparing export...',
+                '${l10n.export}...',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -171,7 +175,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Vendor data export completed successfully',
+                '${l10n.vendor} ${l10n.exportCompleted}',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -189,7 +193,7 @@ class _VendorPageState extends State<VendorPage> {
         ),
       );
     } catch (e) {
-      _showErrorSnackbar('Failed to export data: ${e.toString()}');
+      _showErrorSnackbar('${l10n.error} ${l10n.export}: ${e.toString()}');
     }
   }
 
@@ -256,6 +260,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -271,7 +277,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -281,7 +287,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -297,6 +303,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         // Page Title
@@ -305,7 +313,7 @@ class _VendorPageState extends State<VendorPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Vendor Management',
+                '${l10n.vendor} ${l10n.customerManagement}',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -315,7 +323,7 @@ class _VendorPageState extends State<VendorPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Organize and manage your supplier relationships with comprehensive tools',
+                '${l10n.manageProductCategories} ${l10n.vendor}',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -333,12 +341,14 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Page Title
         Text(
-          'Vendor Management',
+          '${l10n.vendor} ${l10n.customerManagement}',
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -348,7 +358,7 @@ class _VendorPageState extends State<VendorPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Organize and manage supplier relationships',
+          '${l10n.manageProductCategories} ${l10n.vendor}',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -367,12 +377,14 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Compact Page Title
         Text(
-          'Vendors',
+          l10n.vendor,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -382,7 +394,7 @@ class _VendorPageState extends State<VendorPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage supplier relationships',
+          '${l10n.customerManagementShortDescription} ${l10n.vendor}',
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -401,6 +413,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -428,7 +442,7 @@ class _VendorPageState extends State<VendorPage> {
                 ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Vendor',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.vendor}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -445,12 +459,14 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildDesktopStatsRow(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.vendorStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-              'Total Vendors',
+              '${l10n.total} ${l10n.vendor}',
               stats['total'].toString(),
               Icons.store_rounded,
               Colors.blue
@@ -459,7 +475,7 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Active Vendors',
+              '${l10n.activeVendors}',
               stats['active'].toString(),
               Icons.check_circle_rounded,
               Colors.green
@@ -468,7 +484,7 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Monthly Growth',
+              '${l10n.monthlyPerformance}',
               '${stats['monthlyGrowthRate']?.toStringAsFixed(1) ?? '0'}%',
               Icons.trending_up_rounded,
               Colors.purple
@@ -477,7 +493,7 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Cities Covered',
+              l10n.citiesCovered,
               stats['uniqueCities'].toString(),
               Icons.location_city_rounded,
               Colors.orange
@@ -488,14 +504,16 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildMobileStatsGrid(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.vendorStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatsCard(
-                  'Total',
+                  l10n.total,
                   stats['total'].toString(),
                   Icons.store_rounded,
                   Colors.blue
@@ -504,7 +522,7 @@ class _VendorPageState extends State<VendorPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                  'Active',
+                  l10n.active,
                   stats['active'].toString(),
                   Icons.check_circle_rounded,
                   Colors.green
@@ -517,7 +535,7 @@ class _VendorPageState extends State<VendorPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                  'Growth',
+                  l10n.growth,
                   '${stats['monthlyGrowthRate']?.toStringAsFixed(1) ?? '0'}%',
                   Icons.trending_up_rounded,
                   Colors.purple
@@ -526,7 +544,7 @@ class _VendorPageState extends State<VendorPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                  'Cities',
+                  l10n.cities,
                   stats['uniqueCities'].toString(),
                   Icons.location_city_rounded,
                   Colors.orange
@@ -636,6 +654,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildSearchBar(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Sync the search controller with provider state
     if (_searchController.text != provider.searchQuery) {
       _searchController.text = provider.searchQuery;
@@ -654,8 +674,8 @@ class _VendorPageState extends State<VendorPage> {
         ),
         decoration: InputDecoration(
           hintText: context.isTablet
-              ? 'Search vendors...'
-              : 'Search vendors by name, business, CNIC, or phone...',
+              ? '${l10n.search} ${l10n.vendor}...'
+              : l10n.searchVendorsHint,
           hintStyle: GoogleFonts.inter(
             fontSize: context.bodyFontSize * 0.9,
             color: Colors.grey[500],
@@ -689,6 +709,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildShowInactiveToggle(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -714,7 +736,7 @@ class _VendorPageState extends State<VendorPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                provider.showInactive ? l10n.hideInactive : l10n.showInactive,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -729,6 +751,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildFilterButton(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Check for active filters based on provider state
     final hasActiveFilters = provider.selectedCity != null ||
         provider.selectedArea != null ||
@@ -765,7 +789,7 @@ class _VendorPageState extends State<VendorPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                hasActiveFilters ? 'Filters ($filterCount)' : 'Filter',
+                hasActiveFilters ? '${l10n.filter} ($filterCount)' : l10n.filter,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -780,6 +804,8 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildExportButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -805,7 +831,7 @@ class _VendorPageState extends State<VendorPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                'Export',
+                l10n.export,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -820,16 +846,17 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   Widget _buildActiveFilters(VendorProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final activeFilters = <String>[];
 
     if (provider.selectedCity != null) {
-      activeFilters.add('City: ${provider.selectedCity}');
+      activeFilters.add('${l10n.city}: ${provider.selectedCity}');
     }
     if (provider.selectedArea != null) {
-      activeFilters.add('Area: ${provider.selectedArea}');
+      activeFilters.add('${l10n.area}: ${provider.selectedArea}');
     }
     if (provider.searchQuery.isNotEmpty) {
-      activeFilters.add('Search: ${provider.searchQuery}');
+      activeFilters.add('${l10n.search}: ${provider.searchQuery}');
     }
 
     if (activeFilters.isEmpty) {
@@ -896,7 +923,7 @@ class _VendorPageState extends State<VendorPage> {
             child: InkWell(
               onTap: provider.clearAllFilters,
               child: Text(
-                'Clear All',
+                l10n.clearAll,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -911,17 +938,17 @@ class _VendorPageState extends State<VendorPage> {
   }
 
   void _clearSpecificFilter(String filterText, VendorProvider provider) {
-    if (filterText.startsWith('City:')) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (filterText.startsWith('${l10n.city}:')) {
       provider.setCityFilter(null);
-    } else if (filterText.startsWith('Area:')) {
+    } else if (filterText.startsWith('${l10n.area}:')) {
       provider.setAreaFilter(null);
-    } else if (filterText.startsWith('Search:')) {
+    } else if (filterText.startsWith('${l10n.search}:')) {
       _searchController.clear();
       provider.clearSearch();
     }
   }
-
-  // Remove the old _getActiveFilterCount method since we're handling it inline now
 
   Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
     return Container(

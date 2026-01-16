@@ -8,6 +8,7 @@ import '../../../src/models/order/order_model.dart';
 import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_field.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
@@ -24,19 +25,16 @@ class EditOrderDialog extends StatefulWidget {
 class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   late TextEditingController _customerController;
   late TextEditingController _descriptionController;
   late TextEditingController _advancePaymentController;
   late TextEditingController _expectedDeliveryDateController;
 
-  // Form state
   Customer? _selectedCustomer;
   OrderStatus _selectedStatus = OrderStatus.PENDING;
   DateTime? _selectedDeliveryDate;
   bool _isLoadingCustomerDetails = false;
 
-  // Animation
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -45,7 +43,6 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   void initState() {
     super.initState();
 
-    // Initialize controllers with existing order data
     _customerController = TextEditingController(text: widget.order.customerName);
     _descriptionController = TextEditingController(text: widget.order.description);
     _advancePaymentController = TextEditingController(text: widget.order.advancePayment.toString());
@@ -55,20 +52,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           : '',
     );
 
-    // Initialize form state with existing order data
     _selectedStatus = widget.order.status;
     _selectedDeliveryDate = widget.order.expectedDeliveryDate;
 
-    // Initialize animations
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
 
-    // Load customer details
     _loadCustomerDetails();
   }
 
@@ -80,7 +71,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
     try {
       final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
       final customer = customerProvider.customers.firstWhere(
-        (c) => c.id == widget.order.customerId,
+            (c) => c.id == widget.order.customerId,
         orElse: () => Customer(
           id: widget.order.customerId,
           name: widget.order.customerName,
@@ -155,7 +146,6 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
 
   void _handleUpdate() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Check status transition validity
       if (!_isValidStatusTransition()) {
         _showStatusTransitionWarning();
         return;
@@ -168,7 +158,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
         description: _descriptionController.text.trim(),
         advancePayment: double.tryParse(_advancePaymentController.text.trim()) ?? 0.0,
         expectedDeliveryDate: _selectedDeliveryDate,
-        status: _selectedStatus.name.toUpperCase(), // Send status in uppercase
+        status: _selectedStatus.name.toUpperCase(),
       );
 
       if (mounted) {
@@ -182,15 +172,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
     }
   }
 
-  // Check if status transition is valid
   bool _isValidStatusTransition() {
-    if (_selectedStatus == widget.order.status) return true; // No change
+    if (_selectedStatus == widget.order.status) return true;
     final validNextStatuses = _getValidNextStatuses(widget.order.status);
     return validNextStatuses.contains(_selectedStatus);
   }
 
-  // Show status transition warning
   void _showStatusTransitionWarning() {
+    final l10n = AppLocalizations.of(context)!;
     final validNextStatuses = _getValidNextStatuses(widget.order.status);
     final validStatusTexts = validNextStatuses.map((s) => _getStatusText(s)).join(', ');
 
@@ -201,57 +190,54 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.orange),
             SizedBox(width: 8),
-            Text('Invalid Status Transition'),
+            Text(l10n.invalidStatusTransition),
           ],
         ),
         content: Text(
-          'You cannot change the status from "${_getStatusText(widget.order.status)}" to "${_getStatusText(_selectedStatus)}".\n\n'
-          'Valid next statuses are: $validStatusTexts',
+          '${l10n.cannotChangeStatusFrom} "${_getStatusText(widget.order.status)}" ${l10n.to} "${_getStatusText(_selectedStatus)}".\n\n'
+              '${l10n.validNextStatusesAre}: $validStatusTexts',
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('OK'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.ok))],
       ),
     );
   }
 
-  // Get user-friendly error message
   String _getUserFriendlyErrorMessage(String errorMessage) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (errorMessage.contains('Invalid status transition')) {
       return _getStatusTransitionErrorMessage();
     } else if (errorMessage.contains('maximum recursion depth exceeded')) {
-      return 'Server error occurred. Please try again or contact support.';
+      return l10n.serverErrorOccurred;
     } else if (errorMessage.contains('not a valid choice')) {
-      return 'Invalid status selected. Please choose a valid status.';
+      return l10n.invalidStatusSelected;
     } else if (errorMessage.contains('Date has wrong format')) {
-      return 'Invalid date format. Please select a valid delivery date.';
+      return l10n.invalidDateFormat;
     } else if (errorMessage.contains('cannot be before order date')) {
-      return 'Delivery date cannot be before the order date.';
+      return l10n.deliveryDateCannotBeBeforeOrderDate;
     } else if (errorMessage.contains('cannot exceed total amount')) {
-      return 'Advance payment cannot exceed the total order amount.';
+      return l10n.advancePaymentCannotExceedTotal;
     } else if (errorMessage.contains('cannot be negative')) {
-      return 'Advance payment cannot be negative.';
+      return l10n.advancePaymentCannotBeNegative;
     } else if (errorMessage.contains('cannot be modified')) {
-      return 'This order cannot be modified in its current status.';
+      return l10n.orderCannotBeModified;
     }
     return errorMessage;
   }
 
-  // Get specific status transition error message
   String _getStatusTransitionErrorMessage() {
+    final l10n = AppLocalizations.of(context)!;
     final currentStatus = widget.order.status;
-
-    // Get valid next statuses
     final validNextStatuses = _getValidNextStatuses(currentStatus);
 
     if (validNextStatuses.isEmpty) {
-      return 'This order cannot have its status changed.';
+      return l10n.orderCannotHaveStatusChanged;
     }
 
     final validStatusTexts = validNextStatuses.map((status) => _getStatusText(status)).join(', ');
-
-    return 'Invalid status transition. From ${_getStatusText(currentStatus)}, you can only change to: $validStatusTexts';
+    return '${l10n.invalidStatusTransitionFrom} ${_getStatusText(currentStatus)}, ${l10n.youCanOnlyChangeTo}: $validStatusTexts';
   }
 
-  // Get valid next statuses based on current status
   List<OrderStatus> _getValidNextStatuses(OrderStatus currentStatus) {
     switch (currentStatus) {
       case OrderStatus.PENDING:
@@ -263,24 +249,20 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
       case OrderStatus.READY:
         return [OrderStatus.DELIVERED, OrderStatus.CANCELLED];
       case OrderStatus.DELIVERED:
-        return []; // Terminal state
+        return [];
       case OrderStatus.CANCELLED:
-        return []; // Terminal state
+        return [];
     }
   }
 
-  // Get valid status options for UI display
   List<OrderStatus> _getValidStatusOptions() {
-    // Include current status and valid next statuses
     final validOptions = <OrderStatus>[widget.order.status];
     validOptions.addAll(_getValidNextStatuses(widget.order.status));
 
-    // Also include current selected status if it's not in the list
     if (!validOptions.contains(_selectedStatus)) {
       validOptions.add(_selectedStatus);
     }
 
-    // Sort by priority (current status first, then logical progression)
     validOptions.sort((a, b) {
       if (a == widget.order.status) return -1;
       if (b == widget.order.status) return 1;
@@ -290,7 +272,6 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
     return validOptions;
   }
 
-  // Get status priority for sorting
   int _getStatusPriority(OrderStatus status) {
     switch (status) {
       case OrderStatus.PENDING:
@@ -309,6 +290,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -316,7 +299,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Order updated successfully!',
+              l10n.orderUpdatedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -330,6 +313,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   void _showErrorSnackbar(String message) {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -342,7 +327,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Order Update Failed',
+                    l10n.orderUpdateFailed,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                   ),
                   SizedBox(height: 4),
@@ -360,7 +345,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
         action: SnackBarAction(
-          label: 'Dismiss',
+          label: l10n.dismiss,
           textColor: AppTheme.pureWhite,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -413,6 +398,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -435,7 +422,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Edit Order',
+                  l10n.editOrder,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -446,7 +433,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update order information',
+                    l10n.updateOrderInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -509,20 +496,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Customer Information Section
                 _buildCustomerInfoSection(),
                 SizedBox(height: context.cardPadding),
-                // Order Details Section
                 _buildOrderDetailsSection(),
                 SizedBox(height: context.cardPadding),
-
-                // Financial Information Section
                 _buildFinancialInfoSection(),
                 SizedBox(height: context.cardPadding),
-                // Delivery Information Section
                 _buildDeliveryInfoSection(),
                 SizedBox(height: context.mainPadding),
-                // Action Buttons
                 ResponsiveBreakpoints.responsive(
                   context,
                   tablet: _buildCompactButtons(),
@@ -540,6 +521,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildCustomerInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -555,7 +538,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               Icon(Icons.person_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customer Information',
+                l10n.customerInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -628,7 +611,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   Icon(Icons.verified_user_outlined, color: Colors.green, size: context.iconSize('small')),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Customer since: ${_formatDate(_selectedCustomer!.createdAt)}',
+                    '${l10n.customerSince}: ${_formatDate(_selectedCustomer!.createdAt)}',
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
                   ),
                 ],
@@ -641,6 +624,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildOrderDetailsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -656,38 +641,37 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               Icon(Icons.shopping_bag_outlined, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Details',
+                l10n.orderDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Order Description *',
-            hint: context.shouldShowCompactLayout ? 'Enter description' : 'Describe the order details (e.g., products, specifications)',
+            label: '${l10n.orderDescription} *',
+            hint: context.shouldShowCompactLayout ? l10n.enterDescription : l10n.describeOrderDetails,
             controller: _descriptionController,
             prefixIcon: Icons.description_outlined,
             maxLines: 3,
             validator: (value) {
               if (value?.isEmpty ?? true) {
-                return 'Please enter order description';
+                return l10n.pleaseEnterOrderDescription;
               }
               if (value!.length < 10) {
-                return 'Description must be at least 10 characters';
+                return l10n.descriptionMustBeAtLeast10Characters;
               }
               if (value.length > 500) {
-                return 'Description must be less than 500 characters';
+                return l10n.descriptionMustBeLessThan500Characters;
               }
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'Order Status',
+            l10n.orderStatus,
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
-          // Show current status indicator
           Container(
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
             decoration: BoxDecoration(
@@ -701,7 +685,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 Icon(Icons.info_outline, color: _getStatusColor(widget.order.status), size: 16),
                 SizedBox(width: context.smallPadding / 2),
                 Text(
-                  'Current Status: ${_getStatusText(widget.order.status)}',
+                  '${l10n.currentStatus}: ${_getStatusText(widget.order.status)}',
                   style: GoogleFonts.inter(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
@@ -718,32 +702,31 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
             children: _getValidStatusOptions()
                 .map(
                   (status) => InkWell(
-                    onTap: () => _handleStatusChange(status),
+                onTap: () => _handleStatusChange(status),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.smallPadding),
+                  decoration: BoxDecoration(
+                    color: _selectedStatus == status ? _getStatusColor(status).withOpacity(0.1) : Colors.grey.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.smallPadding),
-                      decoration: BoxDecoration(
-                        color: _selectedStatus == status ? _getStatusColor(status).withOpacity(0.1) : Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                        border: Border.all(
-                          color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey.shade300,
-                          width: _selectedStatus == status ? 2 : 1,
-                        ),
-                      ),
-                      child: Text(
-                        _getStatusText(status),
-                        style: GoogleFonts.inter(
-                          fontSize: context.captionFontSize,
-                          fontWeight: _selectedStatus == status ? FontWeight.w600 : FontWeight.w500,
-                          color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey[700],
-                        ),
-                      ),
+                    border: Border.all(
+                      color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey.shade300,
+                      width: _selectedStatus == status ? 2 : 1,
                     ),
                   ),
-                )
+                  child: Text(
+                    _getStatusText(status),
+                    style: GoogleFonts.inter(
+                      fontSize: context.captionFontSize,
+                      fontWeight: _selectedStatus == status ? FontWeight.w600 : FontWeight.w500,
+                      color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey[700],
+                    ),
+                  ),
+                ),
+              ),
+            )
                 .toList(),
           ),
-          // Show status transition info
           if (_getValidNextStatuses(widget.order.status).isNotEmpty) ...[
             SizedBox(height: context.smallPadding),
             Container(
@@ -759,7 +742,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
-                      'Valid next statuses: ${_getValidNextStatuses(widget.order.status).map((s) => _getStatusText(s)).join(', ')}',
+                      '${l10n.validNextStatuses}: ${_getValidNextStatuses(widget.order.status).map((s) => _getStatusText(s)).join(', ')}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
                     ),
                   ),
@@ -773,6 +756,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildFinancialInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -788,47 +773,47 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               Icon(Icons.account_balance_wallet_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Financial Information',
+                l10n.financialInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Total Amount (PKR)',
-            hint: 'Total order amount',
+            label: l10n.totalAmountPKR,
+            hint: l10n.totalOrderAmount,
             controller: TextEditingController(text: 'PKR ${widget.order.totalAmount.toStringAsFixed(2)}'),
             prefixIcon: Icons.attach_money_rounded,
             enabled: false,
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Advance Payment (PKR) *',
-            hint: 'Enter advance payment amount',
+            label: '${l10n.advancePaymentPKR} *',
+            hint: l10n.enterAdvancePaymentAmount,
             controller: _advancePaymentController,
             prefixIcon: Icons.payment_rounded,
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value?.isEmpty ?? true) {
-                return 'Please enter advance payment';
+                return l10n.pleaseEnterAdvancePayment;
               }
               if (double.tryParse(value!) == null) {
-                return 'Please enter a valid amount';
+                return l10n.pleaseEnterValidAmount;
               }
               final advance = double.parse(value);
               if (advance < 0) {
-                return 'Advance payment cannot be negative';
+                return l10n.advancePaymentCannotBeNegative;
               }
               if (advance > widget.order.totalAmount) {
-                return 'Advance payment cannot exceed total amount';
+                return l10n.advancePaymentCannotExceedTotal;
               }
               return null;
             },
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Remaining Amount (PKR)',
-            hint: 'Remaining amount to be paid',
+            label: l10n.remainingAmountPKR,
+            hint: l10n.remainingAmountToBePaid,
             controller: TextEditingController(text: 'PKR ${widget.order.remainingAmount.toStringAsFixed(2)}'),
             prefixIcon: Icons.account_balance_outlined,
             enabled: false,
@@ -839,6 +824,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildDeliveryInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -854,18 +841,18 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               Icon(Icons.local_shipping_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Delivery Information',
+                l10n.deliveryInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Order Date',
-            hint: 'Date when order was placed',
+            label: l10n.orderDate,
+            hint: l10n.dateWhenOrderWasPlaced,
             controller: TextEditingController(
               text:
-                  '${widget.order.dateOrdered.day.toString().padLeft(2, '0')}/${widget.order.dateOrdered.month.toString().padLeft(2, '0')}/${widget.order.dateOrdered.year}',
+              '${widget.order.dateOrdered.day.toString().padLeft(2, '0')}/${widget.order.dateOrdered.month.toString().padLeft(2, '0')}/${widget.order.dateOrdered.year}',
             ),
             prefixIcon: Icons.calendar_today_outlined,
             enabled: false,
@@ -873,14 +860,13 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           SizedBox(height: context.cardPadding),
           InkWell(
             onTap: () async {
-              // Use custom date picker for better UX
               await context.showSyncfusionDateTimePicker(
                 initialDate: _selectedDeliveryDate ?? DateTime.now().add(const Duration(days: 1)),
                 initialTime: TimeOfDay.now(),
-                title: 'Select Expected Delivery Date',
+                title: l10n.selectExpectedDeliveryDate,
                 minDate: DateTime.now(),
                 maxDate: DateTime.now().add(const Duration(days: 365)),
-                showTimeInline: false, // Only show date for delivery
+                showTimeInline: false,
                 onDateTimeSelected: (date, time) {
                   _handleDeliveryDateChange(date);
                 },
@@ -901,8 +887,8 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   Expanded(
                     child: Text(
                       _selectedDeliveryDate != null
-                          ? 'Expected Delivery: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
-                          : 'Select Expected Delivery Date',
+                          ? '${l10n.expectedDelivery}: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
+                          : l10n.selectExpectedDeliveryDate,
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         color: _selectedDeliveryDate != null ? AppTheme.charcoalGray : Colors.grey[500],
@@ -919,13 +905,15 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<OrderProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Order',
+              text: l10n.updateOrder,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -936,7 +924,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -948,12 +936,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -966,7 +956,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           child: Consumer<OrderProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update',
+                text: l10n.update,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
@@ -998,19 +988,21 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
   }
 
   String _getStatusText(OrderStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Pending';
+        return l10n.pending;
       case OrderStatus.CONFIRMED:
-        return 'Confirmed';
+        return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return 'In Production';
+        return l10n.inProduction;
       case OrderStatus.READY:
-        return 'Ready';
+        return l10n.ready;
       case OrderStatus.DELIVERED:
-        return 'Delivered';
+        return l10n.delivered;
       case OrderStatus.CANCELLED:
-        return 'Cancelled';
+        return l10n.cancelled;
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class ViewOrderDialog extends StatefulWidget {
@@ -84,6 +85,8 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -106,7 +109,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'View Order' : 'Order Details',
+                  context.shouldShowCompactLayout ? l10n.viewOrder : l10n.orderDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -117,7 +120,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Complete order information',
+                    l10n.completeOrderInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -131,7 +134,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
-                          'Order ID: ${widget.order.id.substring(0, 8)}...',
+                          '${l10n.orderID}: ${widget.order.id.substring(0, 8)}...',
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
@@ -176,37 +179,30 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Order Information Section
             _buildOrderInfoSection(),
 
             SizedBox(height: context.cardPadding),
 
-            // Customer Information Section
             _buildCustomerInfoSection(),
 
             SizedBox(height: context.cardPadding),
 
-            // Financial Information Section
             _buildFinancialInfoSection(),
 
             SizedBox(height: context.cardPadding),
 
-            // Order Items Section
             _buildOrderItemsSection(),
 
             SizedBox(height: context.cardPadding),
 
-            // Delivery Information Section
             _buildDeliveryInfoSection(),
 
             SizedBox(height: context.cardPadding),
 
-            // Additional Information Section
             _buildAdditionalInfoSection(),
 
             SizedBox(height: context.mainPadding),
 
-            // Close Button
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButton(),
@@ -222,6 +218,8 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   Widget _buildOrderInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -237,22 +235,24 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.info_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Information',
+                l10n.orderInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildInfoRow('Order ID', widget.order.id),
-          _buildInfoRow('Description', widget.order.description),
-          if (widget.order.createdBy != null) _buildInfoRow('Created By', widget.order.createdBy!),
+          _buildInfoRow(l10n.orderID, widget.order.id),
+          _buildInfoRow(l10n.description, widget.order.description),
+          if (widget.order.createdBy != null) _buildInfoRow(l10n.createdBy, widget.order.createdBy!),
         ],
       ),
     );
   }
 
   Widget _buildCustomerInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -268,22 +268,24 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.person_outline, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customer Information',
+                l10n.customerInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildInfoRow('Customer Name', widget.order.customerName),
-          _buildInfoRow('Phone', widget.order.customerPhone),
-          _buildInfoRow('Email', widget.order.customerEmail),
+          _buildInfoRow(l10n.customerName, widget.order.customerName),
+          _buildInfoRow(l10n.phone, widget.order.customerPhone),
+          _buildInfoRow(l10n.email, widget.order.customerEmail),
         ],
       ),
     );
   }
 
   Widget _buildFinancialInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -299,24 +301,26 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.account_balance_wallet_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Financial Information',
+                l10n.financialInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildInfoRow('Total Amount', 'PKR ${widget.order.totalAmount.toStringAsFixed(2)}'),
-          _buildInfoRow('Advance Payment', 'PKR ${widget.order.advancePayment.toStringAsFixed(2)}'),
-          _buildInfoRow('Remaining Amount', 'PKR ${widget.order.remainingAmount.toStringAsFixed(2)}'),
-          _buildInfoRow('Payment Percentage', '${widget.order.paymentPercentage}%'),
-          _buildInfoRow('Fully Paid', widget.order.isFullyPaid ? 'Yes' : 'No'),
+          _buildInfoRow(l10n.totalAmount, 'PKR ${widget.order.totalAmount.toStringAsFixed(2)}'),
+          _buildInfoRow(l10n.advancePayment, 'PKR ${widget.order.advancePayment.toStringAsFixed(2)}'),
+          _buildInfoRow(l10n.remainingAmount, 'PKR ${widget.order.remainingAmount.toStringAsFixed(2)}'),
+          _buildInfoRow(l10n.paymentPercentage, '${widget.order.paymentPercentage}%'),
+          _buildInfoRow(l10n.fullyPaid, widget.order.isFullyPaid ? l10n.yes : l10n.no),
         ],
       ),
     );
   }
 
   Widget _buildOrderItemsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -332,14 +336,13 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.shopping_cart_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Items',
+                l10n.orderItems,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          // Placeholder for order items
           Container(
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
@@ -353,7 +356,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Order items are managed separately. Use the Order Items module to view and manage products in this order.',
+                    l10n.orderItemsManagedSeparately,
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.purple[700]),
                   ),
                 ),
@@ -363,12 +366,11 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
 
           SizedBox(height: context.cardPadding),
 
-          // Summary information
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Items:',
+                '${l10n.totalItems}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -382,7 +384,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Quantity:',
+                '${l10n.totalQuantity}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -397,6 +399,8 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   Widget _buildDeliveryInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -412,23 +416,25 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.local_shipping_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Delivery Information',
+                l10n.deliveryInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          if (widget.order.expectedDeliveryDate != null) _buildInfoRow('Expected Delivery', _formatDate(widget.order.expectedDeliveryDate!)),
-          _buildInfoRow('Days Since Ordered', '${widget.order.daysSinceOrdered} days'),
-          if (widget.order.expectedDeliveryDate != null) _buildInfoRow('Days Until Delivery', '${widget.order.daysUntilDelivery} days'),
-          _buildInfoRow('Is Overdue', widget.order.isOverdue ? 'Yes' : 'No'),
+          if (widget.order.expectedDeliveryDate != null) _buildInfoRow(l10n.expectedDelivery, _formatDate(widget.order.expectedDeliveryDate!)),
+          _buildInfoRow(l10n.daysSinceOrdered, '${widget.order.daysSinceOrdered} ${l10n.days}'),
+          if (widget.order.expectedDeliveryDate != null) _buildInfoRow(l10n.daysUntilDelivery, '${widget.order.daysUntilDelivery} ${l10n.days}'),
+          _buildInfoRow(l10n.isOverdue, widget.order.isOverdue ? l10n.yes : l10n.no),
         ],
       ),
     );
   }
 
   Widget _buildAdditionalInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -444,18 +450,18 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               Icon(Icons.more_horiz, color: Colors.teal, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Additional Information',
+                l10n.additionalInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          _buildInfoRow('Conversion Status', widget.order.conversionStatus),
-          _buildInfoRow('Converted Sales Amount', 'PKR ${widget.order.convertedSalesAmount.toStringAsFixed(2)}'),
-          if (widget.order.conversionDate != null) _buildInfoRow('Conversion Date', _formatDate(widget.order.conversionDate!)),
-          _buildInfoRow('Is Active', widget.order.isActive ? 'Yes' : 'No'),
-          _buildInfoRow('Created At', _formatDateTime(widget.order.createdAt)),
+          _buildInfoRow(l10n.conversionStatus, widget.order.conversionStatus),
+          _buildInfoRow(l10n.convertedSalesAmount, 'PKR ${widget.order.convertedSalesAmount.toStringAsFixed(2)}'),
+          if (widget.order.conversionDate != null) _buildInfoRow(l10n.conversionDate, _formatDate(widget.order.conversionDate!)),
+          _buildInfoRow(l10n.isActive, widget.order.isActive ? l10n.yes : l10n.no),
+          _buildInfoRow(l10n.createdAt, _formatDateTime(widget.order.createdAt)),
         ],
       ),
     );
@@ -487,8 +493,10 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   Widget _buildCompactButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return PremiumButton(
-      text: 'Close',
+      text: l10n.close,
       onPressed: _handleClose,
       height: context.buttonHeight,
       icon: Icons.close_rounded,
@@ -497,11 +505,13 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   Widget _buildDesktopButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: SizedBox(
         width: 200,
         child: PremiumButton(
-          text: 'Close',
+          text: l10n.close,
           onPressed: _handleClose,
           height: context.buttonHeight / 1.5,
           icon: Icons.close_rounded,
@@ -537,19 +547,21 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
   }
 
   String _getStatusText(OrderStatus status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Pending';
+        return l10n.pending;
       case OrderStatus.CONFIRMED:
-        return 'Confirmed';
+        return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return 'In Production';
+        return l10n.inProduction;
       case OrderStatus.READY:
-        return 'Ready';
+        return l10n.ready;
       case OrderStatus.DELIVERED:
-        return 'Delivered';
+        return l10n.delivered;
       case OrderStatus.CANCELLED:
-        return 'Cancelled';
+        return l10n.cancelled;
     }
   }
 }

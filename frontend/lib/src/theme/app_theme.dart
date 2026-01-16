@@ -4,15 +4,68 @@ import 'package:sizer/sizer.dart';
 import 'dart:ui' show Locale;
 
 class AppTheme {
-  // Color Palette
-  static const Color primaryMaroon = Color(0xFF800020);
-  static const Color secondaryMaroon = Color(0xFF9B0030);
+
+
+  // Color Palette primary red
+  // static const Color primaryMaroon = Color(0xFF800020);
+  // static const Color secondaryMaroon = Color(0xFF9B0030);
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFFFFBF5);
+  // static const Color charcoalGray = Color(0xFF2C2C2C);
+  // static const Color lightGray = Color(0xFFF5F5F5);
+  // static const Color shadowColor = Color(0x1A000000);
+
+
+  // static const Color primaryMaroon = Color(0xFF006D77); // Deep Teal
+  // static const Color secondaryMaroon = Color(0xFF4A1A4A); // Rich Plum
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFF9F5F0);
+  // static const Color charcoalGray = Color(0xFF2C2C2C);
+  // static const Color lightGray = Color(0xFFF5F5F5);
+  // static const Color shadowColor = Color(0x1A000000);
+
+
+  // static const Color primaryMaroon = Color(0xFF1A1A1A); // Deep Black
+  // static const Color secondaryMaroon = Color(0xFF3D3D3D); // Charcoal
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFFAF8F3);
+  // static const Color charcoalGray = Color(0xFF2C2C2C);
+  // static const Color lightGray = Color(0xFFE5E5E5);
+  // static const Color shadowColor = Color(0x1A000000);
+
+
+
+  // static const Color primaryMaroon = Color(0xFF6B1F3B); // Deep Burgundy
+  // static const Color secondaryMaroon = Color(0xFF8B3A52); // Lighter Burgundy
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFF9F5F0);
+  // static const Color charcoalGray = Color(0xFF2C2C2C);
+  // static const Color lightGray = Color(0xFFF5F5F5);
+  // static const Color shadowColor = Color(0x1A000000);
+
+
+ // green look
+  static const Color primaryMaroon = Color(0xFF005F3D);
+  static const Color secondaryMaroon = Color(0xFF5D4037);
   static const Color accentGold = Color(0xFFD4AF37);
   static const Color pureWhite = Color(0xFFFFFFFF);
   static const Color creamWhite = Color(0xFFFFFBF5);
-  static const Color charcoalGray = Color(0xFF2C2C2C);
+  static const Color charcoalGray = Color(0xFF3E2723);
   static const Color lightGray = Color(0xFFF5F5F5);
   static const Color shadowColor = Color(0x1A000000);
+
+
+
+
+
+
+
+
+
 
   // Font Configuration - Customizable by customer
   static String englishFontFamily = 'Inter';

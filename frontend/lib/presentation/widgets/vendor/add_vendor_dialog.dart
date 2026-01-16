@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -135,7 +136,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   void _showValidationErrors() {
+    final l10n = AppLocalizations.of(context)!;
     final errorMessages = _validationErrors.values.join('\n');
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -144,7 +147,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
-                'Please fix the following errors:\n$errorMessages',
+                '${l10n.pleaseFixErrors}:\n$errorMessages',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -163,6 +166,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -170,7 +175,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Vendor added successfully!',
+              '${l10n.vendor} ${l10n.success}!',
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -271,6 +276,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -296,7 +303,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Vendor' : 'Add New Vendor',
+                  context.shouldShowCompactLayout
+                      ? '${l10n.add} ${l10n.vendor}'
+                      : '${l10n.add} ${l10n.newCustomer} ${l10n.vendor}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -307,7 +316,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new vendor profile',
+                    '${l10n.createOrder} ${l10n.vendor} ${l10n.profile}',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -372,27 +381,31 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information', Icons.info_outline),
+        _buildSectionTitle(l10n.basicInformation, Icons.info_outline),
         SizedBox(height: context.cardPadding),
 
         // Vendor Name
         PremiumTextField(
-          label: 'Vendor Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter vendor\'s full name',
+          label: '${l10n.vendor} ${l10n.name} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.name}'
+              : '${l10n.enterEmail} ${l10n.vendor} ${l10n.fullName}',
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter vendor name';
+              return '${l10n.pleaseEnter} ${l10n.vendor} ${l10n.name}';
             }
             if (value!.length < 2) {
-              return 'Name must be at least 2 characters';
+              return '${l10n.name} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
             }
             if (value.length > 100) {
-              return 'Name must be less than 100 characters';
+              return '${l10n.name} ${l10n.mustBeLessThan} 100 ${l10n.characters}';
             }
             return null;
           },
@@ -401,19 +414,21 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
 
         // Business Name
         PremiumTextField(
-          label: 'Business Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter business name' : 'Enter business/company name',
+          label: '${l10n.businessName} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.businessName}'
+              : '${l10n.enterEmail} ${l10n.businessName}',
           controller: _businessNameController,
           prefixIcon: Icons.business_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter business name';
+              return '${l10n.pleaseEnter} ${l10n.businessName}';
             }
             if (value!.length < 2) {
-              return 'Business name must be at least 2 characters';
+              return '${l10n.businessName} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
             }
             if (value.length > 200) {
-              return 'Business name must be less than 200 characters';
+              return '${l10n.businessName} ${l10n.mustBeLessThan} 200 ${l10n.characters}';
             }
             return null;
           },
@@ -422,16 +437,18 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
 
         // CNIC
         PremiumTextField(
-          label: 'CNIC *',
-          hint: context.shouldShowCompactLayout ? 'Enter CNIC' : 'Enter CNIC (e.g., 42101-1234567-1)',
+          label: '${l10n.cnic} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.cnic}'
+              : '${l10n.enterEmail} ${l10n.cnic} (${l10n.cnicFormat})',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter CNIC';
+              return '${l10n.pleaseEnter} ${l10n.cnic}';
             }
             if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
-              return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+              return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
             }
             return null;
           },
@@ -481,13 +498,15 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<VendorProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Vendor',
+              text: '${l10n.add} ${l10n.vendor}',
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -498,7 +517,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -510,11 +529,13 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -528,7 +549,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
           child: Consumer<VendorProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Vendor',
+                text: '${l10n.add} ${l10n.vendor}',
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
@@ -543,25 +564,29 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildContactInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
         SizedBox(height: context.cardPadding),
 
         // Phone Number
         PremiumTextField(
-          label: 'Phone Number *',
-          hint: context.shouldShowCompactLayout ? 'Enter phone' : 'Enter phone number (e.g., +923001234567)',
+          label: '${l10n.phone} *',
+          hint: context.shouldShowCompactLayout
+              ? '${l10n.enterEmail} ${l10n.phone}'
+              : '${l10n.enterEmail} ${l10n.phone} (${l10n.phoneFormat})',
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter phone number';
+              return '${l10n.pleaseEnter} ${l10n.phone}';
             }
             if (value!.length < 10) {
-              return 'Please enter a valid phone number';
+              return '${l10n.pleaseEnterValid} ${l10n.phone}';
             }
             return null;
           },
@@ -571,10 +596,12 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildLocationInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Location Information', Icons.location_on_outlined),
+        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
         SizedBox(height: context.cardPadding),
 
         // City and Area Row/Column
@@ -611,17 +638,19 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildCityField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'City *',
-          hint: 'Enter city',
+          label: '${l10n.city} *',
+          hint: '${l10n.enterEmail} ${l10n.city}',
           controller: _cityController,
           prefixIcon: Icons.location_city_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter city';
+              return '${l10n.pleaseEnter} ${l10n.city}';
             }
             return null;
           },
@@ -634,10 +663,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-                  label: city,
-                  onTap: () => setState(() => _cityController.text = city),
-                ),
-              )
+              label: city,
+              onTap: () => setState(() => _cityController.text = city),
+            ),
+          )
               .toList(),
         ),
       ],
@@ -645,17 +674,19 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   }
 
   Widget _buildAreaField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'Area *',
-          hint: 'Enter area',
+          label: '${l10n.area} *',
+          hint: '${l10n.enterEmail} ${l10n.area}',
           controller: _areaController,
           prefixIcon: Icons.map_outlined,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter area';
+              return '${l10n.pleaseEnter} ${l10n.area}';
             }
             return null;
           },
@@ -668,10 +699,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-                  label: area,
-                  onTap: () => setState(() => _areaController.text = area),
-                ),
-              )
+              label: area,
+              onTap: () => setState(() => _areaController.text = area),
+            ),
+          )
               .toList(),
         ),
       ],

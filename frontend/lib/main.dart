@@ -23,6 +23,7 @@ import 'package:frontend/src/providers/product_provider.dart';
 import 'package:frontend/src/providers/profit_loss/profit_loss_provider.dart';
 import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
+import 'package:frontend/src/providers/tax_rates_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/zakat_provider.dart';
 import 'package:frontend/src/providers/return_provider.dart';
@@ -55,7 +56,7 @@ void main() async {
         ..maxSize = Size(1920, 1080)
         ..size = Size(1024, 768)
         ..alignment = Alignment.center
-        ..title = "Maqbool Fashion"
+        ..title = "Al Noor Fashion"
         ..show();
     });
   }
@@ -72,6 +73,7 @@ class MaqboolFabricApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Initialize AuthProvider with API integration
+        ChangeNotifierProvider(create: (_) => TaxRatesProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
@@ -118,7 +120,7 @@ class MaqboolFabricApp extends StatelessWidget {
           return Sizer(
             builder: (context, orientation, deviceType) {
               return MaterialApp(
-                title: 'Maqbool Fashion - Premium POS',
+                title: 'Al Noor Fashion - Premium POS',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,

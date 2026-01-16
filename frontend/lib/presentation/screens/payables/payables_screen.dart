@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/payables/add_payable_dialog.dart';
 import '../../widgets/payables/delete_payable_dialog.dart';
 import '../../widgets/payables/edit_payable_dialog.dart';
@@ -26,7 +27,6 @@ class _PayablesPageState extends State<PayablesPage> {
   @override
   void initState() {
     super.initState();
-    // Load statistics when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<PayablesProvider>();
       provider.loadStatistics();
@@ -111,6 +111,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -122,13 +124,13 @@ class _PayablesPageState extends State<PayablesPage> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
@@ -140,6 +142,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -147,7 +151,7 @@ class _PayablesPageState extends State<PayablesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Payables Management',
+                l10n.payablesManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.w700,
@@ -157,7 +161,7 @@ class _PayablesPageState extends State<PayablesPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Track and manage amounts owed to creditors efficiently',
+                l10n.payablesManagementDescription,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
@@ -169,11 +173,13 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payables',
+          l10n.payables,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -183,7 +189,7 @@ class _PayablesPageState extends State<PayablesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage creditor payables',
+          l10n.manageCreditorPayables,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -193,11 +199,13 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payables',
+          l10n.payables,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -207,7 +215,7 @@ class _PayablesPageState extends State<PayablesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Creditor payables',
+          l10n.creditorPayables,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -217,6 +225,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -235,7 +245,7 @@ class _PayablesPageState extends State<PayablesPage> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Payable',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.payable}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -252,15 +262,17 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildDesktopStatsRow(PayablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
-          child: _buildStatsCard('Total Payables', provider.payables.length.toString(), Icons.account_balance_wallet_rounded, AppTheme.primaryMaroon),
+          child: _buildStatsCard(l10n.totalPayables, provider.payables.length.toString(), Icons.account_balance_wallet_rounded, AppTheme.primaryMaroon),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Total Borrowed',
+            l10n.totalBorrowed,
             'PKR ${provider.totalAmountBorrowed.toStringAsFixed(2)}',
             Icons.trending_up_rounded,
             AppTheme.accentGold,
@@ -268,12 +280,12 @@ class _PayablesPageState extends State<PayablesPage> {
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
-          child: _buildStatsCard('Total Paid', 'PKR ${provider.totalAmountPaid.toStringAsFixed(2)}', Icons.trending_down_rounded, Colors.green),
+          child: _buildStatsCard(l10n.totalPaid, 'PKR ${provider.totalAmountPaid.toStringAsFixed(2)}', Icons.trending_down_rounded, Colors.green),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Balance Due',
+            l10n.balanceDue,
             'PKR ${provider.totalBalanceRemaining.toStringAsFixed(2)}',
             Icons.account_balance_rounded,
             Colors.red,
@@ -284,17 +296,19 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildMobileStatsGrid(PayablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: _buildStatsCard('Total', provider.payables.length.toString(), Icons.account_balance_wallet_rounded, AppTheme.primaryMaroon),
+              child: _buildStatsCard(l10n.total, provider.payables.length.toString(), Icons.account_balance_wallet_rounded, AppTheme.primaryMaroon),
             ),
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'Borrowed',
+                l10n.borrowed,
                 'PKR ${provider.totalAmountBorrowed.toStringAsFixed(2)}',
                 Icons.trending_up_rounded,
                 AppTheme.accentGold,
@@ -305,10 +319,10 @@ class _PayablesPageState extends State<PayablesPage> {
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Paid', 'PKR ${provider.totalAmountPaid.toStringAsFixed(2)}', Icons.trending_down_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard(l10n.paid, 'PKR ${provider.totalAmountPaid.toStringAsFixed(2)}', Icons.trending_down_rounded, Colors.green)),
             SizedBox(width: context.cardPadding),
             Expanded(
-              child: _buildStatsCard('Due', 'PKR ${provider.totalBalanceRemaining.toStringAsFixed(2)}', Icons.account_balance_rounded, Colors.red),
+              child: _buildStatsCard(l10n.due, 'PKR ${provider.totalBalanceRemaining.toStringAsFixed(2)}', Icons.account_balance_rounded, Colors.red),
             ),
           ],
         ),
@@ -380,6 +394,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<PayablesProvider>(
@@ -389,17 +405,17 @@ class _PayablesPageState extends State<PayablesPage> {
             onChanged: provider.setSearchQuery,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: context.isTablet ? 'Search payables...' : 'Search by ID, creditor name, phone, reason, or status...',
+              hintText: context.isTablet ? '${l10n.search} ${l10n.payables}...' : l10n.searchPayablesHint,
               hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        provider.setSearchQuery('');
-                      },
-                      icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
-                    )
+                onPressed: () {
+                  _searchController.clear();
+                  provider.setSearchQuery('');
+                },
+                icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: context.iconSize('small')),
+              )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
@@ -411,6 +427,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return InkWell(
       onTap: _showFilterDialog,
       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -429,7 +447,7 @@ class _PayablesPageState extends State<PayablesPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                'Filter',
+                l10n.filter,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
               ),
             ],
@@ -440,6 +458,8 @@ class _PayablesPageState extends State<PayablesPage> {
   }
 
   Widget _buildRefreshButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<PayablesProvider>(
       builder: (context, provider, child) {
         return InkWell(
@@ -462,7 +482,7 @@ class _PayablesPageState extends State<PayablesPage> {
                 if (!context.isTablet) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Refresh',
+                    l10n.refresh,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                   ),
                 ],

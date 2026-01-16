@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossProductAnalysis extends StatefulWidget {
   const ProfitLossProductAnalysis({super.key});
@@ -24,7 +25,6 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   @override
   void initState() {
     super.initState();
-    // Widget will rely on provider's initialized data
   }
 
   void _updateCategories(List<dynamic> products) {
@@ -43,7 +43,6 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   Widget build(BuildContext context) {
     return Consumer<ProfitLossProvider>(
       builder: (context, provider, child) {
-        // Update categories when data changes (only once)
         if (provider.productProfitability.isNotEmpty && !_categoriesInitialized) {
           _updateCategories(provider.productProfitability);
         }
@@ -57,11 +56,9 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         }
 
         if (provider.productProfitability.isEmpty) {
-          // Show loading state if data is being fetched, otherwise show empty state
           if (provider.isLoading) {
             return _buildLoadingState(context);
           }
-          // If not loading and no data, show empty state with option to load
           return _buildEmptyState(context);
         }
 
@@ -70,17 +67,10 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with filters
             _buildHeader(context, provider),
-
             SizedBox(height: context.cardPadding),
-
-            // Summary Statistics
             _buildSummaryStats(context, filteredProducts),
-
             SizedBox(height: context.cardPadding),
-
-            // Product profitability table
             _buildProductTable(context, filteredProducts),
           ],
         );
@@ -89,6 +79,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildHeader(BuildContext context, ProfitLossProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -108,12 +100,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Product Profitability Analysis',
+                      l10n.productProfitabilityAnalysis,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     if (provider.productProfitability.isNotEmpty)
                       Text(
-                        'Analyzing ${provider.productProfitability.length} products across different categories',
+                        l10n.analyzingProductsAcrossDifferentCategories(provider.productProfitability.length),
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                   ],
@@ -127,7 +119,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                   border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
                 ),
                 child: Text(
-                  '${provider.productProfitability.length} Products',
+                  l10n.productsCount(provider.productProfitability.length),
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
@@ -136,7 +128,6 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
 
           SizedBox(height: context.cardPadding),
 
-          // Filters Row
           ResponsiveBreakpoints.responsive(
             context,
             tablet: _buildMobileFilters(context),
@@ -153,16 +144,10 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   Widget _buildDesktopFilters(BuildContext context) {
     return Row(
       children: [
-        // Category Filter
         Expanded(flex: 2, child: _buildCategoryFilter(context)),
         SizedBox(width: context.cardPadding),
-
-        // Sort Options
         Expanded(flex: 3, child: _buildSortOptions(context)),
-
         SizedBox(width: context.cardPadding),
-
-        // Refresh Button
         Expanded(flex: 1, child: _buildRefreshButton(context)),
       ],
     );
@@ -185,11 +170,13 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildCategoryFilter(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Category',
+          l10n.category,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
@@ -210,7 +197,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
             return DropdownMenuItem(
               value: category,
               child: Text(
-                category,
+                category == 'All' ? l10n.all : category,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -227,11 +214,13 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildSortOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Sort By',
+          l10n.sortBy,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
@@ -254,23 +243,23 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 items: [
                   DropdownMenuItem(
                     value: 'profitability_rank',
-                    child: Text('Rank', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.rank, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'gross_profit',
-                    child: Text('Profit', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.profit, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'units_sold',
-                    child: Text('Units Sold', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.unitsSold, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'product_name',
-                    child: Text('Name', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.name, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'profit_margin',
-                    child: Text('Margin %', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.marginPercent, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   ),
                 ],
                 onChanged: (value) {
@@ -288,7 +277,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 });
               },
               icon: Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward, color: AppTheme.primaryMaroon),
-              tooltip: _sortAscending ? 'Sort Descending' : 'Sort Ascending',
+              tooltip: _sortAscending ? l10n.sortDescending : l10n.sortAscending,
             ),
           ],
         ),
@@ -297,11 +286,13 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildRefreshButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Actions',
+          l10n.actions,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
@@ -314,12 +305,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 onPressed: provider.isLoading ? null : () => provider.loadProductProfitability(),
                 icon: provider.isLoading
                     ? SizedBox(
-                        width: context.iconSize('small'),
-                        height: context.iconSize('small'),
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
+                  width: context.iconSize('small'),
+                  height: context.iconSize('small'),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
                     : Icon(Icons.refresh_rounded, size: context.iconSize('small')),
-                label: Text(provider.isLoading ? 'Refreshing...' : 'Refresh', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                label: Text(provider.isLoading ? l10n.refreshing : l10n.refresh, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryMaroon,
                   foregroundColor: Colors.white,
@@ -335,6 +326,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildSummaryStats(BuildContext context, List<dynamic> products) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (products.isEmpty) return SizedBox.shrink();
 
     final totalRevenue = products.fold<double>(0.0, (sum, p) => sum + p.totalRevenue);
@@ -358,7 +351,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
               Icon(Icons.analytics_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding / 2),
               Text(
-                'Summary Statistics',
+                l10n.summaryStatistics,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -378,24 +371,26 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildDesktopSummaryStats(
-    BuildContext context,
-    double totalRevenue,
-    double totalProfit,
-    double totalCost,
-    double avgProfitMargin,
-    int profitableProducts,
-    int totalProducts,
-  ) {
+      BuildContext context,
+      double totalRevenue,
+      double totalProfit,
+      double totalCost,
+      double avgProfitMargin,
+      int profitableProducts,
+      int totalProducts,
+      ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
-          child: _buildSummaryCard(context, 'Total Revenue', 'PKR ${totalRevenue.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
+          child: _buildSummaryCard(context, l10n.totalRevenue, 'PKR ${totalRevenue.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
         ),
         SizedBox(width: context.smallPadding),
         Expanded(
           child: _buildSummaryCard(
             context,
-            'Total Profit',
+            l10n.totalProfit,
             'PKR ${totalProfit.toStringAsFixed(0)}',
             Icons.analytics_rounded,
             totalProfit > 0 ? Colors.green : Colors.red,
@@ -403,13 +398,13 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         ),
         SizedBox(width: context.smallPadding),
         Expanded(
-          child: _buildSummaryCard(context, 'Total Cost', 'PKR ${totalCost.toStringAsFixed(0)}', Icons.account_balance_wallet_rounded, Colors.orange),
+          child: _buildSummaryCard(context, l10n.totalCost, 'PKR ${totalCost.toStringAsFixed(0)}', Icons.account_balance_wallet_rounded, Colors.orange),
         ),
         SizedBox(width: context.smallPadding),
         Expanded(
           child: _buildSummaryCard(
             context,
-            'Avg Profit Margin',
+            l10n.avgProfitMargin,
             '${avgProfitMargin.toStringAsFixed(1)}%',
             Icons.pie_chart_rounded,
             AppTheme.primaryMaroon,
@@ -417,33 +412,35 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         ),
         SizedBox(width: context.smallPadding),
         Expanded(
-          child: _buildSummaryCard(context, 'Profitable Products', '$profitableProducts/$totalProducts', Icons.check_circle_rounded, Colors.green),
+          child: _buildSummaryCard(context, l10n.profitableProducts, '$profitableProducts/$totalProducts', Icons.check_circle_rounded, Colors.green),
         ),
       ],
     );
   }
 
   Widget _buildMobileSummaryStats(
-    BuildContext context,
-    double totalRevenue,
-    double totalProfit,
-    double totalCost,
-    double avgProfitMargin,
-    int profitableProducts,
-    int totalProducts,
-  ) {
+      BuildContext context,
+      double totalRevenue,
+      double totalProfit,
+      double totalCost,
+      double avgProfitMargin,
+      int profitableProducts,
+      int totalProducts,
+      ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: _buildSummaryCard(context, 'Total Revenue', 'PKR ${totalRevenue.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
+              child: _buildSummaryCard(context, l10n.totalRevenue, 'PKR ${totalRevenue.toStringAsFixed(0)}', Icons.trending_up_rounded, Colors.green),
             ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Total Profit',
+                l10n.totalProfit,
                 'PKR ${totalProfit.toStringAsFixed(0)}',
                 Icons.analytics_rounded,
                 totalProfit > 0 ? Colors.green : Colors.red,
@@ -457,7 +454,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Total Cost',
+                l10n.totalCost,
                 'PKR ${totalCost.toStringAsFixed(0)}',
                 Icons.account_balance_wallet_rounded,
                 Colors.orange,
@@ -467,7 +464,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Avg Profit Margin',
+                l10n.avgProfitMargin,
                 '${avgProfitMargin.toStringAsFixed(1)}%',
                 Icons.pie_chart_rounded,
                 AppTheme.primaryMaroon,
@@ -476,7 +473,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           ],
         ),
         SizedBox(height: context.smallPadding),
-        _buildSummaryCard(context, 'Profitable Products', '$profitableProducts/$totalProducts', Icons.check_circle_rounded, Colors.green),
+        _buildSummaryCard(context, l10n.profitableProducts, '$profitableProducts/$totalProducts', Icons.check_circle_rounded, Colors.green),
       ],
     );
   }
@@ -532,6 +529,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildDesktopProductTable(BuildContext context, List<dynamic> products) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
@@ -539,15 +538,15 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         headingTextStyle: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         dataTextStyle: GoogleFonts.inter(fontSize: context.captionFontSize),
         columns: [
-          DataColumn(label: Text('Rank')),
-          DataColumn(label: Text('Product')),
-          DataColumn(label: Text('Category')),
-          DataColumn(label: Text('Units Sold')),
-          DataColumn(label: Text('Revenue')),
-          DataColumn(label: Text('Cost')),
-          DataColumn(label: Text('Profit')),
-          DataColumn(label: Text('Margin %')),
-          DataColumn(label: Text('Status')),
+          DataColumn(label: Text(l10n.rank)),
+          DataColumn(label: Text(l10n.product)),
+          DataColumn(label: Text(l10n.category)),
+          DataColumn(label: Text(l10n.unitsSold)),
+          DataColumn(label: Text(l10n.revenue)),
+          DataColumn(label: Text(l10n.cost)),
+          DataColumn(label: Text(l10n.profit)),
+          DataColumn(label: Text(l10n.marginPercent)),
+          DataColumn(label: Text(l10n.status)),
         ],
         rows: products.map((product) {
           return DataRow(
@@ -578,7 +577,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                   ),
                   child: Text(
-                    product.isProfitable ? 'Profitable' : 'Loss',
+                    product.isProfitable ? l10n.profitable : l10n.loss,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -595,6 +594,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildMobileProductList(BuildContext context, List<dynamic> products) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -612,7 +613,6 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with rank and name
               Row(
                 children: [
                   Container(
@@ -637,7 +637,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),
                     ),
                     child: Text(
-                      product.isProfitable ? 'Profitable' : 'Loss',
+                      product.isProfitable ? l10n.profitable : l10n.loss,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
@@ -650,7 +650,6 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
 
               SizedBox(height: context.smallPadding),
 
-              // Category
               Text(
                 product.productCategory,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
@@ -658,22 +657,20 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
 
               SizedBox(height: context.smallPadding),
 
-              // Metrics Row
               Row(
                 children: [
-                  Expanded(child: _buildMetricItem(context, 'Units', product.unitsSold.toString(), Icons.inventory_2_rounded)),
-                  Expanded(child: _buildMetricItem(context, 'Revenue', product.formattedTotalRevenue, Icons.trending_up_rounded)),
-                  Expanded(child: _buildMetricItem(context, 'Profit', product.formattedGrossProfit, Icons.analytics_rounded)),
+                  Expanded(child: _buildMetricItem(context, l10n.units, product.unitsSold.toString(), Icons.inventory_2_rounded)),
+                  Expanded(child: _buildMetricItem(context, l10n.revenue, product.formattedTotalRevenue, Icons.trending_up_rounded)),
+                  Expanded(child: _buildMetricItem(context, l10n.profit, product.formattedGrossProfit, Icons.analytics_rounded)),
                 ],
               ),
 
               SizedBox(height: context.smallPadding),
 
-              // Profit margin
               Row(
                 children: [
                   Text(
-                    'Profit Margin: ',
+                    '${l10n.profitMargin}: ',
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
@@ -712,6 +709,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildLoadingState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -723,12 +722,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'Loading Product Data...',
+            l10n.loadingProductData,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Please wait while we fetch the latest profitability information.',
+            l10n.pleaseWaitWhileWeFetchTheLatestProfitabilityInformation,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
@@ -738,6 +737,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildErrorState(BuildContext context, ProfitLossProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -750,12 +751,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'Error Loading Data',
+            l10n.errorLoadingData,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: Colors.red[600]),
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            provider.errorMessage ?? 'An unexpected error occurred while loading product data.',
+            provider.errorMessage ?? l10n.anUnexpectedErrorOccurredWhileLoadingProductData,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
@@ -766,14 +767,14 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
               ElevatedButton.icon(
                 onPressed: () => provider.recoverFromError(),
                 icon: Icon(Icons.refresh_rounded),
-                label: Text('Retry'),
+                label: Text(l10n.retry),
                 style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryMaroon, foregroundColor: Colors.white),
               ),
               SizedBox(width: context.cardPadding),
               OutlinedButton.icon(
                 onPressed: () => provider.clearError(),
                 icon: Icon(Icons.close_rounded),
-                label: Text('Dismiss'),
+                label: Text(l10n.dismiss),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.primaryMaroon,
                   side: BorderSide(color: AppTheme.primaryMaroon),
@@ -787,6 +788,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -806,12 +809,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'Loading Product Data...',
+            l10n.loadingProductData,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            'Product profitability data is being loaded.\nThis includes revenue, costs, profit margins, and rankings.',
+            l10n.productProfitabilityDataIsBeingLoaded,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
@@ -823,7 +826,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 return ElevatedButton.icon(
                   onPressed: () => provider.loadProductProfitability(),
                   icon: Icon(Icons.refresh_rounded),
-                  label: Text('Refresh Data'),
+                  label: Text(l10n.refreshData),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryMaroon,
                     foregroundColor: Colors.white,
@@ -839,13 +842,11 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   }
 
   List<dynamic> _getFilteredAndSortedProducts(List<dynamic> products) {
-    // Apply category filter
     List<dynamic> filtered = products;
     if (_filterCategory != 'All') {
       filtered = products.where((p) => p.productCategory == _filterCategory).toList();
     }
 
-    // Apply sorting
     filtered.sort((a, b) {
       dynamic aValue;
       dynamic bValue;

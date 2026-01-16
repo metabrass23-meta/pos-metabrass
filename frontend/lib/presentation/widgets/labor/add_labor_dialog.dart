@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../globals/drop_down.dart';
@@ -29,7 +30,6 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
 
-  // FIXED: Use backend's expected gender code instead of 'Male'
   String _selectedGender = 'M';
   DateTime _selectedJoiningDate = DateTime.now();
 
@@ -97,77 +97,73 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   void _validateForm() {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<LaborProvider>(context, listen: false);
     _validationErrors = {};
 
-    // Pre-validate required fields
     if (_nameController.text.trim().isEmpty) {
-      _validationErrors['name'] = 'Name is required';
+      _validationErrors['name'] = l10n.nameIsRequired;
     }
     if (_cnicController.text.trim().isEmpty) {
-      _validationErrors['cnic'] = 'CNIC is required';
+      _validationErrors['cnic'] = l10n.cnicIsRequired;
     }
     if (_phoneController.text.trim().isEmpty) {
-      _validationErrors['phoneNumber'] = 'Phone number is required';
+      _validationErrors['phoneNumber'] = l10n.phoneNumberIsRequired;
     }
     if (_casteController.text.trim().isEmpty) {
-      _validationErrors['caste'] = 'Caste is required';
+      _validationErrors['caste'] = l10n.casteIsRequired;
     }
     if (_designationController.text.trim().isEmpty) {
-      _validationErrors['designation'] = 'Designation is required';
+      _validationErrors['designation'] = l10n.designationIsRequired;
     }
     if (_areaController.text.trim().isEmpty) {
-      _validationErrors['area'] = 'Area is required';
+      _validationErrors['area'] = l10n.areaIsRequired;
     }
     if (_cityController.text.trim().isEmpty) {
-      _validationErrors['city'] = 'City is required';
+      _validationErrors['city'] = l10n.cityIsRequired;
     }
     if (_selectedGender.isEmpty) {
-      _validationErrors['gender'] = 'Gender is required';
+      _validationErrors['gender'] = l10n.genderIsRequired;
     }
     if (_selectedJoiningDate.isAfter(DateTime.now())) {
-      _validationErrors['joiningDate'] = 'Joining date cannot be in the future';
+      _validationErrors['joiningDate'] = l10n.joiningDateCannotBeInFuture;
     }
 
-    // Convert and validate salary
     double? salary;
     if (_salaryController.text.trim().isEmpty) {
-      _validationErrors['salary'] = 'Salary is required';
+      _validationErrors['salary'] = l10n.salaryIsRequired;
     } else {
       salary = double.tryParse(_salaryController.text.trim());
       if (salary == null) {
-        _validationErrors['salary'] = 'Please enter a valid salary amount';
+        _validationErrors['salary'] = l10n.pleaseEnterValidSalaryAmount;
       }
     }
 
-    // Convert and validate age
     int? age;
     if (_ageController.text.trim().isEmpty) {
-      _validationErrors['age'] = 'Age is required';
+      _validationErrors['age'] = l10n.ageIsRequired;
     } else {
       age = int.tryParse(_ageController.text.trim());
       if (age == null) {
-        _validationErrors['age'] = 'Please enter a valid age';
+        _validationErrors['age'] = l10n.pleaseEnterValidAge;
       }
     }
 
-    // If pre-validation errors exist, update UI and return
     if (_validationErrors.isNotEmpty) {
       setState(() {});
       return;
     }
 
-    // Call validateLaborData with converted values
     _validationErrors = provider.validateLaborData(
       name: _nameController.text.trim(),
       cnic: _cnicController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
       caste: _casteController.text.trim(),
       designation: _designationController.text.trim(),
-      salary: salary!, // Non-null after checks
+      salary: salary!,
       area: _areaController.text.trim(),
       city: _cityController.text.trim(),
-      age: age!, // Non-null after checks
+      age: age!,
       gender: _selectedGender,
       joiningDate: _selectedJoiningDate,
     );
@@ -176,6 +172,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_isCreating) return;
 
@@ -196,11 +194,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
       try {
         final provider = Provider.of<LaborProvider>(context, listen: false);
 
-        // Convert salary and age for createLabor
         double salary = double.parse(_salaryController.text.trim());
         int age = int.parse(_ageController.text.trim());
 
-        // DEBUG: Print the gender value being sent
         print('🔍 DEBUG: Sending gender value: "$_selectedGender"');
         print('🔍 DEBUG: All form data: {');
         print('  name: "${_nameController.text.trim()}"');
@@ -235,12 +231,12 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             _clearForm();
             Navigator.of(context).pop();
           } else {
-            _showErrorSnackbar(provider.errorMessage ?? 'Failed to create labor');
+            _showErrorSnackbar(provider.errorMessage ?? l10n.failedToCreateLabor);
           }
         }
       } catch (e) {
         if (mounted) {
-          _showErrorSnackbar('Error creating labor: ${e.toString()}');
+          _showErrorSnackbar('${l10n.errorCreatingLabor} ${e.toString()}');
         }
       } finally {
         if (mounted) {
@@ -253,7 +249,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   void _showValidationErrors() {
+    final l10n = AppLocalizations.of(context)!;
     final errorMessages = _validationErrors.values.join('\n');
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -266,7 +264,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
-                'Please fix the following errors:\n$errorMessages',
+                '${l10n.pleaseFixFollowingErrors}\n$errorMessages',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -287,6 +285,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -298,7 +298,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Labor created successfully!',
+              l10n.laborCreatedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -358,7 +358,6 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     });
   }
 
-  // FIXED: Update _clearForm to use 'M' instead of 'Male'
   void _clearForm() {
     _nameController.clear();
     _cnicController.clear();
@@ -370,22 +369,24 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     _cityController.clear();
     _ageController.clear();
     setState(() {
-      _selectedGender = 'M'; // Use 'M' instead of 'Male'
+      _selectedGender = 'M';
       _selectedJoiningDate = DateTime.now();
       _validationErrors = {};
     });
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isCreating) return;
 
     await context.showSyncfusionDateTimePicker(
       initialDate: _selectedJoiningDate,
       initialTime: TimeOfDay.fromDateTime(_selectedJoiningDate),
-      title: 'Select Joining Date',
+      title: l10n.selectJoiningDate,
       minDate: DateTime(2000),
       maxDate: DateTime.now(),
-      showTimeInline: false, // Disable time selection as only date is needed
+      showTimeInline: false,
       onDateTimeSelected: (date, time) {
         setState(() {
           _selectedJoiningDate = date;
@@ -485,6 +486,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -516,7 +519,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Labor' : 'Add New Labor',
+                  context.shouldShowCompactLayout ? l10n.addLabor : l10n.addNewLabor,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -527,7 +530,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new labor record',
+                    l10n.createNewLaborRecord,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -591,53 +594,55 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information', Icons.info_outline),
+        _buildSectionTitle(l10n.basicInformation, Icons.info_outline),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Full Name *',
-          hint: context.shouldShowCompactLayout ? 'Enter name' : 'Enter worker\'s full name',
+          label: l10n.fullNameRequired,
+          hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterWorkersFullName,
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a name';
+              return l10n.pleaseEnterName;
             }
             if (value!.length < 2) {
-              return 'Name must be at least 2 characters';
+              return l10n.nameMustBeAtLeast2Characters;
             }
             if (value.length > 50) {
-              return 'Name must be less than 50 characters';
+              return l10n.nameMustBeLessThan50Characters;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'CNIC *',
+          label: l10n.cnicRequired,
           hint: context.shouldShowCompactLayout
-              ? 'Enter CNIC'
-              : 'Enter CNIC (e.g., 42101-1234567-1)',
+              ? l10n.enterCnic
+              : l10n.enterCnicFormat,
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a CNIC';
+              return l10n.pleaseEnterCnic;
             }
             if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
-              return 'Please enter a valid CNIC (XXXXX-XXXXXXX-X)';
+              return l10n.pleaseEnterValidCnicFormat;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Caste',
-          hint: context.shouldShowCompactLayout ? 'Enter caste' : 'Enter caste (optional)',
+          label: l10n.caste,
+          hint: context.shouldShowCompactLayout ? l10n.enterCaste : l10n.enterCasteOptional,
           controller: _casteController,
           prefixIcon: Icons.group_outlined,
           enabled: !_isCreating,
@@ -647,26 +652,28 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildContactInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Contact Information', Icons.contact_phone_outlined),
+        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Phone Number *',
+          label: l10n.phoneNumberRequired,
           hint: context.shouldShowCompactLayout
-              ? 'Enter phone'
-              : 'Enter phone number (e.g., +923001234567)',
+              ? l10n.enterPhone
+              : l10n.enterPhoneNumberFormat,
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a phone number';
+              return l10n.pleaseEnterPhoneNumber;
             }
             if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
-              return 'Please enter a valid phone number (+92XXXXXXXXXX)';
+              return l10n.pleaseEnterValidPhoneNumberFormat;
             }
             return null;
           },
@@ -676,10 +683,12 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildLocationInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Location Information', Icons.location_on_outlined),
+        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
         SizedBox(height: context.cardPadding),
         ResponsiveBreakpoints.responsive(
           context,
@@ -694,22 +703,24 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildEmploymentInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Employment Information', Icons.work_outline),
+        _buildSectionTitle(l10n.employmentInformation, Icons.work_outline),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Designation *',
+          label: l10n.designationRequired,
           hint: context.shouldShowCompactLayout
-              ? 'Enter designation'
-              : 'Enter job designation (e.g., Tailor, Operator)',
+              ? l10n.enterDesignation
+              : l10n.enterJobDesignation,
           controller: _designationController,
           prefixIcon: Icons.work_outline,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a designation';
+              return l10n.pleaseEnterDesignation;
             }
             return null;
           },
@@ -719,8 +730,8 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           onTap: _isCreating ? null : () => _selectDate(context),
           child: AbsorbPointer(
             child: PremiumTextField(
-              label: 'Joining Date *',
-              hint: 'Select joining date',
+              label: l10n.joiningDateRequired,
+              hint: l10n.selectJoiningDate,
               controller: TextEditingController(
                   text:
                   '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}'),
@@ -731,35 +742,33 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Monthly Salary *',
+          label: l10n.monthlySalaryRequired,
           hint: context.shouldShowCompactLayout
-              ? 'Enter salary'
-              : 'Enter monthly salary in PKR',
+              ? l10n.enterSalary
+              : l10n.enterMonthlySalaryInPkr,
           controller: _salaryController,
           prefixIcon: Icons.account_balance_wallet_outlined,
           keyboardType: TextInputType.number,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter a salary';
+              return l10n.pleaseEnterSalary;
             }
             if (double.tryParse(value!) == null || double.parse(value) <= 0) {
-              return 'Please enter a valid salary';
+              return l10n.pleaseEnterValidSalary;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
-        // FIXED: Use correct gender codes for the dropdown
         PremiumDropdownField<String>(
-          label: 'Gender *',
-          hint: context.shouldShowCompactLayout ? 'Select gender' : 'Select gender',
+          label: l10n.genderRequired,
+          hint: context.shouldShowCompactLayout ? l10n.selectGender : l10n.selectGender,
           prefixIcon: Icons.person_pin_rounded,
-          // Use the backend's expected gender codes with display labels
           items: [
-            DropdownItem<String>(value: 'M', label: 'Male'),
-            DropdownItem<String>(value: 'F', label: 'Female'),
-            DropdownItem<String>(value: 'O', label: 'Other'),
+            DropdownItem<String>(value: 'M', label: l10n.male),
+            DropdownItem<String>(value: 'F', label: l10n.female),
+            DropdownItem<String>(value: 'O', label: l10n.other),
           ],
           value: _selectedGender,
           onChanged: _isCreating
@@ -771,28 +780,28 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please select a gender';
+              return l10n.pleaseSelectGender;
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: 'Age *',
-          hint: context.shouldShowCompactLayout ? 'Enter age' : 'Enter age (minimum 18 years)',
+          label: l10n.ageRequired,
+          hint: context.shouldShowCompactLayout ? l10n.enterAge : l10n.enterAgeMinimum18Years,
           controller: _ageController,
           prefixIcon: Icons.cake_outlined,
           keyboardType: TextInputType.number,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter an age';
+              return l10n.pleaseEnterAge;
             }
             if (int.tryParse(value!) == null || int.parse(value) < 18) {
-              return 'Age must be at least 18';
+              return l10n.ageMustBeAtLeast18;
             }
             if (int.parse(value) > 65) {
-              return 'Age must be less than 65';
+              return l10n.ageMustBeLessThan65;
             }
             return null;
           },
@@ -822,18 +831,20 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildCityField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'City *',
-          hint: 'Enter city',
+          label: l10n.cityRequired,
+          hint: l10n.enterCity,
           controller: _cityController,
           prefixIcon: Icons.location_city_outlined,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter city';
+              return l10n.pleaseEnterCity;
             }
             return null;
           },
@@ -857,18 +868,20 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildAreaField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         PremiumTextField(
-          label: 'Area *',
-          hint: 'Enter area',
+          label: l10n.areaRequired,
+          hint: l10n.enterArea,
           controller: _areaController,
           prefixIcon: Icons.map_outlined,
           enabled: !_isCreating,
           validator: (value) {
             if (value?.isEmpty ?? true) {
-              return 'Please enter area';
+              return l10n.pleaseEnterArea;
             }
             return null;
           },
@@ -892,13 +905,15 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<LaborProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Labor',
+              text: l10n.addLabor,
               onPressed: (_isCreating || provider.isLoading) ? null : _handleSubmit,
               isLoading: _isCreating || provider.isLoading,
               height: context.buttonHeight,
@@ -909,7 +924,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _isCreating ? null : _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -921,11 +936,13 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _isCreating ? null : _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -939,7 +956,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           child: Consumer<LaborProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Labor',
+                text: l10n.addLabor,
                 onPressed: (_isCreating || provider.isLoading) ? null : _handleSubmit,
                 isLoading: _isCreating || provider.isLoading,
                 height: context.buttonHeight / 1.5,

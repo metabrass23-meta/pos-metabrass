@@ -6,6 +6,7 @@ import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ViewPayableDetailsDialog extends StatefulWidget {
   final Payable payable;
@@ -116,6 +117,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -138,7 +141,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Payable Details',
+                  l10n.payableDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -149,7 +152,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete payable information',
+                    l10n.viewCompletePayableInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -215,7 +218,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: AppLocalizations.of(context)!.close,
               onPressed: _handleClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -229,6 +232,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildCreditorInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -244,7 +249,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               Icon(Icons.business_outlined, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Creditor Information',
+                l10n.creditorInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -264,11 +269,13 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildCreditorInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Name',
+          l10n.name,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
@@ -277,11 +284,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
         ),
         SizedBox(height: context.cardPadding),
         Text(
-          'Phone Number',
+          l10n.phoneNumber,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
-          widget.payable.creditorPhone ?? 'N/A',
+          widget.payable.creditorPhone ?? l10n.notAvailable,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
       ],
@@ -289,6 +296,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildCreditorInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -296,7 +305,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Name',
+                l10n.name,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
@@ -311,11 +320,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Phone Number',
+                l10n.phoneNumber,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
-                widget.payable.creditorPhone ?? 'N/A',
+                widget.payable.creditorPhone ?? l10n.notAvailable,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -326,6 +335,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildAmountDetailsCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -340,7 +351,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               Icon(Icons.calculate_rounded, color: Colors.red, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Breakdown',
+                l10n.amountBreakdown,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
               ),
             ],
@@ -350,7 +361,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Amount Borrowed:',
+                '${l10n.amountBorrowed}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
               ),
               Text(
@@ -365,7 +376,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Amount Paid:',
+                  '${l10n.amountPaid}:',
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
@@ -382,7 +393,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Balance Remaining:',
+                '${l10n.balanceRemaining}:',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -401,6 +412,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildStatusCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -434,7 +447,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Status',
+                      l10n.status,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
@@ -449,7 +462,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
                   decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
-                    '${widget.payable.daysOverdue} days overdue',
+                    l10n.daysOverdueCount(widget.payable.daysOverdue),
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                   ),
                 ),
@@ -464,7 +477,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Payment Progress',
+                      l10n.paymentProgress,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
@@ -504,6 +517,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildDateInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -518,7 +533,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date Borrowed',
+                    l10n.dateBorrowed,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
@@ -544,7 +559,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   Icon(Icons.event_available, size: context.iconSize('small'), color: Colors.orange),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Expected Repayment Date',
+                    l10n.expectedRepaymentDate,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
@@ -566,6 +581,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildDateInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -580,7 +597,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date Borrowed',
+                      l10n.dateBorrowed,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
@@ -607,7 +624,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                     Icon(Icons.event_available, size: context.iconSize('small'), color: Colors.orange),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Expected Repayment',
+                      l10n.expectedRepayment,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
@@ -630,6 +647,8 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
   }
 
   Widget _buildReasonNotesCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -641,14 +660,14 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               Icon(Icons.assignment_outlined, color: Colors.grey[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Transaction Details',
+                l10n.transactionDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            'Reason/Item:',
+            '${l10n.reasonItem}:',
             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
@@ -659,7 +678,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
           if (widget.payable.notes != null && widget.payable.notes!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             Text(
-              'Notes:',
+              '${l10n.notes}:',
               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
             ),
             SizedBox(height: context.smallPadding / 2),
@@ -676,7 +695,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Created:',
+                      '${l10n.created}:',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
@@ -691,11 +710,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Last Updated:',
+                      '${l10n.lastUpdated}:',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
-                      widget.payable.updatedAt != null ? _formatDateTime(widget.payable.updatedAt!) : 'Not updated',
+                      widget.payable.updatedAt != null ? _formatDateTime(widget.payable.updatedAt!) : l10n.notUpdated,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[700]),
                     ),
                   ],

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/drop_down.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
@@ -21,7 +22,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   final _nameController = TextEditingController();
   final _detailController = TextEditingController();
   final _priceController = TextEditingController();
-  final _costPriceController = TextEditingController(); // Added cost price controller
+  final _costPriceController = TextEditingController();
   final _quantityController = TextEditingController();
   final _colorController = TextEditingController();
   final _fabricController = TextEditingController();
@@ -51,7 +52,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     _nameController.dispose();
     _detailController.dispose();
     _priceController.dispose();
-    _costPriceController.dispose(); // Dispose cost price controller
+    _costPriceController.dispose();
     _quantityController.dispose();
     _colorController.dispose();
     _fabricController.dispose();
@@ -59,21 +60,23 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_colorController.text.trim().isEmpty) {
-        _showErrorSnackbar('Please enter a color');
+        _showErrorSnackbar('${l10n.pleaseEnter} ${l10n.color}');
         return;
       }
       if (_fabricController.text.trim().isEmpty) {
-        _showErrorSnackbar('Please enter a fabric');
+        _showErrorSnackbar('${l10n.pleaseEnter} ${l10n.fabric}');
         return;
       }
       if (_selectedCategoryId == null) {
-        _showErrorSnackbar('Please select a category');
+        _showErrorSnackbar('${l10n.pleaseSelect} ${l10n.category}');
         return;
       }
       if (_selectedPieces.isEmpty) {
-        _showErrorSnackbar('Please select at least one piece');
+        _showErrorSnackbar(l10n.pleaseSelectAtLeastOnePiece);
         return;
       }
 
@@ -85,7 +88,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         price: double.parse(_priceController.text.trim()),
         costPrice: _costPriceController.text.trim().isNotEmpty
             ? double.parse(_costPriceController.text.trim())
-            : null, // Parse cost price if provided
+            : null,
         color: _colorController.text.trim(),
         fabric: _fabricController.text.trim(),
         pieces: _selectedPieces,
@@ -98,13 +101,15 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(productProvider.errorMessage ?? 'Failed to add product');
+          _showErrorSnackbar(productProvider.errorMessage ?? '${l10n.failedToAdd} ${l10n.product}');
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -112,7 +117,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Product added successfully!',
+              '${l10n.product} ${l10n.addedSuccessfully}!',
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -213,6 +218,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -235,7 +242,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Product' : 'Add New Product',
+                  context.shouldShowCompactLayout
+                      ? '${l10n.add} ${l10n.product}'
+                      : '${l10n.add} ${l10n.newProduct}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -246,7 +255,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new product entry',
+                    l10n.createNewProductEntry,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -274,6 +283,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -282,16 +293,16 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Product Name',
-              hint: isCompact ? 'Enter name' : 'Enter product name',
+              label: '${l10n.product} ${l10n.name}',
+              hint: isCompact ? '${l10n.enterEmail} ${l10n.name}' : '${l10n.enterEmail} ${l10n.product} ${l10n.name}',
               controller: _nameController,
               prefixIcon: Icons.label_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a product name';
+                  return '${l10n.pleaseEnter} ${l10n.product} ${l10n.name}';
                 }
                 if (value!.length < 2) {
-                  return 'Product name must be at least 2 characters';
+                  return '${l10n.product} ${l10n.name} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
                 }
                 return null;
               },
@@ -299,17 +310,17 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Product Detail',
-              hint: isCompact ? 'Enter details' : 'Enter product description/details',
+              label: '${l10n.product} ${l10n.detail}',
+              hint: isCompact ? '${l10n.enterEmail} ${l10n.details}' : '${l10n.enterEmail} ${l10n.product} ${l10n.description}',
               controller: _detailController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter product details';
+                  return '${l10n.pleaseEnter} ${l10n.product} ${l10n.details}';
                 }
                 if (value!.length < 5) {
-                  return 'Product detail must be at least 5 characters';
+                  return '${l10n.product} ${l10n.detail} ${l10n.mustBeAtLeast} 5 ${l10n.characters}';
                 }
                 return null;
               },
@@ -320,18 +331,18 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               children: [
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Price',
-                    hint: isCompact ? 'Enter price' : 'Enter price (PKR)',
+                    label: l10n.price,
+                    hint: isCompact ? '${l10n.enterEmail} ${l10n.price}' : '${l10n.enterEmail} ${l10n.price} (PKR)',
                     controller: _priceController,
                     prefixIcon: Icons.attach_money_rounded,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
-                        return 'Please enter price';
+                        return '${l10n.pleaseEnter} ${l10n.price}';
                       }
                       final price = double.tryParse(value!);
                       if (price == null || price <= 0) {
-                        return 'Please enter a valid price';
+                        return '${l10n.pleaseEnterValid} ${l10n.price}';
                       }
                       return null;
                     },
@@ -340,8 +351,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Cost Price',
-                    hint: isCompact ? 'Enter cost' : 'Enter cost price (PKR) - Optional',
+                    label: l10n.costPrice,
+                    hint: isCompact ? '${l10n.enterEmail} ${l10n.cost}' : '${l10n.enterEmail} ${l10n.costPrice} (PKR) - ${l10n.optional}',
                     controller: _costPriceController,
                     prefixIcon: Icons.shopping_cart_outlined,
                     keyboardType: TextInputType.number,
@@ -349,11 +360,11 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                       if (value?.isNotEmpty ?? false) {
                         final costPrice = double.tryParse(value!);
                         if (costPrice == null || costPrice < 0) {
-                          return 'Please enter a valid cost price';
+                          return '${l10n.pleaseEnterValid} ${l10n.costPrice}';
                         }
                         final price = double.tryParse(_priceController.text);
                         if (price != null && costPrice > price) {
-                          return 'Cost price cannot exceed selling price';
+                          return l10n.costPriceCannotExceedSellingPrice;
                         }
                       }
                       return null;
@@ -378,7 +389,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   SizedBox(width: context.smallPadding / 2),
                   Flexible(
                     child: Text(
-                      'Setting cost price enables profit margin calculations and better financial analysis',
+                      l10n.costPriceInfo,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                     ),
                   ),
@@ -391,25 +402,25 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               children: [
                 Expanded(
                   child: PremiumTextField(
-                    label: 'Quantity',
-                    hint: isCompact ? 'Enter qty' : 'Enter quantity',
+                    label: l10n.quantity,
+                    hint: isCompact ? '${l10n.enterEmail} ${l10n.qty}' : '${l10n.enterEmail} ${l10n.quantity}',
                     controller: _quantityController,
                     prefixIcon: Icons.inventory_2_outlined,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
-                        return 'Please enter quantity';
+                        return '${l10n.pleaseEnter} ${l10n.quantity}';
                       }
                       final quantity = int.tryParse(value!);
                       if (quantity == null || quantity < 0) {
-                        return 'Please enter a valid quantity';
+                        return '${l10n.pleaseEnterValid} ${l10n.quantity}';
                       }
                       return null;
                     },
                   ),
                 ),
                 SizedBox(width: context.cardPadding),
-                Expanded(child: Container()), // Empty container for spacing
+                Expanded(child: Container()),
               ],
             ),
             SizedBox(height: context.cardPadding),
@@ -418,8 +429,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             Consumer<ProductProvider>(
               builder: (context, provider, child) {
                 return PremiumDropdownField<String>(
-                  label: 'Category',
-                  hint: isCompact ? 'Select category' : 'Select product category',
+                  label: l10n.category,
+                  hint: isCompact ? '${l10n.select} ${l10n.category}' : '${l10n.select} ${l10n.product} ${l10n.category}',
                   prefixIcon: Icons.category_outlined,
                   items: provider.categories
                       .where((category) => category.isActive)
@@ -433,7 +444,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select a category';
+                      return '${l10n.pleaseSelect} ${l10n.category}';
                     }
                     return null;
                   },
@@ -444,16 +455,16 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
             // Color Input Field
             PremiumTextField(
-              label: 'Color',
-              hint: isCompact ? 'Enter color' : 'Enter color name (e.g., Red, Blue, Turquoise)',
+              label: l10n.color,
+              hint: isCompact ? '${l10n.enterEmail} ${l10n.color}' : '${l10n.enterEmail} ${l10n.colorName}',
               controller: _colorController,
               prefixIcon: Icons.color_lens_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a color';
+                  return '${l10n.pleaseEnter} ${l10n.color}';
                 }
                 if (value!.length < 2) {
-                  return 'Color name must be at least 2 characters';
+                  return '${l10n.colorName} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
                 }
                 return null;
               },
@@ -462,16 +473,16 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
             // Fabric Input Field
             PremiumTextField(
-              label: 'Fabric',
-              hint: isCompact ? 'Enter fabric' : 'Enter fabric type (e.g., Cotton, Silk, Chiffon)',
+              label: l10n.fabric,
+              hint: isCompact ? '${l10n.enterEmail} ${l10n.fabric}' : '${l10n.enterEmail} ${l10n.fabricType}',
               controller: _fabricController,
               prefixIcon: Icons.texture_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter a fabric';
+                  return '${l10n.pleaseEnter} ${l10n.fabric}';
                 }
                 if (value!.length < 2) {
-                  return 'Fabric name must be at least 2 characters';
+                  return '${l10n.fabricName} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
                 }
                 return null;
               },
@@ -485,7 +496,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pieces',
+                      l10n.pieces,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding),
@@ -530,7 +541,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                     if (_selectedPieces.isEmpty) ...[
                       SizedBox(height: context.smallPadding / 2),
                       Text(
-                        'Please select at least one piece',
+                        l10n.pleaseSelectAtLeastOnePiece,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
@@ -555,13 +566,15 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<ProductProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Product',
+              text: '${l10n.add} ${l10n.product}',
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -571,7 +584,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -583,11 +596,13 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -600,7 +615,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
           child: Consumer<ProductProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Product',
+                text: '${l10n.add} ${l10n.product}',
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

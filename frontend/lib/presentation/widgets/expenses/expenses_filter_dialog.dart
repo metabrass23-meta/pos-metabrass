@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import 'dart:async';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
 
@@ -21,18 +22,15 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables
   String? _selectedWithdrawalBy;
   String? _selectedCategory;
   DateTime? _dateFrom;
   DateTime? _dateTo;
   String _searchQuery = '';
 
-  // Text controllers for custom inputs
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  // Predefined options
   final List<String> _withdrawalOptions = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
 
   final List<String> _commonCategories = ['Office', 'Utilities', 'Transport', 'Marketing', 'Maintenance', 'Supplies', 'Services'];
@@ -46,7 +44,6 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Initialize with current filter values
     final provider = context.read<ExpensesProvider>();
     _selectedWithdrawalBy = provider.selectedWithdrawalBy;
     _selectedCategory = provider.selectedCategory;
@@ -71,11 +68,9 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   void _handleApplyFilters() async {
     final provider = context.read<ExpensesProvider>();
 
-    // Update category and search from text controllers
     final category = _categoryController.text.trim().isEmpty ? null : _categoryController.text.trim();
     final search = _searchController.text.trim();
 
-    // Apply filters using existing provider methods
     if (category != provider.selectedCategory) {
       await provider.setCategoryFilter(category);
     }
@@ -105,21 +100,21 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Future<void> _selectDateRange() async {
-    // Select start date using custom date picker
+    final l10n = AppLocalizations.of(context)!;
+
     final startDate = await _selectCustomDate(
       context: context,
       initialDate: _dateFrom ?? DateTime.now(),
-      title: 'Select Start Date',
+      title: l10n.selectStartDate,
       minDate: DateTime(2000),
       maxDate: DateTime.now(),
     );
 
     if (startDate != null) {
-      // Select end date using custom date picker
       final endDate = await _selectCustomDate(
         context: context,
         initialDate: _dateTo ?? startDate,
-        title: 'Select End Date',
+        title: l10n.selectEndDate,
         minDate: startDate,
         maxDate: DateTime.now(),
       );
@@ -155,7 +150,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
           title: title,
           minDate: minDate,
           maxDate: maxDate,
-          showTimeInline: false, // Only show date picker for range selection
+          showTimeInline: false,
         );
       },
     );
@@ -200,6 +195,8 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -224,7 +221,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Expense Records',
+                  l10n.filterExpenseRecords,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -235,7 +232,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Refine your expense list with filters',
+                    l10n.refineExpenseList,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -264,33 +261,30 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Search Filter
-            _buildFilterSection(title: 'Search Expense Records', icon: Icons.search_outlined, child: _buildSearchFilter()),
+            _buildFilterSection(title: l10n.searchExpenseRecords, icon: Icons.search_outlined, child: _buildSearchFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Category Filter
-            _buildFilterSection(title: 'Expense Category', icon: Icons.category_outlined, child: _buildCategoryFilter()),
+            _buildFilterSection(title: l10n.expenseCategory, icon: Icons.category_outlined, child: _buildCategoryFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Withdrawal By Filter
-            _buildFilterSection(title: 'Withdrawal By', icon: Icons.verified_user_outlined, child: _buildWithdrawalByFilter()),
+            _buildFilterSection(title: l10n.withdrawalBy, icon: Icons.verified_user_outlined, child: _buildWithdrawalByFilter()),
 
             SizedBox(height: context.cardPadding),
 
-            // Date Range Filter
-            _buildFilterSection(title: 'Date Range', icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
+            _buildFilterSection(title: l10n.dateRange, icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
 
             SizedBox(height: context.mainPadding),
 
-            // Action Buttons
             ResponsiveBreakpoints.responsive(
               context,
               tablet: _buildCompactButtons(),
@@ -334,11 +328,13 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildSearchFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return TextFormField(
       controller: _searchController,
       style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
-        hintText: 'Search by expense name, description, or amount',
+        hintText: l10n.searchByExpenseHint,
         hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
@@ -360,13 +356,15 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildCategoryFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         TextFormField(
           controller: _categoryController,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
           decoration: InputDecoration(
-            hintText: 'Enter expense category',
+            hintText: l10n.enterExpenseCategory,
             hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
             prefixIcon: Icon(Icons.category_outlined, color: Colors.grey[500], size: context.iconSize('medium')),
             border: OutlineInputBorder(
@@ -398,15 +396,17 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildWithdrawalByFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Text(
-          'Select Withdrawal Authority',
+          l10n.selectWithdrawalAuthority,
           style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         ...(_withdrawalOptions.map(
-          (person) => RadioListTile<String>(
+              (person) => RadioListTile<String>(
             value: person,
             groupValue: _selectedWithdrawalBy,
             onChanged: (value) {
@@ -422,7 +422,6 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
             dense: true,
           ),
         )),
-        // Option to clear withdrawal by filter
         TextButton.icon(
           onPressed: () {
             setState(() {
@@ -431,7 +430,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
           },
           icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
           label: Text(
-            'Clear Withdrawal Filter',
+            l10n.clearWithdrawalFilter,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
@@ -440,6 +439,8 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildDateRangeFilter() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
@@ -462,7 +463,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                           Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            'Select Date Range',
+                            l10n.selectDateRange,
                             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                           ),
                         ],
@@ -471,7 +472,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                       Text(
                         _dateFrom != null && _dateTo != null
                             ? '${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year} - ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}'
-                            : 'No date range selected',
+                            : l10n.noDateRangeSelected,
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
@@ -498,7 +499,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                   },
                   icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
                   label: Text(
-                    'Clear Date Range',
+                    l10n.clearDateRange,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red[600]),
                   ),
                 ),
@@ -530,11 +531,13 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.filter_alt_rounded,
@@ -542,7 +545,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Clear All Filters',
+          text: l10n.clearAllFilters,
           onPressed: _handleClearFilters,
           height: context.buttonHeight,
           icon: Icons.clear_all_rounded,
@@ -552,7 +555,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         ),
         SizedBox(height: context.smallPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleClose,
           height: context.buttonHeight,
           isOutlined: true,
@@ -564,11 +567,13 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             isOutlined: true,
@@ -579,7 +584,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.clear_all_rounded,
@@ -592,7 +597,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.filter_alt_rounded,

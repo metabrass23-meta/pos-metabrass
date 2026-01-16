@@ -6,8 +6,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.8.1
-assets:
-  - assets/fonts/Jameel Noori Nastaleeq Regular.ttf
+
 dependencies:
   flutter:
     sdk: flutter
@@ -22,11 +21,7 @@ dependencies:
   # Desktop Window Management
   bitsdojo_window:
   desktop_multi_window:
-
-  # Responsive Design
   sizer:
-
-  # Additional Premium Features
   google_fonts:
   flutter_svg:
   animations:
@@ -34,25 +29,29 @@ dependencies:
   file_picker:
   path:
   path_provider:
-  syncfusion_flutter_datepicker:
-  dio:
   shared_preferences:
+  dio:
   json_annotation:
   intl:
-  # Export functionality
+  syncfusion_flutter_datepicker:
   pdf: ^3.10.7
   excel: ^2.1.0
   open_file: ^3.3.2
+  flutter_localization: ^0.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  msix:
+
   flutter_lints: ^5.0.0
-  json_serializable:
   build_runner:
+  json_serializable:
+  msix:
 
 flutter:
-  generate: true
   uses-material-design: true
+  generate: true
 
+  assets:
+    - assets/fonts/
+    - assets/images/

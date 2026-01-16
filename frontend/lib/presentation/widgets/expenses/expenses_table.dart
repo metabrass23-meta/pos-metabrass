@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ExpensesTable extends StatefulWidget {
   final Function(Expense) onEdit;
@@ -26,7 +27,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
   @override
   void initState() {
     super.initState();
-    // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
       if (_contentHorizontalController.hasClients) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
@@ -69,7 +69,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -86,7 +85,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
                   ),
                 ),
 
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -118,52 +116,37 @@ class _ExpensesTableState extends State<ExpensesTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible - increased for View button
     return ResponsiveBreakpoints.responsive(context, tablet: 1500.0, small: 1600.0, medium: 1700.0, large: 1800.0, ultrawide: 1900.0);
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Expense ID
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, 'Expense ID')),
-
-        // Expense
-        Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Expense')),
-
-        // Description
-        Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Description')),
-
-        // Amount
-        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Amount')),
-
-        // Withdrawal By
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Withdrawal By')),
-
-        // Date
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'Date')),
-
-        // Time
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Time')),
-
-        // Actions
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.expenseId)),
+        Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.expense)),
+        Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.description)),
+        Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.amount)),
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.withdrawalBy)),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.date)),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.time)),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      130.0, // Expense ID
-      180.0, // Expense
-      280.0, // Description
-      140.0, // Amount
-      180.0, // Withdrawal By
-      130.0, // Date
-      120.0, // Time
-      260.0, // Actions - increased width for View button
+      130.0,
+      180.0,
+      280.0,
+      140.0,
+      180.0,
+      130.0,
+      120.0,
+      260.0,
     ];
   }
 
@@ -185,7 +168,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Expense ID
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -203,7 +185,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Expense
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -219,7 +200,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Description
           Container(
             width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -231,7 +211,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Amount
           Container(
             width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -245,7 +224,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Withdrawal By
           Container(
             width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -278,7 +256,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Date
           Container(
             width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -297,7 +274,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Time
           Container(
             width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -318,7 +294,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
-          // Actions
           Container(
             width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -333,7 +308,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // View Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -349,7 +323,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Edit Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -365,7 +338,6 @@ class _ExpensesTableState extends State<ExpensesTable> {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Delete Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -383,6 +355,8 @@ class _ExpensesTableState extends State<ExpensesTable> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -397,7 +371,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Expense Records Found',
+            l10n.noExpenseRecordsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -408,7 +382,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first expense record to track business spending',
+              l10n.startAddingFirstExpense,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -424,9 +398,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
+                onTap: () {},
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
@@ -436,7 +408,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Expense',
+                        l10n.addFirstExpense,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -466,6 +438,8 @@ class _ExpensesTableState extends State<ExpensesTable> {
   }
 
   Widget _buildErrorState(BuildContext context, ExpensesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -480,7 +454,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Error loading expenses: ${provider.errorMessage}',
+            '${l10n.errorLoadingExpenses}: ${provider.errorMessage}',
             style: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
@@ -492,7 +466,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Please try again later or check your internet connection.',
+              l10n.pleaseTryAgainLater,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -509,7 +483,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  provider.loadExpenseRecords(); // Retry loading expenses
+                  provider.loadExpenseRecords();
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
@@ -520,7 +494,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry Loading',
+                        l10n.retryLoading,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,

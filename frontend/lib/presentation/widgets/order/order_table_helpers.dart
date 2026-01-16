@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/confirmation_dialog.dart';
 import 'order_items_management_dialog.dart';
 
@@ -16,15 +17,13 @@ class OrderTableHelpers {
 
   OrderTableHelpers({required this.onEdit, required this.onDelete, required this.onView});
 
-  /// Build the actions row for each order in the table
   Widget buildActionsRow(BuildContext context, OrderModel order) {
     return Container(
-      constraints: BoxConstraints(maxWidth: 320.0), // Ensure it doesn't exceed the allocated width
+      constraints: BoxConstraints(maxWidth: 320.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // View Button
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -40,7 +39,6 @@ class OrderTableHelpers {
 
           SizedBox(width: context.smallPadding / 3),
 
-          // Order Items Button
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -60,7 +58,6 @@ class OrderTableHelpers {
 
           SizedBox(width: context.smallPadding / 3),
 
-          // Edit Button
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -76,7 +73,6 @@ class OrderTableHelpers {
 
           SizedBox(width: context.smallPadding / 3),
 
-          // Delete Button
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -92,7 +88,6 @@ class OrderTableHelpers {
 
           SizedBox(width: context.smallPadding / 3),
 
-          // Quick Actions Dropdown
           PopupMenuButton<String>(
             onSelected: (value) => _handleQuickAction(context, order, value),
             itemBuilder: (context) => _buildQuickActionMenuItems(context, order),
@@ -107,11 +102,10 @@ class OrderTableHelpers {
     );
   }
 
-  /// Build quick action menu items based on order state
   List<PopupMenuEntry<String>> _buildQuickActionMenuItems(BuildContext context, OrderModel order) {
+    final l10n = AppLocalizations.of(context)!;
     final items = <PopupMenuEntry<String>>[];
 
-    // Status change actions based on current status
     switch (order.status) {
       case OrderStatus.PENDING:
         items.addAll([
@@ -121,7 +115,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text('Confirm Order', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.confirmOrder, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -131,7 +125,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.cancel, color: Colors.red, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text('Cancel Order', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.cancelOrder, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -145,7 +139,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.build, color: Colors.blue, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text('Start Production', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.startProduction, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -159,7 +153,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.done_all, color: Colors.green, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text('Mark as Ready', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.markAsReady, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -173,7 +167,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.local_shipping, color: Colors.purple, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text('Mark as Delivered', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.markAsDelivered, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -181,11 +175,9 @@ class OrderTableHelpers {
         break;
       case OrderStatus.DELIVERED:
       case OrderStatus.CANCELLED:
-        // No status change actions for delivered/cancelled orders
         break;
     }
 
-    // Soft delete/restore actions
     if (order.isActive) {
       items.add(
         PopupMenuItem(
@@ -194,7 +186,7 @@ class OrderTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Deactivate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -207,7 +199,7 @@ class OrderTableHelpers {
             children: [
               Icon(Icons.restore, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Restore', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.restore, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -217,7 +209,6 @@ class OrderTableHelpers {
     return items;
   }
 
-  /// Handle quick action selection
   void _handleQuickAction(BuildContext context, OrderModel order, String action) async {
     final provider = context.read<OrderProvider>();
 
@@ -246,83 +237,82 @@ class OrderTableHelpers {
     }
   }
 
-  /// Handle order status change
   Future<void> _handleStatusChange(BuildContext context, OrderProvider provider, OrderModel order, String newStatus) async {
-    final statusText = _getStatusTextFromString(newStatus);
+    final l10n = AppLocalizations.of(context)!;
+    final statusText = _getStatusTextFromString(context, newStatus);
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Change Order Status',
-            message: 'Are you sure you want to change the status of order #${order.id.substring(0, 8)} to "$statusText"?',
-            actionText: 'Change Status',
+            title: l10n.changeOrderStatus,
+            message: '${l10n.areYouSureChangeStatusTo} #${order.id.substring(0, 8)} ${l10n.to} "$statusText"?',
+            actionText: l10n.changeStatus,
             actionColor: Colors.blue,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.updateOrderStatus(order.id, newStatus);
       if (provider.errorMessage != null) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to update order status');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToUpdateOrderStatus);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Order status updated to $statusText successfully');
+        _showSuccessSnackbar(context, '${l10n.orderStatusUpdatedTo} $statusText ${l10n.successfully}');
       }
     }
   }
 
-  /// Handle soft delete (deactivate)
   Future<void> _handleSoftDelete(BuildContext context, OrderProvider provider, OrderModel order) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Deactivate Order',
-            message: 'Are you sure you want to deactivate order #${order.id.substring(0, 8)}? This action can be reversed.',
-            actionText: 'Deactivate',
+            title: l10n.deactivateOrder,
+            message: '${l10n.areYouSureDeactivateOrder} #${order.id.substring(0, 8)}? ${l10n.thisActionCanBeReversed}',
+            actionText: l10n.deactivate,
             actionColor: Colors.orange,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.softDeleteOrder(order.id);
       if (provider.errorMessage != null) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to deactivate order');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToDeactivateOrder);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Order deactivated successfully');
+        _showSuccessSnackbar(context, l10n.orderDeactivatedSuccessfully);
       }
     }
   }
 
-  /// Handle restore order
   Future<void> _handleRestore(BuildContext context, OrderProvider provider, OrderModel order) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Restore Order',
-            message: 'Are you sure you want to restore order #${order.id.substring(0, 8)}?',
-            actionText: 'Restore',
+            title: l10n.restoreOrder,
+            message: '${l10n.areYouSureRestoreOrder} #${order.id.substring(0, 8)}?',
+            actionText: l10n.restore,
             actionColor: Colors.green,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.restoreOrder(order.id);
       if (provider.errorMessage != null) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to restore order');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToRestoreOrder);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Order restored successfully');
+        _showSuccessSnackbar(context, l10n.orderRestoredSuccessfully);
       }
     }
   }
 
-  /// Show success snackbar
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -344,7 +334,6 @@ class OrderTableHelpers {
     );
   }
 
-  /// Show error snackbar
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -368,8 +357,9 @@ class OrderTableHelpers {
     );
   }
 
-  /// Build error state widget
   Widget buildErrorState(BuildContext context, OrderProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -384,7 +374,7 @@ class OrderTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Orders',
+            l10n.failedToLoadOrders,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -395,7 +385,7 @@ class OrderTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.unexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -420,7 +410,7 @@ class OrderTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -439,8 +429,9 @@ class OrderTableHelpers {
     );
   }
 
-  /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -455,7 +446,7 @@ class OrderTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Orders Found',
+            l10n.noOrdersFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -466,7 +457,7 @@ class OrderTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start managing your customer orders by creating your first order. Track deliveries, manage payments, and keep customers informed.',
+              l10n.startManagingCustomerOrders,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -483,7 +474,6 @@ class OrderTableHelpers {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // This will trigger the add order dialog from parent
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
@@ -494,7 +484,7 @@ class OrderTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Create New Order',
+                        l10n.createNewOrder,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -513,8 +503,9 @@ class OrderTableHelpers {
     );
   }
 
-  /// Build no search results state widget
   Widget buildNoSearchResultsState(BuildContext context, OrderProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -529,7 +520,7 @@ class OrderTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Orders Found',
+            l10n.noOrdersFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -540,7 +531,7 @@ class OrderTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'No orders match your search criteria "${provider.searchQuery}". Try adjusting your search terms or filters to find what you\'re looking for.',
+              '${l10n.noOrdersMatchSearch} "${provider.searchQuery}". ${l10n.tryAdjustingSearchTerms}',
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -551,7 +542,6 @@ class OrderTableHelpers {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Clear Search Button
               Container(
                 decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(context.borderRadius())),
                 child: Material(
@@ -569,7 +559,7 @@ class OrderTableHelpers {
                           Icon(Icons.clear_rounded, color: Colors.grey[700], size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            'Clear Search',
+                            l10n.clearSearch,
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
@@ -586,7 +576,6 @@ class OrderTableHelpers {
 
               SizedBox(width: context.mainPadding),
 
-              // Create New Order Button
               Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -596,7 +585,6 @@ class OrderTableHelpers {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      // This will trigger the add order dialog from parent
                     },
                     borderRadius: BorderRadius.circular(context.borderRadius()),
                     child: Padding(
@@ -607,7 +595,7 @@ class OrderTableHelpers {
                           Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            'Create New Order',
+                            l10n.createNewOrder,
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
@@ -628,7 +616,6 @@ class OrderTableHelpers {
     );
   }
 
-  /// Get status color based on order status
   Color getStatusColor(OrderStatus status) {
     switch (status) {
       case OrderStatus.PENDING:
@@ -646,7 +633,6 @@ class OrderTableHelpers {
     }
   }
 
-  /// Get status text based on order status
   String getStatusText(OrderStatus status) {
     switch (status) {
       case OrderStatus.PENDING:
@@ -664,32 +650,31 @@ class OrderTableHelpers {
     }
   }
 
-  /// Get status text from string
-  String _getStatusTextFromString(String status) {
+  String _getStatusTextFromString(BuildContext context, String status) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'Pending';
+        return l10n.pending;
       case 'confirmed':
-        return 'Confirmed';
+        return l10n.confirmed;
       case 'in_production':
-        return 'In Production';
+        return l10n.inProduction;
       case 'ready':
-        return 'Ready';
+        return l10n.ready;
       case 'delivered':
-        return 'Delivered';
+        return l10n.delivered;
       case 'cancelled':
-        return 'Cancelled';
+        return l10n.cancelled;
       default:
         return status;
     }
   }
 
-  /// Format date for display
   String formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
-  /// Show Order Items Management Dialog
   void _showOrderItemsManagementDialog(BuildContext context, OrderModel order) {
     showDialog(
       context: context,

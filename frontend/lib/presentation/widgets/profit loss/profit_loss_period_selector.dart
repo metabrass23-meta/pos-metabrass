@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ProfitLossPeriodSelector extends StatelessWidget {
   const ProfitLossPeriodSelector({super.key});
 
   Future<void> _showCustomDatePicker(BuildContext context, ProfitLossProvider provider) async {
-    // Show custom date range dialog using the enhanced date picker
     await _showCustomDateRangeDialog(context, provider);
   }
 
@@ -63,6 +63,8 @@ class ProfitLossPeriodSelector extends StatelessWidget {
   }
 
   Widget _buildDesktopLayout(BuildContext context, ProfitLossProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -104,7 +106,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                       ),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Select Date Range',
+                        l10n.selectDateRange,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -120,7 +122,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                       Column(
                         children: [
                           Text(
-                            'From',
+                            l10n.from,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -147,7 +149,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                       Column(
                         children: [
                           Text(
-                            'To',
+                            l10n.to,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -176,6 +178,8 @@ class ProfitLossPeriodSelector extends StatelessWidget {
   }
 
   Widget _buildTabletLayout(BuildContext context, ProfitLossProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         SingleChildScrollView(
@@ -220,7 +224,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         ),
                         SizedBox(width: context.smallPadding),
                         Text(
-                          'Select Date Range',
+                          l10n.selectDateRange,
                           style: GoogleFonts.inter(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
@@ -236,7 +240,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         Column(
                           children: [
                             Text(
-                              'From',
+                              l10n.from,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
@@ -261,7 +265,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         Column(
                           children: [
                             Text(
-                              'To',
+                              l10n.to,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
@@ -295,11 +299,11 @@ class ProfitLossPeriodSelector extends StatelessWidget {
   }
 
   Widget _buildPeriodButton(
-    BuildContext context,
-    ProfitLossProvider provider,
-    String period,
-    bool isSelected,
-  ) {
+      BuildContext context,
+      ProfitLossProvider provider,
+      String period,
+      bool isSelected,
+      ) {
     return GestureDetector(
       onTap: () => provider.setPeriodType(period),
       child: Container(
@@ -310,7 +314,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
           border: Border.all(color: isSelected ? AppTheme.primaryMaroon : Colors.grey.shade300, width: 1),
         ),
         child: Text(
-          _getPeriodDisplayName(period),
+          _getPeriodDisplayName(context, period),
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
@@ -321,25 +325,26 @@ class ProfitLossPeriodSelector extends StatelessWidget {
     );
   }
 
-  String _getPeriodDisplayName(String period) {
+  String _getPeriodDisplayName(BuildContext context, String period) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (period) {
       case 'daily':
-        return 'Daily';
+        return l10n.daily;
       case 'weekly':
-        return 'Weekly';
+        return l10n.weekly;
       case 'monthly':
-        return 'Monthly';
+        return l10n.monthly;
       case 'yearly':
-        return 'Yearly';
+        return l10n.yearly;
       case 'custom':
-        return 'Custom';
+        return l10n.custom;
       default:
         return period;
     }
   }
 }
 
-// Custom Date Range Dialog Component
 class _CustomDateRangeDialog extends StatefulWidget {
   final DateTime initialStartDate;
   final DateTime initialEndDate;
@@ -390,10 +395,12 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
   }
 
   Future<void> _selectStartDate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _startDate,
       initialTime: TimeOfDay.fromDateTime(_startDate),
-      title: 'Select Start Date',
+      title: l10n.selectStartDate,
       minDate: DateTime(2020),
       maxDate: _endDate,
       onDateTimeSelected: (date, time) {
@@ -405,10 +412,12 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
   }
 
   Future<void> _selectEndDate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _endDate,
       initialTime: TimeOfDay.fromDateTime(_endDate),
-      title: 'Select End Date',
+      title: l10n.selectEndDate,
       minDate: _startDate,
       maxDate: DateTime.now(),
       onDateTimeSelected: (date, time) {
@@ -434,6 +443,8 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -459,7 +470,6 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Header
                     Container(
                       padding: EdgeInsets.all(context.cardPadding),
                       decoration: BoxDecoration(
@@ -481,7 +491,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                           SizedBox(width: context.cardPadding),
                           Expanded(
                             child: Text(
-                              'Select Date Range',
+                              l10n.selectDateRange,
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: context.headerFontSize,
                                 fontWeight: FontWeight.w700,
@@ -504,12 +514,10 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                       ),
                     ),
 
-                    // Content
                     Padding(
                       padding: EdgeInsets.all(context.cardPadding),
                       child: Column(
                         children: [
-                          // Start Date Selector
                           GestureDetector(
                             onTap: _selectStartDate,
                             child: Container(
@@ -532,7 +540,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       ),
                                       SizedBox(width: context.smallPadding),
                                       Text(
-                                        'Start Date',
+                                        l10n.startDate,
                                         style: GoogleFonts.inter(
                                           fontSize: context.bodyFontSize,
                                           fontWeight: FontWeight.w600,
@@ -557,7 +565,6 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
 
                           SizedBox(height: context.cardPadding),
 
-                          // End Date Selector
                           GestureDetector(
                             onTap: _selectEndDate,
                             child: Container(
@@ -580,7 +587,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       ),
                                       SizedBox(width: context.smallPadding),
                                       Text(
-                                        'End Date',
+                                        l10n.endDate,
                                         style: GoogleFonts.inter(
                                           fontSize: context.bodyFontSize,
                                           fontWeight: FontWeight.w600,
@@ -605,7 +612,6 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
 
                           SizedBox(height: context.mainPadding),
 
-                          // Buttons
                           Row(
                             children: [
                               Expanded(
@@ -621,7 +627,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       ),
                                     ),
                                     child: Text(
-                                      'Cancel',
+                                      l10n.cancel,
                                       style: GoogleFonts.inter(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,
@@ -645,7 +651,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       ),
                                     ),
                                     child: Text(
-                                      'Apply Range',
+                                      l10n.applyRange,
                                       style: GoogleFonts.inter(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,

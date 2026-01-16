@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ReceivablesTable extends StatelessWidget {
   final Function(Receivable) onEdit;
@@ -95,6 +96,8 @@ class ReceivablesTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveHeaderRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final receivableColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -108,43 +111,43 @@ class ReceivablesTable extends StatelessWidget {
       children: [
         Expanded(
           flex: receivableColumnFlexes[0],
-          child: _buildHeaderCell(context, 'ID'),
+          child: _buildHeaderCell(context, l10n.id),
         ),
         Expanded(
           flex: receivableColumnFlexes[1],
-          child: _buildHeaderCell(context, context.isTablet ? 'Debtor' : 'Debtor Details'),
+          child: _buildHeaderCell(context, context.isTablet ? l10n.debtor : l10n.debtorDetails),
         ),
         Expanded(
           flex: receivableColumnFlexes[2],
-          child: _buildHeaderCell(context, 'Amounts'),
+          child: _buildHeaderCell(context, l10n.amounts),
         ),
         if (!context.shouldShowCompactLayout) ...[
           Expanded(
             flex: receivableColumnFlexes[3],
-            child: _buildHeaderCell(context, 'Reason/Item'),
+            child: _buildHeaderCell(context, l10n.reasonItem),
           ),
         ],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
           Expanded(
             flex: receivableColumnFlexes[4],
-            child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Dates' : 'Return Date'),
+            child: _buildHeaderCell(context, context.shouldShowFullLayout ? l10n.dates : l10n.returnDate),
           ),
         ],
         if (context.shouldShowFullLayout) ...[
           Expanded(
             flex: receivableColumnFlexes[5],
-            child: _buildHeaderCell(context, 'Progress'),
+            child: _buildHeaderCell(context, l10n.progress),
           ),
         ],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
           Expanded(
             flex: receivableColumnFlexes[6],
-            child: _buildHeaderCell(context, 'Status'),
+            child: _buildHeaderCell(context, l10n.status),
           ),
         ],
         Expanded(
           flex: receivableColumnFlexes[7],
-          child: _buildHeaderCell(context, 'Actions'),
+          child: _buildHeaderCell(context, l10n.actions),
         ),
       ],
     );
@@ -163,6 +166,8 @@ class ReceivablesTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveTableRow(BuildContext context, Receivable receivable, int index) {
+    final l10n = AppLocalizations.of(context)!;
+
     final receivableColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -239,7 +244,7 @@ class ReceivablesTable extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'PKR ${receivable.balanceRemaining.toStringAsFixed(0)} remaining',
+                    'PKR ${receivable.balanceRemaining.toStringAsFixed(0)} ${l10n.remaining}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -371,7 +376,7 @@ class ReceivablesTable extends StatelessWidget {
                   if (context.shouldShowFullLayout) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'Lent: ${receivable.formattedDateLent}',
+                      '${l10n.lent}: ${receivable.formattedDateLent}',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w400,
@@ -382,7 +387,7 @@ class ReceivablesTable extends StatelessWidget {
                   if (receivable.isOverdue) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      '${receivable.daysOverdue} days overdue',
+                      '${receivable.daysOverdue} ${l10n.daysOverdue}',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -488,6 +493,8 @@ class ReceivablesTable extends StatelessWidget {
   }
 
   Widget _buildCompactActions(BuildContext context, Receivable receivable) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'edit') {
@@ -510,7 +517,7 @@ class ReceivablesTable extends StatelessWidget {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Edit',
+                l10n.edit,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   color: Colors.blue,
@@ -530,7 +537,7 @@ class ReceivablesTable extends StatelessWidget {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'View Details',
+                l10n.viewDetails,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   color: Colors.green,
@@ -550,7 +557,7 @@ class ReceivablesTable extends StatelessWidget {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Delete',
+                l10n.deleteText,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   color: Colors.red,
@@ -643,6 +650,8 @@ class ReceivablesTable extends StatelessWidget {
   }
 
   Widget _buildExpandedActions(BuildContext context, Receivable receivable) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -671,7 +680,7 @@ class ReceivablesTable extends StatelessWidget {
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Edit',
+                      l10n.edit,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -711,7 +720,7 @@ class ReceivablesTable extends StatelessWidget {
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'View',
+                      l10n.view,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -751,7 +760,7 @@ class ReceivablesTable extends StatelessWidget {
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Delete',
+                      l10n.deleteText,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -769,6 +778,8 @@ class ReceivablesTable extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -802,7 +813,7 @@ class ReceivablesTable extends StatelessWidget {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'No Receivables Found',
+            l10n.noReceivablesFound,
             style: GoogleFonts.inter(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -822,7 +833,7 @@ class ReceivablesTable extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Start by adding your first receivable record to track amounts lent to customers and suppliers',
+              l10n.startByAddingFirstReceivable,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
@@ -861,7 +872,7 @@ class ReceivablesTable extends StatelessWidget {
                       ),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Receivable',
+                        '${l10n.add} ${l10n.firstReceivable}',
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,

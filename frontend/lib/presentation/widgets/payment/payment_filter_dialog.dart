@@ -8,6 +8,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
 import '../globals/drop_down.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PaymentFilterDialog extends StatefulWidget {
   const PaymentFilterDialog({super.key});
@@ -21,7 +22,6 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables - only fields from payment provider
   String? _selectedLaborId;
   String? _selectedPayerType;
   String? _selectedPaymentMethod;
@@ -38,12 +38,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   bool _showInactive = false;
   String _searchQuery = '';
 
-  // Text controllers for custom inputs
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _minAmountController = TextEditingController();
   final TextEditingController _maxAmountController = TextEditingController();
 
-  // Predefined options based on payment provider
   static const String _allValue = 'ALL';
 
   @override
@@ -55,7 +53,6 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Initialize with current filter values from provider
     final provider = context.read<PaymentProvider>();
     _selectedLaborId = provider.selectedLaborId ?? _allValue;
     _selectedPayerType = provider.selectedPayerType ?? _allValue;
@@ -92,41 +89,34 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   Future<void> _handleApplyFilters() async {
     final provider = context.read<PaymentProvider>();
 
-    // Update search from text controller
     final search = _searchController.text.trim();
     if (search != provider.searchQuery) {
       await provider.searchPayments(search);
     }
 
-    // Apply labor filter
     if (_selectedLaborId != provider.selectedLaborId) {
       final laborId = _selectedLaborId == _allValue ? null : _selectedLaborId;
       provider.setLaborFilter(laborId);
     }
 
-    // Apply payer type filter
     if (_selectedPayerType != provider.selectedPayerType) {
       final payerType = _selectedPayerType == _allValue ? null : _selectedPayerType;
       provider.setPayerTypeFilter(payerType);
     }
 
-    // Apply payment method filter
     if (_selectedPaymentMethod != provider.selectedPaymentMethod) {
       final paymentMethod = _selectedPaymentMethod == _allValue ? null : _selectedPaymentMethod;
       provider.setPaymentMethodFilter(paymentMethod);
     }
 
-    // Apply date range filter
     if (_dateFrom != provider.dateFrom || _dateTo != provider.dateTo) {
       provider.setDateRangeFilter(_dateFrom, _dateTo);
     }
 
-    // Apply payment month range filter
     if (_paymentMonthFrom != provider.paymentMonthFrom || _paymentMonthTo != provider.paymentMonthTo) {
       provider.setPaymentMonthRangeFilter(_paymentMonthFrom, _paymentMonthTo);
     }
 
-    // Apply amount range filter
     final minAmount = _minAmountController.text.trim().isEmpty ? null : double.tryParse(_minAmountController.text.trim());
     final maxAmount = _maxAmountController.text.trim().isEmpty ? null : double.tryParse(_maxAmountController.text.trim());
 
@@ -134,22 +124,18 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
       provider.setAmountRangeFilter(minAmount, maxAmount);
     }
 
-    // Apply receipt filter
     if (_hasReceipt != provider.hasReceipt) {
       provider.setReceiptFilter(_hasReceipt);
     }
 
-    // Apply final payment filter
     if (_isFinalPayment != provider.isFinalPayment) {
       provider.setFinalPaymentFilter(_isFinalPayment);
     }
 
-    // Apply sorting
     if (_sortBy != provider.sortBy || _sortAscending != provider.sortAscending) {
       provider.setSortOptions(_sortBy, _sortAscending);
     }
 
-    // Apply inactive filter
     if (_showInactive != provider.showInactive) {
       provider.setShowInactiveFilter(_showInactive);
     }
@@ -161,7 +147,6 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
     final provider = context.read<PaymentProvider>();
     provider.resetFilters();
 
-    // Reset local state
     setState(() {
       _selectedLaborId = _allValue;
       _selectedPayerType = _allValue;
@@ -230,6 +215,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -245,7 +232,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
           SizedBox(width: context.cardPadding),
           Expanded(
             child: Text(
-              'Payment Filters',
+              l10n.paymentFilters,
               style: GoogleFonts.playfairDisplay(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.w700,
@@ -297,6 +284,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -312,7 +301,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.search_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Search',
+                l10n.search,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -322,7 +311,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             controller: _searchController,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
-              hintText: 'Search by labor name, vendor, description...',
+              hintText: l10n.searchByLaborVendorDescription,
               hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -345,6 +334,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildEntitySection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -360,7 +351,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.person_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Entity Filters',
+                l10n.entityFilters,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -370,10 +361,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Labor',
-                  hint: 'Select labor',
+                  label: l10n.labor,
+                  hint: l10n.selectLabor,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All Labors'),
+                    DropdownItem<String>(value: _allValue, label: l10n.allLabors),
                     ...context.read<PaymentProvider>().laborers.map((labor) => DropdownItem<String>(value: labor.id, label: labor.name)),
                   ],
                   value: _selectedLaborId,
@@ -383,10 +374,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Payer Type',
-                  hint: 'Select payer type',
+                  label: l10n.payerType,
+                  hint: l10n.selectPayerType,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All Types'),
+                    DropdownItem<String>(value: _allValue, label: l10n.allTypes),
                     ...PaymentProvider.staticPayerTypes.map((type) => DropdownItem<String>(value: type, label: type.replaceAll('_', ' '))),
                   ],
                   value: _selectedPayerType,
@@ -401,6 +392,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildPaymentDetailsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -416,7 +409,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.payment_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Details',
+                l10n.paymentDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -426,10 +419,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Payment Method',
-                  hint: 'Select payment method',
+                  label: l10n.paymentMethod,
+                  hint: l10n.selectPaymentMethod,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All Methods'),
+                    DropdownItem<String>(value: _allValue, label: l10n.allMethods),
                     ...PaymentProvider.staticPaymentMethods.map((method) => DropdownItem<String>(value: method, label: method.replaceAll('_', ' '))),
                   ],
                   value: _selectedPaymentMethod,
@@ -439,12 +432,12 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Final Payment',
-                  hint: 'Select final payment status',
+                  label: l10n.finalPayment,
+                  hint: l10n.selectFinalPaymentStatus,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All'),
-                    DropdownItem<String>(value: 'true', label: 'Final Only'),
-                    DropdownItem<String>(value: 'false', label: 'Partial Only'),
+                    DropdownItem<String>(value: _allValue, label: l10n.all),
+                    DropdownItem<String>(value: 'true', label: l10n.finalOnly),
+                    DropdownItem<String>(value: 'false', label: l10n.partialOnly),
                   ],
                   value: _isFinalPayment?.toString() ?? _allValue,
                   onChanged: (value) => setState(() => _isFinalPayment = value == _allValue ? null : value == 'true'),
@@ -457,12 +450,12 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Has Receipt',
-                  hint: 'Select receipt status',
+                  label: l10n.hasReceipt,
+                  hint: l10n.selectReceiptStatus,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All'),
-                    DropdownItem<String>(value: 'true', label: 'With Receipt'),
-                    DropdownItem<String>(value: 'false', label: 'Without Receipt'),
+                    DropdownItem<String>(value: _allValue, label: l10n.all),
+                    DropdownItem<String>(value: 'true', label: l10n.withReceipt),
+                    DropdownItem<String>(value: 'false', label: l10n.withoutReceipt),
                   ],
                   value: _hasReceipt?.toString() ?? _allValue,
                   onChanged: (value) => setState(() => _hasReceipt = value == _allValue ? null : value == 'true'),
@@ -471,11 +464,11 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Show Inactive',
-                  hint: 'Select visibility',
+                  label: l10n.showInactive,
+                  hint: l10n.selectVisibility,
                   items: [
-                    DropdownItem<String>(value: 'true', label: 'Show All'),
-                    DropdownItem<String>(value: 'false', label: 'Active Only'),
+                    DropdownItem<String>(value: 'true', label: l10n.showAll),
+                    DropdownItem<String>(value: 'false', label: l10n.activeOnly),
                   ],
                   value: _showInactive.toString(),
                   onChanged: (value) => setState(() => _showInactive = value == 'true'),
@@ -489,6 +482,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildDateRangeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -504,7 +499,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.calendar_today_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Date Ranges',
+                l10n.dateRanges,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -514,7 +509,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Payment Date From',
+                  label: l10n.paymentDateFrom,
                   selectedDate: _dateFrom,
                   onDateSelected: (date) => setState(() => _dateFrom = date),
                   firstDate: DateTime(2020),
@@ -524,7 +519,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Payment Date To',
+                  label: l10n.paymentDateTo,
                   selectedDate: _dateTo,
                   onDateSelected: (date) => setState(() => _dateTo = date),
                   firstDate: DateTime(2020),
@@ -538,7 +533,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Payment Month From',
+                  label: l10n.paymentMonthFrom,
                   selectedDate: _paymentMonthFrom,
                   onDateSelected: (date) => setState(() => _paymentMonthFrom = date),
                   firstDate: DateTime(2020),
@@ -548,7 +543,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Payment Month To',
+                  label: l10n.paymentMonthTo,
                   selectedDate: _paymentMonthTo,
                   onDateSelected: (date) => setState(() => _paymentMonthTo = date),
                   firstDate: DateTime(2020),
@@ -563,6 +558,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildAmountRangeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -578,7 +575,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.attach_money_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Range (PKR)',
+                l10n.amountRangePkr,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -592,7 +589,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
-                    labelText: 'Minimum Amount',
+                    labelText: l10n.minimumAmount,
                     labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -617,7 +614,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
-                    labelText: 'Maximum Amount',
+                    labelText: l10n.maximumAmount,
                     labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -643,6 +640,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildSortingSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -658,7 +657,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               Icon(Icons.sort_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Sort Options',
+                l10n.sortOptions,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -668,13 +667,13 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Sort By',
-                  hint: 'Select sort field',
+                  label: l10n.sortBy,
+                  hint: l10n.selectSortField,
                   items: [
-                    DropdownItem<String>(value: 'date', label: 'Payment Date'),
-                    DropdownItem<String>(value: 'amount', label: 'Amount'),
-                    DropdownItem<String>(value: 'labor_name', label: 'Labor Name'),
-                    DropdownItem<String>(value: 'created_at', label: 'Created Date'),
+                    DropdownItem<String>(value: 'date', label: l10n.paymentDate),
+                    DropdownItem<String>(value: 'amount', label: l10n.amount),
+                    DropdownItem<String>(value: 'labor_name', label: l10n.laborName),
+                    DropdownItem<String>(value: 'created_at', label: l10n.createdDate),
                   ],
                   value: _sortBy,
                   onChanged: (value) => setState(() => _sortBy = value ?? 'date'),
@@ -683,11 +682,11 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Order',
-                  hint: 'Select sort order',
+                  label: l10n.order,
+                  hint: l10n.selectSortOrder,
                   items: [
-                    DropdownItem<String>(value: 'desc', label: 'Descending'),
-                    DropdownItem<String>(value: 'asc', label: 'Ascending'),
+                    DropdownItem<String>(value: 'desc', label: l10n.descending),
+                    DropdownItem<String>(value: 'asc', label: l10n.ascending),
                   ],
                   value: _sortAscending ? 'asc' : 'desc',
                   onChanged: (value) => setState(() => _sortAscending = value == 'asc'),
@@ -707,6 +706,8 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
     required DateTime firstDate,
     required DateTime lastDate,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -723,7 +724,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               onDateTimeSelected: (date, time) {
                 onDateSelected(date);
               },
-              title: 'Select Date',
+              title: l10n.selectDate,
               minDate: firstDate,
               maxDate: lastDate,
               showTimeInline: false,
@@ -743,7 +744,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                   child: Text(
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
-                        : 'Select date',
+                        : l10n.selectDate,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
@@ -764,11 +765,13 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             backgroundColor: Colors.grey.shade300,
             textColor: AppTheme.charcoalGray,
@@ -777,7 +780,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             backgroundColor: AppTheme.primaryMaroon,
             textColor: AppTheme.pureWhite,

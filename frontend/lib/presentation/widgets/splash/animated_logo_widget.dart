@@ -179,11 +179,7 @@ class AnimatedLogoWidget extends StatelessWidget {
                               ],
                               stops: const [0.0, 0.3, 0.7, 1.0],
                             ).createShader(bounds),
-                            child: Icon(
-                              Icons.diamond_sharp,
-                              size: context.iconSize('special') * 1.5,
-                              color: Colors.white,
-                            ),
+                            child: Image.asset('assets/images/logo.png')
                           ),
                         ],
                       ),

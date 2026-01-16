@@ -7,6 +7,7 @@ import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DeletePayableDialog extends StatefulWidget {
   final Payable payable;
@@ -55,6 +56,8 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -62,7 +65,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Payable deleted successfully!',
+              l10n.payableDeletedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -159,6 +162,8 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -181,7 +186,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Payable' : 'Delete Payable Record',
+                  context.shouldShowCompactLayout ? l10n.deletePayable : l10n.deletePayableRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -192,7 +197,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.thisActionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -220,6 +225,8 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -235,7 +242,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            isCompact ? 'Are you sure you want to delete this payable?' : 'Are you absolutely sure you want to delete this payable record?',
+            isCompact ? l10n.areYouSureYouWantToDeleteThisPayable : l10n.areYouAbsolutelySureYouWantToDeleteThisPayableRecord,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
@@ -280,7 +287,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount Borrowed:',
+                            '${l10n.amountBorrowed}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -295,7 +302,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Balance Remaining:',
+                            '${l10n.balanceRemaining}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -319,11 +326,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Phone:',
+                            '${l10n.phone}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
-                            widget.payable.creditorPhone ?? 'N/A',
+                            widget.payable.creditorPhone ?? l10n.notAvailable,
                             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
@@ -334,7 +341,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Status:',
+                            '${l10n.status}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
@@ -365,7 +372,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Expected Repayment:',
+                            '${l10n.expectedRepayment}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -385,11 +392,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'Days Overdue:',
+                              '${l10n.daysOverdue}:',
                               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                             ),
                             Text(
-                              '${widget.payable.daysOverdue} days',
+                              l10n.daysCount(widget.payable.daysOverdue),
                               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                             ),
                           ],
@@ -405,7 +412,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Reason/Item:',
+                        '${l10n.reasonItem}:',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
@@ -428,9 +435,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    isCompact
-                        ? 'This will permanently delete the payable record.'
-                        : 'This will permanently delete the payable record and all associated data. This action cannot be undone.',
+                    isCompact ? l10n.thisWillPermanentlyDeleteThePayableRecord : l10n.thisWillPermanentlyDeleteThePayableRecordAndAllAssociatedData,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
@@ -452,11 +457,13 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -466,7 +473,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
         Consumer<PayablesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Payable',
+              text: l10n.deletePayable,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -480,12 +487,14 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -498,7 +507,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
           child: Consumer<PayablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

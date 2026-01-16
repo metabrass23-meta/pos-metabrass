@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/zakat/zakat_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -45,7 +46,6 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
 
     _animationController.forward();
 
-    // Set default authority
     if (ZakatAuthorities.authorities.isNotEmpty) {
       _selectedAuthority = ZakatAuthorities.authorities.first;
     }
@@ -64,16 +64,18 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedAuthority == null) {
-        _showErrorSnackbar('Please select an authorized person');
+        _showErrorSnackbar(l10n.pleaseSelectAuthorizedPerson);
         return;
       }
 
       final zakatProvider = Provider.of<ZakatProvider>(context, listen: false);
 
       final success = await zakatProvider.addZakat(
-        name: _nameController.text.trim().isEmpty ? 'Zakat Contribution' : _nameController.text.trim(),
+        name: _nameController.text.trim().isEmpty ? l10n.zakatContribution : _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         date: _selectedDate,
         time: _selectedTime,
@@ -89,13 +91,15 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(zakatProvider.errorMessage ?? 'Failed to add zakat record');
+          _showErrorSnackbar(zakatProvider.errorMessage ?? l10n.failedToAddZakatRecord);
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -103,7 +107,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Zakat record added successfully!',
+              l10n.zakatRecordAddedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -146,11 +150,13 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   Future<void> _selectDateTime() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _selectedDate,
       initialTime: _selectedTime,
       minDate: DateTime(2000),
-      maxDate: DateTime.now(), // Can't select future dates
+      maxDate: DateTime.now(),
       onDateTimeSelected: (date, time) {
         setState(() {
           _selectedDate = date;
@@ -219,6 +225,8 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -241,7 +249,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Zakat' : 'Add New Zakat Record',
+                  context.shouldShowCompactLayout ? l10n.addZakat : l10n.addNewZakatRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -252,7 +260,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Record your zakat contribution',
+                    l10n.recordYourZakatContribution,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -280,6 +288,8 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -288,26 +298,25 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Title (Optional)',
-              hint: isCompact ? 'Enter title' : 'Enter zakat contribution title',
+              label: l10n.titleOptional,
+              hint: isCompact ? l10n.enterTitle : l10n.enterZakatContributionTitle,
               controller: _nameController,
               prefixIcon: Icons.title_outlined,
-              // No validator since this field is optional
             ),
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Description',
-              hint: isCompact ? 'Enter description' : 'Enter description/purpose of zakat',
+              label: l10n.description,
+              hint: isCompact ? l10n.enterDescription : l10n.enterDescriptionPurposeOfZakat,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter description';
+                  return l10n.pleaseEnterDescription;
                 }
                 if (value!.length < 5) {
-                  return 'Description must be at least 5 characters';
+                  return l10n.descriptionMustBeAtLeast5Characters;
                 }
                 return null;
               },
@@ -315,18 +324,18 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Amount (PKR)',
-              hint: isCompact ? 'Enter amount' : 'Enter zakat amount in PKR',
+              label: l10n.amountPkr,
+              hint: isCompact ? l10n.enterAmount : l10n.enterZakatAmountInPkr,
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter amount';
+                  return l10n.pleaseEnterAmount;
                 }
                 final amount = double.tryParse(value!);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount greater than zero';
+                  return l10n.pleaseEnterValidAmountGreaterThanZero;
                 }
                 return null;
               },
@@ -334,16 +343,16 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Beneficiary Name',
-              hint: isCompact ? 'Enter beneficiary name' : 'Enter name of recipient/beneficiary',
+              label: l10n.beneficiaryName,
+              hint: isCompact ? l10n.enterBeneficiaryName : l10n.enterNameOfRecipientBeneficiary,
               controller: _beneficiaryNameController,
               prefixIcon: Icons.person_outline,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter beneficiary name';
+                  return l10n.pleaseEnterBeneficiaryName;
                 }
                 if (value!.length < 2) {
-                  return 'Beneficiary name must be at least 2 characters';
+                  return l10n.beneficiaryNameMustBeAtLeast2Characters;
                 }
                 return null;
               },
@@ -351,16 +360,14 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Beneficiary Contact (Optional)',
-              hint: isCompact ? 'Enter contact' : 'Enter beneficiary contact number',
+              label: l10n.beneficiaryContactOptional,
+              hint: isCompact ? l10n.enterContact : l10n.enterBeneficiaryContactNumber,
               controller: _beneficiaryContactController,
               prefixIcon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
-              // No validator since this field is optional
             ),
             SizedBox(height: context.cardPadding),
 
-            // Authority Selection Dropdown
             Container(
               padding: EdgeInsets.symmetric(horizontal: context.cardPadding),
               decoration: BoxDecoration(
@@ -376,7 +383,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                       Icon(Icons.verified_user_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Authorized By',
+                        l10n.authorizedBy,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
@@ -391,7 +398,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                       value: _selectedAuthority,
                       isExpanded: true,
                       hint: Text(
-                        'Select authorizing person',
+                        l10n.selectAuthorizingPerson,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                       ),
                       items: ZakatAuthorities.authorities.map((String authority) {
@@ -416,7 +423,6 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             ),
             SizedBox(height: context.cardPadding),
 
-            // Date and Time Selection
             InkWell(
               onTap: _selectDateTime,
               child: Container(
@@ -433,14 +439,14 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                         Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                         SizedBox(width: context.smallPadding),
                         Text(
-                          'Date & Time',
+                          l10n.dateAndTime,
                           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ],
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
-                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} at ${_selectedTime.format(context)}',
+                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} ${l10n.at} ${_selectedTime.format(context)}',
                       style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     ),
                   ],
@@ -450,12 +456,11 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Additional Notes (Optional)',
-              hint: isCompact ? 'Enter notes' : 'Enter additional notes or religious considerations',
+              label: l10n.additionalNotesOptional,
+              hint: isCompact ? l10n.enterNotes : l10n.enterAdditionalNotesOrReligiousConsiderations,
               controller: _notesController,
               prefixIcon: Icons.notes_outlined,
               maxLines: 2,
-              // No validator since this field is optional
             ),
 
             SizedBox(height: context.mainPadding),
@@ -475,13 +480,15 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<ZakatProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Zakat Record',
+              text: l10n.addZakatRecord,
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -491,7 +498,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -503,11 +510,13 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -520,7 +529,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
           child: Consumer<ZakatProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Zakat Record',
+                text: l10n.addZakatRecord,
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

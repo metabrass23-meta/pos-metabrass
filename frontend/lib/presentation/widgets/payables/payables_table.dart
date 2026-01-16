@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PayablesTable extends StatelessWidget {
   final Function(Payable) onEdit;
@@ -68,6 +69,7 @@ class PayablesTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveHeaderRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final payableColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -79,18 +81,18 @@ class PayablesTable extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(flex: payableColumnFlexes[0], child: _buildHeaderCell(context, 'ID')),
-        Expanded(flex: payableColumnFlexes[1], child: _buildHeaderCell(context, context.isTablet ? 'Creditor' : 'Creditor Details')),
-        Expanded(flex: payableColumnFlexes[2], child: _buildHeaderCell(context, 'Amounts')),
-        if (!context.shouldShowCompactLayout) ...[Expanded(flex: payableColumnFlexes[3], child: _buildHeaderCell(context, 'Reason/Item'))],
+        Expanded(flex: payableColumnFlexes[0], child: _buildHeaderCell(context, l10n.id)),
+        Expanded(flex: payableColumnFlexes[1], child: _buildHeaderCell(context, context.isTablet ? l10n.creditor : l10n.creditorDetails)),
+        Expanded(flex: payableColumnFlexes[2], child: _buildHeaderCell(context, l10n.amounts)),
+        if (!context.shouldShowCompactLayout) ...[Expanded(flex: payableColumnFlexes[3], child: _buildHeaderCell(context, l10n.reasonItem))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(flex: payableColumnFlexes[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? 'Dates' : 'Repayment Date')),
+          Expanded(flex: payableColumnFlexes[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? l10n.dates : l10n.repaymentDate)),
         ],
-        if (context.shouldShowFullLayout) ...[Expanded(flex: payableColumnFlexes[5], child: _buildHeaderCell(context, 'Progress'))],
+        if (context.shouldShowFullLayout) ...[Expanded(flex: payableColumnFlexes[5], child: _buildHeaderCell(context, l10n.progress))],
         if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(flex: payableColumnFlexes[6], child: _buildHeaderCell(context, 'Status')),
+          Expanded(flex: payableColumnFlexes[6], child: _buildHeaderCell(context, l10n.status)),
         ],
-        Expanded(flex: payableColumnFlexes[7], child: _buildHeaderCell(context, 'Actions')),
+        Expanded(flex: payableColumnFlexes[7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -103,6 +105,7 @@ class PayablesTable extends StatelessWidget {
   }
 
   Widget _buildResponsiveTableRow(BuildContext context, Payable payable, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final payableColumnFlexes = ResponsiveBreakpoints.responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 1, 1],
@@ -151,13 +154,13 @@ class PayablesTable extends StatelessWidget {
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
-                    payable.creditorPhone ?? 'N/A',
+                    payable.creditorPhone ?? l10n.notAvailable,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'PKR ${payable.balanceRemaining.toStringAsFixed(0)} remaining',
+                    l10n.pkrRemaining(payable.balanceRemaining.toStringAsFixed(0)),
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -260,14 +263,14 @@ class PayablesTable extends StatelessWidget {
                   if (context.shouldShowFullLayout) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      'Borrowed: ${payable.formattedDateBorrowed}',
+                      '${l10n.borrowed}: ${payable.formattedDateBorrowed}',
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                     ),
                   ],
                   if (payable.isOverdueComputed) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
-                      '${payable.daysOverdue} days overdue',
+                      l10n.daysOverdueCount(payable.daysOverdue),
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
                     ),
                   ],
@@ -354,6 +357,8 @@ class PayablesTable extends StatelessWidget {
   }
 
   Widget _buildCompactActions(BuildContext context, Payable payable) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'edit') {
@@ -372,7 +377,7 @@ class PayablesTable extends StatelessWidget {
               Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Edit',
+                l10n.edit,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue),
               ),
             ],
@@ -385,7 +390,7 @@ class PayablesTable extends StatelessWidget {
               Icon(Icons.visibility_outlined, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'View Details',
+                l10n.viewDetails,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.green),
               ),
             ],
@@ -398,7 +403,7 @@ class PayablesTable extends StatelessWidget {
               Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Delete',
+                l10n.delete,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
               ),
             ],
@@ -460,6 +465,8 @@ class PayablesTable extends StatelessWidget {
   }
 
   Widget _buildExpandedActions(BuildContext context, Payable payable) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -478,7 +485,7 @@ class PayablesTable extends StatelessWidget {
                     Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Edit',
+                      l10n.edit,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                     ),
                   ],
@@ -504,7 +511,7 @@ class PayablesTable extends StatelessWidget {
                     Icon(Icons.visibility_outlined, color: Colors.green, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'View',
+                      l10n.view,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                     ),
                   ],
@@ -530,7 +537,7 @@ class PayablesTable extends StatelessWidget {
                     Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      'Delete',
+                      l10n.delete,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
                     ),
                   ],
@@ -544,6 +551,8 @@ class PayablesTable extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +565,7 @@ class PayablesTable extends StatelessWidget {
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            'No Payables Found',
+            l10n.noPayablesFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -565,7 +574,7 @@ class PayablesTable extends StatelessWidget {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first payable record to track amounts borrowed from suppliers and creditors',
+              l10n.startByAddingYourFirstPayableRecord,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -591,7 +600,7 @@ class PayablesTable extends StatelessWidget {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Payable',
+                        l10n.addFirstPayable,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,

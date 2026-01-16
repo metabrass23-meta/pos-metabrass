@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/category/add_category_dailog.dart';
 import '../../widgets/category/category_table.dart';
 import '../../widgets/category/delete_category_dialog.dart';
@@ -116,6 +117,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -131,7 +134,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -141,7 +144,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -157,6 +160,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         // Page Title
@@ -165,7 +170,7 @@ class _CategoryPageState extends State<CategoryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Categories Management',
+                '${l10n.category} ${l10n.customerManagement}',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -175,7 +180,7 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Organize and manage your product categories with comprehensive tools',
+                l10n.customerManagementDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -193,12 +198,14 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Page Title
         Text(
-          'Categories Management',
+          '${l10n.category} ${l10n.customerManagement}',
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -208,7 +215,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Organize and manage product categories',
+          l10n.manageProductCategories,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -227,12 +234,14 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Compact Page Title
         Text(
-          'Categories',
+          l10n.category,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -242,7 +251,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage product categories',
+          l10n.manageProductCategories,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -261,6 +270,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -288,7 +299,7 @@ class _CategoryPageState extends State<CategoryPage> {
                 ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Category',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.category}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -305,12 +316,14 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildDesktopStatsRow(CategoryProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.categoryStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-              'Total Categories',
+              '${l10n.total} ${l10n.category}',
               stats['total'].toString(),
               Icons.category_rounded,
               Colors.blue
@@ -319,7 +332,7 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Recently Added',
+              l10n.recent,
               stats['recentlyAdded'].toString(),
               Icons.new_releases_rounded,
               Colors.green
@@ -328,7 +341,7 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Most Popular',
+              l10n.popular,
               stats['mostPopular'],
               Icons.trending_up_rounded,
               Colors.purple
@@ -337,7 +350,7 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-              'Recently Updated',
+              l10n.updated,
               stats['recentlyUpdated'].toString(),
               Icons.update_rounded,
               Colors.orange
@@ -348,14 +361,16 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildMobileStatsGrid(CategoryProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.categoryStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatsCard(
-                  'Total',
+                  l10n.total,
                   stats['total'].toString(),
                   Icons.category_rounded,
                   Colors.blue
@@ -364,7 +379,7 @@ class _CategoryPageState extends State<CategoryPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                  'Recent',
+                  l10n.recent,
                   stats['recentlyAdded'].toString(),
                   Icons.new_releases_rounded,
                   Colors.green
@@ -377,7 +392,7 @@ class _CategoryPageState extends State<CategoryPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                  'Popular',
+                  l10n.popular,
                   stats['mostPopular'],
                   Icons.trending_up_rounded,
                   Colors.purple
@@ -386,7 +401,7 @@ class _CategoryPageState extends State<CategoryPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                  'Updated',
+                  l10n.updated,
                   stats['recentlyUpdated'].toString(),
                   Icons.update_rounded,
                   Colors.orange
@@ -484,6 +499,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<CategoryProvider>(
@@ -497,8 +514,8 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
             decoration: InputDecoration(
               hintText: context.isTablet
-                  ? 'Search categories...'
-                  : 'Search categories by name, ID, or description...',
+                  ? '${l10n.search} ${l10n.category}...'
+                  : l10n.searchCategoriesHint,
               hintStyle: GoogleFonts.inter(
                 fontSize: context.bodyFontSize * 0.9,
                 color: Colors.grey[500],
@@ -534,6 +551,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -556,7 +575,7 @@ class _CategoryPageState extends State<CategoryPage> {
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
-              'Filter',
+              l10n.filter,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -570,6 +589,8 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildExportButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -592,7 +613,7 @@ class _CategoryPageState extends State<CategoryPage> {
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
-              'Export',
+              l10n.export,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,

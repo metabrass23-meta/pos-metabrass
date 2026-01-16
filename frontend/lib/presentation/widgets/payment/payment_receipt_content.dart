@@ -7,6 +7,7 @@ import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/image_upload.dart';
 import '../globals/text_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PaymentReceiptContent extends StatelessWidget {
   final PaymentModel payment;
@@ -26,35 +27,22 @@ class PaymentReceiptContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Payment Details Card
           _buildPaymentDetailsCard(context),
           SizedBox(height: context.cardPadding),
-
-          // Date and Time
           _buildDateTimeSection(context),
           SizedBox(height: context.cardPadding),
-
-          // Description Section
           _buildDescriptionSection(context),
           SizedBox(height: context.cardPadding),
-
-          // Payment Method Section
           _buildPaymentMethodSection(context),
           SizedBox(height: context.cardPadding),
-
-          // Amount Breakdown Section
           _buildAmountBreakdownSection(context),
           SizedBox(height: context.cardPadding),
-
-          // Receipt Section
           if (payment.hasReceipt) ...[_buildReceiptImageSection(context)] else ...[_buildNoReceiptSection(context)],
           SizedBox(height: context.mainPadding),
-
-          // Close Button
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: AppLocalizations.of(context)!.close,
               onPressed: onClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -68,6 +56,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildPaymentDetailsCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -79,7 +69,7 @@ class PaymentReceiptContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Payment Details',
+            l10n.paymentDetails,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -97,24 +87,26 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildPaymentDetailsCompact(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Labor',
+          l10n.labor,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
-          payment.laborName ?? 'N/A',
+          payment.laborName ?? l10n.notAvailable,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         Text(
-          '${payment.laborRole ?? 'N/A'} • ${payment.laborPhone ?? 'N/A'}',
+          '${payment.laborRole ?? l10n.notAvailable} • ${payment.laborPhone ?? l10n.notAvailable}',
           style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
         Text(
-          'Payment Month',
+          l10n.paymentMonth,
           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
@@ -127,7 +119,7 @@ class PaymentReceiptContent extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
-              'Final Payment for Month',
+              l10n.finalPaymentForMonth,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
             ),
           ),
@@ -137,6 +129,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildPaymentDetailsExpanded(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -144,15 +138,15 @@ class PaymentReceiptContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Labor',
+                l10n.labor,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
-                payment.laborName ?? 'N/A',
+                payment.laborName ?? l10n.notAvailable,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
-                '${payment.laborRole ?? 'N/A'} • ${payment.laborPhone ?? 'N/A'}',
+                '${payment.laborRole ?? l10n.notAvailable} • ${payment.laborPhone ?? l10n.notAvailable}',
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
               ),
             ],
@@ -163,7 +157,7 @@ class PaymentReceiptContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Payment Month',
+                l10n.paymentMonth,
                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
@@ -176,7 +170,7 @@ class PaymentReceiptContent extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
-                    'Final Payment',
+                    l10n.finalPayment,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
                   ),
                 ),
@@ -278,6 +272,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildDescriptionSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -285,12 +281,12 @@ class PaymentReceiptContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Description',
+            l10n.description,
             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
-            payment.description ?? 'No description',
+            payment.description ?? l10n.noDescription,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
           ),
         ],
@@ -299,6 +295,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildPaymentMethodSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -322,7 +320,7 @@ class PaymentReceiptContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Payment Method',
+                  l10n.paymentMethod,
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 Text(
@@ -346,6 +344,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildAmountBreakdownSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -360,7 +360,7 @@ class PaymentReceiptContent extends StatelessWidget {
               Icon(Icons.calculate_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Breakdown',
+                l10n.amountBreakdown,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
               ),
             ],
@@ -370,7 +370,7 @@ class PaymentReceiptContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Base Amount:',
+                '${l10n.baseAmount}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
               ),
               Text(
@@ -385,7 +385,7 @@ class PaymentReceiptContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Bonus:',
+                  '${l10n.bonus}:',
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
@@ -401,7 +401,7 @@ class PaymentReceiptContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Deduction:',
+                  '${l10n.deduction}:',
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
@@ -418,7 +418,7 @@ class PaymentReceiptContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Net Amount:',
+                '${l10n.netAmount}:',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -433,6 +433,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildReceiptImageSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -448,7 +450,7 @@ class PaymentReceiptContent extends StatelessWidget {
               Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Receipt Image',
+                l10n.receiptImage,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green),
               ),
             ],
@@ -462,10 +464,8 @@ class PaymentReceiptContent extends StatelessWidget {
             ),
             child: ResponsiveImageUploadWidget(
               initialImagePath: payment.receiptImagePath,
-              onImageChanged: (imagePath) {
-                // Handle image change if needed for viewing
-              },
-              label: 'Payment Receipt',
+              onImageChanged: (imagePath) {},
+              label: l10n.paymentReceipt,
               context: context,
             ),
           ),
@@ -475,6 +475,8 @@ class PaymentReceiptContent extends StatelessWidget {
   }
 
   Widget _buildNoReceiptSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -488,15 +490,13 @@ class PaymentReceiptContent extends StatelessWidget {
           Icon(Icons.receipt_long_outlined, color: Colors.orange, size: context.iconSize('xl')),
           SizedBox(height: context.cardPadding),
           Text(
-            'No Receipt Available',
+            l10n.noReceiptAvailable,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            isCompact
-                ? 'No receipt available. Add one for better records.'
-                : 'No receipt image was uploaded for this payment. Consider adding a receipt for better record keeping.',
+            isCompact ? l10n.noReceiptAvailableShort : l10n.noReceiptAvailableLong,
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[400]),
             textAlign: TextAlign.center,
           ),
@@ -510,11 +510,10 @@ class PaymentReceiptContent extends StatelessWidget {
             child: ResponsiveImageUploadWidget(
               initialImagePath: null,
               onImageChanged: (imagePath) {
-                // Handle new receipt upload
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Receipt uploaded! Please save the payment to update.',
+                      l10n.receiptUploadedSaveToUpdate,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
                     ),
                     backgroundColor: Colors.green,
@@ -524,7 +523,7 @@ class PaymentReceiptContent extends StatelessWidget {
                   ),
                 );
               },
-              label: 'Add Receipt Image',
+              label: l10n.addReceiptImage,
               context: context,
             ),
           ),

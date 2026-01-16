@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/labor/add_labor_dialog.dart';
 import '../../widgets/labor/labor_filter_dialog.dart';
 import '../../widgets/labor/labor_table.dart';
@@ -76,12 +77,13 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Future<void> _handleRefresh() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<LaborProvider>();
     await provider.refreshLabors();
     await provider.loadStatistics();
 
     if (provider.hasError) {
-      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh labors');
+      _showErrorSnackbar(provider.errorMessage ?? '${l10n.failedToRefresh} ${l10n.labors}');
     }
   }
 
@@ -113,6 +115,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   void _handleExport() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = context.read<LaborProvider>();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -129,7 +133,7 @@ class _LaborPageState extends State<LaborPage> {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Preparing export...',
+                l10n.preparingExport,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -156,7 +160,7 @@ class _LaborPageState extends State<LaborPage> {
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Labor data export completed successfully',
+                '${l10n.labor} ${l10n.dataExportCompleted}',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -172,7 +176,7 @@ class _LaborPageState extends State<LaborPage> {
         ),
       );
     } catch (e) {
-      _showErrorSnackbar('Failed to export data: ${e.toString()}');
+      _showErrorSnackbar('${l10n.failedToExportData}: ${e.toString()}');
     }
   }
 
@@ -227,6 +231,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -238,7 +244,7 @@ class _LaborPageState extends State<LaborPage> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -248,7 +254,7 @@ class _LaborPageState extends State<LaborPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -264,6 +270,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -271,7 +279,7 @@ class _LaborPageState extends State<LaborPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Labor Management',
+                l10n.laborManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -281,7 +289,7 @@ class _LaborPageState extends State<LaborPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Organize and manage your labor workforce with comprehensive tools',
+                l10n.laborManagementDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -297,11 +305,13 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Labor Management',
+          l10n.laborManagement,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -311,7 +321,7 @@ class _LaborPageState extends State<LaborPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Organize and manage labor workforce',
+          l10n.organizeAndManageLaborWorkforce,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -328,11 +338,13 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Labors',
+          l10n.labors,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -342,7 +354,7 @@ class _LaborPageState extends State<LaborPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage labor workforce',
+          l10n.manageLaborWorkforce,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -359,6 +371,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -380,7 +394,7 @@ class _LaborPageState extends State<LaborPage> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Labor',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.labor}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -397,23 +411,25 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildDesktopStatsRow(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
-          child: _buildStatsCard('Total Labors', '${provider.totalLabors}', Icons.people, Colors.blue),
+          child: _buildStatsCard('${l10n.total} ${l10n.labors}', '${provider.totalLabors}', Icons.people, Colors.blue),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
-          child: _buildStatsCard('Active', '${provider.totalActiveLabors}', Icons.check_circle_rounded, Colors.green),
+          child: _buildStatsCard(l10n.active, '${provider.totalActiveLabors}', Icons.check_circle_rounded, Colors.green),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
-          child: _buildStatsCard('Inactive', '${provider.totalInactiveLabors}', Icons.cancel, Colors.orange),
+          child: _buildStatsCard(l10n.inactive, '${provider.totalInactiveLabors}', Icons.cancel, Colors.orange),
         ),
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'New This Month',
+            l10n.newThisMonth,
             '${provider.statistics?.newLaborsThisMonth ?? 0}',
             Icons.fiber_new,
             Colors.purple,
@@ -424,16 +440,18 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildMobileStatsGrid(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: _buildStatsCard('Total', '${provider.totalLabors}', Icons.people, Colors.blue),
+              child: _buildStatsCard(l10n.total, '${provider.totalLabors}', Icons.people, Colors.blue),
             ),
             SizedBox(width: context.cardPadding),
             Expanded(
-              child: _buildStatsCard('Active', '${provider.totalActiveLabors}', Icons.check_circle_rounded, Colors.green),
+              child: _buildStatsCard(l10n.active, '${provider.totalActiveLabors}', Icons.check_circle_rounded, Colors.green),
             ),
           ],
         ),
@@ -441,12 +459,12 @@ class _LaborPageState extends State<LaborPage> {
         Row(
           children: [
             Expanded(
-              child: _buildStatsCard('Inactive', '${provider.totalInactiveLabors}', Icons.cancel, Colors.orange),
+              child: _buildStatsCard(l10n.inactive, '${provider.totalInactiveLabors}', Icons.cancel, Colors.orange),
             ),
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'New',
+                l10n.newLabel,
                 '${provider.statistics?.newLaborsThisMonth ?? 0}',
                 Icons.fiber_new,
                 Colors.purple,
@@ -600,6 +618,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildSearchBar(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_searchController.text != (provider.searchQuery ?? '')) {
       _searchController.text = provider.searchQuery ?? '';
     }
@@ -618,8 +638,8 @@ class _LaborPageState extends State<LaborPage> {
         style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         decoration: InputDecoration(
           hintText: context.isTablet
-              ? 'Search labors...'
-              : 'Search labors by name, CNIC, phone, designation...',
+              ? '${l10n.search} ${l10n.labors}...'
+              : l10n.searchLaborsHint,
           hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
           suffixIcon: provider.searchQuery != null && provider.searchQuery!.isNotEmpty
@@ -642,6 +662,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildShowInactiveToggle(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -667,7 +689,7 @@ class _LaborPageState extends State<LaborPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                provider.showInactive ? l10n.hideInactive : l10n.showInactive,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -682,6 +704,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildFilterButton(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     int filterCount = 0;
     if (provider.selectedCity != null) filterCount++;
     if (provider.selectedArea != null) filterCount++;
@@ -715,7 +739,7 @@ class _LaborPageState extends State<LaborPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                filterCount > 0 ? 'Filters ($filterCount)' : 'Filter',
+                filterCount > 0 ? '${l10n.filters} ($filterCount)' : l10n.filter,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -730,6 +754,8 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildExportButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -748,7 +774,7 @@ class _LaborPageState extends State<LaborPage> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                'Export',
+                l10n.export,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -763,25 +789,26 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   Widget _buildActiveFilters(LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final activeFilters = <String>[];
 
     if (provider.selectedCity != null) {
-      activeFilters.add('City: ${provider.selectedCity}');
+      activeFilters.add('${l10n.city}: ${provider.selectedCity}');
     }
     if (provider.selectedArea != null) {
-      activeFilters.add('Area: ${provider.selectedArea}');
+      activeFilters.add('${l10n.area}: ${provider.selectedArea}');
     }
     if (provider.selectedDesignation != null) {
-      activeFilters.add('Designation: ${provider.selectedDesignation}');
+      activeFilters.add('${l10n.designation}: ${provider.selectedDesignation}');
     }
     if (provider.selectedCaste != null) {
-      activeFilters.add('Caste: ${provider.selectedCaste}');
+      activeFilters.add('${l10n.caste}: ${provider.selectedCaste}');
     }
     if (provider.selectedGender != null) {
-      activeFilters.add('Gender: ${provider.selectedGender}');
+      activeFilters.add('${l10n.gender}: ${provider.selectedGender}');
     }
     if (provider.showInactive) {
-      activeFilters.add('Show Inactive');
+      activeFilters.add(l10n.showInactive);
     }
 
     if (activeFilters.isEmpty) {
@@ -840,7 +867,7 @@ class _LaborPageState extends State<LaborPage> {
             child: InkWell(
               onTap: provider.clearAllFilters,
               child: Text(
-                'Clear All',
+                l10n.clearAll,
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -855,17 +882,19 @@ class _LaborPageState extends State<LaborPage> {
   }
 
   void _clearSpecificFilter(String filterText, LaborProvider provider) {
-    if (filterText.startsWith('City:')) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (filterText.startsWith('${l10n.city}:')) {
       provider.setCityFilter(null);
-    } else if (filterText.startsWith('Area:')) {
+    } else if (filterText.startsWith('${l10n.area}:')) {
       provider.setAreaFilter(null);
-    } else if (filterText.startsWith('Designation:')) {
+    } else if (filterText.startsWith('${l10n.designation}:')) {
       provider.setDesignationFilter(null);
-    } else if (filterText.startsWith('Caste:')) {
+    } else if (filterText.startsWith('${l10n.caste}:')) {
       provider.setCasteFilter(null);
-    } else if (filterText.startsWith('Gender:')) {
+    } else if (filterText.startsWith('${l10n.gender}:')) {
       provider.setGenderFilter(null);
-    } else if (filterText == 'Show Inactive') {
+    } else if (filterText == l10n.showInactive) {
       provider.setShowInactive(false);
     }
   }

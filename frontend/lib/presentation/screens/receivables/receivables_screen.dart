@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/receivables/add_receivable_dialog.dart';
 import '../../widgets/receivables/delete_receivable_dialog.dart';
 import '../../widgets/receivables/edit_receivable_dialog.dart';
@@ -105,6 +106,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -120,7 +123,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               ),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
@@ -130,7 +133,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
@@ -146,6 +149,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -153,7 +158,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Receivables Management',
+                l10n.receivablesManagement,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.w700,
@@ -163,7 +168,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Track and manage amounts lent to customers and suppliers',
+                l10n.receivablesManagementDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
@@ -179,11 +184,13 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Receivables',
+          l10n.receivables,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -193,7 +200,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage amounts lent',
+          l10n.manageAmountsLent,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -210,11 +217,13 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Receivables',
+          l10n.receivables,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -224,7 +233,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Amounts lent',
+          l10n.amountsLent,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
@@ -241,6 +250,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -268,7 +279,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
                 ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Receivable',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.receivable}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -285,12 +296,14 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildDesktopStatsRow(ReceivablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.receivablesStats;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatsCard(
-            'Total Records',
+            l10n.totalRecords,
             stats['total'].toString(),
             Icons.account_balance_wallet_rounded,
             Colors.blue,
@@ -299,7 +312,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Amount Lent',
+            l10n.amountLent,
             'PKR ${stats['totalAmountLent']}',
             Icons.trending_up_rounded,
             Colors.orange,
@@ -308,7 +321,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Amount Returned',
+            l10n.amountReturned,
             'PKR ${stats['totalAmountReturned']}',
             Icons.trending_down_rounded,
             Colors.green,
@@ -317,7 +330,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         SizedBox(width: context.cardPadding),
         Expanded(
           child: _buildStatsCard(
-            'Outstanding',
+            l10n.outstanding,
             'PKR ${stats['totalOutstanding']}',
             Icons.schedule_rounded,
             Colors.red,
@@ -328,14 +341,16 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildMobileStatsGrid(ReceivablesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final stats = provider.receivablesStats;
+
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatsCard(
-                'Total',
+                l10n.total,
                 stats['total'].toString(),
                 Icons.account_balance_wallet_rounded,
                 Colors.blue,
@@ -344,7 +359,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'Amount Lent',
+                l10n.amountLent,
                 'PKR ${stats['totalAmountLent']}',
                 Icons.trending_up_rounded,
                 Colors.orange,
@@ -357,7 +372,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
           children: [
             Expanded(
               child: _buildStatsCard(
-                'Returned',
+                l10n.returned,
                 'PKR ${stats['totalAmountReturned']}',
                 Icons.trending_down_rounded,
                 Colors.green,
@@ -366,7 +381,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             SizedBox(width: context.cardPadding),
             Expanded(
               child: _buildStatsCard(
-                'Outstanding',
+                l10n.outstanding,
                 'PKR ${stats['totalOutstanding']}',
                 Icons.schedule_rounded,
                 Colors.red,
@@ -457,6 +472,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: Consumer<ReceivablesProvider>(
@@ -470,8 +487,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             ),
             decoration: InputDecoration(
               hintText: context.isTablet
-                  ? 'Search receivables...'
-                  : 'Search by debtor name, phone, reason, or notes...',
+                  ? '${l10n.search} ${l10n.receivables}...'
+                  : l10n.searchReceivablesHint,
               hintStyle: GoogleFonts.inter(
                 fontSize: context.bodyFontSize * 0.9,
                 color: Colors.grey[500],
@@ -507,6 +524,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildFilterButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -529,7 +548,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
-              'Filter',
+              l10n.filter,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -543,6 +562,8 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   }
 
   Widget _buildExportButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -565,7 +586,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
           if (!context.isTablet) ...[
             SizedBox(width: context.smallPadding),
             Text(
-              'Export',
+              l10n.export,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,

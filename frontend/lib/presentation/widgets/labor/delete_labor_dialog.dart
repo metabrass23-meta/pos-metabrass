@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'delete_labor_widgets.dart';
 
 class EnhancedDeleteLaborDialog extends StatefulWidget {
@@ -82,6 +83,8 @@ class _EnhancedDeleteLaborDialogState extends State<EnhancedDeleteLaborDialog> w
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_validateDeletion()) {
       _showValidationError();
       return;
@@ -95,10 +98,10 @@ class _EnhancedDeleteLaborDialogState extends State<EnhancedDeleteLaborDialog> w
     try {
       if (_isPermanentDelete) {
         success = await provider.deleteLabor(widget.labor.id);
-        successMessage = 'Labor deleted permanently!';
+        successMessage = l10n.laborDeletedPermanently;
       } else {
         success = await provider.softDeleteLabor(widget.labor.id);
-        successMessage = 'Labor deactivated successfully!';
+        successMessage = l10n.laborDeactivatedSuccessfully;
       }
 
       if (mounted) {
@@ -106,12 +109,12 @@ class _EnhancedDeleteLaborDialogState extends State<EnhancedDeleteLaborDialog> w
           _showSuccessSnackbar(successMessage);
           Navigator.of(context).pop(true);
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete labor');
+          _showErrorSnackbar(provider.errorMessage ?? l10n.failedToDeleteLabor);
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('An unexpected error occurred: ${e.toString()}');
+        _showErrorSnackbar('${l10n.unexpectedErrorOccurred}: ${e.toString()}');
       }
     }
   }
@@ -132,15 +135,17 @@ class _EnhancedDeleteLaborDialogState extends State<EnhancedDeleteLaborDialog> w
   }
 
   void _showValidationError() {
+    final l10n = AppLocalizations.of(context)!;
     String message;
+
     if (!_confirmationChecked) {
-      message = 'Please confirm that you understand this action';
+      message = l10n.pleaseConfirmYouUnderstandThisAction;
     } else if (_isPermanentDelete && !_understandConsequences) {
-      message = 'Please confirm that you understand the consequences of permanent deletion';
+      message = l10n.pleaseConfirmYouUnderstandConsequences;
     } else if (_isPermanentDelete && _confirmationText.toLowerCase().trim() != widget.labor.name.toLowerCase().trim()) {
-      message = 'Please type the labor name exactly to confirm permanent deletion';
+      message = l10n.pleaseTypeLaborNameExactly;
     } else {
-      message = 'Please complete all confirmation steps';
+      message = l10n.pleaseCompleteAllConfirmationSteps;
     }
 
     _showSnackbar(message, Colors.orange, Icons.warning_outlined);

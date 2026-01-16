@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/models/order/order_item_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -79,11 +80,12 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Future<void> _handleRefresh() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<OrderItemProvider>();
     await provider.loadOrderItems();
 
     if (provider.errorMessage != null) {
-      _showErrorSnackbar(provider.errorMessage ?? 'Failed to refresh order items');
+      _showErrorSnackbar(provider.errorMessage ?? l10n.failedToRefreshCustomers);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -92,7 +94,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order items refreshed successfully',
+                '${l10n.orderItems} ${l10n.success.toLowerCase()}',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ],
@@ -199,6 +201,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildUnsupportedScreen() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Center(
@@ -210,13 +214,13 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               Icon(Icons.screen_rotation_outlined, size: 15.w, color: Colors.grey[400]),
               SizedBox(height: 3.h),
               Text(
-                'Screen Too Small',
+                l10n.screenTooSmall,
                 style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
-                'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
+                l10n.screenTooSmallMessage,
                 style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
@@ -228,6 +232,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildDesktopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         // Page Title
@@ -236,7 +242,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Order Item Management',
+                '${l10n.orderItems} ${l10n.manageInventory}',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
@@ -246,7 +252,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               ),
               SizedBox(height: context.cardPadding / 4),
               Text(
-                'Manage individual products within customer orders with comprehensive tracking',
+                l10n.productManagementDescription,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
@@ -260,12 +266,14 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildTabletHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Page Title
         Text(
-          'Order Item Management',
+          '${l10n.orderItems} ${l10n.manageInventory}',
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
@@ -275,7 +283,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage individual products within orders',
+          l10n.manageInventory,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -287,12 +295,14 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildMobileHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Compact Page Title
         Text(
-          'Order Items',
+          l10n.orderItems,
           style: GoogleFonts.playfairDisplay(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -302,7 +312,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         ),
         SizedBox(height: context.cardPadding / 4),
         Text(
-          'Manage order products',
+          l10n.manageInventory,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
@@ -314,6 +324,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildAddButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
@@ -332,7 +344,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
                 Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  context.isTablet ? 'Add' : 'Add Order Item',
+                  context.isTablet ? l10n.add : '${l10n.add} ${l10n.orderItems}',
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -349,6 +361,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildDesktopStatsRow(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final totalItems = provider.orderItems.length;
     final totalQuantity = provider.orderItems.fold<int>(0, (sum, item) => sum + (item.quantity ?? 0));
     final totalValue = provider.orderItems.fold<double>(0.0, (sum, item) => sum + ((item.unitPrice ?? 0) * (item.quantity ?? 0)));
@@ -356,18 +369,19 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
 
     return Row(
       children: [
-        Expanded(child: _buildStatsCard('Total Items', totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
+        Expanded(child: _buildStatsCard('${l10n.total} ${l10n.items}', totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Active Items', activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
+        Expanded(child: _buildStatsCard('${l10n.activeCustomers} ${l10n.items}', activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Total Quantity', totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
+        Expanded(child: _buildStatsCard('${l10n.total} ${l10n.quantity}', totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
         SizedBox(width: context.cardPadding),
-        Expanded(child: _buildStatsCard('Total Value', 'PKR ${totalValue.toStringAsFixed(0)}', Icons.attach_money_rounded, Colors.orange)),
+        Expanded(child: _buildStatsCard('${l10n.total} ${l10n.value}', 'PKR ${totalValue.toStringAsFixed(0)}', Icons.attach_money_rounded, Colors.orange)),
       ],
     );
   }
 
   Widget _buildMobileStatsGrid(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final totalItems = provider.orderItems.length;
     final totalQuantity = provider.orderItems.fold<int>(0, (sum, item) => sum + (item.quantity ?? 0));
     final totalValue = provider.orderItems.fold<double>(0.0, (sum, item) => sum + ((item.unitPrice ?? 0) * (item.quantity ?? 0)));
@@ -377,17 +391,17 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Total', totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
+            Expanded(child: _buildStatsCard(l10n.total, totalItems.toString(), Icons.inventory_2_rounded, Colors.blue)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('Active', activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
+            Expanded(child: _buildStatsCard(l10n.activeCustomers, activeCount.toString(), Icons.check_circle_rounded, Colors.green)),
           ],
         ),
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Expanded(child: _buildStatsCard('Quantity', totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
+            Expanded(child: _buildStatsCard(l10n.quantity, totalQuantity.toString(), Icons.shopping_cart_rounded, Colors.purple)),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildStatsCard('Value', 'PKR ${_formatValue(totalValue)}', Icons.attach_money_rounded, Colors.orange)),
+            Expanded(child: _buildStatsCard(l10n.value, 'PKR ${_formatValue(totalValue)}', Icons.attach_money_rounded, Colors.orange)),
           ],
         ),
       ],
@@ -475,6 +489,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildSearchBar(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: TextField(
@@ -485,7 +501,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         },
         style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         decoration: InputDecoration(
-          hintText: context.isTablet ? 'Search items...' : 'Search order items by product, description, or notes...',
+          hintText: context.isTablet ? '${l10n.search} ${l10n.items}...' : '${l10n.searchProductsHint}',
           hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
           suffixIcon: Row(
@@ -518,6 +534,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildShowInactiveToggle(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -542,7 +560,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                provider.showInactive ? 'Hide Inactive' : 'Show Inactive',
+                provider.showInactive ? l10n.hideInactive : l10n.showInactive,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -557,6 +575,8 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildFilterButton(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Check for active filters based on provider state
     final hasActiveFilters = provider.searchQuery.isNotEmpty || provider.currentOrderId != null || provider.currentProductId != null;
 
@@ -588,7 +608,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
             if (!context.isTablet) ...[
               SizedBox(width: context.smallPadding),
               Text(
-                hasActiveFilters ? 'Filters ($filterCount)' : 'Filter',
+                hasActiveFilters ? '${l10n.filter} ($filterCount)' : l10n.filter,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
@@ -603,18 +623,19 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
   }
 
   Widget _buildActiveFilters(OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final activeFilters = <MapEntry<String, String>>[];
 
     if (provider.searchQuery.isNotEmpty) {
-      activeFilters.add(MapEntry('search', 'Search: ${provider.searchQuery}'));
+      activeFilters.add(MapEntry('search', '${l10n.search}: ${provider.searchQuery}'));
     }
 
     if (provider.currentOrderId != null) {
-      activeFilters.add(MapEntry('order', 'Order ID: ${provider.currentOrderId}'));
+      activeFilters.add(MapEntry('order', '${l10n.orders} ID: ${provider.currentOrderId}'));
     }
 
     if (provider.currentProductId != null) {
-      activeFilters.add(MapEntry('product', 'Product ID: ${provider.currentProductId}'));
+      activeFilters.add(MapEntry('product', '${l10n.products} ID: ${provider.currentProductId}'));
     }
 
     // Add more filter indicators as they are implemented in provider
@@ -640,7 +661,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               Icon(Icons.filter_alt, color: AppTheme.accentGold, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Active Filters:',
+                '${l10n.filter}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.accentGold),
               ),
             ],
@@ -692,7 +713,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         provider.clearFilters();
         break;
       default:
-        // Handle other filter types as they are implemented
+      // Handle other filter types as they are implemented
         break;
     }
   }

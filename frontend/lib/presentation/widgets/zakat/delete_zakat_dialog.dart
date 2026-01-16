@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/zakat/zakat_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteZakatDialog extends StatefulWidget {
@@ -56,6 +57,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<ZakatProvider>(context, listen: false);
 
     final success = await provider.deleteZakat(widget.zakat.id);
@@ -65,12 +67,14 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
         _showSuccessSnackbar();
         Navigator.of(context).pop();
       } else {
-        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete zakat record');
+        _showErrorSnackbar(provider.errorMessage ?? l10n.failedToDeleteZakatRecord);
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -82,7 +86,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Zakat record deleted successfully!',
+              l10n.zakatRecordDeletedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -199,6 +203,8 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -230,7 +236,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Zakat' : 'Delete Zakat Record',
+                  context.shouldShowCompactLayout ? l10n.deleteZakat : l10n.deleteZakatRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -241,7 +247,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.thisActionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -273,6 +279,8 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -310,8 +318,8 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
           SizedBox(height: context.mainPadding),
           Text(
             context.shouldShowCompactLayout
-                ? 'Are you sure you want to delete this zakat record?'
-                : 'Are you absolutely sure you want to delete this zakat record?',
+                ? l10n.areYouSureYouWantToDeleteThisZakatRecord
+                : l10n.areYouAbsolutelySureYouWantToDeleteThisZakatRecord,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
@@ -321,7 +329,6 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
           ),
           SizedBox(height: context.cardPadding),
 
-          // Zakat Details Card
           Container(
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
@@ -334,7 +341,6 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             ),
             child: Column(
               children: [
-                // Zakat ID and Title Row
                 Row(
                   children: [
                     Container(
@@ -372,7 +378,6 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
 
                 SizedBox(height: context.smallPadding),
 
-                // Beneficiary and Amount Row
                 Row(
                   children: [
                     Expanded(
@@ -380,7 +385,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Beneficiary:',
+                            '${l10n.beneficiary}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -432,7 +437,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Amount:',
+                            '${l10n.amount}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -466,12 +471,11 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
 
                 SizedBox(height: context.smallPadding),
 
-                // Description Row
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Description:',
+                      '${l10n.description}:',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -494,7 +498,6 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
 
                 SizedBox(height: context.smallPadding),
 
-                // Date, Time and Authority Row
                 Row(
                   children: [
                     Expanded(
@@ -502,7 +505,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Date & Time:',
+                            '${l10n.dateAndTime}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -535,7 +538,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Authorized By:',
+                            '${l10n.authorizedBy}:',
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -584,7 +587,6 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
 
           SizedBox(height: context.cardPadding),
 
-          // Warning Message
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
@@ -602,8 +604,8 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                 Expanded(
                   child: Text(
                     context.shouldShowCompactLayout
-                        ? 'This will permanently delete the zakat record.'
-                        : 'This will permanently delete the zakat record and all associated data. This action cannot be undone.',
+                        ? l10n.thisWillPermanentlyDeleteTheZakatRecord
+                        : l10n.thisWillPermanentlyDeleteTheZakatRecordAndAllAssociatedData,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -631,11 +633,13 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -645,7 +649,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
         Consumer<ZakatProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Zakat',
+              text: l10n.deleteZakat,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -659,12 +663,14 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -677,7 +683,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
           child: Consumer<ZakatProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

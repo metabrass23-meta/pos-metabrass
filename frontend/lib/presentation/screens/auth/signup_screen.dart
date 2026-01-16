@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../widgets/globals/text_button.dart';
 import '../../widgets/globals/text_field.dart';
 
@@ -35,12 +36,14 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _handleSignup() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (!_acceptTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Please accept the terms and conditions',
+              l10n.pleaseAcceptTerms,
               style: GoogleFonts.inter(fontSize: context.captionFontSize),
             ),
             backgroundColor: Colors.red,
@@ -56,86 +59,81 @@ class _SignupScreenState extends State<SignupScreen> {
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Clear any previous errors
       authProvider.clearError();
 
       authProvider
           .signup(
-            _nameController.text.trim(),
-            _emailController.text.trim(),
-            _passwordController.text,
-            _confirmPasswordController.text,
-            _acceptTerms,
-          )
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text,
+        _confirmPasswordController.text,
+        _acceptTerms,
+      )
           .then((_) {
-            if (authProvider.state == AuthState.authenticated) {
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Account created successfully! Welcome to Maqbool Fashion.',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                  ),
-                  margin: EdgeInsets.all(context.mainPadding),
-                ),
-              );
-
-              // Navigate to dashboard after a short delay
-              Future.delayed(const Duration(milliseconds: 1500), () {
-                if (mounted) {
-                  Navigator.of(context).pushReplacementNamed('/dashboard');
-                }
-              });
-            } else if (authProvider.state == AuthState.error) {
-              // Error will be displayed by the Consumer widget below
-              // But also show a snackbar for immediate feedback
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Registration failed. Please check the details below.',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                  ),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                  ),
-                  margin: EdgeInsets.all(context.mainPadding),
-                ),
-              );
-            }
-          })
-          .catchError((error) {
-            // Handle any unexpected errors
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'An unexpected error occurred. Please try again.',
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                ),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-                ),
-                margin: EdgeInsets.all(context.mainPadding),
+        if (authProvider.state == AuthState.authenticated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.accountCreatedSuccessfully,
+                style: GoogleFonts.inter(fontSize: context.captionFontSize),
               ),
-            );
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
+
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (mounted) {
+              Navigator.of(context).pushReplacementNamed('/login');
+            }
           });
+        } else if (authProvider.state == AuthState.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.registrationFailedMessage,
+                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
+        }
+      })
+          .catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.unexpectedErrorOccurred,
+              style: GoogleFonts.inter(fontSize: context.captionFontSize),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+            ),
+            margin: EdgeInsets.all(context.mainPadding),
+          ),
+        );
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Row(
         children: [
-          // Left Side - Branding
           Expanded(
             flex: ResponsiveBreakpoints.responsive(
               context,
@@ -171,17 +169,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.diamond_sharp,
-                        size: context.iconSize('special'),
-                        color: AppTheme.primaryMaroon,
-                      ),
+                      child: Image.asset('assets/images/logo.png'),
                     ),
 
                     SizedBox(height: context.mainPadding),
 
                     Text(
-                      'Join Our',
+                      l10n.joinOur,
                       style: GoogleFonts.inter(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w300,
@@ -192,7 +186,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(height: context.smallPadding),
 
                     Text(
-                      'Premium Family',
+                      l10n.premiumFamily,
                       style: GoogleFonts.playfairDisplay(
                         fontSize: context.headingFontSize,
                         fontWeight: FontWeight.w700,
@@ -206,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: context.mainPadding),
                       child: Text(
-                        'Begin your journey with us and discover the epitome of luxury fashion. \nCreate your account to access exclusive collections and personalized service.',
+                        l10n.signupWelcomeMessage,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
@@ -222,7 +216,6 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
 
-          // Right Side - Signup Form
           Expanded(
             flex: ResponsiveBreakpoints.responsive(
               context,
@@ -245,7 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Create Account',
+                            l10n.createAccount,
                             style: GoogleFonts.playfairDisplay(
                               fontSize: context.headingFontSize,
                               fontWeight: FontWeight.w600,
@@ -258,7 +251,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           SizedBox(height: context.smallPadding),
 
                           Text(
-                            'Join our exclusive community',
+                            l10n.joinExclusiveCommunity,
                             style: GoogleFonts.inter(
                               fontSize: context.headerFontSize,
                               fontWeight: FontWeight.w400,
@@ -270,18 +263,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.mainPadding * 1.5),
 
-                          // Full Name Field
                           PremiumTextField(
-                            label: 'Full Name',
-                            hint: 'Enter your full name',
+                            label: l10n.fullName,
+                            hint: l10n.enterYourFullName,
                             controller: _nameController,
                             prefixIcon: Icons.person_outline,
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please enter your full name';
+                                return l10n.pleaseEnterFullName;
                               }
                               if (value!.length < 2) {
-                                return 'Name must be at least 2 characters';
+                                return l10n.nameMinLength;
                               }
                               return null;
                             },
@@ -289,19 +281,18 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.formFieldSpacing),
 
-                          // Email Field
                           PremiumTextField(
-                            label: 'Email Address',
-                            hint: 'Enter your email',
+                            label: l10n.emailAddress,
+                            hint: l10n.enterYourEmail,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.email_outlined,
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please enter your email';
+                                return l10n.pleaseEnterEmail;
                               }
                               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-                                return 'Please enter a valid email address';
+                                return l10n.pleaseEnterValidEmail;
                               }
                               return null;
                             },
@@ -309,10 +300,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.formFieldSpacing),
 
-                          // Password Field
                           PremiumTextField(
-                            label: 'Password',
-                            hint: 'Create a strong password',
+                            label: l10n.password,
+                            hint: l10n.createStrongPassword,
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             prefixIcon: Icons.lock_outline,
@@ -329,13 +319,13 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please enter a password';
+                                return l10n.pleaseEnterPassword;
                               }
                               if (value!.length < 8) {
-                                return 'Password must be at least 8 characters';
+                                return l10n.passwordMinLength;
                               }
                               if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-                                return 'Password must contain uppercase, lowercase, and number';
+                                return l10n.passwordMustContain;
                               }
                               return null;
                             },
@@ -343,10 +333,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.formFieldSpacing),
 
-                          // Confirm Password Field
                           PremiumTextField(
-                            label: 'Confirm Password',
-                            hint: 'Re-enter your password',
+                            label: l10n.confirmPassword,
+                            hint: l10n.reenterPassword,
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
                             prefixIcon: Icons.lock_outline,
@@ -365,10 +354,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please confirm your password';
+                                return l10n.pleaseConfirmPassword;
                               }
                               if (value != _passwordController.text) {
-                                return 'Passwords do not match';
+                                return l10n.passwordsDoNotMatch;
                               }
                               return null;
                             },
@@ -376,7 +365,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.cardPadding),
 
-                          // Terms and Conditions
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2),
                             child: Row(
@@ -406,14 +394,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: 'I agree to the ',
+                                            text: l10n.iAgreeToThe,
                                             style: GoogleFonts.inter(
                                               fontSize: context.bodyFontSize,
                                               color: Colors.grey[600],
                                             ),
                                           ),
                                           TextSpan(
-                                            text: 'Terms of Service',
+                                            text: l10n.termsOfService,
                                             style: GoogleFonts.inter(
                                               fontSize: context.bodyFontSize,
                                               color: AppTheme.primaryMaroon,
@@ -422,14 +410,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: ' and ',
+                                            text: l10n.and,
                                             style: GoogleFonts.inter(
                                               fontSize: context.bodyFontSize,
                                               color: Colors.grey[600],
                                             ),
                                           ),
                                           TextSpan(
-                                            text: 'Privacy Policy',
+                                            text: l10n.privacyPolicy,
                                             style: GoogleFonts.inter(
                                               fontSize: context.bodyFontSize,
                                               color: AppTheme.primaryMaroon,
@@ -448,11 +436,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.mainPadding),
 
-                          // Signup Button
                           Consumer<AuthProvider>(
                             builder: (context, authProvider, child) {
                               return PremiumButton(
-                                text: 'Create Account',
+                                text: l10n.createAccount,
                                 onPressed: authProvider.isLoading ? null : _handleSignup,
                                 isLoading: authProvider.isLoading,
                                 height: context.buttonHeight / 1.5,
@@ -462,7 +449,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.cardPadding),
 
-                          // Error Message
                           Consumer<AuthProvider>(
                             builder: (context, authProvider, child) {
                               if (authProvider.errorMessage != null) {
@@ -495,7 +481,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Registration Failed',
+                                              l10n.registrationFailed,
                                               style: GoogleFonts.inter(
                                                 color: Colors.red.shade700,
                                                 fontSize: context.bodyFontSize,
@@ -535,12 +521,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           SizedBox(height: context.mainPadding),
 
-                          // Sign In Link
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Already have an account? ',
+                                l10n.alreadyHaveAccount,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   color: Colors.grey[600],
@@ -551,7 +536,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Navigator.pop(context);
                                 },
                                 child: Text(
-                                  'Sign In',
+                                  l10n.signIn,
                                   style: GoogleFonts.inter(
                                     fontSize: context.headerFontSize,
                                     color: AppTheme.primaryMaroon,

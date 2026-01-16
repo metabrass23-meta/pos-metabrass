@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ViewCategoryDetailsDialog extends StatefulWidget {
   final Category category;
@@ -154,6 +155,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -185,7 +188,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Category Details',
+                  '${l10n.category} ${l10n.info}',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -196,7 +199,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete category information',
+                    '${l10n.view} ${l10n.category} ${l10n.info}',
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -247,6 +250,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -272,7 +277,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: l10n.close,
               onPressed: _handleClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -286,6 +291,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildCategoryNameCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -305,7 +312,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Category Name',
+                '${l10n.category} ${l10n.name}',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -356,6 +363,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildDescriptionCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -374,7 +383,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Description',
+                l10n.notes,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -394,7 +403,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             ),
             child: Text(
               widget.category.description.isEmpty
-                  ? 'No description provided'
+                  ? l10n.notSpecified
                   : widget.category.description,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
@@ -426,6 +435,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildDateInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -443,7 +454,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date Created',
+                    '${l10n.date} ${l10n.created}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -489,7 +500,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   Icon(Icons.update, size: context.iconSize('small'), color: Colors.orange),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Last Updated',
+                    l10n.lastUpdated,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -524,6 +535,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildDateInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -541,7 +554,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date Created',
+                      '${l10n.date} ${l10n.created}',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -588,7 +601,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                     Icon(Icons.update, size: context.iconSize('small'), color: Colors.orange),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Last Updated',
+                      l10n.lastUpdated,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -624,6 +637,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildCategoryStatsCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -643,7 +658,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Category Information',
+                '${l10n.category} ${l10n.info}',
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -679,7 +694,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 ),
                 SizedBox(width: context.smallPadding),
                 Text(
-                  'Category Active',
+                  '${l10n.category} ${l10n.active}',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
@@ -695,13 +710,15 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildCategoryStatsCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Type:',
+              '${l10n.type}:',
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
@@ -717,7 +734,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
-                'Product Category',
+                '${l10n.products} ${l10n.category}',
                 style: GoogleFonts.inter(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
@@ -732,7 +749,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Status:',
+              '${l10n.status}:',
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
@@ -748,7 +765,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
               ),
               child: Text(
-                'Active',
+                l10n.active,
                 style: GoogleFonts.inter(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
@@ -763,6 +780,8 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   Widget _buildCategoryStatsExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -770,7 +789,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Type:',
+                '${l10n.type}:',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -788,7 +807,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  'Product Category',
+                  '${l10n.products} ${l10n.category}',
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
@@ -805,7 +824,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Status:',
+                '${l10n.status}:',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -823,7 +842,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  'Active',
+                  l10n.active,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
@@ -843,26 +862,27 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
   }
 
   String _getRelativeDate(DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final targetDate = DateTime(date.year, date.month, date.day);
     final difference = today.difference(targetDate).inDays;
 
     if (difference == 0) {
-      return 'Today';
+      return l10n.today;
     } else if (difference == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference < 7) {
-      return '$difference days ago';
+      return '$difference ${l10n.daysAgo}';
     } else if (difference < 30) {
       final weeks = (difference / 7).floor();
-      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+      return weeks == 1 ? '1 ${l10n.weekAgo}' : '$weeks ${l10n.weeksAgo}';
     } else if (difference < 365) {
       final months = (difference / 30).floor();
-      return months == 1 ? '1 month ago' : '$months months ago';
+      return months == 1 ? '1 ${l10n.monthAgo}' : '$months ${l10n.monthsAgo}';
     } else {
       final years = (difference / 365).floor();
-      return years == 1 ? '1 year ago' : '$years years ago';
+      return years == 1 ? '1 ${l10n.yearAgo}' : '$years ${l10n.yearsAgo}';
     }
   }
 }

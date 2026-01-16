@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeletePaymentDialog extends StatefulWidget {
@@ -55,6 +56,8 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -62,7 +65,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Payment deleted successfully!',
+              l10n.paymentDeletedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -141,6 +144,8 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -163,7 +168,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Payment' : 'Delete Payment Record',
+                  context.shouldShowCompactLayout ? l10n.deletePayment : l10n.deletePaymentRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -174,7 +179,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.thisActionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -202,6 +207,8 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -217,7 +224,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            isCompact ? 'Are you sure you want to delete this payment?' : 'Are you absolutely sure you want to delete this payment record?',
+            isCompact ? l10n.areYouSureDeletePayment : l10n.areYouAbsolutelySureDeletePayment,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
@@ -247,7 +254,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        widget.payment.laborName ?? 'N/A',
+                        widget.payment.laborName ?? l10n.notAvailable,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -262,7 +269,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Net Amount:',
+                            '${l10n.netAmount}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -277,7 +284,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Date:',
+                            '${l10n.date}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -297,7 +304,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Payment Method:',
+                            '${l10n.paymentMethod}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Row(
@@ -322,7 +329,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Payment Month:',
+                            '${l10n.paymentMonth}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -344,7 +351,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Bonus:',
+                                '${l10n.bonus}:',
                                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                               ),
                               Text(
@@ -361,7 +368,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Deduction:',
+                                '${l10n.deduction}:',
                                 style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                               ),
                               Text(
@@ -382,11 +389,11 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Description:',
+                        '${l10n.description}:',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
-                        widget.payment.description ?? 'No description',
+                        widget.payment.description ?? l10n.noDescription,
                         style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
                       ),
                     ],
@@ -405,9 +412,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    isCompact
-                        ? 'This will permanently delete the payment record.'
-                        : 'This will permanently delete the payment record and all associated data. This action cannot be undone.',
+                    isCompact ? l10n.thisWillPermanentlyDeletePayment : l10n.thisWillPermanentlyDeletePaymentLong,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
@@ -429,11 +434,13 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -443,7 +450,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
         Consumer<PaymentProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Payment',
+              text: l10n.deletePayment,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -457,12 +464,14 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -475,7 +484,7 @@ class _DeletePaymentDialogState extends State<DeletePaymentDialog> with SingleTi
           child: Consumer<PaymentProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

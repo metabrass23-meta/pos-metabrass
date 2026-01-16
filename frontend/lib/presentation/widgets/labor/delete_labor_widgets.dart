@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteLaborHeader extends StatelessWidget {
@@ -22,6 +23,8 @@ class DeleteLaborHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -55,7 +58,7 @@ class DeleteLaborHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isPermanentDelete ? 'Delete Permanently' : 'Deactivate Labor',
+                  isPermanentDelete ? l10n.deletePermanently : l10n.deactivateLabor,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -67,8 +70,8 @@ class DeleteLaborHeader extends StatelessWidget {
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     isPermanentDelete
-                        ? 'This action cannot be undone'
-                        : 'Labor can be restored later',
+                        ? l10n.thisActionCannotBeUndone
+                        : l10n.laborCanBeRestoredLater,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -178,6 +181,8 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildWarningMessage(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -201,7 +206,7 @@ class DeleteLaborContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isPermanentDelete ? 'Permanent Deletion Warning' : 'Deactivation Notice',
+                  isPermanentDelete ? l10n.permanentDeletionWarning : l10n.deactivationNotice,
                   style: GoogleFonts.inter(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w700,
@@ -211,8 +216,8 @@ class DeleteLaborContent extends StatelessWidget {
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   isPermanentDelete
-                      ? 'This will permanently remove all labor data from the database. This action cannot be reversed.'
-                      : 'This will deactivate the labor but preserve all data. The labor can be restored later if needed.',
+                      ? l10n.permanentDeletionWarningMessage
+                      : l10n.deactivationNoticeMessage,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     color: AppTheme.charcoalGray,
@@ -228,6 +233,8 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildDeleteTypeToggle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -246,7 +253,7 @@ class DeleteLaborContent extends StatelessWidget {
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Choose deletion type:',
+                l10n.chooseDeletionType,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -270,13 +277,15 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildDeleteOptionsRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildDeleteOption(
             context,
-            title: 'Permanent Delete',
-            subtitle: 'Removes from database permanently',
+            title: l10n.permanentDelete,
+            subtitle: l10n.removesFromDatabasePermanently,
             icon: Icons.delete_forever_rounded,
             color: Colors.red,
             isSelected: isPermanentDelete,
@@ -287,8 +296,8 @@ class DeleteLaborContent extends StatelessWidget {
         Expanded(
           child: _buildDeleteOption(
             context,
-            title: 'Deactivate',
-            subtitle: 'Hide but can be restored',
+            title: l10n.deactivate,
+            subtitle: l10n.hideButCanBeRestored,
             icon: Icons.visibility_off_rounded,
             color: Colors.orange,
             isSelected: !isPermanentDelete,
@@ -300,12 +309,14 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildDeleteOptionsColumn(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         _buildDeleteOption(
           context,
-          title: 'Permanent Delete',
-          subtitle: 'Removes from database permanently',
+          title: l10n.permanentDelete,
+          subtitle: l10n.removesFromDatabasePermanently,
           icon: Icons.delete_forever_rounded,
           color: Colors.red,
           isSelected: isPermanentDelete,
@@ -314,8 +325,8 @@ class DeleteLaborContent extends StatelessWidget {
         SizedBox(height: context.cardPadding),
         _buildDeleteOption(
           context,
-          title: 'Deactivate',
-          subtitle: 'Hide but can be restored',
+          title: l10n.deactivate,
+          subtitle: l10n.hideButCanBeRestored,
           icon: Icons.visibility_off_rounded,
           color: Colors.orange,
           isSelected: !isPermanentDelete,
@@ -384,6 +395,8 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildLaborDetailsCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -476,7 +489,7 @@ class DeleteLaborContent extends StatelessWidget {
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Labor ID: ${labor.id}',
+                    '${l10n.laborID}: ${labor.id}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -493,6 +506,8 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildConfirmationSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -507,8 +522,8 @@ class DeleteLaborContent extends StatelessWidget {
             onChanged: (value) => onConfirmationCheckedChange(value ?? false),
             title: Text(
               isPermanentDelete
-                  ? 'I understand this will permanently delete the labor'
-                  : 'I understand this will deactivate the labor',
+                  ? l10n.iUnderstandPermanentDelete
+                  : l10n.iUnderstandDeactivate,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -524,7 +539,7 @@ class DeleteLaborContent extends StatelessWidget {
               value: understandConsequences,
               onChanged: (value) => onUnderstandConsequencesChange(value ?? false),
               title: Text(
-                'I understand this action cannot be undone and will affect related records',
+                l10n.iUnderstandActionCannotBeUndone,
                 style: GoogleFonts.inter(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
@@ -537,7 +552,7 @@ class DeleteLaborContent extends StatelessWidget {
             ),
             SizedBox(height: context.cardPadding),
             Text(
-              'Type the labor name to confirm permanent deletion:',
+              l10n.typeLaborNameToConfirm,
               style: GoogleFonts.inter(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w600,
@@ -565,7 +580,7 @@ class DeleteLaborContent extends StatelessWidget {
             ),
             SizedBox(height: context.smallPadding),
             Text(
-              'Expected: ${labor.name}',
+              '${l10n.expected}: ${labor.name}',
               style: GoogleFonts.inter(
                 fontSize: context.captionFontSize,
                 color: Colors.grey[600],
@@ -579,11 +594,13 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildCompactButtons(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: onCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -594,7 +611,7 @@ class DeleteLaborContent extends StatelessWidget {
           builder: (context, provider, child) {
             final canDelete = validateDeletion();
             return PremiumButton(
-              text: isPermanentDelete ? 'Delete Permanently' : 'Deactivate Labor',
+              text: isPermanentDelete ? l10n.deletePermanently : l10n.deactivateLabor,
               onPressed: (provider.isLoading || !canDelete) ? null : onDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -608,12 +625,14 @@ class DeleteLaborContent extends StatelessWidget {
   }
 
   Widget _buildDesktopButtons(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: onCancel,
             height: context.buttonHeight,
             backgroundColor: Colors.grey[600],
@@ -627,7 +646,7 @@ class DeleteLaborContent extends StatelessWidget {
             builder: (context, provider, child) {
               final canDelete = validateDeletion();
               return PremiumButton(
-                text: isPermanentDelete ? 'Delete Permanently' : 'Deactivate Labor',
+                text: isPermanentDelete ? l10n.deletePermanently : l10n.deactivateLabor,
                 onPressed: (provider.isLoading || !canDelete) ? null : onDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight,

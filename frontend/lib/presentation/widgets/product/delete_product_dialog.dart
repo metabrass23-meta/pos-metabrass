@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteProductDialog extends StatefulWidget {
@@ -27,8 +28,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   late Animation<double> _fadeAnimation;
   late Animation<double> _shakeAnimation;
 
-  bool _isPermanentDelete = true; // Toggle between permanent and soft delete
-  bool _confirmationChecked = false; // Requires user to check confirmation
+  bool _isPermanentDelete = true;
+  bool _confirmationChecked = false;
 
   @override
   void initState() {
@@ -72,6 +73,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_confirmationChecked) {
       _showValidationSnackbar();
       return;
@@ -91,12 +94,14 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
         _showSuccessSnackbar();
         Navigator.of(context).pop();
       } else {
-        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete product');
+        _showErrorSnackbar(provider.errorMessage ?? l10n.failedToDeleteProduct);
       }
     }
   }
 
   void _showValidationSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -108,7 +113,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Please confirm that you understand this action',
+              l10n.pleaseConfirmAction,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -128,6 +133,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -140,8 +147,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
             SizedBox(width: context.smallPadding),
             Text(
               _isPermanentDelete
-                  ? 'Product deleted permanently!'
-                  : 'Product deactivated successfully!',
+                  ? l10n.productDeletedPermanently
+                  : l10n.productDeactivatedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -258,6 +265,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -293,7 +302,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isPermanentDelete ? 'Delete Permanently' : 'Deactivate Product',
+                  _isPermanentDelete ? l10n.deletePermanently : l10n.deactivateProduct,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -305,8 +314,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     _isPermanentDelete
-                        ? 'This action cannot be undone'
-                        : 'Product can be restored later',
+                        ? l10n.thisActionCannotBeUndone
+                        : l10n.productCanBeRestoredLater,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -339,6 +348,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
       child: SingleChildScrollView(
@@ -347,7 +358,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Delete Type Toggle
               Container(
                 padding: EdgeInsets.all(context.smallPadding),
                 decoration: BoxDecoration(
@@ -364,7 +374,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
-                        'Choose deletion type:',
+                        l10n.chooseDeletionType,
                         style: GoogleFonts.inter(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
@@ -378,7 +388,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
               SizedBox(height: context.cardPadding),
 
-              // Delete Options
               Row(
                 children: [
                   Expanded(
@@ -386,7 +395,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                       onTap: () {
                         setState(() {
                           _isPermanentDelete = true;
-                          _confirmationChecked = false; // Reset confirmation
+                          _confirmationChecked = false;
                         });
                       },
                       child: Container(
@@ -410,7 +419,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             ),
                             SizedBox(height: context.smallPadding),
                             Text(
-                              'Permanent Delete',
+                              l10n.permanentDelete,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
@@ -420,7 +429,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             ),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
-                              'Completely removes from database',
+                              l10n.completelyRemovesFromDatabase,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: _isPermanentDelete ? Colors.red[600] : Colors.grey[600],
@@ -440,7 +449,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                       onTap: () {
                         setState(() {
                           _isPermanentDelete = false;
-                          _confirmationChecked = false; // Reset confirmation
+                          _confirmationChecked = false;
                         });
                       },
                       child: Container(
@@ -464,7 +473,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             ),
                             SizedBox(height: context.smallPadding),
                             Text(
-                              'Deactivate',
+                              l10n.deactivate,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
@@ -474,7 +483,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             ),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
-                              'Hides but can be restored',
+                              l10n.hidesButCanBeRestored,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: !_isPermanentDelete ? Colors.orange[600] : Colors.grey[600],
@@ -491,7 +500,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
               SizedBox(height: context.mainPadding),
 
-              // Product Details Card
               Container(
                 padding: EdgeInsets.all(context.cardPadding),
                 decoration: BoxDecoration(
@@ -504,7 +512,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                 ),
                 child: Column(
                   children: [
-                    // Product ID and Name Row
                     Row(
                       children: [
                         Container(
@@ -544,7 +551,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
                     SizedBox(height: context.smallPadding),
 
-                    // Detail and Price Row
                     Row(
                       children: [
                         Expanded(
@@ -553,7 +559,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Detail:',
+                                '${l10n.detail}:',
                                 style: GoogleFonts.inter(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w500,
@@ -563,7 +569,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                               Text(
                                 widget.product.detail.isNotEmpty
                                     ? widget.product.detail
-                                    : 'No details provided',
+                                    : l10n.noDetailsProvided,
                                 style: GoogleFonts.inter(
                                   fontSize: context.subtitleFontSize,
                                   fontWeight: FontWeight.w500,
@@ -587,7 +593,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Price:',
+                                '${l10n.price}:',
                                 style: GoogleFonts.inter(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w500,
@@ -608,7 +614,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                       ],
                     ),
 
-                    // Total Value Row
                     SizedBox(height: context.smallPadding),
                     Container(
                       padding: EdgeInsets.all(context.smallPadding),
@@ -620,7 +625,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total Inventory Value:',
+                            '${l10n.totalInventoryValue}:',
                             style: GoogleFonts.inter(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
@@ -644,7 +649,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
               SizedBox(height: context.cardPadding),
 
-              // Confirmation Checkbox
               Container(
                 padding: EdgeInsets.all(context.smallPadding),
                 decoration: BoxDecoration(
@@ -660,8 +664,8 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                   },
                   title: Text(
                     _isPermanentDelete
-                        ? 'I understand this will permanently delete the product and cannot be undone'
-                        : 'I understand this will deactivate the product',
+                        ? l10n.iUnderstandPermanentDelete
+                        : l10n.iUnderstandDeactivate,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
@@ -676,7 +680,6 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
               SizedBox(height: context.mainPadding),
 
-              // Action Buttons
               ResponsiveBreakpoints.responsive(
                 context,
                 tablet: _buildCompactButtons(),
@@ -693,12 +696,13 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Cancel Button (full width, primary action)
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -707,11 +711,10 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
         SizedBox(height: context.cardPadding),
 
-        // Delete Button (full width, destructive action)
         Consumer<ProductProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: _isPermanentDelete ? 'Delete Permanently' : 'Deactivate Product',
+              text: _isPermanentDelete ? l10n.deletePermanently : l10n.deactivateProduct,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -725,13 +728,14 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        // Cancel Button (safe action)
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -741,13 +745,12 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
 
         SizedBox(width: context.cardPadding),
 
-        // Delete Button (destructive action)
         Expanded(
           flex: 1,
           child: Consumer<ProductProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: _isPermanentDelete ? 'Delete' : 'Deactivate',
+                text: _isPermanentDelete ? l10n.delete : l10n.deactivate,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

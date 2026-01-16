@@ -8,6 +8,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -41,7 +42,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Use addPostFrameCallback to avoid rendering conflicts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _animationController.forward();
@@ -59,9 +59,11 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   void _handleSubmit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedWithdrawalBy == null) {
-        _showErrorSnackbar('Please select who made the withdrawal');
+        _showErrorSnackbar(l10n.pleaseSelectWhoMadeWithdrawal);
         return;
       }
 
@@ -84,6 +86,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -91,7 +95,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Expense added successfully!',
+              l10n.expenseAddedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -137,14 +141,15 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
     }
   }
 
-  // Using the new reusable DateTime picker
   Future<void> _selectDateTime() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _selectedDate,
       initialTime: _selectedTime,
-      title: 'Select Expense Date & Time',
+      title: l10n.selectExpenseDateTime,
       minDate: DateTime(2000),
-      maxDate: DateTime.now().add(const Duration(days: 365)), // Allow up to 1 year in future
+      maxDate: DateTime.now().add(const Duration(days: 365)),
       onDateTimeSelected: (date, time) {
         setState(() {
           _selectedDate = date;
@@ -213,6 +218,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -235,7 +242,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Expense' : 'Add New Expense',
+                  context.shouldShowCompactLayout ? l10n.addExpense : l10n.addNewExpense,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -246,7 +253,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Record a new expense entry',
+                    l10n.recordNewExpenseEntry,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -274,6 +281,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -282,16 +291,16 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumTextField(
-              label: 'Expense',
-              hint: isCompact ? 'Enter expense' : 'Enter expense type/category',
+              label: l10n.expense,
+              hint: isCompact ? l10n.enterExpense : l10n.enterExpenseTypeCategory,
               controller: _expenseController,
               prefixIcon: Icons.category_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter expense type';
+                  return l10n.pleaseEnterExpenseType;
                 }
                 if (value!.length < 2) {
-                  return 'Expense must be at least 2 characters';
+                  return l10n.expenseMinLength;
                 }
                 return null;
               },
@@ -299,17 +308,17 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Description',
-              hint: isCompact ? 'Enter description' : 'Enter expense description/details',
+              label: l10n.description,
+              hint: isCompact ? l10n.enterDescription : l10n.enterExpenseDescription,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter description';
+                  return l10n.pleaseEnterDescription;
                 }
                 if (value!.length < 5) {
-                  return 'Description must be at least 5 characters';
+                  return l10n.descriptionMinLength;
                 }
                 return null;
               },
@@ -317,30 +326,29 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Amount',
-              hint: isCompact ? 'Enter amount' : 'Enter amount (PKR)',
+              label: l10n.amount,
+              hint: isCompact ? l10n.enterAmount : l10n.enterAmountPKR,
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter amount';
+                  return l10n.pleaseEnterAmount;
                 }
                 final amount = double.tryParse(value!);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount';
+                  return l10n.pleaseEnterValidAmount;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Withdrawal By Selection
             Consumer<ExpensesProvider>(
               builder: (context, provider, child) {
                 return PremiumDropdownField<String>(
-                  label: 'Withdrawal By',
-                  hint: 'Select who made the withdrawal',
+                  label: l10n.withdrawalBy,
+                  hint: l10n.selectWhoMadeWithdrawal,
                   value: _selectedWithdrawalBy,
                   prefixIcon: Icons.person_outline,
                   items: provider.availablePersons.map((person) => DropdownItem<String>(value: person, label: person)).toList(),
@@ -353,7 +361,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select who made the withdrawal';
+                      return l10n.pleaseSelectWhoMadeWithdrawal;
                     }
                     return null;
                   },
@@ -362,11 +370,9 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             ),
             SizedBox(height: context.cardPadding),
 
-            // Enhanced Date and Time Selection
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Primary Syncfusion DateTime Picker Button
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -387,7 +393,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                               Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                               SizedBox(width: context.smallPadding),
                               Text(
-                                'Select Date & Time',
+                                l10n.selectDateTime,
                                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                               ),
                             ],
@@ -399,7 +405,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                               Column(
                                 children: [
                                   Text(
-                                    'Date',
+                                    l10n.date,
                                     style: GoogleFonts.inter(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
@@ -420,7 +426,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                               Column(
                                 children: [
                                   Text(
-                                    'Time',
+                                    l10n.time,
                                     style: GoogleFonts.inter(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
@@ -464,13 +470,15 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<ExpensesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Add Expense',
+              text: l10n.addExpense,
               onPressed: provider.isLoading ? null : _handleSubmit,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -480,7 +488,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -492,11 +500,13 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -509,7 +519,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
           child: Consumer<ExpensesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Add Expense',
+                text: l10n.addExpense,
                 onPressed: provider.isLoading ? null : _handleSubmit,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
@@ -520,16 +530,5 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
         ),
       ],
     );
-  }
-
-  Color _getPersonColor(String person) {
-    switch (person) {
-      case 'Parveez Maqbool':
-        return Colors.blue;
-      case 'Zain Maqbool':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
   }
 }

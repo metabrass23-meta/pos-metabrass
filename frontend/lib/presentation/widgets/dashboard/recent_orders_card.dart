@@ -12,6 +12,8 @@ class RecentOrdersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 60.h,
       padding: EdgeInsets.all(2.w),
@@ -29,7 +31,6 @@ class RecentOrdersCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               Container(
@@ -49,7 +50,7 @@ class RecentOrdersCard extends StatelessWidget {
 
               Expanded(
                 child: Text(
-                  AppLocalizations.of(context)!.recentOrders,
+                  l10n.recentOrders,
                   style: GoogleFonts.inter(
                     fontSize: 2.2.sp,
                     fontWeight: FontWeight.w600,
@@ -59,11 +60,9 @@ class RecentOrdersCard extends StatelessWidget {
               ),
 
               TextButton(
-                onPressed: () {
-                  // View all orders
-                },
+                onPressed: () {},
                 child: Text(
-                  AppLocalizations.of(context)!.viewAll,
+                  l10n.viewAll,
                   style: GoogleFonts.inter(
                     fontSize: 1.6.sp,
                     fontWeight: FontWeight.w500,
@@ -76,7 +75,6 @@ class RecentOrdersCard extends StatelessWidget {
 
           SizedBox(height: 2.h),
 
-          // Orders List
           Expanded(
             child: Consumer<DashboardProvider>(
               builder: (context, provider, child) {
@@ -86,7 +84,7 @@ class RecentOrdersCard extends StatelessWidget {
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     final order = orders[index];
-                    return _buildOrderItem(order, index);
+                    return _buildOrderItem(context, order, index);
                   },
                 );
               },
@@ -97,8 +95,10 @@ class RecentOrdersCard extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderItem(Map<String, dynamic> order, int index) {
-    Color statusColor = _getStatusColor(order['status']);
+  Widget _buildOrderItem(BuildContext context, Map<String, dynamic> order, int index) {
+    final l10n = AppLocalizations.of(context)!;
+    Color statusColor = _getStatusColor(order['status'], l10n);
+    String localizedStatus = _getLocalizedStatus(order['status'], l10n);
 
     return Container(
       margin: EdgeInsets.only(bottom: 1.5.h),
@@ -111,7 +111,6 @@ class RecentOrdersCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
           Row(
             children: [
               Container(
@@ -139,7 +138,7 @@ class RecentOrdersCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(0.8.w),
                 ),
                 child: Text(
-                  order['status'],
+                  localizedStatus,
                   style: GoogleFonts.inter(
                     fontSize: 1.3.sp,
                     fontWeight: FontWeight.w500,
@@ -152,7 +151,6 @@ class RecentOrdersCard extends StatelessWidget {
 
           SizedBox(height: 1.h),
 
-          // Customer Info
           Row(
             children: [
               CircleAvatar(
@@ -198,7 +196,6 @@ class RecentOrdersCard extends StatelessWidget {
 
           SizedBox(height: 1.h),
 
-          // Amount and Date
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -226,16 +223,28 @@ class RecentOrdersCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(String status, AppLocalizations l10n) {
+    if (status == 'Completed' || status == l10n.completed) {
+      return Colors.green;
+    } else if (status == 'In Progress' || status == l10n.inProgress) {
+      return Colors.blue;
+    } else if (status == 'Pending' || status == l10n.pending) {
+      return Colors.orange;
+    } else {
+      return Colors.grey;
+    }
+  }
+
+  String _getLocalizedStatus(String status, AppLocalizations l10n) {
     switch (status) {
       case 'Completed':
-        return Colors.green;
+        return l10n.completed;
       case 'In Progress':
-        return Colors.blue;
+        return l10n.inProgress;
       case 'Pending':
-        return Colors.orange;
+        return l10n.pending;
       default:
-        return Colors.grey;
+        return status;
     }
   }
 }

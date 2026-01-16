@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import 'delete_vendor_widgets.dart';
 
 class EnhancedDeleteVendorDialog extends StatefulWidget {
@@ -89,6 +90,7 @@ class _EnhancedDeleteVendorDialogState extends State<EnhancedDeleteVendorDialog>
     }
 
     final provider = Provider.of<VendorProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
 
     bool success;
     String successMessage;
@@ -96,10 +98,10 @@ class _EnhancedDeleteVendorDialogState extends State<EnhancedDeleteVendorDialog>
     try {
       if (_isPermanentDelete) {
         success = await provider.deleteVendor(widget.vendor.id);
-        successMessage = 'Vendor deleted permanently!';
+        successMessage = '${l10n.vendor} ${l10n.deletedPermanently}!';
       } else {
         success = await provider.softDeleteVendor(widget.vendor.id);
-        successMessage = 'Vendor deactivated successfully!';
+        successMessage = '${l10n.vendor} ${l10n.deactivatedSuccessfully}!';
       }
 
       if (mounted) {
@@ -107,12 +109,12 @@ class _EnhancedDeleteVendorDialogState extends State<EnhancedDeleteVendorDialog>
           _showSuccessSnackbar(successMessage);
           Navigator.of(context).pop(true);
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete vendor');
+          _showErrorSnackbar(provider.errorMessage ?? '${l10n.failedToDelete} ${l10n.vendor}');
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('An unexpected error occurred: ${e.toString()}');
+        _showErrorSnackbar('${l10n.unexpectedError}: ${e.toString()}');
       }
     }
   }
@@ -133,15 +135,17 @@ class _EnhancedDeleteVendorDialogState extends State<EnhancedDeleteVendorDialog>
   }
 
   void _showValidationError() {
+    final l10n = AppLocalizations.of(context)!;
     String message;
+
     if (!_confirmationChecked) {
-      message = 'Please confirm that you understand this action';
+      message = l10n.pleaseConfirmAction;
     } else if (_isPermanentDelete && !_understandConsequences) {
-      message = 'Please confirm that you understand the consequences of permanent deletion';
+      message = l10n.pleaseConfirmConsequences;
     } else if (_isPermanentDelete && _confirmationText.toLowerCase().trim() != widget.vendor.name.toLowerCase().trim()) {
-      message = 'Please type the vendor name exactly to confirm permanent deletion';
+      message = l10n.pleaseTypeVendorName;
     } else {
-      message = 'Please complete all confirmation steps';
+      message = l10n.pleaseCompleteConfirmation;
     }
 
     _showSnackbar(message, Colors.orange, Icons.warning_outlined);

@@ -6,6 +6,7 @@ import '../../../src/providers/product_provider.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_field.dart';
 import '../globals/text_button.dart';
 
@@ -30,7 +31,6 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   bool _isLoading = false;
   Product? _selectedProduct;
 
-  // Animation
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -41,7 +41,6 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
     _quantityController.text = '1';
     _loadProducts();
 
-    // Initialize animations
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
@@ -82,12 +81,10 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
     final provider = Provider.of<ProductProvider>(context, listen: false);
     List<Product> products = provider.products;
 
-    // Filter out excluded products
     if (widget.excludeProductIds != null) {
       products = products.where((product) => !widget.excludeProductIds!.contains(product.id)).toList();
     }
 
-    // Apply search filter
     if (_searchQuery.isNotEmpty) {
       products = products
           .where(
@@ -118,9 +115,11 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   void _addToOrder() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedProduct == null) {
-        _showErrorSnackbar('Please select a product');
+        _showErrorSnackbar(l10n.pleaseSelectProduct);
         return;
       }
 
@@ -204,6 +203,8 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -226,7 +227,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Select Product' : 'Select Product for Order',
+                  context.shouldShowCompactLayout ? l10n.selectProduct : l10n.selectProductForOrder,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -237,7 +238,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Choose a product to add to the order',
+                    l10n.chooseProductToAddToOrder,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -275,18 +276,14 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Search Section
                 _buildSearchSection(),
                 SizedBox(height: context.cardPadding),
 
-                // Product List Section
                 _buildProductListSection(),
                 SizedBox(height: context.cardPadding),
 
-                // Selected Product Details Section
                 if (_selectedProduct != null) ...[_buildSelectedProductSection(), SizedBox(height: context.mainPadding)],
 
-                // Action Buttons
                 ResponsiveBreakpoints.responsive(
                   context,
                   tablet: _buildCompactButtons(),
@@ -304,6 +301,8 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -321,11 +320,11 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Search Products', Icons.search),
+          _buildSectionTitle(l10n.searchProducts, Icons.search),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Search Products',
-            hint: context.shouldShowCompactLayout ? 'Search products' : 'Search products by name, fabric, or color...',
+            label: l10n.searchProducts,
+            hint: context.shouldShowCompactLayout ? l10n.searchProductsShort : l10n.searchProductsByNameFabricOrColor,
             controller: _searchController,
             prefixIcon: Icons.search,
             onChanged: _onSearchChanged,
@@ -336,6 +335,8 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildProductListSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -353,7 +354,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Available Products', Icons.inventory_2),
+          _buildSectionTitle(l10n.availableProducts, Icons.inventory_2),
           SizedBox(height: context.cardPadding),
           _isLoading
               ? Center(child: CircularProgressIndicator(color: AppTheme.primaryMaroon))
@@ -370,7 +371,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                   ),
                   SizedBox(height: context.cardPadding),
                   Text(
-                    _searchQuery.isEmpty ? 'No products available' : 'No products found',
+                    _searchQuery.isEmpty ? l10n.noProductsAvailable : l10n.noProductsFound,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
@@ -380,7 +381,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                   if (_searchQuery.isNotEmpty) ...[
                     SizedBox(height: context.smallPadding),
                     Text(
-                      'Try adjusting your search terms',
+                      l10n.tryAdjustingYourSearchTerms,
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         color: Colors.grey[600],
@@ -424,7 +425,6 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                       padding: EdgeInsets.all(context.cardPadding),
                       child: Row(
                         children: [
-                          // Product Image Placeholder
                           Container(
                             width: 60,
                             height: 60,
@@ -439,7 +439,6 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                             ),
                           ),
                           SizedBox(width: context.cardPadding),
-                          // Product Details
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,7 +485,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
                                       ),
                                       child: Text(
-                                        product.quantity > 0 ? 'In Stock (${product.quantity})' : 'Out of Stock',
+                                        product.quantity > 0 ? '${l10n.inStock} (${product.quantity})' : l10n.outOfStock,
                                         style: GoogleFonts.inter(
                                           fontSize: context.bodyFontSize,
                                           color: product.quantity > 0 ? Colors.green : Colors.red,
@@ -499,7 +498,6 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                               ],
                             ),
                           ),
-                          // Selection Indicator
                           if (isSelected)
                             Container(
                               padding: EdgeInsets.all(context.smallPadding / 2),
@@ -527,6 +525,8 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildSelectedProductSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -544,7 +544,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Selected Product Details', Icons.check_circle_outline),
+          _buildSectionTitle(l10n.selectedProductDetails, Icons.check_circle_outline),
           SizedBox(height: context.cardPadding),
           Row(
             children: [
@@ -598,7 +598,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
-                      'Available: ${_selectedProduct!.quantity} units',
+                      '${l10n.available}: ${_selectedProduct!.quantity} ${l10n.units}',
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w500,
@@ -621,14 +621,14 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Customization Notes (Optional)',
-            hint: context.shouldShowCompactLayout ? 'Enter notes' : 'Special instructions or customization notes',
+            label: l10n.customizationNotesOptional,
+            hint: context.shouldShowCompactLayout ? l10n.enterNotes : l10n.specialInstructionsOrCustomizationNotes,
             controller: _customizationController,
             prefixIcon: Icons.description_outlined,
             maxLines: 3,
             validator: (value) {
               if (value != null && value.isNotEmpty && value.length > 500) {
-                return 'Notes must be less than 500 characters';
+                return l10n.notesMustBeLessThan500Characters;
               }
               return null;
             },
@@ -660,7 +660,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     ),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Total Amount:',
+                      '${l10n.totalAmount}:',
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
@@ -706,25 +706,27 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildQuantityField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return PremiumTextField(
-      label: 'Quantity *',
-      hint: 'Enter quantity',
+      label: '${l10n.quantity} *',
+      hint: l10n.enterQuantity,
       controller: _quantityController,
       keyboardType: TextInputType.number,
       prefixIcon: Icons.numbers,
       validator: (value) {
         if (value?.isEmpty ?? true) {
-          return 'Please enter quantity';
+          return l10n.pleaseEnterQuantity;
         }
         final quantity = int.tryParse(value!);
         if (quantity == null) {
-          return 'Please enter a valid number';
+          return l10n.pleaseEnterValidNumber;
         }
         if (quantity <= 0) {
-          return 'Quantity must be greater than 0';
+          return l10n.quantityMustBeGreaterThanZero;
         }
         if (_selectedProduct != null && quantity > _selectedProduct!.quantity) {
-          return 'Only ${_selectedProduct!.quantity} units available';
+          return '${l10n.only} ${_selectedProduct!.quantity} ${l10n.unitsAvailable}';
         }
         return null;
       },
@@ -733,11 +735,13 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildUnitPriceField() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Unit Price',
+          l10n.unitPrice,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
@@ -794,11 +798,13 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Add to Order',
+          text: l10n.addToOrder,
           onPressed: _selectedProduct != null ? _addToOrder : null,
           isLoading: _isLoading,
           height: context.buttonHeight,
@@ -807,7 +813,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -819,11 +825,13 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -835,7 +843,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Add to Order',
+            text: l10n.addToOrder,
             onPressed: _selectedProduct != null ? _addToOrder : null,
             isLoading: _isLoading,
             height: context.buttonHeight / 1.5,

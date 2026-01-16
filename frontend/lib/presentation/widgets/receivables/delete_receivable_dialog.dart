@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteReceivableDialog extends StatefulWidget {
@@ -55,6 +56,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<ReceivablesProvider>(context, listen: false);
 
     await provider.deleteReceivable(widget.receivable.id);
@@ -66,6 +68,8 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -77,7 +81,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Receivable deleted successfully!',
+              l10n.receivableDeletedSuccessfully,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -199,6 +203,8 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -230,7 +236,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Receivable' : 'Delete Receivable Record',
+                  context.shouldShowCompactLayout ? l10n.deleteReceivable : l10n.deleteReceivableRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -241,7 +247,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.thisActionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -273,6 +279,8 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -310,8 +318,8 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
           SizedBox(height: context.mainPadding),
           Text(
             isCompact
-                ? 'Are you sure you want to delete this receivable?'
-                : 'Are you absolutely sure you want to delete this receivable record?',
+                ? l10n.areYouSureDeleteReceivable
+                : l10n.areYouAbsolutelySureDeleteReceivable,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
@@ -374,7 +382,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount Given:',
+                            l10n.amountGivenLabel,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -397,7 +405,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Balance Remaining:',
+                            l10n.balanceRemainingLabel,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -425,7 +433,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Phone:',
+                            l10n.phoneLabel,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -448,7 +456,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Status:',
+                            l10n.statusLabel,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -486,7 +494,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Expected Return:',
+                            l10n.expectedReturnLabel,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -510,7 +518,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'Days Overdue:',
+                              l10n.daysOverdueLabel,
                               style: GoogleFonts.inter(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
@@ -518,7 +526,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                               ),
                             ),
                             Text(
-                              '${widget.receivable.daysOverdue} days',
+                              '${widget.receivable.daysOverdue} ${l10n.days}',
                               style: GoogleFonts.inter(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
@@ -538,7 +546,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Reason/Item:',
+                        l10n.reasonItemLabel,
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
@@ -577,8 +585,8 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                 Expanded(
                   child: Text(
                     isCompact
-                        ? 'This will permanently delete the receivable record.'
-                        : 'This will permanently delete the receivable record and all associated data. This action cannot be undone.',
+                        ? l10n.willPermanentlyDeleteReceivable
+                        : l10n.willPermanentlyDeleteReceivableAndData,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
@@ -604,11 +612,13 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -618,7 +628,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
         Consumer<ReceivablesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Receivable',
+              text: l10n.deleteReceivable,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -632,12 +642,14 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -650,7 +662,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
           child: Consumer<ReceivablesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
