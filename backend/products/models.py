@@ -80,6 +80,20 @@ class Product(models.Model):
         related_name='products',
         help_text="Product category"
     )
+    barcode = models.CharField(
+        max_length=50,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Product barcode (EAN-13 format)"
+    )
+    sku = models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Stock Keeping Unit identifier"
+    )
     is_active = models.BooleanField(
         default=True,
         help_text="Used for soft deletion. Inactive products won't appear in lists"
@@ -104,6 +118,8 @@ class Product(models.Model):
             models.Index(fields=['category']),
             models.Index(fields=['quantity']),
             models.Index(fields=['price']),
+            models.Index(fields=['barcode']),
+            models.Index(fields=['sku']),
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
         ]
@@ -136,6 +152,27 @@ class Product(models.Model):
                     raise ValidationError({'pieces': 'Each piece must be a string.'})
 
     def save(self, *args, **kwargs):
+        # Auto-generate barcode if not provided
+        if not self.barcode:
+            import random
+            # Generate EAN-13 barcode: prefix "2" + random 12 digits
+            while True:
+                barcode = '2' + ''.join([str(random.randint(0, 9)) for _ in range(12)])
+                # Check uniqueness
+                if not Product.objects.filter(barcode=barcode).exclude(pk=self.pk).exists():
+                    self.barcode = barcode
+                    break
+        
+        # Auto-generate SKU if not provided
+        if not self.sku:
+            # Generate SKU: PROD-{uuid_hex_first_8_chars}
+            while True:
+                sku = f"PROD-{uuid.uuid4().hex[:8].upper()}"
+                # Check uniqueness
+                if not Product.objects.filter(sku=sku).exclude(pk=self.pk).exists():
+                    self.sku = sku
+                    break
+        
         self.full_clean()
         super().save(*args, **kwargs)
 

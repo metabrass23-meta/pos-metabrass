@@ -30,6 +30,7 @@ django-debug-toolbar
 
 # Image handling
 Pillow
+python-barcode[images]
 
 # Utilities
 python-dateutil

@@ -1048,4 +1048,85 @@ def bulk_update_stock(request):
             'success': False,
             'message': f'Error performing bulk stock update: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_by_barcode(request, barcode):
+    """Search product by barcode"""
+    try:
+        product = Product.objects.get(barcode=barcode, is_active=True)
+        serializer = ProductSerializer(product)
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    except Product.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Product not found with the provided barcode'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to search product by barcode',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_barcode_image(request, product_id):
+    """Generate barcode image (EAN-13 format)"""
+    try:
+        product = get_object_or_404(Product, pk=product_id, is_active=True)
+        
+        if not product.barcode:
+            return Response({
+                'success': False,
+                'message': 'Product does not have a barcode'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Generate barcode image
+        try:
+            import barcode
+            from barcode.writer import ImageWriter
+            from io import BytesIO
+            import base64
+            
+            # Use EAN13 format
+            ean = barcode.get('ean13', product.barcode, writer=ImageWriter())
+            buffer = BytesIO()
+            ean.write(buffer)
+            
+            # Convert to base64
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return Response({
+                'success': True,
+                'data': {
+                    'barcode': product.barcode,
+                    'sku': product.sku,
+                    'product_name': product.name,
+                    'image': f'data:image/png;base64,{img_str}'
+                }
+            }, status=status.HTTP_200_OK)
+        except ImportError:
+            return Response({
+                'success': False,
+                'message': 'python-barcode package is not installed. Please install it using: pip install python-barcode[images]'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Failed to generate barcode image',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to generate barcode image',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         

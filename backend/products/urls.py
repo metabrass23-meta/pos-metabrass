@@ -19,6 +19,7 @@ urlpatterns = [
     
     # Search and filtering
     path('search/', views.search_products, name='search_products'),
+    path('search/barcode/<str:barcode>/', views.search_by_barcode, name='search_barcode'),
     path('category/<uuid:category_id>/', views.products_by_category, name='products_by_category'),
     path('low-stock/', views.low_stock_products, name='low_stock_products'),
     
@@ -31,6 +32,7 @@ urlpatterns = [
     
     # Product operations
     path('<uuid:product_id>/duplicate/', views.duplicate_product, name='duplicate_product'),
+    path('<uuid:product_id>/generate-barcode/', views.generate_barcode_image, name='generate_barcode'),
     
     # Real-time Inventory Management
     path('check-stock/', views.check_stock_availability, name='check_stock_availability'),

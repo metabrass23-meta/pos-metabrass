@@ -31,6 +31,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'fabric',
             'pieces',
             'quantity',
+            'barcode',
+            'sku',
             'category_id',
             'category_name',
             'stock_status',
@@ -120,6 +122,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             'fabric',
             'pieces',
             'quantity',
+            'barcode',
+            'sku',
             'category'
         )
 
