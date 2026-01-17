@@ -411,10 +411,8 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
 
           const Spacer(),
 
-          // Pagination controls
           Row(
             children: [
-              // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
                 icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),

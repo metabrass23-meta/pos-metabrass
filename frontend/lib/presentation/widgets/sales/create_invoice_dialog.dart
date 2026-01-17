@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../src/providers/invoice_provider.dart';
 import '../../../src/providers/sales_provider.dart';
@@ -23,8 +24,14 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
   @override
   void initState() {
     super.initState();
-    _termsController.text = 'Standard terms and conditions apply';
     _selectedDueDate = DateTime.now().add(const Duration(days: 30));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final l10n = AppLocalizations.of(context)!;
+    _termsController.text = l10n.standardTermsAndConditionsApply;
   }
 
   @override
@@ -36,6 +43,8 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       child: Container(
         width: 500,
@@ -50,24 +59,26 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
                 children: [
                   Icon(Icons.receipt_long, color: Theme.of(context).primaryColor),
                   const SizedBox(width: 12),
-                  Text('Create New Invoice', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                      l10n.createNewInvoice,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
 
-              // Sale Selection
               Consumer<SalesProvider>(
                 builder: (context, salesProvider, child) {
                   if (salesProvider.sales.isEmpty) {
-                    return const Text('No sales available');
+                    return Text(l10n.noSalesAvailable);
                   }
 
                   return DropdownButtonFormField<String>(
                     value: _selectedSaleId,
-                    decoration: const InputDecoration(
-                      labelText: 'Select Sale *',
+                    decoration: InputDecoration(
+                      labelText: l10n.selectSaleRequired,
                       border: OutlineInputBorder(),
-                      hintText: 'Choose a sale to create invoice for',
+                      hintText: l10n.chooseASaleToCreateInvoiceFor,
                     ),
                     items: salesProvider.sales.map((sale) {
                       return DropdownMenuItem(
@@ -82,7 +93,7 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please select a sale';
+                        return l10n.pleaseSelectASale;
                       }
                       return null;
                     },
@@ -92,12 +103,13 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
 
               const SizedBox(height: 16),
 
-              // Due Date
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Due Date *'),
+                title: Text(l10n.dueDateRequired),
                 subtitle: Text(
-                  _selectedDueDate != null ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}' : 'Select due date',
+                  _selectedDueDate != null
+                      ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}'
+                      : l10n.selectDueDate,
                 ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
@@ -117,21 +129,23 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
 
               const SizedBox(height: 16),
 
-              // Notes
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(labelText: 'Notes', hintText: 'Additional invoice notes (optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.notes,
+                  hintText: l10n.additionalInvoiceNotesOptional,
+                  border: OutlineInputBorder(),
+                ),
                 maxLines: 3,
               ),
 
               const SizedBox(height: 16),
 
-              // Terms & Conditions
               TextFormField(
                 controller: _termsController,
-                decoration: const InputDecoration(
-                  labelText: 'Terms & Conditions',
-                  hintText: 'Invoice terms and conditions',
+                decoration: InputDecoration(
+                  labelText: l10n.termsAndConditions,
+                  hintText: l10n.invoiceTermsAndConditions,
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -139,17 +153,23 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
 
               const SizedBox(height: 24),
 
-              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: _isLoading ? null : () => Navigator.of(context).pop(), child: const Text('Cancel')),
+                  TextButton(
+                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                    child: Text(l10n.cancel),
+                  ),
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _createInvoice,
                     child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text('Create Invoice'),
+                        ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                    )
+                        : Text(l10n.createInvoice),
                   ),
                 ],
               ),
@@ -161,6 +181,8 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
   }
 
   Future<void> _createInvoice() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
     if (_selectedSaleId == null || _selectedDueDate == null) return;
 
@@ -178,11 +200,21 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
 
       if (success && mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invoice created successfully'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.invoiceCreatedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to create invoice: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.failedToCreateInvoice}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) {

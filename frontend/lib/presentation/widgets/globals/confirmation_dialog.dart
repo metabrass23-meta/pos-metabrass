@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:frontend/src/theme/app_theme.dart';
+import 'package:frontend/l10n/app_localizations.dart';
 
 class ConfirmationDialog extends StatefulWidget {
   final String title;
@@ -161,6 +162,8 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -189,6 +192,8 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -202,7 +207,7 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -214,11 +219,13 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,

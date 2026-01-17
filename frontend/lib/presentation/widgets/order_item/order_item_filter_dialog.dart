@@ -9,19 +9,19 @@ import '../../../src/providers/order_provider.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../globals/custom_date_picker.dart';
 import '../globals/drop_down.dart';
 
-// Custom date picker widget for the filter dialog using Syncfusion
 class PremiumDatePicker extends StatefulWidget {
   final String label;
   final DateTime? initialDate;
   final DateTime firstDate;
   final DateTime lastDate;
   final Function(DateTime) onDateSelected;
-  final Key? dateKey; // Add key for forcing rebuilds
+  final Key? dateKey;
 
   const PremiumDatePicker({
     super.key,
@@ -71,29 +71,29 @@ class _PremiumDatePickerState extends State<PremiumDatePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTap: () async {
-        // Use the custom Syncfusion date picker
         await context.showSyncfusionDateTimePicker(
           initialDate: _selectedDate ?? DateTime.now(),
           initialTime: const TimeOfDay(hour: 0, minute: 0),
           onDateTimeSelected: (date, time) {
-            // For filter purposes, we only need the date part
             setState(() {
               _selectedDate = date;
               _controller.text = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
             });
             widget.onDateSelected(date);
           },
-          title: 'Select ${widget.label}',
+          title: '${l10n.select} ${widget.label}',
           minDate: widget.firstDate,
           maxDate: widget.lastDate,
-          showTimeInline: false, // Only show date picker for filters
+          showTimeInline: false,
         );
       },
       child: PremiumTextField(
         label: widget.label,
-        hint: 'Select date',
+        hint: l10n.selectDate,
         controller: _controller,
         prefixIcon: Icons.calendar_today_outlined,
         enabled: false,
@@ -114,39 +114,31 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables
   OrderModel? _selectedOrder;
   Product? _selectedProduct;
   String _searchQuery = '';
   bool _showInactiveOnly = false;
 
-  // Quantity range filters
   int? _minQuantity;
   int? _maxQuantity;
 
-  // Price range filters
   double? _minPrice;
   double? _maxPrice;
 
-  // Customization filter
   bool _hasCustomization = false;
 
-  // Date range filters
   DateTime? _dateFrom;
   DateTime? _dateTo;
 
-  // Sorting options
   String _sortBy = 'created_at';
   String _sortOrder = 'desc';
 
-  // Text controllers (only for search and numeric inputs)
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _minQuantityController = TextEditingController();
   final TextEditingController _maxQuantityController = TextEditingController();
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
-  // Predefined options
   final List<String> _sortByOptions = ['created_at', 'quantity', 'unit_price', 'line_total', 'product_name', 'updated_at'];
 
   final List<String> _sortOrderOptions = ['asc', 'desc'];
@@ -160,16 +152,14 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Initialize with current filter values
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<OrderItemProvider>();
-      _selectedOrder = null; // Will be set from dropdown
-      _selectedProduct = null; // Will be set from dropdown
+      _selectedOrder = null;
+      _selectedProduct = null;
       _searchQuery = provider.searchQuery;
 
       _searchController.text = _searchQuery;
 
-      // Load orders and products for dropdowns
       _loadDropdownData();
     });
 
@@ -177,7 +167,6 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   void _loadDropdownData() {
-    // Load orders and products for dropdowns
     final orderProvider = context.read<OrderProvider>();
     final productProvider = context.read<ProductProvider>();
 
@@ -204,23 +193,19 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   void _handleApplyFilters() async {
     final provider = context.read<OrderItemProvider>();
 
-    // Update filters from text controllers
     final search = _searchController.text.trim();
 
-    // Parse numeric values
     final minQuantity = _minQuantityController.text.trim().isEmpty ? null : int.tryParse(_minQuantityController.text.trim());
     final maxQuantity = _maxQuantityController.text.trim().isEmpty ? null : int.tryParse(_maxQuantityController.text.trim());
     final minPrice = _minPriceController.text.trim().isEmpty ? null : double.tryParse(_minPriceController.text.trim());
     final maxPrice = _maxPriceController.text.trim().isEmpty ? null : double.tryParse(_maxPriceController.text.trim());
 
-    // Store filter values for display
     _searchQuery = search;
     _minQuantity = minQuantity;
     _maxQuantity = maxQuantity;
     _minPrice = minPrice;
     _maxPrice = maxPrice;
 
-    // Apply filters using backend integration
     await provider.loadOrderItemsWithFilters(
       orderId: _selectedOrder?.id,
       productId: _selectedProduct?.id,
@@ -243,10 +228,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   void _handleClearFilters() async {
     final provider = context.read<OrderItemProvider>();
 
-    // Clear all filters
     provider.clearFilters();
 
-    // Reset local state
     _selectedOrder = null;
     _selectedProduct = null;
     _searchQuery = '';
@@ -261,14 +244,12 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     _sortBy = 'created_at';
     _sortOrder = 'desc';
 
-    // Clear text controllers
     _searchController.clear();
     _minQuantityController.clear();
     _maxQuantityController.clear();
     _minPriceController.clear();
     _maxPriceController.clear();
 
-    // Refresh data from backend with no filters
     await provider.loadOrderItemsWithFilters(refresh: true);
 
     _handleClose();
@@ -280,7 +261,6 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     });
   }
 
-  // Helper method to get active filters count
   int get _activeFiltersCount {
     int count = 0;
     if (_selectedOrder != null) count++;
@@ -299,22 +279,21 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     return count;
   }
 
-  // Helper method to get active filters text
-  String get _activeFiltersText {
+  String _getActiveFiltersText(AppLocalizations l10n) {
     final filters = <String>[];
-    if (_selectedOrder != null) filters.add('Order: ${_selectedOrder!.customerName}');
-    if (_selectedProduct != null) filters.add('Product: ${_selectedProduct!.name}');
-    if (_searchQuery.isNotEmpty) filters.add('Search: $_searchQuery');
-    if (_minQuantity != null) filters.add('Min Qty: $_minQuantity');
-    if (_maxQuantity != null) filters.add('Max Qty: $_maxQuantity');
-    if (_minPrice != null) filters.add('Min Price: PKR ${_minPrice!.toStringAsFixed(0)}');
-    if (_maxPrice != null) filters.add('Max Price: PKR ${_maxPrice!.toStringAsFixed(0)}');
-    if (_hasCustomization) filters.add('Has Customization');
-    if (_dateFrom != null) filters.add('From: ${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year}');
-    if (_dateTo != null) filters.add('To: ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}');
-    if (_showInactiveOnly) filters.add('Show Inactive Only');
-    if (_sortBy != 'created_at') filters.add('Sort: $_sortBy');
-    if (_sortOrder != 'desc') filters.add('Order: $_sortOrder.toUpperCase()');
+    if (_selectedOrder != null) filters.add('${l10n.order}: ${_selectedOrder!.customerName}');
+    if (_selectedProduct != null) filters.add('${l10n.product}: ${_selectedProduct!.name}');
+    if (_searchQuery.isNotEmpty) filters.add('${l10n.search}: $_searchQuery');
+    if (_minQuantity != null) filters.add('${l10n.minQuantity}: $_minQuantity');
+    if (_maxQuantity != null) filters.add('${l10n.maxQuantity}: $_maxQuantity');
+    if (_minPrice != null) filters.add('${l10n.minPricePKR}: PKR ${_minPrice!.toStringAsFixed(0)}');
+    if (_maxPrice != null) filters.add('${l10n.maxPricePKR}: PKR ${_maxPrice!.toStringAsFixed(0)}');
+    if (_hasCustomization) filters.add(l10n.hasCustomizationNotes);
+    if (_dateFrom != null) filters.add('${l10n.dateFrom}: ${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year}');
+    if (_dateTo != null) filters.add('${l10n.dateTo}: ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}');
+    if (_showInactiveOnly) filters.add(l10n.showInactiveItems);
+    if (_sortBy != 'created_at') filters.add('${l10n.sortBy}: $_sortBy');
+    if (_sortOrder != 'desc') filters.add('${l10n.sortOrder}: ${_sortOrder.toUpperCase()}');
 
     return filters.join(', ');
   }
@@ -357,6 +336,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -379,7 +360,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Order Item Filters',
+                  l10n.orderItemFilters,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -390,7 +371,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Customize your order item search and filtering',
+                    l10n.customizeOrderItemSearch,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -418,6 +399,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildActiveFiltersDisplay() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_activeFiltersCount == 0) return const SizedBox.shrink();
 
     return Container(
@@ -433,7 +416,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
-              'Active Filters: $_activeFiltersText',
+              '${l10n.activeFilters}: ${_getActiveFiltersText(l10n)}',
               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -461,27 +444,21 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Basic Filters Section
               _buildBasicFiltersSection(),
               SizedBox(height: context.cardPadding),
 
-              // Search and Text Filters Section
               _buildSearchSection(),
               SizedBox(height: context.cardPadding),
 
-              // Numeric Range Filters Section
               _buildNumericFiltersSection(),
               SizedBox(height: context.cardPadding),
 
-              // Date and Status Filters Section
               _buildDateStatusFiltersSection(),
               SizedBox(height: context.cardPadding),
 
-              // Sorting Options Section
               _buildSortingSection(),
               SizedBox(height: context.mainPadding),
 
-              // Action Buttons
               ResponsiveBreakpoints.responsive(
                 context,
                 tablet: _buildCompactButtons(),
@@ -498,6 +475,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildBasicFiltersSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -513,7 +492,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Icon(Icons.filter_alt_outlined, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Basic Filters',
+                l10n.basicFilters,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -532,40 +511,44 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildOrderDropdown() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<OrderProvider>(
       builder: (context, orderProvider, child) {
         return _buildSearchableDropdown<OrderModel>(
-          label: 'Select Order',
-          hint: 'Type customer name to search...',
+          label: l10n.selectOrder,
+          hint: l10n.typeCustomerNameToSearch,
           value: _selectedOrder,
-          items: _getOrderDropdownItems(orderProvider),
+          items: _getOrderDropdownItems(orderProvider, l10n),
           onChanged: (order) {
             setState(() {
               _selectedOrder = order;
             });
           },
           prefixIcon: Icons.receipt_long_outlined,
-          searchHint: 'Search by customer name...',
+          searchHint: l10n.searchByCustomerName,
         );
       },
     );
   }
 
   Widget _buildProductDropdown() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
         return _buildSearchableDropdown<Product>(
-          label: 'Select Product',
-          hint: 'Type product name to search...',
+          label: l10n.selectProduct,
+          hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
-          items: _getProductDropdownItems(productProvider),
+          items: _getProductDropdownItems(productProvider, l10n),
           onChanged: (product) {
             setState(() {
               _selectedProduct = product;
             });
           },
           prefixIcon: Icons.inventory_2_outlined,
-          searchHint: 'Search by product name...',
+          searchHint: l10n.searchByProductName,
         );
       },
     );
@@ -622,12 +605,13 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   void _showSearchableDropdown<T>(
-    BuildContext context,
-    List<DropdownItem<T?>> items,
-    T? currentValue,
-    ValueChanged<T?> onChanged,
-    String? searchHint,
-  ) {
+      BuildContext context,
+      List<DropdownItem<T?>> items,
+      T? currentValue,
+      ValueChanged<T?> onChanged,
+      String? searchHint,
+      ) {
+    final l10n = AppLocalizations.of(context)!;
     final searchController = TextEditingController();
     List<DropdownItem<T?>> filteredItems = List.from(items);
 
@@ -645,14 +629,14 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Select ${T == OrderModel ? 'Order' : 'Product'}',
+                    '${l10n.select} ${T == OrderModel ? l10n.order : l10n.product}',
                     style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.cardPadding),
                   TextField(
                     controller: searchController,
                     decoration: InputDecoration(
-                      hintText: searchHint ?? 'Search...',
+                      hintText: searchHint ?? l10n.search,
                       hintStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
@@ -697,23 +681,25 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     );
   }
 
-  List<DropdownItem<OrderModel?>> _getOrderDropdownItems(OrderProvider orderProvider) {
+  List<DropdownItem<OrderModel?>> _getOrderDropdownItems(OrderProvider orderProvider, AppLocalizations l10n) {
     final orders = orderProvider.orders;
     return [
-      DropdownItem<OrderModel?>(value: null, label: 'All Orders'),
+      DropdownItem<OrderModel?>(value: null, label: l10n.allOrders),
       ...orders.map((order) => DropdownItem<OrderModel?>(value: order, label: '${order.customerName} - ${order.id.substring(0, 8)}...')).toList(),
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider) {
+  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: 'All Products'),
+      DropdownItem<Product?>(value: null, label: l10n.allProducts),
       ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
     ];
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -729,15 +715,15 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Icon(Icons.search_outlined, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Search & Text Filters',
+                l10n.searchAndTextFilters,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Search Query',
-            hint: 'Search in product names, customization notes, or IDs',
+            label: l10n.searchQuery,
+            hint: l10n.searchInProductNames,
             controller: _searchController,
             prefixIcon: Icons.search_rounded,
           ),
@@ -747,6 +733,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildNumericFiltersSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -762,7 +750,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Icon(Icons.tune_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Numeric Range Filters',
+                l10n.numericRangeFilters,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -772,8 +760,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             children: [
               Expanded(
                 child: PremiumTextField(
-                  label: 'Min Quantity',
-                  hint: 'Minimum quantity',
+                  label: l10n.minQuantity,
+                  hint: l10n.minimumQuantity,
                   controller: _minQuantityController,
                   prefixIcon: Icons.numbers_outlined,
                   keyboardType: TextInputType.number,
@@ -782,8 +770,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumTextField(
-                  label: 'Max Quantity',
-                  hint: 'Maximum quantity',
+                  label: l10n.maxQuantity,
+                  hint: l10n.maximumQuantity,
                   controller: _maxQuantityController,
                   prefixIcon: Icons.numbers_outlined,
                   keyboardType: TextInputType.number,
@@ -796,8 +784,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             children: [
               Expanded(
                 child: PremiumTextField(
-                  label: 'Min Price (PKR)',
-                  hint: 'Minimum unit price',
+                  label: l10n.minPricePKR,
+                  hint: l10n.minimumUnitPrice,
                   controller: _minPriceController,
                   prefixIcon: Icons.attach_money_rounded,
                   keyboardType: TextInputType.number,
@@ -806,8 +794,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumTextField(
-                  label: 'Max Price (PKR)',
-                  hint: 'Maximum unit price',
+                  label: l10n.maxPricePKR,
+                  hint: l10n.maximumUnitPrice,
                   controller: _maxPriceController,
                   prefixIcon: Icons.attach_money_rounded,
                   keyboardType: TextInputType.number,
@@ -821,6 +809,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildDateStatusFiltersSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -836,7 +826,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Icon(Icons.date_range_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Date & Status Filters',
+                l10n.dateAndStatusFilters,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -847,7 +837,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Expanded(
                 child: PremiumDatePicker(
                   key: ValueKey('dateFrom_${_dateFrom?.millisecondsSinceEpoch ?? 'null'}'),
-                  label: 'Date From',
+                  label: l10n.dateFrom,
                   initialDate: _dateFrom,
                   firstDate: DateTime(2020),
                   lastDate: DateTime.now(),
@@ -858,7 +848,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Expanded(
                 child: PremiumDatePicker(
                   key: ValueKey('dateTo_${_dateTo?.millisecondsSinceEpoch ?? 'null'}'),
-                  label: 'Date To',
+                  label: l10n.dateTo,
                   initialDate: _dateTo,
                   firstDate: DateTime(2020),
                   lastDate: DateTime.now(),
@@ -873,7 +863,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Expanded(
                 child: CheckboxListTile(
                   title: Text(
-                    'Show Inactive Items',
+                    l10n.showInactiveItems,
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
                   ),
                   value: _showInactiveOnly,
@@ -885,7 +875,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Expanded(
                 child: CheckboxListTile(
                   title: Text(
-                    'Has Customization Notes',
+                    l10n.hasCustomizationNotes,
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
                   ),
                   value: _hasCustomization,
@@ -902,6 +892,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildSortingSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -917,7 +909,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               Icon(Icons.sort_outlined, color: Colors.teal, size: context.iconSize('medium')),
               SizedBox(width: context.cardPadding),
               Text(
-                'Sorting Options',
+                l10n.sortingOptions,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -927,11 +919,11 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Sort By',
-                  hint: 'Select sort field',
+                  label: l10n.sortBy,
+                  hint: l10n.selectSortField,
                   value: _sortBy,
                   items: _sortByOptions.map((option) {
-                    return DropdownItem<String>(value: option, label: _getSortByDisplayName(option));
+                    return DropdownItem<String>(value: option, label: _getSortByDisplayName(option, l10n));
                   }).toList(),
                   onChanged: (value) => setState(() => _sortBy = value ?? 'created_at'),
                   prefixIcon: Icons.sort_by_alpha_outlined,
@@ -940,8 +932,8 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Sort Order',
-                  hint: 'Select sort order',
+                  label: l10n.sortOrder,
+                  hint: l10n.selectSortOrder,
                   value: _sortOrder,
                   items: _sortOrderOptions.map((option) {
                     return DropdownItem<String>(value: option, label: option.toUpperCase());
@@ -957,31 +949,33 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     );
   }
 
-  String _getSortByDisplayName(String sortBy) {
+  String _getSortByDisplayName(String sortBy, AppLocalizations l10n) {
     switch (sortBy) {
       case 'created_at':
-        return 'Created Date';
+        return l10n.createdDate;
       case 'quantity':
-        return 'Quantity';
+        return l10n.quantity;
       case 'unit_price':
-        return 'Unit Price';
+        return l10n.unitPrice;
       case 'line_total':
-        return 'Line Total';
+        return l10n.lineTotal;
       case 'product_name':
-        return 'Product Name';
+        return l10n.productName;
       case 'updated_at':
-        return 'Updated Date';
+        return l10n.updatedDate;
       default:
         return sortBy;
     }
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Apply Filters',
+          text: l10n.applyFilters,
           onPressed: _handleApplyFilters,
           height: context.buttonHeight,
           icon: Icons.check_rounded,
@@ -992,7 +986,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
           children: [
             Expanded(
               child: PremiumButton(
-                text: 'Clear All',
+                text: l10n.clearAll,
                 onPressed: _handleClearFilters,
                 isOutlined: true,
                 height: context.buttonHeight,
@@ -1003,7 +997,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             SizedBox(width: context.cardPadding),
             Expanded(
               child: PremiumButton(
-                text: 'Cancel',
+                text: l10n.cancel,
                 onPressed: _handleClose,
                 isOutlined: true,
                 height: context.buttonHeight,
@@ -1018,12 +1012,14 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Clear All Filters',
+            text: l10n.clearAllFilters,
             onPressed: _handleClearFilters,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -1035,7 +1031,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
         Expanded(
           flex: 1,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleClose,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -1047,7 +1043,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             height: context.buttonHeight / 1.5,
             icon: Icons.check_rounded,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,9 +46,9 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<AdvancePaymentProvider>(context, listen: false);
 
-    // Show loading state
     setState(() {
       _isDeleting = true;
     });
@@ -60,12 +61,12 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete advance payment');
+          _showErrorSnackbar(provider.errorMessage ?? l10n.failedToDeleteAdvancePayment);
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('An unexpected error occurred: ${e.toString()}');
+        _showErrorSnackbar('${l10n.anUnexpectedErrorOccurred}: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -77,6 +78,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -84,7 +86,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Advance payment deleted successfully!',
+              l10n.advancePaymentDeletedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -186,6 +188,8 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -208,7 +212,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Payment' : 'Delete Advance Payment',
+                  context.shouldShowCompactLayout ? l10n.deletePayment : l10n.deleteAdvancePayment,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -219,7 +223,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.thisActionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -247,6 +251,8 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
@@ -262,7 +268,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
           ),
           SizedBox(height: context.mainPadding),
           Text(
-            isCompact ? 'Are you sure you want to delete this payment?' : 'Are you absolutely sure you want to delete this advance payment record?',
+            isCompact ? l10n.areYouSureDeleteThisPayment : l10n.areYouAbsolutelySureDeleteAdvancePayment,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
@@ -307,7 +313,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount:',
+                            '${l10n.amount}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -322,7 +328,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Date:',
+                            '${l10n.date}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -341,7 +347,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Description:',
+                        '${l10n.description}:',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
@@ -364,9 +370,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    isCompact
-                        ? 'This will permanently delete the payment record.'
-                        : 'This will permanently delete the advance payment record and all associated data. This action cannot be undone.',
+                    isCompact ? l10n.thisWillPermanentlyDeleteThePaymentRecord : l10n.thisWillPermanentlyDeleteAdvancePaymentRecord,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
@@ -388,11 +392,13 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -402,7 +408,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
         Consumer<AdvancePaymentProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Payment',
+              text: l10n.deletePayment,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -416,12 +422,14 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -434,7 +442,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
           child: Consumer<AdvancePaymentProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

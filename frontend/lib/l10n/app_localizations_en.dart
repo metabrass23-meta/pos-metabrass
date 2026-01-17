@@ -4442,4 +4442,1009 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retryLoading => 'Retry Loading';
+
+  @override
+  String get expenseDetails => 'Expense Details';
+
+  @override
+  String get viewCompleteExpenseInfo => 'View complete expense information';
+
+  @override
+  String get amountInformation => 'Amount Information';
+
+  @override
+  String get withdrawalInformation => 'Withdrawal Information';
+
+  @override
+  String get expenseDescription => 'Expense Description';
+
+  @override
+  String get recordCreated => 'Record Created:';
+
+  @override
+  String get expenseRecord => 'Expense Record';
+
+  @override
+  String get hour => 'Hour';
+
+  @override
+  String get minute => 'Minute';
+
+  @override
+  String get selected => 'Selected';
+
+  @override
+  String get open => 'Open';
+
+  @override
+  String get explorer => 'Explorer';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get viewImage => 'View Image';
+
+  @override
+  String get invalidImageFile => 'Invalid image file. Please select a valid image (max 10MB).';
+
+  @override
+  String get receiptUploadedSuccessfully => 'Receipt image uploaded successfully!';
+
+  @override
+  String get failedToUploadImage => 'Failed to upload image';
+
+  @override
+  String get receiptImageRemoved => 'Receipt image removed';
+
+  @override
+  String get failedToOpenImage => 'Failed to open image';
+
+  @override
+  String get failedToShowInExplorer => 'Failed to show in explorer';
+
+  @override
+  String get imageCopiedToClipboard => 'Image copied to clipboard!';
+
+  @override
+  String get failedToCopyToClipboard => 'Failed to copy to clipboard';
+
+  @override
+  String get clickToSelectReceiptImage => 'Click to select receipt image';
+
+  @override
+  String get supportedFormats => 'Supported formats: JPG, PNG, BMP, GIF (max 10MB)';
+
+  @override
+  String get supportedFormatsShort => 'JPG, PNG, BMP, GIF (max 10MB)';
+
+  @override
+  String get browseFiles => 'Browse Files';
+
+  @override
+  String get processingImageFile => 'Processing image file...';
+
+  @override
+  String get openingFileDialog => 'Opening file dialog...';
+
+  @override
+  String get validatingImageFile => 'Validating image file...';
+
+  @override
+  String get savingToAppDirectory => 'Saving to application directory...';
+
+  @override
+  String get finalizing => 'Finalizing...';
+
+  @override
+  String get replaceImage => 'Replace Image';
+
+  @override
+  String get replace => 'Replace';
+
+  @override
+  String get file => 'File';
+
+  @override
+  String get size => 'Size';
+
+  @override
+  String get added => 'Added';
+
+  @override
+  String get loadingFileInfo => 'Loading file info...';
+
+  @override
+  String get receiptImageViewer => 'Receipt Image Viewer';
+
+  @override
+  String get openInExternalViewer => 'Open in External Viewer';
+
+  @override
+  String get showInExplorer => 'Show in Explorer';
+
+  @override
+  String get copyToClipboard => 'Copy to Clipboard';
+
+  @override
+  String get failedToOpen => 'Failed to open';
+
+  @override
+  String get failedToCopy => 'Failed to copy';
+
+  @override
+  String get loadingImage => 'Loading image...';
+
+  @override
+  String get failedToLoadImage => 'Failed to load image';
+
+  @override
+  String get openWithExternalViewer => 'Open with External Viewer';
+
+  @override
+  String get failed => 'Failed';
+
+  @override
+  String get removeImage => 'Remove Image';
+
+  @override
+  String get viewFullScreen => 'View Full Screen';
+
+  @override
+  String get processing => 'Processing...';
+
+  @override
+  String get tapToChangeImage => 'Tap to change image';
+
+  @override
+  String get tapToAddImage => 'Tap to add image';
+
+  @override
+  String get supports => 'Supports';
+
+  @override
+  String get max => 'Max';
+
+  @override
+  String get fileSizeMustBeLessThan => 'File size must be less than';
+
+  @override
+  String get errorPickingImage => 'Error picking image';
+
+  @override
+  String get realTimeInventory => 'Real-Time Inventory';
+
+  @override
+  String get refreshInventory => 'Refresh Inventory';
+
+  @override
+  String get noStockInformationAvailable => 'No stock information available';
+
+  @override
+  String get stockInformation => 'Stock Information';
+
+  @override
+  String get unknownProduct => 'Unknown Product';
+
+  @override
+  String get allProductsHaveSufficientStock => 'All products have sufficient stock';
+
+  @override
+  String get lowStockAlerts => 'Low Stock Alerts';
+
+  @override
+  String get uncategorized => 'Uncategorized';
+
+  @override
+  String get critical => 'CRITICAL';
+
+  @override
+  String get currentStock => 'Current Stock';
+
+  @override
+  String get refreshStock => 'Refresh Stock';
+
+  @override
+  String get viewAlerts => 'View Alerts';
+
+  @override
+  String get noLowStockAlertsAtThisTime => 'No low stock alerts at this time.';
+
+  @override
+  String get addNewOrderItem => 'Add New Order Item';
+
+  @override
+  String get productNameIsRequired => 'Product name is required';
+
+  @override
+  String get customizationNotes => 'Customization Notes';
+
+  @override
+  String get quantityIsRequired => 'Quantity is required';
+
+  @override
+  String get unitPriceIsRequired => 'Unit price is required';
+
+  @override
+  String get addOrderItem => 'Add Order Item';
+
+  @override
+  String get pleaseSelectAnOrder => 'Please select an order';
+
+  @override
+  String get pleaseSelectAProduct => 'Please select a product';
+
+  @override
+  String get orderItemCreatedSuccessfully => 'Order item created successfully';
+
+  @override
+  String get failedToCreateOrderItem => 'Failed to create order item';
+
+  @override
+  String get selectOrder => 'Select Order';
+
+  @override
+  String get typeCustomerNameToSearch => 'Type customer name to search...';
+
+  @override
+  String get searchByCustomerName => 'Search by customer name...';
+
+  @override
+  String get typeProductNameToSearch => 'Type product name to search...';
+
+  @override
+  String get searchByProductName => 'Search by product name...';
+
+  @override
+  String get selectAnOrder => 'Select an order...';
+
+  @override
+  String get selectAProduct => 'Select a product...';
+
+  @override
+  String get deleteOrderItem => 'Delete Order Item';
+
+  @override
+  String get removeThisOrderItemPermanently => 'Remove this order item permanently';
+
+  @override
+  String get orderItemDeletedSuccessfully => 'Order item deleted successfully!';
+
+  @override
+  String get failedToDeleteOrderItem => 'Failed to delete order item';
+
+  @override
+  String get irreversibleAction => 'Irreversible Action';
+
+  @override
+  String get deleteWarningMessage => 'This action will permanently delete the order item and cannot be undone. Please review the details below before proceeding.';
+
+  @override
+  String get orderItemSummary => 'Order Item Summary';
+
+  @override
+  String get productId => 'Product ID';
+
+  @override
+  String get lineTotal => 'Line Total';
+
+  @override
+  String get impactAnalysis => 'Impact Analysis';
+
+  @override
+  String get financialImpact => 'Financial Impact';
+
+  @override
+  String willBeRemovedFromOrderTotal(String amount) {
+    return '$amount will be removed from order total';
+  }
+
+  @override
+  String get inventoryImpact => 'Inventory Impact';
+
+  @override
+  String quantityWillBeAffected(int quantity) {
+    return 'Quantity $quantity will be affected';
+  }
+
+  @override
+  String get salesImpact => 'Sales Impact';
+
+  @override
+  String get itemHasBeenSoldWarning => 'This item has been sold and deletion may affect sales records';
+
+  @override
+  String get finalConfirmation => 'Final Confirmation';
+
+  @override
+  String get areYouSureDeleteOrderItem => 'Are you absolutely sure you want to delete this order item?';
+
+  @override
+  String get deleteOrderItemWarningPoints => '• This action cannot be undone\n• All associated data will be permanently removed\n• This may affect order totals and inventory\n• Consider archiving instead if you need to preserve records';
+
+  @override
+  String get editOrderItem => 'Edit Order Item';
+
+  @override
+  String get updateOrderItemInformation => 'Update order item information';
+
+  @override
+  String get changingOrderNotAllowed => 'Changing the order is not allowed. Please create a new order item instead.';
+
+  @override
+  String get changingProductNotAllowed => 'Changing the product is not allowed. Please create a new order item instead.';
+
+  @override
+  String get orderItemUpdatedSuccessfully => 'Order item updated successfully!';
+
+  @override
+  String get failedToUpdateOrderItem => 'Failed to update order item';
+
+  @override
+  String get productInformation => 'Product Information';
+
+  @override
+  String get orderItemDetails => 'Order Item Details';
+
+  @override
+  String get quantityMustBePositive => 'Quantity must be a positive number';
+
+  @override
+  String get unitPricePKR => 'Unit Price (PKR)';
+
+  @override
+  String get enterUnitPrice => 'Enter unit price';
+
+  @override
+  String get pleaseEnterUnitPrice => 'Please enter unit price';
+
+  @override
+  String get unitPriceMustBePositive => 'Unit price must be a positive number';
+
+  @override
+  String get enterCustomizationNotes => 'Enter any customization notes or special requirements';
+
+  @override
+  String get notesMustBeLessThan500 => 'Notes must be less than 500 characters';
+
+  @override
+  String get updateOrderItem => 'Update Order Item';
+
+  @override
+  String get orderItemFilters => 'Order Item Filters';
+
+  @override
+  String get customizeOrderItemSearch => 'Customize your order item search and filtering';
+
+  @override
+  String get activeFilters => 'Active Filters';
+
+  @override
+  String get basicFilters => 'Basic Filters';
+
+  @override
+  String get allOrders => 'All Orders';
+
+  @override
+  String get allProducts => 'All Products';
+
+  @override
+  String get searchAndTextFilters => 'Search & Text Filters';
+
+  @override
+  String get searchQuery => 'Search Query';
+
+  @override
+  String get searchInProductNames => 'Search in product names, customization notes, or IDs';
+
+  @override
+  String get numericRangeFilters => 'Numeric Range Filters';
+
+  @override
+  String get minQuantity => 'Min Quantity';
+
+  @override
+  String get minimumQuantity => 'Minimum quantity';
+
+  @override
+  String get maxQuantity => 'Max Quantity';
+
+  @override
+  String get maximumQuantity => 'Maximum quantity';
+
+  @override
+  String get minPricePKR => 'Min Price (PKR)';
+
+  @override
+  String get minimumUnitPrice => 'Minimum unit price';
+
+  @override
+  String get maxPricePKR => 'Max Price (PKR)';
+
+  @override
+  String get maximumUnitPrice => 'Maximum unit price';
+
+  @override
+  String get dateAndStatusFilters => 'Date & Status Filters';
+
+  @override
+  String get dateFrom => 'Date From';
+
+  @override
+  String get dateTo => 'Date To';
+
+  @override
+  String get showInactiveItems => 'Show Inactive Items';
+
+  @override
+  String get hasCustomizationNotes => 'Has Customization Notes';
+
+  @override
+  String get sortingOptions => 'Sorting Options';
+
+  @override
+  String get updatedDate => 'Updated Date';
+
+  @override
+  String get areYouSureYouWantTo => 'Are you sure you want to';
+
+  @override
+  String get areYouSureYouWantToCreateACopyOf => 'Are you sure you want to create a copy of';
+
+  @override
+  String get failedToUpdateItemStatus => 'Failed to update item status';
+
+  @override
+  String get activatedSuccessfully => 'activated successfully';
+
+  @override
+  String get failedToDuplicateItem => 'Failed to duplicate item';
+
+  @override
+  String get orderItemDuplicatedSuccessfully => 'Order item duplicated successfully';
+
+  @override
+  String get orderItemDetailsExportedSuccessfully => 'Order item details exported successfully';
+
+  @override
+  String get failedToExport => 'Failed to export';
+
+  @override
+  String get failedToLoadOrderItems => 'Failed to Load Order Items';
+
+  @override
+  String get startManagingYourOrderItems => 'Start managing your order items by adding products to track inventory, pricing, and customizations for customer orders.';
+
+  @override
+  String get duplicate => 'Duplicate';
+
+  @override
+  String get orderItem => 'Order Item';
+
+  @override
+  String get viewOrderItem => 'View Order Item';
+
+  @override
+  String get completeOrderItemInformation => 'Complete order item information';
+
+  @override
+  String get orderItemId => 'Order Item ID';
+
+  @override
+  String get productInfo => 'Product Info';
+
+  @override
+  String get noAdditionalProductDetailsAvailable => 'No additional product details available';
+
+  @override
+  String get activeStatus => 'Active Status';
+
+  @override
+  String get soldStatus => 'Sold Status';
+
+  @override
+  String get remainingToSell => 'Remaining to Sell';
+
+  @override
+  String get timestamps => 'Timestamps';
+
+  @override
+  String get updatedAt => 'Updated At';
+
+  @override
+  String get noCustomizationNotesAvailable => 'No customization notes available';
+
+  @override
+  String get brand => 'Brand';
+
+  @override
+  String get material => 'Material';
+
+  @override
+  String get style => 'Style';
+
+  @override
+  String get noAdditionalDetails => 'No additional details';
+
+  @override
+  String get additionalProductInformationAvailable => 'Additional product information available';
+
+  @override
+  String get addedToCart => 'added to cart';
+
+  @override
+  String get stockAvailable => 'Stock';
+
+  @override
+  String get min => 'Min';
+
+  @override
+  String get customPrice => 'Custom Price';
+
+  @override
+  String get customPricePkr => 'Custom Price (PKR)';
+
+  @override
+  String get itemDiscountOptional => 'Item Discount (Optional)';
+
+  @override
+  String get clearDiscount => 'Clear Discount';
+
+  @override
+  String get specialInstructions => 'Special Instructions';
+
+  @override
+  String get anySpecialRequirements => 'Any special requirements, alterations, or notes...';
+
+  @override
+  String get checkoutAndPayment => 'Checkout & Payment';
+
+  @override
+  String get completeTheSaleTransaction => 'Complete the sale transaction';
+
+  @override
+  String get orderSummary => 'Order Summary';
+
+  @override
+  String get credit => 'Credit';
+
+  @override
+  String get split => 'Split';
+
+  @override
+  String get splitPaymentDetails => 'Split Payment Details';
+
+  @override
+  String get cashAmount => 'Cash Amount';
+
+  @override
+  String get cardAmount => 'Card Amount';
+
+  @override
+  String get bankTransferAmount => 'Bank Transfer Amount';
+
+  @override
+  String get pleaseEnterAmountPaid => 'Please enter amount paid';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get hideAdvancedOptions => 'Hide Advanced Options';
+
+  @override
+  String get showAdvancedOptions => 'Show Advanced Options';
+
+  @override
+  String get advancedOptions => 'Advanced Options';
+
+  @override
+  String get overallDiscountPkr => 'Overall Discount (PKR)';
+
+  @override
+  String get gstPercentage => 'GST Percentage (%)';
+
+  @override
+  String get additionalTax => 'Additional Tax (%)';
+
+  @override
+  String get anySpecialInstructionsOrRemarks => 'Any special instructions or remarks...';
+
+  @override
+  String get completeSale => 'Complete Sale';
+
+  @override
+  String get saleCompleted => 'Sale Completed!';
+
+  @override
+  String get transactionProcessedSuccessfully => 'Transaction processed successfully';
+
+  @override
+  String get invoiceNumber => 'Invoice Number';
+
+  @override
+  String get printFunctionalityToBeImplemented => 'Print functionality to be implemented';
+
+  @override
+  String get printReceipt => 'Print Receipt';
+
+  @override
+  String get newSale => 'New Sale';
+
+  @override
+  String get navigateToSalesManagementToContinue => 'Navigate to Sales Management to continue';
+
+  @override
+  String get createNewInvoice => 'Create New Invoice';
+
+  @override
+  String get selectSaleRequired => 'Select Sale *';
+
+  @override
+  String get chooseASaleToCreateInvoiceFor => 'Choose a sale to create invoice for';
+
+  @override
+  String get pleaseSelectASale => 'Please select a sale';
+
+  @override
+  String get dueDateRequired => 'Due Date *';
+
+  @override
+  String get selectDueDate => 'Select due date';
+
+  @override
+  String get additionalInvoiceNotesOptional => 'Additional invoice notes (optional)';
+
+  @override
+  String get termsAndConditions => 'Terms & Conditions';
+
+  @override
+  String get invoiceTermsAndConditions => 'Invoice terms and conditions';
+
+  @override
+  String get standardTermsAndConditionsApply => 'Standard terms and conditions apply';
+
+  @override
+  String get createInvoice => 'Create Invoice';
+
+  @override
+  String get invoiceCreatedSuccessfully => 'Invoice created successfully';
+
+  @override
+  String get failedToCreateInvoice => 'Failed to create invoice';
+
+  @override
+  String get receiptManagement => 'Receipt Management';
+
+  @override
+  String get pleaseSelectALabor => 'Please select a labor';
+
+  @override
+  String get amountCannotExceedRemainingAdvanceAmount => 'Amount cannot exceed remaining advance amount of';
+
+  @override
+  String get failedToAddAdvancePayment => 'Failed to add advance payment';
+
+  @override
+  String get advancePaymentAddedSuccessfully => 'Advance payment added successfully';
+
+  @override
+  String get selectDateAndTime => 'Select Date & Time';
+
+  @override
+  String get uploadReceiptImageForBetterRecordKeeping => 'Upload receipt image for better record keeping';
+
+  @override
+  String get selectALabor => 'Select a labor';
+
+  @override
+  String get advanceAmountPkr => 'Advance Amount (PKR)';
+
+  @override
+  String get enterAdvanceAmountPkr => 'Enter advance amount (PKR)';
+
+  @override
+  String get pleaseEnterAdvanceAmount => 'Please enter advance amount';
+
+  @override
+  String get amountExceedsRemainingSalary => 'Amount exceeds remaining monthly salary';
+
+  @override
+  String get enterReasonForAdvancePayment => 'Enter reason for advance payment';
+
+  @override
+  String get salaryCalculation => 'Salary Calculation';
+
+  @override
+  String get originalSalary => 'Original Salary';
+
+  @override
+  String get currentMonthAdvances => 'Current Month Advances';
+
+  @override
+  String get remainingForMonth => 'Remaining for Month';
+
+  @override
+  String get newAdvance => 'New Advance';
+
+  @override
+  String get afterAdvance => 'After Advance';
+
+  @override
+  String get filterAdvancePayments => 'Filter Advance Payments';
+
+  @override
+  String get applyFiltersToFindSpecificAdvancePayments => 'Apply filters to find specific advance payments';
+
+  @override
+  String get searchAdvancePayments => 'Search advance payments...';
+
+  @override
+  String get allLaborers => 'All Laborers';
+
+  @override
+  String get receiptAndSorting => 'Receipt & Sorting';
+
+  @override
+  String get showInactiveRecords => 'Show Inactive Records';
+
+  @override
+  String showingAdvancePayments(Object end, Object start, Object total) {
+    return 'Showing $start-$end of $total advance payments';
+  }
+
+  @override
+  String get failedToLoadAdvancePayments => 'Failed to Load Advance Payments';
+
+  @override
+  String get noAdvancePaymentRecordsFound => 'No Advance Payment Records Found';
+
+  @override
+  String get startByAddingYourFirstAdvancePaymentRecord => 'Start by adding your first advance payment record to track labor payments effectively';
+
+  @override
+  String get addFirstAdvancePayment => 'Add First Advance Payment';
+
+  @override
+  String get highAmount => 'High Amount';
+
+  @override
+  String get failedToDeleteAdvancePayment => 'Failed to delete advance payment';
+
+  @override
+  String get advancePaymentDeletedSuccessfully => 'Advance payment deleted successfully!';
+
+  @override
+  String get deleteAdvancePayment => 'Delete Advance Payment';
+
+  @override
+  String get areYouSureDeleteThisPayment => 'Are you sure you want to delete this payment?';
+
+  @override
+  String get areYouAbsolutelySureDeleteAdvancePayment => 'Are you absolutely sure you want to delete this advance payment record?';
+
+  @override
+  String get thisWillPermanentlyDeleteThePaymentRecord => 'This will permanently delete the payment record.';
+
+  @override
+  String get thisWillPermanentlyDeleteAdvancePaymentRecord => 'This will permanently delete the advance payment record and all associated data. This action cannot be undone.';
+
+  @override
+  String get amountIncreaseCannotExceedRemainingAdvanceAmount => 'Amount increase cannot exceed remaining advance amount of';
+
+  @override
+  String get advancePaymentUpdatedSuccessfully => 'Advance payment updated successfully!';
+
+  @override
+  String get editAdvancePayment => 'Edit Advance Payment';
+
+  @override
+  String get laborInformation => 'Labor Information';
+
+  @override
+  String get advancePaymentDetails => 'Advance Payment Details';
+
+  @override
+  String get viewCompletePaymentInformation => 'View complete payment information';
+
+  @override
+  String get role => 'Role';
+
+  @override
+  String get advanceAmount => 'Advance Amount';
+
+  @override
+  String get paymentDescription => 'Payment Description';
+
+  @override
+  String get receiptInformation => 'Receipt Information';
+
+  @override
+  String get receiptImageAvailable => 'Receipt image available';
+
+  @override
+  String get salaryInformation => 'Salary Information';
+
+  @override
+  String get totalSalary => 'Total Salary';
+
+  @override
+  String get viewReceiptDetailsAndImage => 'View receipt details and image';
+
+  @override
+  String get ofSalary => 'of salary';
+
+  @override
+  String get used => 'used';
+
+  @override
+  String get receiptImagePreview => 'Receipt Image Preview';
+
+  @override
+  String get receiptUploadFunctionalityToBeImplemented => 'Receipt upload functionality to be implemented';
+
+  @override
+  String get areYouSureLogoutFromYourAccount => 'Are you sure you want to logout from your account?';
+
+  @override
+  String get forgotPasswordComingSoon => 'Forgot password feature coming soon!';
+
+  @override
+  String get successfullyLoggedOutSeeSoon => 'Successfully logged out. See you soon!';
+
+  @override
+  String get loggedOutLocallyDueToError => 'Logged out locally due to an error.';
+
+  @override
+  String get createNewReceipt => 'Create New Receipt';
+
+  @override
+  String get chooseASaleToCreateReceiptFor => 'Choose a sale to create receipt for';
+
+  @override
+  String get additionalReceiptNotesOptional => 'Additional receipt notes (optional)';
+
+  @override
+  String get failedToCreateReceipt => 'Failed to create receipt';
+
+  @override
+  String get addPrincipalAccountEntry => 'Add Principal Account Entry';
+
+  @override
+  String get recordANewLedgerTransaction => 'Record a new ledger transaction';
+
+  @override
+  String get sourceModule => 'Source Module';
+
+  @override
+  String get pleaseSelectSourceModule => 'Please select source module';
+
+  @override
+  String get transactionType => 'Transaction Type';
+
+  @override
+  String get pleaseSelectTransactionType => 'Please select transaction type';
+
+  @override
+  String get creditMoneyIn => 'Credit (Money In)';
+
+  @override
+  String get debitMoneyOut => 'Debit (Money Out)';
+
+  @override
+  String get sourceID => 'Source ID';
+
+  @override
+  String get referenceIDOptional => 'Reference ID (optional)';
+
+  @override
+  String get referenceIDFromSourceModuleOptional => 'Reference ID from source module (optional)';
+
+  @override
+  String get enterTransactionDescription => 'Enter transaction description';
+
+  @override
+  String get enterTransactionAmountPKR => 'Enter transaction amount (PKR)';
+
+  @override
+  String get handledByOptional => 'Handled By (Optional)';
+
+  @override
+  String get selectTransactionDateTime => 'Select Transaction Date & Time';
+
+  @override
+  String get additionalNotesOrDetailsOptional => 'Additional notes or details (optional)';
+
+  @override
+  String get principalAccountEntryAddedSuccessfully => 'Principal account entry added successfully!';
+
+  @override
+  String get principalAccountDetails => 'Principal Account Details';
+
+  @override
+  String get viewCompleteTransactionInformation => 'View complete transaction information';
+
+  @override
+  String get sourceModuleInformation => 'Source Module Information';
+
+  @override
+  String get module => 'Module';
+
+  @override
+  String get balanceInformation => 'Balance Information';
+
+  @override
+  String get balanceAfterTransaction => 'Balance After Transaction';
+
+  @override
+  String get handlerInformation => 'Handler Information';
+
+  @override
+  String get transactionDescription => 'Transaction Description';
+
+  @override
+  String get ledgerEntry => 'Ledger Entry';
+
+  @override
+  String get transactions => 'Transactions';
+
+  @override
+  String get entryID => 'Entry ID';
+
+  @override
+  String get balanceAfter => 'Balance After';
+
+  @override
+  String get handledBy => 'Handled By';
+
+  @override
+  String get exportAccountEntry => 'Export account entry';
+
+  @override
+  String get noPrincipalAccountRecordsFound => 'No Principal Account Records Found';
+
+  @override
+  String get startByAddingYourFirstPrincipalAccountEntry => 'Start by adding your first principal account entry to track all cash movements';
+
+  @override
+  String get addFirstEntry => 'Add First Entry';
+
+  @override
+  String get editEntry => 'Edit Entry';
+
+  @override
+  String get editPrincipalAccountEntry => 'Edit Principal Account Entry';
+
+  @override
+  String get updateTransactionInformation => 'Update transaction information';
+
+  @override
+  String get updateEntry => 'Update Entry';
+
+  @override
+  String get principalAccountEntryUpdatedSuccessfully => 'Principal account entry updated successfully!';
+
+  @override
+  String get deleteEntry => 'Delete Entry';
+
+  @override
+  String get deletePrincipalAccountEntry => 'Delete Principal Account Entry';
+
+  @override
+  String get areYouSureYouWantToDeleteThisEntry => 'Are you sure you want to delete this principal account entry?';
+
+  @override
+  String get areYouAbsolutelySureYouWantToDeleteThisEntry => 'Are you absolutely sure you want to delete this principal account entry?';
+
+  @override
+  String get thisWillPermanentlyDeleteTheEntry => 'This will permanently delete the principal account entry and affect balance calculations.';
+
+  @override
+  String get thisWillPermanentlyDeleteTheEntryFull => 'This will permanently delete the principal account entry and may affect balance calculations. This action cannot be undone.';
+
+  @override
+  String get principalAccountEntryDeletedSuccessfully => 'Principal account entry deleted successfully!';
 }

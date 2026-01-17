@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
@@ -39,7 +40,6 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
     _selectedTime = widget.payment.timeOfDay;
     _receiptImagePath = widget.payment.receiptImagePath;
 
-    // Initialize labor model with payment data
     _selectedLabor = LaborModel(
       id: widget.payment.laborId,
       name: widget.payment.laborName,
@@ -84,18 +84,17 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final amount = double.parse(_amountController.text.trim());
 
-      // Calculate remaining salary after this advance
-      // This should be: original salary - (previous advances + new advance)
-      // But since we don't have previous advances in the frontend, we'll use the backend's calculation
       final currentAdvanceAmount = widget.payment.amount;
       final newAdvanceAmount = amount;
       final salaryDifference = newAdvanceAmount - currentAdvanceAmount;
       if (salaryDifference > 0 && salaryDifference > _selectedLabor.remainingAdvanceAmount) {
         _showErrorSnackbar(
-          'Amount increase cannot exceed remaining advance amount of PKR ${_selectedLabor.remainingAdvanceAmount.toStringAsFixed(0)}. Total advances this month: PKR ${_selectedLabor.totalAdvancesAmount.toStringAsFixed(0)}',
+          '${l10n.amountIncreaseCannotExceedRemainingAdvanceAmount} PKR ${_selectedLabor.remainingAdvanceAmount.toStringAsFixed(0)}. ${l10n.totalAdvancesThisMonth}: PKR ${_selectedLabor.totalAdvancesAmount.toStringAsFixed(0)}',
         );
         return;
       }
@@ -105,7 +104,6 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
       });
 
       try {
-        // Simulate API call - replace with actual API call
         await Future.delayed(const Duration(seconds: 1));
 
         if (mounted) {
@@ -114,7 +112,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
         }
       } catch (e) {
         if (mounted) {
-          _showErrorSnackbar('An unexpected error occurred: ${e.toString()}');
+          _showErrorSnackbar('${l10n.anUnexpectedErrorOccurred}: ${e.toString()}');
         }
       } finally {
         if (mounted) {
@@ -131,6 +129,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -138,7 +137,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Advance payment updated successfully!',
+              l10n.advancePaymentUpdatedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -200,6 +199,8 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -212,7 +213,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Text(
-              'Edit Advance Payment',
+              l10n.editAdvancePayment,
               style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
@@ -226,6 +227,8 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
   }
 
   Widget _buildFormContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -233,7 +236,6 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Labor Information (Read-only)
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
@@ -245,7 +247,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Labor Information',
+                    l10n.laborInformation,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
@@ -282,46 +284,43 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             ),
             SizedBox(height: context.cardPadding),
 
-            // Amount Field
             PremiumTextField(
-              label: 'Amount (PKR)',
-              hint: 'Enter amount',
+              label: l10n.amountPkr,
+              hint: l10n.enterAmount,
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter amount';
+                  return l10n.pleaseEnterAmount;
                 }
                 final amount = double.tryParse(value!);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount';
+                  return l10n.pleaseEnterValidAmount;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Description Field
             PremiumTextField(
-              label: 'Description',
-              hint: 'Enter description',
+              label: l10n.description,
+              hint: l10n.enterDescription,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter description';
+                  return l10n.pleaseEnterDescription;
                 }
                 if (value!.length < 5) {
-                  return 'Description must be at least 5 characters';
+                  return l10n.descriptionMustBeAtLeast5Characters;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Date and Time Selection
             Row(
               children: [
                 Expanded(
@@ -332,7 +331,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                         await context.showSyncfusionDateTimePicker(
                           initialDate: _selectedDate,
                           initialTime: _selectedTime,
-                          title: 'Select Date',
+                          title: l10n.selectDate,
                           minDate: DateTime(2000),
                           maxDate: DateTime.now().add(const Duration(days: 365)),
                           onDateTimeSelected: (date, time) {
@@ -355,7 +354,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                             Icon(Icons.calendar_today, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                             SizedBox(height: context.smallPadding),
                             Text(
-                              'Date',
+                              l10n.date,
                               style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                             ),
                             SizedBox(height: context.smallPadding / 2),
@@ -378,7 +377,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                         await context.showSyncfusionDateTimePicker(
                           initialDate: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute),
                           initialTime: _selectedTime,
-                          title: 'Select Time',
+                          title: l10n.selectTime,
                           minDate: DateTime(2000),
                           maxDate: DateTime.now().add(const Duration(days: 365)),
                           onDateTimeSelected: (date, time) {
@@ -400,7 +399,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                             Icon(Icons.access_time, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                             SizedBox(height: context.smallPadding),
                             Text(
-                              'Time',
+                              l10n.time,
                               style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                             ),
                             SizedBox(height: context.smallPadding / 2),
@@ -418,7 +417,6 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             ),
             SizedBox(height: context.cardPadding),
 
-            // Receipt Image
             ImageUploadWidget(
               initialImagePath: _receiptImagePath,
               onImageChanged: (file) {
@@ -426,7 +424,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                 //   _selectedImageFile = file;
                 // });
               },
-              label: 'Receipt Image (Optional)',
+              label: l10n.receiptImageOptional,
               isRequired: false,
               maxHeight: 200,
               allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
@@ -434,12 +432,11 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             ),
             SizedBox(height: context.mainPadding),
 
-            // Action Buttons
             Row(
               children: [
                 Expanded(
                   child: PremiumButton(
-                    text: 'Cancel',
+                    text: l10n.cancel,
                     onPressed: _handleCancel,
                     isOutlined: true,
                     height: context.buttonHeight,
@@ -450,7 +447,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                 SizedBox(width: context.cardPadding),
                 Expanded(
                   child: PremiumButton(
-                    text: 'Update Payment',
+                    text: l10n.updatePayment,
                     onPressed: _isUpdating ? null : _handleUpdate,
                     isLoading: _isUpdating,
                     height: context.buttonHeight,

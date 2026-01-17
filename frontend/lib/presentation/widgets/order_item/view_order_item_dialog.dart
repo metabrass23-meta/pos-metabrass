@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
@@ -46,6 +47,8 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -70,15 +73,15 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                 ),
                 child: Column(
                   children: [
-                    _buildHeader(),
+                    _buildHeader(l10n),
                     Expanded(
                       child: ResponsiveBreakpoints.responsive(
                         context,
-                        tablet: _buildTabletContent(),
-                        small: _buildMobileContent(),
-                        medium: _buildDesktopLayout(),
-                        large: _buildDesktopLayout(),
-                        ultrawide: _buildDesktopLayout(),
+                        tablet: _buildTabletContent(l10n),
+                        small: _buildMobileContent(l10n),
+                        medium: _buildDesktopLayout(l10n),
+                        large: _buildDesktopLayout(l10n),
+                        ultrawide: _buildDesktopLayout(l10n),
                       ),
                     ),
                   ],
@@ -91,17 +94,17 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout(AppLocalizations l10n) {
     return Row(
       children: [
-        Expanded(flex: 2, child: _buildLeftPanel()),
+        Expanded(flex: 2, child: _buildLeftPanel(l10n)),
         Container(width: 1, color: Colors.grey.withOpacity(0.3)),
-        Expanded(flex: 3, child: _buildRightPanel()),
+        Expanded(flex: 3, child: _buildRightPanel(l10n)),
       ],
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -124,7 +127,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'View Order Item',
+                  l10n.viewOrderItem,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -135,7 +138,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Complete order item information',
+                    l10n.completeOrderItemInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -186,101 +189,101 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildLeftPanel() {
+  Widget _buildLeftPanel(AppLocalizations l10n) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildBasicInfoSection(),
+            _buildBasicInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildProductDetailsSection(),
+            _buildProductDetailsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildFinancialSection(),
+            _buildFinancialSection(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRightPanel() {
+  Widget _buildRightPanel(AppLocalizations l10n) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildOrderInfoSection(),
+            _buildOrderInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildStatusSection(),
+            _buildStatusSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildTimestampsSection(),
+            _buildTimestampsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildCustomizationSection(),
+            _buildCustomizationSection(l10n),
             SizedBox(height: context.mainPadding),
-            _buildActionButtons(),
+            _buildActionButtons(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTabletContent() {
+  Widget _buildTabletContent(AppLocalizations l10n) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           children: [
-            _buildBasicInfoSection(),
+            _buildBasicInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildProductDetailsSection(),
+            _buildProductDetailsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildFinancialSection(),
+            _buildFinancialSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildOrderInfoSection(),
+            _buildOrderInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildStatusSection(),
+            _buildStatusSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildTimestampsSection(),
+            _buildTimestampsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildCustomizationSection(),
+            _buildCustomizationSection(l10n),
             SizedBox(height: context.mainPadding),
-            _buildActionButtons(),
+            _buildActionButtons(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMobileContent() {
+  Widget _buildMobileContent(AppLocalizations l10n) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           children: [
-            _buildBasicInfoSection(),
+            _buildBasicInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildProductDetailsSection(),
+            _buildProductDetailsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildFinancialSection(),
+            _buildFinancialSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildOrderInfoSection(),
+            _buildOrderInfoSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildStatusSection(),
+            _buildStatusSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildTimestampsSection(),
+            _buildTimestampsSection(l10n),
             SizedBox(height: context.cardPadding),
-            _buildCustomizationSection(),
+            _buildCustomizationSection(l10n),
             SizedBox(height: context.mainPadding),
-            _buildActionButtons(),
+            _buildActionButtons(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBasicInfoSection() {
+  Widget _buildBasicInfoSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -296,21 +299,21 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.info_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Basic Information',
+                l10n.basicInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildInfoRow('Order Item ID', widget.orderItem.id, Icons.qr_code_outlined),
+          _buildInfoRow(l10n.orderItemId, widget.orderItem.id, Icons.qr_code_outlined),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Order ID', widget.orderItem.orderId, Icons.receipt_long_outlined),
+          _buildInfoRow(l10n.orderId, widget.orderItem.orderId, Icons.receipt_long_outlined),
         ],
       ),
     );
   }
 
-  Widget _buildProductDetailsSection() {
+  Widget _buildProductDetailsSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -326,45 +329,32 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.inventory_2_outlined, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Product Details',
+                l10n.productDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          // Product ID (already shown in Basic Info, but keeping for completeness)
-          _buildInfoRow('Product ID', widget.orderItem.productId, Icons.qr_code_outlined),
+          _buildInfoRow(l10n.productId, widget.orderItem.productId, Icons.qr_code_outlined),
           SizedBox(height: context.smallPadding),
-
-          // Product Name (already shown in Basic Info, but keeping for completeness)
-          _buildInfoRow('Product Name', widget.orderItem.productName, Icons.shopping_bag_outlined),
+          _buildInfoRow(l10n.productName, widget.orderItem.productName, Icons.shopping_bag_outlined),
           SizedBox(height: context.smallPadding),
-
-          // Product Color
           if (widget.orderItem.productColor != null && widget.orderItem.productColor!.isNotEmpty) ...[
-            _buildInfoRow('Color', widget.orderItem.productColor!, Icons.palette_outlined),
+            _buildInfoRow(l10n.color, widget.orderItem.productColor!, Icons.palette_outlined),
             SizedBox(height: context.smallPadding),
           ],
-
-          // Product Fabric
           if (widget.orderItem.productFabric != null && widget.orderItem.productFabric!.isNotEmpty) ...[
-            _buildInfoRow('Fabric', widget.orderItem.productFabric!, Icons.texture_outlined),
+            _buildInfoRow(l10n.fabric, widget.orderItem.productFabric!, Icons.texture_outlined),
             SizedBox(height: context.smallPadding),
           ],
-
-          // Current Stock
           if (widget.orderItem.currentStock != null) ...[
-            _buildInfoRow('Current Stock', '${widget.orderItem.currentStock!} units', Icons.inventory_outlined),
+            _buildInfoRow(l10n.currentStock, '${widget.orderItem.currentStock!} ${l10n.units}', Icons.inventory_outlined),
             SizedBox(height: context.smallPadding),
           ],
-
-          // Product Display Info (if available)
           if (widget.orderItem.productDisplayInfo != null && widget.orderItem.productDisplayInfo!.isNotEmpty) ...[
-            _buildInfoRow('Product Info', _formatProductDisplayInfo(widget.orderItem.productDisplayInfo!), Icons.info_outline),
+            _buildInfoRow(l10n.productInfo, _formatProductDisplayInfo(widget.orderItem.productDisplayInfo!, l10n), Icons.info_outline),
             SizedBox(height: context.smallPadding),
           ],
-
-          // Show "No additional details" if no extra info is available
           if ((widget.orderItem.productColor == null || widget.orderItem.productColor!.isEmpty) &&
               (widget.orderItem.productFabric == null || widget.orderItem.productFabric!.isEmpty) &&
               widget.orderItem.currentStock == null &&
@@ -383,7 +373,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Text(
-                      'No additional product details available',
+                      l10n.noAdditionalProductDetailsAvailable,
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w400,
@@ -401,7 +391,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildFinancialSection() {
+  Widget _buildFinancialSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -417,25 +407,25 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.attach_money_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Financial Information',
+                l10n.financialInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildInfoRow('Quantity', widget.orderItem.quantity.toString(), Icons.numbers_outlined),
+          _buildInfoRow(l10n.quantity, widget.orderItem.quantity.toString(), Icons.numbers_outlined),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Unit Price', 'PKR ${widget.orderItem.unitPrice.toStringAsFixed(2)}', Icons.attach_money_outlined),
+          _buildInfoRow(l10n.unitPrice, 'PKR ${widget.orderItem.unitPrice.toStringAsFixed(2)}', Icons.attach_money_outlined),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Line Total', 'PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)}', Icons.calculate_outlined),
+          _buildInfoRow(l10n.lineTotal, 'PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)}', Icons.calculate_outlined),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Total Value', 'PKR ${widget.orderItem.totalValue.toStringAsFixed(2)}', Icons.account_balance_wallet_outlined),
+          _buildInfoRow(l10n.totalValue, 'PKR ${widget.orderItem.totalValue.toStringAsFixed(2)}', Icons.account_balance_wallet_outlined),
         ],
       ),
     );
   }
 
-  Widget _buildOrderInfoSection() {
+  Widget _buildOrderInfoSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -451,25 +441,25 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.receipt_long_outlined, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Information',
+                l10n.orderInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildInfoRow('Order ID', widget.orderItem.orderId, Icons.receipt_outlined),
+          _buildInfoRow(l10n.orderId, widget.orderItem.orderId, Icons.receipt_outlined),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow('Created Date', _formatDate(widget.orderItem.createdAt), Icons.calendar_today_outlined),
+          _buildInfoRow(l10n.createdDate, _formatDate(widget.orderItem.createdAt), Icons.calendar_today_outlined),
           if (widget.orderItem.updatedAt != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildInfoRow('Last Updated', _formatDate(widget.orderItem.updatedAt!), Icons.update_outlined),
+            _buildInfoRow(l10n.lastUpdated, _formatDate(widget.orderItem.updatedAt!), Icons.update_outlined),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildStatusSection() {
+  Widget _buildStatusSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -485,27 +475,27 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.info_outline, color: Colors.indigo, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Status Information',
+                l10n.statusInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildStatusRow('Active Status', widget.orderItem.isActive, Icons.check_circle_outline),
+          _buildStatusRow(l10n.activeStatus, widget.orderItem.isActive, Icons.check_circle_outline, l10n),
           if (widget.orderItem.hasBeenSold != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildStatusRow('Sold Status', widget.orderItem.hasBeenSold!, Icons.shopping_cart_outlined),
+            _buildStatusRow(l10n.soldStatus, widget.orderItem.hasBeenSold!, Icons.shopping_cart_outlined, l10n),
           ],
           if (widget.orderItem.remainingToSell != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildInfoRow('Remaining to Sell', widget.orderItem.remainingToSell!.toString(), Icons.inventory_2_outlined),
+            _buildInfoRow(l10n.remainingToSell, widget.orderItem.remainingToSell!.toString(), Icons.inventory_2_outlined),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildTimestampsSection() {
+  Widget _buildTimestampsSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -521,23 +511,23 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.access_time_outlined, color: Colors.teal, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Timestamps',
+                l10n.timestamps,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildInfoRow('Created At', _formatDateTime(widget.orderItem.createdAt), Icons.add_circle_outline),
+          _buildInfoRow(l10n.createdAt, _formatDateTime(widget.orderItem.createdAt), Icons.add_circle_outline),
           if (widget.orderItem.updatedAt != null) ...[
             SizedBox(height: context.smallPadding),
-            _buildInfoRow('Updated At', _formatDateTime(widget.orderItem.updatedAt!), Icons.edit_calendar_outlined),
+            _buildInfoRow(l10n.updatedAt, _formatDateTime(widget.orderItem.updatedAt!), Icons.edit_calendar_outlined),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildCustomizationSection() {
+  Widget _buildCustomizationSection(AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -553,7 +543,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               Icon(Icons.note_outlined, color: Colors.amber, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customization Notes',
+                l10n.customizationNotes,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -568,7 +558,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               border: Border.all(color: Colors.amber.withOpacity(0.3)),
             ),
             child: Text(
-              widget.orderItem.customizationNotes.isNotEmpty ? widget.orderItem.customizationNotes : 'No customization notes available',
+              widget.orderItem.customizationNotes.isNotEmpty ? widget.orderItem.customizationNotes : l10n.noCustomizationNotesAvailable,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
@@ -612,7 +602,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildStatusRow(String label, bool value, IconData icon) {
+  Widget _buildStatusRow(String label, bool value, IconData icon, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
@@ -640,7 +630,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                   border: Border.all(color: (value ? Colors.green : Colors.red).withOpacity(0.3)),
                 ),
                 child: Text(
-                  value ? 'Active' : 'Inactive',
+                  value ? l10n.active : l10n.inactive,
                   style: GoogleFonts.inter(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
@@ -655,23 +645,23 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(AppLocalizations l10n) {
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: _buildCompactButtons(),
-      small: _buildCompactButtons(),
-      medium: _buildDesktopButtons(),
-      large: _buildDesktopButtons(),
-      ultrawide: _buildDesktopButtons(),
+      tablet: _buildCompactButtons(l10n),
+      small: _buildCompactButtons(l10n),
+      medium: _buildDesktopButtons(l10n),
+      large: _buildDesktopButtons(l10n),
+      ultrawide: _buildDesktopButtons(l10n),
     );
   }
 
-  Widget _buildCompactButtons() {
+  Widget _buildCompactButtons(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Close',
+          text: l10n.close,
           onPressed: _handleClose,
           height: context.buttonHeight,
           icon: Icons.close_rounded,
@@ -681,12 +671,12 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     );
   }
 
-  Widget _buildDesktopButtons() {
+  Widget _buildDesktopButtons(AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Close',
+            text: l10n.close,
             onPressed: _handleClose,
             height: context.buttonHeight / 1.5,
             icon: Icons.close_rounded,
@@ -705,33 +695,33 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
     return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  String _formatProductDisplayInfo(Map<String, dynamic> productInfo) {
+  String _formatProductDisplayInfo(Map<String, dynamic> productInfo, AppLocalizations l10n) {
     try {
       final List<String> infoParts = [];
 
       if (productInfo['category'] != null) {
-        infoParts.add('Category: ${productInfo['category']}');
+        infoParts.add('${l10n.category}: ${productInfo['category']}');
       }
       if (productInfo['brand'] != null) {
-        infoParts.add('Brand: ${productInfo['brand']}');
+        infoParts.add('${l10n.brand}: ${productInfo['brand']}');
       }
       if (productInfo['size'] != null) {
-        infoParts.add('Size: ${productInfo['size']}');
+        infoParts.add('${l10n.size}: ${productInfo['size']}');
       }
       if (productInfo['material'] != null) {
-        infoParts.add('Material: ${productInfo['material']}');
+        infoParts.add('${l10n.material}: ${productInfo['material']}');
       }
       if (productInfo['style'] != null) {
-        infoParts.add('Style: ${productInfo['style']}');
+        infoParts.add('${l10n.style}: ${productInfo['style']}');
       }
 
       if (infoParts.isEmpty) {
-        return 'No additional details';
+        return l10n.noAdditionalDetails;
       }
 
       return infoParts.join(' • ');
     } catch (e) {
-      return 'Additional product information available';
+      return l10n.additionalProductInformationAvailable;
     }
   }
 }

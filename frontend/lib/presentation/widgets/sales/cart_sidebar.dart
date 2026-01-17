@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +8,6 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
 
 class CartSidebar extends StatefulWidget {
   final VoidCallback onCheckout;
@@ -52,6 +52,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildCartHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 2),
       decoration: BoxDecoration(
@@ -88,9 +90,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.shouldShowCompactLayout
-                          ? AppLocalizations.of(context)!.cart
-                          : AppLocalizations.of(context)!.cart,
+                      l10n.cart,
                       style: GoogleFonts.playfairDisplay(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w700,
@@ -98,7 +98,7 @@ class _CartSidebarState extends State<CartSidebar> {
                       ),
                     ),
                     Text(
-                      '${provider.cartTotalItems} ${AppLocalizations.of(context)!.items}',
+                      '${provider.cartTotalItems} ${l10n.items}',
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         color: AppTheme.pureWhite.withOpacity(0.9),
@@ -131,6 +131,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildCustomerSelection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding / 2),
       decoration: BoxDecoration(
@@ -145,7 +147,7 @@ class _CartSidebarState extends State<CartSidebar> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppLocalizations.of(context)!.customer,
+                l10n.customer,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -154,7 +156,6 @@ class _CartSidebarState extends State<CartSidebar> {
               ),
               SizedBox(height: context.smallPadding),
 
-              // Customer Dropdown
               Container(
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
@@ -170,7 +171,7 @@ class _CartSidebarState extends State<CartSidebar> {
                         horizontal: context.cardPadding / 2,
                       ),
                       child: Text(
-                        AppLocalizations.of(context)!.selectCustomer,
+                        l10n.selectCustomer,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           color: Colors.grey[500],
@@ -187,7 +188,7 @@ class _CartSidebarState extends State<CartSidebar> {
                             horizontal: context.cardPadding / 2,
                           ),
                           child: Text(
-                            AppLocalizations.of(context)!.walkInCustomer,
+                            l10n.walkInCustomer,
                             style: GoogleFonts.inter(
                               fontSize: context.bodyFontSize,
                               color: AppTheme.charcoalGray,
@@ -198,42 +199,41 @@ class _CartSidebarState extends State<CartSidebar> {
                       ...provider.customers
                           .map(
                             (customer) => DropdownMenuItem<CustomerModel?>(
-                              value: customer,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: context.cardPadding / 2,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      customer.name,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.charcoalGray,
-                                      ),
-                                    ),
-                                    Text(
-                                      customer.phone,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.captionFontSize,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          value: customer,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.cardPadding / 2,
                             ),
-                          )
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  customer.name,
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.charcoalGray,
+                                  ),
+                                ),
+                                Text(
+                                  customer.phone,
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.captionFontSize,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
                           .toList(),
                     ],
                   ),
                 ),
               ),
 
-              // Selected Customer Info
               if (provider.selectedCustomer != null) ...[
                 SizedBox(height: context.smallPadding),
                 Container(
@@ -306,6 +306,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildEmptyCart() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -324,7 +326,7 @@ class _CartSidebarState extends State<CartSidebar> {
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            AppLocalizations.of(context)!.cartIsEmpty,
+            l10n.cartIsEmpty,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
@@ -333,7 +335,7 @@ class _CartSidebarState extends State<CartSidebar> {
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            AppLocalizations.of(context)!.addProductsToStartSale,
+            l10n.addProductsToStartSale,
             style: GoogleFonts.inter(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[400],
@@ -346,10 +348,12 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildCartItem(
-    BuildContext context,
-    CartItem item,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      CartItem item,
+      SalesProvider provider,
+      ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: context.cardPadding / 2,
@@ -371,7 +375,6 @@ class _CartSidebarState extends State<CartSidebar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Item Header
           Row(
             children: [
               Expanded(
@@ -406,15 +409,13 @@ class _CartSidebarState extends State<CartSidebar> {
 
           SizedBox(height: context.smallPadding / 2),
 
-          // Price and Quantity Controls
           Row(
             children: [
-              // Unit Price
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.unitPrice,
+                    l10n.unitPrice,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       color: Colors.grey[600],
@@ -433,7 +434,6 @@ class _CartSidebarState extends State<CartSidebar> {
 
               const Spacer(),
 
-              // Quantity Controls
               Row(
                 children: [
                   Material(
@@ -441,9 +441,9 @@ class _CartSidebarState extends State<CartSidebar> {
                     child: InkWell(
                       onTap: item.quantity > 1
                           ? () => provider.updateCartItemQuantity(
-                              item.productId,
-                              item.quantity - 1,
-                            )
+                        item.productId,
+                        item.quantity - 1,
+                      )
                           : null,
                       borderRadius: BorderRadius.circular(
                         context.borderRadius('small'),
@@ -522,7 +522,6 @@ class _CartSidebarState extends State<CartSidebar> {
 
           SizedBox(height: context.smallPadding / 2),
 
-          // Line Total and Discount
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -539,7 +538,7 @@ class _CartSidebarState extends State<CartSidebar> {
                     ),
                   ),
                   child: Text(
-                    '${AppLocalizations.of(context)!.discount}: PKR ${item.itemDiscount.toStringAsFixed(0)}',
+                    '${l10n.discount}: PKR ${item.itemDiscount.toStringAsFixed(0)}',
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -561,7 +560,6 @@ class _CartSidebarState extends State<CartSidebar> {
             ],
           ),
 
-          // Customization Notes
           if (item.customizationNotes != null &&
               item.customizationNotes!.isNotEmpty) ...[
             SizedBox(height: context.smallPadding / 2),
@@ -583,7 +581,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
-                      '${AppLocalizations.of(context)!.notes}: ${item.customizationNotes}',
+                      '${l10n.notes}: ${item.customizationNotes}',
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         color: Colors.blue[700],
@@ -602,6 +600,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildCartSummary() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {
         if (provider.currentCart.isEmpty) {
@@ -618,12 +618,11 @@ class _CartSidebarState extends State<CartSidebar> {
           ),
           child: Column(
             children: [
-              // Subtotal
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.subtotal,
+                    l10n.subtotal,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       color: AppTheme.charcoalGray,
@@ -642,13 +641,12 @@ class _CartSidebarState extends State<CartSidebar> {
 
               SizedBox(height: context.smallPadding / 2),
 
-              // Overall Discount
               if (provider.overallDiscount > 0) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.discount,
+                      l10n.discount,
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         color: Colors.orange[700],
@@ -667,7 +665,6 @@ class _CartSidebarState extends State<CartSidebar> {
                 SizedBox(height: context.smallPadding / 2),
               ],
 
-              // GST
               if (provider.gstPercentage > 0) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -692,13 +689,12 @@ class _CartSidebarState extends State<CartSidebar> {
                 SizedBox(height: context.smallPadding / 2),
               ],
 
-              // Tax
               if (provider.taxPercentage > 0) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Tax (${provider.taxPercentage}%)',
+                      '${l10n.tax} (${provider.taxPercentage}%)',
                       style: GoogleFonts.inter(
                         fontSize: context.bodyFontSize,
                         color: AppTheme.charcoalGray,
@@ -721,12 +717,11 @@ class _CartSidebarState extends State<CartSidebar> {
 
               SizedBox(height: context.smallPadding / 2),
 
-              // Grand Total
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.total,
+                    l10n.total,
                     style: GoogleFonts.inter(
                       fontSize: context.headerFontSize * 0.9,
                       fontWeight: FontWeight.w700,
@@ -751,6 +746,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   Widget _buildCheckoutButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {
         final isDisabled = provider.currentCart.isEmpty || provider.isLoading;
@@ -762,14 +759,14 @@ class _CartSidebarState extends State<CartSidebar> {
             decoration: BoxDecoration(
               gradient: isDisabled
                   ? LinearGradient(
-                      colors: [Colors.grey.shade400, Colors.grey.shade500],
-                    )
+                colors: [Colors.grey.shade400, Colors.grey.shade500],
+              )
                   : const LinearGradient(
-                      colors: [
-                        AppTheme.primaryMaroon,
-                        AppTheme.secondaryMaroon,
-                      ],
-                    ),
+                colors: [
+                  AppTheme.primaryMaroon,
+                  AppTheme.secondaryMaroon,
+                ],
+              ),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
             child: Material(
@@ -783,39 +780,37 @@ class _CartSidebarState extends State<CartSidebar> {
                   ),
                   child: provider.isLoading
                       ? Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: AppTheme.pureWhite,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        )
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: AppTheme.pureWhite,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  )
                       : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.payment_rounded,
-                              color: AppTheme.pureWhite,
-                              size: context.iconSize('medium'),
-                            ),
-                            SizedBox(width: context.smallPadding),
-                            Text(
-                              context.shouldShowCompactLayout
-                                  ? AppLocalizations.of(context)!.checkout
-                                  : AppLocalizations.of(
-                                      context,
-                                    )!.proceedToCheckout,
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.pureWhite,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.payment_rounded,
+                        color: AppTheme.pureWhite,
+                        size: context.iconSize('medium'),
+                      ),
+                      SizedBox(width: context.smallPadding),
+                      Text(
+                        context.shouldShowCompactLayout
+                            ? l10n.checkout
+                            : l10n.proceedToCheckout,
+                        style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.pureWhite,
+                          letterSpacing: 0.5,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -826,6 +821,8 @@ class _CartSidebarState extends State<CartSidebar> {
   }
 
   void _showClearCartDialog(BuildContext context, SalesProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -834,7 +831,7 @@ class _CartSidebarState extends State<CartSidebar> {
           borderRadius: BorderRadius.circular(context.borderRadius()),
         ),
         title: Text(
-          AppLocalizations.of(context)!.clearCart,
+          l10n.clearCart,
           style: GoogleFonts.inter(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
@@ -842,7 +839,7 @@ class _CartSidebarState extends State<CartSidebar> {
           ),
         ),
         content: Text(
-          AppLocalizations.of(context)!.clearCartQuestion,
+          l10n.clearCartQuestion,
           style: GoogleFonts.inter(
             fontSize: context.bodyFontSize,
             color: Colors.grey[700],
@@ -852,7 +849,7 @@ class _CartSidebarState extends State<CartSidebar> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              AppLocalizations.of(context)!.cancel,
+              l10n.cancel,
               style: GoogleFonts.inter(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
@@ -871,7 +868,7 @@ class _CartSidebarState extends State<CartSidebar> {
                 Navigator.of(context).pop();
               },
               child: Text(
-                AppLocalizations.of(context)!.clearCart,
+                l10n.clearCart,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,

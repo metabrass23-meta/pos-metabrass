@@ -9,6 +9,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../../../src/models/principal_account/principal_account_model.dart';
+import '../../../l10n/app_localizations.dart';
 
 class EditPrincipalAccountDialog extends StatefulWidget {
   final PrincipalAccount account;
@@ -50,11 +51,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
     _selectedTime = widget.account.time;
 
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
   }
 
@@ -69,6 +67,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<PrincipalAccountProvider>(context, listen: false);
 
@@ -88,6 +88,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -95,7 +97,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Principal account entry updated successfully!',
+              l10n.principalAccountEntryUpdatedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -135,12 +137,13 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
     });
   }
 
-  // Using the new reusable DateTime picker
   Future<void> _selectDateTime() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await context.showSyncfusionDateTimePicker(
       initialDate: _selectedDate,
       initialTime: _selectedTime,
-      title: 'Select Transaction Date & Time',
+      title: l10n.selectTransactionDateTime,
       minDate: DateTime(2000),
       maxDate: DateTime(2101),
       onDateTimeSelected: (date, time) {
@@ -211,6 +214,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -233,7 +238,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Edit Entry' : 'Edit Principal Account Entry',
+                  context.shouldShowCompactLayout ? l10n.editEntry : l10n.editPrincipalAccountEntry,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -244,7 +249,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update transaction information',
+                    l10n.updateTransactionInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -281,6 +286,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   Widget _buildFormContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Form(
@@ -288,34 +295,33 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Source Module Selection
             Consumer<PrincipalAccountProvider>(
               builder: (context, provider, child) {
                 return DropdownButtonFormField<String>(
                   value: _selectedSourceModule,
                   decoration: InputDecoration(
-                    labelText: 'Source Module',
+                    labelText: l10n.sourceModule,
                     prefixIcon: const Icon(Icons.source_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                   ),
                   items: provider.availableSourceModules
                       .map(
                         (module) => DropdownMenuItem<String>(
-                          value: module,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(color: _getSourceModuleColor(module), shape: BoxShape.circle),
-                                child: Icon(_getSourceModuleIcon(module), color: AppTheme.pureWhite, size: context.iconSize('small')),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Text(_getFormattedSourceModule(module)),
-                            ],
+                      value: module,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(color: _getSourceModuleColor(module), shape: BoxShape.circle),
+                            child: Icon(_getSourceModuleIcon(module), color: AppTheme.pureWhite, size: context.iconSize('small')),
                           ),
-                        ),
-                      )
+                          SizedBox(width: context.smallPadding),
+                          Text(_getFormattedSourceModule(module)),
+                        ],
+                      ),
+                    ),
+                  )
                       .toList(),
                   onChanged: (module) {
                     setState(() {
@@ -324,7 +330,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select source module';
+                      return l10n.pleaseSelectSourceModule;
                     }
                     return null;
                   },
@@ -333,36 +339,35 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             ),
             SizedBox(height: context.cardPadding),
 
-            // Transaction Type Selection
             Consumer<PrincipalAccountProvider>(
               builder: (context, provider, child) {
                 return DropdownButtonFormField<String>(
                   value: _selectedTransactionType,
                   decoration: InputDecoration(
-                    labelText: 'Transaction Type',
+                    labelText: l10n.transactionType,
                     prefixIcon: const Icon(Icons.swap_horiz_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                   ),
                   items: provider.availableTransactionTypes
                       .map(
                         (type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Row(
-                            children: [
-                              Icon(
-                                type == 'credit' ? Icons.add_circle_outline : Icons.remove_circle_outline,
-                                color: type == 'credit' ? Colors.green : Colors.red,
-                                size: context.iconSize('medium'),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Text(
-                                type == 'credit' ? 'Credit (Money In)' : 'Debit (Money Out)',
-                                style: GoogleFonts.inter(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
-                              ),
-                            ],
+                      value: type,
+                      child: Row(
+                        children: [
+                          Icon(
+                            type == 'credit' ? Icons.add_circle_outline : Icons.remove_circle_outline,
+                            color: type == 'credit' ? Colors.green : Colors.red,
+                            size: context.iconSize('medium'),
                           ),
-                        ),
-                      )
+                          SizedBox(width: context.smallPadding),
+                          Text(
+                            type == 'credit' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
+                            style: GoogleFonts.inter(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                       .toList(),
                   onChanged: (type) {
                     setState(() {
@@ -371,7 +376,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select transaction type';
+                      return l10n.pleaseSelectTransactionType;
                     }
                     return null;
                   },
@@ -381,25 +386,25 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Source ID',
-              hint: isCompact ? 'Reference ID (optional)' : 'Reference ID from source module (optional)',
+              label: l10n.sourceID,
+              hint: isCompact ? l10n.referenceIDOptional : l10n.referenceIDFromSourceModuleOptional,
               controller: _sourceIdController,
               prefixIcon: Icons.tag_outlined,
             ),
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Description',
-              hint: isCompact ? 'Enter description' : 'Enter transaction description',
+              label: l10n.description,
+              hint: isCompact ? l10n.enterDescription : l10n.enterTransactionDescription,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter description';
+                  return l10n.pleaseEnterDescription;
                 }
                 if (value!.length < 5) {
-                  return 'Description must be at least 5 characters';
+                  return l10n.descriptionMustBeAtLeast5Characters;
                 }
                 return null;
               },
@@ -407,38 +412,37 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Amount',
-              hint: isCompact ? 'Enter amount' : 'Enter transaction amount (PKR)',
+              label: l10n.amount,
+              hint: isCompact ? l10n.enterAmount : l10n.enterTransactionAmountPKR,
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return 'Please enter amount';
+                  return l10n.pleaseEnterAmount;
                 }
                 final amount = double.tryParse(value!);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount';
+                  return l10n.pleaseEnterAValidAmount;
                 }
                 return null;
               },
             ),
             SizedBox(height: context.cardPadding),
 
-            // Handled By Selection
             Consumer<PrincipalAccountProvider>(
               builder: (context, provider, child) {
                 return DropdownButtonFormField<String>(
                   value: _selectedHandledBy,
                   decoration: InputDecoration(
-                    labelText: 'Handled By (Optional)',
+                    labelText: l10n.handledByOptional,
                     prefixIcon: const Icon(Icons.person_outline),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
                   ),
                   items: [
-                    const DropdownMenuItem<String>(value: null, child: Text('Not specified')),
+                    DropdownMenuItem<String>(value: null, child: Text(l10n.notSpecified)),
                     ...provider.availableHandlers.map(
-                      (handler) => DropdownMenuItem<String>(
+                          (handler) => DropdownMenuItem<String>(
                         value: handler,
                         child: Row(
                           children: [
@@ -465,11 +469,9 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             ),
             SizedBox(height: context.cardPadding),
 
-            // Enhanced Date and Time Selection
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Primary Syncfusion DateTime Picker Button
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -490,7 +492,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                               Icon(Icons.date_range_rounded, color: Colors.blue, size: context.iconSize('medium')),
                               SizedBox(width: context.smallPadding),
                               Text(
-                                'Select Date & Time',
+                                l10n.selectDateTime,
                                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                               ),
                             ],
@@ -502,7 +504,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                               Column(
                                 children: [
                                   Text(
-                                    'Date',
+                                    l10n.date,
                                     style: GoogleFonts.inter(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
@@ -523,7 +525,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                               Column(
                                 children: [
                                   Text(
-                                    'Time',
+                                    l10n.time,
                                     style: GoogleFonts.inter(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
@@ -553,8 +555,8 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: 'Notes',
-              hint: isCompact ? 'Additional notes (optional)' : 'Additional notes or details (optional)',
+              label: l10n.notes,
+              hint: isCompact ? l10n.additionalNotesOptional : l10n.additionalNotesOrDetailsOptional,
               controller: _notesController,
               prefixIcon: Icons.note_outlined,
               maxLines: 2,
@@ -577,13 +579,15 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<PrincipalAccountProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Entry',
+              text: l10n.updateEntry,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -594,7 +598,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -606,11 +610,13 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight / 1.5,
@@ -623,7 +629,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
           child: Consumer<PrincipalAccountProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update Entry',
+                text: l10n.updateEntry,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

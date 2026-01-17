@@ -39,16 +39,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
 void main() async {
-  // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize API services
   await StorageService().init();
   ApiClient().init();
 
   runApp(const MaqboolFabricApp());
 
-  // Add this for desktop platforms
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
       appWindow
@@ -65,14 +62,12 @@ void main() async {
 class MaqboolFabricApp extends StatelessWidget {
   const MaqboolFabricApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Initialize AuthProvider with API integration
         ChangeNotifierProvider(create: (_) => TaxRatesProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
@@ -100,14 +95,12 @@ class MaqboolFabricApp extends StatelessWidget {
       ],
       child: Consumer2<AuthProvider, ProfitLossProvider>(
         builder: (context, authProvider, profitLossProvider, child) {
-          // Initialize auth provider immediately (splash screen depends on it)
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.initial) {
               authProvider.initialize();
             }
           });
 
-          // Initialize profit loss provider when first accessed AND authenticated
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.authenticated) {
               if (profitLossProvider.profitLossHistory.isEmpty &&
@@ -126,12 +119,10 @@ class MaqboolFabricApp extends StatelessWidget {
                 darkTheme: AppTheme.darkTheme,
                 themeMode: ThemeMode.light,
                 navigatorKey: navigatorKey,
-
-                // Localization Configuration
-                locale: const Locale('ur'), // Set Urdu as default
+                locale: const Locale('ur'),
                 supportedLocales: const [
-                  Locale('ur'), // Urdu
-                  Locale('en'), // English (fallback)
+                  Locale('ur'),
+                  Locale('en'),
                 ],
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
@@ -139,13 +130,53 @@ class MaqboolFabricApp extends StatelessWidget {
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-
                 initialRoute: '/',
-                routes: {
-                  '/': (context) => const SplashScreen(),
-                  '/login': (context) => const LoginScreen(),
-                  '/signup': (context) => const SignupScreen(),
-                  '/dashboard': (context) => const DashboardScreen(),
+                onGenerateRoute: (settings) {
+                  if (settings.name == '/dashboard') {
+                    if (authProvider.state != AuthState.authenticated) {
+                      return MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                        settings: settings,
+                      );
+                    }
+                  }
+
+                  if (settings.name == '/login' || settings.name == '/signup') {
+                    if (authProvider.state == AuthState.authenticated) {
+                      return MaterialPageRoute(
+                        builder: (_) => const DashboardScreen(),
+                        settings: settings,
+                      );
+                    }
+                  }
+
+                  switch (settings.name) {
+                    case '/':
+                      return MaterialPageRoute(
+                        builder: (_) => const SplashScreen(),
+                        settings: settings,
+                      );
+                    case '/login':
+                      return MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                        settings: settings,
+                      );
+                    case '/signup':
+                      return MaterialPageRoute(
+                        builder: (_) => const SignupScreen(),
+                        settings: settings,
+                      );
+                    case '/dashboard':
+                      return MaterialPageRoute(
+                        builder: (_) => const DashboardScreen(),
+                        settings: settings,
+                      );
+                    default:
+                      return MaterialPageRoute(
+                        builder: (_) => const SplashScreen(),
+                        settings: settings,
+                      );
+                  }
                 },
               );
             },

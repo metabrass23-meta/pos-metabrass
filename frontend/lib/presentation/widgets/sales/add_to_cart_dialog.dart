@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +66,6 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
       final customPrice = _isCustomPrice ? double.tryParse(_customPriceController.text) ?? widget.product.price : widget.product.price;
       final notes = _hasNotes && _notesController.text.isNotEmpty ? _notesController.text : null;
 
-      // Create a modified product if custom price is used
       final productToAdd = _isCustomPrice ? widget.product.copyWith(price: customPrice) : widget.product;
 
       provider.addToCartWithCustomization(
@@ -82,6 +82,8 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   void _handleSuccess() {
+    final l10n = AppLocalizations.of(context)!;
+
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
 
@@ -92,7 +94,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
               SizedBox(width: context.smallPadding),
               Expanded(
-                child: Text('${widget.product.name} added to cart', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+                child: Text('${widget.product.name} ${l10n.addedToCart}', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
               ),
             ],
           ),
@@ -158,6 +160,8 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -180,7 +184,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Add to Cart',
+                  l10n.addToCart,
                   style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
                 Text(
@@ -236,6 +240,8 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildProductInfo() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -283,7 +289,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                   ),
                   child: Text(
-                    'Stock: ${widget.product.quantity} available',
+                    '${l10n.stockAvailable}: ${widget.product.quantity}',
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: widget.product.stockStatusColor),
                   ),
                 ),
@@ -296,17 +302,18 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildQuantitySection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quantity',
+          l10n.quantity,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Row(
           children: [
-            // Quantity Controls
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade300),
@@ -320,11 +327,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     child: InkWell(
                       onTap: _quantity > 1
                           ? () {
-                              setState(() {
-                                _quantity--;
-                                _quantityController.text = _quantity.toString();
-                              });
-                            }
+                        setState(() {
+                          _quantity--;
+                          _quantityController.text = _quantity.toString();
+                        });
+                      }
                           : null,
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
@@ -350,8 +357,8 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                       },
                       validator: (value) {
                         final qty = int.tryParse(value ?? '') ?? 0;
-                        if (qty < 1) return 'Min 1';
-                        if (qty > widget.product.quantity) return 'Max ${widget.product.quantity}';
+                        if (qty < 1) return '${l10n.min} 1';
+                        if (qty > widget.product.quantity) return '${l10n.max} ${widget.product.quantity}';
                         return null;
                       },
                     ),
@@ -361,11 +368,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     child: InkWell(
                       onTap: _quantity < widget.product.quantity
                           ? () {
-                              setState(() {
-                                _quantity++;
-                                _quantityController.text = _quantity.toString();
-                              });
-                            }
+                        setState(() {
+                          _quantity++;
+                          _quantityController.text = _quantity.toString();
+                        });
+                      }
                           : null,
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       child: Container(
@@ -383,7 +390,6 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             ),
             SizedBox(width: context.cardPadding),
 
-            // Quick Quantity Buttons
             ...([2, 5, 10].where((qty) => qty <= widget.product.quantity).map((qty) {
               return Container(
                 margin: EdgeInsets.only(right: context.smallPadding / 2),
@@ -424,13 +430,15 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildPriceSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'Price',
+              l10n.price,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             const Spacer(),
@@ -448,7 +456,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Custom Price',
+              l10n.customPrice,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
             ),
           ],
@@ -457,13 +465,13 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
 
         if (_isCustomPrice) ...[
           PremiumTextField(
-            label: 'Custom Price (PKR)',
+            label: l10n.customPricePkr,
             controller: _customPriceController,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.attach_money_rounded,
             validator: (value) {
               final price = double.tryParse(value ?? '');
-              if (price == null || price <= 0) return 'Please enter a valid price';
+              if (price == null || price <= 0) return l10n.pleaseEnterValidPrice;
               return null;
             },
             onChanged: (value) => setState(() {}),
@@ -480,7 +488,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Unit Price:',
+                  '${l10n.unitPrice}:',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
                 Text(
@@ -496,16 +504,17 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildDiscountSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Item Discount (Optional)',
+          l10n.itemDiscountOptional,
           style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
 
-        // Quick Discount Buttons
         Row(
           children: [
             ...[5, 10, 15, 20].map((percentage) {
@@ -554,7 +563,6 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
 
         SizedBox(height: context.smallPadding),
 
-        // Clear Discount Button
         if (_itemDiscount > 0)
           Align(
             alignment: Alignment.centerRight,
@@ -566,7 +574,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   child: Text(
-                    'Clear Discount',
+                    l10n.clearDiscount,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                   ),
                 ),
@@ -578,13 +586,15 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildNotesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'Customization Notes',
+              l10n.customizationNotes,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             const Spacer(),
@@ -606,11 +616,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
         if (_hasNotes) ...[
           SizedBox(height: context.smallPadding),
           PremiumTextField(
-            label: 'Special Instructions',
+            label: l10n.specialInstructions,
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
             maxLines: 3,
-            hint: 'Any special requirements, alterations, or notes...',
+            hint: l10n.anySpecialRequirements,
           ),
         ],
       ],
@@ -618,6 +628,8 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildOrderSummary() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -631,7 +643,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Unit Price:',
+                '${l10n.unitPrice}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -645,7 +657,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Quantity:',
+                '${l10n.quantity}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -659,7 +671,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Subtotal:',
+                '${l10n.subtotal}:',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -675,7 +687,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Discount:',
+                  '${l10n.discount}:',
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                 ),
                 Text(
@@ -693,7 +705,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total:',
+                '${l10n.total}:',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -708,11 +720,13 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight,
@@ -724,7 +738,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Add to Cart',
+            text: l10n.addToCart,
             onPressed: _handleAddToCart,
             height: context.buttonHeight,
             icon: Icons.add_shopping_cart_rounded,

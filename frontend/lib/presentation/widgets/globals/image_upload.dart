@@ -7,8 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/services/receipt_image_service.dart';
+import '../../../l10n/app_localizations.dart';
 
-// Responsive wrapper for the image upload functionality
 class ResponsiveImageUploadWidget extends StatefulWidget {
   final String? initialImagePath;
   final Function(String?) onImageChanged;
@@ -58,6 +58,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         _isUploading = true;
@@ -81,7 +83,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
         setState(() {
           _isUploading = false;
         });
-        _showErrorMessage('Invalid image file. Please select a valid image (max 10MB).');
+        _showErrorMessage(l10n.invalidImageFile);
         return;
       }
 
@@ -102,13 +104,13 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
       });
 
       widget.onImageChanged(_imagePath);
-      _showSuccessMessage('Receipt image uploaded successfully!');
+      _showSuccessMessage(l10n.receiptUploadedSuccessfully);
     } catch (e) {
       setState(() {
         _isUploading = false;
         _uploadProgress = 0.0;
       });
-      _showErrorMessage('Failed to upload image: ${e.toString()}');
+      _showErrorMessage('${l10n.failedToUploadImage}: ${e.toString()}');
     }
   }
 
@@ -122,13 +124,15 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   void _removeImage() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_imagePath != null) {
       await DesktopReceiptImageService.deleteImage(_imagePath!);
       setState(() {
         _imagePath = null;
       });
       widget.onImageChanged(null);
-      _showInfoMessage('Receipt image removed');
+      _showInfoMessage(l10n.receiptImageRemoved);
     }
   }
 
@@ -145,32 +149,38 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   void _openInExternalViewer() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_imagePath != null) {
       try {
         await DesktopReceiptImageService.openInExternalViewer(_imagePath!);
       } catch (e) {
-        _showErrorMessage('Failed to open image: ${e.toString()}');
+        _showErrorMessage('${l10n.failedToOpenImage}: ${e.toString()}');
       }
     }
   }
 
   void _showInExplorer() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_imagePath != null) {
       try {
         await DesktopReceiptImageService.showInExplorer(_imagePath!);
       } catch (e) {
-        _showErrorMessage('Failed to show in explorer: ${e.toString()}');
+        _showErrorMessage('${l10n.failedToShowInExplorer}: ${e.toString()}');
       }
     }
   }
 
   void _copyToClipboard() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_imagePath != null) {
       try {
         await DesktopReceiptImageService.copyImageToClipboard(_imagePath!);
-        _showSuccessMessage('Image copied to clipboard!');
+        _showSuccessMessage(l10n.imageCopiedToClipboard);
       } catch (e) {
-        _showErrorMessage('Failed to copy to clipboard: ${e.toString()}');
+        _showErrorMessage('${l10n.failedToCopyToClipboard}: ${e.toString()}');
       }
     }
   }
@@ -278,6 +288,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
     final bool isCompact = widget.context.shouldShowCompactLayout;
 
     if (isCompact) {
@@ -297,15 +308,15 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
           itemBuilder: (context, index) {
             switch (index) {
               case 0:
-                return _buildActionChip(Icons.visibility, 'View', Colors.blue, _viewImage);
+                return _buildActionChip(Icons.visibility, l10n.view, Colors.blue, _viewImage);
               case 1:
-                return _buildActionChip(Icons.open_in_new, 'Open', Colors.green, _openInExternalViewer);
+                return _buildActionChip(Icons.open_in_new, l10n.open, Colors.green, _openInExternalViewer);
               case 2:
-                return _buildActionChip(Icons.folder_open, 'Explorer', Colors.orange, _showInExplorer);
+                return _buildActionChip(Icons.folder_open, l10n.explorer, Colors.orange, _showInExplorer);
               case 3:
-                return _buildActionChip(Icons.content_copy, 'Copy', Colors.purple, _copyToClipboard);
+                return _buildActionChip(Icons.content_copy, l10n.copy, Colors.purple, _copyToClipboard);
               case 4:
-                return _buildActionChip(Icons.delete, 'Remove', Colors.red, _removeImage);
+                return _buildActionChip(Icons.delete, l10n.remove, Colors.red, _removeImage);
               default:
                 return SizedBox.shrink();
             }
@@ -317,11 +328,11 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
         spacing: widget.context.smallPadding / 2,
         runSpacing: widget.context.smallPadding / 2,
         children: [
-          _buildActionButton(Icons.visibility, 'View Image', Colors.blue, _viewImage),
-          _buildActionButton(Icons.open_in_new, 'Open', Colors.green, _openInExternalViewer),
-          _buildActionButton(Icons.folder_open, 'Explorer', Colors.orange, _showInExplorer),
-          _buildActionButton(Icons.content_copy, 'Copy', Colors.purple, _copyToClipboard),
-          _buildActionButton(Icons.delete, 'Remove', Colors.red, _removeImage),
+          _buildActionButton(Icons.visibility, l10n.viewImage, Colors.blue, _viewImage),
+          _buildActionButton(Icons.open_in_new, l10n.open, Colors.green, _openInExternalViewer),
+          _buildActionButton(Icons.folder_open, l10n.explorer, Colors.orange, _showInExplorer),
+          _buildActionButton(Icons.content_copy, l10n.copy, Colors.purple, _copyToClipboard),
+          _buildActionButton(Icons.delete, l10n.remove, Colors.red, _removeImage),
         ],
       );
     }
@@ -386,6 +397,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildImagePicker() {
+    final l10n = AppLocalizations.of(context)!;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
@@ -434,7 +447,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                     ),
                     SizedBox(height: widget.context.cardPadding),
                     Text(
-                      'Click to select receipt image',
+                      l10n.clickToSelectReceiptImage,
                       style: GoogleFonts.inter(
                         fontSize: widget.context.bodyFontSize,
                         fontWeight: FontWeight.w500,
@@ -444,8 +457,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                     SizedBox(height: widget.context.smallPadding),
                     Text(
                       widget.context.shouldShowCompactLayout
-                          ? 'JPG, PNG, BMP, GIF (max 10MB)'
-                          : 'Supported formats: JPG, PNG, BMP, GIF (max 10MB)',
+                          ? l10n.supportedFormatsShort
+                          : l10n.supportedFormats,
                       style: GoogleFonts.inter(
                         fontSize: widget.context.captionFontSize,
                         color: Colors.grey[500],
@@ -473,7 +486,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                           ),
                           SizedBox(width: widget.context.smallPadding),
                           Text(
-                            'Browse Files',
+                            l10n.browseFiles,
                             style: GoogleFonts.inter(
                               fontSize: widget.context.captionFontSize,
                               fontWeight: FontWeight.w500,
@@ -494,6 +507,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildUploadProgress() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(widget.context.cardPadding),
       decoration: BoxDecoration(
@@ -550,7 +565,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
           ),
           SizedBox(height: widget.context.cardPadding),
           Text(
-            'Processing image file...',
+            l10n.processingImageFile,
             style: GoogleFonts.inter(
               fontSize: widget.context.bodyFontSize,
               fontWeight: FontWeight.w500,
@@ -586,10 +601,12 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   String _getProgressText() {
-    if (_uploadProgress < 0.3) return 'Opening file dialog...';
-    if (_uploadProgress < 0.6) return 'Validating image file...';
-    if (_uploadProgress < 0.8) return 'Saving to application directory...';
-    return 'Finalizing...';
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_uploadProgress < 0.3) return l10n.openingFileDialog;
+    if (_uploadProgress < 0.6) return l10n.validatingImageFile;
+    if (_uploadProgress < 0.8) return l10n.savingToAppDirectory;
+    return l10n.finalizing;
   }
 
   Widget _buildImagePreview() {
@@ -607,6 +624,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildCompactImagePreview() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -634,7 +653,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             onPressed: _pickImage,
             icon: Icon(Icons.edit, size: widget.context.iconSize('small')),
             label: Text(
-              'Replace Image',
+              l10n.replaceImage,
               style: GoogleFonts.inter(
                 fontSize: widget.context.captionFontSize,
                 fontWeight: FontWeight.w500,
@@ -655,6 +674,8 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildExpandedImagePreview() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Container(
@@ -691,7 +712,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                 onPressed: _pickImage,
                 icon: Icon(Icons.edit, size: widget.context.iconSize('small')),
                 label: Text(
-                  'Replace',
+                  l10n.replace,
                   style: GoogleFonts.inter(
                     fontSize: widget.context.captionFontSize,
                     fontWeight: FontWeight.w500,
@@ -744,11 +765,13 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
   }
 
   Widget _buildFileInfo() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Receipt uploaded successfully',
+          l10n.receiptUploadedSuccessfully,
           style: GoogleFonts.inter(
             fontSize: widget.context.bodyFontSize,
             fontWeight: FontWeight.w600,
@@ -765,7 +788,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'File: ${_truncateFileName(fileInfo['name'] ?? 'Unknown')}',
+                    '${l10n.file}: ${_truncateFileName(fileInfo['name'] ?? l10n.unknown)}',
                     style: GoogleFonts.inter(
                       fontSize: widget.context.captionFontSize,
                       color: Colors.green[600],
@@ -775,7 +798,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Size: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
+                    '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
                     style: GoogleFonts.inter(
                       fontSize: widget.context.captionFontSize,
                       color: Colors.green[600],
@@ -784,7 +807,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                   if (fileInfo['created'] != null) ...[
                     SizedBox(height: 2),
                     Text(
-                      'Added: ${_formatDate(fileInfo['created'])}',
+                      '${l10n.added}: ${_formatDate(fileInfo['created'])}',
                       style: GoogleFonts.inter(
                         fontSize: ResponsiveBreakpoints.responsive(
                           widget.context,
@@ -802,7 +825,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
               );
             }
             return Text(
-              'Loading file info...',
+              l10n.loadingFileInfo,
               style: GoogleFonts.inter(
                 fontSize: widget.context.captionFontSize,
                 color: Colors.green[600],
@@ -823,7 +846,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
         : fileName;
 
     if (extension.isNotEmpty) {
-      final maxNameLength = 25 - extension.length - 4; // -4 for "..." and "."
+      final maxNameLength = 25 - extension.length - 4;
       if (nameWithoutExt.length > maxNameLength) {
         return '${nameWithoutExt.substring(0, maxNameLength)}...$extension';
       }
@@ -849,14 +872,16 @@ class ResponsiveImageViewDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext dialogContext) {
+    final l10n = AppLocalizations.of(dialogContext)!;
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.all(this.context.mainPadding),
+      insetPadding: EdgeInsets.all(context.mainPadding),
       child: Container(
         constraints: BoxConstraints(
           maxWidth: ResponsiveBreakpoints.responsive(
-            this.context,
+            context,
             tablet: 90.w,
             small: 85.w,
             medium: 80.w,
@@ -864,7 +889,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
             ultrawide: 70.w,
           ),
           maxHeight: ResponsiveBreakpoints.responsive(
-            this.context,
+            context,
             tablet: 85.h,
             small: 90.h,
             medium: 80.h,
@@ -874,28 +899,28 @@ class ResponsiveImageViewDialog extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(this.context.borderRadius('large')),
+          borderRadius: BorderRadius.circular(context.borderRadius('large')),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
-              blurRadius: this.context.shadowBlur('heavy'),
-              offset: Offset(0, this.context.cardPadding),
+              blurRadius: context.shadowBlur('heavy'),
+              offset: Offset(0, context.cardPadding),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildHeader(),
-            Expanded(child: _buildImageContent()),
-            _buildFooter(),
+            _buildHeader(dialogContext, l10n),
+            Expanded(child: _buildImageContent(dialogContext, l10n)),
+            _buildFooter(dialogContext, l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext dialogContext, AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -910,7 +935,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
           Icon(Icons.receipt, color: Colors.blue, size: context.iconSize('medium')),
           SizedBox(width: context.cardPadding),
           Text(
-            'Receipt Image Viewer',
+            l10n.receiptImageViewer,
             style: GoogleFonts.inter(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
@@ -918,10 +943,10 @@ class ResponsiveImageViewDialog extends StatelessWidget {
           ),
           const Spacer(),
           if (!context.shouldShowCompactLayout) ...[
-            _buildHeaderActions(),
+            _buildHeaderActions(dialogContext, l10n),
           ] else ...[
             IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               icon: Icon(Icons.close, size: context.iconSize('medium')),
             ),
           ],
@@ -930,79 +955,79 @@ class ResponsiveImageViewDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderActions() {
+  Widget _buildHeaderActions(BuildContext dialogContext, AppLocalizations l10n) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Tooltip(
-          message: 'Open in External Viewer',
+          message: l10n.openInExternalViewer,
           child: IconButton(
             onPressed: () async {
               try {
                 await DesktopReceiptImageService.openInExternalViewer(imagePath);
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
-                    content: Text('Failed to open: $e'),
+                    content: Text('${l10n.failedToOpen}: $e'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            icon: Icon(Icons.open_in_new, size: this.context.iconSize('medium')),
+            icon: Icon(Icons.open_in_new, size: context.iconSize('medium')),
           ),
         ),
         Tooltip(
-          message: 'Show in Explorer',
+          message: l10n.showInExplorer,
           child: IconButton(
             onPressed: () async {
               try {
                 await DesktopReceiptImageService.showInExplorer(imagePath);
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
-                    content: Text('Failed to show in explorer: $e'),
+                    content: Text('${l10n.failedToShowInExplorer}: $e'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            icon: Icon(Icons.folder_open, size: this.context.iconSize('medium')),
+            icon: Icon(Icons.folder_open, size: context.iconSize('medium')),
           ),
         ),
         Tooltip(
-          message: 'Copy to Clipboard',
+          message: l10n.copyToClipboard,
           child: IconButton(
             onPressed: () async {
               try {
                 await DesktopReceiptImageService.copyImageToClipboard(imagePath);
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
-                    content: Text('Image copied to clipboard!'),
+                    content: Text(l10n.imageCopiedToClipboard),
                     backgroundColor: Colors.green,
                   ),
                 );
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
-                    content: Text('Failed to copy: $e'),
+                    content: Text('${l10n.failedToCopy}: $e'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            icon: Icon(Icons.content_copy, size: this.context.iconSize('medium')),
+            icon: Icon(Icons.content_copy, size: context.iconSize('medium')),
           ),
         ),
         IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.close, size: this.context.iconSize('medium')),
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          icon: Icon(Icons.close, size: context.iconSize('medium')),
         ),
       ],
     );
   }
 
-  Widget _buildImageContent() {
+  Widget _buildImageContent(BuildContext dialogContext, AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       child: FutureBuilder<Uint8List?>(
@@ -1025,7 +1050,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                   ),
                   SizedBox(height: this.context.cardPadding),
                   Text(
-                    'Loading image...',
+                    l10n.loadingImage,
                     style: GoogleFonts.inter(
                       fontSize: this.context.bodyFontSize,
                       color: Colors.grey[600],
@@ -1072,7 +1097,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                 ),
                 SizedBox(height: this.context.cardPadding),
                 Text(
-                  'Failed to load image',
+                  l10n.failedToLoadImage,
                   style: GoogleFonts.inter(
                     fontSize: this.context.bodyFontSize,
                     color: Colors.grey[600],
@@ -1084,9 +1109,9 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                     try {
                       await DesktopReceiptImageService.openInExternalViewer(imagePath);
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
                         SnackBar(
-                          content: Text('Failed to open: $e'),
+                          content: Text('${l10n.failedToOpen}: $e'),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -1099,7 +1124,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Open with External Viewer',
+                    l10n.openWithExternalViewer,
                     style: GoogleFonts.inter(
                       fontSize: this.context.captionFontSize,
                     ),
@@ -1113,7 +1138,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext dialogContext, AppLocalizations l10n) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -1130,11 +1155,11 @@ class ResponsiveImageViewDialog extends StatelessWidget {
             final fileInfo = snapshot.data!;
             return ResponsiveBreakpoints.responsive(
               this.context,
-              tablet: _buildCompactFooter(fileInfo),
-              small: _buildCompactFooter(fileInfo),
-              medium: _buildExpandedFooter(fileInfo),
-              large: _buildExpandedFooter(fileInfo),
-              ultrawide: _buildExpandedFooter(fileInfo),
+              tablet: _buildCompactFooter(dialogContext, fileInfo, l10n),
+              small: _buildCompactFooter(dialogContext, fileInfo, l10n),
+              medium: _buildExpandedFooter(dialogContext, fileInfo, l10n),
+              large: _buildExpandedFooter(dialogContext, fileInfo, l10n),
+              ultrawide: _buildExpandedFooter(dialogContext, fileInfo, l10n),
             );
           }
           return const SizedBox.shrink();
@@ -1143,12 +1168,12 @@ class ResponsiveImageViewDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactFooter(Map<String, dynamic> fileInfo) {
+  Widget _buildCompactFooter(BuildContext dialogContext, Map<String, dynamic> fileInfo, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'File: ${fileInfo['name'] ?? 'Unknown'}',
+          '${l10n.file}: ${fileInfo['name'] ?? l10n.unknown}',
           style: GoogleFonts.inter(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
@@ -1158,7 +1183,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
         ),
         SizedBox(height: context.smallPadding / 2),
         Text(
-          'Size: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
+          '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
           style: GoogleFonts.inter(
             fontSize: context.captionFontSize,
             color: Colors.grey[600],
@@ -1174,13 +1199,13 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                     try {
                       await DesktopReceiptImageService.openInExternalViewer(imagePath);
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(content: Text('${l10n.failed}: $e'), backgroundColor: Colors.red),
                       );
                     }
                   },
                   icon: Icon(Icons.open_in_new, size: context.iconSize('small')),
-                  label: Text('Open', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  label: Text(l10n.open, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
@@ -1191,13 +1216,13 @@ class ResponsiveImageViewDialog extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: context.smallPadding),
                   ),
-                  child: Text('Close', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  child: Text(l10n.close, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
                 ),
               ),
             ],
@@ -1207,12 +1232,12 @@ class ResponsiveImageViewDialog extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Close'),
+              child: Text(l10n.close),
             ),
           ),
         ],
@@ -1220,7 +1245,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildExpandedFooter(Map<String, dynamic> fileInfo) {
+  Widget _buildExpandedFooter(BuildContext dialogContext, Map<String, dynamic> fileInfo, AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
@@ -1228,14 +1253,14 @@ class ResponsiveImageViewDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'File: ${fileInfo['name'] ?? 'Unknown'}',
+                '${l10n.file}: ${fileInfo['name'] ?? l10n.unknown}',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
-                'Size: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)} • Modified: ${_formatDate(fileInfo['modified'] ?? DateTime.now())}',
+                '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)} • ${l10n.modified}: ${_formatDate(fileInfo['modified'] ?? DateTime.now())}',
                 style: GoogleFonts.inter(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],
@@ -1245,12 +1270,12 @@ class ResponsiveImageViewDialog extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(dialogContext).pop(),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
           ),
-          child: Text('Close'),
+          child: Text(l10n.close),
         ),
       ],
     );

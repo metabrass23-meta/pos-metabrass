@@ -84,49 +84,49 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
           controller: TextEditingController(
             text: widget.value != null
                 ? widget.items
-                      .firstWhere(
-                        (item) => item.value == widget.value,
-                        orElse: () => DropdownItem<T>(value: widget.value as T, label: ''),
-                      )
-                      .label
+                .firstWhere(
+                  (item) => item.value == widget.value,
+              orElse: () => DropdownItem<T>(value: widget.value as T, label: ''),
+            )
+                .label
                 : '',
           ),
           onTap: widget.enabled
               ? () async {
-                  final RenderBox box = context.findRenderObject() as RenderBox;
-                  final Offset position = box.localToGlobal(Offset.zero);
-                  final Size size = box.size;
+            final RenderBox box = context.findRenderObject() as RenderBox;
+            final Offset position = box.localToGlobal(Offset.zero);
+            final Size size = box.size;
 
-                  final T? selected = await showMenu<T>(
-                    context: context,
-                    position: RelativeRect.fromLTRB(
-                      position.dx,
-                      position.dy + size.height,
-                      position.dx + size.width,
-                      position.dy,
+            final T? selected = await showMenu<T>(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                position.dx,
+                position.dy + size.height,
+                position.dx + size.width,
+                position.dy,
+              ),
+              items: widget.items.map((item) {
+                return PopupMenuItem<T>(
+                  value: item.value,
+                  child: Text(
+                    item.label,
+                    style: GoogleFonts.inter(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppTheme.charcoalGray,
                     ),
-                    items: widget.items.map((item) {
-                      return PopupMenuItem<T>(
-                        value: item.value,
-                        child: Text(
-                          item.label,
-                          style: GoogleFonts.inter(
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppTheme.charcoalGray,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1.5.w)),
-                    color: AppTheme.pureWhite,
-                  );
+                  ),
+                );
+              }).toList(),
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1.5.w)),
+              color: AppTheme.pureWhite,
+            );
 
-                  if (selected != null) {
-                    widget.onChanged?.call(selected);
-                  }
-                }
+            if (selected != null) {
+              widget.onChanged?.call(selected);
+            }
+          }
               : null,
           validator: widget.validator != null ? (String? value) => widget.validator!(widget.value) : null,
           style: GoogleFonts.inter(
@@ -139,13 +139,13 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
-                    widget.prefixIcon,
-                    size: 12.sp,
-                    color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
-                  )
+              widget.prefixIcon,
+              size: 12.sp,
+              color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
+            )
                 : null,
             suffixIcon:
-                widget.suffixIcon ??
+            widget.suffixIcon ??
                 Icon(
                   Icons.arrow_drop_down_rounded,
                   size: 12.sp,

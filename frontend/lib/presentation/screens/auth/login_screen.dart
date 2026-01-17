@@ -23,92 +23,141 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+
+    // ✅ Pre-fill email if coming from signup
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null && args['email'] != null) {
+        _emailController.text = args['email'];
+
+        // Show welcome message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
+                SizedBox(width: context.smallPadding),
+                Expanded(
+                  child: Text(
+                    'Welcome! Please log in with your new account.',
+                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppTheme.primaryMaroon,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+            ),
+            margin: EdgeInsets.all(context.mainPadding),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final l10n = AppLocalizations.of(context)!;
 
       // Clear any previous errors
       authProvider.clearError();
 
-      authProvider
-          .login(_emailController.text.trim(), _passwordController.text)
-          .then((_) {
-            if (authProvider.state == AuthState.authenticated) {
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.loginSuccess,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                  ),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      context.borderRadius('medium'),
-                    ),
-                  ),
-                  margin: EdgeInsets.all(context.mainPadding),
-                ),
-              );
+      // ✅ Call login with await
+      await authProvider.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-              // Navigate to dashboard after a short delay
-              Future.delayed(const Duration(milliseconds: 1000), () {
-                if (mounted) {
-                  Navigator.of(context).pushReplacementNamed('/dashboard');
-                }
-              });
-            } else if (authProvider.state == AuthState.error) {
-              // Error will be displayed by the Consumer widget below
-              // But also show a snackbar for immediate feedback
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.loginFailed,
+      if (mounted) {
+        if (authProvider.state == AuthState.authenticated) {
+          // ✅ Login successful - Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('medium'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    l10n.loginSuccess,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize),
                   ),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      context.borderRadius('medium'),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
+
+          // ✅ Navigate to dashboard
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            if (mounted) {
+              Navigator.of(context).pushReplacementNamed('/dashboard');
+            }
+          });
+        } else if (authProvider.state == AuthState.error) {
+          // ❌ Login failed - Show error snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('medium'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Expanded(
+                    child: Text(
+                      authProvider.errorMessage ?? l10n.loginFailed,
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
                     ),
                   ),
-                  margin: EdgeInsets.all(context.mainPadding),
-                ),
-              );
-            }
-          })
-          .catchError((error) {
-            // Handle any unexpected errors
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.unexpectedError,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize),
-                ),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    context.borderRadius('medium'),
-                  ),
-                ),
-                margin: EdgeInsets.all(context.mainPadding),
+                ],
               ),
-            );
-          });
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              ),
+              margin: EdgeInsets.all(context.mainPadding),
+            ),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Row(
         children: [
@@ -149,13 +198,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       child: Image.asset('assets/images/logo.png'),
-
                     ),
 
                     SizedBox(height: context.mainPadding),
 
                     Text(
-                      AppLocalizations.of(context)!.welcomeBack,
+                      l10n.welcomeBack,
                       style: GoogleFonts.inter(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w300,
@@ -166,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: context.smallPadding),
 
                     Text(
-                      AppLocalizations.of(context)!.brandName,
+                      l10n.brandName,
                       style: GoogleFonts.playfairDisplay(
                         fontSize: context.headingFontSize,
                         fontWeight: FontWeight.w700,
@@ -182,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         horizontal: context.mainPadding,
                       ),
                       child: Text(
-                        AppLocalizations.of(context)!.tagline,
+                        l10n.tagline,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
@@ -223,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            AppLocalizations.of(context)!.signIn,
+                            l10n.signIn,
                             style: GoogleFonts.playfairDisplay(
                               fontSize: context.headingFontSize,
                               fontWeight: FontWeight.w600,
@@ -236,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: context.smallPadding),
 
                           Text(
-                            AppLocalizations.of(context)!.accessDashboard,
+                            l10n.accessDashboard,
                             style: GoogleFonts.inter(
                               fontSize: context.headerFontSize,
                               fontWeight: FontWeight.w400,
@@ -250,19 +298,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Email Field
                           PremiumTextField(
-                            label: AppLocalizations.of(context)!.emailAddress,
-                            hint: AppLocalizations.of(context)!.enterEmail,
+                            label: l10n.emailAddress,
+                            hint: l10n.enterEmail,
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: Icons.email_outlined,
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please enter your email';
+                                return l10n.pleaseEnterEmail;
                               }
                               if (!RegExp(
                                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                               ).hasMatch(value!)) {
-                                return 'Please enter a valid email address';
+                                return l10n.pleaseEnterValidEmail;
                               }
                               return null;
                             },
@@ -272,8 +320,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Password Field
                           PremiumTextField(
-                            label: AppLocalizations.of(context)!.password,
-                            hint: AppLocalizations.of(context)!.enterPassword,
+                            label: l10n.password,
+                            hint: l10n.enterPassword,
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             prefixIcon: Icons.lock_outline,
@@ -292,7 +340,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
-                                return 'Please enter your password';
+                                return l10n.pleaseEnterPassword;
                               }
                               return null;
                             },
@@ -309,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Forgot password feature coming soon!',
+                                      l10n.forgotPasswordComingSoon,
                                       style: GoogleFonts.inter(
                                         fontSize: context.captionFontSize,
                                       ),
@@ -326,7 +374,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               },
                               child: Text(
-                                AppLocalizations.of(context)!.forgotPassword,
+                                l10n.forgotPassword,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   color: AppTheme.primaryMaroon,
@@ -342,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Consumer<AuthProvider>(
                             builder: (context, authProvider, child) {
                               return PremiumButton(
-                                text: AppLocalizations.of(context)!.signIn,
+                                text: l10n.signIn,
                                 onPressed: authProvider.isLoading
                                     ? null
                                     : _handleLogin,
@@ -382,7 +430,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Icon(
                                         Icons.error_outline,
@@ -393,10 +441,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Login Failed',
+                                              l10n.loginFailed,
                                               style: GoogleFonts.inter(
                                                 color: Colors.red.shade700,
                                                 fontSize: context.bodyFontSize,
@@ -411,7 +459,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               style: GoogleFonts.inter(
                                                 color: Colors.red.shade600,
                                                 fontSize:
-                                                    context.captionFontSize,
+                                                context.captionFontSize,
                                                 height: 1.4,
                                               ),
                                             ),
@@ -446,7 +494,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                AppLocalizations.of(context)!.noAccount,
+                                l10n.noAccount,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   color: Colors.grey[600],
@@ -457,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.pushNamed(context, '/signup');
                                 },
                                 child: Text(
-                                  AppLocalizations.of(context)!.signUp,
+                                  l10n.signUp,
                                   style: GoogleFonts.inter(
                                     fontSize: context.headerFontSize,
                                     color: AppTheme.primaryMaroon,

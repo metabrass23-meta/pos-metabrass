@@ -4442,4 +4442,1009 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get retryLoading => 'دوبارہ لوڈ کریں';
+
+  @override
+  String get expenseDetails => 'اخراجات کی تفصیلات';
+
+  @override
+  String get viewCompleteExpenseInfo => 'مکمل اخراجات کی معلومات دیکھیں';
+
+  @override
+  String get amountInformation => 'رقم کی معلومات';
+
+  @override
+  String get withdrawalInformation => 'نکالنے کی معلومات';
+
+  @override
+  String get expenseDescription => 'اخراجات کی تفصیل';
+
+  @override
+  String get recordCreated => 'ریکارڈ بنایا گیا:';
+
+  @override
+  String get expenseRecord => 'اخراجات کا ریکارڈ';
+
+  @override
+  String get hour => 'گھنٹہ';
+
+  @override
+  String get minute => 'منٹ';
+
+  @override
+  String get selected => 'منتخب شدہ';
+
+  @override
+  String get open => 'کھولیں';
+
+  @override
+  String get explorer => 'ایکسپلورر';
+
+  @override
+  String get copy => 'کاپی';
+
+  @override
+  String get remove => 'ہٹائیں';
+
+  @override
+  String get viewImage => 'تصویر دیکھیں';
+
+  @override
+  String get invalidImageFile => 'غلط تصویر کی فائل۔ براہ کرم ایک درست تصویر منتخب کریں (زیادہ سے زیادہ 10MB)۔';
+
+  @override
+  String get receiptUploadedSuccessfully => 'رسید کی تصویر کامیابی سے اپ لوڈ ہو گئی!';
+
+  @override
+  String get failedToUploadImage => 'تصویر اپ لوڈ کرنے میں ناکامی';
+
+  @override
+  String get receiptImageRemoved => 'رسید کی تصویر ہٹا دی گئی';
+
+  @override
+  String get failedToOpenImage => 'تصویر کھولنے میں ناکامی';
+
+  @override
+  String get failedToShowInExplorer => 'ایکسپلورر میں دکھانے میں ناکامی';
+
+  @override
+  String get imageCopiedToClipboard => 'تصویر کلپ بورڈ میں کاپی ہو گئی!';
+
+  @override
+  String get failedToCopyToClipboard => 'کلپ بورڈ میں کاپی کرنے میں ناکامی';
+
+  @override
+  String get clickToSelectReceiptImage => 'رسید کی تصویر منتخب کرنے کے لیے کلک کریں';
+
+  @override
+  String get supportedFormats => 'تعاون یافتہ فارمیٹس: JPG, PNG, BMP, GIF (زیادہ سے زیادہ 10MB)';
+
+  @override
+  String get supportedFormatsShort => 'JPG, PNG, BMP, GIF (زیادہ سے زیادہ 10MB)';
+
+  @override
+  String get browseFiles => 'فائلیں براؤز کریں';
+
+  @override
+  String get processingImageFile => 'تصویر کی فائل پروسیس ہو رہی ہے...';
+
+  @override
+  String get openingFileDialog => 'فائل ڈائیلاگ کھولا جا رہا ہے...';
+
+  @override
+  String get validatingImageFile => 'تصویر کی فائل کی تصدیق ہو رہی ہے...';
+
+  @override
+  String get savingToAppDirectory => 'ایپلیکیشن ڈائریکٹری میں محفوظ کیا جا رہا ہے...';
+
+  @override
+  String get finalizing => 'حتمی شکل دی جا رہی ہے...';
+
+  @override
+  String get replaceImage => 'تصویر تبدیل کریں';
+
+  @override
+  String get replace => 'تبدیل کریں';
+
+  @override
+  String get file => 'فائل';
+
+  @override
+  String get size => 'سائز';
+
+  @override
+  String get added => 'شامل کیا گیا';
+
+  @override
+  String get loadingFileInfo => 'فائل کی معلومات لوڈ ہو رہی ہیں...';
+
+  @override
+  String get receiptImageViewer => 'رسید تصویر ویوئر';
+
+  @override
+  String get openInExternalViewer => 'بیرونی ویوئر میں کھولیں';
+
+  @override
+  String get showInExplorer => 'ایکسپلورر میں دکھائیں';
+
+  @override
+  String get copyToClipboard => 'کلپ بورڈ میں کاپی کریں';
+
+  @override
+  String get failedToOpen => 'کھولنے میں ناکامی';
+
+  @override
+  String get failedToCopy => 'کاپی کرنے میں ناکامی';
+
+  @override
+  String get loadingImage => 'تصویر لوڈ ہو رہی ہے...';
+
+  @override
+  String get failedToLoadImage => 'تصویر لوڈ کرنے میں ناکامی';
+
+  @override
+  String get openWithExternalViewer => 'بیرونی ویوئر کے ساتھ کھولیں';
+
+  @override
+  String get failed => 'ناکام';
+
+  @override
+  String get removeImage => 'تصویر ہٹائیں';
+
+  @override
+  String get viewFullScreen => 'مکمل اسکرین دیکھیں';
+
+  @override
+  String get processing => 'پروسیسنگ جاری ہے...';
+
+  @override
+  String get tapToChangeImage => 'تصویر تبدیل کرنے کے لیے ٹیپ کریں';
+
+  @override
+  String get tapToAddImage => 'تصویر شامل کرنے کے لیے ٹیپ کریں';
+
+  @override
+  String get supports => 'تعاون یافتہ';
+
+  @override
+  String get max => 'زیادہ سے زیادہ';
+
+  @override
+  String get fileSizeMustBeLessThan => 'فائل کا سائز کم ہونا چاہیے';
+
+  @override
+  String get errorPickingImage => 'تصویر منتخب کرنے میں خرابی';
+
+  @override
+  String get realTimeInventory => 'حقیقی وقت انوینٹری';
+
+  @override
+  String get refreshInventory => 'انوینٹری تازہ کریں';
+
+  @override
+  String get noStockInformationAvailable => 'اسٹاک کی معلومات دستیاب نہیں';
+
+  @override
+  String get stockInformation => 'اسٹاک کی معلومات';
+
+  @override
+  String get unknownProduct => 'نامعلوم پروڈکٹ';
+
+  @override
+  String get allProductsHaveSufficientStock => 'تمام مصنوعات میں کافی اسٹاک ہے';
+
+  @override
+  String get lowStockAlerts => 'کم اسٹاک الرٹس';
+
+  @override
+  String get uncategorized => 'غیر زمرہ بند';
+
+  @override
+  String get critical => 'نازک';
+
+  @override
+  String get currentStock => 'موجودہ اسٹاک';
+
+  @override
+  String get refreshStock => 'اسٹاک تازہ کریں';
+
+  @override
+  String get viewAlerts => 'الرٹس دیکھیں';
+
+  @override
+  String get noLowStockAlertsAtThisTime => 'اس وقت کم اسٹاک کی کوئی الرٹ نہیں۔';
+
+  @override
+  String get addNewOrderItem => 'نیا آرڈر آئٹم شامل کریں';
+
+  @override
+  String get productNameIsRequired => 'پروڈکٹ کا نام ضروری ہے';
+
+  @override
+  String get customizationNotes => 'تخصیص کے نوٹس';
+
+  @override
+  String get quantityIsRequired => 'مقدار ضروری ہے';
+
+  @override
+  String get unitPriceIsRequired => 'یونٹ قیمت ضروری ہے';
+
+  @override
+  String get addOrderItem => 'آرڈر آئٹم شامل کریں';
+
+  @override
+  String get pleaseSelectAnOrder => 'براہ کرم ایک آرڈر منتخب کریں';
+
+  @override
+  String get pleaseSelectAProduct => 'براہ کرم ایک پروڈکٹ منتخب کریں';
+
+  @override
+  String get orderItemCreatedSuccessfully => 'آرڈر آئٹم کامیابی سے بنایا گیا';
+
+  @override
+  String get failedToCreateOrderItem => 'آرڈر آئٹم بنانے میں ناکامی';
+
+  @override
+  String get selectOrder => 'آرڈر منتخب کریں';
+
+  @override
+  String get typeCustomerNameToSearch => 'تلاش کرنے کے لیے کسٹمر کا نام ٹائپ کریں...';
+
+  @override
+  String get searchByCustomerName => 'کسٹمر کے نام سے تلاش کریں...';
+
+  @override
+  String get typeProductNameToSearch => 'تلاش کرنے کے لیے پروڈکٹ کا نام ٹائپ کریں...';
+
+  @override
+  String get searchByProductName => 'پروڈکٹ کے نام سے تلاش کریں...';
+
+  @override
+  String get selectAnOrder => 'ایک آرڈر منتخب کریں...';
+
+  @override
+  String get selectAProduct => 'ایک پروڈکٹ منتخب کریں...';
+
+  @override
+  String get deleteOrderItem => 'آرڈر آئٹم حذف کریں';
+
+  @override
+  String get removeThisOrderItemPermanently => 'اس آرڈر آئٹم کو مستقل طور پر ہٹائیں';
+
+  @override
+  String get orderItemDeletedSuccessfully => 'آرڈر آئٹم کامیابی سے حذف ہو گیا!';
+
+  @override
+  String get failedToDeleteOrderItem => 'آرڈر آئٹم حذف کرنے میں ناکامی';
+
+  @override
+  String get irreversibleAction => 'ناقابل واپسی عمل';
+
+  @override
+  String get deleteWarningMessage => 'یہ عمل آرڈر آئٹم کو مستقل طور پر حذف کر دے گا اور اسے واپس نہیں کیا جا سکتا۔ براہ کرم آگے بڑھنے سے پہلے تفصیلات کا جائزہ لیں۔';
+
+  @override
+  String get orderItemSummary => 'آرڈر آئٹم کا خلاصہ';
+
+  @override
+  String get productId => 'پروڈکٹ آئی ڈی';
+
+  @override
+  String get lineTotal => 'لائن ٹوٹل';
+
+  @override
+  String get impactAnalysis => 'اثر تجزیہ';
+
+  @override
+  String get financialImpact => 'مالی اثر';
+
+  @override
+  String willBeRemovedFromOrderTotal(String amount) {
+    return '$amount آرڈر ٹوٹل سے ہٹا دیا جائے گا';
+  }
+
+  @override
+  String get inventoryImpact => 'انوینٹری اثر';
+
+  @override
+  String quantityWillBeAffected(int quantity) {
+    return 'مقدار $quantity متاثر ہوگی';
+  }
+
+  @override
+  String get salesImpact => 'سیلز اثر';
+
+  @override
+  String get itemHasBeenSoldWarning => 'یہ آئٹم فروخت ہو چکا ہے اور حذف کرنے سے سیلز ریکارڈ متاثر ہو سکتے ہیں';
+
+  @override
+  String get finalConfirmation => 'حتمی تصدیق';
+
+  @override
+  String get areYouSureDeleteOrderItem => 'کیا آپ واقعی اس آرڈر آئٹم کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get deleteOrderItemWarningPoints => '• یہ عمل واپس نہیں کیا جا سکتا\n• تمام منسلک ڈیٹا مستقل طور پر ہٹا دیا جائے گا\n• یہ آرڈر ٹوٹلز اور انوینٹری کو متاثر کر سکتا ہے\n• اگر آپ کو ریکارڈ محفوظ کرنے کی ضرورت ہے تو آرکائیونگ پر غور کریں';
+
+  @override
+  String get editOrderItem => 'آرڈر آئٹم میں ترمیم کریں';
+
+  @override
+  String get updateOrderItemInformation => 'آرڈر آئٹم کی معلومات اپ ڈیٹ کریں';
+
+  @override
+  String get changingOrderNotAllowed => 'آرڈر تبدیل کرنے کی اجازت نہیں ہے۔ براہ کرم اس کے بجائے ایک نیا آرڈر آئٹم بنائیں۔';
+
+  @override
+  String get changingProductNotAllowed => 'پروڈکٹ تبدیل کرنے کی اجازت نہیں ہے۔ براہ کرم اس کے بجائے ایک نیا آرڈر آئٹم بنائیں۔';
+
+  @override
+  String get orderItemUpdatedSuccessfully => 'آرڈر آئٹم کامیابی سے اپ ڈیٹ ہو گیا!';
+
+  @override
+  String get failedToUpdateOrderItem => 'آرڈر آئٹم اپ ڈیٹ کرنے میں ناکامی';
+
+  @override
+  String get productInformation => 'پروڈکٹ کی معلومات';
+
+  @override
+  String get orderItemDetails => 'آرڈر آئٹم کی تفصیلات';
+
+  @override
+  String get quantityMustBePositive => 'مقدار ایک مثبت نمبر ہونا چاہیے';
+
+  @override
+  String get unitPricePKR => 'یونٹ قیمت (PKR)';
+
+  @override
+  String get enterUnitPrice => 'یونٹ قیمت درج کریں';
+
+  @override
+  String get pleaseEnterUnitPrice => 'براہ کرم یونٹ قیمت درج کریں';
+
+  @override
+  String get unitPriceMustBePositive => 'یونٹ قیمت ایک مثبت نمبر ہونا چاہیے';
+
+  @override
+  String get enterCustomizationNotes => 'کوئی بھی تخصیص کے نوٹس یا خاص ضروریات درج کریں';
+
+  @override
+  String get notesMustBeLessThan500 => 'نوٹس 500 حروف سے کم ہونے چاہئیں';
+
+  @override
+  String get updateOrderItem => 'آرڈر آئٹم اپ ڈیٹ کریں';
+
+  @override
+  String get orderItemFilters => 'آرڈر آئٹم فلٹرز';
+
+  @override
+  String get customizeOrderItemSearch => 'اپنی آرڈر آئٹم تلاش اور فلٹرنگ کو اپنی مرضی کے مطابق بنائیں';
+
+  @override
+  String get activeFilters => 'فعال فلٹرز';
+
+  @override
+  String get basicFilters => 'بنیادی فلٹرز';
+
+  @override
+  String get allOrders => 'تمام آرڈرز';
+
+  @override
+  String get allProducts => 'تمام پروڈکٹس';
+
+  @override
+  String get searchAndTextFilters => 'تلاش اور ٹیکسٹ فلٹرز';
+
+  @override
+  String get searchQuery => 'تلاش کی استفسار';
+
+  @override
+  String get searchInProductNames => 'پروڈکٹ کے ناموں، تخصیص کے نوٹس، یا آئی ڈیز میں تلاش کریں';
+
+  @override
+  String get numericRangeFilters => 'عددی حد فلٹرز';
+
+  @override
+  String get minQuantity => 'کم سے کم مقدار';
+
+  @override
+  String get minimumQuantity => 'کم سے کم مقدار';
+
+  @override
+  String get maxQuantity => 'زیادہ سے زیادہ مقدار';
+
+  @override
+  String get maximumQuantity => 'زیادہ سے زیادہ مقدار';
+
+  @override
+  String get minPricePKR => 'کم سے کم قیمت (PKR)';
+
+  @override
+  String get minimumUnitPrice => 'کم سے کم یونٹ قیمت';
+
+  @override
+  String get maxPricePKR => 'زیادہ سے زیادہ قیمت (PKR)';
+
+  @override
+  String get maximumUnitPrice => 'زیادہ سے زیادہ یونٹ قیمت';
+
+  @override
+  String get dateAndStatusFilters => 'تاریخ اور حیثیت فلٹرز';
+
+  @override
+  String get dateFrom => 'تاریخ سے';
+
+  @override
+  String get dateTo => 'تاریخ تک';
+
+  @override
+  String get showInactiveItems => 'غیر فعال آئٹمز دکھائیں';
+
+  @override
+  String get hasCustomizationNotes => 'تخصیص کے نوٹس ہیں';
+
+  @override
+  String get sortingOptions => 'ترتیب دینے کے اختیارات';
+
+  @override
+  String get updatedDate => 'تازہ کاری کی تاریخ';
+
+  @override
+  String get areYouSureYouWantTo => 'کیا آپ واقعی یہ کرنا چاہتے ہیں';
+
+  @override
+  String get areYouSureYouWantToCreateACopyOf => 'کیا آپ واقعی اس کی ایک کاپی بنانا چاہتے ہیں';
+
+  @override
+  String get failedToUpdateItemStatus => 'آئٹم کی حیثیت اپ ڈیٹ کرنے میں ناکامی';
+
+  @override
+  String get activatedSuccessfully => 'کامیابی سے فعال کر دیا گیا';
+
+  @override
+  String get failedToDuplicateItem => 'آئٹم کی نقل بنانے میں ناکامی';
+
+  @override
+  String get orderItemDuplicatedSuccessfully => 'آرڈر آئٹم کی نقل کامیابی سے بنا دی گئی';
+
+  @override
+  String get orderItemDetailsExportedSuccessfully => 'آرڈر آئٹم کی تفصیلات کامیابی سے ایکسپورٹ ہو گئیں';
+
+  @override
+  String get failedToExport => 'ایکسپورٹ کرنے میں ناکامی';
+
+  @override
+  String get failedToLoadOrderItems => 'آرڈر آئٹمز لوڈ کرنے میں ناکامی';
+
+  @override
+  String get startManagingYourOrderItems => 'اپنے آرڈر آئٹمز مینیج کرنا شروع کریں، پروڈکٹس شامل کرکے اسٹاک، قیمتوں اور کسٹمائزیشن کو ٹریک کریں';
+
+  @override
+  String get duplicate => 'نقل بنائیں';
+
+  @override
+  String get orderItem => 'آرڈر آئٹم';
+
+  @override
+  String get viewOrderItem => 'آرڈر آئٹم دیکھیں';
+
+  @override
+  String get completeOrderItemInformation => 'مکمل آرڈر آئٹم کی معلومات';
+
+  @override
+  String get orderItemId => 'آرڈر آئٹم ID';
+
+  @override
+  String get productInfo => 'پروڈکٹ کی معلومات';
+
+  @override
+  String get noAdditionalProductDetailsAvailable => 'پروڈکٹ کی اضافی تفصیلات دستیاب نہیں ہیں';
+
+  @override
+  String get activeStatus => 'فعال حیثیت';
+
+  @override
+  String get soldStatus => 'فروخت کی حیثیت';
+
+  @override
+  String get remainingToSell => 'فروخت کے لیے باقی';
+
+  @override
+  String get timestamps => 'ٹائم سٹیمپس';
+
+  @override
+  String get updatedAt => 'اپ ڈیٹ کیا گیا';
+
+  @override
+  String get noCustomizationNotesAvailable => 'تخصیص کے نوٹس دستیاب نہیں ہیں';
+
+  @override
+  String get brand => 'برانڈ';
+
+  @override
+  String get material => 'مواد';
+
+  @override
+  String get style => 'انداز';
+
+  @override
+  String get noAdditionalDetails => 'کوئی اضافی تفصیلات نہیں';
+
+  @override
+  String get additionalProductInformationAvailable => 'اضافی پروڈکٹ کی معلومات دستیاب ہیں';
+
+  @override
+  String get addedToCart => 'کارٹ میں شامل کیا گیا';
+
+  @override
+  String get stockAvailable => 'اسٹاک';
+
+  @override
+  String get min => 'کم از کم';
+
+  @override
+  String get customPrice => 'حسب ضرورت قیمت';
+
+  @override
+  String get customPricePkr => 'حسب ضرورت قیمت (PKR)';
+
+  @override
+  String get itemDiscountOptional => 'آئٹم ڈسکاؤنٹ (اختیاری)';
+
+  @override
+  String get clearDiscount => 'ڈسکاؤنٹ صاف کریں';
+
+  @override
+  String get specialInstructions => 'خصوصی ہدایات';
+
+  @override
+  String get anySpecialRequirements => 'کوئی خاص ضروریات، تبدیلیاں، یا نوٹس...';
+
+  @override
+  String get checkoutAndPayment => 'چیک آؤٹ اور ادائیگی';
+
+  @override
+  String get completeTheSaleTransaction => 'فروخت کا لین دین مکمل کریں';
+
+  @override
+  String get orderSummary => 'آرڈر کا خلاصہ';
+
+  @override
+  String get credit => 'قرض';
+
+  @override
+  String get split => 'تقسیم';
+
+  @override
+  String get splitPaymentDetails => 'تقسیم شدہ ادائیگی کی تفصیلات';
+
+  @override
+  String get cashAmount => 'نقد رقم';
+
+  @override
+  String get cardAmount => 'کارڈ کی رقم';
+
+  @override
+  String get bankTransferAmount => 'بینک ٹرانسفر کی رقم';
+
+  @override
+  String get pleaseEnterAmountPaid => 'براہ کرم ادا کی گئی رقم درج کریں';
+
+  @override
+  String get change => 'بدلہ';
+
+  @override
+  String get hideAdvancedOptions => 'اعلیٰ اختیارات چھپائیں';
+
+  @override
+  String get showAdvancedOptions => 'اعلیٰ اختیارات دکھائیں';
+
+  @override
+  String get advancedOptions => 'اعلیٰ اختیارات';
+
+  @override
+  String get overallDiscountPkr => 'مجموعی ڈسکاؤنٹ (PKR)';
+
+  @override
+  String get gstPercentage => 'GST فیصد (%)';
+
+  @override
+  String get additionalTax => 'اضافی ٹیکس (%)';
+
+  @override
+  String get anySpecialInstructionsOrRemarks => 'کوئی خاص ہدایات یا تبصرے...';
+
+  @override
+  String get completeSale => 'فروخت مکمل کریں';
+
+  @override
+  String get saleCompleted => 'فروخت مکمل ہوگئی!';
+
+  @override
+  String get transactionProcessedSuccessfully => 'لین دین کامیابی سے مکمل ہوگیا';
+
+  @override
+  String get invoiceNumber => 'انوائس نمبر';
+
+  @override
+  String get printFunctionalityToBeImplemented => 'پرنٹ فعالیت کو نافذ کیا جانا ہے';
+
+  @override
+  String get printReceipt => 'رسید پرنٹ کریں';
+
+  @override
+  String get newSale => 'نئی فروخت';
+
+  @override
+  String get navigateToSalesManagementToContinue => 'جاری رکھنے کے لیے سیلز مینجمنٹ پر جائیں';
+
+  @override
+  String get createNewInvoice => 'نیا انوائس بنائیں';
+
+  @override
+  String get selectSaleRequired => 'فروخت منتخب کریں *';
+
+  @override
+  String get chooseASaleToCreateInvoiceFor => 'انوائس بنانے کے لیے فروخت کا انتخاب کریں';
+
+  @override
+  String get pleaseSelectASale => 'براہ کرم ایک فروخت منتخب کریں';
+
+  @override
+  String get dueDateRequired => 'واجب الادا تاریخ *';
+
+  @override
+  String get selectDueDate => 'واجب الادا تاریخ منتخب کریں';
+
+  @override
+  String get additionalInvoiceNotesOptional => 'اضافی انوائس نوٹس (اختیاری)';
+
+  @override
+  String get termsAndConditions => 'شرائط و ضوابط';
+
+  @override
+  String get invoiceTermsAndConditions => 'انوائس کی شرائط و ضوابط';
+
+  @override
+  String get standardTermsAndConditionsApply => 'معیاری شرائط و ضوابط لاگو ہوتے ہیں';
+
+  @override
+  String get createInvoice => 'انوائس بنائیں';
+
+  @override
+  String get invoiceCreatedSuccessfully => 'انوائس کامیابی سے بنایا گیا';
+
+  @override
+  String get failedToCreateInvoice => 'انوائس بنانے میں ناکام';
+
+  @override
+  String get receiptManagement => 'رسید کا انتظام';
+
+  @override
+  String get pleaseSelectALabor => 'براہ کرم ایک مزدور منتخب کریں';
+
+  @override
+  String get amountCannotExceedRemainingAdvanceAmount => 'رقم باقی پیشگی رقم سے زیادہ نہیں ہو سکتی';
+
+  @override
+  String get failedToAddAdvancePayment => 'پیشگی ادائیگی شامل کرنے میں ناکام';
+
+  @override
+  String get advancePaymentAddedSuccessfully => 'پیشگی ادائیگی کامیابی سے شامل کی گئی';
+
+  @override
+  String get selectDateAndTime => 'تاریخ اور وقت منتخب کریں';
+
+  @override
+  String get uploadReceiptImageForBetterRecordKeeping => 'بہتر ریکارڈ رکھنے کے لیے رسید کی تصویر اپ لوڈ کریں';
+
+  @override
+  String get selectALabor => 'ایک مزدور منتخب کریں';
+
+  @override
+  String get advanceAmountPkr => 'پیشگی رقم (PKR)';
+
+  @override
+  String get enterAdvanceAmountPkr => 'پیشگی رقم درج کریں (PKR)';
+
+  @override
+  String get pleaseEnterAdvanceAmount => 'براہ کرم پیشگی رقم درج کریں';
+
+  @override
+  String get amountExceedsRemainingSalary => 'رقم باقی ماہانہ تنخواہ سے زیادہ ہے';
+
+  @override
+  String get enterReasonForAdvancePayment => 'پیشگی ادائیگی کی وجہ درج کریں';
+
+  @override
+  String get salaryCalculation => 'تنخواہ کا حساب';
+
+  @override
+  String get originalSalary => 'اصل تنخواہ';
+
+  @override
+  String get currentMonthAdvances => 'موجودہ ماہ کی پیشگیاں';
+
+  @override
+  String get remainingForMonth => 'ماہ کے لیے باقی';
+
+  @override
+  String get newAdvance => 'نئی پیشگی';
+
+  @override
+  String get afterAdvance => 'پیشگی کے بعد';
+
+  @override
+  String get filterAdvancePayments => 'پیشگی ادائیگیوں کو فلٹر کریں';
+
+  @override
+  String get applyFiltersToFindSpecificAdvancePayments => 'مخصوص پیشگی ادائیگیوں کو تلاش کرنے کے لیے فلٹرز لگائیں';
+
+  @override
+  String get searchAdvancePayments => 'پیشگی ادائیگیاں تلاش کریں...';
+
+  @override
+  String get allLaborers => 'تمام مزدور';
+
+  @override
+  String get receiptAndSorting => 'رسید اور ترتیب';
+
+  @override
+  String get showInactiveRecords => 'غیر فعال ریکارڈز دکھائیں';
+
+  @override
+  String showingAdvancePayments(Object end, Object start, Object total) {
+    return '$start-$end دکھا رہے ہیں کل $total پیشگی ادائیگیوں میں سے';
+  }
+
+  @override
+  String get failedToLoadAdvancePayments => 'پیشگی ادائیگیاں لوڈ کرنے میں ناکام';
+
+  @override
+  String get noAdvancePaymentRecordsFound => 'کوئی پیشگی ادائیگی ریکارڈ نہیں ملا';
+
+  @override
+  String get startByAddingYourFirstAdvancePaymentRecord => 'مزدوروں کی ادائیگیوں کو مؤثر طریقے سے ٹریک کرنے کے لیے اپنا پہلا پیشگی ادائیگی ریکارڈ شامل کرکے شروع کریں';
+
+  @override
+  String get addFirstAdvancePayment => 'پہلی پیشگی ادائیگی شامل کریں';
+
+  @override
+  String get highAmount => 'زیادہ رقم';
+
+  @override
+  String get failedToDeleteAdvancePayment => 'پیشگی ادائیگی حذف کرنے میں ناکام';
+
+  @override
+  String get advancePaymentDeletedSuccessfully => 'پیشگی ادائیگی کامیابی سے حذف ہوگئی!';
+
+  @override
+  String get deleteAdvancePayment => 'پیشگی ادائیگی حذف کریں';
+
+  @override
+  String get areYouSureDeleteThisPayment => 'کیا آپ واقعی اس ادائیگی کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get areYouAbsolutelySureDeleteAdvancePayment => 'کیا آپ واقعی اس پیشگی ادائیگی ریکارڈ کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get thisWillPermanentlyDeleteThePaymentRecord => 'یہ ادائیگی ریکارڈ کو مستقل طور پر حذف کر دے گا۔';
+
+  @override
+  String get thisWillPermanentlyDeleteAdvancePaymentRecord => 'یہ پیشگی ادائیگی ریکارڈ اور تمام منسلک ڈیٹا کو مستقل طور پر حذف کر دے گا۔ اس عمل کو کالعدم نہیں کیا جا سکتا۔';
+
+  @override
+  String get amountIncreaseCannotExceedRemainingAdvanceAmount => 'رقم میں اضافہ باقی پیشگی رقم سے زیادہ نہیں ہو سکتا';
+
+  @override
+  String get advancePaymentUpdatedSuccessfully => 'پیشگی ادائیگی کامیابی سے اپ ڈیٹ ہوگئی!';
+
+  @override
+  String get editAdvancePayment => 'پیشگی ادائیگی میں ترمیم کریں';
+
+  @override
+  String get laborInformation => 'مزدور کی معلومات';
+
+  @override
+  String get advancePaymentDetails => 'پیشگی ادائیگی کی تفصیلات';
+
+  @override
+  String get viewCompletePaymentInformation => 'مکمل ادائیگی کی معلومات دیکھیں';
+
+  @override
+  String get role => 'کردار';
+
+  @override
+  String get advanceAmount => 'پیشگی رقم';
+
+  @override
+  String get paymentDescription => 'ادائیگی کی تفصیل';
+
+  @override
+  String get receiptInformation => 'رسید کی معلومات';
+
+  @override
+  String get receiptImageAvailable => 'رسید کی تصویر دستیاب ہے';
+
+  @override
+  String get salaryInformation => 'تنخواہ کی معلومات';
+
+  @override
+  String get totalSalary => 'کل تنخواہ';
+
+  @override
+  String get viewReceiptDetailsAndImage => 'رسید کی تفصیلات اور تصویر دیکھیں';
+
+  @override
+  String get ofSalary => 'تنخواہ کا';
+
+  @override
+  String get used => 'استعمال شدہ';
+
+  @override
+  String get receiptImagePreview => 'رسید کی تصویر کا پیش نظارہ';
+
+  @override
+  String get receiptUploadFunctionalityToBeImplemented => 'رسید اپ لوڈ کی فعالیت لاگو کی جائے گی';
+
+  @override
+  String get areYouSureLogoutFromYourAccount => 'کیا آپ واقعی اپنے اکاؤنٹ سے لاگ آؤٹ کرنا چاہتے ہیں؟';
+
+  @override
+  String get forgotPasswordComingSoon => 'پاس ورڈ بھول جانے کی سہولت جلد آرہی ہے!';
+
+  @override
+  String get successfullyLoggedOutSeeSoon => 'کامیابی سے لاگ آؤٹ ہوگئے۔ جلد ملیں گے!';
+
+  @override
+  String get loggedOutLocallyDueToError => 'ایک خرابی کی وجہ سے مقامی طور پر لاگ آؤٹ ہوگئے۔';
+
+  @override
+  String get createNewReceipt => 'نئی رسید بنائیں';
+
+  @override
+  String get chooseASaleToCreateReceiptFor => 'رسید بنانے کے لیے فروخت منتخب کریں';
+
+  @override
+  String get additionalReceiptNotesOptional => 'اضافی رسید نوٹس (اختیاری)';
+
+  @override
+  String get failedToCreateReceipt => 'رسید بنانے میں ناکام';
+
+  @override
+  String get addPrincipalAccountEntry => 'پرنسپل اکاؤنٹ اندراج شامل کریں';
+
+  @override
+  String get recordANewLedgerTransaction => 'ایک نیا لیجر لین دین ریکارڈ کریں';
+
+  @override
+  String get sourceModule => 'ماخذ ماڈیول';
+
+  @override
+  String get pleaseSelectSourceModule => 'براہ کرم ماخذ ماڈیول منتخب کریں';
+
+  @override
+  String get transactionType => 'لین دین کی قسم';
+
+  @override
+  String get pleaseSelectTransactionType => 'براہ کرم لین دین کی قسم منتخب کریں';
+
+  @override
+  String get creditMoneyIn => 'کریڈٹ (رقم اندر)';
+
+  @override
+  String get debitMoneyOut => 'ڈیبٹ (رقم باہر)';
+
+  @override
+  String get sourceID => 'ماخذ ID';
+
+  @override
+  String get referenceIDOptional => 'حوالہ ID (اختیاری)';
+
+  @override
+  String get referenceIDFromSourceModuleOptional => 'ماخذ ماڈیول سے حوالہ ID (اختیاری)';
+
+  @override
+  String get enterTransactionDescription => 'لین دین کی تفصیل درج کریں';
+
+  @override
+  String get enterTransactionAmountPKR => 'لین دین کی رقم درج کریں (PKR)';
+
+  @override
+  String get handledByOptional => 'ہینڈل کنندہ (اختیاری)';
+
+  @override
+  String get selectTransactionDateTime => 'لین دین کی تاریخ اور وقت منتخب کریں';
+
+  @override
+  String get additionalNotesOrDetailsOptional => 'اضافی نوٹس یا تفصیلات (اختیاری)';
+
+  @override
+  String get principalAccountEntryAddedSuccessfully => 'پرنسپل اکاؤنٹ کا اندراج کامیابی سے شامل ہو گیا!';
+
+  @override
+  String get principalAccountDetails => 'پرنسپل اکاؤنٹ کی تفصیلات';
+
+  @override
+  String get viewCompleteTransactionInformation => 'مکمل لین دین کی معلومات دیکھیں';
+
+  @override
+  String get sourceModuleInformation => 'ماخذ ماڈیول کی معلومات';
+
+  @override
+  String get module => 'ماڈیول';
+
+  @override
+  String get balanceInformation => 'بیلنس کی معلومات';
+
+  @override
+  String get balanceAfterTransaction => 'لین دین کے بعد بیلنس';
+
+  @override
+  String get handlerInformation => 'ہینڈلر کی معلومات';
+
+  @override
+  String get transactionDescription => 'لین دین کی تفصیل';
+
+  @override
+  String get ledgerEntry => 'لیجر اندراج';
+
+  @override
+  String get transactions => 'لین دین';
+
+  @override
+  String get entryID => 'اندراج ID';
+
+  @override
+  String get balanceAfter => 'بعد کا بیلنس';
+
+  @override
+  String get handledBy => 'ہینڈل کنندہ';
+
+  @override
+  String get exportAccountEntry => 'اکاؤنٹ اندراج برآمد کریں';
+
+  @override
+  String get noPrincipalAccountRecordsFound => 'کوئی پرنسپل اکاؤنٹ ریکارڈ نہیں ملا';
+
+  @override
+  String get startByAddingYourFirstPrincipalAccountEntry => 'تمام نقد حرکات کو ٹریک کرنے کے لیے اپنا پہلا پرنسپل اکاؤنٹ اندراج شامل کریں';
+
+  @override
+  String get addFirstEntry => 'پہلا اندراج شامل کریں';
+
+  @override
+  String get editEntry => 'اندراج میں ترمیم کریں';
+
+  @override
+  String get editPrincipalAccountEntry => 'پرنسپل اکاؤنٹ اندراج میں ترمیم کریں';
+
+  @override
+  String get updateTransactionInformation => 'لین دین کی معلومات اپ ڈیٹ کریں';
+
+  @override
+  String get updateEntry => 'اندراج اپ ڈیٹ کریں';
+
+  @override
+  String get principalAccountEntryUpdatedSuccessfully => 'پرنسپل اکاؤنٹ کا اندراج کامیابی سے اپ ڈیٹ ہو گیا!';
+
+  @override
+  String get deleteEntry => 'اندراج حذف کریں';
+
+  @override
+  String get deletePrincipalAccountEntry => 'پرنسپل اکاؤنٹ اندراج حذف کریں';
+
+  @override
+  String get areYouSureYouWantToDeleteThisEntry => 'کیا آپ واقعی اس پرنسپل اکاؤنٹ اندراج کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get areYouAbsolutelySureYouWantToDeleteThisEntry => 'کیا آپ بالکل یقین سے اس پرنسپل اکاؤنٹ اندراج کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get thisWillPermanentlyDeleteTheEntry => 'یہ پرنسپل اکاؤنٹ کے اندراج کو مستقل طور پر حذف کر دے گا اور بیلنس کے حساب کتاب کو متاثر کرے گا۔';
+
+  @override
+  String get thisWillPermanentlyDeleteTheEntryFull => 'یہ پرنسپل اکاؤنٹ کے اندراج کو مستقل طور پر حذف کر دے گا اور بیلنس کے حساب کتاب کو متاثر کر سکتا ہے۔ یہ عمل کالعدم نہیں کیا جا سکتا۔';
+
+  @override
+  String get principalAccountEntryDeletedSuccessfully => 'پرنسپل اکاؤنٹ کا اندراج کامیابی سے حذف ہو گیا!';
 }
