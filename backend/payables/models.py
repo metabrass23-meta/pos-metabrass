@@ -118,7 +118,15 @@ class Payable(models.Model):
         related_name='payables',
         help_text="Link to vendor if creditor is a registered vendor"
     )
-    
+    purchase = models.OneToOneField(
+    'purchases.Purchase',
+    on_delete=models.CASCADE,
+    null=True,
+    blank=True,
+    related_name='payable',
+    help_text="Linked purchase if payable originated from a purchase"
+    )
+
     # Amount fields
     amount_borrowed = models.DecimalField(
         max_digits=12,
