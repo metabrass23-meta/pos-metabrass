@@ -9,7 +9,8 @@ import '../../utils/debug_helper.dart';
 import '../api_client.dart';
 
 class VendorServiceExtended {
-  static final VendorServiceExtended _instance = VendorServiceExtended._internal();
+  static final VendorServiceExtended _instance =
+      VendorServiceExtended._internal();
 
   factory VendorServiceExtended() => _instance;
 
@@ -29,12 +30,14 @@ class VendorServiceExtended {
         // Use your existing ApiResponse.fromJson method with the correct data structure
         return ApiResponse<VendorStatisticsResponse>.fromJson(
           response.data,
-              (data) => VendorStatisticsResponse.fromJson(data as Map<String, dynamic>),
+          (data) =>
+              VendorStatisticsResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorStatisticsResponse>(
           success: false,
-          message: response.data['message'] ?? 'Failed to get vendor statistics',
+          message:
+              response.data['message'] ?? 'Failed to get vendor statistics',
           errors: response.data['errors'] as Map<String, dynamic>?,
         );
       }
@@ -77,7 +80,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(
@@ -125,7 +128,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(
@@ -174,7 +177,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(
@@ -223,7 +226,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(
@@ -281,7 +284,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(
@@ -330,7 +333,8 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<Map<String, dynamic>>(
           success: true,
-          message: response.data['message'] ?? 'Bulk action completed successfully',
+          message:
+              response.data['message'] ?? 'Bulk action completed successfully',
           data: response.data['data'] as Map<String, dynamic>?,
         );
       } else {
@@ -384,7 +388,9 @@ class VendorServiceExtended {
   }
 
   /// Get vendor areas
-  Future<ApiResponse<List<VendorAreaCount>>> getVendorAreas({String? city}) async {
+  Future<ApiResponse<List<VendorAreaCount>>> getVendorAreas({
+    String? city,
+  }) async {
     try {
       // Since there's no direct endpoint for areas, we'll get it from statistics
       final statsResponse = await getVendorStatistics();
@@ -393,7 +399,9 @@ class VendorServiceExtended {
 
         // Filter by city if provided
         if (city != null && city.isNotEmpty) {
-          areas = areas.where((area) => area.city.toLowerCase() == city.toLowerCase()).toList();
+          areas = areas
+              .where((area) => area.city.toLowerCase() == city.toLowerCase())
+              .toList();
         }
 
         return ApiResponse<List<VendorAreaCount>>(
@@ -438,7 +446,8 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorPaymentsResponse>.fromJson(
           response.data,
-              (data) => VendorPaymentsResponse.fromJson(data as Map<String, dynamic>),
+          (data) =>
+              VendorPaymentsResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorPaymentsResponse>(
@@ -472,28 +481,38 @@ class VendorServiceExtended {
   }) async {
     try {
       // Since there's no endpoint for transactions yet, return a placeholder response
-      return ApiResponse<VendorTransactionsResponse>(
-        success: true,
-        message: 'Transaction integration not yet implemented.',
-        data: VendorTransactionsResponse(
-          vendorId: vendorId,
-          vendorName: 'Unknown',
-          transactions: [],
-          summary: VendorTransactionSummary(
-            totalTransactions: 0,
-            totalAmount: 0.0,
-            pendingAmount: 0.0,
-            paidAmount: 0.0,
-            lastTransactionDate: null,
-          ),
-          note: 'Transaction integration not yet implemented.',
-        ),
+      final queryParams = {
+        'page': page.toString(),
+        'page_size': pageSize.toString(),
+      };
+
+      final response = await _apiClient.get(
+        ApiConfig.vendorTransactions(vendorId),
+        queryParameters: queryParams,
       );
+
+      DebugHelper.printApiResponse('GET Vendor Transactions', response.data);
+
+      if (response.statusCode == 200) {
+        return ApiResponse<VendorTransactionsResponse>.fromJson(
+          response.data,
+          (data) =>
+              VendorTransactionsResponse.fromJson(data as Map<String, dynamic>),
+        );
+      } else {
+        return ApiResponse<VendorTransactionsResponse>(
+          success: false,
+          message:
+              response.data['message'] ?? 'Failed to get vendor transactions',
+          errors: response.data['errors'] as Map<String, dynamic>?,
+        );
+      }
     } catch (e) {
       debugPrint('Get vendor transactions error: ${e.toString()}');
       return ApiResponse<VendorTransactionsResponse>(
         success: false,
-        message: 'An unexpected error occurred while getting vendor transactions',
+        message:
+            'An unexpected error occurred while getting vendor transactions',
       );
     }
   }
@@ -523,12 +542,13 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorModel>.fromJson(
           response.data,
-              (data) => VendorModel.fromJson(data as Map<String, dynamic>),
+          (data) => VendorModel.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorModel>(
           success: false,
-          message: response.data['message'] ?? 'Failed to update vendor contact',
+          message:
+              response.data['message'] ?? 'Failed to update vendor contact',
           errors: response.data['errors'] as Map<String, dynamic>?,
         );
       }
@@ -557,11 +577,7 @@ class VendorServiceExtended {
     required String newCnic,
   }) async {
     try {
-      final requestData = {
-        'name': newName,
-        'phone': newPhone,
-        'cnic': newCnic,
-      };
+      final requestData = {'name': newName, 'phone': newPhone, 'cnic': newCnic};
 
       DebugHelper.printJson('Duplicate Vendor Request', requestData);
 
@@ -575,7 +591,7 @@ class VendorServiceExtended {
       if (response.statusCode == 201 || response.statusCode == 200) {
         return ApiResponse<VendorModel>.fromJson(
           response.data,
-              (data) => VendorModel.fromJson(data as Map<String, dynamic>),
+          (data) => VendorModel.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorModel>(
@@ -633,10 +649,14 @@ class VendorServiceExtended {
         queryParams['area'] = area;
       }
       if (createdAfter != null) {
-        queryParams['created_after'] = createdAfter.toIso8601String().split('T')[0];
+        queryParams['created_after'] = createdAfter.toIso8601String().split(
+          'T',
+        )[0];
       }
       if (createdBefore != null) {
-        queryParams['created_before'] = createdBefore.toIso8601String().split('T')[0];
+        queryParams['created_before'] = createdBefore.toIso8601String().split(
+          'T',
+        )[0];
       }
 
       final response = await _apiClient.get(
@@ -649,7 +669,7 @@ class VendorServiceExtended {
       if (response.statusCode == 200) {
         return ApiResponse<VendorsListResponse>.fromJson(
           response.data,
-              (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
+          (data) => VendorsListResponse.fromJson(data as Map<String, dynamic>),
         );
       } else {
         return ApiResponse<VendorsListResponse>(

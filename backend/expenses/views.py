@@ -182,7 +182,7 @@ def expense_detail(request, expense_id):
     DELETE: Soft delete expense
     """
     try:
-        expense = get_object_or_404(Expense, id=expense_id)
+        expense = Expense.objects.get(id=expense_id)
         
         if request.method == 'GET':
             serializer = ExpenseSerializer(expense)
@@ -200,6 +200,13 @@ def expense_detail(request, expense_id):
                 'message': 'Expense deleted successfully.'
             }, status=status.HTTP_200_OK)
             
+    except Expense.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Expense not found.',
+            'errors': {'detail': 'Expense with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -377,7 +384,7 @@ def expense_monthly_summary(request):
 def expense_update(request, expense_id):
     """Update an existing expense"""
     try:
-        expense = get_object_or_404(Expense, id=expense_id, is_active=True)
+        expense = Expense.objects.get(id=expense_id, is_active=True)
         
         serializer = ExpenseUpdateSerializer(
             expense,
@@ -443,6 +450,13 @@ def expense_update(request, expense_id):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
         
+    except Expense.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Expense not found.',
+            'errors': {'detail': 'Expense with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -456,7 +470,7 @@ def expense_update(request, expense_id):
 def expense_delete(request, expense_id):
     """Soft delete an expense"""
     try:
-        expense = get_object_or_404(Expense, id=expense_id, is_active=True)
+        expense = Expense.objects.get(id=expense_id, is_active=True)
         
         # Soft delete the expense using the model's delete method
         expense.delete()  # This calls the soft delete method
@@ -501,6 +515,13 @@ def expense_delete(request, expense_id):
             'message': 'Expense deleted successfully.'
         }, status=status.HTTP_200_OK)
         
+    except Expense.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Expense not found.',
+            'errors': {'detail': 'Expense with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,

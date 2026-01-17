@@ -120,7 +120,7 @@ def get_category(request, category_id):
     Retrieve a specific category by ID
     """
     try:
-        category = get_object_or_404(Category, id=category_id)
+        category = Category.objects.get(id=category_id)
         serializer = CategorySerializer(category)
         
         return Response({
@@ -128,6 +128,13 @@ def get_category(request, category_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Category.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Category not found.',
+            'errors': {'detail': 'Category with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -143,7 +150,7 @@ def update_category(request, category_id):
     Update a category
     """
     try:
-        category = get_object_or_404(Category, id=category_id)
+        category = Category.objects.get(id=category_id)
         
         serializer = CategoryUpdateSerializer(
             category,
@@ -190,7 +197,7 @@ def delete_category(request, category_id):
     Hard delete a category (permanently remove from database)
     """
     try:
-        category = get_object_or_404(Category, id=category_id)
+        category = Category.objects.get(id=category_id)
         
         # Store category name for response message
         category_name = category.name
@@ -234,7 +241,7 @@ def soft_delete_category(request, category_id):
     Soft delete a category (set is_active=False) - Alternative endpoint
     """
     try:
-        category = get_object_or_404(Category, id=category_id)
+        category = Category.objects.get(id=category_id)
         
         if not category.is_active:
             return Response({
@@ -272,7 +279,7 @@ def restore_category(request, category_id):
     Restore a soft-deleted category (set is_active=True)
     """
     try:
-        category = get_object_or_404(Category, id=category_id)
+        category = Category.objects.get(id=category_id)
         
         if category.is_active:
             return Response({

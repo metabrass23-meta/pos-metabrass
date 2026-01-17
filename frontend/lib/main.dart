@@ -52,11 +52,11 @@ void main() async {
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
       appWindow
-        ..minSize = Size(1024, 768)
-        ..maxSize = Size(1920, 1080)
-        ..size = Size(1024, 768)
+        ..minSize = const Size(1024, 720)
+        ..maxSize = const Size(1920, 1080)
+        ..size = const Size(1024, 768)
         ..alignment = Alignment.center
-        ..title = "Al Noor Fashion"
+        ..title = "Al Noor Fabrics"
         ..show();
     });
   }
@@ -72,7 +72,6 @@ class MaqboolFabricApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Initialize AuthProvider with API integration
         ChangeNotifierProvider(create: (_) => TaxRatesProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
@@ -98,59 +97,80 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReceiptProvider()),
         ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
-      child: Consumer2<AuthProvider, ProfitLossProvider>(
-        builder: (context, authProvider, profitLossProvider, child) {
-          // Initialize auth provider immediately (splash screen depends on it)
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (authProvider.state == AuthState.initial) {
-              authProvider.initialize();
-            }
-          });
+      child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
+        builder:
+            (context, authProvider, profitLossProvider, appProvider, child) {
+              // Initialize app provider immediately
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!appProvider.isInitialized) {
+                  appProvider.initialize();
+                }
+                if (authProvider.state == AuthState.initial) {
+                  authProvider.initialize();
+                }
+              });
 
-          // Initialize profit loss provider when first accessed AND authenticated
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (authProvider.state == AuthState.authenticated) {
-              if (profitLossProvider.profitLossHistory.isEmpty &&
-                  !profitLossProvider.isLoading) {
-                profitLossProvider.initialize();
-              }
-            }
-          });
+              // Initialize profit loss provider when authenticated
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (authProvider.state == AuthState.authenticated) {
+                  if (profitLossProvider.profitLossHistory.isEmpty &&
+                      !profitLossProvider.isLoading) {
+                    profitLossProvider.initialize();
+                  }
+                }
+              });
 
-          return Sizer(
-            builder: (context, orientation, deviceType) {
-              return MaterialApp(
-                title: 'Al Noor Fashion - Premium POS',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: ThemeMode.light,
-                navigatorKey: navigatorKey,
+              return Sizer(
+                builder: (context, orientation, deviceType) {
+                  final currentLocale = appProvider.locale;
 
-                // Localization Configuration
-                locale: const Locale('ur'), // Set Urdu as default
-                supportedLocales: const [
-                  Locale('ur'), // Urdu
-                  Locale('en'), // English (fallback)
-                ],
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
+                  return MaterialApp(
+                    title: 'Al Noor Fashion - Premium POS',
+                    debugShowCheckedModeBanner: false,
 
-                initialRoute: '/',
-                routes: {
-                  '/': (context) => const SplashScreen(),
-                  '/login': (context) => const LoginScreen(),
-                  '/signup': (context) => const SignupScreen(),
-                  '/dashboard': (context) => const DashboardScreen(),
+                    // Use locale-aware themes
+                    theme: AppTheme.getLightTheme(currentLocale),
+                    darkTheme: AppTheme.getDarkTheme(currentLocale),
+                    themeMode: appProvider.isDarkMode
+                        ? ThemeMode.dark
+                        : ThemeMode.light,
+
+                    navigatorKey: navigatorKey,
+
+                    // Localization Configuration
+                    locale: currentLocale,
+                    supportedLocales: const [
+                      Locale('ur'), // Urdu
+                      Locale('en'), // English (fallback)
+                    ],
+                    localizationsDelegates: const [
+                      AppLocalizations.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                    ],
+
+                    initialRoute: '/',
+                    routes: {
+                      '/': (context) => const SplashScreen(),
+                      '/login': (context) => const LoginScreen(),
+                      '/signup': (context) => const SignupScreen(),
+                      '/dashboard': (context) => const DashboardScreen(),
+                    },
+
+                    // Add builder to ensure font applies to all widgets
+                    builder: (context, child) {
+                      return MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(textScaler: const TextScaler.linear(1.0)),
+                        child: child!,
+                      );
+                    },
+                  );
                 },
               );
             },
-          );
-        },
       ),
     );
   }

@@ -40,5 +40,7 @@ urlpatterns = [
     path('<uuid:vendor_id>/payments/', views.vendor_payments, name='payments'),
     # Vendor purchases
     path('<uuid:vendor_id>/purchases/', views.vendor_purchases, name='vendor_purchases'),
+    # Vendor transactions
+    path('<uuid:vendor_id>/transactions/', views.vendor_transactions, name='transactions'),
 
 ]

@@ -241,7 +241,7 @@ def get_advance_payment(request, payment_id):
     Retrieve a specific advance payment by ID
     """
     try:
-        payment = get_object_or_404(AdvancePayment, id=payment_id)
+        payment = AdvancePayment.objects.get(id=payment_id)
         serializer = AdvancePaymentDetailSerializer(payment)
         
         return Response({
@@ -264,7 +264,7 @@ def update_advance_payment(request, payment_id):
     Update an advance payment
     """
     try:
-        payment = get_object_or_404(AdvancePayment, id=payment_id)
+        payment = AdvancePayment.objects.get(id=payment_id)
         
         serializer = AdvancePaymentUpdateSerializer(
             payment,
@@ -311,7 +311,7 @@ def delete_advance_payment(request, payment_id):
     Hard delete an advance payment (permanently remove from database)
     """
     try:
-        payment = get_object_or_404(AdvancePayment, id=payment_id)
+        payment = AdvancePayment.objects.get(id=payment_id)
         
         # Store payment details for response message
         payment_info = f"{payment.labor_name} - {payment.amount} PKR ({payment.date})"
@@ -346,7 +346,7 @@ def soft_delete_advance_payment(request, payment_id):
     Soft delete an advance payment (set is_active=False)
     """
     try:
-        payment = get_object_or_404(AdvancePayment, id=payment_id)
+        payment = AdvancePayment.objects.get(id=payment_id)
         
         if not payment.is_active:
             return Response({
@@ -384,7 +384,7 @@ def restore_advance_payment(request, payment_id):
     Restore a soft-deleted advance payment (set is_active=True)
     """
     try:
-        payment = get_object_or_404(AdvancePayment, id=payment_id)
+        payment = AdvancePayment.objects.get(id=payment_id)
         
         if payment.is_active:
             return Response({
@@ -426,7 +426,7 @@ def payments_by_labor(request, labor_id):
     """
     try:
         # Verify labor exists
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         page_size = min(int(request.GET.get('page_size', 20)), 100)
         page = int(request.GET.get('page', 1))
@@ -469,6 +469,13 @@ def payments_by_labor(request, labor_id):
             }
         }, status=status.HTTP_200_OK)
         
+    except Labor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Labor not found.',
+            'errors': {'detail': 'Labor with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+    
     except ValueError:
         return Response({
             'success': False,

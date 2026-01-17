@@ -9,6 +9,7 @@ import 'package:frontend/presentation/screens/sales/sales_screen.dart';
 import 'package:frontend/presentation/screens/returns/return_management_screen.dart';
 import 'package:frontend/presentation/screens/invoices/invoice_management_screen.dart';
 import 'package:frontend/presentation/screens/receipts/receipt_management_screen.dart';
+import 'package:frontend/presentation/screens/settings/settings_screen.dart';
 import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
 import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
@@ -26,7 +27,6 @@ import '../../screens/customer/customer_screen.dart';
 import '../../screens/expenses/expenses_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/order/order_screen.dart';
-import '../../screens/order_item/order_item_screen.dart';
 import '../../screens/profit loss/profit_loss_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
@@ -39,52 +39,70 @@ class DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (selectedIndex == 0) {
-      return _buildDashboard(context);
-    } else if (selectedIndex == 1) {
-      return const SalesPage();
-    } else if (selectedIndex == 2) {
-      return const OrderPage();
-    } else if (selectedIndex == 3) {
-      return const OrderItemScreen();
-    } else if (selectedIndex == 4) {
-      return const ProductPage();
-    } else if (selectedIndex == 5) {
-      return const CategoryPage();
-    } else if (selectedIndex == 6) {
-      return const CustomerPage();
-    } else if (selectedIndex == 7) {
-      return const VendorPage();
-    } else if (selectedIndex == 8) {
-      return const LaborPage();
-    } else if (selectedIndex == 9) {
-      return const ReceivablesPage();
-    } else if (selectedIndex == 10) {
-      return const PayablesPage();
-    } else if (selectedIndex == 11) {
-      return const AdvancePaymentPage();
-    } else if (selectedIndex == 12) {
-      return const PaymentPage();
-    } else if (selectedIndex == 13) {
-      return const ExpensesPage();
-    } else if (selectedIndex == 14) {
-      return const PrincipalAccountPage();
-    } else if (selectedIndex == 15) {
-      return const ZakatPage();
-    } else if (selectedIndex == 16) {
-      return const ProfitLossPage();
-    } else if (selectedIndex == 17) {
-      return const TaxManagementScreen();
-    } else if (selectedIndex == 18) {
-      return const ReturnManagementScreen();
-    } else if (selectedIndex == 19) {
-      return const InvoiceManagementScreen();
-    } else if (selectedIndex == 20) {
-      return const ReceiptManagementScreen();
-    } else if (selectedIndex == 21) {
-      return _buildPlaceholderContent(context); // Settings
-    } else {
-      return _buildPlaceholderContent(context);
+    switch (selectedIndex) {
+      case 0:
+        return _buildDashboard(context);
+      case 1:
+        return const SalesPage();
+      case 2:
+        // Order Management
+        return const OrderPage();
+      case 3:
+        // Product Management
+        return const ProductPage();
+      case 4:
+        // Category Management
+        return const CategoryPage();
+      case 5:
+        // Customer Management
+        return const CustomerPage();
+      case 6:
+        // Vendor Management
+        return const VendorPage();
+      case 7:
+        // Labor Management
+        return const LaborPage();
+      case 8:
+        // Receivables
+        return const ReceivablesPage();
+      case 9:
+        // Payables
+        return const PayablesPage();
+      case 10:
+        // Advance Payment
+        return const AdvancePaymentPage();
+      case 11:
+        // Payment Management
+        return const PaymentPage();
+      case 12:
+        // Expenses
+        return const ExpensesPage();
+      case 13:
+        // Principal Account
+        return const PrincipalAccountPage();
+      case 14:
+        // Zakat Management
+        return const ZakatPage();
+      case 15:
+        // Profit & Loss
+        return const ProfitLossPage();
+      case 16:
+        // Tax Management
+        return const TaxManagementScreen();
+      case 17:
+        // Returns
+        return const ReturnManagementScreen();
+      case 18:
+        // Invoices
+        return const InvoiceManagementScreen();
+      case 19:
+        // Receipts
+        return const ReceiptManagementScreen();
+      case 20:
+        // Settings
+        return const SettingsScreen();
+      default:
+        return _buildPlaceholderContent(context);
     }
   }
 

@@ -21,6 +21,11 @@ from .serializers import (
     LaborSalaryUpdateSerializer,
 )
 from .signals import labor_bulk_updated
+from payments.models import Payment
+from payments.serializers import PaymentListSerializer
+from advance_payments.models import AdvancePayment
+from advance_payments.serializers import AdvancePaymentListSerializer
+from django.db.models import Sum
 from . import models
 
 
@@ -272,7 +277,7 @@ def get_labor(request, labor_id):
     Retrieve a specific labor by ID
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         serializer = LaborDetailSerializer(labor)
         
         return Response({
@@ -280,6 +285,13 @@ def get_labor(request, labor_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Labor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Labor not found.',
+            'errors': {'detail': 'Labor with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -295,7 +307,7 @@ def update_labor(request, labor_id):
     Update a labor
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         serializer = LaborUpdateSerializer(
             labor,
@@ -342,7 +354,7 @@ def delete_labor(request, labor_id):
     Hard delete a labor (permanently remove from database)
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         # Store labor name for response message
         labor_name = labor.name
@@ -386,7 +398,7 @@ def soft_delete_labor(request, labor_id):
     Soft delete a labor (set is_active=False)
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         if not labor.is_active:
             return Response({
@@ -424,7 +436,7 @@ def restore_labor(request, labor_id):
     Restore a soft-deleted labor (set is_active=True)
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         if labor.is_active:
             return Response({
@@ -463,7 +475,7 @@ def update_labor_contact(request, labor_id):
     Update labor contact information
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         serializer = LaborContactUpdateSerializer(
             labor,
@@ -516,7 +528,7 @@ def update_labor_salary(request, labor_id):
     Update labor salary and designation
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
         serializer = LaborSalaryUpdateSerializer(
             labor,
@@ -1304,25 +1316,36 @@ def duplicate_labor(request, labor_id):
 @permission_classes([IsAuthenticated])
 def labor_payments(request, labor_id):
     """
-    Get labor's payment history (placeholder for future integration)
+    Get labor's payment history (Advance and Regular)
     """
     try:
-        labor = get_object_or_404(Labor, id=labor_id)
+        labor = Labor.objects.get(id=labor_id)
         
-        # Placeholder response - will be implemented when Payment module is available
+        # Get Advance Payments
+        advance_payments = AdvancePayment.objects.filter(labor=labor, is_active=True).order_by('-date', '-created_at')
+        advance_serializer = AdvancePaymentListSerializer(advance_payments, many=True)
+        
+        # Get Regular Payments
+        regular_payments = Payment.objects.filter(labor=labor, is_active=True).order_by('-date', '-created_at')
+        regular_serializer = PaymentListSerializer(regular_payments, many=True)
+        
+        # Calculate Totals
+        total_advance = advance_payments.aggregate(total=Sum('amount'))['total'] or 0
+        total_payment = regular_payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+        
         return Response({
             'success': True,
-            'message': 'Payment integration not yet implemented.',
+            'message': 'Labor payments retrieved successfully.',
             'data': {
                 'labor_id': str(labor.id),
                 'labor_name': labor.name,
-                'advance_payments': [],
-                'regular_payments': [],
-                'total_advance_amount': 0.00,
-                'total_payments_amount': 0.00,
-                'remaining_advance_balance': 0.00,
-                'last_payment_date': None,
-                'note': 'Payment history will be available once Payment module is integrated.'
+                'advance_payments': advance_serializer.data,
+                'regular_payments': regular_serializer.data,
+                'total_advance_amount': float(total_advance),
+                'total_payments_amount': float(total_payment),
+                'remaining_advance_balance': float(labor.remaining_monthly_salary), # This represents the remaining salary available
+                'last_payment_date': regular_payments.first().date if regular_payments.exists() else None,
+                'note': 'Payments retrieved successfully.'
             }
         }, status=status.HTTP_200_OK)
         

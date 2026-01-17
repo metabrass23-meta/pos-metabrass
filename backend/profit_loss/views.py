@@ -599,6 +599,11 @@ class ProductProfitabilityView(APIView):
             serializer = ProductProfitabilitySerializer(product_profitability, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
             
+        except Product.DoesNotExist:
+            return Response({
+                'error': 'One or more products in this analysis was not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
             return Response({
                 'error': f'Error getting product profitability: {str(e)}'

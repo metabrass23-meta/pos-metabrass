@@ -4,51 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'dart:ui' show Locale;
 
 class AppTheme {
-
-
-  // Color Palette primary red
-  // static const Color primaryMaroon = Color(0xFF800020);
-  // static const Color secondaryMaroon = Color(0xFF9B0030);
-  // static const Color accentGold = Color(0xFFD4AF37);
-  // static const Color pureWhite = Color(0xFFFFFFFF);
-  // static const Color creamWhite = Color(0xFFFFFBF5);
-  // static const Color charcoalGray = Color(0xFF2C2C2C);
-  // static const Color lightGray = Color(0xFFF5F5F5);
-  // static const Color shadowColor = Color(0x1A000000);
-
-
-  // static const Color primaryMaroon = Color(0xFF006D77); // Deep Teal
-  // static const Color secondaryMaroon = Color(0xFF4A1A4A); // Rich Plum
-  // static const Color accentGold = Color(0xFFD4AF37);
-  // static const Color pureWhite = Color(0xFFFFFFFF);
-  // static const Color creamWhite = Color(0xFFF9F5F0);
-  // static const Color charcoalGray = Color(0xFF2C2C2C);
-  // static const Color lightGray = Color(0xFFF5F5F5);
-  // static const Color shadowColor = Color(0x1A000000);
-
-
-  // static const Color primaryMaroon = Color(0xFF1A1A1A); // Deep Black
-  // static const Color secondaryMaroon = Color(0xFF3D3D3D); // Charcoal
-  // static const Color accentGold = Color(0xFFD4AF37);
-  // static const Color pureWhite = Color(0xFFFFFFFF);
-  // static const Color creamWhite = Color(0xFFFAF8F3);
-  // static const Color charcoalGray = Color(0xFF2C2C2C);
-  // static const Color lightGray = Color(0xFFE5E5E5);
-  // static const Color shadowColor = Color(0x1A000000);
-
-
-
-  // static const Color primaryMaroon = Color(0xFF6B1F3B); // Deep Burgundy
-  // static const Color secondaryMaroon = Color(0xFF8B3A52); // Lighter Burgundy
-  // static const Color accentGold = Color(0xFFD4AF37);
-  // static const Color pureWhite = Color(0xFFFFFFFF);
-  // static const Color creamWhite = Color(0xFFF9F5F0);
-  // static const Color charcoalGray = Color(0xFF2C2C2C);
-  // static const Color lightGray = Color(0xFFF5F5F5);
-  // static const Color shadowColor = Color(0x1A000000);
-
-
- // green look
+  // Color Palette - Green Look
   static const Color primaryMaroon = Color(0xFF005F3D);
   static const Color secondaryMaroon = Color(0xFF5D4037);
   static const Color accentGold = Color(0xFFD4AF37);
@@ -58,18 +14,10 @@ class AppTheme {
   static const Color lightGray = Color(0xFFF5F5F5);
   static const Color shadowColor = Color(0x1A000000);
 
-
-
-
-
-
-
-
-
-
-  // Font Configuration - Customizable by customer
-  static String englishFontFamily = 'Inter';
-  static String urduFontFamily = 'Noto Nastaliq Urdu';
+  // Font Configuration
+  static const String englishFontFamily = 'Inter';
+  static const String urduFontFamily = 'Jameel Noori Nastaleeq';
+  static const String fallbackUrduFont = 'Noto Nastaliq Urdu';
 
   // Get font family based on locale
   static String getFontFamily(Locale locale) {
@@ -79,12 +27,17 @@ class AppTheme {
     return englishFontFamily;
   }
 
-  static ThemeData get lightTheme {
+  // Light Theme with Locale Support
+  static ThemeData getLightTheme(Locale locale) {
+    final String fontFamily = getFontFamily(locale);
+    final bool isUrdu = locale.languageCode == 'ur';
+
     return ThemeData(
       useMaterial3: true,
       primaryColor: primaryMaroon,
       scaffoldBackgroundColor: creamWhite,
-      fontFamily: GoogleFonts.inter().fontFamily,
+      fontFamily: fontFamily,
+      fontFamilyFallback: isUrdu ? [fallbackUrduFont] : null,
 
       colorScheme: const ColorScheme.light(
         primary: primaryMaroon,
@@ -98,51 +51,65 @@ class AppTheme {
       ),
 
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.playfairDisplay(
-          fontSize: 4.sp, // Responsive font size
+        displayLarge: TextStyle(
+          fontFamily: isUrdu
+              ? urduFontFamily
+              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamilyFallback: isUrdu ? [fallbackUrduFont] : null,
+          fontSize: 4.sp,
           fontWeight: FontWeight.w700,
           color: charcoalGray,
-          letterSpacing: -0.5,
+          letterSpacing: isUrdu ? 0 : -0.5,
         ),
-        displayMedium: GoogleFonts.playfairDisplay(
-          fontSize: 3.5.sp, // Responsive font size
+        displayMedium: TextStyle(
+          fontFamily: isUrdu
+              ? urduFontFamily
+              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamilyFallback: isUrdu ? [fallbackUrduFont] : null,
+          fontSize: 3.5.sp,
           fontWeight: FontWeight.w600,
           color: charcoalGray,
-          letterSpacing: -0.3,
+          letterSpacing: isUrdu ? 0 : -0.3,
         ),
-        headlineLarge: GoogleFonts.inter(
-          fontSize: 3.sp, // Responsive font size
+        headlineLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 3.sp,
           fontWeight: FontWeight.w600,
           color: charcoalGray,
-          letterSpacing: -0.2,
+          letterSpacing: isUrdu ? 0 : -0.2,
         ),
-        headlineMedium: GoogleFonts.inter(
-          fontSize: 2.5.sp, // Responsive font size
+        headlineMedium: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.5.sp,
           fontWeight: FontWeight.w500,
           color: charcoalGray,
         ),
-        titleLarge: GoogleFonts.inter(
-          fontSize: 2.2.sp, // Responsive font size
+        titleLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.2.sp,
           fontWeight: FontWeight.w500,
           color: charcoalGray,
         ),
-        bodyLarge: GoogleFonts.inter(
-          fontSize: 2.sp, // Responsive font size
+        bodyLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.sp,
           fontWeight: FontWeight.w400,
           color: charcoalGray,
           height: 1.5,
         ),
-        bodyMedium: GoogleFonts.inter(
-          fontSize: 1.8.sp, // Responsive font size
+        bodyMedium: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 1.8.sp,
           fontWeight: FontWeight.w400,
           color: charcoalGray,
           height: 1.4,
         ),
-        labelLarge: GoogleFonts.inter(
-          fontSize: 1.8.sp, // Responsive font size
+        labelLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 1.8.sp,
           fontWeight: FontWeight.w500,
           color: charcoalGray,
-          letterSpacing: 0.1,
+          letterSpacing: isUrdu ? 0 : 0.1,
         ),
       ),
 
@@ -153,18 +120,14 @@ class AppTheme {
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              1.5.w,
-            ), // Responsive border radius
+            borderRadius: BorderRadius.circular(1.5.w),
           ),
-          padding: EdgeInsets.symmetric(
-            vertical: 2.h,
-            horizontal: 3.w,
-          ), // Responsive padding
-          textStyle: GoogleFonts.inter(
-            fontSize: 1.8.sp, // Responsive font size
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 3.w),
+          textStyle: TextStyle(
+            fontFamily: fontFamily,
+            fontSize: 1.8.sp,
             fontWeight: FontWeight.w500,
-            letterSpacing: 0.2,
+            letterSpacing: isUrdu ? 0 : 0.2,
           ),
         ),
       ),
@@ -173,13 +136,8 @@ class AppTheme {
         filled: true,
         fillColor: pureWhite,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            1.5.w,
-          ), // Responsive border radius
-          borderSide: BorderSide(
-            color: const Color(0xFFE0E0E0),
-            width: 0.1.w,
-          ), // Responsive border width
+          borderRadius: BorderRadius.circular(1.5.w),
+          borderSide: BorderSide(color: const Color(0xFFE0E0E0), width: 0.1.w),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
@@ -187,27 +145,23 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
-          borderSide: BorderSide(
-            color: primaryMaroon,
-            width: 0.2.w,
-          ), // Responsive border width
+          borderSide: BorderSide(color: primaryMaroon, width: 0.2.w),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.w),
           borderSide: BorderSide(color: Colors.red, width: 0.1.w),
         ),
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 2.h,
-          horizontal: 2.w,
-        ), // Responsive padding
-        hintStyle: GoogleFonts.inter(
+        contentPadding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
+        hintStyle: TextStyle(
+          fontFamily: fontFamily,
           color: const Color(0xFF9E9E9E),
-          fontSize: 1.8.sp, // Responsive font size
+          fontSize: 1.8.sp,
           fontWeight: FontWeight.w400,
         ),
-        labelStyle: GoogleFonts.inter(
+        labelStyle: TextStyle(
+          fontFamily: fontFamily,
           color: charcoalGray,
-          fontSize: 1.8.sp, // Responsive font size
+          fontSize: 1.8.sp,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -215,16 +169,18 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 8,
         shadowColor: shadowColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2.w), // Responsive border radius
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)),
         color: pureWhite,
       ),
     );
   }
 
-  static ThemeData get darkTheme {
-    return lightTheme.copyWith(
+  // Dark Theme with Locale Support
+  static ThemeData getDarkTheme(Locale locale) {
+    final String fontFamily = getFontFamily(locale);
+    final bool isUrdu = locale.languageCode == 'ur';
+
+    return getLightTheme(locale).copyWith(
       scaffoldBackgroundColor: const Color(0xFF1A1A1A),
       colorScheme: const ColorScheme.dark(
         primary: primaryMaroon,
@@ -236,6 +192,70 @@ class AppTheme {
         onSurface: pureWhite,
         onBackground: pureWhite,
       ),
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: isUrdu
+              ? urduFontFamily
+              : GoogleFonts.playfairDisplay().fontFamily,
+          fontSize: 4.sp,
+          fontWeight: FontWeight.w700,
+          color: pureWhite,
+          letterSpacing: isUrdu ? 0 : -0.5,
+        ),
+        displayMedium: TextStyle(
+          fontFamily: isUrdu
+              ? urduFontFamily
+              : GoogleFonts.playfairDisplay().fontFamily,
+          fontSize: 3.5.sp,
+          fontWeight: FontWeight.w600,
+          color: pureWhite,
+          letterSpacing: isUrdu ? 0 : -0.3,
+        ),
+        headlineLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 3.sp,
+          fontWeight: FontWeight.w600,
+          color: pureWhite,
+          letterSpacing: isUrdu ? 0 : -0.2,
+        ),
+        headlineMedium: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.5.sp,
+          fontWeight: FontWeight.w500,
+          color: pureWhite,
+        ),
+        titleLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.2.sp,
+          fontWeight: FontWeight.w500,
+          color: pureWhite,
+        ),
+        bodyLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 2.sp,
+          fontWeight: FontWeight.w400,
+          color: pureWhite,
+          height: 1.5,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 1.8.sp,
+          fontWeight: FontWeight.w400,
+          color: pureWhite,
+          height: 1.4,
+        ),
+        labelLarge: TextStyle(
+          fontFamily: fontFamily,
+          fontSize: 1.8.sp,
+          fontWeight: FontWeight.w500,
+          color: pureWhite,
+          letterSpacing: isUrdu ? 0 : 0.1,
+        ),
+      ),
     );
   }
+
+  // Backward compatibility - use Urdu by default
+  static ThemeData get lightTheme => getLightTheme(const Locale('ur'));
+  static ThemeData get darkTheme => getDarkTheme(const Locale('ur'));
 }

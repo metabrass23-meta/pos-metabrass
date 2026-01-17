@@ -244,7 +244,7 @@ def get_payable(request, payable_id):
     Retrieve a specific payable by ID
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         serializer = PayableDetailSerializer(payable)
         
         return Response({
@@ -267,7 +267,7 @@ def update_payable(request, payable_id):
     Update a payable
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         serializer = PayableUpdateSerializer(
             payable,
@@ -314,7 +314,7 @@ def delete_payable(request, payable_id):
     Hard delete a payable (permanently remove from database)
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         # Store payable info for response message
         creditor_name = payable.creditor_name
@@ -358,7 +358,7 @@ def soft_delete_payable(request, payable_id):
     Soft delete a payable (set is_active=False)
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         if not payable.is_active:
             return Response({
@@ -396,7 +396,7 @@ def restore_payable(request, payable_id):
     Restore a soft-deleted payable (set is_active=True)
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         if payable.is_active:
             return Response({
@@ -435,7 +435,7 @@ def add_payment(request, payable_id):
     Add a payment to a payable
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         # Add payable to the request data
         payment_data = request.data.copy()
@@ -491,7 +491,7 @@ def update_payable_contact(request, payable_id):
     Update payable contact information
     """
     try:
-        payable = get_object_or_404(Payable, id=payable_id)
+        payable = Payable.objects.get(id=payable_id)
         
         serializer = PayableContactUpdateSerializer(
             payable,

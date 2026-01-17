@@ -1522,23 +1522,16 @@
   "addFirstExpense": "پہلا اخراجات شامل کریں",
   "errorLoadingExpenses": "اخراجات لوڈ کرنے میں خرابی",
   "pleaseTryAgainLater": "براہ کرم بعد میں دوبارہ کوشش کریں یا اپنا انٹرنیٹ کنکشن چیک کریں۔",
-  "retryLoading": "دوبارہ لوڈ کریں"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "retryLoading": "دوبارہ لوڈ کریں",
+  "language": "زبان",
+  "appearance": "ظاہری شکل",
+  "aboutApp": "ایپلیکیشن کے بارے میں",
+  "darkMode": "ڈارک موڈ",
+  "enableDarkThemeForApplication": "ایپلیکیشن کے لیے ڈارک تھیم فعال کریں",
+  "alNoorFashionPOS": "النور فیشن پی او ایس",
+  "version": "ورژن",
+  "aPremiumPointOfSaleSolution": "ایک پریمیم پوائنٹ آف سیل حل جو اعلیٰ درجے کے فیشن بوتیک اور ٹیلرنگ سروسز کے لیے ڈیزائن کیا گیا ہے۔"
+}
 
 
 

@@ -181,7 +181,7 @@ def get_receivable(request, receivable_id):
     Get a specific receivable by ID
     """
     try:
-        receivable = get_object_or_404(Receivable, id=receivable_id)
+        receivable = Receivable.objects.get(id=receivable_id)
         serializer = ReceivableSerializer(receivable)
         
         return Response({
@@ -189,6 +189,13 @@ def get_receivable(request, receivable_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Receivable.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Receivable not found.',
+            'errors': {'detail': 'Receivable with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -204,7 +211,7 @@ def update_receivable(request, receivable_id):
     Update a receivable
     """
     try:
-        receivable = get_object_or_404(Receivable, id=receivable_id)
+        receivable = Receivable.objects.get(id=receivable_id)
         serializer = ReceivableUpdateSerializer(
             receivable,
             data=request.data,
@@ -227,6 +234,13 @@ def update_receivable(request, receivable_id):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
             
+    except Receivable.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Receivable not found.',
+            'errors': {'detail': 'Receivable with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -242,7 +256,7 @@ def delete_receivable(request, receivable_id):
     Soft delete a receivable
     """
     try:
-        receivable = get_object_or_404(Receivable, id=receivable_id)
+        receivable = Receivable.objects.get(id=receivable_id)
         
         with transaction.atomic():
             receivable.soft_delete()
@@ -252,6 +266,13 @@ def delete_receivable(request, receivable_id):
                 'message': 'Receivable deleted successfully.'
             }, status=status.HTTP_200_OK)
             
+    except Receivable.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Receivable not found.',
+            'errors': {'detail': 'Receivable with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -267,7 +288,7 @@ def record_payment(request, receivable_id):
     Record a payment/return on a receivable
     """
     try:
-        receivable = get_object_or_404(Receivable, id=receivable_id)
+        receivable = Receivable.objects.get(id=receivable_id)
         
         if receivable.is_fully_paid():
             return Response({
@@ -310,6 +331,13 @@ def record_payment(request, receivable_id):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
             
+    except Receivable.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Receivable not found.',
+            'errors': {'detail': 'Receivable with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -325,7 +353,7 @@ def restore_receivable(request, receivable_id):
     Restore a soft-deleted receivable
     """
     try:
-        receivable = get_object_or_404(Receivable, id=receivable_id)
+        receivable = Receivable.objects.get(id=receivable_id)
         
         if receivable.is_active:
             return Response({
@@ -343,6 +371,13 @@ def restore_receivable(request, receivable_id):
                 'data': ReceivableSerializer(receivable).data
             }, status=status.HTTP_200_OK)
             
+    except Receivable.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Receivable not found.',
+            'errors': {'detail': 'Receivable with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,

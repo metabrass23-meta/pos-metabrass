@@ -197,7 +197,7 @@ def principal_account_detail(request, transaction_id):
     DELETE: Soft delete principal account transaction
     """
     try:
-        principal_account = get_object_or_404(PrincipalAccount, id=transaction_id)
+        principal_account = PrincipalAccount.objects.get(id=transaction_id)
         
         if request.method == 'GET':
             serializer = PrincipalAccountSerializer(principal_account)
@@ -237,6 +237,13 @@ def principal_account_detail(request, transaction_id):
                 'message': 'Principal account transaction deleted successfully.'
             }, status=status.HTTP_200_OK)
             
+    except PrincipalAccount.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Principal account transaction not found.',
+            'errors': {'detail': 'Transaction with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,

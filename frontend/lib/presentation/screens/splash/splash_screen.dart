@@ -45,6 +45,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _lightRayAnimation;
 
   bool _hasNavigated = false;
+  int _retryCount = 0;
+  static const int _maxRetries = 10; // Maximum 5 seconds of waiting (10 * 500ms)
 
   @override
   void initState() {
@@ -193,14 +195,32 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   Future<void> _initializeApp() async {
     try {
-      // Initialize app provider
+      // Initialize app provider (no delay needed)
       await Provider.of<AppProvider>(context, listen: false).initialize();
 
-      // Wait for auth provider to initialize
+      // Wait for auth provider to initialize with timeout
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      // Ensure auth provider is initializing
+      if (authProvider.state == AuthState.initial) {
+        authProvider.initialize();
+      }
 
-      // Wait for minimum splash duration for better UX
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Wait for auth to complete with timeout (max 5 seconds)
+      int waitCount = 0;
+      while (authProvider.state == AuthState.initial || 
+             authProvider.state == AuthState.loading) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        waitCount++;
+        if (waitCount >= 25) { // 5 seconds max (25 * 200ms)
+          debugPrint('Auth initialization timeout, navigating to login');
+          break;
+        }
+        if (!mounted || _hasNavigated) return;
+      }
+
+      // Wait for minimum splash duration for better UX (only if not already waited)
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted && !_hasNavigated) {
         _navigateBasedOnAuthState(authProvider);

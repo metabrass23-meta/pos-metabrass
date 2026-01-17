@@ -130,7 +130,7 @@ def create_sale(request):
 def get_sale(request, sale_id):
     """Get sale details with items"""
     try:
-        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        sale = Sales.objects.get(id=sale_id, is_active=True)
         serializer = SalesSerializer(sale)
         
         return Response({
@@ -156,7 +156,7 @@ def get_sale(request, sale_id):
 def update_sale(request, sale_id):
     """Update sale details"""
     try:
-        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        sale = Sales.objects.get(id=sale_id, is_active=True)
         
         if request.method == 'PUT':
             serializer = SalesUpdateSerializer(sale, data=request.data)
@@ -197,7 +197,7 @@ def update_sale(request, sale_id):
 def delete_sale(request, sale_id):
     """Soft delete sale"""
     try:
-        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        sale = Sales.objects.get(id=sale_id, is_active=True)
         sale.is_active = False
         sale.save()
         
@@ -224,7 +224,7 @@ def delete_sale(request, sale_id):
 def add_payment(request, sale_id):
     """Record payment for a sale"""
     try:
-        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        sale = Sales.objects.get(id=sale_id, is_active=True)
         serializer = SalesPaymentSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -271,7 +271,7 @@ def add_payment(request, sale_id):
 def update_status(request, sale_id):
     """Update sale status"""
     try:
-        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        sale = Sales.objects.get(id=sale_id, is_active=True)
         serializer = SalesStatusUpdateSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -311,7 +311,7 @@ def update_status(request, sale_id):
 def customer_sales_history(request, customer_id):
     """Get sales history for a specific customer"""
     try:
-        customer = get_object_or_404(Customer, id=customer_id, is_active=True)
+        customer = Customer.objects.get(id=customer_id, is_active=True)
         sales = Sales.objects.by_customer(customer_id).active()
         
         serializer = SalesListSerializer(sales, many=True)
@@ -624,7 +624,7 @@ def create_sale_item(request):
 def update_sale_item(request, item_id):
     """Update sale item"""
     try:
-        sale_item = get_object_or_404(SaleItem, id=item_id, is_active=True)
+        sale_item = SaleItem.objects.get(id=item_id, is_active=True)
         
         if request.method == 'PUT':
             serializer = SaleItemUpdateSerializer(sale_item, data=request.data)
@@ -668,7 +668,7 @@ def update_sale_item(request, item_id):
 def delete_sale_item(request, item_id):
     """Delete sale item"""
     try:
-        sale_item = get_object_or_404(SaleItem, id=item_id, is_active=True)
+        sale_item = SaleItem.objects.get(id=item_id, is_active=True)
         
         with transaction.atomic():
             sale_item.is_active = False
@@ -737,7 +737,7 @@ def create_invoice(request):
 def get_invoice(request, invoice_id):
     """Get invoice details"""
     try:
-        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        invoice = Invoice.objects.get(id=invoice_id, is_active=True)
         serializer = InvoiceSerializer(invoice)
         
         return Response({
@@ -757,7 +757,7 @@ def get_invoice(request, invoice_id):
 def update_invoice(request, invoice_id):
     """Update invoice details"""
     try:
-        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        invoice = Invoice.objects.get(id=invoice_id, is_active=True)
         serializer = InvoiceUpdateSerializer(invoice, data=request.data, partial=True)
         
         if serializer.is_valid():

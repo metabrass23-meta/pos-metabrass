@@ -1611,32 +1611,16 @@
   "addFirstExpense": "Add First Expense",
   "errorLoadingExpenses": "Error loading expenses",
   "pleaseTryAgainLater": "Please try again later or check your internet connection.",
-  "retryLoading": "Retry Loading"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "retryLoading": "Retry Loading",
+  "language": "Language",
+  "appearance": "Appearance",
+  "aboutApp": "About Application",
+  "darkMode": "Dark Mode",
+  "enableDarkThemeForApplication": "Enable dark theme for the application",
+  "alNoorFashionPOS": "Al Noor Fashion POS",
+  "version": "Version",
+  "aPremiumPointOfSaleSolution": "A premium Point of Sale solution designed for high-end fashion boutiques and tailoring services."
+}
 
 
 

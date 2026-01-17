@@ -21,6 +21,9 @@ from .serializers import (
     VendorContactUpdateSerializer,
 )
 from .signals import vendor_bulk_updated
+from payments.models import Payment
+from payments.serializers import PaymentListSerializer
+from django.db.models import Sum
 
 
 @api_view(['GET'])
@@ -197,7 +200,7 @@ def get_vendor(request, vendor_id):
     Retrieve a specific vendor by ID
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         serializer = VendorDetailSerializer(vendor)
         
         return Response({
@@ -205,6 +208,13 @@ def get_vendor(request, vendor_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Vendor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Vendor not found.',
+            'errors': {'detail': 'Vendor with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -220,7 +230,7 @@ def update_vendor(request, vendor_id):
     Update a vendor
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
         serializer = VendorUpdateSerializer(
             vendor,
@@ -267,7 +277,7 @@ def delete_vendor(request, vendor_id):
     Hard delete a vendor (permanently remove from database)
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
         # Store vendor name for response message
         vendor_name = vendor.name
@@ -311,7 +321,7 @@ def soft_delete_vendor(request, vendor_id):
     Soft delete a vendor (set is_active=False)
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
         if not vendor.is_active:
             return Response({
@@ -349,7 +359,7 @@ def restore_vendor(request, vendor_id):
     Restore a soft-deleted vendor (set is_active=True)
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
         if vendor.is_active:
             return Response({
@@ -388,7 +398,7 @@ def update_vendor_contact(request, vendor_id):
     Update vendor contact information
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
         serializer = VendorContactUpdateSerializer(
             vendor,
@@ -917,25 +927,51 @@ def duplicate_vendor(request, vendor_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def vendor_payments(request, vendor_id):
+def vendor_transactions(request, vendor_id):
     """
-    Get vendor's payment history (placeholder for future integration)
+    Get vendor's transactions (payments and purchases)
     """
     try:
-        vendor = get_object_or_404(Vendor, id=vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
         
-        # Placeholder response - will be implemented when Payment module is available
+        # Get pagination parameters
+        page_size = min(int(request.GET.get('page_size', 20)), 100)
+        page = int(request.GET.get('page', 1))
+        
+        # Get payments
+        payments = Payment.objects.filter(vendor=vendor, is_active=True).order_by('-date', '-created_at')
+        
+        # Calculate summary
+        total_payments = payments.count()
+        total_amount = payments.aggregate(total=Sum('amount_paid'))['total'] or 0
+        
+        # Calculate pagination
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        paginated_payments = payments[start_index:end_index]
+        
+        payment_serializer = PaymentListSerializer(paginated_payments, many=True)
+        
         return Response({
             'success': True,
-            'message': 'Payment integration not yet implemented.',
             'data': {
                 'vendor_id': str(vendor.id),
                 'vendor_name': vendor.name,
-                'payments': [],
-                'total_payments': 0,
-                'total_payments_amount': 0.00,
-                'last_payment_date': None,
-                'note': 'Payment history will be available once Payment module is integrated.'
+                'transactions': payment_serializer.data,
+                'summary': {
+                    'totalTransactions': total_payments,
+                    'totalAmount': float(total_amount),
+                    'pendingAmount': 0.0, # Placeholder for now as we don't have Payable model integration here yet
+                    'paidAmount': float(total_amount),
+                    'lastTransactionDate': payments.first().date if payments.exists() else None,
+                },
+                'pagination': {
+                    'current_page': page,
+                    'page_size': page_size,
+                    'total_count': total_payments,
+                    'total_pages': (total_payments + page_size - 1) // page_size,
+                },
+                'note': 'Transactions retrieved successfully.'
             }
         }, status=status.HTTP_200_OK)
         
@@ -945,6 +981,21 @@ def vendor_payments(request, vendor_id):
             'message': 'Vendor not found.',
             'errors': {'detail': 'Vendor with this ID does not exist.'}
         }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+         return Response({
+            'success': False,
+            'message': 'Failed to retrieve vendor transactions.',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def vendor_payments(request, vendor_id):
+    """
+    Get vendor's payment history (Redirects to transactions for now)
+    """
+    return vendor_transactions(request, vendor_id)
+
 @api_view(['GET'])
 def vendor_purchases(request, vendor_id):
     vendor = Vendor.objects.get(id=vendor_id)

@@ -62,7 +62,8 @@ import 'app_localizations_ur.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('ur')
+    Locale('ur'),
   ];
 
   /// No description provided for @appTitle.
@@ -5919,7 +5922,8 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Start by adding your first payable record to track your borrowings effectively'**
-  String get startByAddingYourFirstPayableRecordToTrackYourBorrowingsEffectively;
+  String
+  get startByAddingYourFirstPayableRecordToTrackYourBorrowingsEffectively;
 
   /// No description provided for @addFirstPayableRecord.
   ///
@@ -8879,14 +8883,60 @@ abstract class AppLocalizations {
   /// **'Please try again later or check your internet connection.'**
   String get pleaseTryAgainLater;
 
-  /// No description provided for @retryLoading.
-  ///
-  /// In en, this message translates to:
   /// **'Retry Loading'**
   String get retryLoading;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @aboutApp.
+  ///
+  /// In en, this message translates to:
+  /// **'About Application'**
+  String get aboutApp;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @enableDarkThemeForApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable dark theme for the application'**
+  String get enableDarkThemeForApplication;
+
+  /// No description provided for @alNoorFashionPOS.
+  ///
+  /// In en, this message translates to:
+  /// **'Al Noor Fashion POS'**
+  String get alNoorFashionPOS;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @aPremiumPointOfSaleSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'A premium Point of Sale solution designed for high-end fashion boutiques and tailoring services.'**
+  String get aPremiumPointOfSaleSolution;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -8895,25 +8945,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'ur'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'ur'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'ur': return AppLocalizationsUr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'ur':
+      return AppLocalizationsUr();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

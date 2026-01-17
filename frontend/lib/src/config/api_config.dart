@@ -1,5 +1,6 @@
 class ApiConfig {
-  static const String baseUrl = 'https://django-flutter-pos-production.up.railway.app/api/v1';
+  static const String baseUrl =
+      'https://django-flutter-pos-production.up.railway.app/api/v1';
   static const String register = '/auth/register/';
   static const String login = '/auth/login/';
   static const String logout = '/auth/logout/';
@@ -26,12 +27,14 @@ class ApiConfig {
   static String restoreProduct(String id) => '/products/$id/restore/';
 
   static const String searchProducts = '/products/search/';
-  static String productsByCategory(String categoryId) => '/products/category/$categoryId/';
+  static String productsByCategory(String categoryId) =>
+      '/products/category/$categoryId/';
   static const String lowStockProducts = '/products/low-stock/';
   static const String productStatistics = '/products/statistics/';
 
   static String updateProductQuantity(String id) => '/products/$id/quantity/';
-  static const String bulkUpdateQuantities = '/products/bulk-update-quantities/';
+  static const String bulkUpdateQuantities =
+      '/products/bulk-update-quantities/';
   static String duplicateProduct(String id) => '/products/$id/duplicate/';
 
   // Real-time Inventory Integration endpoints
@@ -51,10 +54,12 @@ class ApiConfig {
   static String restoreCustomer(String id) => '/customers/$id/restore/';
 
   static const String searchCustomers = '/customers/search/';
-  static String customersByStatus(String status) => '/customers/status/$status/';
+  static String customersByStatus(String status) =>
+      '/customers/status/$status/';
   static String customersByType(String type) => '/customers/type/$type/';
   static String customersByCity(String city) => '/customers/city/$city/';
-  static String customersByCountry(String country) => '/customers/country/$country/';
+  static String customersByCountry(String country) =>
+      '/customers/country/$country/';
 
   static const String pakistaniCustomers = '/customers/pakistani/';
   static const String internationalCustomers = '/customers/international/';
@@ -91,8 +96,10 @@ class ApiConfig {
   static String restoreSale(String id) => '/sales/$id/restore/';
   static const String searchSales = '/sales/search/';
   static String salesByStatus(String status) => '/sales/status/$status/';
-  static String salesByCustomer(String customerId) => '/sales/customer/$customerId/';
-  static String salesByPaymentMethod(String method) => '/sales/payment-method/$method/';
+  static String salesByCustomer(String customerId) =>
+      '/sales/customer/$customerId/';
+  static String salesByPaymentMethod(String method) =>
+      '/sales/payment-method/$method/';
   static const String pendingSales = '/sales/pending/';
   static const String paidSales = '/sales/paid/';
   static const String unpaidSales = '/sales/unpaid/';
@@ -106,7 +113,8 @@ class ApiConfig {
   static const String bulkSaleActions = '/sales/bulk-action/';
   static String recalculateSaleTotals(String id) => '/sales/$id/recalculate/';
   static const String createFromOrder = '/sales/create-from-order/';
-  static String customerSalesHistory(String customerId) => '/sales/by-customer/$customerId/';
+  static String customerSalesHistory(String customerId) =>
+      '/sales/by-customer/$customerId/';
 
   // Invoice Management API endpoints
   static const String invoices = '/sales/invoices/';
@@ -114,7 +122,8 @@ class ApiConfig {
   static String getInvoiceById(String id) => '/sales/invoices/$id/';
   static String updateInvoice(String id) => '/sales/invoices/$id/update/';
   static String deleteInvoice(String id) => '/sales/invoices/$id/delete/';
-  static String generateInvoicePdf(String id) => '/sales/invoices/$id/generate-pdf/';
+  static String generateInvoicePdf(String id) =>
+      '/sales/invoices/$id/generate-pdf/';
 
   // Receipt Management API endpoints
   static const String receipts = '/sales/receipts/';
@@ -122,7 +131,8 @@ class ApiConfig {
   static String getReceiptById(String id) => '/sales/receipts/$id/';
   static String updateReceipt(String id) => '/sales/receipts/$id/update/';
   static String deleteReceipt(String id) => '/sales/receipts/$id/delete/';
-  static String generateReceiptPdf(String id) => '/sales/receipts/$id/generate-pdf/';
+  static String generateReceiptPdf(String id) =>
+      '/sales/receipts/$id/generate-pdf/';
 
   // Returns & Refunds API endpoints
   static const String returns = '/sales/returns/';
@@ -135,8 +145,10 @@ class ApiConfig {
   static String processReturn(String id) => '/sales/returns/$id/process/';
   static String getReturnItems(String id) => '/sales/returns/$id/items/';
   static String getReturnStatistics = '/sales/returns/statistics/';
-  static String getCustomerReturnHistory(String customerId) => '/sales/returns/customer/$customerId/history/';
-  static String getSaleReturnDetails(String saleId) => '/sales/returns/sale/$saleId/returns/';
+  static String getCustomerReturnHistory(String customerId) =>
+      '/sales/returns/customer/$customerId/history/';
+  static String getSaleReturnDetails(String saleId) =>
+      '/sales/returns/sale/$saleId/returns/';
 
   // Refunds API endpoints
   static const String refunds = '/sales/returns/refunds/';
@@ -144,7 +156,8 @@ class ApiConfig {
   static String getRefundById(String id) => '/sales/returns/refunds/$id/';
   static String updateRefund(String id) => '/sales/returns/refunds/$id/update/';
   static String deleteRefund(String id) => '/sales/returns/refunds/$id/delete/';
-  static String processRefund(String id) => '/sales/returns/refunds/$id/process/';
+  static String processRefund(String id) =>
+      '/sales/returns/refunds/$id/process/';
   static String failRefund(String id) => '/sales/returns/refunds/$id/fail/';
   static String cancelRefund(String id) => '/sales/returns/refunds/$id/cancel/';
 
@@ -155,11 +168,13 @@ class ApiConfig {
   static String getSaleItemById(String id) => '/sales/items/$id/';
   static String updateSaleItem(String id) => '/sales/items/$id/update/';
   static String deleteSaleItem(String id) => '/sales/items/$id/delete/';
-  static String softDeleteSaleItem(String id) => '/sales/items/$id/soft-delete/';
+  static String softDeleteSaleItem(String id) =>
+      '/sales/items/$id/soft-delete/';
   static String restoreSaleItem(String id) => '/sales/items/$id/restore/';
   static const String searchSaleItems = '/sales/items/search/';
   static String saleItemsBySale(String saleId) => '/sales/items/sale/$saleId/';
-  static String saleItemsByProduct(String productId) => '/sales/items/product/$productId/';
+  static String saleItemsByProduct(String productId) =>
+      '/sales/items/product/$productId/';
 
   // Tax Rates API endpoints
   static const String taxRates = '/tax-rates/';
@@ -215,13 +230,15 @@ class ApiConfig {
 
   static const String vendorStatistics = '/vendors/statistics/';
 
-  static String updateVendorContact(String id) => '/vendors/$id/contact/update/';
+  static String updateVendorContact(String id) =>
+      '/vendors/$id/contact/update/';
 
   static const String bulkVendorActions = '/vendors/bulk-actions/';
 
   static String duplicateVendor(String id) => '/vendors/$id/duplicate/';
 
   static String vendorPayments(String id) => '/vendors/$id/payments/';
+  static String vendorTransactions(String id) => '/vendors/$id/transactions/';
 
   static const String labors = '/labors/';
   static const String createLabor = '/labors/create/';
@@ -236,7 +253,8 @@ class ApiConfig {
   static const String searchLabors = '/labors/search/';
   static String laborsByCity(String cityName) => '/labors/city/$cityName/';
   static String laborsByArea(String areaName) => '/labors/area/$areaName/';
-  static String laborsByDesignation(String designationName) => '/labors/designation/$designationName/';
+  static String laborsByDesignation(String designationName) =>
+      '/labors/designation/$designationName/';
   static String laborsByCaste(String casteName) => '/labors/caste/$casteName/';
   static String laborsByGender(String gender) => '/labors/gender/$gender/';
   static const String laborsBySalaryRange = '/labors/salary-range/';
@@ -278,8 +296,10 @@ class ApiConfig {
   static String deleteZakat(String id) => '/zakats/$id/delete/';
 
   static const String searchZakats = '/zakats/search/';
-  static String zakatsByBeneficiary(String beneficiaryName) => '/zakats/by-beneficiary/$beneficiaryName/';
-  static String zakatsByAuthority(String authority) => '/zakats/by-authority/$authority/';
+  static String zakatsByBeneficiary(String beneficiaryName) =>
+      '/zakats/by-beneficiary/$beneficiaryName/';
+  static String zakatsByAuthority(String authority) =>
+      '/zakats/by-authority/$authority/';
   static const String zakatsByDateRange = '/zakats/by-date-range/';
 
   static const String zakatStatistics = '/zakats/statistics/';
@@ -306,7 +326,8 @@ class ApiConfig {
 
   static const String searchOrders = '/orders/search/';
   static String ordersByStatus(String status) => '/orders/status/$status/';
-  static String ordersByCustomer(String customerId) => '/orders/customer/$customerId/';
+  static String ordersByCustomer(String customerId) =>
+      '/orders/customer/$customerId/';
 
   static const String pendingOrders = '/orders/pending/';
   static const String overdueOrders = '/orders/overdue/';
@@ -322,7 +343,8 @@ class ApiConfig {
   static const String bulkOrderActions = '/orders/bulk-actions/';
 
   static String recalculateOrderTotals(String id) => '/orders/$id/recalculate/';
-  static String updateOrderCustomerInfo(String id) => '/orders/$id/customer-info/';
+  static String updateOrderCustomerInfo(String id) =>
+      '/orders/$id/customer-info/';
   static String duplicateOrder(String id) => '/orders/$id/duplicate/';
 
   static const String orderItems = '/order-items/';
@@ -331,12 +353,15 @@ class ApiConfig {
   static String getOrderItemById(String id) => '/order-items/$id/';
   static String updateOrderItem(String id) => '/order-items/$id/update/';
   static String deleteOrderItem(String id) => '/order-items/$id/delete/';
-  static String softDeleteOrderItem(String id) => '/order-items/$id/soft-delete/';
+  static String softDeleteOrderItem(String id) =>
+      '/order-items/$id/soft-delete/';
   static String restoreOrderItem(String id) => '/order-items/$id/restore/';
 
   static const String searchOrderItems = '/order-items/search/';
-  static String orderItemsByOrder(String orderId) => '/order-items/order/$orderId/';
-  static String orderItemsByProduct(String productId) => '/order-items/product/$productId/';
+  static String orderItemsByOrder(String orderId) =>
+      '/order-items/order/$orderId/';
+  static String orderItemsByProduct(String productId) =>
+      '/order-items/product/$productId/';
 
   static const String expenses = '/expenses/';
   static const String createExpense = '/expenses/';
@@ -345,8 +370,10 @@ class ApiConfig {
   static String updateExpense(String id) => '/expenses/$id/update/';
   static String deleteExpense(String id) => '/expenses/$id/delete/';
 
-  static String expensesByAuthority(String authority) => '/expenses/by-authority/$authority/';
-  static String expensesByCategory(String category) => '/expenses/by-category/$category/';
+  static String expensesByAuthority(String authority) =>
+      '/expenses/by-authority/$authority/';
+  static String expensesByCategory(String category) =>
+      '/expenses/by-category/$category/';
   static const String expensesByDateRange = '/expenses/by-date-range/';
 
   static const String expenseStatistics = '/expenses/statistics/';
@@ -357,22 +384,32 @@ class ApiConfig {
   static const String advancePayments = '/advance-payments/';
   static const String createAdvancePayment = '/advance-payments/create/';
   static String getAdvancePaymentById(String id) => '/advance-payments/$id/';
-  static String updateAdvancePayment(String id) => '/advance-payments/$id/update/';
-  static String deleteAdvancePayment(String id) => '/advance-payments/$id/delete/';
-  static String softDeleteAdvancePayment(String id) => '/advance-payments/$id/soft-delete/';
-  static String restoreAdvancePayment(String id) => '/advance-payments/$id/restore/';
+  static String updateAdvancePayment(String id) =>
+      '/advance-payments/$id/update/';
+  static String deleteAdvancePayment(String id) =>
+      '/advance-payments/$id/delete/';
+  static String softDeleteAdvancePayment(String id) =>
+      '/advance-payments/$id/soft-delete/';
+  static String restoreAdvancePayment(String id) =>
+      '/advance-payments/$id/restore/';
   static const String searchAdvancePayments = '/advance-payments/search/';
-  static String paymentsByLabor(String laborId) => '/advance-payments/labor/$laborId/';
+  static String paymentsByLabor(String laborId) =>
+      '/advance-payments/labor/$laborId/';
   static const String paymentsByDateRange = '/advance-payments/date-range/';
   static const String todayPayments = '/advance-payments/today/';
   static const String recentPayments = '/advance-payments/recent/';
-  static const String advancePaymentStatistics = '/advance-payments/statistics/';
+  static const String advancePaymentStatistics =
+      '/advance-payments/statistics/';
   static const String monthlyReport = '/advance-payments/monthly-report/';
-  static const String laborAdvanceReport = '/advance-payments/labor-advance-report/';
-  static const String bulkAdvancePaymentActions = '/advance-payments/bulk-actions/';
+  static const String laborAdvanceReport =
+      '/advance-payments/labor-advance-report/';
+  static const String bulkAdvancePaymentActions =
+      '/advance-payments/bulk-actions/';
   static const String paymentsWithReceipts = '/advance-payments/with-receipts/';
-  static const String paymentsWithoutReceipts = '/advance-payments/without-receipts/';
-  static String laborAdvanceSummary(String laborId) => '/advance-payments/labor/$laborId/summary/';
+  static const String paymentsWithoutReceipts =
+      '/advance-payments/without-receipts/';
+  static String laborAdvanceSummary(String laborId) =>
+      '/advance-payments/labor/$laborId/summary/';
 
   // Payments API endpoints
   static const String payments = '/payments/';
@@ -383,12 +420,16 @@ class ApiConfig {
   static String softDeletePayment(String id) => '/payments/$id/soft-delete/';
   static String restorePayment(String id) => '/payments/$id/restore/';
   static const String searchPayments = '/payments/search/';
-  static String paymentsByLaborId(String laborId) => '/payments/by-labor/$laborId/';
-  static String paymentsByVendorId(String vendorId) => '/payments/by-vendor/$vendorId/';
-  static String paymentsByOrderId(String orderId) => '/payments/by-order/$orderId/';
+  static String paymentsByLaborId(String laborId) =>
+      '/payments/by-labor/$laborId/';
+  static String paymentsByVendorId(String vendorId) =>
+      '/payments/by-vendor/$vendorId/';
+  static String paymentsByOrderId(String orderId) =>
+      '/payments/by-order/$orderId/';
   static String paymentsBySaleId(String saleId) => '/payments/by-sale/$saleId/';
   static const String paymentDateRange = '/payments/by-date-range/';
-  static String paymentsByMethod(String method) => '/payments/by-payment-method/$method/';
+  static String paymentsByMethod(String method) =>
+      '/payments/by-payment-method/$method/';
   static const String paymentWithReceipts = '/payments/with-receipts/';
   static const String paymentWithoutReceipts = '/payments/without-receipts/';
   static const String paymentRecent = '/payments/recent/';
@@ -408,8 +449,10 @@ class ApiConfig {
   static String softDeletePayable(String id) => '/payables/$id/soft-delete/';
   static String restorePayable(String id) => '/payables/$id/restore/';
   static const String searchPayables = '/payables/search/';
-  static String payablesByCreditor(String creditorName) => '/payables/creditor/$creditorName/';
-  static String payablesByVendor(String vendorId) => '/payables/vendor/$vendorId/';
+  static String payablesByCreditor(String creditorName) =>
+      '/payables/creditor/$creditorName/';
+  static String payablesByVendor(String vendorId) =>
+      '/payables/vendor/$vendorId/';
   static const String overduePayables = '/payables/overdue/';
   static const String urgentPayables = '/payables/urgent/';
   static const String dueSoonPayables = '/payables/due-soon/';
@@ -419,7 +462,8 @@ class ApiConfig {
   static const String creditorSummary = '/payables/creditor-summary/';
   static const String bulkPayableActions = '/payables/bulk-actions/';
   static String addPayablePayment(String id) => '/payables/$id/payment/';
-  static String updatePayableContact(String id) => '/payables/$id/contact/update/';
+  static String updatePayableContact(String id) =>
+      '/payables/$id/contact/update/';
 
   // Profit Loss endpoints
   static const String _profitLossBase = '$baseUrl/profit-loss';
@@ -428,11 +472,13 @@ class ApiConfig {
   static const String calculateProfitLoss = '$_profitLossBase/calculate/';
   static const String profitLossRecords = '$_profitLossBase/records/';
   static const String profitLossSummary = '$_profitLossBase/summary/';
-  static const String productProfitability = '$_profitLossBase/product-profitability/';
+  static const String productProfitability =
+      '$_profitLossBase/product-profitability/';
   static const String profitLossDashboard = '$_profitLossBase/dashboard/';
 
   // Dynamic endpoints
-  static String getProfitLossRecordById(String id) => '$_profitLossBase/records/$id/';
+  static String getProfitLossRecordById(String id) =>
+      '$_profitLossBase/records/$id/';
 
   // Principal Account endpoints
   static const String principalAccount = '/principal-account/';
@@ -443,8 +489,10 @@ class ApiConfig {
 
   // Principal Account specific endpoints
   static const String principalAccountBalance = '/principal-account/balance/';
-  static const String principalAccountStatistics = '/principal-account/statistics/';
-  static const String createPrincipalAccountFromModule = '/principal-account/create-from-module/';
+  static const String principalAccountStatistics =
+      '/principal-account/statistics/';
+  static const String createPrincipalAccountFromModule =
+      '/principal-account/create-from-module/';
 
   // Note: Backend uses UUIDs for transaction IDs and has limited endpoints
   // Additional endpoints can be added as needed
@@ -452,7 +500,8 @@ class ApiConfig {
   // Cache keys
   static const String profitLossCacheKey = 'profit_loss_records_cache';
   static const String profitLossSummaryCacheKey = 'profit_loss_summary_cache';
-  static const String profitLossDashboardCacheKey = 'profit_loss_dashboard_cache';
+  static const String profitLossDashboardCacheKey =
+      'profit_loss_dashboard_cache';
 
   // Cache keys for expenses
   static const String expensesCacheKey = 'cached_expenses';
@@ -462,7 +511,8 @@ class ApiConfig {
 
   static const String orderItemStatistics = '/order-items/statistics/';
 
-  static String updateOrderItemQuantity(String id) => '/order-items/$id/quantity/';
+  static String updateOrderItemQuantity(String id) =>
+      '/order-items/$id/quantity/';
   static const String bulkUpdateOrderItems = '/order-items/bulk-update/';
 
   static String duplicateOrderItem(String id) => '/order-items/$id/duplicate/';
@@ -471,9 +521,15 @@ class ApiConfig {
   static const int receiveTimeout = 30000;
   static const int sendTimeout = 30000;
 
-  static const Map<String, String> defaultHeaders = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+  static const Map<String, String> defaultHeaders = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
 
-  static Map<String, String> getAuthHeaders(String token) => {...defaultHeaders, 'Authorization': 'Bearer $token'};
+  static Map<String, String> getAuthHeaders(String token) => {
+    ...defaultHeaders,
+    'Authorization': 'Bearer $token',
+  };
 
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';
@@ -487,11 +543,13 @@ class ApiConfig {
   static const String laborsCacheKey = 'cached_labors';
   static const String laborStatsCacheKey = 'cached_labor_stats';
   static const String laborSalaryReportCacheKey = 'cached_labor_salary_report';
-  static const String laborDemographicsReportCacheKey = 'cached_labor_demographics_report';
+  static const String laborDemographicsReportCacheKey =
+      'cached_labor_demographics_report';
   static const String zakatsCacheKey = 'cached_zakats';
   static const String zakatStatsCacheKey = 'cached_zakat_stats';
   static const String advancePaymentsCacheKey = 'cached_advance_payments';
-  static const String advancePaymentStatsCacheKey = 'cached_advance_payment_stats';
+  static const String advancePaymentStatsCacheKey =
+      'cached_advance_payment_stats';
   static const String paymentsCacheKey = 'cached_payments';
   static const String paymentStatsCacheKey = 'cached_payment_stats';
   static const String payablesCacheKey = 'cached_payables';
@@ -504,8 +562,10 @@ class ApiConfig {
 
   // Principal Account cache keys
   static const String principalAccountCacheKey = 'cached_principal_accounts';
-  static const String principalAccountStatsCacheKey = 'cached_principal_account_stats';
-  static const String principalAccountBalanceCacheKey = 'cached_principal_account_balance';
+  static const String principalAccountStatsCacheKey =
+      'cached_principal_account_stats';
+  static const String principalAccountBalanceCacheKey =
+      'cached_principal_account_balance';
 
   static const String taxRatesCacheKey = 'cached_tax_rates';
 

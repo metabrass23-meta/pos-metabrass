@@ -397,7 +397,7 @@ def get_customer(request, customer_id):
     Retrieve a specific customer by ID
     """
     try:
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = Customer.objects.get(id=customer_id)
         serializer = CustomerDetailSerializer(customer)
         
         return Response({
@@ -405,6 +405,13 @@ def get_customer(request, customer_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Customer.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Customer not found.',
+            'errors': {'detail': 'Customer with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -420,7 +427,7 @@ def update_customer(request, customer_id):
     Update a customer
     """
     try:
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = Customer.objects.get(id=customer_id)
         
         serializer = CustomerUpdateSerializer(
             customer,
@@ -467,7 +474,7 @@ def delete_customer(request, customer_id):
     Hard delete a customer (permanently remove from database)
     """
     try:
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = Customer.objects.get(id=customer_id)
         
         # Store customer name for response message
         customer_name = customer.name
@@ -511,7 +518,7 @@ def soft_delete_customer(request, customer_id):
     Soft delete a customer (set is_active=False)
     """
     try:
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = Customer.objects.get(id=customer_id)
         
         if not customer.is_active:
             return Response({
@@ -549,7 +556,7 @@ def restore_customer(request, customer_id):
     Restore a soft-deleted customer (set is_active=True)
     """
     try:
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = Customer.objects.get(id=customer_id)
         
         if customer.is_active:
             return Response({

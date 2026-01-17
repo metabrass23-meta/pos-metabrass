@@ -281,7 +281,6 @@ class PremiumSidebar extends StatelessWidget {
       // Core Business Operations
       {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': '23'},
       {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': '7'},
-      {'icon': Icons.list_alt_rounded, 'title': l10n.orders, 'badge': '24'},
 
       // Inventory & Products
       {
@@ -403,7 +402,6 @@ class PremiumSidebar extends StatelessWidget {
                     ],
                   ),
                   child: Image.asset('assets/images/logo.png'),
-
                 ),
 
                 if (isExpanded) ...[

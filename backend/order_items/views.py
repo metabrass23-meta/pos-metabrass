@@ -261,7 +261,7 @@ def get_order_item(request, order_item_id):
     Retrieve a specific order item by ID
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         serializer = OrderItemDetailSerializer(order_item)
         
         return Response({
@@ -284,7 +284,7 @@ def update_order_item(request, order_item_id):
     Update an order item
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         
         serializer = OrderItemUpdateSerializer(
             order_item,
@@ -331,7 +331,7 @@ def delete_order_item(request, order_item_id):
     Hard delete an order item (permanently remove from database)
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         
         # Store info for response message
         product_name = order_item.product_name
@@ -375,7 +375,7 @@ def soft_delete_order_item(request, order_item_id):
     Soft delete an order item (set is_active=False)
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         
         if not order_item.is_active:
             return Response({
@@ -414,7 +414,7 @@ def restore_order_item(request, order_item_id):
     Restore a soft-deleted order item (set is_active=True)
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         
         if order_item.is_active:
             return Response({
@@ -652,7 +652,7 @@ def update_order_item_quantity(request, order_item_id):
     Update order item quantity
     """
     try:
-        order_item = get_object_or_404(OrderItem, id=order_item_id)
+        order_item = OrderItem.objects.get(id=order_item_id)
         
         serializer = OrderItemQuantityUpdateSerializer(data=request.data)
         

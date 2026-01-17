@@ -197,7 +197,7 @@ def get_product(request, product_id):
     Retrieve a specific product by ID
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         serializer = ProductDetailSerializer(product)
         
         return Response({
@@ -205,6 +205,13 @@ def get_product(request, product_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Product.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Product not found.',
+            'errors': {'detail': 'Product with this ID does not exist.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -220,7 +227,7 @@ def update_product(request, product_id):
     Update a product
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         
         serializer = ProductUpdateSerializer(
             product,
@@ -267,7 +274,7 @@ def delete_product(request, product_id):
     Hard delete a product (permanently remove from database)
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         
         # Store product name for response message
         product_name = product.name
@@ -311,7 +318,7 @@ def soft_delete_product(request, product_id):
     Soft delete a product (set is_active=False)
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         
         if not product.is_active:
             return Response({
@@ -349,7 +356,7 @@ def restore_product(request, product_id):
     Restore a soft-deleted product (set is_active=True)
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         
         if product.is_active:
             return Response({
@@ -583,7 +590,7 @@ def update_product_quantity(request, product_id):
     Update product quantity
     """
     try:
-        product = get_object_or_404(Product, id=product_id)
+        product = Product.objects.get(id=product_id)
         
         new_quantity = request.data.get('quantity')
         if new_quantity is None:
@@ -696,7 +703,7 @@ def duplicate_product(request, product_id):
     Duplicate an existing product
     """
     try:
-        original_product = get_object_or_404(Product, id=product_id)
+        original_product = Product.objects.get(id=product_id)
         
         # Get new name from request data or auto-generate
         new_name = request.data.get('name', f"{original_product.name} (Copy)")
@@ -1079,7 +1086,7 @@ def search_by_barcode(request, barcode):
 def generate_barcode_image(request, product_id):
     """Generate barcode image (EAN-13 format)"""
     try:
-        product = get_object_or_404(Product, pk=product_id, is_active=True)
+        product = Product.objects.get(id=product_id, is_active=True)
         
         if not product.barcode:
             return Response({
@@ -1116,6 +1123,13 @@ def generate_barcode_image(request, product_id):
                 'success': False,
                 'message': 'python-barcode package is not installed. Please install it using: pip install python-barcode[images]'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Product.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Product not found.',
+                'errors': {'detail': 'Product with this ID does not exist.'}
+            }, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
             return Response({
                 'success': False,

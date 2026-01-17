@@ -175,7 +175,7 @@ def get_payment(request, payment_id):
     Retrieve a specific payment by ID
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         serializer = PaymentDetailSerializer(payment)
         
         return Response({
@@ -198,7 +198,7 @@ def update_payment(request, payment_id):
     Update a payment
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         
         serializer = PaymentUpdateSerializer(
             payment,
@@ -252,7 +252,7 @@ def delete_payment(request, payment_id):
     Hard delete a payment (permanently remove from database)
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         
         # Store payment info for response message
         payment_info = f"{payment.labor_name or payment.vendor} - {payment.formatted_amount}"
@@ -287,7 +287,7 @@ def soft_delete_payment(request, payment_id):
     Soft delete a payment (set is_active=False)
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         
         if not payment.is_active:
             return Response({
@@ -325,7 +325,7 @@ def restore_payment(request, payment_id):
     Restore a soft-deleted payment (set is_active=True)
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         
         if payment.is_active:
             return Response({
@@ -386,7 +386,7 @@ def mark_as_final_payment(request, payment_id):
     Mark payment as final payment
     """
     try:
-        payment = get_object_or_404(Payment, id=payment_id)
+        payment = Payment.objects.get(id=payment_id)
         
         if payment.is_final_payment:
             return Response({

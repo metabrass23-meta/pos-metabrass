@@ -242,7 +242,7 @@ def get_order(request, order_id):
     Retrieve a specific order by ID
     """
     try:
-        order = get_object_or_404(Order, id=order_id)
+        order = Order.objects.get(id=order_id)
         serializer = OrderDetailSerializer(order)
         
         return Response({
@@ -265,7 +265,7 @@ def update_order(request, order_id):
     Update an order
     """
     try:
-        order = get_object_or_404(Order, id=order_id)
+        order = Order.objects.get(id=order_id)
         
         # Check if order can be modified
         if not order.can_be_modified():
@@ -320,7 +320,7 @@ def delete_order(request, order_id):
     Hard delete an order (permanently remove from database)
     """
     try:
-        order = get_object_or_404(Order, id=order_id)
+        order = Order.objects.get(id=order_id)
         
         # Store info for response message
         customer_name = order.customer_name
@@ -364,7 +364,7 @@ def soft_delete_order(request, order_id):
     Soft delete an order (set is_active=False)
     """
     try:
-        order = get_object_or_404(Order, id=order_id)
+        order = Order.objects.get(id=order_id)
         
         if not order.is_active:
             return Response({
@@ -402,7 +402,7 @@ def restore_order(request, order_id):
     Restore a soft-deleted order (set is_active=True)
     """
     try:
-        order = get_object_or_404(Order, id=order_id)
+        order = Order.objects.get(id=order_id)
         
         if order.is_active:
             return Response({

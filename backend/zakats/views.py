@@ -155,7 +155,7 @@ def zakat_detail(request, zakat_id):
     Get Zakat entry details
     """
     try:
-        zakat_entry = get_object_or_404(Zakat, id=zakat_id, is_active=True)
+        zakat_entry = Zakat.objects.get(id=zakat_id, is_active=True)
         serializer = ZakatSerializer(zakat_entry)
         
         return Response({
@@ -163,6 +163,13 @@ def zakat_detail(request, zakat_id):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+    except Zakat.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Zakat entry not found.',
+            'errors': {'detail': 'Zakat entry with this ID does not exist or is inactive.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -178,7 +185,7 @@ def zakat_update(request, zakat_id):
     Update Zakat entry
     """
     try:
-        zakat_entry = get_object_or_404(Zakat, id=zakat_id, is_active=True)
+        zakat_entry = Zakat.objects.get(id=zakat_id, is_active=True)
         
         serializer = ZakatUpdateSerializer(
             zakat_entry,
@@ -210,6 +217,13 @@ def zakat_update(request, zakat_id):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
         
+    except Zakat.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Zakat entry not found.',
+            'errors': {'detail': 'Zakat entry with this ID does not exist or is inactive.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
@@ -225,7 +239,7 @@ def zakat_delete(request, zakat_id):
     Delete Zakat entry (soft delete)
     """
     try:
-        zakat_entry = get_object_or_404(Zakat, id=zakat_id, is_active=True)
+        zakat_entry = Zakat.objects.get(id=zakat_id, is_active=True)
         
         with transaction.atomic():
             zakat_entry.delete()  # This performs soft delete
@@ -235,6 +249,13 @@ def zakat_delete(request, zakat_id):
                 'message': 'Zakat entry deleted successfully.'
             }, status=status.HTTP_200_OK)
             
+    except Zakat.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Zakat entry not found.',
+            'errors': {'detail': 'Zakat entry with this ID does not exist or is inactive.'}
+        }, status=status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         return Response({
             'success': False,
