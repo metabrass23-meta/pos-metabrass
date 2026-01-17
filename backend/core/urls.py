@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/v1/', include('posapi.urls')),
     path('api/v1/categories/', include('categories.urls')),
     path('api/v1/products/', include('products.urls')),
+    path('api/v1/purchases/', include('purchases.urls')),
     path('api/v1/customers/', include('customers.urls')),
     path('api/v1/vendors/', include('vendors.urls')),
     path('api/v1/labors/', include('labors.urls')),

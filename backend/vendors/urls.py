@@ -38,4 +38,7 @@ urlpatterns = [
     
     # Payment integration (placeholder)
     path('<uuid:vendor_id>/payments/', views.vendor_payments, name='payments'),
+    # Vendor purchases
+    path('<uuid:vendor_id>/purchases/', views.vendor_purchases, name='vendor_purchases'),
+
 ]

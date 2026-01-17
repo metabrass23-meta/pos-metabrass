@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
+from purchases.serializers import PurchaseSerializer
+
 from .models import Vendor
 from .serializers import (
     VendorBulkActionSerializer,
@@ -943,4 +945,9 @@ def vendor_payments(request, vendor_id):
             'message': 'Vendor not found.',
             'errors': {'detail': 'Vendor with this ID does not exist.'}
         }, status=status.HTTP_404_NOT_FOUND)
-    
+@api_view(['GET'])
+def vendor_purchases(request, vendor_id):
+    vendor = Vendor.objects.get(id=vendor_id)
+    purchases = vendor.purchases.all()
+    serializer = PurchaseSerializer(purchases, many=True)
+    return Response(serializer.data)

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'profit_loss',
     'principal_account',
     'analytics',
+    'purchases',
 ]
 
 MIDDLEWARE = [
@@ -156,8 +157,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.pagination.PageNumberPagination'
+        # REMOVE PAGINATION FROM HERE
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # ADD THIS LINE
     'PAGE_SIZE': 20,
 }
 
