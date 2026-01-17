@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/order/order_item_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteOrderItemDialog extends StatefulWidget {
@@ -44,6 +45,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   void _handleDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<OrderItemProvider>(context, listen: false);
 
     final success = await provider.deleteOrderItem(widget.orderItem.id);
@@ -53,12 +55,14 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
         _showSuccessSnackbar();
         Navigator.of(context).pop();
       } else {
-        _showErrorSnackbar(provider.errorMessage ?? 'Failed to delete order item');
+        _showErrorSnackbar(provider.errorMessage ?? l10n.failedToDeleteOrderItem);
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -66,7 +70,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Order item deleted successfully!',
+              l10n.orderItemDeletedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -145,6 +149,8 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -167,7 +173,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Delete Order Item',
+                  l10n.deleteOrderItem,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -178,7 +184,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Remove this order item permanently',
+                    l10n.removeThisOrderItemPermanently,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -269,6 +275,8 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildWarningSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -289,12 +297,12 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '⚠️ Irreversible Action',
+                  '⚠️ ${l10n.irreversibleAction}',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
-                  'This action will permanently delete the order item and cannot be undone. Please review the details below before proceeding.',
+                  l10n.deleteWarningMessage,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[600]),
                 ),
               ],
@@ -306,6 +314,8 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildOrderItemSummarySection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -321,26 +331,26 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               Icon(Icons.info_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Item Summary',
+                l10n.orderItemSummary,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildSummaryRow('Product Name', widget.orderItem.productName, Icons.shopping_bag_outlined),
+          _buildSummaryRow(l10n.productName, widget.orderItem.productName, Icons.shopping_bag_outlined),
           SizedBox(height: context.smallPadding),
-          _buildSummaryRow('Product ID', widget.orderItem.productId, Icons.qr_code_outlined),
+          _buildSummaryRow(l10n.productId, widget.orderItem.productId, Icons.qr_code_outlined),
           SizedBox(height: context.smallPadding),
-          _buildSummaryRow('Order ID', widget.orderItem.orderId, Icons.receipt_long_outlined),
+          _buildSummaryRow(l10n.orderId, widget.orderItem.orderId, Icons.receipt_long_outlined),
           SizedBox(height: context.smallPadding),
-          _buildSummaryRow('Quantity', widget.orderItem.quantity.toString(), Icons.numbers_outlined),
+          _buildSummaryRow(l10n.quantity, widget.orderItem.quantity.toString(), Icons.numbers_outlined),
           SizedBox(height: context.smallPadding),
-          _buildSummaryRow('Unit Price', 'PKR ${widget.orderItem.unitPrice.toStringAsFixed(2)}', Icons.attach_money_outlined),
+          _buildSummaryRow(l10n.unitPrice, 'PKR ${widget.orderItem.unitPrice.toStringAsFixed(2)}', Icons.attach_money_outlined),
           SizedBox(height: context.smallPadding),
-          _buildSummaryRow('Line Total', 'PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)}', Icons.calculate_outlined),
+          _buildSummaryRow(l10n.lineTotal, 'PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)}', Icons.calculate_outlined),
           if (widget.orderItem.customizationNotes.isNotEmpty) ...[
             SizedBox(height: context.smallPadding),
-            _buildSummaryRow('Customization Notes', widget.orderItem.customizationNotes, Icons.note_outlined),
+            _buildSummaryRow(l10n.customizationNotes, widget.orderItem.customizationNotes, Icons.note_outlined),
           ],
         ],
       ),
@@ -348,6 +358,8 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildImpactAnalysisSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -363,25 +375,25 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               Icon(Icons.analytics_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Impact Analysis',
+                l10n.impactAnalysis,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           _buildImpactRow(
-            'Financial Impact',
-            'PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)} will be removed from order total',
+            l10n.financialImpact,
+            '${l10n.willBeRemovedFromOrderTotal('PKR ${widget.orderItem.lineTotal.toStringAsFixed(2)}')}',
             Icons.attach_money_outlined,
             Colors.red,
           ),
           SizedBox(height: context.smallPadding),
-          _buildImpactRow('Inventory Impact', 'Quantity ${widget.orderItem.quantity} will be affected', Icons.inventory_2_outlined, Colors.orange),
+          _buildImpactRow(l10n.inventoryImpact, l10n.quantityWillBeAffected(widget.orderItem.quantity), Icons.inventory_2_outlined, Colors.orange),
           if (widget.orderItem.hasBeenSold == true) ...[
             SizedBox(height: context.smallPadding),
             _buildImpactRow(
-              'Sales Impact',
-              'This item has been sold and deletion may affect sales records',
+              l10n.salesImpact,
+              l10n.itemHasBeenSoldWarning,
               Icons.shopping_cart_outlined,
               Colors.red,
             ),
@@ -392,6 +404,8 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildConfirmationSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -407,7 +421,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               Icon(Icons.check_circle_outline, color: Colors.grey[600], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Final Confirmation',
+                l10n.finalConfirmation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -424,12 +438,12 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Are you absolutely sure you want to delete this order item?',
+                  l10n.areYouSureDeleteOrderItem,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
-                  '• This action cannot be undone\n• All associated data will be permanently removed\n• This may affect order totals and inventory\n• Consider archiving instead if you need to preserve records',
+                  l10n.deleteOrderItemWarningPoints,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
@@ -499,13 +513,15 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<OrderItemProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Delete Order Item',
+              text: l10n.deleteOrderItem,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -516,7 +532,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -528,12 +544,14 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -546,7 +564,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
           child: Consumer<OrderItemProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Delete',
+                text: l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
@@ -560,4 +578,3 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
     );
   }
 }
-

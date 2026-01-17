@@ -10,6 +10,7 @@ import '../../../src/models/product/product_model.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/order/order_item_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import '../globals/drop_down.dart';
@@ -83,7 +84,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
       // Find and set the current order
       final currentOrder = orderProvider.orders.firstWhere(
-        (order) => order.id == widget.orderItem.orderId,
+            (order) => order.id == widget.orderItem.orderId,
         orElse: () => OrderModel(
           id: widget.orderItem.orderId,
           customerId: '',
@@ -117,7 +118,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
       // Find and set the current product
       final currentProduct = productProvider.products.firstWhere(
-        (product) => product.id == widget.orderItem.productId,
+            (product) => product.id == widget.orderItem.productId,
         orElse: () => Product(
           id: widget.orderItem.productId,
           name: widget.orderItem.productName,
@@ -159,15 +160,17 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   void _handleUpdate() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       // Validate that order and product selections haven't changed
       if (_selectedOrder?.id != widget.orderItem.orderId) {
-        _showErrorSnackbar('Changing the order is not allowed. Please create a new order item instead.');
+        _showErrorSnackbar(l10n.changingOrderNotAllowed);
         return;
       }
 
       if (_selectedProduct?.id != widget.orderItem.productId) {
-        _showErrorSnackbar('Changing the product is not allowed. Please create a new order item instead.');
+        _showErrorSnackbar(l10n.changingProductNotAllowed);
         return;
       }
 
@@ -185,7 +188,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(orderItemProvider.errorMessage ?? 'Failed to update order item');
+          _showErrorSnackbar(orderItemProvider.errorMessage ?? l10n.failedToUpdateOrderItem);
         }
       }
     }
@@ -198,6 +201,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -205,7 +210,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Order item updated successfully!',
+              l10n.orderItemUpdatedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -298,12 +303,13 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   void _showSearchableDropdown<T>(
-    BuildContext context,
-    List<DropdownItem<T?>> items,
-    T? currentValue,
-    ValueChanged<T?> onChanged,
-    String? searchHint,
-  ) {
+      BuildContext context,
+      List<DropdownItem<T?>> items,
+      T? currentValue,
+      ValueChanged<T?> onChanged,
+      String? searchHint,
+      ) {
+    final l10n = AppLocalizations.of(context)!;
     final searchController = TextEditingController();
     List<DropdownItem<T?>> filteredItems = List.from(items);
 
@@ -321,14 +327,14 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Select ${T == OrderModel ? 'Order' : 'Product'}',
+                    '${l10n.select} ${T == OrderModel ? l10n.order : l10n.product}',
                     style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.cardPadding),
                   TextField(
                     controller: searchController,
                     decoration: InputDecoration(
-                      hintText: searchHint ?? 'Search...',
+                      hintText: searchHint ?? l10n.search,
                       hintStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
@@ -374,57 +380,61 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildOrderDropdown() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<OrderProvider>(
       builder: (context, orderProvider, child) {
         return _buildSearchableDropdown<OrderModel>(
-          label: 'Select Order',
-          hint: 'Type customer name to search...',
+          label: l10n.selectOrder,
+          hint: l10n.typeCustomerNameToSearch,
           value: _selectedOrder,
-          items: _getOrderDropdownItems(orderProvider),
+          items: _getOrderDropdownItems(orderProvider, l10n),
           onChanged: (order) {
             setState(() {
               _selectedOrder = order;
             });
           },
           prefixIcon: Icons.receipt_long_outlined,
-          searchHint: 'Search by customer name...',
+          searchHint: l10n.searchByCustomerName,
         );
       },
     );
   }
 
   Widget _buildProductDropdown() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
         return _buildSearchableDropdown<Product>(
-          label: 'Select Product',
-          hint: 'Type product name to search...',
+          label: l10n.selectProduct,
+          hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
-          items: _getProductDropdownItems(productProvider),
+          items: _getProductDropdownItems(productProvider, l10n),
           onChanged: (product) {
             setState(() {
               _selectedProduct = product;
             });
           },
           prefixIcon: Icons.inventory_2_outlined,
-          searchHint: 'Search by product name...',
+          searchHint: l10n.searchByProductName,
         );
       },
     );
   }
 
-  List<DropdownItem<OrderModel?>> _getOrderDropdownItems(OrderProvider orderProvider) {
+  List<DropdownItem<OrderModel?>> _getOrderDropdownItems(OrderProvider orderProvider, AppLocalizations l10n) {
     final orders = orderProvider.orders;
     return [
-      DropdownItem<OrderModel?>(value: null, label: 'Select an order...'),
+      DropdownItem<OrderModel?>(value: null, label: l10n.selectAnOrder),
       ...orders.map((order) => DropdownItem<OrderModel?>(value: order, label: '${order.customerName} - ${order.id.substring(0, 8)}...')),
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider) {
+  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: 'Select a product...'),
+      DropdownItem<Product?>(value: null, label: l10n.selectAProduct),
       ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')),
     ];
   }
@@ -466,6 +476,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -488,7 +500,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Edit Order Item',
+                  l10n.editOrderItem,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -499,7 +511,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Update order item information',
+                    l10n.updateOrderItemInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -589,6 +601,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildProductInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -604,15 +618,15 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               Icon(Icons.inventory_2_outlined, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Product Information',
+                l10n.productInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Product Name',
-            hint: 'Product name',
+            label: l10n.productName,
+            hint: l10n.productName,
             controller: TextEditingController(text: widget.orderItem.productName),
             prefixIcon: Icons.shopping_bag_outlined,
             enabled: false,
@@ -631,6 +645,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildOrderItemDetailsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -646,7 +662,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               Icon(Icons.edit_note_outlined, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Item Details',
+                l10n.orderItemDetails,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -656,18 +672,18 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
             children: [
               Expanded(
                 child: PremiumTextField(
-                  label: 'Quantity *',
-                  hint: 'Enter quantity',
+                  label: '${l10n.quantity} *',
+                  hint: l10n.enterQuantity,
                   controller: _quantityController,
                   prefixIcon: Icons.numbers_outlined,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter quantity';
+                      return l10n.pleaseEnterQuantity;
                     }
                     final quantity = int.tryParse(value!);
                     if (quantity == null || quantity <= 0) {
-                      return 'Quantity must be a positive number';
+                      return l10n.quantityMustBePositive;
                     }
                     return null;
                   },
@@ -676,18 +692,18 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumTextField(
-                  label: 'Unit Price (PKR) *',
-                  hint: 'Enter unit price',
+                  label: '${l10n.unitPricePKR} *',
+                  hint: l10n.enterUnitPrice,
                   controller: _unitPriceController,
                   prefixIcon: Icons.attach_money_rounded,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter unit price';
+                      return l10n.pleaseEnterUnitPrice;
                     }
                     final price = double.tryParse(value!);
                     if (price == null || price < 0) {
-                      return 'Unit price must be a positive number';
+                      return l10n.unitPriceMustBePositive;
                     }
                     return null;
                   },
@@ -697,14 +713,14 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
           ),
           SizedBox(height: context.cardPadding),
           PremiumTextField(
-            label: 'Customization Notes',
-            hint: 'Enter any customization notes or special requirements',
+            label: l10n.customizationNotes,
+            hint: l10n.enterCustomizationNotes,
             controller: _customizationNotesController,
             prefixIcon: Icons.note_outlined,
             maxLines: 3,
             validator: (value) {
               if (value != null && value.length > 500) {
-                return 'Notes must be less than 500 characters';
+                return l10n.notesMustBeLessThan500;
               }
               return null;
             },
@@ -715,6 +731,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildLineTotalSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -730,7 +748,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               Icon(Icons.calculate_outlined, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Line Total',
+                l10n.lineTotal,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -747,7 +765,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Line Total:',
+                  '${l10n.lineTotal}:',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 ),
                 Text(
@@ -763,13 +781,15 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Consumer<OrderItemProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: 'Update Order Item',
+              text: l10n.updateOrderItem,
               onPressed: provider.isLoading ? null : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -780,7 +800,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
         ),
         SizedBox(height: context.cardPadding),
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           isOutlined: true,
           height: context.buttonHeight,
@@ -792,12 +812,14 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -810,7 +832,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
           child: Consumer<OrderItemProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: 'Update',
+                text: l10n.update,
                 onPressed: provider.isLoading ? null : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,

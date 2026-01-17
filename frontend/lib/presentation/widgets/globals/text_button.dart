@@ -106,10 +106,10 @@ class _PremiumButtonState extends State<PremiumButton>
                   child: Center(
                     child: widget.isLoading
                         ? SizedBox(
-                      width: 3.sp, // Changed from 2.5.w to 3.sp for better scaling
-                      height: 3.sp, // Changed from 2.5.w to 3.sp for better scaling
+                      width: 3.sp,
+                      height: 3.sp,
                       child: CircularProgressIndicator(
-                        strokeWidth: 0.3.sp, // Changed from 0.2.w to 0.3.sp for better scaling
+                        strokeWidth: 0.3.sp,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           widget.isOutlined
                               ? (widget.backgroundColor ?? AppTheme.primaryMaroon)
@@ -123,7 +123,7 @@ class _PremiumButtonState extends State<PremiumButton>
                         if (widget.icon != null) ...[
                           Icon(
                             widget.icon,
-                            size: 12.sp, // Changed from 2.2.w to 2.5.sp for better icon scaling
+                            size: 12.sp,
                             color: widget.isOutlined
                                 ? (widget.textColor ??
                                 widget.backgroundColor ??
@@ -135,7 +135,7 @@ class _PremiumButtonState extends State<PremiumButton>
                         Text(
                           widget.text,
                           style: GoogleFonts.inter(
-                            fontSize: 10.sp, // Changed from 2.w to 2.sp for better text scaling
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                             color: widget.isOutlined

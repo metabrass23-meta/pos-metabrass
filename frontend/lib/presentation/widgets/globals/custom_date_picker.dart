@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 
 class SyncfusionDateTimePicker extends StatefulWidget {
   final DateTime initialDate;
@@ -98,7 +99,6 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Syncfusion Date Picker
           Container(
             height: 280,
             decoration: BoxDecoration(
@@ -111,7 +111,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                 initialSelectedDate: _tempSelectedDate,
                 initialDisplayDate: _tempSelectedDate,
                 minDate: widget.minDate ?? DateTime(2000),
-                maxDate: widget.maxDate ?? DateTime.now().add(const Duration(days: 365)), // Default: allow up to 1 year in future
+                maxDate: widget.maxDate ?? DateTime.now().add(const Duration(days: 365)),
                 selectionMode: DateRangePickerSelectionMode.single,
                 onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                   if (args.value is DateTime) {
@@ -133,7 +133,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                   textStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 monthViewSettings: const DateRangePickerMonthViewSettings(
-                  firstDayOfWeek: 1, // Monday
+                  firstDayOfWeek: 1,
                   showTrailingAndLeadingDates: true,
                 ),
                 yearCellStyle: DateRangePickerYearCellStyle(
@@ -151,6 +151,8 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
   }
 
   Widget _buildTimeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(context.cardPadding),
@@ -167,14 +169,13 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
               Icon(Icons.access_time_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Select Time',
+                l10n.selectTime,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
 
-          // Custom inline time picker
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
@@ -185,12 +186,11 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Hour selection
                 Expanded(
                   child: Column(
                     children: [
                       Text(
-                        'Hour',
+                        l10n.hour,
                         style: GoogleFonts.inter(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
@@ -237,15 +237,13 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                   ),
                 ),
 
-                // Separator
                 Container(width: 1, height: 80, color: Colors.grey.shade300),
 
-                // Minute selection
                 Expanded(
                   child: Column(
                     children: [
                       Text(
-                        'Minute',
+                        l10n.minute,
                         style: GoogleFonts.inter(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
@@ -262,14 +260,14 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                             setState(() {
                               _tempSelectedTime = TimeOfDay(
                                 hour: _tempSelectedTime.hour,
-                                minute: index * 5, // 5-minute intervals
+                                minute: index * 5,
                               );
                             });
                           },
                           controller: FixedExtentScrollController(initialItem: (_tempSelectedTime.minute / 5).round()),
                           childDelegate: ListWheelChildBuilderDelegate(
                             builder: (context, index) {
-                              if (index < 0 || index >= 12) return null; // 0-55 minutes (5-minute intervals)
+                              if (index < 0 || index >= 12) return null;
                               final minute = index * 5;
                               final isSelected = minute == _tempSelectedTime.minute;
                               return Container(
@@ -288,7 +286,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
                                 ),
                               );
                             },
-                            childCount: 12, // 0, 5, 10, 15, ..., 55
+                            childCount: 12,
                           ),
                         ),
                       ),
@@ -301,12 +299,11 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
 
           SizedBox(height: context.smallPadding),
 
-          // Current time display and fallback button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Selected: ${_tempSelectedTime.format(context)}',
+                '${l10n.selected}: ${_tempSelectedTime.format(context)}',
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
@@ -317,6 +314,8 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
   }
 
   Widget _buildActions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -332,7 +331,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
               padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
             ),
             child: Text(
-              'Cancel',
+              l10n.cancel,
               style: GoogleFonts.inter(color: Colors.grey[600], fontWeight: FontWeight.w600, fontSize: context.bodyFontSize),
             ),
           ),
@@ -349,7 +348,7 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
             ),
             child: Text(
-              'Confirm',
+              l10n.confirm,
               style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: context.bodyFontSize),
             ),
           ),
@@ -358,12 +357,9 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
     );
   }
 
-  // New method for precise time selection that works better in dialog context
   Future<void> _selectTimeDialog() async {
-    // Close current dialog temporarily
     Navigator.of(context).pop();
 
-    // Show time picker
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _tempSelectedTime,
@@ -386,7 +382,6 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
       _tempSelectedTime = picked;
     }
 
-    // Reopen the dialog with updated time
     await showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -405,7 +400,6 @@ class _SyncfusionDateTimePickerState extends State<SyncfusionDateTimePicker> {
   }
 }
 
-// Extension method to easily show the picker
 extension SyncfusionDateTimePickerExtension on BuildContext {
   Future<void> showSyncfusionDateTimePicker({
     required DateTime initialDate,

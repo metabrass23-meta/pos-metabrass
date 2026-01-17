@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,7 +31,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
     super.initState();
     _helpers = AdvancePaymentTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
 
-    // Synchronize horizontal scrolling between header and content
     _headerHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
@@ -73,7 +73,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             thumbVisibility: true,
             child: Column(
               children: [
-                // Table Header with Horizontal Scroll
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.lightGray.withOpacity(0.5),
@@ -94,7 +93,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                   ),
                 ),
 
-                // Table Content with Synchronized Scroll
                 Expanded(
                   child: Scrollbar(
                     controller: _verticalController,
@@ -118,7 +116,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                   ),
                 ),
 
-                // Pagination Controls
                 if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
               ],
             ),
@@ -166,33 +163,19 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Payment ID
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Payment ID', 'id')),
-
-        // Labor Name
-        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, 'Labor Name', 'labor_name')),
-
-        // Labor Details (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Labor Details')),
-
-        // Description (responsive)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Description')),
-
-        // Amount
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildSortableHeaderCell(context, 'Amount', 'amount')),
-
-        // Date
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildSortableHeaderCell(context, 'Date', 'date')),
-
-        // Receipt (hidden on compact layouts)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, 'Receipt')),
-
-        // Actions
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.paymentId, 'id')),
+        Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, l10n.laborName, 'labor_name')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.laborDetails)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.description)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildSortableHeaderCell(context, l10n.amount, 'amount')),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildSortableHeaderCell(context, l10n.date, 'date')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.receipt)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -251,7 +234,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
-          // Payment ID Column
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -271,7 +253,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             ),
           ),
 
-          // Labor Name Column
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -284,7 +265,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Show labor details on compact layouts
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Row(
@@ -301,7 +281,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                       ),
                     ],
                   ),
-                  // Show description on compact layouts if available
                   if (payment.description.isNotEmpty) ...[
                     SizedBox(height: context.smallPadding / 4),
                     Text(
@@ -316,7 +295,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             ),
           ),
 
-          // Labor Details Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[2],
@@ -354,7 +332,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               ),
             ),
 
-          // Description Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[3],
@@ -367,7 +344,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               ),
             ),
 
-          // Amount Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 2 : 4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -386,7 +362,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             ),
           ),
 
-          // Date Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -398,14 +373,13 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
-                  context.shouldShowCompactLayout ? payment.time : _getRelativeDate(payment.date),
+                  context.shouldShowCompactLayout ? payment.time : _getRelativeDate(context, payment.date),
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
 
-          // Receipt Column (hidden on compact layouts)
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[6],
@@ -413,7 +387,6 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               child: _helpers.buildReceiptBadge(context, payment),
             ),
 
-          // Actions Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -424,19 +397,21 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
     );
   }
 
-  String _getRelativeDate(DateTime date) {
+  String _getRelativeDate(BuildContext context, DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(date).inDays;
 
-    if (difference == 0) return 'Today';
-    if (difference == 1) return 'Yesterday';
-    if (difference < 7) return '$difference days ago';
-    if (difference < 30) return '${(difference / 7).floor()} weeks ago';
-    if (difference < 365) return '${(difference / 30).floor()} months ago';
-    return '${(difference / 365).floor()} years ago';
+    if (difference == 0) return l10n.today;
+    if (difference == 1) return l10n.yesterday;
+    if (difference < 7) return l10n.daysAgo(difference);
+    if (difference < 30) return l10n.weeksAgo((difference / 7).floor());
+    if (difference < 365) return l10n.monthsAgo((difference / 30).floor());
+    return l10n.yearsAgo((difference / 365).floor());
   }
 
   Widget _buildPaginationControls(BuildContext context, AdvancePaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final pagination = provider.paginationInfo!;
 
     return Container(
@@ -450,24 +425,24 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
       ),
       child: Row(
         children: [
-          // Results info
           Text(
-            'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} advance payments',
+            l10n.showingAdvancePayments(
+              ((pagination.currentPage - 1) * pagination.pageSize) + 1,
+              pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
+              pagination.totalCount,
+            ),
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
 
-          // Pagination controls
           Row(
             children: [
-              // Previous button
               IconButton(
                 onPressed: pagination.hasPrevious ? provider.loadPreviousPage : null,
                 icon: Icon(Icons.chevron_left, color: pagination.hasPrevious ? AppTheme.primaryMaroon : Colors.grey[400]),
               ),
 
-              // Page info
               Container(
                 padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
                 decoration: BoxDecoration(
@@ -475,12 +450,11 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  '${pagination.currentPage} of ${pagination.totalPages}',
+                  l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 
-              // Next button
               IconButton(
                 onPressed: pagination.hasNext ? provider.loadNextPage : null,
                 icon: Icon(Icons.chevron_right, color: pagination.hasNext ? AppTheme.primaryMaroon : Colors.grey[400]),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,12 +15,10 @@ class AdvancePaymentTableHelpers {
 
   AdvancePaymentTableHelpers({required this.onEdit, required this.onDelete, required this.onView});
 
-  /// Build the actions row for each advance payment record in the table
   Widget buildActionsRow(BuildContext context, AdvancePayment payment) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // View Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -35,7 +34,6 @@ class AdvancePaymentTableHelpers {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Edit Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -51,7 +49,6 @@ class AdvancePaymentTableHelpers {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Delete Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -70,7 +67,6 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Show success snackbar
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -92,7 +88,6 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Show error snackbar
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -115,8 +110,9 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Build error state widget
   Widget buildErrorState(BuildContext context, AdvancePaymentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,7 +127,7 @@ class AdvancePaymentTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Advance Payments',
+            l10n.failedToLoadAdvancePayments,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -142,7 +138,7 @@ class AdvancePaymentTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.anUnexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -168,7 +164,7 @@ class AdvancePaymentTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -187,8 +183,9 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -203,7 +200,7 @@ class AdvancePaymentTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Advance Payment Records Found',
+            l10n.noAdvancePaymentRecordsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -214,7 +211,7 @@ class AdvancePaymentTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start by adding your first advance payment record to track labor payments effectively',
+              l10n.startByAddingYourFirstAdvancePaymentRecord,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -242,7 +239,7 @@ class AdvancePaymentTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add First Advance Payment',
+                        l10n.addFirstAdvancePayment,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -261,21 +258,19 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Get status color based on payment status
   Color getStatusColor(AdvancePayment payment) {
     if (payment.isActive == false) return Colors.red;
     if (payment.amount > payment.totalSalary * 0.5) return Colors.orange;
-    return Colors.green; // Active and reasonable amount
+    return Colors.green;
   }
 
-  /// Get status text
-  String getStatusText(AdvancePayment payment) {
-    if (payment.isActive == false) return 'Inactive';
-    if (payment.amount > payment.totalSalary * 0.5) return 'High Amount';
-    return 'Active';
+  String getStatusText(BuildContext context, AdvancePayment payment) {
+    final l10n = AppLocalizations.of(context)!;
+    if (payment.isActive == false) return l10n.inactive;
+    if (payment.amount > payment.totalSalary * 0.5) return l10n.highAmount;
+    return l10n.active;
   }
 
-  /// Get labor initials for avatar
   String getLaborInitials(String laborName) {
     final words = laborName.trim().split(' ');
     if (words.isEmpty) return 'L';
@@ -283,22 +278,19 @@ class AdvancePaymentTableHelpers {
     return '${words[0].substring(0, 1)}${words[words.length - 1].substring(0, 1)}'.toUpperCase();
   }
 
-  /// Format currency for display
   String formatCurrency(double amount) {
     return 'PKR ${amount.toStringAsFixed(0)}';
   }
 
-  /// Get priority color based on amount
   Color getPriorityColor(double amount) {
-    if (amount >= 100000) return Colors.red; // High priority
-    if (amount >= 50000) return Colors.orange; // Medium priority
-    return Colors.green; // Normal priority
+    if (amount >= 100000) return Colors.red;
+    if (amount >= 50000) return Colors.orange;
+    return Colors.green;
   }
 
-  /// Build status chip
   Widget buildStatusChip(BuildContext context, AdvancePayment payment) {
     final color = getStatusColor(payment);
-    final text = getStatusText(payment);
+    final text = getStatusText(context, payment);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
@@ -314,7 +306,6 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Build labor avatar
   Widget buildLaborAvatar(BuildContext context, AdvancePayment payment) {
     return Container(
       width: 32,
@@ -333,8 +324,9 @@ class AdvancePaymentTableHelpers {
     );
   }
 
-  /// Build receipt badge
   Widget buildReceiptBadge(BuildContext context, AdvancePayment payment) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (payment.hasReceipt) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
@@ -345,7 +337,7 @@ class AdvancePaymentTableHelpers {
             Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('small')),
             SizedBox(width: context.smallPadding / 2),
             Text(
-              'Available',
+              l10n.available,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
             ),
           ],
@@ -361,7 +353,7 @@ class AdvancePaymentTableHelpers {
             Icon(Icons.receipt_long_outlined, color: Colors.grey, size: context.iconSize('small')),
             SizedBox(width: context.smallPadding / 2),
             Text(
-              'Missing',
+              l10n.missing,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
             ),
           ],
@@ -370,5 +362,3 @@ class AdvancePaymentTableHelpers {
     }
   }
 }
-
-

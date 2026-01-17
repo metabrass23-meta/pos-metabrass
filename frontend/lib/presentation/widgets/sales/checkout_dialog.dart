@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   final _notesController = TextEditingController();
   final _scrollController = ScrollController();
 
-  // Split Payment Controllers
   final _cashAmountController = TextEditingController();
   final _cardAmountController = TextEditingController();
   final _bankTransferAmountController = TextEditingController();
@@ -43,14 +43,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
     super.initState();
 
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
 
-    // Initialize with current provider values
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
       _amountPaidController.text = provider.cartGrandTotal.toStringAsFixed(0);
@@ -80,14 +76,11 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   void _handleCheckout() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
-
-      // Update provider values
       provider.setOverallDiscount(double.tryParse(_overallDiscountController.text) ?? 0.0);
 
       final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
       final notes = _notesController.text.trim();
 
-      // Create sale from cart
       await provider.createSaleFromCart(paymentMethod: _selectedPaymentMethod, amountPaid: amountPaid, notes: notes.isNotEmpty ? notes : null);
 
       if (mounted) {
@@ -125,11 +118,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   void _navigateToSalesManagement() {
-    // This would typically navigate to the sales management screen
-    // For now, we'll just show a snackbar
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Navigate to Sales Management to continue'), backgroundColor: AppTheme.primaryMaroon));
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.navigateToSalesManagementToContinue), backgroundColor: AppTheme.primaryMaroon)
+    );
   }
 
   void _handleCancel() {
@@ -200,6 +192,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -222,7 +216,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Checkout' : 'Checkout & Payment',
+                  context.shouldShowCompactLayout ? l10n.checkout : l10n.checkoutAndPayment,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -233,7 +227,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Complete the sale transaction',
+                    l10n.completeTheSaleTransaction,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -244,8 +238,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               ],
             ),
           ),
-
-          // Order Summary (Desktop only)
           if (context.shouldShowFullLayout)
             Consumer<SalesProvider>(
               builder: (context, provider, child) {
@@ -255,7 +247,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   child: Column(
                     children: [
                       Text(
-                        '${provider.cartTotalItems} Items',
+                        '${provider.cartTotalItems} ${l10n.items}',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.pureWhite.withOpacity(0.8)),
                       ),
                       Text(
@@ -267,7 +259,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 );
               },
             ),
-
           SizedBox(width: context.smallPadding),
           Material(
             color: Colors.transparent,
@@ -322,7 +313,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left Column - Order Summary & Advanced Options
               Expanded(
                 flex: 1,
                 child: Column(
@@ -332,10 +322,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   ],
                 ),
               ),
-
               SizedBox(width: context.cardPadding),
-
-              // Right Column - Payment & Actions
               Expanded(
                 flex: 1,
                 child: Column(
@@ -354,6 +341,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildOrderSummaryCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {
         return Container(
@@ -371,15 +360,12 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   Icon(Icons.receipt_long_rounded, color: Colors.blue, size: context.iconSize('medium')),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Order Summary',
+                    l10n.orderSummary,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                 ],
               ),
-
               SizedBox(height: context.cardPadding),
-
-              // Customer Info
               if (provider.selectedCustomer != null) ...[
                 Row(
                   children: [
@@ -406,13 +392,11 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 Divider(color: Colors.grey.shade300),
                 SizedBox(height: context.smallPadding),
               ],
-
-              // Items Count
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Items (${provider.cartTotalItems})',
+                    '${l10n.items} (${provider.cartTotalItems})',
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                   ),
                   Text(
@@ -421,15 +405,13 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   ),
                 ],
               ),
-
-              // Overall Discount
               if (provider.overallDiscount > 0) ...[
                 SizedBox(height: context.smallPadding / 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Discount',
+                      l10n.discount,
                       style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                     ),
                     Text(
@@ -439,8 +421,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   ],
                 ),
               ],
-
-              // GST
               if (provider.gstPercentage > 0) ...[
                 SizedBox(height: context.smallPadding / 2),
                 Row(
@@ -457,15 +437,13 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   ],
                 ),
               ],
-
-              // Tax
               if (provider.taxPercentage > 0) ...[
                 SizedBox(height: context.smallPadding / 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Tax (${provider.taxPercentage}%)',
+                      '${l10n.tax} (${provider.taxPercentage}%)',
                       style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                     ),
                     Text(
@@ -475,17 +453,14 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   ],
                 ),
               ],
-
               SizedBox(height: context.smallPadding),
               Divider(color: Colors.grey.shade400, thickness: 1.5),
               SizedBox(height: context.smallPadding),
-
-              // Grand Total
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Grand Total',
+                    l10n.grandTotal,
                     style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                   ),
                   Text(
@@ -502,6 +477,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildPaymentMethodCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -517,15 +494,12 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               Icon(Icons.payment_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Method',
+                l10n.paymentMethod,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Payment Method Selection
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300),
@@ -541,7 +515,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                     _isSplitPayment = value == 'Split';
                   });
                 },
-                items: ['Cash', 'Card', 'Bank Transfer', 'Credit', 'Split'].map((method) {
+                items: [l10n.cash, l10n.card, l10n.bankTransfer, l10n.credit, l10n.split].map((method) {
                   return DropdownMenuItem<String>(
                     value: method,
                     child: Padding(
@@ -562,37 +536,31 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               ),
             ),
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Split Payment Fields
           if (_isSplitPayment) ...[
             Text(
-              'Split Payment Details',
+              l10n.splitPaymentDetails,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
-
             PremiumTextField(
-              label: 'Cash Amount',
+              label: l10n.cashAmount,
               controller: _cashAmountController,
               keyboardType: TextInputType.number,
               prefixIcon: Icons.money_rounded,
               onChanged: (value) => _updateAmountFromSplit(),
             ),
             SizedBox(height: context.smallPadding),
-
             PremiumTextField(
-              label: 'Card Amount',
+              label: l10n.cardAmount,
               controller: _cardAmountController,
               keyboardType: TextInputType.number,
               prefixIcon: Icons.credit_card_rounded,
               onChanged: (value) => _updateAmountFromSplit(),
             ),
             SizedBox(height: context.smallPadding),
-
             PremiumTextField(
-              label: 'Bank Transfer Amount',
+              label: l10n.bankTransferAmount,
               controller: _bankTransferAmountController,
               keyboardType: TextInputType.number,
               prefixIcon: Icons.account_balance_rounded,
@@ -600,23 +568,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             ),
             SizedBox(height: context.cardPadding),
           ],
-
-          // Amount Paid
           PremiumTextField(
-            label: 'Amount Paid',
+            label: l10n.amountPaid,
             controller: _amountPaidController,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.attach_money_rounded,
             enabled: !_isSplitPayment,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Please enter amount paid';
+              if (value?.isEmpty ?? true) return l10n.pleaseEnterAmountPaid;
               final amount = double.tryParse(value!);
-              if (amount == null || amount < 0) return 'Please enter a valid amount';
+              if (amount == null || amount < 0) return l10n.pleaseEnterValidAmount;
               return null;
             },
           ),
-
-          // Change/Remaining Amount
           Consumer<SalesProvider>(
             builder: (context, provider, child) {
               final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
@@ -637,7 +601,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      difference > 0 ? 'Change' : 'Remaining',
+                      difference > 0 ? l10n.change : l10n.remaining,
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
@@ -657,10 +621,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               );
             },
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Advanced Options Toggle
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -682,7 +643,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                     ),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      _showAdvancedOptions ? 'Hide Advanced Options' : 'Show Advanced Options',
+                      _showAdvancedOptions ? l10n.hideAdvancedOptions : l10n.showAdvancedOptions,
                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                     ),
                   ],
@@ -696,6 +657,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildAdvancedOptionsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -711,17 +674,14 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               Icon(Icons.settings_rounded, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Advanced Options',
+                l10n.advancedOptions,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Overall Discount
           PremiumTextField(
-            label: 'Overall Discount (PKR)',
+            label: l10n.overallDiscountPkr,
             controller: _overallDiscountController,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.local_offer_rounded,
@@ -730,46 +690,29 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               provider.setOverallDiscount(double.tryParse(value) ?? 0.0);
             },
           ),
-
           SizedBox(height: context.smallPadding),
-
-          // GST Percentage
           PremiumTextField(
-            label: 'GST Percentage (%)',
+            label: l10n.gstPercentage,
             controller: _gstController,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.receipt_rounded,
-            onChanged: (value) {
-              // Tax configuration is handled by the cart system
-              // final provider = Provider.of<SalesProvider>(context, listen: false);
-              // provider.setGstPercentage(double.tryParse(value) ?? 18.0);
-            },
+            onChanged: (value) {},
           ),
-
           SizedBox(height: context.smallPadding),
-
-          // Tax Percentage
           PremiumTextField(
-            label: 'Additional Tax (%)',
+            label: l10n.additionalTax,
             controller: _taxController,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.account_balance_rounded,
-            onChanged: (value) {
-              // Tax configuration is handled by the cart system
-              // final provider = Provider.of<SalesProvider>(context, listen: false);
-              // provider.setTaxPercentage(double.tryParse(value) ?? 0.0);
-            },
+            onChanged: (value) {},
           ),
-
           SizedBox(height: context.smallPadding),
-
-          // Notes
           PremiumTextField(
-            label: 'Notes (Optional)',
+            label: l10n.notesOptional,
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
             maxLines: 3,
-            hint: 'Any special instructions or remarks...',
+            hint: l10n.anySpecialInstructionsOrRemarks,
           ),
         ],
       ),
@@ -777,6 +720,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {
         if (context.shouldShowCompactLayout) {
@@ -784,7 +729,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PremiumButton(
-                text: provider.isLoading ? 'Processing...' : 'Complete Sale',
+                text: provider.isLoading ? l10n.processing : l10n.completeSale,
                 onPressed: provider.isLoading ? null : _handleCheckout,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight,
@@ -793,7 +738,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               ),
               SizedBox(height: context.cardPadding),
               PremiumButton(
-                text: 'Cancel',
+                text: l10n.cancel,
                 onPressed: provider.isLoading ? null : _handleCancel,
                 isOutlined: true,
                 height: context.buttonHeight,
@@ -807,7 +752,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             children: [
               Expanded(
                 child: PremiumButton(
-                  text: 'Cancel',
+                  text: l10n.cancel,
                   onPressed: provider.isLoading ? null : _handleCancel,
                   isOutlined: true,
                   height: context.buttonHeight / 1.5,
@@ -819,7 +764,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               Expanded(
                 flex: 2,
                 child: PremiumButton(
-                  text: provider.isLoading ? 'Processing...' : 'Complete Sale',
+                  text: provider.isLoading ? l10n.processing : l10n.completeSale,
                   onPressed: provider.isLoading ? null : _handleCheckout,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight / 1.5,
@@ -835,6 +780,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   }
 
   Widget _buildSuccessDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -851,7 +798,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Success Header
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
@@ -877,7 +823,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Sale Completed!',
+                          l10n.saleCompleted,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
@@ -885,7 +831,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                           ),
                         ),
                         Text(
-                          'Transaction processed successfully',
+                          l10n.transactionProcessedSuccessfully,
                           style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
                         ),
                       ],
@@ -894,8 +840,6 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 ],
               ),
             ),
-
-            // Success Content
             Padding(
               padding: EdgeInsets.all(context.cardPadding),
               child: Column(
@@ -915,7 +859,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Invoice Number:',
+                                  '${l10n.invoiceNumber}:',
                                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                                 ),
                                 Text(
@@ -933,7 +877,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Total Amount:',
+                                  '${l10n.totalAmount}:',
                                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                                 ),
                                 Text(
@@ -947,7 +891,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Payment Method:',
+                                  '${l10n.paymentMethod}:',
                                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                                 ),
                                 Text(
@@ -961,10 +905,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                       );
                     },
                   ),
-
                   SizedBox(height: context.cardPadding),
-
-                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
@@ -977,10 +918,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                // Print receipt functionality
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(SnackBar(content: Text('Print functionality to be implemented'), backgroundColor: Colors.blue));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(l10n.printFunctionalityToBeImplemented), backgroundColor: Colors.blue)
+                                );
                               },
                               borderRadius: BorderRadius.circular(context.borderRadius()),
                               child: Container(
@@ -991,7 +931,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                                     Icon(Icons.print_rounded, color: Colors.blue, size: context.iconSize('medium')),
                                     SizedBox(width: context.smallPadding),
                                     Text(
-                                      'Print Receipt',
+                                      l10n.printReceipt,
                                       style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                                     ),
                                   ],
@@ -1012,8 +952,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
-                                Navigator.of(context).pop(); // Close success dialog
-                                Navigator.of(context).pop(); // Close checkout dialog
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
                               },
                               borderRadius: BorderRadius.circular(context.borderRadius()),
                               child: Container(
@@ -1024,7 +964,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                                     Icon(Icons.done_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                                     SizedBox(width: context.smallPadding),
                                     Text(
-                                      'New Sale',
+                                      l10n.newSale,
                                       style: GoogleFonts.inter(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,

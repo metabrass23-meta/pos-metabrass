@@ -14,7 +14,6 @@ class AuthService {
   final ApiClient _apiClient = ApiClient();
   final StorageService _storageService = StorageService();
 
-  /// Register a new user
   Future<ApiResponse<AuthResponse>> register({
     required String fullName,
     required String email,
@@ -40,7 +39,6 @@ class AuthService {
         );
 
         if (apiResponse.success && apiResponse.data != null) {
-          // Store token and user data
           await _storageService.saveToken(apiResponse.data!.token);
           await _storageService.saveUser(apiResponse.data!.user);
         }
@@ -54,7 +52,6 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Registration DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<AuthResponse>(
         success: false,
@@ -62,7 +59,6 @@ class AuthService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Registration error: ${e.toString()}');
       return ApiResponse<AuthResponse>(
         success: false,
         message: 'An unexpected error occurred during registration',
@@ -70,7 +66,6 @@ class AuthService {
     }
   }
 
-  /// Login user
   Future<ApiResponse<AuthResponse>> login({
     required String email,
     required String password,
@@ -90,7 +85,6 @@ class AuthService {
         );
 
         if (apiResponse.success && apiResponse.data != null) {
-          // Store token and user data
           await _storageService.saveToken(apiResponse.data!.token);
           await _storageService.saveUser(apiResponse.data!.user);
         }
@@ -104,7 +98,6 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Login DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<AuthResponse>(
         success: false,
@@ -112,7 +105,6 @@ class AuthService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Login error: ${e.toString()}');
       return ApiResponse<AuthResponse>(
         success: false,
         message: 'An unexpected error occurred during login',
@@ -120,38 +112,27 @@ class AuthService {
     }
   }
 
-  /// Logout user
   Future<ApiResponse<void>> logout() async {
     try {
-      // Send logout request to server
-      final response = await _apiClient.post(ApiConfig.logout);
-
-      // Clear local storage regardless of server response
-      await _storageService.clearAll();
-
-      if (response.statusCode == 200) {
-        return ApiResponse<void>(
-          success: true,
-          message: response.data['message'] ?? 'Logged out successfully',
-        );
-      } else {
-        return ApiResponse<void>(
-          success: true, // Still success since we cleared local data
-          message: 'Logged out locally',
-        );
+      try {
+        await _apiClient.post(ApiConfig.logout);
+      } catch (e) {
+        debugPrint('Server logout failed: $e');
       }
-    } on DioException catch (e) {
-      debugPrint('Logout DioException: ${e.toString()}');
-      // Clear local storage even if server request fails
+
       await _storageService.clearAll();
+
       return ApiResponse<void>(
         success: true,
-        message: 'Logged out locally',
+        message: 'Logged out successfully',
       );
     } catch (e) {
-      debugPrint('Logout error: ${e.toString()}');
-      // Clear local storage even if there's an error
-      await _storageService.clearAll();
+      try {
+        await _storageService.clearAll();
+      } catch (clearError) {
+        debugPrint('Failed to clear storage: $clearError');
+      }
+
       return ApiResponse<void>(
         success: true,
         message: 'Logged out locally',
@@ -159,7 +140,6 @@ class AuthService {
     }
   }
 
-  /// Get user profile
   Future<ApiResponse<UserModel>> getProfile() async {
     try {
       final response = await _apiClient.get(ApiConfig.profile);
@@ -171,7 +151,6 @@ class AuthService {
         );
 
         if (apiResponse.success && apiResponse.data != null) {
-          // Update stored user data
           await _storageService.saveUser(apiResponse.data!);
         }
 
@@ -184,7 +163,6 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Get profile DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<UserModel>(
         success: false,
@@ -192,7 +170,6 @@ class AuthService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Get profile error: ${e.toString()}');
       return ApiResponse<UserModel>(
         success: false,
         message: 'An unexpected error occurred while getting profile',
@@ -200,7 +177,6 @@ class AuthService {
     }
   }
 
-  /// Update user profile
   Future<ApiResponse<UserModel>> updateProfile({
     required String fullName,
     required String email,
@@ -220,7 +196,6 @@ class AuthService {
         );
 
         if (apiResponse.success && apiResponse.data != null) {
-          // Update stored user data
           await _storageService.saveUser(apiResponse.data!);
         }
 
@@ -233,7 +208,6 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Update profile DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<UserModel>(
         success: false,
@@ -241,7 +215,6 @@ class AuthService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Update profile error: ${e.toString()}');
       return ApiResponse<UserModel>(
         success: false,
         message: 'An unexpected error occurred while updating profile',
@@ -249,7 +222,6 @@ class AuthService {
     }
   }
 
-  /// Change password
   Future<ApiResponse<String>> changePassword({
     required String oldPassword,
     required String newPassword,
@@ -271,7 +243,6 @@ class AuthService {
         );
 
         if (apiResponse.success && apiResponse.data != null) {
-          // Update stored token
           await _storageService.saveToken(apiResponse.data!);
         }
 
@@ -284,7 +255,6 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      debugPrint('Change password DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
       return ApiResponse<String>(
         success: false,
@@ -292,7 +262,6 @@ class AuthService {
         errors: apiError.errors,
       );
     } catch (e) {
-      debugPrint('Change password error: ${e.toString()}');
       return ApiResponse<String>(
         success: false,
         message: 'An unexpected error occurred while changing password',
@@ -300,17 +269,14 @@ class AuthService {
     }
   }
 
-  /// Check if user is logged in
   Future<bool> isLoggedIn() async {
     return await _storageService.isLoggedIn();
   }
 
-  /// Get current user from storage
   Future<UserModel?> getCurrentUser() async {
     return await _storageService.getUser();
   }
 
-  /// Get current token from storage
   Future<String?> getCurrentToken() async {
     return await _storageService.getToken();
   }

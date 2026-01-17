@@ -39,24 +39,21 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
 void main() async {
-  // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize API services
   await StorageService().init();
   ApiClient().init();
 
   runApp(const MaqboolFabricApp());
 
-  // Add this for desktop platforms
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
       appWindow
-        ..minSize = const Size(1024, 720)
-        ..maxSize = const Size(1920, 1080)
-        ..size = const Size(1024, 768)
+        ..minSize = Size(1024, 768)
+        ..maxSize = Size(1920, 1080)
+        ..size = Size(1024, 768)
         ..alignment = Alignment.center
-        ..title = "Al Noor Fabrics"
+        ..title = "Al Noor Fashion"
         ..show();
     });
   }
@@ -65,8 +62,7 @@ void main() async {
 class MaqboolFabricApp extends StatelessWidget {
   const MaqboolFabricApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -97,80 +93,95 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReceiptProvider()),
         ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
-      child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
-        builder:
-            (context, authProvider, profitLossProvider, appProvider, child) {
-              // Initialize app provider immediately
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!appProvider.isInitialized) {
-                  appProvider.initialize();
-                }
-                if (authProvider.state == AuthState.initial) {
-                  authProvider.initialize();
-                }
-              });
+      child: Consumer2<AuthProvider, ProfitLossProvider>(
+        builder: (context, authProvider, profitLossProvider, child) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (authProvider.state == AuthState.initial) {
+              authProvider.initialize();
+            }
+          });
 
-              // Initialize profit loss provider when authenticated
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (authProvider.state == AuthState.authenticated) {
-                  if (profitLossProvider.profitLossHistory.isEmpty &&
-                      !profitLossProvider.isLoading) {
-                    profitLossProvider.initialize();
-                  }
-                }
-              });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (authProvider.state == AuthState.authenticated) {
+              if (profitLossProvider.profitLossHistory.isEmpty &&
+                  !profitLossProvider.isLoading) {
+                profitLossProvider.initialize();
+              }
+            }
+          });
 
-              return Sizer(
-                builder: (context, orientation, deviceType) {
-                  final currentLocale = appProvider.locale;
-
-                  return MaterialApp(
-                    title: 'Al Noor Fashion - Premium POS',
-                    debugShowCheckedModeBanner: false,
-
-                    // Use locale-aware themes
-                    theme: AppTheme.getLightTheme(currentLocale),
-                    darkTheme: AppTheme.getDarkTheme(currentLocale),
-                    themeMode: appProvider.isDarkMode
-                        ? ThemeMode.dark
-                        : ThemeMode.light,
-
-                    navigatorKey: navigatorKey,
-
-                    // Localization Configuration
-                    locale: currentLocale,
-                    supportedLocales: const [
-                      Locale('ur'), // Urdu
-                      Locale('en'), // English (fallback)
-                    ],
-                    localizationsDelegates: const [
-                      AppLocalizations.delegate,
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                    ],
-
-                    initialRoute: '/',
-                    routes: {
-                      '/': (context) => const SplashScreen(),
-                      '/login': (context) => const LoginScreen(),
-                      '/signup': (context) => const SignupScreen(),
-                      '/dashboard': (context) => const DashboardScreen(),
-                    },
-
-                    // Add builder to ensure font applies to all widgets
-                    builder: (context, child) {
-                      return MediaQuery(
-                        data: MediaQuery.of(
-                          context,
-                        ).copyWith(textScaler: const TextScaler.linear(1.0)),
-                        child: child!,
+          return Sizer(
+            builder: (context, orientation, deviceType) {
+              return MaterialApp(
+                title: 'Al Noor Fashion - Premium POS',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: ThemeMode.light,
+                navigatorKey: navigatorKey,
+                locale: const Locale('ur'),
+                supportedLocales: const [
+                  Locale('ur'),
+                  Locale('en'),
+                ],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                initialRoute: '/',
+                onGenerateRoute: (settings) {
+                  if (settings.name == '/dashboard') {
+                    if (authProvider.state != AuthState.authenticated) {
+                      return MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                        settings: settings,
                       );
-                    },
-                  );
+                    }
+                  }
+
+                  if (settings.name == '/login' || settings.name == '/signup') {
+                    if (authProvider.state == AuthState.authenticated) {
+                      return MaterialPageRoute(
+                        builder: (_) => const DashboardScreen(),
+                        settings: settings,
+                      );
+                    }
+                  }
+
+                  switch (settings.name) {
+                    case '/':
+                      return MaterialPageRoute(
+                        builder: (_) => const SplashScreen(),
+                        settings: settings,
+                      );
+                    case '/login':
+                      return MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                        settings: settings,
+                      );
+                    case '/signup':
+                      return MaterialPageRoute(
+                        builder: (_) => const SignupScreen(),
+                        settings: settings,
+                      );
+                    case '/dashboard':
+                      return MaterialPageRoute(
+                        builder: (_) => const DashboardScreen(),
+                        settings: settings,
+                      );
+                    default:
+                      return MaterialPageRoute(
+                        builder: (_) => const SplashScreen(),
+                        settings: settings,
+                      );
+                  }
                 },
               );
             },
+          );
+        },
       ),
     );
   }

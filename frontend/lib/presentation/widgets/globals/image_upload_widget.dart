@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ImageUploadWidget extends StatefulWidget {
   final String? initialImagePath;
@@ -42,6 +43,8 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -82,7 +85,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                   onPressed: _removeImage,
                   icon: Icon(Icons.delete_outline, color: Colors.red.shade600, size: context.iconSize('small')),
                   label: Text(
-                    'Remove Image',
+                    l10n.removeImage,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red.shade600),
                   ),
                 ),
@@ -93,7 +96,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                     onPressed: _viewImageFullScreen,
                     icon: Icon(Icons.fullscreen, color: AppTheme.primaryMaroon, size: context.iconSize('small')),
                     label: Text(
-                      'View Full Screen',
+                      l10n.viewFullScreen,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
                     ),
                   ),
@@ -125,47 +128,47 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                 padding: EdgeInsets.all(context.smallPadding),
                 child: _isLoading
                     ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: context.iconSize('medium'),
-                              height: context.iconSize('medium'),
-                              child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon)),
-                            ),
-                            SizedBox(height: context.smallPadding / 2),
-                            Text(
-                              'Processing...',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _selectedImageFile != null || _currentImagePath != null ? Icons.edit_outlined : Icons.add_photo_alternate_outlined,
-                            color: _selectedImageFile != null || _currentImagePath != null ? AppTheme.primaryMaroon : Colors.grey.shade600,
-                            size: context.iconSize('medium'),
-                          ),
-                          SizedBox(height: context.smallPadding / 2),
-                          Text(
-                            _selectedImageFile != null || _currentImagePath != null ? 'Tap to change image' : 'Tap to add image',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              color: _selectedImageFile != null || _currentImagePath != null ? AppTheme.primaryMaroon : Colors.grey.shade600,
-                            ),
-                          ),
-                          if (_selectedImageFile != null || _currentImagePath != null) ...[
-                            SizedBox(height: context.smallPadding / 2),
-                            Text(
-                              'Supports: ${widget.allowedExtensions.join(', ').toUpperCase()} (Max ${widget.maxFileSizeMB}MB)',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize - 2, color: Colors.grey.shade500),
-                            ),
-                          ],
-                        ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: context.iconSize('medium'),
+                        height: context.iconSize('medium'),
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon)),
                       ),
+                      SizedBox(height: context.smallPadding / 2),
+                      Text(
+                        l10n.processing,
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
+                      ),
+                    ],
+                  ),
+                )
+                    : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _selectedImageFile != null || _currentImagePath != null ? Icons.edit_outlined : Icons.add_photo_alternate_outlined,
+                      color: _selectedImageFile != null || _currentImagePath != null ? AppTheme.primaryMaroon : Colors.grey.shade600,
+                      size: context.iconSize('medium'),
+                    ),
+                    SizedBox(height: context.smallPadding / 2),
+                    Text(
+                      _selectedImageFile != null || _currentImagePath != null ? l10n.tapToChangeImage : l10n.tapToAddImage,
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        color: _selectedImageFile != null || _currentImagePath != null ? AppTheme.primaryMaroon : Colors.grey.shade600,
+                      ),
+                    ),
+                    if (_selectedImageFile != null || _currentImagePath != null) ...[
+                      SizedBox(height: context.smallPadding / 2),
+                      Text(
+                        '${l10n.supports}: ${widget.allowedExtensions.join(', ').toUpperCase()} (${l10n.max} ${widget.maxFileSizeMB}MB)',
+                        style: GoogleFonts.inter(fontSize: context.captionFontSize - 2, color: Colors.grey.shade500),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -226,6 +229,8 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   }
 
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         _isLoading = true;
@@ -239,7 +244,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
         // Check file size
         final fileSize = await file.length();
         if (fileSize > widget.maxFileSizeMB * 1024 * 1024) {
-          _showErrorSnackbar('File size must be less than ${widget.maxFileSizeMB}MB');
+          _showErrorSnackbar('${l10n.fileSizeMustBeLessThan} ${widget.maxFileSizeMB}MB');
           return;
         }
 
@@ -251,7 +256,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
         widget.onImageChanged?.call(file);
       }
     } catch (e) {
-      _showErrorSnackbar('Error picking image: $e');
+      _showErrorSnackbar('${l10n.errorPickingImage}: $e');
     } finally {
       setState(() {
         _isLoading = false;

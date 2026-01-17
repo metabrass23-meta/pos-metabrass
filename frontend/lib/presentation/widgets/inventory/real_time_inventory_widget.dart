@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../src/providers/inventory_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class RealTimeInventoryWidget extends StatefulWidget {
   final List<String> productIds;
@@ -32,6 +33,8 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<InventoryProvider>(
       builder: (context, inventoryProvider, child) {
         return Container(
@@ -45,18 +48,18 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              _buildHeader(inventoryProvider),
+              _buildHeader(inventoryProvider, l10n),
 
               SizedBox(height: 16),
 
               // Stock Information
-              if (widget.showStockInfo) ...[_buildStockInfo(inventoryProvider), SizedBox(height: 16)],
+              if (widget.showStockInfo) ...[_buildStockInfo(inventoryProvider, l10n), SizedBox(height: 16)],
 
               // Low Stock Alerts
-              if (widget.showAlerts) ...[_buildLowStockAlerts(inventoryProvider), SizedBox(height: 16)],
+              if (widget.showAlerts) ...[_buildLowStockAlerts(inventoryProvider, l10n), SizedBox(height: 16)],
 
               // Action Buttons
-              _buildActionButtons(inventoryProvider),
+              _buildActionButtons(inventoryProvider, l10n),
             ],
           ),
         );
@@ -64,7 +67,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     );
   }
 
-  Widget _buildHeader(InventoryProvider provider) {
+  Widget _buildHeader(InventoryProvider provider, AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -73,7 +76,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             Icon(Icons.inventory_2, color: AppTheme.primaryMaroon, size: 24),
             SizedBox(width: 12),
             Text(
-              'Real-Time Inventory',
+              l10n.realTimeInventory,
               style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
             ),
           ],
@@ -90,7 +93,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             IconButton(
               onPressed: () => _refreshInventory(provider),
               icon: Icon(Icons.refresh, color: AppTheme.primaryMaroon),
-              tooltip: 'Refresh Inventory',
+              tooltip: l10n.refreshInventory,
             ),
           ],
         ),
@@ -98,13 +101,13 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     );
   }
 
-  Widget _buildStockInfo(InventoryProvider provider) {
+  Widget _buildStockInfo(InventoryProvider provider, AppLocalizations l10n) {
     if (provider.stockInfo.isEmpty) {
       return Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
         child: Center(
-          child: Text('No stock information available', style: GoogleFonts.poppins(color: Colors.grey[600])),
+          child: Text(l10n.noStockInformationAvailable, style: GoogleFonts.poppins(color: Colors.grey[600])),
         ),
       );
     }
@@ -112,15 +115,15 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Stock Information', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(l10n.stockInformation, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
         SizedBox(height: 12),
-        ...provider.stockInfo.map((stock) => _buildStockItem(stock)).toList(),
+        ...provider.stockInfo.map((stock) => _buildStockItem(stock, l10n)).toList(),
       ],
     );
   }
 
-  Widget _buildStockItem(Map<String, dynamic> stock) {
-    final productName = stock['product_name'] as String? ?? 'Unknown Product';
+  Widget _buildStockItem(Map<String, dynamic> stock, AppLocalizations l10n) {
+    final productName = stock['product_name'] as String? ?? l10n.unknownProduct;
     final availableQuantity = stock['available_quantity'] as int? ?? 0;
     final stockStatus = stock['stock_status'] as String? ?? 'UNKNOWN';
     final lowStockWarning = stock['low_stock_warning'] as bool? ?? false;
@@ -133,15 +136,15 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     if (outOfStock) {
       statusColor = Colors.red;
       statusIcon = Icons.cancel;
-      statusText = 'Out of Stock';
+      statusText = l10n.outOfStock;
     } else if (lowStockWarning) {
       statusColor = Colors.orange;
       statusIcon = Icons.warning;
-      statusText = 'Low Stock';
+      statusText = l10n.lowStock;
     } else {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = 'In Stock';
+      statusText = l10n.inStock;
     }
 
     return Container(
@@ -161,7 +164,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text('Available: $availableQuantity', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                Text('${l10n.available}: $availableQuantity', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
           ),
@@ -178,7 +181,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     );
   }
 
-  Widget _buildLowStockAlerts(InventoryProvider provider) {
+  Widget _buildLowStockAlerts(InventoryProvider provider, AppLocalizations l10n) {
     if (provider.lowStockAlerts.isEmpty) {
       return Container(
         padding: EdgeInsets.all(16),
@@ -193,7 +196,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                'All products have sufficient stock',
+                l10n.allProductsHaveSufficientStock,
                 style: GoogleFonts.poppins(color: Colors.green[700], fontWeight: FontWeight.w500),
               ),
             ),
@@ -210,7 +213,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             Icon(Icons.warning, color: Colors.orange, size: 20),
             SizedBox(width: 8),
             Text(
-              'Low Stock Alerts',
+              l10n.lowStockAlerts,
               style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.orange[700]),
             ),
             SizedBox(width: 8),
@@ -225,32 +228,36 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           ],
         ),
         SizedBox(height: 12),
-        ...provider.lowStockAlerts.map((alert) => _buildAlertItem(alert)).toList(),
+        ...provider.lowStockAlerts.map((alert) => _buildAlertItem(alert, l10n)).toList(),
       ],
     );
   }
 
-  Widget _buildAlertItem(Map<String, dynamic> alert) {
-    final productName = alert['product_name'] as String? ?? 'Unknown Product';
+  Widget _buildAlertItem(Map<String, dynamic> alert, AppLocalizations l10n) {
+    final productName = alert['product_name'] as String? ?? l10n.unknownProduct;
     final currentQuantity = alert['current_quantity'] as int? ?? 0;
     final alertLevel = alert['alert_level'] as String? ?? 'WARNING';
-    final categoryName = alert['category_name'] as String? ?? 'Uncategorized';
+    final categoryName = alert['category_name'] as String? ?? l10n.uncategorized;
 
     Color alertColor;
     IconData alertIcon;
+    String alertLevelText;
 
     switch (alertLevel) {
       case 'CRITICAL':
         alertColor = Colors.red;
         alertIcon = Icons.error;
+        alertLevelText = l10n.critical;
         break;
       case 'WARNING':
         alertColor = Colors.orange;
         alertIcon = Icons.warning;
+        alertLevelText = l10n.warning;
         break;
       default:
         alertColor = Colors.blue;
         alertIcon = Icons.info;
+        alertLevelText = l10n.info;
     }
 
     return Container(
@@ -270,9 +277,9 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text('Category: $categoryName', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                Text('${l10n.category}: $categoryName', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
                 Text(
-                  'Current Stock: $currentQuantity',
+                  '${l10n.currentStock}: $currentQuantity',
                   style: GoogleFonts.poppins(fontSize: 12, color: alertColor, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -282,7 +289,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(color: alertColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
             child: Text(
-              alertLevel,
+              alertLevelText,
               style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: alertColor),
             ),
           ),
@@ -291,14 +298,14 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     );
   }
 
-  Widget _buildActionButtons(InventoryProvider provider) {
+  Widget _buildActionButtons(InventoryProvider provider, AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
           child: ElevatedButton.icon(
             onPressed: provider.isLoading ? null : () => _refreshInventory(provider),
             icon: Icon(Icons.refresh, size: 18),
-            label: Text('Refresh Stock', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            label: Text(l10n.refreshStock, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryMaroon,
               foregroundColor: Colors.white,
@@ -312,7 +319,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           child: OutlinedButton.icon(
             onPressed: provider.isLoading ? null : () => _showLowStockAlerts(provider),
             icon: Icon(Icons.warning, size: 18),
-            label: Text('View Alerts', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            label: Text(l10n.viewAlerts, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.primaryMaroon,
               side: BorderSide(color: AppTheme.primaryMaroon),
@@ -334,6 +341,8 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
   }
 
   void _showLowStockAlerts(InventoryProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -341,7 +350,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           children: [
             Icon(Icons.warning, color: Colors.orange),
             SizedBox(width: 12),
-            Text('Low Stock Alerts', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            Text(l10n.lowStockAlerts, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
           ],
         ),
         content: SizedBox(
@@ -350,13 +359,13 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (provider.lowStockAlerts.isEmpty)
-                Text('No low stock alerts at this time.', style: GoogleFonts.poppins(color: Colors.grey[600]))
+                Text(l10n.noLowStockAlertsAtThisTime, style: GoogleFonts.poppins(color: Colors.grey[600]))
               else
-                ...provider.lowStockAlerts.map((alert) => _buildAlertItem(alert)).toList(),
+                ...provider.lowStockAlerts.map((alert) => _buildAlertItem(alert, l10n)).toList(),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
       ),
     );
   }

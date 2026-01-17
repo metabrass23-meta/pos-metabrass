@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class ViewExpenseDetailsDialog extends StatefulWidget {
@@ -155,6 +156,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -186,7 +189,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Expense Details',
+                  l10n.expenseDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -197,7 +200,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete expense information',
+                    l10n.viewCompleteExpenseInfo,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -248,36 +251,32 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Expense Category Card
           _buildExpenseCategoryCard(isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Amount Details Card
           _buildAmountDetailsCard(isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Person Information Card
           _buildPersonInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Date and Time Information Card
           _buildDateTimeInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
 
-          // Description Card
           _buildDescriptionCard(isCompact),
           SizedBox(height: context.mainPadding),
 
-          // Close Button
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: l10n.close,
               onPressed: _handleClose,
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -291,6 +290,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildExpenseCategoryCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -310,7 +311,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Expense Category',
+                l10n.expenseCategory,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -343,6 +344,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildAmountDetailsCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -361,7 +364,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Information',
+                l10n.amountInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -381,7 +384,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
             child: Column(
               children: [
                 Text(
-                  'Total Amount',
+                  l10n.totalAmount,
                   style: GoogleFonts.inter(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
@@ -406,6 +409,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildPersonInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -425,7 +430,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Withdrawal Information',
+                l10n.withdrawalInformation,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -487,6 +492,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildDateTimeInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -504,7 +511,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date',
+                    l10n.date,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -550,7 +557,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.blue),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Time',
+                    l10n.time,
                     style: GoogleFonts.inter(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
@@ -576,6 +583,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildDateTimeInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -593,7 +602,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date',
+                      l10n.date,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -640,7 +649,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                     Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.blue),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Time',
+                      l10n.time,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -667,6 +676,8 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
   }
 
   Widget _buildDescriptionCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -685,7 +696,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               ),
               SizedBox(width: context.smallPadding),
               Text(
-                'Expense Description',
+                l10n.expenseDescription,
                 style: GoogleFonts.inter(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
@@ -721,7 +732,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Record Created:',
+                      l10n.recordCreated,
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -748,7 +759,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  'Expense Record',
+                  l10n.expenseRecord,
                   style: GoogleFonts.inter(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,

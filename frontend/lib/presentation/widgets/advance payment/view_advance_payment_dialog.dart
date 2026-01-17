@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
@@ -79,6 +80,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -101,7 +104,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Advance Payment Details',
+                  l10n.advancePaymentDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -112,7 +115,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'View complete payment information',
+                    l10n.viewCompletePaymentInformation,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -149,39 +152,28 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Labor Information Card
           _buildLaborInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Amount Details Card
           _buildAmountDetailsCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Date and Time Information Card
           _buildDateTimeInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Description Card
           _buildDescriptionCard(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Receipt Information Card
           if (widget.payment.hasReceipt) ...[_buildReceiptInfoCard(isCompact), SizedBox(height: context.cardPadding)],
-
-          // Salary Information Card
           _buildSalaryInfoCard(isCompact),
           SizedBox(height: context.mainPadding),
-
-          // Close Button
           Align(
             alignment: Alignment.centerRight,
             child: PremiumButton(
-              text: 'Close',
+              text: l10n.close,
               onPressed: () => Navigator.of(context).pop(),
               height: context.buttonHeight / (isCompact ? 1 : 1.5),
               isOutlined: true,
@@ -195,6 +187,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildLaborInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -210,7 +204,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               Icon(Icons.person_outline, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Labor Information',
+                l10n.laborInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -229,12 +223,12 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
-                  'Role: ${widget.payment.laborRole}',
+                  '${l10n.role}: ${widget.payment.laborRole}',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
-                  'Phone: ${widget.payment.laborPhone}',
+                  '${l10n.phone}: ${widget.payment.laborPhone}',
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
               ],
@@ -246,6 +240,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildAmountDetailsCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -260,7 +256,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               Icon(Icons.attach_money_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Information',
+                l10n.paymentInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
               ),
             ],
@@ -273,7 +269,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
             child: Column(
               children: [
                 Text(
-                  'Advance Amount',
+                  l10n.advanceAmount,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                 ),
                 SizedBox(height: context.smallPadding),
@@ -313,6 +309,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildDateTimeInfoCompact() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Container(
@@ -327,7 +325,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Date',
+                    l10n.date,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
@@ -353,7 +351,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.blue),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    'Time',
+                    l10n.time,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
@@ -371,6 +369,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildDateTimeInfoExpanded() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -385,7 +385,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Date',
+                      l10n.date,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
@@ -412,7 +412,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.blue),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      'Time',
+                      l10n.time,
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
@@ -431,6 +431,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildDescriptionCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -442,7 +444,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               Icon(Icons.description_outlined, color: Colors.grey[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Description',
+                l10n.paymentDescription,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -467,6 +469,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildReceiptInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -482,7 +486,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               Icon(Icons.receipt_rounded, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Receipt Information',
+                l10n.receiptInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -498,7 +502,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    'Receipt image available',
+                    l10n.receiptImageAvailable,
                     style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.orange[700]),
                   ),
                 ),
@@ -509,7 +513,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                   ),
                   child: Text(
-                    'View',
+                    l10n.view,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                   ),
                 ),
@@ -522,6 +526,8 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
   }
 
   Widget _buildSalaryInfoCard(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -537,7 +543,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               Icon(Icons.account_balance_wallet_outlined, color: Colors.indigo, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Salary Information',
+                l10n.salaryInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -555,7 +561,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   child: Column(
                     children: [
                       Text(
-                        'Total Salary',
+                        l10n.totalSalary,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
@@ -575,7 +581,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   child: Column(
                     children: [
                       Text(
-                        'Remaining',
+                        l10n.remaining,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
@@ -601,7 +607,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Record Created:',
+                        '${l10n.recordCreated}:',
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
@@ -615,7 +621,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
-                    'Advance Payment',
+                    l10n.advancePayment,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
                   ),
                 ),
@@ -631,5 +637,3 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }
-
-

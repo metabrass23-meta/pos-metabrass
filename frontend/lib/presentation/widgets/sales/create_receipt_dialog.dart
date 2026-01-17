@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../src/providers/receipt_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
+import '../../../l10n/app_localizations.dart';
 
 class CreateReceiptDialog extends StatefulWidget {
   const CreateReceiptDialog({super.key});
@@ -32,6 +33,8 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       child: Container(
         width: 500,
@@ -46,24 +49,26 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
                 children: [
                   Icon(Icons.receipt, color: Theme.of(context).primaryColor),
                   const SizedBox(width: 12),
-                  Text('Create New Receipt', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    l10n.createNewReceipt,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
 
-              // Sale Selection
               Consumer<SalesProvider>(
                 builder: (context, salesProvider, child) {
                   if (salesProvider.sales.isEmpty) {
-                    return const Text('No sales available');
+                    return Text(l10n.noSalesAvailable);
                   }
 
                   return DropdownButtonFormField<String>(
                     value: _selectedSaleId,
-                    decoration: const InputDecoration(
-                      labelText: 'Select Sale *',
-                      border: OutlineInputBorder(),
-                      hintText: 'Choose a sale to create receipt for',
+                    decoration: InputDecoration(
+                      labelText: l10n.selectSaleRequired,
+                      border: const OutlineInputBorder(),
+                      hintText: l10n.chooseASaleToCreateReceiptFor,
                     ),
                     items: salesProvider.sales.map((sale) {
                       return DropdownMenuItem(
@@ -74,12 +79,12 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
                     onChanged: (value) {
                       setState(() {
                         _selectedSaleId = value;
-                        _selectedPaymentId = null; // Reset payment selection
+                        _selectedPaymentId = null;
                       });
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please select a sale';
+                        return l10n.pleaseSelectASale;
                       }
                       return null;
                     },
@@ -89,7 +94,6 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
 
               const SizedBox(height: 16),
 
-              // Payment Method (derived from sale)
               if (_selectedSaleId != null)
                 Consumer<SalesProvider>(
                   builder: (context, salesProvider, child) {
@@ -97,7 +101,10 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
 
                     return TextFormField(
                       enabled: false,
-                      decoration: const InputDecoration(labelText: 'Payment Method', border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        labelText: l10n.paymentMethod,
+                        border: const OutlineInputBorder(),
+                      ),
                       initialValue: sale.paymentMethodDisplay,
                     );
                   },
@@ -105,26 +112,35 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
 
               const SizedBox(height: 16),
 
-              // Notes
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(labelText: 'Notes', hintText: 'Additional receipt notes (optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.notes,
+                  hintText: l10n.additionalReceiptNotesOptional,
+                  border: const OutlineInputBorder(),
+                ),
                 maxLines: 3,
               ),
 
               const SizedBox(height: 24),
 
-              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: _isLoading ? null : () => Navigator.of(context).pop(), child: const Text('Cancel')),
+                  TextButton(
+                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                    child: Text(l10n.cancel),
+                  ),
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _createReceipt,
                     child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text('Create Receipt'),
+                        ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                        : Text(l10n.createReceipt),
                   ),
                 ],
               ),
@@ -136,6 +152,8 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
   }
 
   Future<void> _createReceipt() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
     if (_selectedSaleId == null || _selectedPaymentId == null) return;
 
@@ -147,17 +165,27 @@ class _CreateReceiptDialogState extends State<CreateReceiptDialog> {
       final receiptProvider = context.read<ReceiptProvider>();
       final success = await receiptProvider.createReceipt(
         saleId: _selectedSaleId!,
-        paymentId: _selectedSaleId!, // Use sale ID as payment ID for now
+        paymentId: _selectedSaleId!,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
       );
 
       if (success && mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Receipt created successfully'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.receiptCreatedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to create receipt: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.failedToCreateReceipt}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) {

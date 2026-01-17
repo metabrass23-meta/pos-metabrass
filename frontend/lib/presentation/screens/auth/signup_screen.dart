@@ -35,7 +35,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _handleSignup() {
+  void _handleSignup() async {
     final l10n = AppLocalizations.of(context)!;
 
     if (_formKey.currentState?.validate() ?? false) {
@@ -58,27 +58,44 @@ class _SignupScreenState extends State<SignupScreen> {
       }
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
       authProvider.clearError();
 
-      authProvider
-          .signup(
+      // Store email for pre-filling login form
+      final userEmail = _emailController.text.trim();
+
+      // ✅ Call signup method (returns bool)
+      final success = await authProvider.signup(
         _nameController.text.trim(),
-        _emailController.text.trim(),
+        userEmail,
         _passwordController.text,
         _confirmPasswordController.text,
         _acceptTerms,
-      )
-          .then((_) {
-        if (authProvider.state == AuthState.authenticated) {
+      );
+
+      if (mounted) {
+        if (success) {
+          // ✅ Signup successful - Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                l10n.accountCreatedSuccessfully,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('medium'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Expanded(
+                    child: Text(
+                      l10n.accountCreatedSuccessfully,
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                    ),
+                  ),
+                ],
               ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 3),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(context.borderRadius('medium')),
               ),
@@ -86,20 +103,39 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           );
 
+          // ✅ Navigate to login screen after delay
           Future.delayed(const Duration(milliseconds: 1500), () {
             if (mounted) {
-              Navigator.of(context).pushReplacementNamed('/login');
+              Navigator.of(context).pushReplacementNamed(
+                '/login',
+                arguments: {'email': userEmail}, // Pass email to pre-fill
+              );
             }
           });
-        } else if (authProvider.state == AuthState.error) {
+        } else {
+          // ❌ Signup failed - Error already set in provider
+          // Error will be displayed by Consumer widget below
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                l10n.registrationFailedMessage,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('medium'),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Expanded(
+                    child: Text(
+                      authProvider.errorMessage ?? l10n.registrationFailedMessage,
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                    ),
+                  ),
+                ],
               ),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(context.borderRadius('medium')),
               ),
@@ -107,23 +143,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           );
         }
-      })
-          .catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.unexpectedErrorOccurred,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-            ),
-            margin: EdgeInsets.all(context.mainPadding),
-          ),
-        );
-      });
+      }
     }
   }
 

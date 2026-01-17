@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_item_model.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/confirmation_dialog.dart';
 
 class OrderItemTableHelpers {
@@ -15,12 +16,10 @@ class OrderItemTableHelpers {
 
   OrderItemTableHelpers({required this.onEdit, required this.onDelete, required this.onView});
 
-  /// Build the actions row for each order item in the table
   Widget buildActionsRow(BuildContext context, OrderItemModel orderItem) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // View Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -36,7 +35,6 @@ class OrderItemTableHelpers {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Edit Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -52,7 +50,6 @@ class OrderItemTableHelpers {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Delete Button
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -68,7 +65,6 @@ class OrderItemTableHelpers {
 
         SizedBox(width: context.smallPadding / 2),
 
-        // Quick Actions Dropdown
         PopupMenuButton<String>(
           onSelected: (value) => _handleQuickAction(context, orderItem, value),
           itemBuilder: (context) => _buildQuickActionMenuItems(context, orderItem),
@@ -82,11 +78,10 @@ class OrderItemTableHelpers {
     );
   }
 
-  /// Build quick action menu items based on order item state
   List<PopupMenuEntry<String>> _buildQuickActionMenuItems(BuildContext context, OrderItemModel orderItem) {
+    final l10n = AppLocalizations.of(context)!;
     final items = <PopupMenuEntry<String>>[];
 
-    // Status change actions based on current status
     if (orderItem.isActive) {
       items.add(
         PopupMenuItem(
@@ -95,7 +90,7 @@ class OrderItemTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Deactivate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -108,56 +103,16 @@ class OrderItemTableHelpers {
             children: [
               Icon(Icons.visibility, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text('Activate', style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.activate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
             ],
           ),
         ),
       );
     }
 
-    // Additional actions
-    // Removed duplicate and export options as requested
-    // items.addAll([
-    //   PopupMenuItem(
-    //     value: 'duplicate',
-    //     child: Row(
-    //       children: [
-    //         Icon(
-    //           Icons.content_copy,
-    //           color: Colors.blue,
-    //           size: context.iconSize('small'),
-    //         ),
-    //         SizedBox(width: context.smallPadding),
-    //         Text(
-    //           'Duplicate',
-    //           style: GoogleFonts.inter(fontSize: context.captionFontSize),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    //   PopupMenuItem(
-    //     value: 'export',
-    //     child: Row(
-    //       children: [
-    //         Icon(
-    //           Icons.download,
-    //           color: AppTheme.accentGold,
-    //           size: context.iconSize('small'),
-    //         ),
-    //         SizedBox(width: context.smallPadding),
-    //         Text(
-    //           'Export Details',
-    //           style: GoogleFonts.inter(fontSize: context.captionFontSize),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // ]);
-
     return items;
   }
 
-  /// Handle quick action selection
   void _handleQuickAction(BuildContext context, OrderItemModel orderItem, String action) async {
     final provider = context.read<OrderItemProvider>();
 
@@ -168,78 +123,69 @@ class OrderItemTableHelpers {
       case 'deactivate':
         await _handleStatusChange(context, provider, orderItem, false);
         break;
-      // Removed duplicate and export cases as requested
-      // case 'duplicate':
-      //   await _handleDuplicate(context, provider, orderItem);
-      //   break;
-      // case 'export':
-      //   await _handleExport(context, orderItem);
-      //   break;
     }
   }
 
-  /// Handle order item status change
   Future<void> _handleStatusChange(BuildContext context, OrderItemProvider provider, OrderItemModel orderItem, bool isActive) async {
-    final statusText = isActive ? 'activate' : 'deactivate';
+    final l10n = AppLocalizations.of(context)!;
+    final statusText = isActive ? l10n.activate.toLowerCase() : l10n.deactivate.toLowerCase();
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: '${isActive ? 'Activate' : 'Deactivate'} Order Item',
-            message: 'Are you sure you want to $statusText "${orderItem.productName}"?',
-            actionText: isActive ? 'Activate' : 'Deactivate',
+            title: '${isActive ? l10n.activate : l10n.deactivate} ${l10n.orderItem}',
+            message: '${l10n.areYouSureYouWantTo} $statusText "${orderItem.productName}"?',
+            actionText: isActive ? l10n.activate : l10n.deactivate,
             actionColor: isActive ? Colors.green : Colors.orange,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.updateOrderItemStatus(orderItem.id, isActive);
       if (provider.errorMessage != null) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to update item status');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToUpdateItemStatus);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Order item ${isActive ? 'activated' : 'deactivated'} successfully');
+        _showSuccessSnackbar(context, '${l10n.orderItem} ${isActive ? l10n.activatedSuccessfully : l10n.deactivatedSuccessfully}');
       }
     }
   }
 
-  /// Handle duplicate order item
   Future<void> _handleDuplicate(BuildContext context, OrderItemProvider provider, OrderItemModel orderItem) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed =
         await showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (context) => ConfirmationDialog(
-            title: 'Duplicate Order Item',
-            message: 'Are you sure you want to create a copy of "${orderItem.productName}"?',
-            actionText: 'Duplicate',
+            title: '${l10n.duplicate} ${l10n.orderItem}',
+            message: '${l10n.areYouSureYouWantToCreateACopyOf} "${orderItem.productName}"?',
+            actionText: l10n.duplicate,
             actionColor: Colors.blue,
           ),
         ) ??
-        false;
+            false;
 
     if (confirmed) {
       final success = await provider.duplicateOrderItem(orderItem.id);
       if (provider.errorMessage != null) {
-        _showErrorSnackbar(context, provider.errorMessage ?? 'Failed to duplicate item');
+        _showErrorSnackbar(context, provider.errorMessage ?? l10n.failedToDuplicateItem);
       } else if (success) {
-        _showSuccessSnackbar(context, 'Order item duplicated successfully');
+        _showSuccessSnackbar(context, l10n.orderItemDuplicatedSuccessfully);
       }
     }
   }
 
-  /// Handle export order item
   Future<void> _handleExport(BuildContext context, OrderItemModel orderItem) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
-      // TODO: Implement actual export functionality
-      _showSuccessSnackbar(context, 'Order item details exported successfully');
+      _showSuccessSnackbar(context, l10n.orderItemDetailsExportedSuccessfully);
     } catch (e) {
-      _showErrorSnackbar(context, 'Failed to export: ${e.toString()}');
+      _showErrorSnackbar(context, '${l10n.failedToExport}: ${e.toString()}');
     }
   }
 
-  /// Show success snackbar
   void _showSuccessSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -261,7 +207,6 @@ class OrderItemTableHelpers {
     );
   }
 
-  /// Show error snackbar
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -285,8 +230,9 @@ class OrderItemTableHelpers {
     );
   }
 
-  /// Build error state widget
   Widget buildErrorState(BuildContext context, OrderItemProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -301,7 +247,7 @@ class OrderItemTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'Failed to Load Order Items',
+            l10n.failedToLoadOrderItems,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -312,7 +258,7 @@ class OrderItemTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              provider.errorMessage ?? 'An unexpected error occurred',
+              provider.errorMessage ?? l10n.anUnexpectedErrorOccurred,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -326,7 +272,7 @@ class OrderItemTableHelpers {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  provider.loadOrderItems(); // Use the refresh method from provider
+                  provider.loadOrderItems();
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
@@ -337,7 +283,7 @@ class OrderItemTableHelpers {
                       Icon(Icons.refresh_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Retry',
+                        l10n.retry,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -356,8 +302,9 @@ class OrderItemTableHelpers {
     );
   }
 
-  /// Build empty state widget
   Widget buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -372,7 +319,7 @@ class OrderItemTableHelpers {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Order Items Found',
+            l10n.noOrderItemsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -383,7 +330,7 @@ class OrderItemTableHelpers {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Start managing your order items by adding products to track inventory, pricing, and customizations for customer orders.',
+              l10n.startManagingYourOrderItems,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -400,7 +347,6 @@ class OrderItemTableHelpers {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // This will trigger the add order item dialog from parent
                 },
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 child: Padding(
@@ -411,7 +357,7 @@ class OrderItemTableHelpers {
                       Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
                       SizedBox(width: context.smallPadding),
                       Text(
-                        'Add Order Item',
+                        l10n.addOrderItem,
                         style: GoogleFonts.inter(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
@@ -430,12 +376,10 @@ class OrderItemTableHelpers {
     );
   }
 
-  /// Get status color based on order item active state
   Color getStatusColor(bool isActive) {
     return isActive ? Colors.green : Colors.orange;
   }
 
-  /// Get status text based on order item active state
   String getStatusText(bool isActive) {
     return isActive ? 'Active' : 'Inactive';
   }

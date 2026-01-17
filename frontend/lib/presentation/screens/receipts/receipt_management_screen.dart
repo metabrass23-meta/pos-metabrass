@@ -8,12 +8,12 @@ class ReceiptManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       appBar: AppBar(
-        title: Text(l10n.titleReceiptManagement),
+        title: Text(l10n.receiptManagement),
         backgroundColor: AppTheme.primaryMaroon,
         foregroundColor: AppTheme.pureWhite,
         elevation: 0,

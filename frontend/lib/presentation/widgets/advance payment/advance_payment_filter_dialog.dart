@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +22,6 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Filter state variables - only fields from provider
   String? _selectedLaborId;
   DateTime? _dateFrom;
   DateTime? _dateTo;
@@ -33,12 +33,10 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   bool _showInactive = false;
   String _searchQuery = '';
 
-  // Text controllers for custom inputs
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _minAmountController = TextEditingController();
   final TextEditingController _maxAmountController = TextEditingController();
 
-  // Predefined options based on provider
   static const String _allValue = 'ALL';
 
   @override
@@ -50,7 +48,6 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    // Initialize with current filter values from provider
     final provider = context.read<AdvancePaymentProvider>();
     _selectedLaborId = provider.selectedLaborId ?? _allValue;
     _dateFrom = provider.dateFrom;
@@ -82,24 +79,20 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   void _handleApplyFilters() async {
     final provider = context.read<AdvancePaymentProvider>();
 
-    // Update search from text controller
     final search = _searchController.text.trim();
     if (search != provider.searchQuery) {
       await provider.searchAdvancePayments(search);
     }
 
-    // Apply labor filter
     if (_selectedLaborId != provider.selectedLaborId) {
       final laborId = _selectedLaborId == _allValue ? null : _selectedLaborId;
       await provider.setLaborFilter(laborId);
     }
 
-    // Apply date range filter
     if (_dateFrom != provider.dateFrom || _dateTo != provider.dateTo) {
       await provider.setDateRangeFilter(_dateFrom, _dateTo);
     }
 
-    // Apply amount range filter
     final minAmount = _minAmountController.text.trim().isEmpty ? null : double.tryParse(_minAmountController.text.trim());
     final maxAmount = _maxAmountController.text.trim().isEmpty ? null : double.tryParse(_maxAmountController.text.trim());
 
@@ -107,18 +100,15 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
       await provider.setAmountRangeFilter(minAmount, maxAmount);
     }
 
-    // Apply receipt filter
     if (_hasReceipt != provider.hasReceipt) {
       final receiptFilter = _hasReceipt == _allValue ? null : _hasReceipt;
       await provider.setReceiptFilter(receiptFilter);
     }
 
-    // Apply sorting
     if (_sortBy != provider.sortBy) {
       await provider.setSortBy(_sortBy);
     }
 
-    // Apply inactive filter
     if (_showInactive != provider.showInactive) {
       await provider.setShowInactiveFilter(_showInactive);
     }
@@ -130,7 +120,6 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
     final provider = context.read<AdvancePaymentProvider>();
     await provider.clearFilters();
 
-    // Reset local state
     setState(() {
       _selectedLaborId = _allValue;
       _dateFrom = null;
@@ -194,6 +183,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -216,7 +207,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Filter Advance Payments',
+                  l10n.filterAdvancePayments,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -227,7 +218,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Apply filters to find specific advance payments',
+                    l10n.applyFiltersToFindSpecificAdvancePayments,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -281,6 +272,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildSearchSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -292,14 +285,14 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Search',
+            l10n.search,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search advance payments...',
+              hintText: l10n.searchAdvancePayments,
               prefixIcon: Icon(Icons.search, color: AppTheme.primaryMaroon),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
             ),
@@ -310,6 +303,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildLaborSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<AdvancePaymentProvider>(
       builder: (context, provider, child) {
         return Container(
@@ -323,15 +318,15 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Labor',
+                l10n.labor,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
               PremiumDropdownField<String>(
-                label: 'Labor',
-                hint: 'Select labor',
+                label: l10n.labor,
+                hint: l10n.selectLabor,
                 items: [
-                  DropdownItem<String>(value: _allValue, label: 'All Laborers'),
+                  DropdownItem<String>(value: _allValue, label: l10n.allLaborers),
                   ...provider.laborers.map((labor) => DropdownItem<String>(value: labor.id, label: '${labor.name} - ${labor.designation}')),
                 ],
                 value: _selectedLaborId,
@@ -349,6 +344,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildAmountRangeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -364,7 +361,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               Icon(Icons.attach_money_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Amount Range (PKR)',
+                l10n.amountRangePkr,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -378,7 +375,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
-                    labelText: 'Minimum Amount',
+                    labelText: l10n.minimumAmount,
                     labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -403,7 +400,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
-                    labelText: 'Maximum Amount',
+                    labelText: l10n.maximumAmount,
                     labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -429,6 +426,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildReceiptAndSortSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -440,7 +439,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Receipt & Sorting',
+            l10n.receiptAndSorting,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -448,12 +447,12 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
             children: [
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Has Receipt',
-                  hint: 'Select receipt status',
+                  label: l10n.hasReceipt,
+                  hint: l10n.selectReceiptStatus,
                   items: [
-                    DropdownItem<String>(value: _allValue, label: 'All'),
-                    DropdownItem<String>(value: 'yes', label: 'With Receipt'),
-                    DropdownItem<String>(value: 'no', label: 'Without Receipt'),
+                    DropdownItem<String>(value: _allValue, label: l10n.all),
+                    DropdownItem<String>(value: 'yes', label: l10n.withReceipt),
+                    DropdownItem<String>(value: 'no', label: l10n.withoutReceipt),
                   ],
                   value: _hasReceipt,
                   onChanged: (value) {
@@ -466,12 +465,12 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumDropdownField<String>(
-                  label: 'Sort By',
-                  hint: 'Select sort field',
+                  label: l10n.sortBy,
+                  hint: l10n.selectSortField,
                   items: [
-                    DropdownItem<String>(value: 'date', label: 'Date'),
-                    DropdownItem<String>(value: 'amount', label: 'Amount'),
-                    DropdownItem<String>(value: 'laborName', label: 'Labor Name'),
+                    DropdownItem<String>(value: 'date', label: l10n.date),
+                    DropdownItem<String>(value: 'amount', label: l10n.amount),
+                    DropdownItem<String>(value: 'laborName', label: l10n.laborName),
                   ],
                   value: _sortBy,
                   onChanged: (value) {
@@ -496,7 +495,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                 activeColor: AppTheme.primaryMaroon,
               ),
               Text(
-                'Sort Ascending',
+                l10n.sortAscending,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
             ],
@@ -507,6 +506,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildDateRangeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -518,7 +519,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Date Range',
+            l10n.dateRange,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -526,7 +527,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
             children: [
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Date From',
+                  label: l10n.dateFrom,
                   selectedDate: _dateFrom,
                   onDateSelected: (date) {
                     setState(() {
@@ -540,7 +541,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: _buildDatePicker(
-                  label: 'Date To',
+                  label: l10n.dateTo,
                   selectedDate: _dateTo,
                   onDateSelected: (date) {
                     setState(() {
@@ -559,6 +560,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildAdvancedOptionsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -570,7 +573,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Advanced Options',
+            l10n.advancedOptions,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -587,7 +590,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               ),
               Expanded(
                 child: Text(
-                  'Show Inactive Records',
+                  l10n.showInactiveRecords,
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
               ),
@@ -605,6 +608,8 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
     required DateTime firstDate,
     required DateTime lastDate,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -621,7 +626,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               onDateTimeSelected: (date, time) {
                 onDateSelected(date);
               },
-              title: 'Select Date',
+              title: l10n.selectDate,
               minDate: firstDate,
               maxDate: lastDate,
               showTimeInline: false,
@@ -641,7 +646,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                   child: Text(
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
-                        : 'Select date',
+                        : l10n.selectDate,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
@@ -662,11 +667,13 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: PremiumButton(
-            text: 'Clear All',
+            text: l10n.clearAll,
             onPressed: _handleClearFilters,
             backgroundColor: Colors.grey.shade300,
             textColor: AppTheme.charcoalGray,
@@ -675,7 +682,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         SizedBox(width: context.cardPadding),
         Expanded(
           child: PremiumButton(
-            text: 'Apply Filters',
+            text: l10n.applyFilters,
             onPressed: _handleApplyFilters,
             backgroundColor: AppTheme.primaryMaroon,
             textColor: AppTheme.pureWhite,
