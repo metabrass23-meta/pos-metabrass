@@ -214,7 +214,14 @@ class Payment(models.Model):
         blank=True,
         help_text="ID of the payer entity"
     )
-    
+    payable = models.ForeignKey(
+    'payables.Payable',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='linked_payments',
+    help_text="Payable this payment is reducing (if applicable)"
+    )
     # Cached labor information for historical accuracy
     labor_name = models.CharField(
         max_length=200,
