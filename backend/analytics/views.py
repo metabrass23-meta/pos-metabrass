@@ -24,7 +24,10 @@ from products.models import Product
 from vendors.models import Vendor
 from expenses.models import Expense
 from payments.models import Payment
+from rest_framework.throttling import UserRateThrottle
 
+class DashboardRateThrottle(UserRateThrottle):
+    scope = 'dashboard'
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -355,7 +358,7 @@ def realtime_analytics(request):
         today = now.date()
         
         # Today's sales
-        today_sales = Sale.objects.filter(
+        today_sales = Sales.objects.filter(
             is_active=True,
             date_of_sale=today
         ).aggregate(
@@ -371,7 +374,7 @@ def realtime_analytics(request):
         
         # Active sessions (customers who made purchases in last hour)
         one_hour_ago = now - timedelta(hours=1)
-        active_sessions = Sale.objects.filter(
+        active_sessions = Sales.objects.filter(
             is_active=True,
             created_at__gte=one_hour_ago
         ).values('customer').distinct().count()

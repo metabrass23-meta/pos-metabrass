@@ -244,11 +244,14 @@ class Return(models.Model):
     )
     
     class Meta:
+        
         db_table = 'sales_return'
         verbose_name = 'Return'
         verbose_name_plural = 'Returns'
         ordering = ['-return_date', '-created_at']
         indexes = [
+            models.Index(fields=['sale_date', '-created_at']),
+            models.Index(fields=['status', 'is_deleted']),
             models.Index(fields=['return_number']),
             models.Index(fields=['sale']),
             models.Index(fields=['customer']),

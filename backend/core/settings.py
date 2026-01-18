@@ -159,8 +159,16 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
         # REMOVE PAGINATION FROM HERE
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES' : {
+        'user': '1000/hour',
+        'dashboard': '60/minute',
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # ADD THIS LINE
     'PAGE_SIZE': 20,
+    'MAX_PAGE_SIZE': 100,
 }
 
 # --- CORS ---
