@@ -1,311 +1,241 @@
-import 'package:flutter/material.dart';
-
-class DashboardAnalytics {
-  final SalesMetrics salesMetrics;
-  final FinancialMetrics financialMetrics;
-  final CustomerMetrics customerMetrics;
-  final InventoryMetrics inventoryMetrics;
-  final OperationalMetrics operationalMetrics;
-  final List<ChartData> salesTrend;
-  final List<ChartData> profitTrend;
-  final List<ChartData> customerGrowth;
-  final List<ChartData> topProducts;
-
-  DashboardAnalytics({
-    required this.salesMetrics,
-    required this.financialMetrics,
-    required this.customerMetrics,
-    required this.inventoryMetrics,
-    required this.operationalMetrics,
-    required this.salesTrend,
-    required this.profitTrend,
-    required this.customerGrowth,
-    required this.topProducts,
-  });
-
-  factory DashboardAnalytics.fromJson(Map<String, dynamic> json) {
-    return DashboardAnalytics(
-      salesMetrics: SalesMetrics.fromJson(json['sales_metrics'] ?? {}),
-      financialMetrics: FinancialMetrics.fromJson(json['financial_metrics'] ?? {}),
-      customerMetrics: CustomerMetrics.fromJson(json['customer_metrics'] ?? {}),
-      inventoryMetrics: InventoryMetrics.fromJson(json['inventory_metrics'] ?? {}),
-      operationalMetrics: OperationalMetrics.fromJson(json['operational_metrics'] ?? {}),
-      salesTrend: (json['sales_trend'] as List<dynamic>?)?.map((item) => ChartData.fromJson(item)).toList() ?? [],
-      profitTrend: (json['profit_trend'] as List<dynamic>?)?.map((item) => ChartData.fromJson(item)).toList() ?? [],
-      customerGrowth: (json['customer_growth'] as List<dynamic>?)?.map((item) => ChartData.fromJson(item)).toList() ?? [],
-      topProducts: (json['top_products'] as List<dynamic>?)?.map((item) => ChartData.fromJson(item)).toList() ?? [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'sales_metrics': salesMetrics.toJson(),
-      'financial_metrics': financialMetrics.toJson(),
-      'customer_metrics': customerMetrics.toJson(),
-      'inventory_metrics': inventoryMetrics.toJson(),
-      'operational_metrics': operationalMetrics.toJson(),
-      'sales_trend': salesTrend.map((item) => item.toJson()).toList(),
-      'profit_trend': profitTrend.map((item) => item.toJson()).toList(),
-      'customer_growth': customerGrowth.map((item) => item.toJson()).toList(),
-      'top_products': topProducts.map((item) => item.toJson()).toList(),
-    };
-  }
-}
-
-class SalesMetrics {
+class DashboardAnalyticsModel {
+  // Overview metrics
   final double totalSales;
-  final int salesCount;
-  final double averageSaleValue;
-  final double todaySales;
-  final double thisWeekSales;
-  final double thisMonthSales;
-  final double growthRate;
+  final int totalSalesCount;
+  final int totalOrders;
+  final int pendingOrders;
+  final int totalCustomers;
+  final int activeCustomers;
+  final int totalVendors;
+  final int activeVendors;
+  final int totalProducts;
+  final int lowStockProducts;
 
-  SalesMetrics({
+  // Financial metrics
+  final double totalRevenue;
+  final double totalExpenses;
+  final double netProfit;
+  final double profitMargin;
+
+  // This month metrics
+  final double thisMonthSales;
+  final int thisMonthSalesCount;
+
+  // Recent activity
+  final int recentSalesCount;
+  final int recentOrdersCount;
+
+  // Collections
+  final List<TopProduct> topSellingProducts;
+  final List<SalesTrendData> salesTrend;
+  final List<RecentTransaction> recentTransactions;
+  final DateRanges dateRanges;
+
+  DashboardAnalyticsModel({
     required this.totalSales,
-    required this.salesCount,
-    required this.averageSaleValue,
-    required this.todaySales,
-    required this.thisWeekSales,
+    required this.totalSalesCount,
+    required this.totalOrders,
+    required this.pendingOrders,
+    required this.totalCustomers,
+    required this.activeCustomers,
+    required this.totalVendors,
+    required this.activeVendors,
+    required this.totalProducts,
+    required this.lowStockProducts,
+    required this.totalRevenue,
+    required this.totalExpenses,
+    required this.netProfit,
+    required this.profitMargin,
     required this.thisMonthSales,
-    required this.growthRate,
+    required this.thisMonthSalesCount,
+    required this.recentSalesCount,
+    required this.recentOrdersCount,
+    required this.topSellingProducts,
+    required this.salesTrend,
+    required this.recentTransactions,
+    required this.dateRanges,
   });
 
-  factory SalesMetrics.fromJson(Map<String, dynamic> json) {
-    return SalesMetrics(
-      totalSales: (json['total_sales'] ?? 0.0).toDouble(),
-      salesCount: json['sales_count'] ?? 0,
-      averageSaleValue: (json['average_sale_value'] ?? 0.0).toDouble(),
-      todaySales: (json['today_sales'] ?? 0.0).toDouble(),
-      thisWeekSales: (json['this_week_sales'] ?? 0.0).toDouble(),
-      thisMonthSales: (json['this_month_sales'] ?? 0.0).toDouble(),
-      growthRate: (json['growth_rate'] ?? 0.0).toDouble(),
+  factory DashboardAnalyticsModel.fromJson(Map<String, dynamic> json) {
+    return DashboardAnalyticsModel(
+      totalSales: (json['total_sales'] ?? 0).toDouble(),
+      totalSalesCount: json['total_sales_count'] ?? 0,
+      totalOrders: json['total_orders'] ?? 0,
+      pendingOrders: json['pending_orders'] ?? 0,
+      totalCustomers: json['total_customers'] ?? 0,
+      activeCustomers: json['active_customers'] ?? 0,
+      totalVendors: json['total_vendors'] ?? 0,
+      activeVendors: json['active_vendors'] ?? 0,
+      totalProducts: json['total_products'] ?? 0,
+      lowStockProducts: json['low_stock_products'] ?? 0,
+      totalRevenue: (json['total_revenue'] ?? 0).toDouble(),
+      totalExpenses: (json['total_expenses'] ?? 0).toDouble(),
+      netProfit: (json['net_profit'] ?? 0).toDouble(),
+      profitMargin: (json['profit_margin'] ?? 0).toDouble(),
+      thisMonthSales: (json['this_month_sales'] ?? 0).toDouble(),
+      thisMonthSalesCount: json['this_month_sales_count'] ?? 0,
+      recentSalesCount: json['recent_sales_count'] ?? 0,
+      recentOrdersCount: json['recent_orders_count'] ?? 0,
+      topSellingProducts: (json['top_selling_products'] as List<dynamic>?)
+              ?.map((item) => TopProduct.fromJson(item))
+              .toList() ??
+          [],
+      salesTrend: (json['sales_trend'] as List<dynamic>?)
+              ?.map((item) => SalesTrendData.fromJson(item))
+              .toList() ??
+          [],
+      recentTransactions: (json['recent_transactions'] as List<dynamic>?)
+              ?.map((item) => RecentTransaction.fromJson(item))
+              .toList() ??
+          [],
+      dateRanges: DateRanges.fromJson(json['date_ranges'] ?? {}),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'total_sales': totalSales,
-      'sales_count': salesCount,
-      'average_sale_value': averageSaleValue,
-      'today_sales': todaySales,
-      'this_week_sales': thisWeekSales,
-      'this_month_sales': thisMonthSales,
-      'growth_rate': growthRate,
-    };
-  }
-
-  String get formattedTotalSales => 'PKR ${totalSales.toStringAsFixed(2)}';
-  String get formattedAverageSaleValue => 'PKR ${averageSaleValue.toStringAsFixed(2)}';
-  String get formattedTodaySales => 'PKR ${todaySales.toStringAsFixed(2)}';
-  String get formattedThisWeekSales => 'PKR ${thisWeekSales.toStringAsFixed(2)}';
-  String get formattedThisMonthSales => 'PKR ${thisMonthSales.toStringAsFixed(2)}';
-  String get formattedGrowthRate => '${growthRate.toStringAsFixed(1)}%';
-}
-
-class FinancialMetrics {
-  final double totalRevenue;
-  final double totalExpenses;
-  final double netProfit;
-  final double profitMargin;
-  final double cashFlow;
-  final double outstandingReceivables;
-  final double outstandingPayables;
-
-  FinancialMetrics({
-    required this.totalRevenue,
-    required this.totalExpenses,
-    required this.netProfit,
-    required this.profitMargin,
-    required this.cashFlow,
-    required this.outstandingReceivables,
-    required this.outstandingPayables,
-  });
-
-  factory FinancialMetrics.fromJson(Map<String, dynamic> json) {
-    return FinancialMetrics(
-      totalRevenue: (json['total_revenue'] ?? 0.0).toDouble(),
-      totalExpenses: (json['total_expenses'] ?? 0.0).toDouble(),
-      netProfit: (json['net_profit'] ?? 0.0).toDouble(),
-      profitMargin: (json['profit_margin'] ?? 0.0).toDouble(),
-      cashFlow: (json['cash_flow'] ?? 0.0).toDouble(),
-      outstandingReceivables: (json['outstanding_receivables'] ?? 0.0).toDouble(),
-      outstandingPayables: (json['outstanding_payables'] ?? 0.0).toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
+      'total_sales_count': totalSalesCount,
+      'total_orders': totalOrders,
+      'pending_orders': pendingOrders,
+      'total_customers': totalCustomers,
+      'active_customers': activeCustomers,
+      'total_vendors': totalVendors,
+      'active_vendors': activeVendors,
+      'total_products': totalProducts,
+      'low_stock_products': lowStockProducts,
       'total_revenue': totalRevenue,
       'total_expenses': totalExpenses,
       'net_profit': netProfit,
       'profit_margin': profitMargin,
-      'cash_flow': cashFlow,
-      'outstanding_receivables': outstandingReceivables,
-      'outstanding_payables': outstandingPayables,
+      'this_month_sales': thisMonthSales,
+      'this_month_sales_count': thisMonthSalesCount,
+      'recent_sales_count': recentSalesCount,
+      'recent_orders_count': recentOrdersCount,
+      'top_selling_products': topSellingProducts.map((p) => p.toJson()).toList(),
+      'sales_trend': salesTrend.map((t) => t.toJson()).toList(),
+      'recent_transactions': recentTransactions.map((t) => t.toJson()).toList(),
+      'date_ranges': dateRanges.toJson(),
     };
   }
-
-  String get formattedTotalRevenue => 'PKR ${totalRevenue.toStringAsFixed(2)}';
-  String get formattedTotalExpenses => 'PKR ${totalExpenses.toStringAsFixed(2)}';
-  String get formattedNetProfit => 'PKR ${netProfit.toStringAsFixed(2)}';
-  String get formattedProfitMargin => '${profitMargin.toStringAsFixed(1)}%';
-  String get formattedCashFlow => 'PKR ${cashFlow.toStringAsFixed(2)}';
-  String get formattedOutstandingReceivables => 'PKR ${outstandingReceivables.toStringAsFixed(2)}';
-  String get formattedOutstandingPayables => 'PKR ${outstandingPayables.toStringAsFixed(2)}';
 }
 
-class CustomerMetrics {
-  final int totalCustomers;
-  final int newCustomers;
-  final int returningCustomers;
-  final double averageCustomerValue;
-  final double customerRetentionRate;
-  final List<String> topCustomerSegments;
+class TopProduct {
+  final String name;
+  final int quantity;
+  final double revenue;
 
-  CustomerMetrics({
-    required this.totalCustomers,
-    required this.newCustomers,
-    required this.returningCustomers,
-    required this.averageCustomerValue,
-    required this.customerRetentionRate,
-    required this.topCustomerSegments,
+  TopProduct({
+    required this.name,
+    required this.quantity,
+    required this.revenue,
   });
 
-  factory CustomerMetrics.fromJson(Map<String, dynamic> json) {
-    return CustomerMetrics(
-      totalCustomers: json['total_customers'] ?? 0,
-      newCustomers: json['new_customers'] ?? 0,
-      returningCustomers: json['returning_customers'] ?? 0,
-      averageCustomerValue: (json['average_customer_value'] ?? 0.0).toDouble(),
-      customerRetentionRate: (json['customer_retention_rate'] ?? 0.0).toDouble(),
-      topCustomerSegments: (json['top_customer_segments'] as List<dynamic>?)?.map((item) => item.toString()).toList() ?? [],
+  factory TopProduct.fromJson(Map<String, dynamic> json) {
+    return TopProduct(
+      name: json['name'] ?? '',
+      quantity: json['quantity'] ?? 0,
+      revenue: (json['revenue'] ?? 0).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'total_customers': totalCustomers,
-      'new_customers': newCustomers,
-      'returning_customers': returningCustomers,
-      'average_customer_value': averageCustomerValue,
-      'customer_retention_rate': customerRetentionRate,
-      'top_customer_segments': topCustomerSegments,
+      'name': name,
+      'quantity': quantity,
+      'revenue': revenue,
     };
   }
-
-  String get formattedAverageCustomerValue => 'PKR ${averageCustomerValue.toStringAsFixed(2)}';
-  String get formattedCustomerRetentionRate => '${customerRetentionRate.toStringAsFixed(1)}%';
 }
 
-class InventoryMetrics {
-  final int totalProducts;
-  final int lowStockProducts;
-  final int outOfStockProducts;
-  final double inventoryValue;
-  final double inventoryTurnoverRate;
-  final List<String> topSellingCategories;
+class SalesTrendData {
+  final String month;
+  final double sales;
 
-  InventoryMetrics({
-    required this.totalProducts,
-    required this.lowStockProducts,
-    required this.outOfStockProducts,
-    required this.inventoryValue,
-    required this.inventoryTurnoverRate,
-    required this.topSellingCategories,
+  SalesTrendData({
+    required this.month,
+    required this.sales,
   });
 
-  factory InventoryMetrics.fromJson(Map<String, dynamic> json) {
-    return InventoryMetrics(
-      totalProducts: json['total_products'] ?? 0,
-      lowStockProducts: json['low_stock_products'] ?? 0,
-      outOfStockProducts: json['out_of_stock_products'] ?? 0,
-      inventoryValue: (json['inventory_value'] ?? 0.0).toDouble(),
-      inventoryTurnoverRate: (json['inventory_turnover_rate'] ?? 0.0).toDouble(),
-      topSellingCategories: (json['top_selling_categories'] as List<dynamic>?)?.map((item) => item.toString()).toList() ?? [],
+  factory SalesTrendData.fromJson(Map<String, dynamic> json) {
+    return SalesTrendData(
+      month: json['month'] ?? '',
+      sales: (json['sales'] ?? 0).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'total_products': totalProducts,
-      'low_stock_products': lowStockProducts,
-      'out_of_stock_products': outOfStockProducts,
-      'inventory_value': inventoryValue,
-      'inventory_turnover_rate': inventoryTurnoverRate,
-      'top_selling_categories': topSellingCategories,
+      'month': month,
+      'sales': sales,
     };
   }
-
-  String get formattedInventoryValue => 'PKR ${inventoryValue.toStringAsFixed(2)}';
-  String get formattedInventoryTurnoverRate => '${inventoryTurnoverRate.toStringAsFixed(1)}x';
 }
 
-class OperationalMetrics {
-  final int totalOrders;
-  final int pendingOrders;
-  final int completedOrders;
-  final double averageOrderValue;
-  final double averageFulfillmentTime;
-  final double orderCompletionRate;
+class RecentTransaction {
+  final String id;
+  final String type;
+  final String customer;
+  final double amount;
+  final String date;
+  final String status;
 
-  OperationalMetrics({
-    required this.totalOrders,
-    required this.pendingOrders,
-    required this.completedOrders,
-    required this.averageOrderValue,
-    required this.averageFulfillmentTime,
-    required this.orderCompletionRate,
+  RecentTransaction({
+    required this.id,
+    required this.type,
+    required this.customer,
+    required this.amount,
+    required this.date,
+    required this.status,
   });
 
-  factory OperationalMetrics.fromJson(Map<String, dynamic> json) {
-    return OperationalMetrics(
-      totalOrders: json['total_orders'] ?? 0,
-      pendingOrders: json['pending_orders'] ?? 0,
-      completedOrders: json['completed_orders'] ?? 0,
-      averageOrderValue: (json['average_order_value'] ?? 0.0).toDouble(),
-      averageFulfillmentTime: (json['average_fulfillment_time'] ?? 0.0).toDouble(),
-      orderCompletionRate: (json['order_completion_rate'] ?? 0.0).toDouble(),
+  factory RecentTransaction.fromJson(Map<String, dynamic> json) {
+    return RecentTransaction(
+      id: json['id'] ?? '',
+      type: json['type'] ?? '',
+      customer: json['customer'] ?? '',
+      amount: (json['amount'] ?? 0).toDouble(),
+      date: json['date'] ?? '',
+      status: json['status'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'total_orders': totalOrders,
-      'pending_orders': pendingOrders,
-      'completed_orders': completedOrders,
-      'average_order_value': averageOrderValue,
-      'average_fulfillment_time': averageFulfillmentTime,
-      'order_completion_rate': orderCompletionRate,
+      'id': id,
+      'type': type,
+      'customer': customer,
+      'amount': amount,
+      'date': date,
+      'status': status,
     };
   }
-
-  String get formattedAverageOrderValue => 'PKR ${averageOrderValue.toStringAsFixed(2)}';
-  String get formattedAverageFulfillmentTime => '${averageFulfillmentTime.toStringAsFixed(1)} days';
-  String get formattedOrderCompletionRate => '${orderCompletionRate.toStringAsFixed(1)}%';
 }
 
-class ChartData {
-  final String label;
-  final double value;
-  final String? color;
-  final Map<String, dynamic>? additionalData;
+class DateRanges {
+  final String today;
+  final String lastWeek;
+  final String lastMonth;
 
-  ChartData({required this.label, required this.value, this.color, this.additionalData});
+  DateRanges({
+    required this.today,
+    required this.lastWeek,
+    required this.lastMonth,
+  });
 
-  factory ChartData.fromJson(Map<String, dynamic> json) {
-    return ChartData(
-      label: json['label'] ?? '',
-      value: (json['value'] ?? 0.0).toDouble(),
-      color: json['color'],
-      additionalData: json['additional_data'] as Map<String, dynamic>?,
+  factory DateRanges.fromJson(Map<String, dynamic> json) {
+    return DateRanges(
+      today: json['today'] ?? '',
+      lastWeek: json['last_week'] ?? '',
+      lastMonth: json['last_month'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'label': label, 'value': value, 'color': color, 'additional_data': additionalData};
+    return {
+      'today': today,
+      'last_week': lastWeek,
+      'last_month': lastMonth,
+    };
   }
-
-  String get formattedValue => 'PKR ${value.toStringAsFixed(2)}';
 }
-

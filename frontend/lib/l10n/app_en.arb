@@ -1968,7 +1968,15 @@
   "areYouAbsolutelySureYouWantToDeleteThisEntry": "Are you absolutely sure you want to delete this principal account entry?",
   "thisWillPermanentlyDeleteTheEntry": "This will permanently delete the principal account entry and affect balance calculations.",
   "thisWillPermanentlyDeleteTheEntryFull": "This will permanently delete the principal account entry and may affect balance calculations. This action cannot be undone.",
-  "principalAccountEntryDeletedSuccessfully": "Principal account entry deleted successfully!"
+  "principalAccountEntryDeletedSuccessfully": "Principal account entry deleted successfully!",
+  "language": "Language",
+  "appearance": "Appearance",
+  "aboutApp": "About App",
+  "darkMode": "Dark Mode",
+  "enableDarkThemeForApplication": "Enable dark theme for the application",
+  "alNoorFashionPOS": "Al Noor Fashion POS",
+  "version": "Version",
+  "aPremiumPointOfSaleSolution": "A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance."
 
 
 

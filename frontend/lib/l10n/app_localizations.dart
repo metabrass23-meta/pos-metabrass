@@ -10882,6 +10882,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Principal account entry deleted successfully!'**
   String get principalAccountEntryDeletedSuccessfully;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @aboutApp.
+  ///
+  /// In en, this message translates to:
+  /// **'About App'**
+  String get aboutApp;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @enableDarkThemeForApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable dark theme for the application'**
+  String get enableDarkThemeForApplication;
+
+  /// No description provided for @alNoorFashionPOS.
+  ///
+  /// In en, this message translates to:
+  /// **'Al Noor Fashion POS'**
+  String get alNoorFashionPOS;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @aPremiumPointOfSaleSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.'**
+  String get aPremiumPointOfSaleSolution;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

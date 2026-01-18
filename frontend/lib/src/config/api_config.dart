@@ -1,6 +1,8 @@
 class ApiConfig {
   static const String baseUrl =
       'https://django-flutter-pos-production.up.railway.app/api/v1';
+  
+  static const String dashboardAnalytics = '/analytics/dashboard/';
   static const String register = '/auth/register/';
   static const String login = '/auth/login/';
   static const String logout = '/auth/logout/';

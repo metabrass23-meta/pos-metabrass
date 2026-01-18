@@ -5447,4 +5447,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get principalAccountEntryDeletedSuccessfully => 'Principal account entry deleted successfully!';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get aboutApp => 'About App';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get enableDarkThemeForApplication => 'Enable dark theme for the application';
+
+  @override
+  String get alNoorFashionPOS => 'Al Noor Fashion POS';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get aPremiumPointOfSaleSolution => 'A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.';
 }

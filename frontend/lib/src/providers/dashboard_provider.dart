@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/models/analytics/dashboard_analytics.dart';
+import 'package:frontend/src/services/dashboard_service.dart';
 
 class DashboardProvider extends ChangeNotifier {
+  final DashboardService _dashboardService = DashboardService();
+
   bool _isSidebarExpanded = true;
   int _selectedMenuIndex = 0;
+  bool _isLoading = false;
+  String? _errorMessage;
+  DashboardAnalyticsModel? _analytics;
 
   bool get isSidebarExpanded => _isSidebarExpanded;
   int get selectedMenuIndex => _selectedMenuIndex;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  DashboardAnalyticsModel? get analytics => _analytics;
 
   final List<String> _menuTitles = [
     'Dashboard',
@@ -35,206 +45,324 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Dashboard Statistics - Updated to include Active Customers
-  Map<String, dynamic> get dashboardStats => {
-    'totalSales': {'value': 'Rs. 2,45,000', 'change': '+12.5%', 'isPositive': true},
-    'totalOrders': {'value': '1,247', 'change': '+8.2%', 'isPositive': true},
-    'totalProducts': {'value': '432', 'change': '+5.1%', 'isPositive': true},
-    'activeVendors': {'value': '8', 'change': '+2', 'isPositive': true},
-    'activeCustomers': {'value': '156', 'change': '+18', 'isPositive': true},
-    'pendingOrders': {'value': '23', 'change': '-2.3%', 'isPositive': false},
-    'pendingReturns': {'value': '7', 'change': '+2', 'isPositive': false},
-    'totalInvoices': {'value': '89', 'change': '+15.2%', 'isPositive': true},
-    'totalReceipts': {'value': '156', 'change': '+8.7%', 'isPositive': true},
-  };
+  // Initialize dashboard with real data
+  Future<void> initialize() async {
+    await loadDashboardAnalytics();
+  }
 
-  List<Map<String, dynamic>> get recentOrders => [
-    {'id': '#MF001', 'customer': 'Aisha Khan', 'type': 'Bridal Dress', 'amount': 'Rs. 85,000', 'status': 'In Progress', 'date': 'Today'},
-    {'id': '#MF002', 'customer': 'Fatima Ali', 'type': 'Groom Sherwani', 'amount': 'Rs. 45,000', 'status': 'Completed', 'date': 'Yesterday'},
-    {'id': '#MF003', 'customer': 'Sarah Ahmed', 'type': 'Party Dress', 'amount': 'Rs. 25,000', 'status': 'Pending', 'date': '2 days ago'},
-    {'id': '#MF004', 'customer': 'Zara Sheikh', 'type': 'Wedding Lehenga', 'amount': 'Rs. 120,000', 'status': 'In Progress', 'date': '3 days ago'},
-  ];
+  // Load dashboard analytics from API
+  Future<void> loadDashboardAnalytics() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
-  List<Map<String, double>> get salesChart => [
-    {'month': 1, 'sales': 180000},
-    {'month': 2, 'sales': 195000},
-    {'month': 3, 'sales': 220000},
-    {'month': 4, 'sales': 245000},
-    {'month': 5, 'sales': 210000},
-    {'month': 6, 'sales': 275000},
-  ];
+    try {
+      final response = await _dashboardService.getDashboardAnalytics();
 
-  // Vendor-related data for dashboard
+      if (response.success && response.data != null) {
+        _analytics = response.data!;
+        _errorMessage = null;
+      } else {
+        _errorMessage = response.message;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to load dashboard analytics: ${e.toString()}';
+      debugPrint('Dashboard analytics error: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Dashboard Statistics - Now using real data or fallback
+  Map<String, dynamic> get dashboardStats {
+    if (_analytics == null) {
+      // Return default/loading state
+      return {
+        'totalSales': {
+          'value': 'Loading...',
+          'change': '0%',
+          'isPositive': true,
+        },
+        'totalOrders': {'value': '0', 'change': '0%', 'isPositive': true},
+        'totalProducts': {'value': '0', 'change': '0%', 'isPositive': true},
+        'activeVendors': {'value': '0', 'change': '0', 'isPositive': true},
+        'activeCustomers': {'value': '0', 'change': '0', 'isPositive': true},
+        'pendingOrders': {'value': '0', 'change': '0%', 'isPositive': false},
+        'pendingReturns': {'value': '0', 'change': '0', 'isPositive': false},
+      };
+    }
+
+    return {
+      'totalSales': {
+        'value': 'Rs. ${_analytics!.totalSales.toStringAsFixed(0)}',
+        'change': '+${_analytics!.profitMargin.toStringAsFixed(1)}%',
+        'isPositive': _analytics!.profitMargin > 0,
+      },
+      'totalOrders': {
+        'value': _analytics!.totalOrders.toString(),
+        'change': '+${_analytics!.recentOrdersCount}',
+        'isPositive': _analytics!.recentOrdersCount > 0,
+      },
+      'totalProducts': {
+        'value': _analytics!.totalProducts.toString(),
+        'change': '${_analytics!.lowStockProducts} low stock',
+        'isPositive': _analytics!.lowStockProducts < 10,
+      },
+      'activeVendors': {
+        'value': _analytics!.activeVendors.toString(),
+        'change': '${_analytics!.totalVendors} total',
+        'isPositive': true,
+      },
+      'activeCustomers': {
+        'value': _analytics!.activeCustomers.toString(),
+        'change': '${_analytics!.totalCustomers} total',
+        'isPositive': true,
+      },
+      'pendingOrders': {
+        'value': _analytics!.pendingOrders.toString(),
+        'change': '${((_analytics!.pendingOrders / _analytics!.totalOrders) * 100).toStringAsFixed(1)}%',
+        'isPositive': _analytics!.pendingOrders < 5,
+      },
+      'lowStockProducts': {
+        'value': _analytics!.lowStockProducts.toString(),
+        'change': '${((_analytics!.lowStockProducts / _analytics!.totalProducts) * 100).toStringAsFixed(1)}%',
+        'isPositive': _analytics!.lowStockProducts < 10,
+      },
+    };
+  }
+
+  // Recent Orders from API or mock data
+  List<Map<String, dynamic>> get recentOrders {
+    if (_analytics == null || _analytics!.recentTransactions.isEmpty) {
+      return [
+        {
+          'id': '#MF001',
+          'customer': 'Loading...',
+          'type': 'Please wait',
+          'amount': 'Rs. 0',
+          'status': 'Pending',
+          'date': 'Today',
+        },
+      ];
+    }
+
+    return _analytics!.recentTransactions.take(10).map((transaction) {
+      return {
+        'id': transaction.id,
+        'customer': transaction.customer,
+        'type': transaction.type,
+        'amount': 'Rs. ${transaction.amount.toStringAsFixed(0)}',
+        'status': transaction.status,
+        'date': _formatDate(transaction.date),
+      };
+    }).toList();
+  }
+
+  // Sales Chart from API
+  List<Map<String, double>> get salesChart {
+    if (_analytics == null || _analytics!.salesTrend.isEmpty) {
+      return [
+        {'month': 1, 'sales': 0},
+        {'month': 2, 'sales': 0},
+        {'month': 3, 'sales': 0},
+        {'month': 4, 'sales': 0},
+        {'month': 5, 'sales': 0},
+        {'month': 6, 'sales': 0},
+      ];
+    }
+
+    return _analytics!.salesTrend.asMap().entries.map((entry) {
+      return {
+        'month': (entry.key + 1).toDouble(),
+        'sales': entry.value.sales,
+      };
+    }).toList();
+  }
+
+  // Top Products from API
+  List<Map<String, dynamic>> get topProducts {
+    if (_analytics == null || _analytics!.topSellingProducts.isEmpty) {
+      return [];
+    }
+
+    return _analytics!.topSellingProducts.map((product) {
+      return {
+        'name': product.name,
+        'quantity': product.quantity,
+        'revenue': 'Rs. ${product.revenue.toStringAsFixed(0)}',
+      };
+    }).toList();
+  }
+
+  // Vendor-related data (keep mock for now)
   List<Map<String, dynamic>> get topVendors => [
-    {'name': 'Ali Textiles & Co.', 'city': 'Karachi', 'revenue': 'Rs. 2,50,000', 'orders': 45},
-    {'name': 'Khan Fabrics', 'city': 'Lahore', 'revenue': 'Rs. 1,85,000', 'orders': 38},
-    {'name': 'Hassan Brothers Trading', 'city': 'Karachi', 'revenue': 'Rs. 1,45,000', 'orders': 32},
-    {'name': 'Sheikh Embroidery Works', 'city': 'Islamabad', 'revenue': 'Rs. 98,000', 'orders': 25},
-  ];
+        {
+          'name': 'Ali Textiles & Co.',
+          'city': 'Karachi',
+          'revenue': 'Rs. 2,50,000',
+          'orders': 45,
+        },
+        {
+          'name': 'Khan Fabrics',
+          'city': 'Lahore',
+          'revenue': 'Rs. 1,85,000',
+          'orders': 38,
+        },
+      ];
 
-  // Customer-related data for dashboard
+  // Customer-related data (keep mock for now)
   List<Map<String, dynamic>> get topCustomers => [
-    {'name': 'Zara Sheikh', 'type': 'VIP Customer', 'totalSpent': 'Rs. 1,20,000', 'orders': 8},
-    {'name': 'Aisha Khan', 'type': 'Premium Customer', 'totalSpent': 'Rs. 85,000', 'orders': 5},
-    {'name': 'Hina Malik', 'type': 'Corporate Client', 'totalSpent': 'Rs. 95,000', 'orders': 6},
-    {'name': 'Fatima Ali', 'type': 'Regular Customer', 'totalSpent': 'Rs. 45,000', 'orders': 3},
-  ];
+        {
+          'name': 'Zara Sheikh',
+          'type': 'VIP Customer',
+          'totalSpent': 'Rs. 1,20,000',
+          'orders': 8,
+        },
+        {
+          'name': 'Aisha Khan',
+          'type': 'Premium Customer',
+          'totalSpent': 'Rs. 85,000',
+          'orders': 5,
+        },
+      ];
 
-  // Recent activities including vendor and customer activities
-  List<Map<String, dynamic>> get recentActivities => [
-    {
-      'title': 'New customer registered: Aisha Khan',
-      'subtitle': 'Premium customer from Karachi',
-      'time': '15 minutes ago',
-      'icon': Icons.person_add_rounded,
-      'color': Colors.indigo,
-    },
-    {
-      'title': 'New vendor registered: Ali Textiles',
-      'subtitle': 'Muhammad Ali - Fabric Supplier',
-      'time': '30 minutes ago',
-      'icon': Icons.store_rounded,
-      'color': Colors.teal,
-    },
-    {
-      'title': 'Customer purchase completed',
-      'subtitle': 'Zara Sheikh - Rs. 120,000 Wedding Collection',
-      'time': '2 hours ago',
-      'icon': Icons.shopping_bag_rounded,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Vendor delivery received',
-      'subtitle': 'Khan Fabrics - Silk Materials',
-      'time': '5 hours ago',
-      'icon': Icons.local_shipping_rounded,
-      'color': Colors.purple,
-    },
-  ];
+  // Recent activities
+  List<Map<String, dynamic>> get recentActivities {
+    if (_analytics == null || _analytics!.recentTransactions.isEmpty) {
+      return [];
+    }
 
-  // Performance metrics with vendor and customer data
-  Map<String, dynamic> get performanceMetrics => {
-    'revenueTarget': {'label': 'Revenue Target', 'value': 'Rs. 3,00,000', 'percentage': '82%', 'color': Colors.blue},
-    'customerGrowth': {'label': 'Customer Growth', 'value': '200', 'percentage': '78%', 'color': Colors.indigo},
-    'vendorPartnerships': {'label': 'Vendor Partnerships', 'value': '25', 'percentage': '88%', 'color': Colors.teal},
-    'conversionRate': {'label': 'Conversion Rate', 'value': '65%', 'percentage': '92%', 'color': Colors.orange},
-  };
+    return _analytics!.recentTransactions.take(5).map((transaction) {
+      return {
+        'title': 'New ${transaction.type.toLowerCase()}: ${transaction.customer}',
+        'subtitle': 'Rs. ${transaction.amount.toStringAsFixed(0)}',
+        'time': _formatDate(transaction.date),
+        'icon': Icons.shopping_bag_rounded,
+        'color': Colors.green,
+      };
+    }).toList();
+  }
 
-  // Customer statistics summary
-  Map<String, dynamic> get customerStats => {
-    'totalCustomers': 156,
-    'activeCustomers': 142,
-    'newThisMonth': 18,
-    'vipCustomers': 8,
-    'totalRevenue': 'Rs. 8,45,000',
-    'averageOrderValue': 'Rs. 55,000',
-    'topSpendingCity': 'Karachi',
-  };
+  // Performance metrics with real data
+  Map<String, dynamic> get performanceMetrics {
+    if (_analytics == null) {
+      return {
+        'revenueTarget': {
+          'label': 'Revenue Target',
+          'value': 'Rs. 0',
+          'percentage': '0%',
+          'color': Colors.blue,
+        },
+      };
+    }
 
-  // Vendor statistics summary
-  Map<String, dynamic> get vendorStats => {
-    'totalVendors': 8,
-    'activeVendors': 8,
-    'newThisMonth': 2,
-    'totalRevenue': 'Rs. 6,78,000',
-    'averageOrderValue': 'Rs. 35,000',
-    'topPerformingCity': 'Karachi',
-  };
+    return {
+      'revenueTarget': {
+        'label': 'Revenue Target',
+        'value': 'Rs. ${_analytics!.totalRevenue.toStringAsFixed(0)}',
+        'percentage': '${_analytics!.profitMargin.toStringAsFixed(1)}%',
+        'color': Colors.blue,
+      },
+      'customerGrowth': {
+        'label': 'Customer Growth',
+        'value': _analytics!.totalCustomers.toString(),
+        'percentage': '${((_analytics!.activeCustomers / _analytics!.totalCustomers) * 100).toStringAsFixed(0)}%',
+        'color': Colors.indigo,
+      },
+      'vendorPartnerships': {
+        'label': 'Vendor Partnerships',
+        'value': _analytics!.totalVendors.toString(),
+        'percentage': '${((_analytics!.activeVendors / _analytics!.totalVendors) * 100).toStringAsFixed(0)}%',
+        'color': Colors.teal,
+      },
+      'profitMargin': {
+        'label': 'Profit Margin',
+        'value': '${_analytics!.profitMargin.toStringAsFixed(1)}%',
+        'percentage': '${_analytics!.profitMargin.toStringAsFixed(0)}%',
+        'color': Colors.orange,
+      },
+    };
+  }
+
+  // Customer statistics with real data
+  Map<String, dynamic> get customerStats {
+    if (_analytics == null) {
+      return {
+        'totalCustomers': 0,
+        'activeCustomers': 0,
+        'newThisMonth': 0,
+      };
+    }
+
+    return {
+      'totalCustomers': _analytics!.totalCustomers,
+      'activeCustomers': _analytics!.activeCustomers,
+      'totalRevenue': 'Rs. ${_analytics!.totalRevenue.toStringAsFixed(0)}',
+    };
+  }
+
+  // Vendor statistics with real data
+  Map<String, dynamic> get vendorStats {
+    if (_analytics == null) {
+      return {
+        'totalVendors': 0,
+        'activeVendors': 0,
+      };
+    }
+
+    return {
+      'totalVendors': _analytics!.totalVendors,
+      'activeVendors': _analytics!.activeVendors,
+    };
+  }
 
   // Quick actions for dashboard
   List<Map<String, dynamic>> get quickActions => [
-    {
-      'title': 'New Sale',
-      'subtitle': 'Create new order',
-      'icon': Icons.add_shopping_cart_rounded,
-      'color': Colors.green,
-      'index': 8, // Sales page index
-    },
-    {
-      'title': 'Add Product',
-      'subtitle': 'Register new item',
-      'icon': Icons.inventory_2_rounded,
-      'color': Colors.blue,
-      'index': 2, // Products page index
-    },
-    {
-      'title': 'Add Customer',
-      'subtitle': 'Register client',
-      'icon': Icons.person_add_rounded,
-      'color': Colors.indigo,
-      'index': 5, // Customer page index
-    },
-    {
-      'title': 'Add Vendor',
-      'subtitle': 'Register supplier',
-      'icon': Icons.store_rounded,
-      'color': Colors.teal,
-      'index': 4, // Vendor page index
-    },
-    {
-      'title': 'View Reports',
-      'subtitle': 'Analytics & insights',
-      'icon': Icons.analytics_rounded,
-      'color': Colors.orange,
-      'index': 11, // Reports page index
-    },
-    {
-      'title': 'Manage Stock',
-      'subtitle': 'Inventory control',
-      'icon': Icons.inventory_rounded,
-      'color': Colors.red,
-      'index': 10, // Stock page index
-    },
-  ];
+        {
+          'title': 'New Sale',
+          'subtitle': 'Create new order',
+          'icon': Icons.add_shopping_cart_rounded,
+          'color': Colors.green,
+          'index': 8,
+        },
+        {
+          'title': 'Add Product',
+          'subtitle': 'Register new item',
+          'icon': Icons.inventory_2_rounded,
+          'color': Colors.blue,
+          'index': 2,
+        },
+      ];
 
   // Handle quick actions
   void handleQuickAction(int pageIndex) {
     selectMenu(pageIndex);
   }
 
-  // Get stats for different time periods
-  Map<String, dynamic> getStatsForPeriod(String period) {
-    switch (period) {
-      case 'today':
-        return {'sales': 'Rs. 45,230', 'orders': 23, 'customers': 156, 'vendors': 8, 'products': 432};
-      case 'week':
-        return {'sales': 'Rs. 3,24,500', 'orders': 156, 'customers': 156, 'vendors': 8, 'products': 432};
-      case 'month':
-        return {'sales': 'Rs. 12,45,000', 'orders': 672, 'customers': 156, 'vendors': 8, 'products': 432};
-      default:
-        return {'sales': 'Rs. 2,45,000', 'orders': 1247, 'customers': 156, 'vendors': 8, 'products': 432};
-    }
-  }
-
   // Refresh dashboard data
   Future<void> refreshData() async {
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-    notifyListeners();
+    await loadDashboardAnalytics();
   }
 
-  // Customer analytics
-  Map<String, dynamic> get customerAnalytics => {
-    'totalRevenue': 845000.0,
-    'averageOrderValue': 55000.0,
-    'conversionRate': 78.0,
-    'retentionRate': 85.0,
-    'lifetimeValue': 125000.0,
-  };
+  // Helper method to format dates
+  String _formatDate(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate);
+      final now = DateTime.now();
+      final difference = now.difference(date);
 
-  // Get customer segments
-  Map<String, List<Map<String, dynamic>>> get customerSegments => {
-    'vip': [
-      {'name': 'Zara Sheikh', 'spent': 120000, 'orders': 8},
-      {'name': 'Hina Malik', 'spent': 95000, 'orders': 6},
-    ],
-    'premium': [
-      {'name': 'Aisha Khan', 'spent': 85000, 'orders': 5},
-      {'name': 'Sarah Ahmed', 'spent': 75000, 'orders': 4},
-    ],
-    'regular': [
-      {'name': 'Fatima Ali', 'spent': 45000, 'orders': 3},
-      {'name': 'Mehwish Qureshi', 'spent': 35000, 'orders': 2},
-    ],
-  };
+      if (difference.inDays == 0) {
+        return 'Today';
+      } else if (difference.inDays == 1) {
+        return 'Yesterday';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays} days ago';
+      } else {
+        return '${date.day}/${date.month}/${date.year}';
+      }
+    } catch (e) {
+      return isoDate;
+    }
+  }
 }

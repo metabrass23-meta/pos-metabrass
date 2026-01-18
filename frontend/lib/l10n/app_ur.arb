@@ -1871,7 +1871,15 @@
   "areYouAbsolutelySureYouWantToDeleteThisEntry": "کیا آپ بالکل یقین سے اس پرنسپل اکاؤنٹ اندراج کو حذف کرنا چاہتے ہیں؟",
   "thisWillPermanentlyDeleteTheEntry": "یہ پرنسپل اکاؤنٹ کے اندراج کو مستقل طور پر حذف کر دے گا اور بیلنس کے حساب کتاب کو متاثر کرے گا۔",
   "thisWillPermanentlyDeleteTheEntryFull": "یہ پرنسپل اکاؤنٹ کے اندراج کو مستقل طور پر حذف کر دے گا اور بیلنس کے حساب کتاب کو متاثر کر سکتا ہے۔ یہ عمل کالعدم نہیں کیا جا سکتا۔",
-  "principalAccountEntryDeletedSuccessfully": "پرنسپل اکاؤنٹ کا اندراج کامیابی سے حذف ہو گیا!"
+  "principalAccountEntryDeletedSuccessfully": "پرنسپل اکاؤنٹ کا اندراج کامیابی سے حذف ہو گیا!",
+  "language": "زبان",
+  "appearance": "ظاہری شکل",
+  "aboutApp": "ایپ کے بارے میں",
+  "darkMode": "ڈارک موڈ",
+  "enableDarkThemeForApplication": "ایپلیکیشن کے لیے ڈارک تھیم فعال کریں",
+  "alNoorFashionPOS": "النور فیشن پی او ایس",
+  "version": "ورژن",
+  "aPremiumPointOfSaleSolution": "فیشن ریٹیل کاروبار کے لیے ایک پریمیم پوائنٹ آف سیل حل۔ اپنی انوینٹری، گاہکوں اور فروخت کو خوبصورتی سے منظم کریں۔"
 
 
 

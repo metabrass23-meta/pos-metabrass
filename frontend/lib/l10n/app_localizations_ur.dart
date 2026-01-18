@@ -5447,4 +5447,28 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get principalAccountEntryDeletedSuccessfully => 'پرنسپل اکاؤنٹ کا اندراج کامیابی سے حذف ہو گیا!';
+
+  @override
+  String get language => 'زبان';
+
+  @override
+  String get appearance => 'ظاہری شکل';
+
+  @override
+  String get aboutApp => 'ایپ کے بارے میں';
+
+  @override
+  String get darkMode => 'ڈارک موڈ';
+
+  @override
+  String get enableDarkThemeForApplication => 'ایپلیکیشن کے لیے ڈارک تھیم فعال کریں';
+
+  @override
+  String get alNoorFashionPOS => 'النور فیشن پی او ایس';
+
+  @override
+  String get version => 'ورژن';
+
+  @override
+  String get aPremiumPointOfSaleSolution => 'فیشن ریٹیل کاروبار کے لیے ایک پریمیم پوائنٹ آف سیل حل۔ اپنی انوینٹری، گاہکوں اور فروخت کو خوبصورتی سے منظم کریں۔';
 }
