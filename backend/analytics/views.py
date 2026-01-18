@@ -45,7 +45,7 @@ def dashboard_analytics(request):
         
         # Total sales (all time) - Using 'Sales' model
         total_sales_data = Sales.objects.filter(is_active=True).aggregate(
-            total=Sum('total_amount'),
+            total=Sum('grand_total'),
             count=Count('id')
         )
         total_sales = total_sales_data['total'] or Decimal('0.00')
@@ -56,7 +56,7 @@ def dashboard_analytics(request):
             is_active=True,
             sale_date__gte=current_month_start
         ).aggregate(
-            total=Sum('total_amount'),
+            total=Sum('grand_total'),
             count=Count('id')
         )
         this_month_sales = this_month_sales_data['total'] or Decimal('0.00')
@@ -211,7 +211,7 @@ def dashboard_analytics(request):
         ).extra(
             select={'month': "TO_CHAR(sale_date, 'Mon')"}
         ).values('month').annotate(
-            sales=Sum('total_amount')
+            sales=Sum('grand_total')
         ).order_by('sale_date')
         
         # Format sales trend
@@ -236,7 +236,7 @@ def dashboard_analytics(request):
                 'id': str(sale.id),
                 'type': 'Sale',
                 'customer': sale.customer_name or 'Walk-in Customer',
-                'amount': float(sale.total_amount),
+                'amount': float(sale.grand_total),
                 'date': sale.sale_date.isoformat(),
                 'status': sale.status
             }
@@ -359,7 +359,7 @@ def realtime_analytics(request):
             is_active=True,
             sale_date=today
         ).aggregate(
-            total=Sum('total_amount'),
+            total=Sum('grand_total'),
             count=Count('id')
         )
         
