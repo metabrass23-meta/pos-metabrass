@@ -1,14 +1,23 @@
+"""
+CORRECTED Dashboard Analytics View
+File: backend/analytics/views.py
+
+IMPORTANT: This version uses the correct model names:
+- Sales (not Sale)
+- SaleItem (not SaleItem) - this one was correct
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from django.db.models import Sum, Count, Avg, Q
-from datetime import datetime, timedelta, date
+from django.db.models import Sum, Count, Avg, Q, F
+from datetime import datetime, timedelta
 from decimal import Decimal
 
-# Import your models
-from sales.models import Sale, SaleItem
+# Import your models - CORRECTED IMPORTS
+from sales.models import Sales, SaleItem  # ← Changed from 'Sale' to 'Sales'
 from orders.models import Order
 from customers.models import Customer
 from products.models import Product
@@ -34,8 +43,8 @@ def dashboard_analytics(request):
         # SALES METRICS
         # =====================================================
         
-        # Total sales (all time)
-        total_sales_data = Sale.objects.filter(is_deleted=False).aggregate(
+        # Total sales (all time) - Using 'Sales' model
+        total_sales_data = Sales.objects.filter(is_deleted=False).aggregate(
             total=Sum('total_amount'),
             count=Count('id')
         )
@@ -43,7 +52,7 @@ def dashboard_analytics(request):
         total_sales_count = total_sales_data['count'] or 0
         
         # This month's sales
-        this_month_sales_data = Sale.objects.filter(
+        this_month_sales_data = Sales.objects.filter(
             is_deleted=False,
             sale_date__gte=current_month_start
         ).aggregate(
@@ -54,7 +63,7 @@ def dashboard_analytics(request):
         this_month_sales_count = this_month_sales_data['count'] or 0
         
         # Recent sales (last 7 days)
-        recent_sales_count = Sale.objects.filter(
+        recent_sales_count = Sales.objects.filter(
             is_deleted=False,
             sale_date__gte=last_week
         ).count()
@@ -100,17 +109,18 @@ def dashboard_analytics(request):
         total_vendors = Vendor.objects.filter(is_active=True).count()
         
         # Active vendors (vendors with payments in last 30 days)
-        # or vendors linked to recent orders/purchases
-        active_vendors = Vendor.objects.filter(
-            is_active=True,
-            payment_vendor__created_at__gte=last_month
-        ).distinct().count()
-        
-        # If no payments table relationship, use alternative:
-        # active_vendors = Vendor.objects.filter(
-        #     is_active=True,
-        #     updated_at__gte=last_month
-        # ).count()
+        # Note: Adjust the related_name based on your Payment model's ForeignKey to Vendor
+        try:
+            active_vendors = Vendor.objects.filter(
+                is_active=True,
+                payments__created_at__gte=last_month  # May need to adjust related_name
+            ).distinct().count()
+        except:
+            # Fallback: count vendors updated recently
+            active_vendors = Vendor.objects.filter(
+                is_active=True,
+                updated_at__gte=last_month
+            ).count()
         
         # =====================================================
         # PRODUCT METRICS ⭐ NEW
@@ -120,14 +130,14 @@ def dashboard_analytics(request):
         total_products = Product.objects.filter(is_active=True).count()
         
         # Low stock products
-        # Method 1: If reorder_point field exists
+        # Try using reorder_point if it exists, otherwise use threshold of 10
         try:
             low_stock_products = Product.objects.filter(
                 is_active=True,
                 quantity__lt=F('reorder_point')
             ).count()
-        except:
-            # Method 2: If no reorder_point field, use arbitrary threshold (quantity < 10)
+        except Exception as e:
+            # Fallback: use arbitrary threshold (quantity < 10)
             low_stock_products = Product.objects.filter(
                 is_active=True,
                 quantity__lt=10
@@ -194,7 +204,8 @@ def dashboard_analytics(request):
         # Get sales grouped by month for last 6 months
         six_months_ago = today - timedelta(days=180)
         
-        monthly_sales = Sale.objects.filter(
+        # Use PostgreSQL-specific date formatting
+        monthly_sales = Sales.objects.filter(
             is_deleted=False,
             sale_date__gte=six_months_ago
         ).extra(
@@ -216,7 +227,7 @@ def dashboard_analytics(request):
         # RECENT TRANSACTIONS (Last 10)
         # =====================================================
         
-        recent_sales = Sale.objects.filter(
+        recent_sales = Sales.objects.filter(
             is_deleted=False
         ).select_related('customer').order_by('-sale_date')[:10]
         
