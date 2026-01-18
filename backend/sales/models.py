@@ -250,8 +250,8 @@ class Return(models.Model):
         verbose_name_plural = 'Returns'
         ordering = ['-return_date', '-created_at']
         indexes = [
-            models.Index(fields=['sale_date', '-created_at']),
-            models.Index(fields=['status', 'is_deleted']),
+            models.Index(fields=['date_of_sale', '-created_at']),
+            models.Index(fields=['status', 'is_active']),
             models.Index(fields=['return_number']),
             models.Index(fields=['sale']),
             models.Index(fields=['customer']),
