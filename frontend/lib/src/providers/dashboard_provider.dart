@@ -249,7 +249,39 @@ class DashboardProvider extends ChangeNotifier {
       'activeVendors': _analytics!.activeVendors,
     };
   }
+  // Add after the vendorStats getter
 
+// Recent orders data
+List<Map<String, dynamic>> get recentOrders {
+  if (_analytics == null || _analytics!.recentTransactions.isEmpty) {
+    return [];
+  }
+  
+  // Convert recent transactions to order format
+  return _analytics!.recentTransactions.take(5).map((transaction) {
+    return {
+      'id': transaction.id,
+      'customer': transaction.customer,
+      'amount': transaction.amount,
+      'status': transaction.status,
+      'date': transaction.date,
+      'type': transaction.type,
+    };
+  }).toList();
+}
+
+// Sales chart data
+List<Map<String, double>> get salesChart {
+  if (_analytics == null || _analytics!.salesTrend.isEmpty) {
+    return [];
+  }
+  
+  return _analytics!.salesTrend.map((trend) {
+    return {
+      'sales': trend.sales,
+    };
+  }).toList();
+}
   // Quick actions for dashboard
   List<Map<String, dynamic>> get quickActions => [
         {

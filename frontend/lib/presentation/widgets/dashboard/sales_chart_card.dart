@@ -98,7 +98,7 @@ class SalesChartCard extends StatelessWidget {
 
                 return CustomPaint(
                   size: Size(double.infinity, double.infinity),
-                  painter: SalesChartPainter(chartData),
+                  painter: SalesChartPainter(chartData ),
                 );
               },
             ),
