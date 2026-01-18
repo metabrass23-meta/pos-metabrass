@@ -250,8 +250,6 @@ class Return(models.Model):
         verbose_name_plural = 'Returns'
         ordering = ['-return_date', '-created_at']
         indexes = [
-            models.Index(fields=['date_of_sale', '-created_at']),
-            models.Index(fields=['status', 'is_active']),
             models.Index(fields=['return_number']),
             models.Index(fields=['sale']),
             models.Index(fields=['customer']),
@@ -1116,6 +1114,8 @@ class Sales(models.Model):
         verbose_name_plural = 'Sales'
         ordering = ['-date_of_sale', '-created_at']
         indexes = [
+               models.Index(fields=['date_of_sale', '-created_at']),
+            models.Index(fields=['status', 'is_active']),
             models.Index(fields=['invoice_number']),
             models.Index(fields=['customer']),
             models.Index(fields=['order_id']),
