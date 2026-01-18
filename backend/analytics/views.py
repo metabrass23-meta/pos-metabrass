@@ -54,7 +54,7 @@ def dashboard_analytics(request):
         # This month's sales
         this_month_sales_data = Sales.objects.filter(
             is_active=True,
-            sale_date__gte=current_month_start
+            date_of_sale__gte=current_month_start
         ).aggregate(
             total=Sum('grand_total'),
             count=Count('id')
@@ -65,7 +65,7 @@ def dashboard_analytics(request):
         # Recent sales (last 7 days)
         recent_sales_count = Sales.objects.filter(
             is_active=True,
-            sale_date__gte=last_week
+            date_of_sale__gte=last_week
         ).count()
         
         # =====================================================
@@ -97,7 +97,7 @@ def dashboard_analytics(request):
         # Active customers (customers who made purchases in last 30 days)
         active_customers = Customer.objects.filter(
             is_active=True,
-            sales__sale_date__gte=last_month,
+            sales__date_of_sale__gte=last_month,
             sales__is_active=True
         ).distinct().count()
         
@@ -181,7 +181,7 @@ def dashboard_analytics(request):
         
         top_products = SaleItem.objects.filter(
             sale__is_active=True,
-            sale__sale_date__gte=last_month
+            sale__date_of_sale__gte=last_month
         ).values('product__name').annotate(
             total_quantity=Sum('quantity'),
             total_revenue=Sum('line_total')
@@ -207,12 +207,12 @@ def dashboard_analytics(request):
         # Use PostgreSQL-specific date formatting
         monthly_sales = Sales.objects.filter(
             is_active=True,
-            sale_date__gte=six_months_ago
+            date_of_sale__gte=six_months_ago
         ).extra(
-            select={'month': "TO_CHAR(sale_date, 'Mon')"}
+            select={'month': "TO_CHAR(date_of_sale, 'Mon')"}
         ).values('month').annotate(
             sales=Sum('grand_total')
-        ).order_by('sale_date')
+        ).order_by('date_of_sale')
         
         # Format sales trend
         sales_trend = [
@@ -229,7 +229,7 @@ def dashboard_analytics(request):
         
         recent_sales = Sales.objects.filter(
             is_active=True
-        ).select_related('customer').order_by('-sale_date')[:10]
+        ).select_related('customer').order_by('-date_of_sale')[:10]
         
         recent_transactions = [
             {
@@ -237,7 +237,7 @@ def dashboard_analytics(request):
                 'type': 'Sale',
                 'customer': sale.customer_name or 'Walk-in Customer',
                 'amount': float(sale.grand_total),
-                'date': sale.sale_date.isoformat(),
+                'date': sale.date_of_sale.isoformat(),
                 'status': sale.status
             }
             for sale in recent_sales
@@ -357,7 +357,7 @@ def realtime_analytics(request):
         # Today's sales
         today_sales = Sale.objects.filter(
             is_active=True,
-            sale_date=today
+            date_of_sale=today
         ).aggregate(
             total=Sum('grand_total'),
             count=Count('id')
