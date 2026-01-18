@@ -27,9 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => DashboardProvider(),
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: AppTheme.creamWhite,
         body: Consumer<DashboardProvider>(
           builder: (context, dashboardProvider, child) {
@@ -80,7 +78,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
         ),
-      ),
-    );
+      );
   }
 }
