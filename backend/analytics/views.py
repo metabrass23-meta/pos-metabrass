@@ -44,7 +44,7 @@ def dashboard_analytics(request):
         # =====================================================
         
         # Total sales (all time) - Using 'Sales' model
-        total_sales_data = Sales.objects.filter(is_deleted=False).aggregate(
+        total_sales_data = Sales.objects.filter(is_active=True).aggregate(
             total=Sum('total_amount'),
             count=Count('id')
         )
@@ -53,7 +53,7 @@ def dashboard_analytics(request):
         
         # This month's sales
         this_month_sales_data = Sales.objects.filter(
-            is_deleted=False,
+            is_active=True,
             sale_date__gte=current_month_start
         ).aggregate(
             total=Sum('total_amount'),
@@ -64,7 +64,7 @@ def dashboard_analytics(request):
         
         # Recent sales (last 7 days)
         recent_sales_count = Sales.objects.filter(
-            is_deleted=False,
+            is_active=True,
             sale_date__gte=last_week
         ).count()
         
@@ -73,17 +73,17 @@ def dashboard_analytics(request):
         # =====================================================
         
         # Total orders (all active orders)
-        total_orders = Order.objects.filter(is_deleted=False).count()
+        total_orders = Order.objects.filter(is_active=True).count()
         
         # Pending orders
         pending_orders = Order.objects.filter(
-            is_deleted=False,
+            is_active=True,
             status='PENDING'
         ).count()
         
         # Recent orders (last 7 days)
         recent_orders_count = Order.objects.filter(
-            is_deleted=False,
+            is_active=True,
             created_at__gte=last_week
         ).count()
         
@@ -98,7 +98,7 @@ def dashboard_analytics(request):
         active_customers = Customer.objects.filter(
             is_active=True,
             sales__sale_date__gte=last_month,
-            sales__is_deleted=False
+            sales__is_active=True
         ).distinct().count()
         
         # =====================================================
@@ -180,7 +180,7 @@ def dashboard_analytics(request):
         # =====================================================
         
         top_products = SaleItem.objects.filter(
-            sale__is_deleted=False,
+            sale__is_active=True,
             sale__sale_date__gte=last_month
         ).values('product__name').annotate(
             total_quantity=Sum('quantity'),
@@ -206,7 +206,7 @@ def dashboard_analytics(request):
         
         # Use PostgreSQL-specific date formatting
         monthly_sales = Sales.objects.filter(
-            is_deleted=False,
+            is_active=True,
             sale_date__gte=six_months_ago
         ).extra(
             select={'month': "TO_CHAR(sale_date, 'Mon')"}
@@ -228,7 +228,7 @@ def dashboard_analytics(request):
         # =====================================================
         
         recent_sales = Sales.objects.filter(
-            is_deleted=False
+            is_active=True
         ).select_related('customer').order_by('-sale_date')[:10]
         
         recent_transactions = [
@@ -356,7 +356,7 @@ def realtime_analytics(request):
         
         # Today's sales
         today_sales = Sale.objects.filter(
-            is_deleted=False,
+            is_active=True,
             sale_date=today
         ).aggregate(
             total=Sum('total_amount'),
@@ -365,14 +365,14 @@ def realtime_analytics(request):
         
         # Today's orders
         today_orders = Order.objects.filter(
-            is_deleted=False,
+            is_active=True,
             order_date=today
         ).count()
         
         # Active sessions (customers who made purchases in last hour)
         one_hour_ago = now - timedelta(hours=1)
         active_sessions = Sale.objects.filter(
-            is_deleted=False,
+            is_active=True,
             created_at__gte=one_hour_ago
         ).values('customer').distinct().count()
         
@@ -384,7 +384,7 @@ def realtime_analytics(request):
             'today_orders': today_orders,
             'active_sessions': active_sessions,
             'pending_orders': Order.objects.filter(
-                is_deleted=False,
+                is_active=True,
                 status='PENDING'
             ).count(),
         }
