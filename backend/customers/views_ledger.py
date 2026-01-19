@@ -144,11 +144,11 @@ def customer_ledger(request, customer_id):
         )
         
         if start_date:
-            receivables_query = receivables_query.filter(lend_date__gte=start_date)
+            receivables_query = receivables_query.filter(date_lent__gte=start_date)
         if end_date:
-            receivables_query = receivables_query.filter(lend_date__lte=end_date)
+            receivables_query = receivables_query.filter(date_lent__lte=end_date)
         
-        receivables = receivables_query.order_by('lend_date')
+        receivables = receivables_query.order_by('date_lent')
         
         for receivable in receivables:
             # Add the lending transaction
@@ -156,27 +156,28 @@ def customer_ledger(request, customer_id):
                 'id': str(receivable.id),
                 'type': 'RECEIVABLE',
                 'transaction_type': 'DEBIT',  # Customer owes money
-                'amount': float(receivable.amount_lent),
-                'date': receivable.lend_date.strftime('%Y-%m-%d'),
+                'amount': float(receivable.amount_given),
+                'date': receivable.date_lent.strftime('%Y-%m-%d'),
                 'time': receivable.created_at.strftime('%H:%M:%S'),
                 'description': f'Amount lent: {receivable.reason_or_item}',
                 'reference_number': f'REC-{str(receivable.id)[:8].upper()}',
                 'reference_id': str(receivable.id),
                 'source_module': 'RECEIVABLES',
-                'status': receivable.status,
+                'status': 'PAID' if receivable.balance_remaining == 0 else 'PARTIAL' if receivable.amount_returned > 0 else 'PENDING',
                 'details': {
-                    'amount_lent': float(receivable.amount_lent),
+                    'amount_lent': float(receivable.amount_given),
                     'amount_returned': float(receivable.amount_returned),
                     'balance_remaining': float(receivable.balance_remaining),
                     'reason': receivable.reason_or_item,
                     'expected_return_date': receivable.expected_return_date.strftime('%Y-%m-%d') if receivable.expected_return_date else None,
-                    'status': receivable.status
+                    'status': 'PAID' if receivable.balance_remaining == 0 else 'PARTIAL' if receivable.amount_returned > 0 else 'PENDING'
                 }
             })
             
             # If customer has returned money, add credit entry
             if receivable.amount_returned > 0:
-                return_date = receivable.return_date if receivable.return_date else receivable.lend_date
+                # Use updated_at for return date since there's no specific return_date field
+                return_date = receivable.updated_at.date() if hasattr(receivable.updated_at, 'date') else receivable.date_lent
                 ledger_entries.append({
                     'id': f"{receivable.id}_return",
                     'type': 'RECEIVABLE_PAYMENT',
@@ -188,7 +189,7 @@ def customer_ledger(request, customer_id):
                     'reference_number': f'REC-{str(receivable.id)[:8].upper()}-RETURN',
                     'reference_id': str(receivable.id),
                     'source_module': 'RECEIVABLES',
-                    'status': receivable.status,
+                    'status': 'PAID' if receivable.balance_remaining == 0 else 'PARTIAL',
                     'details': {
                         'parent_receivable_id': str(receivable.id),
                         'amount_returned': float(receivable.amount_returned),

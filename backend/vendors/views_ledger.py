@@ -67,11 +67,11 @@ def vendor_ledger(request, vendor_id):
         )
         
         if start_date:
-            payables_query = payables_query.filter(borrow_date__gte=start_date)
+            payables_query = payables_query.filter(date_borrowed__gte=start_date)
         if end_date:
-            payables_query = payables_query.filter(borrow_date__lte=end_date)
+            payables_query = payables_query.filter(date_borrowed__lte=end_date)
         
-        payables = payables_query.order_by('borrow_date', 'created_at')
+        payables = payables_query.order_by('date_borrowed', 'created_at')
         
         for payable in payables:
             # Add the borrowing transaction (we owe vendor)
@@ -80,9 +80,9 @@ def vendor_ledger(request, vendor_id):
                 'type': 'PAYABLE',
                 'transaction_type': 'CREDIT',  # We owe vendor money
                 'amount': float(payable.amount_borrowed),
-                'date': payable.borrow_date.strftime('%Y-%m-%d'),
+                'date': payable.date_borrowed.strftime('%Y-%m-%d'),
                 'time': payable.created_at.strftime('%H:%M:%S'),
-                'description': f'Amount borrowed: {payable.reason}',
+                'description': f'Amount borrowed: {payable.reason_or_item}',
                 'reference_number': f'PAY-{str(payable.id)[:8].upper()}',
                 'reference_id': str(payable.id),
                 'source_module': 'PAYABLES',
@@ -91,8 +91,8 @@ def vendor_ledger(request, vendor_id):
                     'amount_borrowed': float(payable.amount_borrowed),
                     'amount_paid': float(payable.amount_paid),
                     'balance_remaining': float(payable.balance_remaining),
-                    'reason': payable.reason,
-                    'expected_return_date': payable.expected_return_date.strftime('%Y-%m-%d') if payable.expected_return_date else None,
+                    'reason': payable.reason_or_item,
+                    'expected_return_date': payable.expected_repayment_date.strftime('%Y-%m-%d') if payable.expected_repayment_date else None,
                     'creditor_name': payable.creditor_name,
                     'creditor_phone': payable.creditor_phone,
                     'status': payable.status
@@ -101,7 +101,8 @@ def vendor_ledger(request, vendor_id):
             
             # If we've made payments, add debit entries
             if payable.amount_paid > 0:
-                payment_date = payable.return_date if payable.return_date else payable.borrow_date
+                # Use updated_at for payment date since there's no specific return_date field
+                payment_date = payable.updated_at.date() if hasattr(payable.updated_at, 'date') else payable.date_borrowed
                 ledger_entries.append({
                     'id': f"{payable.id}_payment",
                     'type': 'PAYABLE_PAYMENT',
@@ -109,7 +110,7 @@ def vendor_ledger(request, vendor_id):
                     'amount': float(payable.amount_paid),
                     'date': payment_date.strftime('%Y-%m-%d'),
                     'time': payable.updated_at.strftime('%H:%M:%S'),
-                    'description': f'Payment made for: {payable.reason}',
+                    'description': f'Payment made for: {payable.reason_or_item}',
                     'reference_number': f'PAY-{str(payable.id)[:8].upper()}-PMT',
                     'reference_id': str(payable.id),
                     'source_module': 'PAYABLES',
