@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 // import 'package:flutter/material.dart';
 // import 'package:flutter_test/flutter_test.dart';
 // import 'package:frontend/src/providers/app_provider.dart';
@@ -60,4 +59,3 @@
 //     });
 //   });
 // }
->>>>>>> d642f33 (frontend folder)
