@@ -1,7 +1,7 @@
 class ApiConfig {
   static const String baseUrl =
       'https://django-flutter-pos-production.up.railway.app/api/v1';
-  
+
   static const String dashboardAnalytics = '/analytics/dashboard/';
   static const String register = '/auth/register/';
   static const String login = '/auth/login/';
@@ -467,6 +467,7 @@ class ApiConfig {
   static String updatePayableContact(String id) =>
       '/payables/$id/contact/update/';
 
+
   // Profit Loss endpoints
   static const String _profitLossBase = '$baseUrl/profit-loss';
 
@@ -489,15 +490,25 @@ class ApiConfig {
   static String updatePrincipalAccount(String id) => '/principal-account/$id/';
   static String deletePrincipalAccount(String id) => '/principal-account/$id/';
 
-  // Principal Account specific endpoints
+
+
+
+
+
+
+  static String vendorLedger(String id) => '$baseUrl/vendors/$id/ledger/';
+
+
+
+
+
+
   static const String principalAccountBalance = '/principal-account/balance/';
   static const String principalAccountStatistics =
       '/principal-account/statistics/';
   static const String createPrincipalAccountFromModule =
       '/principal-account/create-from-module/';
 
-  // Note: Backend uses UUIDs for transaction IDs and has limited endpoints
-  // Additional endpoints can be added as needed
 
   // Cache keys
   static const String profitLossCacheKey = 'profit_loss_records_cache';
