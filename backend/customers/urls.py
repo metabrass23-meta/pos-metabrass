@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
-
+from . import views_ledger
 app_name = 'customers'
 
 urlpatterns = [
+    # Customer Ledger API
+    path('<uuid:customer_id>/ledger/', views_ledger.customer_ledger, name='customer_ledger'),
+
+
     # Core CRUD operations
     path('', views.list_customers, name='list_customers'),
     path('create/', views.create_customer, name='create_customer'),

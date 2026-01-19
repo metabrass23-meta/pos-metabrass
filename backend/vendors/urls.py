@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
+from . import views_ledger
 
 app_name = 'vendors'
 
 urlpatterns = [
+    #ledger api
+    path('<uuid:vendor_id>/ledger/', views_ledger.vendor_ledger, name='vendor_ledger'),
+     
     # Basic CRUD operations
     path('', views.list_vendors, name='list'),
     path('create/', views.create_vendor, name='create'),
