@@ -204,7 +204,6 @@ def vendor_ledger(request, vendor_id):
             'vendor_name': vendor.name,
             'vendor_business_name': vendor.business_name or '',
             'vendor_phone': vendor.phone,
-            'vendor_email': vendor.email or '',
             'total_transactions': len(ledger_entries),
             'total_payables': float(total_payables),
             'total_payables_count': len([e for e in ledger_entries if e['type'] == 'PAYABLE']),
