@@ -63,7 +63,6 @@ class ProductGrid extends StatelessWidget {
             return _buildEmptyState(context);
           }
 
-          // Calculate fixed card width for horizontal scrolling
           final cardWidth = ResponsiveBreakpoints.responsive(
             context,
             tablet: 180.0,
@@ -82,7 +81,6 @@ class ProductGrid extends StatelessWidget {
             ultrawide: 340.0,
           );
 
-          // Calculate how many rows we need based on products
           final productsPerRow = ResponsiveBreakpoints.responsive(
             context,
             tablet: 3,
@@ -128,34 +126,32 @@ class ProductGrid extends StatelessWidget {
   List<Product> _getFilteredProducts(SalesProvider provider) {
     var products = provider.products;
 
-    // Apply category filter
     if (selectedCategory != 'All') {
       products = products
           .where((product) => product.fabric == selectedCategory)
           .toList();
     }
 
-    // Apply search filter
     if (searchQuery.isNotEmpty) {
       products = products
           .where(
             (product) =>
-                product.name.toLowerCase().contains(
-                  searchQuery.toLowerCase(),
-                ) ||
-                product.detail.toLowerCase().contains(
-                  searchQuery.toLowerCase(),
-                ) ||
-                product.color.toLowerCase().contains(
-                  searchQuery.toLowerCase(),
-                ) ||
-                product.fabric.toLowerCase().contains(
-                  searchQuery.toLowerCase(),
-                ) ||
-                product.piecesText.toLowerCase().contains(
-                  searchQuery.toLowerCase(),
-                ),
-          )
+        product.name.toLowerCase().contains(
+          searchQuery.toLowerCase(),
+        ) ||
+            product.detail.toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            ) ||
+            product.color.toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            ) ||
+            product.fabric.toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            ) ||
+            product.piecesText.toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            ),
+      )
           .toList();
     }
 
@@ -163,10 +159,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   Widget _buildEnhancedProductCard(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     final isOutOfStock = product.quantity <= 0;
     final isLowStock = product.quantity <= 5 && product.quantity > 0;
 
@@ -178,7 +174,7 @@ class ProductGrid extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: context.shadowBlur('light'),
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -194,7 +190,6 @@ class ProductGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Image with Actions
                 Expanded(
                   flex: 1,
                   child: Stack(
@@ -226,8 +221,6 @@ class ProductGrid extends StatelessWidget {
                           ],
                         ),
                       ),
-
-                      // Quick Actions Row
                       if (!isOutOfStock)
                         Positioned(
                           top: context.smallPadding / 2,
@@ -236,7 +229,6 @@ class ProductGrid extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Discount Badge
                               Material(
                                 color: Colors.transparent,
                                 child: InkWell(
@@ -267,12 +259,12 @@ class ProductGrid extends StatelessWidget {
                                           color: AppTheme.pureWhite,
                                           size: context.iconSize('small') * 0.8,
                                         ),
-                                        SizedBox(width: 2),
+                                        const SizedBox(width: 2),
                                         Text(
                                           '%',
                                           style: GoogleFonts.inter(
                                             fontSize:
-                                                context.captionFontSize * 0.7,
+                                            context.captionFontSize * 0.7,
                                             fontWeight: FontWeight.w600,
                                             color: AppTheme.pureWhite,
                                           ),
@@ -282,8 +274,6 @@ class ProductGrid extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
-                              // Stock Status Badge
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.smallPadding / 2,
@@ -307,8 +297,6 @@ class ProductGrid extends StatelessWidget {
                             ],
                           ),
                         ),
-
-                      // Existing Order Indicator
                       Positioned(
                         bottom: context.smallPadding / 2,
                         right: context.smallPadding / 2,
@@ -318,8 +306,6 @@ class ProductGrid extends StatelessWidget {
                           provider,
                         ),
                       ),
-
-                      // Out of Stock Overlay
                       if (isOutOfStock)
                         Container(
                           decoration: BoxDecoration(
@@ -353,16 +339,12 @@ class ProductGrid extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 SizedBox(height: context.smallPadding),
-
-                // Product Details
                 Expanded(
                   flex: 2,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Product Name with Category Badge
                       Row(
                         children: [
                           Expanded(
@@ -404,10 +386,7 @@ class ProductGrid extends StatelessWidget {
                             ),
                         ],
                       ),
-
                       SizedBox(height: context.smallPadding / 2),
-
-                      // Color, Pieces, and Custom Options
                       Row(
                         children: [
                           Container(
@@ -442,10 +421,7 @@ class ProductGrid extends StatelessWidget {
                             ),
                         ],
                       ),
-
                       SizedBox(height: context.smallPadding / 2),
-
-                      // Price with Original Price if Discounted
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -459,7 +435,6 @@ class ProductGrid extends StatelessWidget {
                                   : AppTheme.primaryMaroon,
                             ),
                           ),
-                          // Show original price if there's a standard discount
                           if (_hasStandardDiscount(product) && !isOutOfStock)
                             Text(
                               'PKR ${_getOriginalPrice(product).toStringAsFixed(0)}',
@@ -471,14 +446,10 @@ class ProductGrid extends StatelessWidget {
                             ),
                         ],
                       ),
-
                       const Spacer(),
-
-                      // Action Buttons Row
                       if (!isOutOfStock)
                         Row(
                           children: [
-                            // Quick Add Button
                             Expanded(
                               child: Material(
                                 color: Colors.transparent,
@@ -509,7 +480,7 @@ class ProductGrid extends StatelessWidget {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.add_shopping_cart_rounded,
@@ -533,10 +504,7 @@ class ProductGrid extends StatelessWidget {
                                 ),
                               ),
                             ),
-
                             SizedBox(width: context.smallPadding / 2),
-
-                            // Options Button
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -568,8 +536,6 @@ class ProductGrid extends StatelessWidget {
                             ),
                           ],
                         ),
-
-                      // Low Stock Warning
                       if (isLowStock)
                         Container(
                           margin: EdgeInsets.only(
@@ -616,11 +582,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   Widget _buildExistingOrderIndicator(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
-    // Check if this product is in any existing orders
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     final hasExistingOrders = _hasExistingOrders(product, provider);
 
     if (!hasExistingOrders) return const SizedBox.shrink();
@@ -647,7 +612,7 @@ class ProductGrid extends StatelessWidget {
                 color: AppTheme.pureWhite,
                 size: context.iconSize('small') * 0.8,
               ),
-              SizedBox(width: 2),
+              const SizedBox(width: 2),
               Text(
                 _getExistingOrderCount(product, provider).toString(),
                 style: GoogleFonts.inter(
@@ -695,9 +660,7 @@ class ProductGrid extends StatelessWidget {
               color: Colors.grey[400],
             ),
           ),
-
           SizedBox(height: context.mainPadding),
-
           Text(
             searchQuery.isNotEmpty || selectedCategory != 'All'
                 ? AppLocalizations.of(context)!.noProductsFound
@@ -708,9 +671,7 @@ class ProductGrid extends StatelessWidget {
               color: AppTheme.charcoalGray,
             ),
           ),
-
           SizedBox(height: context.smallPadding),
-
           Container(
             constraints: BoxConstraints(
               maxWidth: ResponsiveBreakpoints.responsive(
@@ -734,7 +695,6 @@ class ProductGrid extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-
           if (searchQuery.isNotEmpty || selectedCategory != 'All') ...[
             SizedBox(height: context.mainPadding),
             Material(
@@ -846,31 +806,25 @@ class ProductGrid extends StatelessWidget {
   }
 
   bool _isCustomizable(Product product) {
-    // Bridal and formal wear are typically customizable
     return product.name.toLowerCase().contains('bridal') ||
         product.name.toLowerCase().contains('wedding') ||
         product.name.toLowerCase().contains('formal') ||
-        product.price > 50000; // High-value items are usually customizable
+        product.price > 50000;
   }
 
   bool _hasStandardDiscount(Product product) {
-    // This would typically check if there's a current promotion
-    return false; // Placeholder
+    return false;
   }
 
   double _getOriginalPrice(Product product) {
-    // This would calculate the original price before discount
-    return product.price * 1.1; // Placeholder
+    return product.price * 1.1;
   }
 
   bool _hasExistingOrders(Product product, SalesProvider provider) {
-    // Check if this product appears in any existing orders
     return _getExistingOrderCount(product, provider) > 0;
   }
 
   int _getExistingOrderCount(Product product, SalesProvider provider) {
-    // This would check against actual orders from OrderProvider
-    // For now, we'll simulate some existing orders
     if (product.name.toLowerCase().contains('bridal')) return 2;
     if (product.name.toLowerCase().contains('wedding')) return 1;
     return 0;
@@ -918,10 +872,10 @@ class ProductGrid extends StatelessWidget {
 
   // Action Methods
   void _quickAddToCart(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     provider.addToCartWithCustomization(
       productId: product.id,
       productName: product.name,
@@ -932,7 +886,7 @@ class ProductGrid extends StatelessWidget {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
+            const Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -953,10 +907,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showEnhancedAddToCartDialog(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     showDialog(
       context: context,
       builder: (context) => EnhancedAddToCartDialog(product: product),
@@ -964,10 +918,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showDiscountDialog(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     showDialog(
       context: context,
       builder: (context) => DiscountDialog(product: product),
@@ -975,10 +929,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showExistingOrdersDialog(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     showDialog(
       context: context,
       builder: (context) => ExistingOrdersDialog(product: product),
@@ -986,10 +940,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showProductOptionsMenu(
-    BuildContext context,
-    Product product,
-    SalesProvider provider,
-  ) {
+      BuildContext context,
+      Product product,
+      SalesProvider provider,
+      ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1018,7 +972,7 @@ class ProductGrid extends StatelessWidget {
   }
 }
 
-// Discount Dialog (updated to work with new structure)
+// Discount Dialog (LOCALIZED)
 class DiscountDialog extends StatefulWidget {
   final Product product;
 
@@ -1057,6 +1011,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final discountedPrice = widget.product.price - _calculatedDiscount;
 
     return Dialog(
@@ -1086,7 +1041,6 @@ class _DiscountDialogState extends State<DiscountDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
@@ -1120,7 +1074,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Apply Discount',
+                          l10n.applyDiscount,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
@@ -1159,16 +1113,13 @@ class _DiscountDialogState extends State<DiscountDialog> {
                 ],
               ),
             ),
-
-            // Content
             Padding(
               padding: EdgeInsets.all(context.cardPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Quick Discount Buttons
                   Text(
-                    'Quick Discounts',
+                    l10n.quickDiscounts,
                     style: GoogleFonts.inter(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
@@ -1227,10 +1178,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       );
                     }).toList(),
                   ),
-
                   SizedBox(height: context.cardPadding),
-
-                  // Price Summary
                   Container(
                     padding: EdgeInsets.all(context.cardPadding),
                     decoration: BoxDecoration(
@@ -1246,7 +1194,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Original Price:',
+                              l10n.originalPrice,
                               style: GoogleFonts.inter(
                                 fontSize: context.subtitleFontSize,
                                 color: AppTheme.charcoalGray,
@@ -1271,7 +1219,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Discount:',
+                                l10n.discount,
                                 style: GoogleFonts.inter(
                                   fontSize: context.subtitleFontSize,
                                   color: Colors.orange[700],
@@ -1288,13 +1236,13 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             ],
                           ),
                           SizedBox(height: context.smallPadding / 2),
-                          Divider(),
+                          const Divider(),
                           SizedBox(height: context.smallPadding / 2),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Final Price:',
+                                l10n.finalPrice,
                                 style: GoogleFonts.inter(
                                   fontSize: context.bodyFontSize,
                                   fontWeight: FontWeight.w700,
@@ -1315,10 +1263,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       ],
                     ),
                   ),
-
                   SizedBox(height: context.cardPadding),
-
-                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
@@ -1341,7 +1286,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                   vertical: context.cardPadding / 1.5,
                                 ),
                                 child: Text(
-                                  'Cancel',
+                                  l10n.cancel,
                                   style: GoogleFonts.inter(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
@@ -1371,30 +1316,31 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             child: InkWell(
                               onTap: _calculatedDiscount > 0
                                   ? () {
-                                      // Apply discount and add to cart
-                                      Provider.of<SalesProvider>(
-                                        context,
-                                        listen: false,
-                                      ).addToCartWithCustomization(
-                                        productId: widget.product.id,
-                                        productName: widget.product.name,
-                                        unitPrice: widget.product.price,
-                                        quantity: 1,
-                                        itemDiscount: _calculatedDiscount,
-                                      );
-                                      Navigator.of(context).pop();
+                                Provider.of<SalesProvider>(
+                                  context,
+                                  listen: false,
+                                ).addToCartWithCustomization(
+                                  productId: widget.product.id,
+                                  productName: widget.product.name,
+                                  unitPrice: widget.product.price,
+                                  quantity: 1,
+                                  itemDiscount: _calculatedDiscount,
+                                );
+                                Navigator.of(context).pop();
 
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Added ${widget.product.name} with ${_isPercentage ? _percentageController.text + "%" : "PKR " + _calculatedDiscount.toStringAsFixed(0)} discount',
-                                          ),
-                                          backgroundColor: Colors.green,
-                                        ),
-                                      );
-                                    }
+                                final discountText = _isPercentage
+                                    ? '${_percentageController.text}%'
+                                    : 'PKR ${_calculatedDiscount.toStringAsFixed(0)}';
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      l10n.addedWithDiscount(widget.product.name, discountText),
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
                                   : null,
                               borderRadius: BorderRadius.circular(
                                 context.borderRadius(),
@@ -1413,7 +1359,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                     ),
                                     SizedBox(width: context.smallPadding),
                                     Text(
-                                      'Add with Discount',
+                                      l10n.addWithDiscount,
                                       style: GoogleFonts.inter(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,

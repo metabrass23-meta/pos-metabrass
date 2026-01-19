@@ -208,7 +208,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           await _animationController.reverse();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(_getUserFriendlyErrorMessage(provider.errorMessage ?? l10n.error));
+          _showErrorSnackbar(_getUserFriendlyErrorMessage(provider.errorMessage ?? 'Error'));
         }
       }
     }
@@ -1460,13 +1460,13 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
 
     switch (status) {
       case OrderStatus.PENDING:
-        return l10n.draft;
+        return l10n.pending;  // Changed from l10n.draft
       case OrderStatus.CONFIRMED:
         return l10n.confirmed;
       case OrderStatus.IN_PRODUCTION:
-        return l10n.processPayment;
+        return l10n.inProduction;  // Changed from l10n.processPayment
       case OrderStatus.READY:
-        return l10n.status;
+        return l10n.ready;  // Changed from l10n.status
       case OrderStatus.DELIVERED:
         return l10n.delivered;
       case OrderStatus.CANCELLED:

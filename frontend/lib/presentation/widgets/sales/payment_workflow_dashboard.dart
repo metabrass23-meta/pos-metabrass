@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -34,9 +35,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
 
     try {
       final provider = Provider.of<SalesProvider>(context, listen: false);
-      // This would typically load aggregated workflow data
-      // For now, we'll simulate some data
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
         setState(() {
@@ -55,20 +54,20 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
                 'type': 'payment',
                 'description': 'Payment received for INV-2025-0001',
                 'amount': 45000.0,
-                'timestamp': DateTime.now().subtract(Duration(hours: 2)),
+                'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
                 'status': 'completed',
               },
               {
                 'type': 'status_update',
                 'description': 'Sale INV-2025-0002 marked as delivered',
-                'timestamp': DateTime.now().subtract(Duration(hours: 4)),
+                'timestamp': DateTime.now().subtract(const Duration(hours: 4)),
                 'status': 'completed',
               },
               {
                 'type': 'payment',
                 'description': 'Partial payment for INV-2025-0003',
                 'amount': 25000.0,
-                'timestamp': DateTime.now().subtract(Duration(hours: 6)),
+                'timestamp': DateTime.now().subtract(const Duration(hours: 6)),
                 'status': 'partial',
               },
             ],
@@ -87,56 +86,48 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Payment Workflow Dashboard',
+                l10n.paymentWorkflowDashboard,
                 style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
               IconButton(
                 onPressed: _loadDashboardData,
-                icon: Icon(Icons.refresh, color: AppTheme.primaryMaroon),
-                tooltip: 'Refresh Dashboard',
+                icon: const Icon(Icons.refresh, color: AppTheme.primaryMaroon),
+                tooltip: l10n.refreshDashboard,
               ),
             ],
           ),
-
-          SizedBox(height: 20),
-
+          const SizedBox(height: 20),
           if (_isLoading)
-            Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon)))
+            const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon)))
           else if (_dashboardData != null)
             Column(
               children: [
-                // Key Metrics Row
                 _buildKeyMetricsRow(),
-
-                SizedBox(height: 24),
-
-                // Payment Progress Chart
+                const SizedBox(height: 24),
                 _buildPaymentProgressChart(),
-
-                SizedBox(height: 24),
-
-                // Recent Activities
+                const SizedBox(height: 24),
                 _buildRecentActivities(),
               ],
             )
           else
             Center(
-              child: Text('No data available', style: GoogleFonts.poppins(color: Colors.grey)),
+              child: Text(l10n.noDataAvailable, style: GoogleFonts.poppins(color: Colors.grey)),
             ),
         ],
       ),
@@ -144,38 +135,40 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
   }
 
   Widget _buildKeyMetricsRow() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildMetricCard(
-            title: 'Total Sales',
+            title: l10n.totalSales,
             value: _dashboardData!['total_sales'].toString(),
             icon: Icons.shopping_cart,
             color: Colors.blue,
           ),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: _buildMetricCard(
-            title: 'Pending Payments',
+            title: l10n.pendingPayments,
             value: _dashboardData!['pending_payments'].toString(),
             icon: Icons.pending,
             color: Colors.orange,
           ),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: _buildMetricCard(
-            title: 'Completed',
+            title: l10n.completed,
             value: _dashboardData!['completed_payments'].toString(),
             icon: Icons.check_circle,
             color: Colors.green,
           ),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: _buildMetricCard(
-            title: 'Completion Rate',
+            title: l10n.completionRate,
             value: '${_dashboardData!['payment_completion_rate'].toStringAsFixed(1)}%',
             icon: Icons.trending_up,
             color: AppTheme.primaryMaroon,
@@ -187,7 +180,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
 
   Widget _buildMetricCard({required String title, required String value, required IconData icon, required Color color}) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
@@ -196,12 +189,12 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             value,
             style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600, color: color),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             title,
             style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
@@ -213,13 +206,14 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
   }
 
   Widget _buildPaymentProgressChart() {
+    final l10n = AppLocalizations.of(context)!;
     final totalRevenue = _dashboardData!['total_revenue'] as double;
     final collectedRevenue = _dashboardData!['collected_revenue'] as double;
     final pendingRevenue = _dashboardData!['pending_revenue'] as double;
     final completionRate = _dashboardData!['payment_completion_rate'] as double;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.creamWhite,
         borderRadius: BorderRadius.circular(8),
@@ -229,51 +223,46 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Payment Progress Overview',
+            l10n.paymentProgressOverview,
             style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
-          SizedBox(height: 16),
-
-          // Progress Bar
+          const SizedBox(height: 16),
           Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Payment Completion', style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                  Text(l10n.paymentCompletion, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
                   Text(
                     '${completionRate.toStringAsFixed(1)}%',
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: completionRate / 100,
                 backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon),
+                valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryMaroon),
                 minHeight: 10,
               ),
             ],
           ),
-
-          SizedBox(height: 20),
-
-          // Revenue Breakdown
+          const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
                 child: _buildRevenueItem(
-                  label: 'Collected',
+                  label: l10n.collected,
                   amount: collectedRevenue,
                   color: Colors.green,
                   percentage: (collectedRevenue / totalRevenue) * 100,
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildRevenueItem(
-                  label: 'Pending',
+                  label: l10n.pending,
                   amount: pendingRevenue,
                   color: Colors.orange,
                   percentage: (pendingRevenue / totalRevenue) * 100,
@@ -288,7 +277,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
 
   Widget _buildRevenueItem({required String label, required double amount, required Color color, required double percentage}) {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
@@ -301,7 +290,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             label,
             style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: color),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'PKR ${amount.toStringAsFixed(0)}',
             style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: color),
@@ -313,10 +302,11 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
   }
 
   Widget _buildRecentActivities() {
+    final l10n = AppLocalizations.of(context)!;
     final activities = _dashboardData!['recent_workflow_activities'] as List;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.creamWhite,
         borderRadius: BorderRadius.circular(8),
@@ -326,11 +316,10 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recent Workflow Activities',
+            l10n.recentWorkflowActivities,
             style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
-          SizedBox(height: 16),
-
+          const SizedBox(height: 16),
           ...activities.map((activity) => _buildActivityItem(activity)).toList(),
         ],
       ),
@@ -362,8 +351,8 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
@@ -372,7 +361,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +377,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
             child: Text(
               status.toUpperCase(),
@@ -401,16 +390,16 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
   }
 
   String _formatTimestamp(DateTime timestamp) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final difference = now.difference(timestamp);
 
     if (difference.inHours < 1) {
-      return '${difference.inMinutes}m ago';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
+      return l10n.hoursAgo(difference.inHours);
     } else {
-      return '${difference.inDays}d ago';
+      return l10n.daysAgo(difference.inDays);
     }
   }
 }
-

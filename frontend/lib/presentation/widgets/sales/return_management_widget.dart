@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/return_provider.dart';
 import '../../../src/models/sales/return_model.dart';
 import 'create_return_dialog.dart';
@@ -35,15 +36,17 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Return Management'),
+        title: Text(l10n.returnManagement),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Returns', icon: Icon(Icons.assignment_return)),
-            Tab(text: 'Refunds', icon: Icon(Icons.payment)),
-            Tab(text: 'Statistics', icon: Icon(Icons.analytics)),
+          tabs: [
+            Tab(text: l10n.returns, icon: const Icon(Icons.assignment_return)),
+            Tab(text: l10n.refunds, icon: const Icon(Icons.payment)),
+            Tab(text: l10n.statistics, icon: const Icon(Icons.analytics)),
           ],
         ),
         actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => context.read<ReturnProvider>().refresh())],
@@ -51,13 +54,15 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       body: TabBarView(controller: _tabController, children: [_buildReturnsTab(), _buildRefundsTab(), _buildStatisticsTab()]),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateReturnDialog(context),
+        tooltip: l10n.createReturn,
         child: const Icon(Icons.add),
-        tooltip: 'Create Return',
       ),
     );
   }
 
   Widget _buildReturnsTab() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ReturnProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -69,8 +74,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Error: ${provider.error}'),
-                ElevatedButton(onPressed: () => provider.refresh(), child: const Text('Retry')),
+                Text(l10n.error(provider.error!)),
+                ElevatedButton(onPressed: () => provider.refresh(), child: Text(l10n.retry)),
               ],
             ),
           );
@@ -87,6 +92,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildFilters(ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
@@ -94,17 +101,17 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Filters', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.filters, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    decoration: const InputDecoration(
-                      labelText: 'Search',
-                      hintText: 'Search by return number, customer, or invoice',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      labelText: l10n.search,
+                      hintText: l10n.searchByReturnCustomerInvoice,
+                      prefixIcon: const Icon(Icons.search),
                     ),
                     onChanged: (value) => provider.setFilters(search: value),
                   ),
@@ -113,14 +120,14 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
+                    decoration: InputDecoration(labelText: l10n.status, border: const OutlineInputBorder()),
                     items: [
-                      const DropdownMenuItem(value: '', child: Text('All Statuses')),
-                      const DropdownMenuItem(value: 'PENDING', child: Text('Pending')),
-                      const DropdownMenuItem(value: 'APPROVED', child: Text('Approved')),
-                      const DropdownMenuItem(value: 'PROCESSED', child: Text('Processed')),
-                      const DropdownMenuItem(value: 'REJECTED', child: Text('Rejected')),
-                      const DropdownMenuItem(value: 'CANCELLED', child: Text('Cancelled')),
+                      DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
+                      DropdownMenuItem(value: 'PENDING', child: Text(l10n.pending)),
+                      DropdownMenuItem(value: 'APPROVED', child: Text(l10n.approved)),
+                      DropdownMenuItem(value: 'PROCESSED', child: Text(l10n.processed)),
+                      DropdownMenuItem(value: 'REJECTED', child: Text(l10n.rejected)),
+                      DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -134,16 +141,16 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedReason.isEmpty ? null : _selectedReason,
-                    decoration: const InputDecoration(labelText: 'Reason', border: OutlineInputBorder()),
+                    decoration: InputDecoration(labelText: l10n.reason, border: const OutlineInputBorder()),
                     items: [
-                      const DropdownMenuItem(value: '', child: Text('All Reasons')),
-                      const DropdownMenuItem(value: 'DEFECTIVE', child: Text('Defective')),
-                      const DropdownMenuItem(value: 'WRONG_SIZE', child: Text('Wrong Size')),
-                      const DropdownMenuItem(value: 'WRONG_COLOR', child: Text('Wrong Color')),
-                      const DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text('Quality Issue')),
-                      const DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text('Customer Changed Mind')),
-                      const DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text('Damaged in Transit')),
-                      const DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+                      DropdownMenuItem(value: '', child: Text(l10n.allReasons)),
+                      DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.defective)),
+                      DropdownMenuItem(value: 'WRONG_SIZE', child: Text(l10n.wrongSize)),
+                      DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.wrongColor)),
+                      DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.qualityIssue)),
+                      DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text(l10n.customerChangedMind)),
+                      DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text(l10n.damagedInTransit)),
+                      DropdownMenuItem(value: 'OTHER', child: Text(l10n.other)),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -168,7 +175,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                     });
                     provider.clearFilters();
                   },
-                  child: const Text('Clear Filters'),
+                  child: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -179,17 +186,18 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildReturnsList(ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final returns = provider.filteredReturns;
 
     if (returns.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.assignment_return, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('No returns found'),
-            Text('Create a new return using the + button'),
+            const Icon(Icons.assignment_return, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(l10n.noReturnsFound),
+            Text(l10n.createNewReturnUsingButton),
           ],
         ),
       );
@@ -205,6 +213,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildReturnCard(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: ListTile(
@@ -216,11 +226,11 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Customer: ${returnItem.customerName}'),
-            Text('Invoice: ${returnItem.saleInvoiceNumber}'),
-            Text('Reason: ${returnItem.reason.replaceAll('_', ' ')}'),
-            Text('Amount: \$${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
-            Text('Status: ${returnItem.status}'),
+            Text('${l10n.customer}: ${returnItem.customerName}'),
+            Text('${l10n.invoice}: ${returnItem.saleInvoiceNumber}'),
+            Text('${l10n.reason}: ${returnItem.reason.replaceAll('_', ' ')}'),
+            Text('${l10n.amount}: \$${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
+            Text('${l10n.status}: ${returnItem.status}'),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -267,17 +277,18 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   List<PopupMenuEntry<String>> _buildReturnActionMenu(ReturnModel returnItem) {
+    final l10n = AppLocalizations.of(context)!;
     final actions = <PopupMenuEntry<String>>[];
 
     if (returnItem.canBeApproved) {
       actions.add(
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'approve',
           child: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Approve'),
+              const Icon(Icons.check_circle, color: Colors.green),
+              const SizedBox(width: 8),
+              Text(l10n.approve),
             ],
           ),
         ),
@@ -286,13 +297,13 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     if (returnItem.canBeProcessed) {
       actions.add(
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'process',
           child: Row(
             children: [
-              Icon(Icons.play_circle, color: Colors.blue),
-              SizedBox(width: 8),
-              Text('Process'),
+              const Icon(Icons.play_circle, color: Colors.blue),
+              const SizedBox(width: 8),
+              Text(l10n.process),
             ],
           ),
         ),
@@ -301,13 +312,13 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     if (returnItem.canBeCancelled) {
       actions.add(
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'cancel',
           child: Row(
             children: [
-              Icon(Icons.cancel, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Cancel'),
+              const Icon(Icons.cancel, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(l10n.cancel),
             ],
           ),
         ),
@@ -315,23 +326,23 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     }
 
     actions.addAll([
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'edit',
         child: Row(
           children: [
-            Icon(Icons.edit, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Edit'),
+            const Icon(Icons.edit, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(l10n.edit),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'delete',
         child: Row(
           children: [
-            Icon(Icons.delete, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Delete'),
+            const Icon(Icons.delete, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(l10n.delete),
           ],
         ),
       ),
@@ -361,6 +372,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildRefundsTab() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ReturnProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -370,14 +383,14 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         final refunds = provider.refunds;
 
         if (refunds.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.payment, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No refunds found'),
-                Text('Refunds will appear here when returns are processed'),
+                const Icon(Icons.payment, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(l10n.noRefundsFound),
+                Text(l10n.refundsWillAppearHere),
               ],
             ),
           );
@@ -395,6 +408,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildRefundCard(RefundModel refund, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: ListTile(
@@ -406,10 +421,10 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Amount: \$${refund.amount.toStringAsFixed(2)}'),
-            Text('Method: ${refund.method.replaceAll('_', ' ')}'),
-            Text('Status: ${refund.status}'),
-            if (refund.referenceNumber != null) Text('Reference: ${refund.referenceNumber}'),
+            Text('${l10n.amount}: \$${refund.amount.toStringAsFixed(2)}'),
+            Text('${l10n.method}: ${refund.method.replaceAll('_', ' ')}'),
+            Text('${l10n.status}: ${refund.status}'),
+            if (refund.referenceNumber != null) Text('${l10n.reference}: ${refund.referenceNumber}'),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -452,17 +467,18 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   List<PopupMenuEntry<String>> _buildRefundActionMenu(RefundModel refund) {
+    final l10n = AppLocalizations.of(context)!;
     final actions = <PopupMenuEntry<String>>[];
 
     if (refund.status == 'PENDING') {
       actions.add(
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'process',
           child: Row(
             children: [
-              Icon(Icons.play_circle, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Process'),
+              const Icon(Icons.play_circle, color: Colors.green),
+              const SizedBox(width: 8),
+              Text(l10n.process),
             ],
           ),
         ),
@@ -470,23 +486,23 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     }
 
     actions.addAll([
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'edit',
         child: Row(
           children: [
-            Icon(Icons.edit, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Edit'),
+            const Icon(Icons.edit, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(l10n.edit),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'delete',
         child: Row(
           children: [
-            Icon(Icons.delete, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Delete'),
+            const Icon(Icons.delete, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(l10n.delete),
           ],
         ),
       ),
@@ -510,6 +526,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildStatisticsTab() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ReturnProvider>(
       builder: (context, provider, child) {
         final statistics = provider.statistics;
@@ -523,7 +541,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Return Statistics', style: Theme.of(context).textTheme.headlineSmall),
+              Text(l10n.returnStatistics, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 24),
               _buildStatisticsGrid(statistics),
               const SizedBox(height: 24),
@@ -536,6 +554,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildStatisticsGrid(Map<String, dynamic> statistics) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -543,10 +563,10 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _buildStatCard('Total Returns', statistics['total_returns']?.toString() ?? '0', Icons.assignment_return, Colors.blue),
-        _buildStatCard('Pending Returns', statistics['pending_returns']?.toString() ?? '0', Icons.schedule, Colors.orange),
-        _buildStatCard('Approved Returns', statistics['approved_returns']?.toString() ?? '0', Icons.check_circle, Colors.green),
-        _buildStatCard('Total Refunds', statistics['total_refunds']?.toString() ?? '0', Icons.payment, Colors.purple),
+        _buildStatCard(l10n.totalReturns, statistics['total_returns']?.toString() ?? '0', Icons.assignment_return, Colors.blue),
+        _buildStatCard(l10n.pendingReturns, statistics['pending_returns']?.toString() ?? '0', Icons.schedule, Colors.orange),
+        _buildStatCard(l10n.approvedReturns, statistics['approved_returns']?.toString() ?? '0', Icons.check_circle, Colors.green),
+        _buildStatCard(l10n.totalRefunds, statistics['total_refunds']?.toString() ?? '0', Icons.payment, Colors.purple),
       ],
     );
   }
@@ -574,17 +594,19 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   Widget _buildStatusBreakdown(ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Status Breakdown', style: Theme.of(context).textTheme.titleLarge),
+            Text(l10n.statusBreakdown, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            _buildStatusRow('Pending', provider.pendingReturns.length, Colors.orange),
-            _buildStatusRow('Approved', provider.approvedReturns.length, Colors.blue),
-            _buildStatusRow('Processed', provider.processedReturns.length, Colors.green),
+            _buildStatusRow(l10n.pending, provider.pendingReturns.length, Colors.orange),
+            _buildStatusRow(l10n.approved, provider.approvedReturns.length, Colors.blue),
+            _buildStatusRow(l10n.processed, provider.processedReturns.length, Colors.green),
           ],
         ),
       ),
@@ -609,94 +631,98 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     );
   }
 
-  // Dialog methods (to be implemented)
   void _showCreateReturnDialog(BuildContext context) {
     showDialog(context: context, builder: (context) => const CreateReturnDialog());
   }
 
   void _showReturnDetails(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Return Details - ${returnItem.returnNumber}'),
+        title: Text(l10n.returnDetails(returnItem.returnNumber)),
         content: SizedBox(
           width: 400,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Sale Invoice', returnItem.saleInvoiceNumber),
-              _buildDetailRow('Customer', returnItem.customerName),
-              _buildDetailRow('Return Date', returnItem.formattedReturnDate),
-              _buildDetailRow('Status', returnItem.status),
-              _buildDetailRow('Reason', returnItem.reason),
-              if (returnItem.reasonDetails?.isNotEmpty == true) _buildDetailRow('Reason Details', returnItem.reasonDetails!),
-              _buildDetailRow('Items Count', '${returnItem.returnItemsCount}'),
-              _buildDetailRow('Total Amount', 'PKR ${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
+              _buildDetailRow(l10n.saleInvoice, returnItem.saleInvoiceNumber),
+              _buildDetailRow(l10n.customer, returnItem.customerName),
+              _buildDetailRow(l10n.returnDate, returnItem.formattedReturnDate),
+              _buildDetailRow(l10n.status, returnItem.status),
+              _buildDetailRow(l10n.reason, returnItem.reason),
+              if (returnItem.reasonDetails?.isNotEmpty == true) _buildDetailRow(l10n.reasonDetails, returnItem.reasonDetails!),
+              _buildDetailRow(l10n.itemsCount as String, '${returnItem.returnItemsCount}'),
+              _buildDetailRow(l10n.totalAmount, 'PKR ${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
               if (returnItem.approvedAt != null)
-                _buildDetailRow('Approved At', '${returnItem.approvedAt!.day}/${returnItem.approvedAt!.month}/${returnItem.approvedAt!.year}'),
+                _buildDetailRow(l10n.approvedAt, '${returnItem.approvedAt!.day}/${returnItem.approvedAt!.month}/${returnItem.approvedAt!.year}'),
               if (returnItem.processedAt != null)
-                _buildDetailRow('Processed At', '${returnItem.processedAt!.day}/${returnItem.processedAt!.month}/${returnItem.processedAt!.year}'),
-              if (returnItem.notes?.isNotEmpty == true) _buildDetailRow('Notes', returnItem.notes!),
+                _buildDetailRow(l10n.processedAt, '${returnItem.processedAt!.day}/${returnItem.processedAt!.month}/${returnItem.processedAt!.year}'),
+              if (returnItem.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, returnItem.notes!),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
       ),
     );
   }
 
   void _showRefundDetails(RefundModel refund, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Refund Details - ${refund.refundNumber}'),
+        title: Text(l10n.refundDetails(refund.refundNumber)),
         content: SizedBox(
           width: 400,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Refund Number', refund.refundNumber),
-              _buildDetailRow('Return ID', refund.returnRequestId),
-              _buildDetailRow('Amount', 'PKR ${refund.amount.toStringAsFixed(2)}'),
-              _buildDetailRow('Method', refund.method),
-              _buildDetailRow('Status', refund.status),
-              _buildDetailRow('Created At', '${refund.createdAt.day}/${refund.createdAt.month}/${refund.createdAt.year}'),
+              _buildDetailRow(l10n.refundNumber, refund.refundNumber),
+              _buildDetailRow(l10n.returnId, refund.returnRequestId),
+              _buildDetailRow(l10n.amount, 'PKR ${refund.amount.toStringAsFixed(2)}'),
+              _buildDetailRow(l10n.method, refund.method),
+              _buildDetailRow(l10n.status, refund.status),
+              _buildDetailRow(l10n.createdAt, '${refund.createdAt.day}/${refund.createdAt.month}/${refund.createdAt.year}'),
               if (refund.processedAt != null)
-                _buildDetailRow('Processed At', '${refund.processedAt!.day}/${refund.processedAt!.month}/${refund.processedAt!.year}'),
-              if (refund.referenceNumber?.isNotEmpty == true) _buildDetailRow('Reference', refund.referenceNumber!),
-              if (refund.notes?.isNotEmpty == true) _buildDetailRow('Notes', refund.notes!),
+                _buildDetailRow(l10n.processedAt, '${refund.processedAt!.day}/${refund.processedAt!.month}/${refund.processedAt!.year}'),
+              if (refund.referenceNumber?.isNotEmpty == true) _buildDetailRow(l10n.reference, refund.referenceNumber!),
+              if (refund.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, refund.notes!),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
       ),
     );
   }
 
   void _showApproveReturnDialog(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final reasonController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Approve Return - ${returnItem.returnNumber}'),
+        title: Text(l10n.approveReturn(returnItem.returnNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Are you sure you want to approve this return?'),
+            Text(l10n.areYouSureApproveReturn),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(labelText: 'Approval Reason (Optional)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.approvalReasonOptional, border: const OutlineInputBorder()),
               maxLines: 3,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -705,12 +731,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 reason: reasonController.text.trim().isEmpty ? null : reasonController.text.trim(),
               );
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Return approved successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.returnApprovedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Approve'),
+            child: Text(l10n.approve),
           ),
         ],
       ),
@@ -718,37 +744,38 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showProcessReturnDialog(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final refundAmountController = TextEditingController(text: returnItem.totalReturnAmount.toString());
     final refundMethodController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Process Return - ${returnItem.returnNumber}'),
+        title: Text(l10n.processReturn(returnItem.returnNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Process this return and initiate refund?'),
+            Text(l10n.processReturnAndInitiateRefund),
             const SizedBox(height: 16),
             TextField(
               controller: refundAmountController,
-              decoration: const InputDecoration(labelText: 'Refund Amount', border: OutlineInputBorder(), prefixText: 'PKR '),
+              decoration: InputDecoration(labelText: l10n.refundAmount, border: const OutlineInputBorder(), prefixText: 'PKR '),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: refundMethodController,
-              decoration: const InputDecoration(
-                labelText: 'Refund Method',
-                border: OutlineInputBorder(),
-                hintText: 'e.g., Cash, Bank Transfer, etc.',
+              decoration: InputDecoration(
+                labelText: l10n.refundMethod,
+                border: const OutlineInputBorder(),
+                hintText: l10n.refundMethodHint,
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -758,17 +785,17 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
               if (refundAmount != null && refundMethod.isNotEmpty) {
                 final success = await provider.processReturn(id: returnItem.id, refundAmount: refundAmount, refundMethod: refundMethod);
                 if (success && mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('Return processed successfully'), backgroundColor: Colors.green));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.returnProcessedSuccessfully), backgroundColor: Colors.green),
+                  );
                 }
               } else {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Please provide valid refund amount and method'), backgroundColor: Colors.red));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.provideValidRefundAmountAndMethod), backgroundColor: Colors.red),
+                );
               }
             },
-            child: const Text('Process'),
+            child: Text(l10n.process),
           ),
         ],
       ),
@@ -776,45 +803,46 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showCancelReturnDialog(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final reasonController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cancel Return - ${returnItem.returnNumber}'),
+        title: Text(l10n.cancelReturn(returnItem.returnNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Are you sure you want to cancel this return?'),
+            Text(l10n.areYouSureCancelReturn),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(labelText: 'Cancellation Reason (Required)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.cancellationReasonRequired, border: const OutlineInputBorder()),
               maxLines: 3,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('No')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.no)),
           ElevatedButton(
             onPressed: () async {
               if (reasonController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Please provide a cancellation reason'), backgroundColor: Colors.red));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.provideCancellationReason), backgroundColor: Colors.red),
+                );
                 return;
               }
               Navigator.of(context).pop();
               final success = await provider.rejectReturn(id: returnItem.id, reason: reasonController.text.trim());
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Return cancelled successfully'), backgroundColor: Colors.orange));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.returnCancelledSuccessfully), backgroundColor: Colors.orange),
+                );
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text('Cancel Return'),
+            child: Text(l10n.cancelReturn(returnItem.returnNumber).split(' - ')[0]),
           ),
         ],
       ),
@@ -822,6 +850,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showEditReturnDialog(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final reasonController = TextEditingController(text: returnItem.reason);
     final reasonDetailsController = TextEditingController(text: returnItem.reasonDetails);
     final notesController = TextEditingController(text: returnItem.notes);
@@ -829,7 +858,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Return - ${returnItem.returnNumber}'),
+        title: Text(l10n.editReturn(returnItem.returnNumber)),
         content: SizedBox(
           width: 500,
           child: Column(
@@ -838,26 +867,26 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             children: [
               TextField(
                 controller: reasonController,
-                decoration: const InputDecoration(labelText: 'Return Reason', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.returnReason, border: const OutlineInputBorder()),
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: reasonDetailsController,
-                decoration: const InputDecoration(labelText: 'Reason Details (Optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: '${l10n.reasonDetails} (${l10n.notesOptional})', border: const OutlineInputBorder()),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: notesController,
-                decoration: const InputDecoration(labelText: 'Notes (Optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.notesOptional, border: const OutlineInputBorder()),
                 maxLines: 3,
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -868,12 +897,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
               );
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Return updated successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.returnUpdatedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Update'),
+            child: Text(l10n.update),
           ),
         ],
       ),
@@ -881,33 +910,35 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showDeleteReturnDialog(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Return - ${returnItem.returnNumber}'),
+        title: Text(l10n.deleteReturn(returnItem.returnNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to delete this return?'),
+            Text(l10n.areYouSureDeleteReturn),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.', style: TextStyle(color: Colors.red)),
+            Text(l10n.thisActionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.deleteReturn(returnItem.id);
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Return deleted successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.returnDeletedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -915,35 +946,36 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showProcessRefundDialog(RefundModel refund, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final referenceController = TextEditingController();
     final notesController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Process Refund - ${refund.refundNumber}'),
+        title: Text(l10n.processRefund(refund.refundNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Amount: PKR ${refund.amount.toStringAsFixed(2)}'),
-            Text('Method: ${refund.method}'),
+            Text('${l10n.amount}: PKR ${refund.amount.toStringAsFixed(2)}'),
+            Text('${l10n.method}: ${refund.method}'),
             const SizedBox(height: 16),
             TextField(
               controller: referenceController,
-              decoration: const InputDecoration(labelText: 'Reference Number (Optional)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.referenceNumberOptional, border: const OutlineInputBorder()),
               maxLines: 1,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(labelText: 'Processing Notes (Optional)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.processingNotesOptional, border: const OutlineInputBorder()),
               maxLines: 3,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -953,12 +985,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
               );
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Refund processed successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.refundProcessedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Process Refund'),
+            child: Text(l10n.processRefundAction),
           ),
         ],
       ),
@@ -966,6 +998,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showEditRefundDialog(RefundModel refund, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     final methodController = TextEditingController(text: refund.method);
     final notesController = TextEditingController(text: refund.notes);
     final referenceController = TextEditingController(text: refund.referenceNumber);
@@ -973,37 +1006,37 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Edit Refund - ${refund.refundNumber}'),
+        title: Text(l10n.editRefund(refund.refundNumber)),
         content: SizedBox(
           width: 500,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Amount: PKR ${refund.amount.toStringAsFixed(2)} (Cannot be changed)'),
+              Text(l10n.amountCannotBeChanged(refund.amount.toStringAsFixed(2))),
               const SizedBox(height: 16),
               TextField(
                 controller: methodController,
-                decoration: const InputDecoration(labelText: 'Refund Method', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.refundMethod, border: const OutlineInputBorder()),
                 maxLines: 1,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: referenceController,
-                decoration: const InputDecoration(labelText: 'Reference Number (Optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.referenceNumberOptional, border: const OutlineInputBorder()),
                 maxLines: 1,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: notesController,
-                decoration: const InputDecoration(labelText: 'Notes (Optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.notesOptional, border: const OutlineInputBorder()),
                 maxLines: 3,
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
@@ -1014,12 +1047,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 referenceNumber: referenceController.text.trim().isEmpty ? null : referenceController.text.trim(),
               );
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Refund updated successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.refundUpdatedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Update'),
+            child: Text(l10n.update),
           ),
         ],
       ),
@@ -1027,35 +1060,37 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   }
 
   void _showDeleteRefundDialog(RefundModel refund, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Refund - ${refund.refundNumber}'),
+        title: Text(l10n.deleteRefund(refund.refundNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to delete this refund?'),
+            Text(l10n.areYouSureDeleteRefund),
             const SizedBox(height: 8),
-            Text('Amount: PKR ${refund.amount.toStringAsFixed(2)}'),
+            Text('${l10n.amount}: PKR ${refund.amount.toStringAsFixed(2)}'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.', style: TextStyle(color: Colors.red)),
+            Text(l10n.thisActionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.deleteRefund(refund.id);
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Refund deleted successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.refundDeletedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

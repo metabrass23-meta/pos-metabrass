@@ -574,9 +574,10 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   child: Text(
-                    l10n.clearDiscount,
+                    l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
                   ),
+
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/receipt_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import 'create_receipt_dialog.dart';
@@ -32,6 +33,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Column(
         children: [
@@ -41,13 +44,15 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateReceiptDialog(context),
+        tooltip: l10n.createReceipt,
         child: const Icon(Icons.add),
-        tooltip: 'Create Receipt',
       ),
     );
   }
 
   Widget _buildFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
@@ -55,17 +60,17 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Filters', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.filters, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    decoration: const InputDecoration(
-                      labelText: 'Search',
-                      hintText: 'Search by receipt number, customer, or payment',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      labelText: l10n.search,
+                      hintText: l10n.searchByReceiptCustomerPayment,
+                      prefixIcon: const Icon(Icons.search),
                     ),
                     onChanged: (value) => context.read<ReceiptProvider>().setFilters(search: value),
                   ),
@@ -74,12 +79,15 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.status,
+                      border: const OutlineInputBorder(),
+                    ),
                     items: [
-                      const DropdownMenuItem(value: '', child: Text('All Statuses')),
-                      const DropdownMenuItem(value: 'GENERATED', child: Text('Generated')),
-                      const DropdownMenuItem(value: 'SENT', child: Text('Sent')),
-                      const DropdownMenuItem(value: 'VIEWED', child: Text('Viewed')),
+                      DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
+                      DropdownMenuItem(value: 'GENERATED', child: Text(l10n.generated)),
+                      DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
+                      DropdownMenuItem(value: 'VIEWED', child: Text(l10n.viewed)),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -98,7 +106,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                     });
                     context.read<ReceiptProvider>().clearFilters();
                   },
-                  child: const Text('Clear Filters'),
+                  child: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -109,6 +117,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   Widget _buildReceiptsList() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ReceiptProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -120,8 +130,11 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Error: ${provider.error}'),
-                ElevatedButton(onPressed: () => provider.refresh(), child: const Text('Retry')),
+                Text(l10n.error(provider.error!)),
+                ElevatedButton(
+                  onPressed: () => provider.refresh(),
+                  child: Text(l10n.retry),
+                ),
               ],
             ),
           );
@@ -130,14 +143,14 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         final receipts = provider.filteredReceipts;
 
         if (receipts.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No receipts found'),
-                Text('Create a new receipt using the + button'),
+                const Icon(Icons.receipt, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(l10n.noReceiptsFound),
+                Text(l10n.createNewReceiptUsingButton),
               ],
             ),
           );
@@ -155,6 +168,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   Widget _buildReceiptCard(ReceiptModel receipt, ReceiptProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: ListTile(
@@ -166,10 +181,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Amount: ${receipt.formattedPaymentAmount}'),
-            Text('Customer: ${receipt.customerName}'),
-            Text('Status: ${receipt.statusDisplay}'),
-            Text('Generated: ${receipt.formattedGeneratedDate}'),
+            Text('${l10n.amount}: ${receipt.formattedPaymentAmount}'),
+            Text('${l10n.customer}: ${receipt.customerName}'),
+            Text('${l10n.status}: ${receipt.statusDisplay}'),
+            Text('${l10n.generated}: ${receipt.formattedGeneratedDate}'),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -208,34 +223,36 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   List<PopupMenuEntry<String>> _buildReceiptActionMenu(ReceiptModel receipt) {
+    final l10n = AppLocalizations.of(context)!;
+
     return [
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'view',
         child: Row(
           children: [
-            Icon(Icons.visibility, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('View'),
+            const Icon(Icons.visibility, color: Colors.blue),
+            const SizedBox(width: 8),
+            Text(l10n.view),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'edit',
         child: Row(
           children: [
-            Icon(Icons.edit, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Edit'),
+            const Icon(Icons.edit, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(l10n.edit),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'delete',
         child: Row(
           children: [
-            Icon(Icons.delete, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Delete'),
+            const Icon(Icons.delete, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(l10n.delete),
           ],
         ),
       ),
@@ -261,26 +278,33 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   void _showReceiptDetails(ReceiptModel receipt, ReceiptProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Receipt Details - ${receipt.receiptNumber}'),
+        title: Text(l10n.receiptDetails(receipt.receiptNumber)),
         content: SizedBox(
           width: 400,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Receipt Number', receipt.receiptNumber),
-              _buildDetailRow('Amount', receipt.formattedPaymentAmount),
-              _buildDetailRow('Status', receipt.statusDisplay),
-              _buildDetailRow('Generated At', receipt.formattedGeneratedDate),
-              if (receipt.customerName != null) _buildDetailRow('Customer', receipt.customerName!),
-              if (receipt.notes?.isNotEmpty == true) _buildDetailRow('Notes', receipt.notes!),
+              _buildDetailRow(l10n.receiptNumber, receipt.receiptNumber),
+              _buildDetailRow(l10n.amount, receipt.formattedPaymentAmount),
+              _buildDetailRow(l10n.status, receipt.statusDisplay),
+              _buildDetailRow(l10n.generatedAt, receipt.formattedGeneratedDate),
+              if (receipt.customerName != null) _buildDetailRow(l10n.customer, receipt.customerName!),
+              if (receipt.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, receipt.notes!),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.close),
+          )
+        ],
       ),
     );
   }
@@ -293,35 +317,43 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   void _showDeleteReceiptDialog(ReceiptModel receipt, ReceiptProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Receipt - ${receipt.receiptNumber}'),
+        title: Text(l10n.deleteReceipt(receipt.receiptNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to delete this receipt?'),
+            Text(l10n.areYouSureDeleteReceipt),
             const SizedBox(height: 8),
-            Text('Amount: ${receipt.formattedPaymentAmount}'),
+            Text('${l10n.amount}: ${receipt.formattedPaymentAmount}'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.', style: TextStyle(color: Colors.red)),
+            Text(l10n.thisActionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.deleteReceipt(receipt.id);
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Receipt deleted successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.receiptDeletedSuccessfully),
+                    backgroundColor: Colors.green,
+                  ),
+                );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

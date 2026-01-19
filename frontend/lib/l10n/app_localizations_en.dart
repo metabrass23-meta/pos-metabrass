@@ -228,7 +228,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noData => 'No data available';
 
   @override
-  String get error => 'Error';
+  String error(String error) {
+    return 'Error';
+  }
 
   @override
   String get success => 'Success';
@@ -927,7 +929,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get costPriceInfo => 'Setting cost price enables profit margin calculations and better financial analysis';
 
   @override
-  String get qty => 'Qty';
+  String qty(int quantity) {
+    return 'Qty';
+  }
 
   @override
   String get colorName => 'Color Name';
@@ -3868,7 +3872,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPhone => 'No phone';
 
   @override
-  String get item => 'item';
+  String item(int itemNumber) {
+    return 'item';
+  }
 
   @override
   String get noItems => 'No items';
@@ -4850,7 +4856,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get minimumQuantity => 'Minimum quantity';
 
   @override
-  String get maxQuantity => 'Max Quantity';
+  String maxQuantity(int max) {
+    return 'Max Quantity';
+  }
 
   @override
   String get maximumQuantity => 'Maximum quantity';
@@ -4976,7 +4984,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addedToCart => 'added to cart';
 
   @override
-  String get stockAvailable => 'Stock';
+  String stockAvailable(int quantity) {
+    return 'Stock';
+  }
 
   @override
   String get min => 'Min';
@@ -4991,7 +5001,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itemDiscountOptional => 'Item Discount (Optional)';
 
   @override
-  String get clearDiscount => 'Clear Discount';
+  String clearDiscount(String amount) {
+    return 'Clear Discount';
+  }
 
   @override
   String get specialInstructions => 'Special Instructions';
@@ -5471,4 +5483,1000 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aPremiumPointOfSaleSolution => 'A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.';
+
+  @override
+  String get createNewReturn => 'Create New Return';
+
+  @override
+  String get enterSaleId => 'Enter sale ID';
+
+  @override
+  String get saleIdRequired => 'Sale ID is required';
+
+  @override
+  String get customerId => 'Customer ID';
+
+  @override
+  String get enterCustomerId => 'Enter customer ID';
+
+  @override
+  String get customerIdRequired => 'Customer ID is required';
+
+  @override
+  String get returnReason => 'Return Reason';
+
+  @override
+  String get selectReason => 'Select a reason';
+
+  @override
+  String get reasonDefective => 'Defective Product';
+
+  @override
+  String get reasonWrongSize => 'Wrong Size';
+
+  @override
+  String get reasonWrongColor => 'Wrong Color';
+
+  @override
+  String get reasonQualityIssue => 'Quality Issue';
+
+  @override
+  String get reasonChangeMind => 'Customer Changed Mind';
+
+  @override
+  String get reasonDamagedTransit => 'Damaged in Transit';
+
+  @override
+  String get reasonOther => 'Other';
+
+  @override
+  String get selectReturnReason => 'Please select a return reason';
+
+  @override
+  String get reasonDetails => 'Reason Details';
+
+  @override
+  String get specifyReason => 'Please specify the reason';
+
+  @override
+  String get provideReasonDetails => 'Please provide reason details';
+
+  @override
+  String get returnItems => 'Return Items';
+
+  @override
+  String get noItemsAdded => 'No return items added';
+
+  @override
+  String get clickAddItem => 'Click \"Add Item\" to add items to return';
+
+  @override
+  String get removeItem => 'Remove Item';
+
+  @override
+  String get saleItemId => 'Sale Item ID';
+
+  @override
+  String get enterSaleItemId => 'Enter sale item ID';
+
+  @override
+  String get saleItemIdRequired => 'Sale item ID is required';
+
+  @override
+  String get quantityRequired => 'Quantity is required';
+
+  @override
+  String get quantityPositive => 'Quantity must be a positive number';
+
+  @override
+  String get condition => 'Condition';
+
+  @override
+  String get selectCondition => 'Select condition';
+
+  @override
+  String get conditionNew => 'New';
+
+  @override
+  String get conditionGood => 'Good';
+
+  @override
+  String get conditionFair => 'Fair';
+
+  @override
+  String get conditionPoor => 'Poor';
+
+  @override
+  String get conditionDamaged => 'Damaged';
+
+  @override
+  String get selectConditionError => 'Please select condition';
+
+  @override
+  String get conditionNotes => 'Condition Notes';
+
+  @override
+  String get conditionNotesHint => 'Additional notes about condition';
+
+  @override
+  String get notesHint => 'Any additional notes about the return';
+
+  @override
+  String get createReturn => 'Create Return';
+
+  @override
+  String get addOneItem => 'Please add at least one return item';
+
+  @override
+  String get createdSuccessfully => 'Return created successfully';
+
+  @override
+  String get failedToCreate => 'Failed to create return';
+
+  @override
+  String errorCreating(String error) {
+    return 'Error creating return: $error';
+  }
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get red => 'Red';
+
+  @override
+  String get blue => 'Blue';
+
+  @override
+  String get green => 'Green';
+
+  @override
+  String get purple => 'Purple';
+
+  @override
+  String get pink => 'Pink';
+
+  @override
+  String get orange => 'Orange';
+
+  @override
+  String get customizeAndAdd => 'Customize & Add';
+
+  @override
+  String customizedAddedToCart(String productName) {
+    return 'Customized $productName added to cart';
+  }
+
+  @override
+  String get quantityAndPricing => 'Quantity & Pricing';
+
+  @override
+  String get enterValidPrice => 'Please enter a valid price';
+
+  @override
+  String get sizeAndFitting => 'Size & Fitting';
+
+  @override
+  String get fitting => 'Fitting';
+
+  @override
+  String get fittingStyle => 'Fitting Style';
+
+  @override
+  String get customizationOptions => 'Customization Options';
+
+  @override
+  String get embroideryWork => 'Embroidery Work';
+
+  @override
+  String get embroidery => 'Embroidery';
+
+  @override
+  String get fabricQuality => 'Fabric Quality';
+
+  @override
+  String get accentColor => 'Accent Color';
+
+  @override
+  String get additionalServices => 'Additional Services';
+
+  @override
+  String get expressDelivery => 'Express Delivery';
+
+  @override
+  String get expressDeliveryDesc => 'Get your order in 2-3 days (+PKR 1,000)';
+
+  @override
+  String get expressDeliveryRequired => 'Express Delivery Required';
+
+  @override
+  String get giftWrapping => 'Gift Wrapping';
+
+  @override
+  String get giftWrappingDesc => 'Beautiful gift packaging (+PKR 500)';
+
+  @override
+  String get giftWrappingRequired => 'Gift Wrapping Required';
+
+  @override
+  String get additionalRequirements => 'Additional Requirements';
+
+  @override
+  String get additionalRequirementsHint => 'Any special requirements, measurements, design preferences, or delivery instructions...';
+
+  @override
+  String basePriceQuantity(int quantity) {
+    return 'Base Price × $quantity:';
+  }
+
+  @override
+  String get customSizeLabel => 'Custom Size';
+
+  @override
+  String get customTailoring => 'Custom Tailoring';
+
+  @override
+  String get slimFit => 'Slim Fit';
+
+  @override
+  String get subtotalWithCustomizations => 'Subtotal with Customizations:';
+
+  @override
+  String get itemDiscount => 'Item Discount:';
+
+  @override
+  String youSave(String amount) {
+    return 'You save PKR $amount';
+  }
+
+  @override
+  String get deleteSale => 'Delete Sale';
+
+  @override
+  String get deleteSaleRecord => 'Delete Sale Record';
+
+  @override
+  String get areYouSureDeleteSale => 'Are you sure you want to delete this sale?';
+
+  @override
+  String get areYouAbsolutelySure => 'Are you absolutely sure you want to delete this sale record?';
+
+  @override
+  String get permanentDeleteWarningShort => 'This will permanently delete the sale record and all associated data.';
+
+  @override
+  String get permanentDeleteWarningLong => 'This will permanently delete the sale record, payment information, and all associated data. This action cannot be undone.';
+
+  @override
+  String get deleting => 'Deleting...';
+
+  @override
+  String get deleteSaleButton => 'Delete Sale';
+
+  @override
+  String get saleDeletedSuccessfully => 'Sale record deleted successfully!';
+
+  @override
+  String get editInvoice => 'Edit Invoice';
+
+  @override
+  String editInvoiceWithNumber(String invoiceNumber) {
+    return 'Edit Invoice - $invoiceNumber';
+  }
+
+  @override
+  String get statusRequired => 'Status *';
+
+  @override
+  String get selectInvoiceStatus => 'Select invoice status';
+
+  @override
+  String get pleaseSelectStatus => 'Please select a status';
+
+  @override
+  String get clearDueDate => 'Clear due date';
+
+  @override
+  String get additionalInvoiceNotes => 'Additional invoice notes (optional)';
+
+  @override
+  String get invoiceTermsConditions => 'Invoice terms and conditions';
+
+  @override
+  String get standardTermsConditions => 'Standard terms and conditions apply';
+
+  @override
+  String get updateInvoice => 'Update Invoice';
+
+  @override
+  String get invoiceUpdatedSuccessfully => 'Invoice updated successfully';
+
+  @override
+  String get failedToUpdateInvoice => 'Failed to update invoice';
+
+  @override
+  String get editReceipt => 'Edit Receipt';
+
+  @override
+  String editReceiptWithNumber(String receiptNumber) {
+    return 'Edit Receipt - $receiptNumber';
+  }
+
+  @override
+  String get failedToUpdateReceipt => 'Failed to update receipt';
+
+  @override
+  String get editSale => 'Edit Sale';
+
+  @override
+  String get editSaleDetails => 'Edit Sale Details';
+
+  @override
+  String get saleSummaryReadOnly => 'Sale Summary (Read-Only)';
+
+  @override
+  String itemsCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get gst => 'GST';
+
+  @override
+  String get editableFields => 'Editable Fields';
+
+  @override
+  String get amountPaidPkr => 'Amount Paid (PKR)';
+
+  @override
+  String get enterAmountPaid => 'Please enter amount paid';
+
+  @override
+  String get partialStatus => 'Partial';
+
+  @override
+  String get unpaidStatus => 'Unpaid';
+
+  @override
+  String get specialInstructionsOrRemarks => 'Any special instructions or remarks...';
+
+  @override
+  String get amountPaying => 'Amount Paying';
+
+  @override
+  String get updateSale => 'Update Sale';
+
+  @override
+  String get saleUpdatedSuccessfully => 'Sale updated successfully!';
+
+  @override
+  String get existingOrders => 'Existing Orders';
+
+  @override
+  String get deliveryDate => 'Delivery Date';
+
+  @override
+  String get pendingStatus => 'Pending';
+
+  @override
+  String get inProgressStatus => 'In Progress';
+
+  @override
+  String get completedStatus => 'Completed';
+
+  @override
+  String get deliveredStatus => 'Delivered';
+
+  @override
+  String get cancelledStatus => 'Cancelled';
+
+  @override
+  String productAddedToOrder(String productName, String orderId) {
+    return '$productName added to order $orderId';
+  }
+
+  @override
+  String get searchByInvoiceNumberCustomerOrSale => 'Search by invoice number, customer, or sale';
+
+  @override
+  String get noInvoicesFound => 'No invoices found';
+
+  @override
+  String get createNewInvoiceUsingButton => 'Create a new invoice using the + button';
+
+  @override
+  String get generatePdf => 'Generate PDF';
+
+  @override
+  String get invoiceDetails => 'Invoice Details';
+
+  @override
+  String invoiceDetailsWithNumber(String invoiceNumber) {
+    return 'Invoice Details - $invoiceNumber';
+  }
+
+  @override
+  String get saleInvoiceNumber => 'Sale Invoice Number';
+
+  @override
+  String get issueDate => 'Issue Date';
+
+  @override
+  String get invoicePdfGeneratedSuccessfully => 'Invoice PDF generated successfully';
+
+  @override
+  String deleteInvoiceWithNumber(String invoiceNumber) {
+    return 'Delete Invoice - $invoiceNumber';
+  }
+
+  @override
+  String get areYouSureDeleteInvoice => 'Are you sure you want to delete this invoice?';
+
+  @override
+  String get invoiceDeletedSuccessfully => 'Invoice deleted successfully';
+
+  @override
+  String get orderCreated => 'Order Created!';
+
+  @override
+  String get customOrderCreatedSuccessfully => 'Custom order created successfully';
+
+  @override
+  String get advanceReceived => 'Advance Received:';
+
+  @override
+  String get printOrder => 'Print Order';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get printFunctionalityWillBeImplemented => 'Print functionality will be implemented';
+
+  @override
+  String get paymentConfirmation => 'Payment Confirmation';
+
+  @override
+  String get paymentComplete => 'Payment Complete';
+
+  @override
+  String get paymentInProgress => 'Payment in Progress';
+
+  @override
+  String get previouslyPaid => 'Previously Paid:';
+
+  @override
+  String get thisPayment => 'This Payment:';
+
+  @override
+  String get newBalance => 'New Balance:';
+
+  @override
+  String get creditDebitCard => 'Credit/Debit Card';
+
+  @override
+  String get mobilePayment => 'Mobile Payment';
+
+  @override
+  String get check => 'Check';
+
+  @override
+  String get amountExceedsBalance => 'Amount exceeds remaining balance';
+
+  @override
+  String get referenceOptional => 'Reference (Optional)';
+
+  @override
+  String get transactionReferenceOrReceipt => 'Transaction reference or receipt number';
+
+  @override
+  String get additionalNotesAboutPayment => 'Additional notes about this payment';
+
+  @override
+  String get confirmPayment => 'Confirm Payment';
+
+  @override
+  String get paymentConfirmed => 'Payment Confirmed';
+
+  @override
+  String get paymentProcessedSuccessfully => 'Payment has been processed successfully!';
+
+  @override
+  String get continue_ => 'Continue';
+
+  @override
+  String get paymentError => 'Payment Error';
+
+  @override
+  String get invalidPaymentAmount => 'Invalid payment amount. Please check the amount and try again.';
+
+  @override
+  String get paymentProcessingFailed => 'Payment processing failed. Please try again.';
+
+  @override
+  String errorOccurred(String error) {
+    return 'An error occurred: $error';
+  }
+
+  @override
+  String get paymentWorkflowDashboard => 'Payment Workflow Dashboard';
+
+  @override
+  String get refreshDashboard => 'Refresh Dashboard';
+
+  @override
+  String get noDataAvailable => 'No data available';
+
+  @override
+  String get pendingPayments => 'Pending Payments';
+
+  @override
+  String get completionRate => 'Completion Rate';
+
+  @override
+  String get paymentProgressOverview => 'Payment Progress Overview';
+
+  @override
+  String get paymentCompletion => 'Payment Completion';
+
+  @override
+  String get recentWorkflowActivities => 'Recent Workflow Activities';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String get collected => 'Collected';
+
+  @override
+  String get updateSaleStatus => 'Update Sale Status';
+
+  @override
+  String get selectActionToPerform => 'Select an action to perform:';
+
+  @override
+  String get cancelSale => 'Cancel Sale';
+
+  @override
+  String get returnSale => 'Return Sale';
+
+  @override
+  String get unknownAction => 'Unknown Action';
+
+  @override
+  String get processAdditionalPayment => 'Process additional payment for this sale';
+
+  @override
+  String get markSaleAsDelivered => 'Mark the sale as delivered to customer';
+
+  @override
+  String get cancelSaleAndRestoreInventory => 'Cancel this sale and restore inventory';
+
+  @override
+  String get processReturnForDeliveredSale => 'Process return for delivered sale';
+
+  @override
+  String get noDescriptionAvailable => 'No description available';
+
+  @override
+  String get markedAsDelivered => 'Marked as delivered';
+
+  @override
+  String get saleCancelled => 'Sale cancelled';
+
+  @override
+  String get saleReturned => 'Sale returned';
+
+  @override
+  String get awaitingPayment => 'Awaiting Payment';
+
+  @override
+  String get partialPayment => 'Partial Payment';
+
+  @override
+  String get moreActions => 'More Actions';
+
+  @override
+  String get applyDiscount => 'Apply Discount';
+
+  @override
+  String get quickDiscounts => 'Quick Discounts';
+
+  @override
+  String get originalPrice => 'Original Price:';
+
+  @override
+  String get finalPrice => 'Final Price:';
+
+  @override
+  String get addWithDiscount => 'Add with Discount';
+
+  @override
+  String addedWithDiscount(String productName, String discount) {
+    return 'Added $productName with $discount discount';
+  }
+
+  @override
+  String get quickAddWithDefaultOptions => 'Quick add with default options';
+
+  @override
+  String get setSizeQualityEmbroidery => 'Set size, quality, embroidery, and options';
+
+  @override
+  String get applyDiscountBeforeAdding => 'Add discount before adding to cart';
+
+  @override
+  String get createCustomOrder => 'Create Custom Order';
+
+  @override
+  String get scheduleDeliveryAndAdvance => 'Schedule delivery and take advance';
+
+  @override
+  String get searchByReceiptCustomerPayment => 'Search by receipt number, customer, or payment';
+
+  @override
+  String get createNewReceiptUsingButton => 'Create a new receipt using the + button';
+
+  @override
+  String receiptDetails(String receiptNumber) {
+    return 'Receipt Details - $receiptNumber';
+  }
+
+  @override
+  String get receiptNumber => 'Receipt Number';
+
+  @override
+  String get generatedAt => 'Generated At';
+
+  @override
+  String deleteReceipt(String receiptNumber) {
+    return 'Delete Receipt - $receiptNumber';
+  }
+
+  @override
+  String get areYouSureDeleteReceipt => 'Are you sure you want to delete this receipt?';
+
+  @override
+  String get refunds => 'Refunds';
+
+  @override
+  String get searchByReturnCustomerInvoice => 'Search by return number, customer, or invoice';
+
+  @override
+  String get allReasons => 'All Reasons';
+
+  @override
+  String get defective => 'Defective';
+
+  @override
+  String get wrongSize => 'Wrong Size';
+
+  @override
+  String get wrongColor => 'Wrong Color';
+
+  @override
+  String get qualityIssue => 'Quality Issue';
+
+  @override
+  String get customerChangedMind => 'Customer Changed Mind';
+
+  @override
+  String get damagedInTransit => 'Damaged in Transit';
+
+  @override
+  String get approved => 'Approved';
+
+  @override
+  String get processed => 'Processed';
+
+  @override
+  String get rejected => 'Rejected';
+
+  @override
+  String get noReturnsFound => 'No returns found';
+
+  @override
+  String get createNewReturnUsingButton => 'Create a new return using the + button';
+
+  @override
+  String get noRefundsFound => 'No refunds found';
+
+  @override
+  String get refundsWillAppearHere => 'Refunds will appear here when returns are processed';
+
+  @override
+  String get approve => 'Approve';
+
+  @override
+  String get approvedAt => 'Approved At';
+
+  @override
+  String get processedAt => 'Processed At';
+
+  @override
+  String get returnStatistics => 'Return Statistics';
+
+  @override
+  String get totalReturns => 'Total Returns';
+
+  @override
+  String get approvedReturns => 'Approved Returns';
+
+  @override
+  String get totalRefunds => 'Total Refunds';
+
+  @override
+  String get statusBreakdown => 'Status Breakdown';
+
+  @override
+  String returnDetails(String returnNumber) {
+    return 'Return Details - $returnNumber';
+  }
+
+  @override
+  String get saleInvoice => 'Sale Invoice';
+
+  @override
+  String refundDetails(String refundNumber) {
+    return 'Refund Details - $refundNumber';
+  }
+
+  @override
+  String get returnId => 'Return ID';
+
+  @override
+  String approveReturn(String returnNumber) {
+    return 'Approve Return - $returnNumber';
+  }
+
+  @override
+  String get areYouSureApproveReturn => 'Are you sure you want to approve this return?';
+
+  @override
+  String get approvalReasonOptional => 'Approval Reason (Optional)';
+
+  @override
+  String get returnApprovedSuccessfully => 'Return approved successfully';
+
+  @override
+  String processReturn(String returnNumber) {
+    return 'Process Return - $returnNumber';
+  }
+
+  @override
+  String get processReturnAndInitiateRefund => 'Process this return and initiate refund?';
+
+  @override
+  String get refundAmount => 'Refund Amount';
+
+  @override
+  String get refundMethod => 'Refund Method';
+
+  @override
+  String get refundMethodHint => 'e.g., Cash, Bank Transfer, etc.';
+
+  @override
+  String get returnProcessedSuccessfully => 'Return processed successfully';
+
+  @override
+  String get provideValidRefundAmountAndMethod => 'Please provide valid refund amount and method';
+
+  @override
+  String cancelReturn(String returnNumber) {
+    return 'Cancel Return - $returnNumber';
+  }
+
+  @override
+  String get areYouSureCancelReturn => 'Are you sure you want to cancel this return?';
+
+  @override
+  String get cancellationReasonRequired => 'Cancellation Reason (Required)';
+
+  @override
+  String get provideCancellationReason => 'Please provide a cancellation reason';
+
+  @override
+  String get returnCancelledSuccessfully => 'Return cancelled successfully';
+
+  @override
+  String editReturn(String returnNumber) {
+    return 'Edit Return - $returnNumber';
+  }
+
+  @override
+  String get returnUpdatedSuccessfully => 'Return updated successfully';
+
+  @override
+  String deleteReturn(String returnNumber) {
+    return 'Delete Return - $returnNumber';
+  }
+
+  @override
+  String get areYouSureDeleteReturn => 'Are you sure you want to delete this return?';
+
+  @override
+  String get returnDeletedSuccessfully => 'Return deleted successfully';
+
+  @override
+  String processRefund(String refundNumber) {
+    return 'Process Refund - $refundNumber';
+  }
+
+  @override
+  String get referenceNumberOptional => 'Reference Number (Optional)';
+
+  @override
+  String get processingNotesOptional => 'Processing Notes (Optional)';
+
+  @override
+  String get refundProcessedSuccessfully => 'Refund processed successfully';
+
+  @override
+  String get processRefundAction => 'Process Refund';
+
+  @override
+  String editRefund(String refundNumber) {
+    return 'Edit Refund - $refundNumber';
+  }
+
+  @override
+  String amountCannotBeChanged(String amount) {
+    return 'Amount: PKR $amount (Cannot be changed)';
+  }
+
+  @override
+  String get refundUpdatedSuccessfully => 'Refund updated successfully';
+
+  @override
+  String deleteRefund(String refundNumber) {
+    return 'Delete Refund - $refundNumber';
+  }
+
+  @override
+  String get areYouSureDeleteRefund => 'Are you sure you want to delete this refund?';
+
+  @override
+  String get refundDeletedSuccessfully => 'Refund deleted successfully';
+
+  @override
+  String get createNewSale => 'Create New Sale';
+
+  @override
+  String get pleaseEnterInvoiceNumber => 'Please enter an invoice number';
+
+  @override
+  String get pleaseEnterCustomerName => 'Please enter customer name';
+
+  @override
+  String get pleaseEnterCustomerPhone => 'Please enter customer phone';
+
+  @override
+  String get overallDiscountRs => 'Overall Discount (Rs.)';
+
+  @override
+  String get invoiced => 'INVOICED';
+
+  @override
+  String get saleItems => 'Sale Items';
+
+  @override
+  String get noSaleItemsAdded => 'No Sale Items Added';
+
+  @override
+  String get addItemsToSale => 'Add items to this sale';
+
+  @override
+  String get taxConfiguration => 'Tax Configuration';
+
+  @override
+  String get totalTax => 'Total Tax';
+
+  @override
+  String get createSale => 'Create Sale';
+
+  @override
+  String get addSaleItemFunctionalityToBeImplemented => 'Add Sale Item functionality to be implemented';
+
+  @override
+  String get pleaseAddAtLeastOneSaleItem => 'Please add at least one sale item';
+
+  @override
+  String errorSavingSale(String error) {
+    return 'Error saving sale: $error';
+  }
+
+  @override
+  String get reason => 'Reason';
+
+  @override
+  String get method => 'Method';
+
+  @override
+  String get process => 'Process';
+
+  @override
+  String get reference => 'Reference';
+
+  @override
+  String get refundNumber => 'Refund Number';
+
+  @override
+  String get saleDate => 'Sale Date';
+
+  @override
+  String get customerPhone => 'Customer Phone';
+
+  @override
+  String get summary => 'Summary';
+
+  @override
+  String get noSalesRecordsFound => 'No Sales Records Found';
+
+  @override
+  String get completeFirstSaleMessage => 'Complete your first sale to see transaction records here';
+
+  @override
+  String printReceiptFor(String invoice) {
+    return 'Print receipt for $invoice';
+  }
+
+  @override
+  String get addCustomTax => 'Add Custom Tax';
+
+  @override
+  String get refreshTaxRates => 'Refresh Tax Rates';
+
+  @override
+  String get noTaxRatesAvailable => 'No Tax Rates Available';
+
+  @override
+  String get contactAdministratorToSetupTaxRates => 'Contact administrator to set up tax rates';
+
+  @override
+  String get rate => 'Rate';
+
+  @override
+  String get totalTaxAmount => 'Total Tax Amount';
+
+  @override
+  String get totalTaxPercentage => 'Total Tax Percentage';
+
+  @override
+  String get addTax => 'Add Tax';
+
+  @override
+  String get saleDetails => 'Sale Details';
+
+  @override
+  String get saleInvoiceDetails => 'Sale Invoice Details';
+
+  @override
+  String get dateTime => 'Date & Time';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get noSplitPaymentDetails => 'No split payment details';
+
+  @override
+  String get overallDiscount => 'Overall Discount';
+
+  @override
+  String get notesRemarks => 'Notes & Remarks';
+
+  @override
+  String get noNotesAvailable => 'No notes available';
+
+  @override
+  String printingReceiptFor(String invoice) {
+    return 'Printing receipt for $invoice';
+  }
 }

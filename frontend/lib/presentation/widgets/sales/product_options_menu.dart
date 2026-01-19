@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -13,10 +14,18 @@ class ProductOptionsMenu extends StatelessWidget {
   final VoidCallback? onCreateCustomOrder;
   final VoidCallback? onApplyDiscount;
 
-  const ProductOptionsMenu({super.key, required this.product, this.onCustomizeAndAdd, this.onCreateCustomOrder, this.onApplyDiscount});
+  const ProductOptionsMenu({
+    super.key,
+    required this.product,
+    this.onCustomizeAndAdd,
+    this.onCreateCustomOrder,
+    this.onApplyDiscount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
@@ -34,7 +43,10 @@ class ProductOptionsMenu extends StatelessWidget {
               margin: EdgeInsets.only(top: context.smallPadding / 2),
               width: 40,
               height: 4,
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
 
             // Header
@@ -45,8 +57,15 @@ class ProductOptionsMenu extends StatelessWidget {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(context.borderRadius())),
-                    child: Icon(Icons.checkroom_outlined, color: Colors.grey[500], size: context.iconSize('medium')),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                    ),
+                    child: Icon(
+                      Icons.checkroom_outlined,
+                      color: Colors.grey[500],
+                      size: context.iconSize('medium'),
+                    ),
                   ),
                   SizedBox(width: context.cardPadding),
                   Expanded(
@@ -55,13 +74,21 @@ class ProductOptionsMenu extends StatelessWidget {
                       children: [
                         Text(
                           product.name,
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: GoogleFonts.inter(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.charcoalGray,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'PKR ${product.price.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primaryMaroon,
+                          ),
                         ),
                       ],
                     ),
@@ -76,30 +103,40 @@ class ProductOptionsMenu extends StatelessWidget {
                 _buildOptionTile(
                   context,
                   icon: Icons.add_shopping_cart_rounded,
-                  title: 'Add to Cart',
-                  subtitle: 'Quick add with default options',
+                  title: l10n.addToCart,
+                  subtitle: l10n.quickAddWithDefaultOptions,
                   color: AppTheme.primaryMaroon,
                   onTap: () {
                     Navigator.of(context).pop();
                     Provider.of<SalesProvider>(
                       context,
                       listen: false,
-                    ).addToCartWithCustomization(productId: product.id, productName: product.name, unitPrice: product.price, quantity: 1);
+                    ).addToCartWithCustomization(
+                      productId: product.id,
+                      productName: product.name,
+                      unitPrice: product.price,
+                      quantity: 1,
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
                           children: [
-                            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
+                            const Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
                             SizedBox(width: context.smallPadding),
                             Expanded(
-                              child: Text('${product.name} added to cart', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+                              child: Text(
+                                '${product.name} ${l10n.addToCart}',
+                                style: GoogleFonts.inter(color: AppTheme.pureWhite),
+                              ),
                             ),
                           ],
                         ),
                         backgroundColor: Colors.green,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(context.borderRadius()),
+                        ),
                       ),
                     );
                   },
@@ -107,8 +144,8 @@ class ProductOptionsMenu extends StatelessWidget {
                 _buildOptionTile(
                   context,
                   icon: Icons.tune_rounded,
-                  title: 'Customize & Add',
-                  subtitle: 'Set size, quality, embroidery, and options',
+                  title: l10n.customizeAndAdd,
+                  subtitle: l10n.setSizeQualityEmbroidery,
                   color: Colors.blue,
                   onTap: () {
                     Navigator.of(context).pop();
@@ -120,8 +157,8 @@ class ProductOptionsMenu extends StatelessWidget {
                 _buildOptionTile(
                   context,
                   icon: Icons.local_offer_rounded,
-                  title: 'Apply Discount',
-                  subtitle: 'Add discount before adding to cart',
+                  title: l10n.applyDiscount,
+                  subtitle: l10n.applyDiscountBeforeAdding,
                   color: Colors.orange,
                   onTap: () {
                     Navigator.of(context).pop();
@@ -133,8 +170,8 @@ class ProductOptionsMenu extends StatelessWidget {
                 _buildOptionTile(
                   context,
                   icon: Icons.assignment_rounded,
-                  title: 'Create Custom Order',
-                  subtitle: 'Schedule delivery and take advance',
+                  title: l10n.createCustomOrder,
+                  subtitle: l10n.scheduleDeliveryAndAdvance,
                   color: Colors.purple,
                   onTap: () {
                     Navigator.of(context).pop();
@@ -154,24 +191,30 @@ class ProductOptionsMenu extends StatelessWidget {
   }
 
   Widget _buildOptionTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required String subtitle,
+        required Color color,
+        required VoidCallback onTap,
+      }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.cardPadding / 2,
+            vertical: context.cardPadding / 2,
+          ),
           child: Row(
             children: [
               Container(
                 padding: EdgeInsets.all(context.smallPadding / 1.5),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                ),
                 child: Icon(icon, color: color, size: context.iconSize('medium')),
               ),
               SizedBox(width: context.cardPadding),
@@ -181,16 +224,27 @@ class ProductOptionsMenu extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.charcoalGray,
+                      ),
                     ),
                     Text(
                       subtitle,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: GoogleFonts.inter(
+                        fontSize: context.captionFontSize,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey[400], size: context.iconSize('small')),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.grey[400],
+                size: context.iconSize('small'),
+              ),
             ],
           ),
         ),

@@ -653,7 +653,6 @@
   "totalEntries": "Total Entries",
   "totalCredits": "Total Credits",
   "totalDebits": "Total Debits",
-
   "credits": "Credits",
   "debits": "Debits",
   "searchLedgerEntries": "Search ledger entries...",
@@ -752,16 +751,26 @@
   "showingZakatRecords": "Showing {start}-{end} of {total} zakat records",
   "@showingZakatRecords": {
     "placeholders": {
-      "start": {"type": "int"},
-      "end": {"type": "int"},
-      "total": {"type": "int"}
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "pageOfPages": "{current} of {total}",
   "@pageOfPages": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"}
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "filterZakatRecords": "Filter Zakat Records",
@@ -1774,7 +1783,6 @@
   "hasCustomizationNotes": "Has Customization Notes",
   "sortingOptions": "Sorting Options",
   "updatedDate": "Updated Date",
-
   "areYouSureYouWantTo": "Are you sure you want to",
   "areYouSureYouWantToCreateACopyOf": "Are you sure you want to create a copy of",
   "failedToUpdateItemStatus": "Failed to update item status",
@@ -1875,7 +1883,6 @@
   "searchAdvancePayments": "Search advance payments...",
   "allLaborers": "All Laborers",
   "receiptAndSorting": "Receipt & Sorting",
-
   "showInactiveRecords": "Show Inactive Records",
   "showingAdvancePayments": "Showing {start}-{end} of {total} advance payments",
   "failedToLoadAdvancePayments": "Failed to Load Advance Payments",
@@ -1904,7 +1911,6 @@
   "salaryInformation": "Salary Information",
   "totalSalary": "Total Salary",
   "viewReceiptDetailsAndImage": "View receipt details and image",
-
   "ofSalary": "of salary",
   "used": "used",
   "receiptImagePreview": "Receipt Image Preview",
@@ -1928,20 +1934,14 @@
   "sourceID": "Source ID",
   "referenceIDOptional": "Reference ID (optional)",
   "referenceIDFromSourceModuleOptional": "Reference ID from source module (optional)",
-
   "enterTransactionDescription": "Enter transaction description",
-
   "enterTransactionAmountPKR": "Enter transaction amount (PKR)",
-
   "handledByOptional": "Handled By (Optional)",
-
   "selectTransactionDateTime": "Select Transaction Date & Time",
-
   "additionalNotesOrDetailsOptional": "Additional notes or details (optional)",
   "principalAccountEntryAddedSuccessfully": "Principal account entry added successfully!",
   "principalAccountDetails": "Principal Account Details",
   "viewCompleteTransactionInformation": "View complete transaction information",
-
   "sourceModuleInformation": "Source Module Information",
   "module": "Module",
   "balanceInformation": "Balance Information",
@@ -1976,115 +1976,576 @@
   "enableDarkThemeForApplication": "Enable dark theme for the application",
   "alNoorFashionPOS": "Al Noor Fashion POS",
   "version": "Version",
-  "aPremiumPointOfSaleSolution": "A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "aPremiumPointOfSaleSolution": "A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.",
+  "createNewReturn": "Create New Return",
+  "enterSaleId": "Enter sale ID",
+  "saleIdRequired": "Sale ID is required",
+  "customerId": "Customer ID",
+  "enterCustomerId": "Enter customer ID",
+  "customerIdRequired": "Customer ID is required",
+  "returnReason": "Return Reason",
+  "selectReason": "Select a reason",
+  "reasonDefective": "Defective Product",
+  "reasonWrongSize": "Wrong Size",
+  "reasonWrongColor": "Wrong Color",
+  "reasonQualityIssue": "Quality Issue",
+  "reasonChangeMind": "Customer Changed Mind",
+  "reasonDamagedTransit": "Damaged in Transit",
+  "reasonOther": "Other",
+  "selectReturnReason": "Please select a return reason",
+  "reasonDetails": "Reason Details",
+  "specifyReason": "Please specify the reason",
+  "provideReasonDetails": "Please provide reason details",
+  "returnItems": "Return Items",
+  "noItemsAdded": "No return items added",
+  "clickAddItem": "Click \"Add Item\" to add items to return",
+  "@item": {
+    "placeholders": {
+      "itemNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "removeItem": "Remove Item",
+  "saleItemId": "Sale Item ID",
+  "enterSaleItemId": "Enter sale item ID",
+  "saleItemIdRequired": "Sale item ID is required",
+  "quantityRequired": "Quantity is required",
+  "quantityPositive": "Quantity must be a positive number",
+  "condition": "Condition",
+  "selectCondition": "Select condition",
+  "conditionNew": "New",
+  "conditionGood": "Good",
+  "conditionFair": "Fair",
+  "conditionPoor": "Poor",
+  "conditionDamaged": "Damaged",
+  "selectConditionError": "Please select condition",
+  "conditionNotes": "Condition Notes",
+  "conditionNotesHint": "Additional notes about condition",
+  "notesHint": "Any additional notes about the return",
+  "createReturn": "Create Return",
+  "addOneItem": "Please add at least one return item",
+  "createdSuccessfully": "Return created successfully",
+  "failedToCreate": "Failed to create return",
+  "errorCreating": "Error creating return: {error}",
+  "@errorCreating": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@customizedAddedToCart": {
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      }
+    }
+  },
+  "@stockAvailable": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "none": "None",
+  "red": "Red",
+  "blue": "Blue",
+  "green": "Green",
+  "purple": "Purple",
+  "pink": "Pink",
+  "orange": "Orange",
+  "customizeAndAdd": "Customize & Add",
+  "customizedAddedToCart": "Customized {productName} added to cart",
+  "quantityAndPricing": "Quantity & Pricing",
+  "@maxQuantity": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "enterValidPrice": "Please enter a valid price",
+  "@clearDiscount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sizeAndFitting": "Size & Fitting",
+  "fitting": "Fitting",
+  "fittingStyle": "Fitting Style",
+  "customizationOptions": "Customization Options",
+  "embroideryWork": "Embroidery Work",
+  "embroidery": "Embroidery",
+  "fabricQuality": "Fabric Quality",
+  "accentColor": "Accent Color",
+  "additionalServices": "Additional Services",
+  "expressDelivery": "Express Delivery",
+  "expressDeliveryDesc": "Get your order in 2-3 days (+PKR 1,000)",
+  "expressDeliveryRequired": "Express Delivery Required",
+  "giftWrapping": "Gift Wrapping",
+  "giftWrappingDesc": "Beautiful gift packaging (+PKR 500)",
+  "giftWrappingRequired": "Gift Wrapping Required",
+  "additionalRequirements": "Additional Requirements",
+  "additionalRequirementsHint": "Any special requirements, measurements, design preferences, or delivery instructions...",
+  "basePriceQuantity": "Base Price × {quantity}:",
+  "@basePriceQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "customSizeLabel": "Custom Size",
+  "customTailoring": "Custom Tailoring",
+  "slimFit": "Slim Fit",
+  "subtotalWithCustomizations": "Subtotal with Customizations:",
+  "itemDiscount": "Item Discount:",
+  "youSave": "You save PKR {amount}",
+  "@youSave": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSale": "Delete Sale",
+  "deleteSaleRecord": "Delete Sale Record",
+  "areYouSureDeleteSale": "Are you sure you want to delete this sale?",
+  "areYouAbsolutelySure": "Are you absolutely sure you want to delete this sale record?",
+  "permanentDeleteWarningShort": "This will permanently delete the sale record and all associated data.",
+  "permanentDeleteWarningLong": "This will permanently delete the sale record, payment information, and all associated data. This action cannot be undone.",
+  "deleting": "Deleting...",
+  "deleteSaleButton": "Delete Sale",
+  "saleDeletedSuccessfully": "Sale record deleted successfully!",
+  "editInvoice": "Edit Invoice",
+  "editInvoiceWithNumber": "Edit Invoice - {invoiceNumber}",
+  "@editInvoiceWithNumber": {
+    "placeholders": {
+      "invoiceNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "statusRequired": "Status *",
+  "selectInvoiceStatus": "Select invoice status",
+  "pleaseSelectStatus": "Please select a status",
+  "clearDueDate": "Clear due date",
+  "additionalInvoiceNotes": "Additional invoice notes (optional)",
+  "invoiceTermsConditions": "Invoice terms and conditions",
+  "standardTermsConditions": "Standard terms and conditions apply",
+  "updateInvoice": "Update Invoice",
+  "invoiceUpdatedSuccessfully": "Invoice updated successfully",
+  "failedToUpdateInvoice": "Failed to update invoice",
+  "editReceipt": "Edit Receipt",
+  "editReceiptWithNumber": "Edit Receipt - {receiptNumber}",
+  "@editReceiptWithNumber": {
+    "placeholders": {
+      "receiptNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateReceipt": "Failed to update receipt",
+  "editSale": "Edit Sale",
+  "editSaleDetails": "Edit Sale Details",
+  "saleSummaryReadOnly": "Sale Summary (Read-Only)",
+  "itemsCount": "{count} items",
+  "@itemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gst": "GST",
+  "editableFields": "Editable Fields",
+  "amountPaidPkr": "Amount Paid (PKR)",
+  "enterAmountPaid": "Please enter amount paid",
+  "partialStatus": "Partial",
+  "unpaidStatus": "Unpaid",
+  "specialInstructionsOrRemarks": "Any special instructions or remarks...",
+  "amountPaying": "Amount Paying",
+  "updateSale": "Update Sale",
+  "saleUpdatedSuccessfully": "Sale updated successfully!",
+  "existingOrders": "Existing Orders",
+  "deliveryDate": "Delivery Date",
+  "pendingStatus": "Pending",
+  "inProgressStatus": "In Progress",
+  "completedStatus": "Completed",
+  "deliveredStatus": "Delivered",
+  "cancelledStatus": "Cancelled",
+  "productAddedToOrder": "{productName} added to order {orderId}",
+  "@productAddedToOrder": {
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      },
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "searchByInvoiceNumberCustomerOrSale": "Search by invoice number, customer, or sale",
+  "noInvoicesFound": "No invoices found",
+  "createNewInvoiceUsingButton": "Create a new invoice using the + button",
+  "generatePdf": "Generate PDF",
+  "invoiceDetails": "Invoice Details",
+  "invoiceDetailsWithNumber": "Invoice Details - {invoiceNumber}",
+  "@invoiceDetailsWithNumber": {
+    "placeholders": {
+      "invoiceNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "saleInvoiceNumber": "Sale Invoice Number",
+  "issueDate": "Issue Date",
+  "invoicePdfGeneratedSuccessfully": "Invoice PDF generated successfully",
+  "deleteInvoiceWithNumber": "Delete Invoice - {invoiceNumber}",
+  "@deleteInvoiceWithNumber": {
+    "placeholders": {
+      "invoiceNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureDeleteInvoice": "Are you sure you want to delete this invoice?",
+  "invoiceDeletedSuccessfully": "Invoice deleted successfully",
+  "orderCreated": "Order Created!",
+  "customOrderCreatedSuccessfully": "Custom order created successfully",
+  "advanceReceived": "Advance Received:",
+  "printOrder": "Print Order",
+  "done": "Done",
+  "printFunctionalityWillBeImplemented": "Print functionality will be implemented",
+  "paymentConfirmation": "Payment Confirmation",
+  "paymentComplete": "Payment Complete",
+  "paymentInProgress": "Payment in Progress",
+  "previouslyPaid": "Previously Paid:",
+  "thisPayment": "This Payment:",
+  "newBalance": "New Balance:",
+  "creditDebitCard": "Credit/Debit Card",
+  "mobilePayment": "Mobile Payment",
+  "check": "Check",
+  "amountExceedsBalance": "Amount exceeds remaining balance",
+  "referenceOptional": "Reference (Optional)",
+  "transactionReferenceOrReceipt": "Transaction reference or receipt number",
+  "additionalNotesAboutPayment": "Additional notes about this payment",
+  "confirmPayment": "Confirm Payment",
+  "paymentConfirmed": "Payment Confirmed",
+  "paymentProcessedSuccessfully": "Payment has been processed successfully!",
+  "continue_": "Continue",
+  "paymentError": "Payment Error",
+  "invalidPaymentAmount": "Invalid payment amount. Please check the amount and try again.",
+  "paymentProcessingFailed": "Payment processing failed. Please try again.",
+  "errorOccurred": "An error occurred: {error}",
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentWorkflowDashboard": "Payment Workflow Dashboard",
+  "refreshDashboard": "Refresh Dashboard",
+  "noDataAvailable": "No data available",
+  "pendingPayments": "Pending Payments",
+  "completionRate": "Completion Rate",
+  "paymentProgressOverview": "Payment Progress Overview",
+  "paymentCompletion": "Payment Completion",
+  "recentWorkflowActivities": "Recent Workflow Activities",
+  "minutesAgo": "{minutes}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "collected": "Collected",
+  "updateSaleStatus": "Update Sale Status",
+  "selectActionToPerform": "Select an action to perform:",
+  "cancelSale": "Cancel Sale",
+  "returnSale": "Return Sale",
+  "unknownAction": "Unknown Action",
+  "processAdditionalPayment": "Process additional payment for this sale",
+  "markSaleAsDelivered": "Mark the sale as delivered to customer",
+  "cancelSaleAndRestoreInventory": "Cancel this sale and restore inventory",
+  "processReturnForDeliveredSale": "Process return for delivered sale",
+  "noDescriptionAvailable": "No description available",
+  "markedAsDelivered": "Marked as delivered",
+  "saleCancelled": "Sale cancelled",
+  "saleReturned": "Sale returned",
+  "awaitingPayment": "Awaiting Payment",
+  "partialPayment": "Partial Payment",
+  "moreActions": "More Actions",
+  "applyDiscount": "Apply Discount",
+  "quickDiscounts": "Quick Discounts",
+  "originalPrice": "Original Price:",
+  "finalPrice": "Final Price:",
+  "addWithDiscount": "Add with Discount",
+  "addedWithDiscount": "Added {productName} with {discount} discount",
+  "@addedWithDiscount": {
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      },
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddWithDefaultOptions": "Quick add with default options",
+  "setSizeQualityEmbroidery": "Set size, quality, embroidery, and options",
+  "applyDiscountBeforeAdding": "Add discount before adding to cart",
+  "createCustomOrder": "Create Custom Order",
+  "scheduleDeliveryAndAdvance": "Schedule delivery and take advance",
+  "searchByReceiptCustomerPayment": "Search by receipt number, customer, or payment",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewReceiptUsingButton": "Create a new receipt using the + button",
+  "receiptDetails": "Receipt Details - {receiptNumber}",
+  "@receiptDetails": {
+    "placeholders": {
+      "receiptNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptNumber": "Receipt Number",
+  "generatedAt": "Generated At",
+  "deleteReceipt": "Delete Receipt - {receiptNumber}",
+  "@deleteReceipt": {
+    "placeholders": {
+      "receiptNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureDeleteReceipt": "Are you sure you want to delete this receipt?",
+  "refunds": "Refunds",
+  "searchByReturnCustomerInvoice": "Search by return number, customer, or invoice",
+  "allReasons": "All Reasons",
+  "defective": "Defective",
+  "wrongSize": "Wrong Size",
+  "wrongColor": "Wrong Color",
+  "qualityIssue": "Quality Issue",
+  "customerChangedMind": "Customer Changed Mind",
+  "damagedInTransit": "Damaged in Transit",
+  "approved": "Approved",
+  "processed": "Processed",
+  "rejected": "Rejected",
+  "noReturnsFound": "No returns found",
+  "createNewReturnUsingButton": "Create a new return using the + button",
+  "noRefundsFound": "No refunds found",
+  "refundsWillAppearHere": "Refunds will appear here when returns are processed",
+  "approve": "Approve",
+  "approvedAt": "Approved At",
+  "processedAt": "Processed At",
+  "returnStatistics": "Return Statistics",
+  "totalReturns": "Total Returns",
+  "approvedReturns": "Approved Returns",
+  "totalRefunds": "Total Refunds",
+  "statusBreakdown": "Status Breakdown",
+  "returnDetails": "Return Details - {returnNumber}",
+  "@returnDetails": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "saleInvoice": "Sale Invoice",
+  "refundDetails": "Refund Details - {refundNumber}",
+  "@refundDetails": {
+    "placeholders": {
+      "refundNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "returnId": "Return ID",
+  "approveReturn": "Approve Return - {returnNumber}",
+  "@approveReturn": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureApproveReturn": "Are you sure you want to approve this return?",
+  "approvalReasonOptional": "Approval Reason (Optional)",
+  "returnApprovedSuccessfully": "Return approved successfully",
+  "processReturn": "Process Return - {returnNumber}",
+  "@processReturn": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "processReturnAndInitiateRefund": "Process this return and initiate refund?",
+  "refundAmount": "Refund Amount",
+  "refundMethod": "Refund Method",
+  "refundMethodHint": "e.g., Cash, Bank Transfer, etc.",
+  "returnProcessedSuccessfully": "Return processed successfully",
+  "provideValidRefundAmountAndMethod": "Please provide valid refund amount and method",
+  "cancelReturn": "Cancel Return - {returnNumber}",
+  "@cancelReturn": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureCancelReturn": "Are you sure you want to cancel this return?",
+  "cancellationReasonRequired": "Cancellation Reason (Required)",
+  "provideCancellationReason": "Please provide a cancellation reason",
+  "returnCancelledSuccessfully": "Return cancelled successfully",
+  "editReturn": "Edit Return - {returnNumber}",
+  "@editReturn": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "returnUpdatedSuccessfully": "Return updated successfully",
+  "deleteReturn": "Delete Return - {returnNumber}",
+  "@deleteReturn": {
+    "placeholders": {
+      "returnNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureDeleteReturn": "Are you sure you want to delete this return?",
+  "returnDeletedSuccessfully": "Return deleted successfully",
+  "processRefund": "Process Refund - {refundNumber}",
+  "@processRefund": {
+    "placeholders": {
+      "refundNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "referenceNumberOptional": "Reference Number (Optional)",
+  "processingNotesOptional": "Processing Notes (Optional)",
+  "refundProcessedSuccessfully": "Refund processed successfully",
+  "processRefundAction": "Process Refund",
+  "editRefund": "Edit Refund - {refundNumber}",
+  "@editRefund": {
+    "placeholders": {
+      "refundNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "amountCannotBeChanged": "Amount: PKR {amount} (Cannot be changed)",
+  "@amountCannotBeChanged": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "refundUpdatedSuccessfully": "Refund updated successfully",
+  "deleteRefund": "Delete Refund - {refundNumber}",
+  "@deleteRefund": {
+    "placeholders": {
+      "refundNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSureDeleteRefund": "Are you sure you want to delete this refund?",
+  "refundDeletedSuccessfully": "Refund deleted successfully",
+  "createNewSale": "Create New Sale",
+  "pleaseEnterInvoiceNumber": "Please enter an invoice number",
+  "pleaseEnterCustomerName": "Please enter customer name",
+  "pleaseEnterCustomerPhone": "Please enter customer phone",
+  "overallDiscountRs": "Overall Discount (Rs.)",
+  "invoiced": "INVOICED",
+  "saleItems": "Sale Items",
+  "noSaleItemsAdded": "No Sale Items Added",
+  "addItemsToSale": "Add items to this sale",
+  "@qty": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "taxConfiguration": "Tax Configuration",
+  "totalTax": "Total Tax",
+  "createSale": "Create Sale",
+  "addSaleItemFunctionalityToBeImplemented": "Add Sale Item functionality to be implemented",
+  "pleaseAddAtLeastOneSaleItem": "Please add at least one sale item",
+  "errorSavingSale": "Error saving sale: {error}",
+  "@errorSavingSale": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reason": "Reason",
+  "method": "Method",
+  "process": "Process",
+  "reference": "Reference",
+  "refundNumber": "Refund Number",
+  "saleDate": "Sale Date",
+  "customerPhone": "Customer Phone",
+  "summary": "Summary",
+  "noSalesRecordsFound": "No Sales Records Found",
+  "completeFirstSaleMessage": "Complete your first sale to see transaction records here",
+  "printReceiptFor": "Print receipt for {invoice}",
+  "@printReceiptFor": {
+    "placeholders": {
+      "invoice": {
+        "type": "String"
+      }
+    }
+  },
+  "addCustomTax": "Add Custom Tax",
+  "refreshTaxRates": "Refresh Tax Rates",
+  "noTaxRatesAvailable": "No Tax Rates Available",
+  "contactAdministratorToSetupTaxRates": "Contact administrator to set up tax rates",
+  "rate": "Rate",
+  "totalTaxAmount": "Total Tax Amount",
+  "totalTaxPercentage": "Total Tax Percentage",
+  "addTax": "Add Tax",
+  "saleDetails": "Sale Details",
+  "saleInvoiceDetails": "Sale Invoice Details",
+  "dateTime": "Date & Time",
+  "note": "Note",
+  "noSplitPaymentDetails": "No split payment details",
+  "overallDiscount": "Overall Discount",
+  "notesRemarks": "Notes & Remarks",
+  "noNotesAvailable": "No notes available",
+  "printingReceiptFor": "Printing receipt for {invoice}",
+  "@printingReceiptFor": {
+    "placeholders": {
+      "invoice": {
+        "type": "String"
+      }
+    }
+  }
 
 }

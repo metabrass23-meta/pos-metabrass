@@ -228,7 +228,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get noData => 'کوئی ڈیٹا دستیاب نہیں';
 
   @override
-  String get error => 'خرابی';
+  String error(String error) {
+    return 'خرابی';
+  }
 
   @override
   String get success => 'کامیابی';
@@ -927,7 +929,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get costPriceInfo => 'لاگت قیمت کی ترتیب منافع کے مارجن کی گنتی اور بہتر مالیاتی تجزیہ کو فعال کرتی ہے';
 
   @override
-  String get qty => 'مقدار';
+  String qty(int quantity) {
+    return 'مقدار';
+  }
 
   @override
   String get colorName => 'رنگ کا نام';
@@ -3868,7 +3872,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get noPhone => 'فون نہیں';
 
   @override
-  String get item => 'آئٹم';
+  String item(int itemNumber) {
+    return 'آئٹم';
+  }
 
   @override
   String get noItems => 'کوئی آئٹمز نہیں';
@@ -4850,7 +4856,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get minimumQuantity => 'کم سے کم مقدار';
 
   @override
-  String get maxQuantity => 'زیادہ سے زیادہ مقدار';
+  String maxQuantity(int max) {
+    return 'زیادہ سے زیادہ مقدار';
+  }
 
   @override
   String get maximumQuantity => 'زیادہ سے زیادہ مقدار';
@@ -4976,7 +4984,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get addedToCart => 'کارٹ میں شامل کیا گیا';
 
   @override
-  String get stockAvailable => 'اسٹاک';
+  String stockAvailable(int quantity) {
+    return 'اسٹاک';
+  }
 
   @override
   String get min => 'کم از کم';
@@ -4991,7 +5001,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get itemDiscountOptional => 'آئٹم ڈسکاؤنٹ (اختیاری)';
 
   @override
-  String get clearDiscount => 'ڈسکاؤنٹ صاف کریں';
+  String clearDiscount(String amount) {
+    return 'ڈسکاؤنٹ صاف کریں';
+  }
 
   @override
   String get specialInstructions => 'خصوصی ہدایات';
@@ -5471,4 +5483,1000 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get aPremiumPointOfSaleSolution => 'فیشن ریٹیل کاروبار کے لیے ایک پریمیم پوائنٹ آف سیل حل۔ اپنی انوینٹری، گاہکوں اور فروخت کو خوبصورتی سے منظم کریں۔';
+
+  @override
+  String get createNewReturn => 'نیا واپسی بنائیں';
+
+  @override
+  String get enterSaleId => 'فروخت آئی ڈی درج کریں';
+
+  @override
+  String get saleIdRequired => 'فروخت آئی ڈی ضروری ہے';
+
+  @override
+  String get customerId => 'کسٹمر آئی ڈی';
+
+  @override
+  String get enterCustomerId => 'کسٹمر آئی ڈی درج کریں';
+
+  @override
+  String get customerIdRequired => 'کسٹمر آئی ڈی ضروری ہے';
+
+  @override
+  String get returnReason => 'واپسی کی وجہ';
+
+  @override
+  String get selectReason => 'وجہ منتخب کریں';
+
+  @override
+  String get reasonDefective => 'خراب پروڈکٹ';
+
+  @override
+  String get reasonWrongSize => 'غلط سائز';
+
+  @override
+  String get reasonWrongColor => 'غلط رنگ';
+
+  @override
+  String get reasonQualityIssue => 'معیار کا مسئلہ';
+
+  @override
+  String get reasonChangeMind => 'کسٹمر نے رائے بدلی';
+
+  @override
+  String get reasonDamagedTransit => 'ٹرانزٹ میں خراب';
+
+  @override
+  String get reasonOther => 'دیگر';
+
+  @override
+  String get selectReturnReason => 'براہ کرم واپسی کی وجہ منتخب کریں';
+
+  @override
+  String get reasonDetails => 'وجہ کی تفصیلات';
+
+  @override
+  String get specifyReason => 'براہ کرم وجہ بتائیں';
+
+  @override
+  String get provideReasonDetails => 'براہ کرم وجہ کی تفصیلات فراہم کریں';
+
+  @override
+  String get returnItems => 'واپسی کی اشیاء';
+
+  @override
+  String get noItemsAdded => 'کوئی واپسی کی اشیاء شامل نہیں';
+
+  @override
+  String get clickAddItem => 'واپسی کے لیے اشیاء شامل کرنے کے لیے \"شے شامل کریں\" پر کلک کریں';
+
+  @override
+  String get removeItem => 'شے ہٹائیں';
+
+  @override
+  String get saleItemId => 'فروخت شے آئی ڈی';
+
+  @override
+  String get enterSaleItemId => 'فروخت شے آئی ڈی درج کریں';
+
+  @override
+  String get saleItemIdRequired => 'فروخت شے آئی ڈی ضروری ہے';
+
+  @override
+  String get quantityRequired => 'مقدار ضروری ہے';
+
+  @override
+  String get quantityPositive => 'مقدار ایک مثبت نمبر ہونی چاہیے';
+
+  @override
+  String get condition => 'حالت';
+
+  @override
+  String get selectCondition => 'حالت منتخب کریں';
+
+  @override
+  String get conditionNew => 'نیا';
+
+  @override
+  String get conditionGood => 'اچھا';
+
+  @override
+  String get conditionFair => 'ٹھیک ٹھاک';
+
+  @override
+  String get conditionPoor => 'خراب';
+
+  @override
+  String get conditionDamaged => 'تباہ شدہ';
+
+  @override
+  String get selectConditionError => 'براہ کرم حالت منتخب کریں';
+
+  @override
+  String get conditionNotes => 'حالت کے نوٹس';
+
+  @override
+  String get conditionNotesHint => 'حالت کے بارے میں اضافی نوٹس';
+
+  @override
+  String get notesHint => 'واپسی کے بارے میں کوئی اضافی نوٹس';
+
+  @override
+  String get createReturn => 'واپسی بنائیں';
+
+  @override
+  String get addOneItem => 'براہ کرم کم از کم ایک واپسی شے شامل کریں';
+
+  @override
+  String get createdSuccessfully => 'واپسی کامیابی سے بنائی گئی';
+
+  @override
+  String get failedToCreate => 'واپسی بنانے میں ناکام';
+
+  @override
+  String errorCreating(String error) {
+    return 'واپسی بنانے میں خرابی: $error';
+  }
+
+  @override
+  String get none => 'کوئی نہیں';
+
+  @override
+  String get red => 'سرخ';
+
+  @override
+  String get blue => 'نیلا';
+
+  @override
+  String get green => 'سبز';
+
+  @override
+  String get purple => 'جامنی';
+
+  @override
+  String get pink => 'گلابی';
+
+  @override
+  String get orange => 'نارنجی';
+
+  @override
+  String get customizeAndAdd => 'تخصیص اور شامل کریں';
+
+  @override
+  String customizedAddedToCart(String productName) {
+    return 'تخصیص شدہ $productName کارٹ میں شامل ہوگیا';
+  }
+
+  @override
+  String get quantityAndPricing => 'مقدار اور قیمت';
+
+  @override
+  String get enterValidPrice => 'براہ کرم درست قیمت درج کریں';
+
+  @override
+  String get sizeAndFitting => 'سائز اور فٹنگ';
+
+  @override
+  String get fitting => 'فٹنگ';
+
+  @override
+  String get fittingStyle => 'فٹنگ سٹائل';
+
+  @override
+  String get customizationOptions => 'تخصیص کے اختیارات';
+
+  @override
+  String get embroideryWork => 'کڑھائی کا کام';
+
+  @override
+  String get embroidery => 'کڑھائی';
+
+  @override
+  String get fabricQuality => 'کپڑے کا معیار';
+
+  @override
+  String get accentColor => 'لہجے کا رنگ';
+
+  @override
+  String get additionalServices => 'اضافی خدمات';
+
+  @override
+  String get expressDelivery => 'فوری ترسیل';
+
+  @override
+  String get expressDeliveryDesc => '2-3 دنوں میں اپنا آرڈر حاصل کریں (+PKR 1,000)';
+
+  @override
+  String get expressDeliveryRequired => 'فوری ترسیل مطلوب';
+
+  @override
+  String get giftWrapping => 'تحفہ لپیٹنا';
+
+  @override
+  String get giftWrappingDesc => 'خوبصورت تحفہ پیکیجنگ (+PKR 500)';
+
+  @override
+  String get giftWrappingRequired => 'تحفہ لپیٹنا مطلوب';
+
+  @override
+  String get additionalRequirements => 'اضافی ضروریات';
+
+  @override
+  String get additionalRequirementsHint => 'کوئی خاص ضروریات، پیمائش، ڈیزائن ترجیحات، یا ترسیل کی ہدایات...';
+
+  @override
+  String basePriceQuantity(int quantity) {
+    return 'بنیادی قیمت × $quantity:';
+  }
+
+  @override
+  String get customSizeLabel => 'اپنی مرضی کا سائز';
+
+  @override
+  String get customTailoring => 'اپنی مرضی کی درزی';
+
+  @override
+  String get slimFit => 'سلم فٹ';
+
+  @override
+  String get subtotalWithCustomizations => 'تخصیص کے ساتھ ذیلی کل:';
+
+  @override
+  String get itemDiscount => 'شے کی رعایت:';
+
+  @override
+  String youSave(String amount) {
+    return 'آپ PKR $amount بچاتے ہیں';
+  }
+
+  @override
+  String get deleteSale => 'فروخت حذف کریں';
+
+  @override
+  String get deleteSaleRecord => 'فروخت کا ریکارڈ حذف کریں';
+
+  @override
+  String get areYouSureDeleteSale => 'کیا آپ واقعی اس فروخت کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get areYouAbsolutelySure => 'کیا آپ واقعی یقین سے اس فروخت کے ریکارڈ کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get permanentDeleteWarningShort => 'یہ فروخت کے ریکارڈ اور تمام منسلک ڈیٹا کو مستقل طور پر حذف کر دے گا۔';
+
+  @override
+  String get permanentDeleteWarningLong => 'یہ فروخت کے ریکارڈ، ادائیگی کی معلومات، اور تمام منسلک ڈیٹا کو مستقل طور پر حذف کر دے گا۔ اس عمل کو کالعدم نہیں کیا جا سکتا۔';
+
+  @override
+  String get deleting => 'حذف کیا جا رہا ہے...';
+
+  @override
+  String get deleteSaleButton => 'فروخت حذف کریں';
+
+  @override
+  String get saleDeletedSuccessfully => 'فروخت کا ریکارڈ کامیابی سے حذف کر دیا گیا!';
+
+  @override
+  String get editInvoice => 'رسید میں ترمیم کریں';
+
+  @override
+  String editInvoiceWithNumber(String invoiceNumber) {
+    return 'رسید میں ترمیم کریں - $invoiceNumber';
+  }
+
+  @override
+  String get statusRequired => 'حیثیت *';
+
+  @override
+  String get selectInvoiceStatus => 'رسید کی حیثیت منتخب کریں';
+
+  @override
+  String get pleaseSelectStatus => 'براہ کرم حیثیت منتخب کریں';
+
+  @override
+  String get clearDueDate => 'مقررہ تاریخ صاف کریں';
+
+  @override
+  String get additionalInvoiceNotes => 'اضافی رسید نوٹس (اختیاری)';
+
+  @override
+  String get invoiceTermsConditions => 'رسید کی شرائط و ضوابط';
+
+  @override
+  String get standardTermsConditions => 'معیاری شرائط و ضوابط لاگو ہوتی ہیں';
+
+  @override
+  String get updateInvoice => 'رسید اپ ڈیٹ کریں';
+
+  @override
+  String get invoiceUpdatedSuccessfully => 'رسید کامیابی سے اپ ڈیٹ ہوگئی';
+
+  @override
+  String get failedToUpdateInvoice => 'رسید اپ ڈیٹ کرنے میں ناکام';
+
+  @override
+  String get editReceipt => 'رسید میں ترمیم کریں';
+
+  @override
+  String editReceiptWithNumber(String receiptNumber) {
+    return 'رسید میں ترمیم کریں - $receiptNumber';
+  }
+
+  @override
+  String get failedToUpdateReceipt => 'رسید اپ ڈیٹ کرنے میں ناکام';
+
+  @override
+  String get editSale => 'فروخت میں ترمیم کریں';
+
+  @override
+  String get editSaleDetails => 'فروخت کی تفصیلات میں ترمیم کریں';
+
+  @override
+  String get saleSummaryReadOnly => 'فروخت کا خلاصہ (صرف پڑھنے کے لیے)';
+
+  @override
+  String itemsCount(int count) {
+    return '$count اشیاء';
+  }
+
+  @override
+  String get gst => 'جی ایس ٹی';
+
+  @override
+  String get editableFields => 'قابل ترمیم فیلڈز';
+
+  @override
+  String get amountPaidPkr => 'ادا شدہ رقم (PKR)';
+
+  @override
+  String get enterAmountPaid => 'براہ کرم ادا شدہ رقم درج کریں';
+
+  @override
+  String get partialStatus => 'جزوی';
+
+  @override
+  String get unpaidStatus => 'غیر ادا شدہ';
+
+  @override
+  String get specialInstructionsOrRemarks => 'کوئی خاص ہدایات یا تبصرے...';
+
+  @override
+  String get amountPaying => 'ادا کی جانے والی رقم';
+
+  @override
+  String get updateSale => 'فروخت اپ ڈیٹ کریں';
+
+  @override
+  String get saleUpdatedSuccessfully => 'فروخت کامیابی سے اپ ڈیٹ ہوگئی!';
+
+  @override
+  String get existingOrders => 'موجودہ آرڈرز';
+
+  @override
+  String get deliveryDate => 'ترسیل کی تاریخ';
+
+  @override
+  String get pendingStatus => 'زیر التواء';
+
+  @override
+  String get inProgressStatus => 'جاری';
+
+  @override
+  String get completedStatus => 'مکمل';
+
+  @override
+  String get deliveredStatus => 'پہنچایا گیا';
+
+  @override
+  String get cancelledStatus => 'منسوخ';
+
+  @override
+  String productAddedToOrder(String productName, String orderId) {
+    return '$productName آرڈر $orderId میں شامل کیا گیا';
+  }
+
+  @override
+  String get searchByInvoiceNumberCustomerOrSale => 'رسید نمبر، کسٹمر، یا فروخت سے تلاش کریں';
+
+  @override
+  String get noInvoicesFound => 'کوئی رسید نہیں ملی';
+
+  @override
+  String get createNewInvoiceUsingButton => '+ بٹن استعمال کرکے نئی رسید بنائیں';
+
+  @override
+  String get generatePdf => 'پی ڈی ایف بنائیں';
+
+  @override
+  String get invoiceDetails => 'رسید کی تفصیلات';
+
+  @override
+  String invoiceDetailsWithNumber(String invoiceNumber) {
+    return 'رسید کی تفصیلات - $invoiceNumber';
+  }
+
+  @override
+  String get saleInvoiceNumber => 'فروخت کا رسید نمبر';
+
+  @override
+  String get issueDate => 'جاری کرنے کی تاریخ';
+
+  @override
+  String get invoicePdfGeneratedSuccessfully => 'رسید کی پی ڈی ایف کامیابی سے بن گئی';
+
+  @override
+  String deleteInvoiceWithNumber(String invoiceNumber) {
+    return 'رسید حذف کریں - $invoiceNumber';
+  }
+
+  @override
+  String get areYouSureDeleteInvoice => 'کیا آپ واقعی یہ رسید حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get invoiceDeletedSuccessfully => 'رسید کامیابی سے حذف ہوگئی';
+
+  @override
+  String get orderCreated => 'آرڈر بن گیا!';
+
+  @override
+  String get customOrderCreatedSuccessfully => 'حسب ضرورت آرڈر کامیابی سے بنایا گیا';
+
+  @override
+  String get advanceReceived => 'پیشگی موصول:';
+
+  @override
+  String get printOrder => 'آرڈر پرنٹ کریں';
+
+  @override
+  String get done => 'مکمل';
+
+  @override
+  String get printFunctionalityWillBeImplemented => 'پرنٹ کی سہولت کو لاگو کیا جائے گا';
+
+  @override
+  String get paymentConfirmation => 'ادائیگی کی تصدیق';
+
+  @override
+  String get paymentComplete => 'ادائیگی مکمل';
+
+  @override
+  String get paymentInProgress => 'ادائیگی جاری ہے';
+
+  @override
+  String get previouslyPaid => 'پہلے ادا شدہ:';
+
+  @override
+  String get thisPayment => 'یہ ادائیگی:';
+
+  @override
+  String get newBalance => 'نیا بیلنس:';
+
+  @override
+  String get creditDebitCard => 'کریڈٹ/ڈیبٹ کارڈ';
+
+  @override
+  String get mobilePayment => 'موبائل ادائیگی';
+
+  @override
+  String get check => 'چیک';
+
+  @override
+  String get amountExceedsBalance => 'رقم بقیہ بیلنس سے زیادہ ہے';
+
+  @override
+  String get referenceOptional => 'حوالہ (اختیاری)';
+
+  @override
+  String get transactionReferenceOrReceipt => 'لین دین کا حوالہ یا رسید نمبر';
+
+  @override
+  String get additionalNotesAboutPayment => 'اس ادائیگی کے بارے میں اضافی نوٹس';
+
+  @override
+  String get confirmPayment => 'ادائیگی کی تصدیق کریں';
+
+  @override
+  String get paymentConfirmed => 'ادائیگی کی تصدیق ہوگئی';
+
+  @override
+  String get paymentProcessedSuccessfully => 'ادائیگی کامیابی سے عمل میں آگئی!';
+
+  @override
+  String get continue_ => 'جاری رکھیں';
+
+  @override
+  String get paymentError => 'ادائیگی کی خرابی';
+
+  @override
+  String get invalidPaymentAmount => 'غلط ادائیگی کی رقم۔ براہ کرم رقم چیک کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get paymentProcessingFailed => 'ادائیگی کی کارروائی ناکام ہوگئی۔ براہ کرم دوبارہ کوشش کریں۔';
+
+  @override
+  String errorOccurred(String error) {
+    return 'ایک خرابی پیش آئی: $error';
+  }
+
+  @override
+  String get paymentWorkflowDashboard => 'ادائیگی کے عمل کا ڈیش بورڈ';
+
+  @override
+  String get refreshDashboard => 'ڈیش بورڈ کو تازہ کریں';
+
+  @override
+  String get noDataAvailable => 'کوئی ڈیٹا دستیاب نہیں';
+
+  @override
+  String get pendingPayments => 'زیر التواء ادائیگیاں';
+
+  @override
+  String get completionRate => 'تکمیل کی شرح';
+
+  @override
+  String get paymentProgressOverview => 'ادائیگی کی پیشرفت کا جائزہ';
+
+  @override
+  String get paymentCompletion => 'ادائیگی کی تکمیل';
+
+  @override
+  String get recentWorkflowActivities => 'حالیہ کام کی سرگرمیاں';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes منٹ پہلے';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours گھنٹے پہلے';
+  }
+
+  @override
+  String get collected => 'جمع شدہ';
+
+  @override
+  String get updateSaleStatus => 'فروخت کی حیثیت اپ ڈیٹ کریں';
+
+  @override
+  String get selectActionToPerform => 'انجام دینے کے لیے کارروائی منتخب کریں:';
+
+  @override
+  String get cancelSale => 'فروخت منسوخ کریں';
+
+  @override
+  String get returnSale => 'فروخت واپس کریں';
+
+  @override
+  String get unknownAction => 'نامعلوم کارروائی';
+
+  @override
+  String get processAdditionalPayment => 'اس فروخت کے لیے اضافی ادائیگی کی کارروائی کریں';
+
+  @override
+  String get markSaleAsDelivered => 'فروخت کو کسٹمر تک پہنچایا گیا نشان زد کریں';
+
+  @override
+  String get cancelSaleAndRestoreInventory => 'یہ فروخت منسوخ کریں اور انوینٹری بحال کریں';
+
+  @override
+  String get processReturnForDeliveredSale => 'پہنچائی گئی فروخت کی واپسی کی کارروائی کریں';
+
+  @override
+  String get noDescriptionAvailable => 'کوئی تفصیل دستیاب نہیں';
+
+  @override
+  String get markedAsDelivered => 'پہنچایا گیا نشان زد';
+
+  @override
+  String get saleCancelled => 'فروخت منسوخ ہوگئی';
+
+  @override
+  String get saleReturned => 'فروخت واپس ہوگئی';
+
+  @override
+  String get awaitingPayment => 'ادائیگی کا انتظار';
+
+  @override
+  String get partialPayment => 'جزوی ادائیگی';
+
+  @override
+  String get moreActions => 'مزید اعمال';
+
+  @override
+  String get applyDiscount => 'رعایت لگائیں';
+
+  @override
+  String get quickDiscounts => 'فوری رعایتیں';
+
+  @override
+  String get originalPrice => 'اصل قیمت:';
+
+  @override
+  String get finalPrice => 'حتمی قیمت:';
+
+  @override
+  String get addWithDiscount => 'رعایت کے ساتھ شامل کریں';
+
+  @override
+  String addedWithDiscount(String productName, String discount) {
+    return '$productName کو $discount رعایت کے ساتھ شامل کیا گیا';
+  }
+
+  @override
+  String get quickAddWithDefaultOptions => 'ڈیفالٹ اختیارات کے ساتھ فوری شامل کریں';
+
+  @override
+  String get setSizeQualityEmbroidery => 'سائز، معیار، کڑھائی اور اختیارات مقرر کریں';
+
+  @override
+  String get applyDiscountBeforeAdding => 'کارٹ میں شامل کرنے سے پہلے رعایت لگائیں';
+
+  @override
+  String get createCustomOrder => 'حسب ضرورت آرڈر بنائیں';
+
+  @override
+  String get scheduleDeliveryAndAdvance => 'ڈیلیوری شیڈول کریں اور ایڈوانس لیں';
+
+  @override
+  String get searchByReceiptCustomerPayment => 'رسید نمبر، کسٹمر یا ادائیگی سے تلاش کریں';
+
+  @override
+  String get createNewReceiptUsingButton => '+ بٹن استعمال کرکے نئی رسید بنائیں';
+
+  @override
+  String receiptDetails(String receiptNumber) {
+    return 'رسید کی تفصیلات - $receiptNumber';
+  }
+
+  @override
+  String get receiptNumber => 'رسید نمبر';
+
+  @override
+  String get generatedAt => 'تیار شدہ';
+
+  @override
+  String deleteReceipt(String receiptNumber) {
+    return 'رسید حذف کریں - $receiptNumber';
+  }
+
+  @override
+  String get areYouSureDeleteReceipt => 'کیا آپ واقعی اس رسید کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get refunds => 'رقم کی واپسی';
+
+  @override
+  String get searchByReturnCustomerInvoice => 'واپسی نمبر، کسٹمر یا رسید سے تلاش کریں';
+
+  @override
+  String get allReasons => 'تمام وجوہات';
+
+  @override
+  String get defective => 'خراب';
+
+  @override
+  String get wrongSize => 'غلط سائز';
+
+  @override
+  String get wrongColor => 'غلط رنگ';
+
+  @override
+  String get qualityIssue => 'معیار کا مسئلہ';
+
+  @override
+  String get customerChangedMind => 'کسٹمر نے ارادہ بدل لیا';
+
+  @override
+  String get damagedInTransit => 'ٹرانزٹ میں خراب ہوا';
+
+  @override
+  String get approved => 'منظور شدہ';
+
+  @override
+  String get processed => 'عمل شدہ';
+
+  @override
+  String get rejected => 'مسترد';
+
+  @override
+  String get noReturnsFound => 'کوئی واپسیاں نہیں ملیں';
+
+  @override
+  String get createNewReturnUsingButton => '+ بٹن استعمال کرکے نئی واپسی بنائیں';
+
+  @override
+  String get noRefundsFound => 'کوئی رقم کی واپسی نہیں ملی';
+
+  @override
+  String get refundsWillAppearHere => 'واپسیوں کی کارروائی ہونے پر رقم کی واپسی یہاں ظاہر ہوگی';
+
+  @override
+  String get approve => 'منظور کریں';
+
+  @override
+  String get approvedAt => 'منظوری کی تاریخ';
+
+  @override
+  String get processedAt => 'عمل کی تاریخ';
+
+  @override
+  String get returnStatistics => 'واپسی کے اعداد و شمار';
+
+  @override
+  String get totalReturns => 'کل واپسیاں';
+
+  @override
+  String get approvedReturns => 'منظور شدہ واپسیاں';
+
+  @override
+  String get totalRefunds => 'کل رقم کی واپسی';
+
+  @override
+  String get statusBreakdown => 'حیثیت کی تفصیل';
+
+  @override
+  String returnDetails(String returnNumber) {
+    return 'واپسی کی تفصیلات - $returnNumber';
+  }
+
+  @override
+  String get saleInvoice => 'فروخت کی رسید';
+
+  @override
+  String refundDetails(String refundNumber) {
+    return 'رقم کی واپسی کی تفصیلات - $refundNumber';
+  }
+
+  @override
+  String get returnId => 'واپسی آئی ڈی';
+
+  @override
+  String approveReturn(String returnNumber) {
+    return 'واپسی منظور کریں - $returnNumber';
+  }
+
+  @override
+  String get areYouSureApproveReturn => 'کیا آپ واقعی اس واپسی کو منظور کرنا چاہتے ہیں؟';
+
+  @override
+  String get approvalReasonOptional => 'منظوری کی وجہ (اختیاری)';
+
+  @override
+  String get returnApprovedSuccessfully => 'واپسی کامیابی سے منظور ہوگئی';
+
+  @override
+  String processReturn(String returnNumber) {
+    return 'واپسی پر عمل کریں - $returnNumber';
+  }
+
+  @override
+  String get processReturnAndInitiateRefund => 'اس واپسی پر عمل کریں اور رقم کی واپسی شروع کریں؟';
+
+  @override
+  String get refundAmount => 'رقم کی واپسی';
+
+  @override
+  String get refundMethod => 'واپسی کا طریقہ';
+
+  @override
+  String get refundMethodHint => 'مثال: نقد، بینک ٹرانسفر، وغیرہ';
+
+  @override
+  String get returnProcessedSuccessfully => 'واپسی کامیابی سے عمل میں آگئی';
+
+  @override
+  String get provideValidRefundAmountAndMethod => 'براہ کرم درست رقم اور طریقہ فراہم کریں';
+
+  @override
+  String cancelReturn(String returnNumber) {
+    return 'واپسی منسوخ کریں - $returnNumber';
+  }
+
+  @override
+  String get areYouSureCancelReturn => 'کیا آپ واقعی اس واپسی کو منسوخ کرنا چاہتے ہیں؟';
+
+  @override
+  String get cancellationReasonRequired => 'منسوخی کی وجہ (ضروری)';
+
+  @override
+  String get provideCancellationReason => 'براہ کرم منسوخی کی وجہ فراہم کریں';
+
+  @override
+  String get returnCancelledSuccessfully => 'واپسی کامیابی سے منسوخ ہوگئی';
+
+  @override
+  String editReturn(String returnNumber) {
+    return 'واپسی میں ترمیم کریں - $returnNumber';
+  }
+
+  @override
+  String get returnUpdatedSuccessfully => 'واپسی کامیابی سے اپ ڈیٹ ہوگئی';
+
+  @override
+  String deleteReturn(String returnNumber) {
+    return 'واپسی حذف کریں - $returnNumber';
+  }
+
+  @override
+  String get areYouSureDeleteReturn => 'کیا آپ واقعی اس واپسی کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get returnDeletedSuccessfully => 'واپسی کامیابی سے حذف ہوگئی';
+
+  @override
+  String processRefund(String refundNumber) {
+    return 'رقم کی واپسی پر عمل کریں - $refundNumber';
+  }
+
+  @override
+  String get referenceNumberOptional => 'حوالہ نمبر (اختیاری)';
+
+  @override
+  String get processingNotesOptional => 'عمل کے نوٹس (اختیاری)';
+
+  @override
+  String get refundProcessedSuccessfully => 'رقم کی واپسی کامیابی سے عمل میں آگئی';
+
+  @override
+  String get processRefundAction => 'رقم کی واپسی پر عمل کریں';
+
+  @override
+  String editRefund(String refundNumber) {
+    return 'رقم کی واپسی میں ترمیم کریں - $refundNumber';
+  }
+
+  @override
+  String amountCannotBeChanged(String amount) {
+    return 'رقم: PKR $amount (تبدیل نہیں کی جا سکتی)';
+  }
+
+  @override
+  String get refundUpdatedSuccessfully => 'رقم کی واپسی کامیابی سے اپ ڈیٹ ہوگئی';
+
+  @override
+  String deleteRefund(String refundNumber) {
+    return 'رقم کی واپسی حذف کریں - $refundNumber';
+  }
+
+  @override
+  String get areYouSureDeleteRefund => 'کیا آپ واقعی اس رقم کی واپسی کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get refundDeletedSuccessfully => 'رقم کی واپسی کامیابی سے حذف ہوگئی';
+
+  @override
+  String get createNewSale => 'نئی فروخت بنائیں';
+
+  @override
+  String get pleaseEnterInvoiceNumber => 'براہ کرم رسید نمبر درج کریں';
+
+  @override
+  String get pleaseEnterCustomerName => 'براہ کرم کسٹمر کا نام درج کریں';
+
+  @override
+  String get pleaseEnterCustomerPhone => 'براہ کرم کسٹمر کا فون درج کریں';
+
+  @override
+  String get overallDiscountRs => 'مجموعی رعایت (روپے)';
+
+  @override
+  String get invoiced => 'رسید جاری';
+
+  @override
+  String get saleItems => 'فروخت کی اشیاء';
+
+  @override
+  String get noSaleItemsAdded => 'کوئی فروخت کی اشیاء شامل نہیں';
+
+  @override
+  String get addItemsToSale => 'اس فروخت میں اشیاء شامل کریں';
+
+  @override
+  String get taxConfiguration => 'ٹیکس کی ترتیب';
+
+  @override
+  String get totalTax => 'کل ٹیکس';
+
+  @override
+  String get createSale => 'فروخت بنائیں';
+
+  @override
+  String get addSaleItemFunctionalityToBeImplemented => 'فروخت کی شے شامل کرنے کی فعالیت نافذ کی جائے گی';
+
+  @override
+  String get pleaseAddAtLeastOneSaleItem => 'براہ کرم کم از کم ایک فروخت کی شے شامل کریں';
+
+  @override
+  String errorSavingSale(String error) {
+    return 'فروخت محفوظ کرنے میں خرابی: $error';
+  }
+
+  @override
+  String get reason => 'وجہ';
+
+  @override
+  String get method => 'طریقہ';
+
+  @override
+  String get process => 'عمل کریں';
+
+  @override
+  String get reference => 'حوالہ';
+
+  @override
+  String get refundNumber => 'رقم کی واپسی نمبر';
+
+  @override
+  String get saleDate => 'فروخت کی تاریخ';
+
+  @override
+  String get customerPhone => 'کسٹمر کا فون نمبر';
+
+  @override
+  String get summary => 'خلاصہ';
+
+  @override
+  String get noSalesRecordsFound => 'کوئی فروخت کا ریکارڈ نہیں ملا';
+
+  @override
+  String get completeFirstSaleMessage => 'لین دین کے ریکارڈ یہاں دیکھنے کے لیے پہلی فروخت مکمل کریں';
+
+  @override
+  String printReceiptFor(String invoice) {
+    return 'رسید پرنٹ کریں $invoice';
+  }
+
+  @override
+  String get addCustomTax => 'حسب ضرورت ٹیکس شامل کریں';
+
+  @override
+  String get refreshTaxRates => 'ٹیکس کی شرحیں تازہ کریں';
+
+  @override
+  String get noTaxRatesAvailable => 'کوئی ٹیکس کی شرحیں دستیاب نہیں';
+
+  @override
+  String get contactAdministratorToSetupTaxRates => 'ٹیکس کی شرحیں ترتیب دینے کے لیے منتظم سے رابطہ کریں';
+
+  @override
+  String get rate => 'شرح';
+
+  @override
+  String get totalTaxAmount => 'کل ٹیکس رقم';
+
+  @override
+  String get totalTaxPercentage => 'کل ٹیکس فیصد';
+
+  @override
+  String get addTax => 'ٹیکس شامل کریں';
+
+  @override
+  String get saleDetails => 'سیل کی تفصیلات';
+
+  @override
+  String get saleInvoiceDetails => 'سیل رسید کی تفصیلات';
+
+  @override
+  String get dateTime => 'تاریخ اور وقت';
+
+  @override
+  String get note => 'نوٹ';
+
+  @override
+  String get noSplitPaymentDetails => 'کوئی تقسیم ادائیگی کی تفصیلات نہیں';
+
+  @override
+  String get overallDiscount => 'مجموعی رعایت';
+
+  @override
+  String get notesRemarks => 'نوٹس اور ریمارکس';
+
+  @override
+  String get noNotesAvailable => 'کوئی نوٹس دستیاب نہیں';
+
+  @override
+  String printingReceiptFor(String invoice) {
+    return 'رسید پرنٹ کی جا رہی ہے $invoice';
+  }
 }

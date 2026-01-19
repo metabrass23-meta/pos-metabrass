@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/theme/app_theme.dart';
 
 class OrderSuccessDialog extends StatelessWidget {
@@ -55,6 +56,8 @@ class OrderSuccessDialog extends StatelessWidget {
   }
 
   Widget _buildSuccessHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -93,7 +96,7 @@ class OrderSuccessDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Order Created!',
+                  l10n.orderCreated,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
@@ -108,7 +111,7 @@ class OrderSuccessDialog extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Custom order created successfully',
+                  l10n.customOrderCreatedSuccessfully,
                   style: GoogleFonts.inter(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
@@ -143,6 +146,8 @@ class OrderSuccessDialog extends StatelessWidget {
   }
 
   Widget _buildOrderSummaryCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -154,14 +159,14 @@ class OrderSuccessDialog extends StatelessWidget {
         children: [
           _buildSummaryRow(
             context,
-            'Order ID:',
+            l10n.orderId,
             'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
             valueColor: Colors.purple,
           ),
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
-            'Total Amount:',
+            l10n.totalAmount,
             'PKR ${totalPrice.toStringAsFixed(0)}',
             valueColor: Colors.green,
             isHighlight: true,
@@ -169,21 +174,21 @@ class OrderSuccessDialog extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
-            'Advance Received:',
+            l10n.advanceReceived,
             'PKR ${advanceAmount.toStringAsFixed(0)}',
             valueColor: Colors.blue,
           ),
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
-            'Remaining Amount:',
+            l10n.remainingAmount,
             'PKR ${(totalPrice - advanceAmount).toStringAsFixed(0)}',
             valueColor: Colors.orange,
           ),
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
-            'Delivery Date:',
+            '${l10n.deliveryDate}:',
             '${deliveryDate.day}/${deliveryDate.month}/${deliveryDate.year}',
           ),
         ],
@@ -236,12 +241,14 @@ class OrderSuccessDialog extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           child: _buildActionButton(
             context,
-            label: 'Print Order',
+            label: l10n.printOrder,
             icon: Icons.print_rounded,
             color: Colors.blue,
             onTap: () => _handlePrintOrder(context),
@@ -251,7 +258,7 @@ class OrderSuccessDialog extends StatelessWidget {
         Expanded(
           child: _buildActionButton(
             context,
-            label: 'Done',
+            label: l10n.done,
             icon: Icons.done_rounded,
             color: Colors.purple,
             onTap: () => _handleDone(context),
@@ -327,9 +334,11 @@ class OrderSuccessDialog extends StatelessWidget {
   }
 
   void _handlePrintOrder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Print functionality will be implemented'),
+        content: Text(l10n.printFunctionalityWillBeImplemented),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -340,16 +349,16 @@ class OrderSuccessDialog extends StatelessWidget {
   }
 
   void _handleDone(BuildContext context) {
-    Navigator.of(context).pop(); // Close success dialog
-    Navigator.of(context).pop(); // Close order dialog
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 }
 
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String message;
-  final String confirmText;
-  final String cancelText;
+  final String? confirmText;
+  final String? cancelText;
   final VoidCallback onConfirm;
   final VoidCallback? onCancel;
   final Color? confirmColor;
@@ -359,8 +368,8 @@ class ConfirmationDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.message,
-    this.confirmText = 'Confirm',
-    this.cancelText = 'Cancel',
+    this.confirmText,
+    this.cancelText,
     required this.onConfirm,
     this.onCancel,
     this.confirmColor,
@@ -369,6 +378,8 @@ class ConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -398,7 +409,7 @@ class ConfirmationDialog extends StatelessWidget {
           children: [
             _buildHeader(context),
             _buildContent(context),
-            _buildActions(context),
+            _buildActions(context, l10n),
           ],
         ),
       ),
@@ -483,7 +494,7 @@ class ConfirmationDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, AppLocalizations l10n) {
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Row(
@@ -504,7 +515,7 @@ class ConfirmationDialog extends StatelessWidget {
                       vertical: context.cardPadding / 1.5,
                     ),
                     child: Text(
-                      cancelText,
+                      cancelText ?? l10n.cancel,
                       style: GoogleFonts.inter(
                         fontSize: ResponsiveBreakpoints.responsive(
                           context,
@@ -541,7 +552,7 @@ class ConfirmationDialog extends StatelessWidget {
                       vertical: context.cardPadding / 1.5,
                     ),
                     child: Text(
-                      confirmText,
+                      confirmText ?? l10n.confirm,
                       style: GoogleFonts.inter(
                         fontSize: ResponsiveBreakpoints.responsive(
                           context,
@@ -568,15 +579,17 @@ class ConfirmationDialog extends StatelessWidget {
 }
 
 class LoadingDialog extends StatelessWidget {
-  final String message;
+  final String? message;
 
   const LoadingDialog({
     super.key,
-    this.message = 'Processing...',
+    this.message,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -594,7 +607,7 @@ class LoadingDialog extends StatelessWidget {
             ),
             SizedBox(height: context.cardPadding),
             Text(
-              message,
+              message ?? l10n.processing,
               style: GoogleFonts.inter(
                 fontSize: ResponsiveBreakpoints.responsive(
                   context,

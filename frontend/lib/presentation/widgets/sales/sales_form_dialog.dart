@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/models/sales/request_models.dart';
 import '../../../src/providers/sales_provider.dart';
@@ -43,7 +44,6 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
 
   void _initializeForm() {
     if (widget.sale != null) {
-      // Editing existing sale
       _invoiceNumberController.text = widget.sale!.invoiceNumber;
       _customerNameController.text = widget.sale!.customerName;
       _customerPhoneController.text = widget.sale!.customerPhone;
@@ -55,7 +55,6 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       _selectedPaymentMethod = widget.sale!.paymentMethod;
       _overallDiscount = widget.sale!.overallDiscount;
     } else {
-      // Creating new sale
       _invoiceNumberController.text = '';
       _customerNameController.text = '';
       _customerPhoneController.text = '';
@@ -97,6 +96,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -112,7 +113,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           SizedBox(width: context.cardPadding),
           Expanded(
             child: Text(
-              widget.sale == null ? 'Create New Sale' : 'Edit Sale',
+              widget.sale == null ? l10n.createNewSale : l10n.editSale,
               style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
             ),
           ),
@@ -149,6 +150,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -160,7 +163,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Basic Information',
+            l10n.basicInformation,
             style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -170,12 +173,12 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 child: TextFormField(
                   controller: _invoiceNumberController,
                   decoration: InputDecoration(
-                    labelText: 'Invoice Number',
+                    labelText: l10n.invoiceNumber,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter an invoice number';
+                      return l10n.pleaseEnterInvoiceNumber;
                     }
                     return null;
                   },
@@ -187,9 +190,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   readOnly: true,
                   initialValue: _saleDate?.toString().split(' ')[0] ?? DateTime.now().toString().split(' ')[0],
                   decoration: InputDecoration(
-                    labelText: 'Sale Date',
+                    labelText: l10n.saleDate,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-                    suffixIcon: IconButton(onPressed: () => _selectDate(context), icon: Icon(Icons.calendar_today_rounded)),
+                    suffixIcon: IconButton(onPressed: () => _selectDate(context), icon: const Icon(Icons.calendar_today_rounded)),
                   ),
                 ),
               ),
@@ -202,12 +205,12 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 child: TextFormField(
                   controller: _customerNameController,
                   decoration: InputDecoration(
-                    labelText: 'Customer Name',
+                    labelText: l10n.customerName,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter customer name';
+                      return l10n.pleaseEnterCustomerName;
                     }
                     return null;
                   },
@@ -218,12 +221,12 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 child: TextFormField(
                   controller: _customerPhoneController,
                   decoration: InputDecoration(
-                    labelText: 'Customer Phone',
+                    labelText: l10n.customerPhone,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
-                      return 'Please enter customer phone';
+                      return l10n.pleaseEnterCustomerPhone;
                     }
                     return null;
                   },
@@ -238,16 +241,16 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 child: DropdownButtonFormField<String>(
                   value: _selectedPaymentMethod,
                   decoration: InputDecoration(
-                    labelText: 'Payment Method',
+                    labelText: l10n.paymentMethod,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   ),
                   items: [
-                    'CASH',
-                    'CARD',
-                    'BANK_TRANSFER',
-                    'MOBILE_PAYMENT',
-                    'CREDIT',
-                  ].map((method) => DropdownMenuItem(value: method, child: Text(method))).toList(),
+                    DropdownMenuItem(value: 'CASH', child: Text(l10n.cash)),
+                    DropdownMenuItem(value: 'CARD', child: Text(l10n.card)),
+                    DropdownMenuItem(value: 'BANK_TRANSFER', child: Text(l10n.bankTransfer)),
+                    DropdownMenuItem(value: 'MOBILE_PAYMENT', child: Text(l10n.mobilePayment)),
+                    DropdownMenuItem(value: 'CREDIT', child: Text(l10n.credit)),
+                  ],
                   onChanged: (value) {
                     setState(() {
                       _selectedPaymentMethod = value!;
@@ -255,7 +258,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select a payment method';
+                      return l10n.pleaseSelectPaymentMethod;
                     }
                     return null;
                   },
@@ -266,7 +269,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 child: TextFormField(
                   initialValue: _overallDiscount.toString(),
                   decoration: InputDecoration(
-                    labelText: 'Overall Discount (Rs.)',
+                    labelText: l10n.overallDiscountRs,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   ),
                   keyboardType: TextInputType.number,
@@ -281,7 +284,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           TextFormField(
             controller: _notesController,
             decoration: InputDecoration(
-              labelText: 'Notes',
+              labelText: l10n.notes,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             ),
             maxLines: 3,
@@ -290,18 +293,18 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           DropdownButtonFormField<String>(
             value: _selectedStatus,
             decoration: InputDecoration(
-              labelText: 'Status',
+              labelText: l10n.status,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             ),
             items: [
-              'DRAFT',
-              'CONFIRMED',
-              'INVOICED',
-              'PAID',
-              'DELIVERED',
-              'CANCELLED',
-              'RETURNED',
-            ].map((status) => DropdownMenuItem(value: status, child: Text(status))).toList(),
+              DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
+              DropdownMenuItem(value: 'CONFIRMED', child: Text(l10n.confirmed)),
+              DropdownMenuItem(value: 'INVOICED', child: Text(l10n.invoiced)),
+              DropdownMenuItem(value: 'PAID', child: Text(l10n.paid)),
+              DropdownMenuItem(value: 'DELIVERED', child: Text(l10n.delivered)),
+              DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
+              DropdownMenuItem(value: 'RETURNED', child: Text(l10n.returned)),
+            ],
             onChanged: (value) {
               setState(() {
                 _selectedStatus = value;
@@ -309,7 +312,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             },
             validator: (value) {
               if (value == null) {
-                return 'Please select a status';
+                return l10n.pleaseSelectStatus;
               }
               return null;
             },
@@ -320,6 +323,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildSaleItemsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -333,7 +338,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           Row(
             children: [
               Text(
-                'Sale Items',
+                l10n.saleItems,
                 style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
@@ -341,7 +346,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 onPressed: () => _showAddSaleItemDialog(),
                 icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
                 label: Text(
-                  'Add Item',
+                  l10n.addItem,
                   style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -355,6 +360,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildEmptySaleItemsState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding * 2),
       child: Center(
@@ -363,12 +370,12 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             Icon(Icons.shopping_cart_outlined, color: AppTheme.lightGray, size: 8.w),
             SizedBox(height: context.cardPadding),
             Text(
-              'No Sale Items Added',
+              l10n.noSaleItemsAdded,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
             ),
             SizedBox(height: context.smallPadding),
             Text(
-              'Add items to this sale',
+              l10n.addItemsToSale,
               style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
             ),
           ],
@@ -378,6 +385,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildSaleItemsList() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: _saleItems.asMap().entries.map((entry) {
         final index = entry.key;
@@ -401,7 +410,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
               ),
               Expanded(
                 child: Text(
-                  'Qty: ${item.quantity}',
+                  l10n.qty(item.quantity),
                   style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
               ),
@@ -429,6 +438,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildTaxSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -440,7 +451,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Tax Configuration',
+            l10n.taxConfiguration,
             style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
@@ -459,11 +470,10 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildSummarySection() {
+    final l10n = AppLocalizations.of(context)!;
     final subtotal = _calculateSubtotal();
     final totalTax = _taxConfiguration.totalTaxAmount;
-    // Calculate grand total for display purposes
     final grandTotal = subtotal + totalTax - _overallDiscount;
-    // Note: grandTotal is used in the summary display
 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
@@ -476,15 +486,15 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Summary',
+            l10n.summary,
             style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
-          _buildSummaryRow('Subtotal', subtotal),
-          _buildSummaryRow('Overall Discount', _overallDiscount),
-          _buildSummaryRow('Total Tax', totalTax),
+          _buildSummaryRow(l10n.subtotal, subtotal),
+          _buildSummaryRow(l10n.overallDiscount, _overallDiscount),
+          _buildSummaryRow(l10n.totalTax, totalTax),
           Divider(color: AppTheme.lightGray),
-          _buildSummaryRow('Grand Total', grandTotal, isTotal: true),
+          _buildSummaryRow(l10n.grandTotal, grandTotal, isTotal: true),
         ],
       ),
     );
@@ -518,6 +528,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   Widget _buildActions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -533,7 +545,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'Cancel',
+              l10n.cancel,
               style: GoogleFonts.inter(color: AppTheme.charcoalGray, fontWeight: FontWeight.w500),
             ),
           ),
@@ -542,14 +554,14 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             onPressed: _isLoading ? null : _saveSale,
             child: _isLoading
                 ? SizedBox(
-                    width: 4.w,
-                    height: 4.w,
-                    child: const CircularProgressIndicator(color: AppTheme.pureWhite, strokeWidth: 2),
-                  )
+              width: 4.w,
+              height: 4.w,
+              child: const CircularProgressIndicator(color: AppTheme.pureWhite, strokeWidth: 2),
+            )
                 : Text(
-                    widget.sale == null ? 'Create Sale' : 'Update Sale',
-                    style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
-                  ),
+              widget.sale == null ? l10n.createSale : l10n.updateSale,
+              style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),
@@ -575,11 +587,13 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   void _showAddSaleItemDialog() {
-    // TODO: Implement add sale item dialog
-    // This would integrate with the products module
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Add Sale Item functionality to be implemented'), backgroundColor: AppTheme.primaryMaroon));
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.addSaleItemFunctionalityToBeImplemented),
+        backgroundColor: AppTheme.primaryMaroon,
+      ),
+    );
   }
 
   void _removeSaleItem(int index) {
@@ -589,12 +603,16 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   }
 
   void _saveSale() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (_saleItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please add at least one sale item'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pleaseAddAtLeastOneSaleItem), backgroundColor: Colors.red),
+      );
       return;
     }
 
@@ -609,21 +627,20 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       final grandTotal = subtotal + totalTax - _overallDiscount;
 
       if (widget.sale == null) {
-        // Create new sale
         final saleItems = _saleItems
             .map(
               (item) => CreateSaleItemRequest(
-                productId: item.productId,
-                unitPrice: item.unitPrice,
-                quantity: item.quantity,
-                itemDiscount: item.itemDiscount,
-                customizationNotes: item.customizationNotes,
-              ),
-            )
+            productId: item.productId,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            itemDiscount: item.itemDiscount,
+            customizationNotes: item.customizationNotes,
+          ),
+        )
             .toList();
 
         final request = CreateSaleRequest(
-          customerId: 'temp_customer_id', // TODO: Get from customer selection
+          customerId: 'temp_customer_id',
           overallDiscount: _overallDiscount,
           taxConfiguration: _taxConfiguration,
           paymentMethod: _selectedPaymentMethod,
@@ -633,11 +650,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
 
         final success = await provider.createSale(request);
         if (success) {
-          // TODO: Get the created sale from provider and pass it to onSaved
           Navigator.of(context).pop();
         }
       } else {
-        // Update existing sale
         final request = UpdateSaleRequest(
           overallDiscount: _overallDiscount,
           taxConfiguration: _taxConfiguration,
@@ -652,7 +667,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error saving sale: $e'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorSavingSale(e.toString())), backgroundColor: Colors.red),
+      );
     } finally {
       setState(() {
         _isLoading = false;

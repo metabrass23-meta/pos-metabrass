@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/invoice_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 
@@ -24,8 +25,9 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
   @override
   void initState() {
     super.initState();
+    final l10n = AppLocalizations.of(context);
     _notesController.text = widget.invoice.notes ?? '';
-    _termsController.text = widget.invoice.termsConditions ?? 'Standard terms and conditions apply';
+    _termsController.text = widget.invoice.termsConditions ?? l10n?.standardTermsConditions ?? 'Standard terms and conditions apply';
     _selectedDueDate = widget.invoice.dueDate;
     _selectedStatus = widget.invoice.status;
   }
@@ -39,6 +41,8 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       child: Container(
         width: 500,
@@ -54,25 +58,28 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
                   Icon(Icons.edit, color: Theme.of(context).primaryColor),
                   const SizedBox(width: 12),
                   Text(
-                    'Edit Invoice - ${widget.invoice.invoiceNumber}',
+                    l10n.editInvoiceWithNumber(widget.invoice.invoiceNumber),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
 
-              // Status Selection
               DropdownButtonFormField<String>(
                 value: _selectedStatus,
-                decoration: const InputDecoration(labelText: 'Status *', border: OutlineInputBorder(), hintText: 'Select invoice status'),
+                decoration: InputDecoration(
+                  labelText: l10n.statusRequired,
+                  border: const OutlineInputBorder(),
+                  hintText: l10n.selectInvoiceStatus,
+                ),
                 items: [
-                  const DropdownMenuItem(value: 'DRAFT', child: Text('Draft')),
-                  const DropdownMenuItem(value: 'ISSUED', child: Text('Issued')),
-                  const DropdownMenuItem(value: 'SENT', child: Text('Sent')),
-                  const DropdownMenuItem(value: 'VIEWED', child: Text('Viewed')),
-                  const DropdownMenuItem(value: 'PAID', child: Text('Paid')),
-                  const DropdownMenuItem(value: 'OVERDUE', child: Text('Overdue')),
-                  const DropdownMenuItem(value: 'CANCELLED', child: Text('Cancelled')),
+                  DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
+                  DropdownMenuItem(value: 'ISSUED', child: Text(l10n.issued)),
+                  DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
+                  DropdownMenuItem(value: 'VIEWED', child: Text(l10n.viewed)),
+                  DropdownMenuItem(value: 'PAID', child: Text(l10n.paid)),
+                  DropdownMenuItem(value: 'OVERDUE', child: Text(l10n.overdue)),
+                  DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -81,7 +88,7 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a status';
+                    return l10n.pleaseSelectStatus;
                   }
                   return null;
                 },
@@ -89,12 +96,13 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
 
               const SizedBox(height: 16),
 
-              // Due Date
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Due Date'),
+                title: Text(l10n.dueDate),
                 subtitle: Text(
-                  _selectedDueDate != null ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}' : 'Not specified',
+                  _selectedDueDate != null
+                      ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}'
+                      : l10n.notSpecified,
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -107,7 +115,7 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
                             _selectedDueDate = null;
                           });
                         },
-                        tooltip: 'Clear due date',
+                        tooltip: l10n.clearDueDate,
                       ),
                     const Icon(Icons.calendar_today),
                   ],
@@ -129,39 +137,43 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
 
               const SizedBox(height: 16),
 
-              // Notes
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(labelText: 'Notes', hintText: 'Additional invoice notes (optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.notes,
+                  hintText: l10n.additionalInvoiceNotes,
+                  border: const OutlineInputBorder(),
+                ),
                 maxLines: 3,
               ),
 
               const SizedBox(height: 16),
 
-              // Terms & Conditions
               TextFormField(
                 controller: _termsController,
-                decoration: const InputDecoration(
-                  labelText: 'Terms & Conditions',
-                  hintText: 'Invoice terms and conditions',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.termsAndConditions,
+                  hintText: l10n.invoiceTermsConditions,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
               ),
 
               const SizedBox(height: 24),
 
-              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: _isLoading ? null : () => Navigator.of(context).pop(), child: const Text('Cancel')),
+                  TextButton(
+                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                    child: Text(l10n.cancel),
+                  ),
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: _isLoading ? null : _updateInvoice,
                     child: _isLoading
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text('Update Invoice'),
+                        : Text(l10n.updateInvoice),
                   ),
                 ],
               ),
@@ -173,6 +185,8 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
   }
 
   Future<void> _updateInvoice() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -190,11 +204,21 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
 
       if (success && mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invoice updated successfully'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.invoiceUpdatedSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update invoice: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.failedToUpdateInvoice}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) {

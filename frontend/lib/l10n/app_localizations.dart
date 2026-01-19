@@ -537,7 +537,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error'**
-  String get error;
+  String error(String error);
 
   /// No description provided for @success.
   ///
@@ -1935,7 +1935,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Qty'**
-  String get qty;
+  String qty(int quantity);
 
   /// No description provided for @colorName.
   ///
@@ -7737,7 +7737,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'item'**
-  String get item;
+  String item(int itemNumber);
 
   /// No description provided for @noItems.
   ///
@@ -9693,7 +9693,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Max Quantity'**
-  String get maxQuantity;
+  String maxQuantity(int max);
 
   /// No description provided for @maximumQuantity.
   ///
@@ -9945,7 +9945,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Stock'**
-  String get stockAvailable;
+  String stockAvailable(int quantity);
 
   /// No description provided for @min.
   ///
@@ -9975,7 +9975,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Clear Discount'**
-  String get clearDiscount;
+  String clearDiscount(String amount);
 
   /// No description provided for @specialInstructions.
   ///
@@ -10930,6 +10930,1878 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.'**
   String get aPremiumPointOfSaleSolution;
+
+  /// No description provided for @createNewReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Return'**
+  String get createNewReturn;
+
+  /// No description provided for @enterSaleId.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter sale ID'**
+  String get enterSaleId;
+
+  /// No description provided for @saleIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale ID is required'**
+  String get saleIdRequired;
+
+  /// No description provided for @customerId.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer ID'**
+  String get customerId;
+
+  /// No description provided for @enterCustomerId.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer ID'**
+  String get enterCustomerId;
+
+  /// No description provided for @customerIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer ID is required'**
+  String get customerIdRequired;
+
+  /// No description provided for @returnReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Reason'**
+  String get returnReason;
+
+  /// No description provided for @selectReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a reason'**
+  String get selectReason;
+
+  /// No description provided for @reasonDefective.
+  ///
+  /// In en, this message translates to:
+  /// **'Defective Product'**
+  String get reasonDefective;
+
+  /// No description provided for @reasonWrongSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Size'**
+  String get reasonWrongSize;
+
+  /// No description provided for @reasonWrongColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Color'**
+  String get reasonWrongColor;
+
+  /// No description provided for @reasonQualityIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Issue'**
+  String get reasonQualityIssue;
+
+  /// No description provided for @reasonChangeMind.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Changed Mind'**
+  String get reasonChangeMind;
+
+  /// No description provided for @reasonDamagedTransit.
+  ///
+  /// In en, this message translates to:
+  /// **'Damaged in Transit'**
+  String get reasonDamagedTransit;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reasonOther;
+
+  /// No description provided for @selectReturnReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a return reason'**
+  String get selectReturnReason;
+
+  /// No description provided for @reasonDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason Details'**
+  String get reasonDetails;
+
+  /// No description provided for @specifyReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please specify the reason'**
+  String get specifyReason;
+
+  /// No description provided for @provideReasonDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide reason details'**
+  String get provideReasonDetails;
+
+  /// No description provided for @returnItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Items'**
+  String get returnItems;
+
+  /// No description provided for @noItemsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No return items added'**
+  String get noItemsAdded;
+
+  /// No description provided for @clickAddItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Click \"Add Item\" to add items to return'**
+  String get clickAddItem;
+
+  /// No description provided for @removeItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Item'**
+  String get removeItem;
+
+  /// No description provided for @saleItemId.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Item ID'**
+  String get saleItemId;
+
+  /// No description provided for @enterSaleItemId.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter sale item ID'**
+  String get enterSaleItemId;
+
+  /// No description provided for @saleItemIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale item ID is required'**
+  String get saleItemIdRequired;
+
+  /// No description provided for @quantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity is required'**
+  String get quantityRequired;
+
+  /// No description provided for @quantityPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity must be a positive number'**
+  String get quantityPositive;
+
+  /// No description provided for @condition.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition'**
+  String get condition;
+
+  /// No description provided for @selectCondition.
+  ///
+  /// In en, this message translates to:
+  /// **'Select condition'**
+  String get selectCondition;
+
+  /// No description provided for @conditionNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get conditionNew;
+
+  /// No description provided for @conditionGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get conditionGood;
+
+  /// No description provided for @conditionFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get conditionFair;
+
+  /// No description provided for @conditionPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get conditionPoor;
+
+  /// No description provided for @conditionDamaged.
+  ///
+  /// In en, this message translates to:
+  /// **'Damaged'**
+  String get conditionDamaged;
+
+  /// No description provided for @selectConditionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select condition'**
+  String get selectConditionError;
+
+  /// No description provided for @conditionNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition Notes'**
+  String get conditionNotes;
+
+  /// No description provided for @conditionNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional notes about condition'**
+  String get conditionNotesHint;
+
+  /// No description provided for @notesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any additional notes about the return'**
+  String get notesHint;
+
+  /// No description provided for @createReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Return'**
+  String get createReturn;
+
+  /// No description provided for @addOneItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one return item'**
+  String get addOneItem;
+
+  /// No description provided for @createdSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return created successfully'**
+  String get createdSuccessfully;
+
+  /// No description provided for @failedToCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create return'**
+  String get failedToCreate;
+
+  /// No description provided for @errorCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating return: {error}'**
+  String errorCreating(String error);
+
+  /// No description provided for @none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// No description provided for @red.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get red;
+
+  /// No description provided for @blue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get blue;
+
+  /// No description provided for @green.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get green;
+
+  /// No description provided for @purple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get purple;
+
+  /// No description provided for @pink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get pink;
+
+  /// No description provided for @orange.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get orange;
+
+  /// No description provided for @customizeAndAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize & Add'**
+  String get customizeAndAdd;
+
+  /// No description provided for @customizedAddedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Customized {productName} added to cart'**
+  String customizedAddedToCart(String productName);
+
+  /// No description provided for @quantityAndPricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity & Pricing'**
+  String get quantityAndPricing;
+
+  /// No description provided for @enterValidPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid price'**
+  String get enterValidPrice;
+
+  /// No description provided for @sizeAndFitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Size & Fitting'**
+  String get sizeAndFitting;
+
+  /// No description provided for @fitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Fitting'**
+  String get fitting;
+
+  /// No description provided for @fittingStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fitting Style'**
+  String get fittingStyle;
+
+  /// No description provided for @customizationOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Customization Options'**
+  String get customizationOptions;
+
+  /// No description provided for @embroideryWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Embroidery Work'**
+  String get embroideryWork;
+
+  /// No description provided for @embroidery.
+  ///
+  /// In en, this message translates to:
+  /// **'Embroidery'**
+  String get embroidery;
+
+  /// No description provided for @fabricQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Fabric Quality'**
+  String get fabricQuality;
+
+  /// No description provided for @accentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent Color'**
+  String get accentColor;
+
+  /// No description provided for @additionalServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Services'**
+  String get additionalServices;
+
+  /// No description provided for @expressDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Express Delivery'**
+  String get expressDelivery;
+
+  /// No description provided for @expressDeliveryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your order in 2-3 days (+PKR 1,000)'**
+  String get expressDeliveryDesc;
+
+  /// No description provided for @expressDeliveryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Express Delivery Required'**
+  String get expressDeliveryRequired;
+
+  /// No description provided for @giftWrapping.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift Wrapping'**
+  String get giftWrapping;
+
+  /// No description provided for @giftWrappingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Beautiful gift packaging (+PKR 500)'**
+  String get giftWrappingDesc;
+
+  /// No description provided for @giftWrappingRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift Wrapping Required'**
+  String get giftWrappingRequired;
+
+  /// No description provided for @additionalRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Requirements'**
+  String get additionalRequirements;
+
+  /// No description provided for @additionalRequirementsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special requirements, measurements, design preferences, or delivery instructions...'**
+  String get additionalRequirementsHint;
+
+  /// No description provided for @basePriceQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Price × {quantity}:'**
+  String basePriceQuantity(int quantity);
+
+  /// No description provided for @customSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Size'**
+  String get customSizeLabel;
+
+  /// No description provided for @customTailoring.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Tailoring'**
+  String get customTailoring;
+
+  /// No description provided for @slimFit.
+  ///
+  /// In en, this message translates to:
+  /// **'Slim Fit'**
+  String get slimFit;
+
+  /// No description provided for @subtotalWithCustomizations.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal with Customizations:'**
+  String get subtotalWithCustomizations;
+
+  /// No description provided for @itemDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Discount:'**
+  String get itemDiscount;
+
+  /// No description provided for @youSave.
+  ///
+  /// In en, this message translates to:
+  /// **'You save PKR {amount}'**
+  String youSave(String amount);
+
+  /// No description provided for @deleteSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Sale'**
+  String get deleteSale;
+
+  /// No description provided for @deleteSaleRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Sale Record'**
+  String get deleteSaleRecord;
+
+  /// No description provided for @areYouSureDeleteSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this sale?'**
+  String get areYouSureDeleteSale;
+
+  /// No description provided for @areYouAbsolutelySure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you absolutely sure you want to delete this sale record?'**
+  String get areYouAbsolutelySure;
+
+  /// No description provided for @permanentDeleteWarningShort.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the sale record and all associated data.'**
+  String get permanentDeleteWarningShort;
+
+  /// No description provided for @permanentDeleteWarningLong.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the sale record, payment information, and all associated data. This action cannot be undone.'**
+  String get permanentDeleteWarningLong;
+
+  /// No description provided for @deleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting...'**
+  String get deleting;
+
+  /// No description provided for @deleteSaleButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Sale'**
+  String get deleteSaleButton;
+
+  /// No description provided for @saleDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale record deleted successfully!'**
+  String get saleDeletedSuccessfully;
+
+  /// No description provided for @editInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Invoice'**
+  String get editInvoice;
+
+  /// No description provided for @editInvoiceWithNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Invoice - {invoiceNumber}'**
+  String editInvoiceWithNumber(String invoiceNumber);
+
+  /// No description provided for @statusRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Status *'**
+  String get statusRequired;
+
+  /// No description provided for @selectInvoiceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Select invoice status'**
+  String get selectInvoiceStatus;
+
+  /// No description provided for @pleaseSelectStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a status'**
+  String get pleaseSelectStatus;
+
+  /// No description provided for @clearDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear due date'**
+  String get clearDueDate;
+
+  /// No description provided for @additionalInvoiceNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional invoice notes (optional)'**
+  String get additionalInvoiceNotes;
+
+  /// No description provided for @invoiceTermsConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice terms and conditions'**
+  String get invoiceTermsConditions;
+
+  /// No description provided for @standardTermsConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard terms and conditions apply'**
+  String get standardTermsConditions;
+
+  /// No description provided for @updateInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Invoice'**
+  String get updateInvoice;
+
+  /// No description provided for @invoiceUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice updated successfully'**
+  String get invoiceUpdatedSuccessfully;
+
+  /// No description provided for @failedToUpdateInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update invoice'**
+  String get failedToUpdateInvoice;
+
+  /// No description provided for @editReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Receipt'**
+  String get editReceipt;
+
+  /// No description provided for @editReceiptWithNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Receipt - {receiptNumber}'**
+  String editReceiptWithNumber(String receiptNumber);
+
+  /// No description provided for @failedToUpdateReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update receipt'**
+  String get failedToUpdateReceipt;
+
+  /// No description provided for @editSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Sale'**
+  String get editSale;
+
+  /// No description provided for @editSaleDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Sale Details'**
+  String get editSaleDetails;
+
+  /// No description provided for @saleSummaryReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Summary (Read-Only)'**
+  String get saleSummaryReadOnly;
+
+  /// No description provided for @itemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String itemsCount(int count);
+
+  /// No description provided for @gst.
+  ///
+  /// In en, this message translates to:
+  /// **'GST'**
+  String get gst;
+
+  /// No description provided for @editableFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Editable Fields'**
+  String get editableFields;
+
+  /// No description provided for @amountPaidPkr.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paid (PKR)'**
+  String get amountPaidPkr;
+
+  /// No description provided for @enterAmountPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter amount paid'**
+  String get enterAmountPaid;
+
+  /// No description provided for @partialStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial'**
+  String get partialStatus;
+
+  /// No description provided for @unpaidStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaid'**
+  String get unpaidStatus;
+
+  /// No description provided for @specialInstructionsOrRemarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special instructions or remarks...'**
+  String get specialInstructionsOrRemarks;
+
+  /// No description provided for @amountPaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paying'**
+  String get amountPaying;
+
+  /// No description provided for @updateSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Sale'**
+  String get updateSale;
+
+  /// No description provided for @saleUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale updated successfully!'**
+  String get saleUpdatedSuccessfully;
+
+  /// No description provided for @existingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing Orders'**
+  String get existingOrders;
+
+  /// No description provided for @deliveryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery Date'**
+  String get deliveryDate;
+
+  /// No description provided for @pendingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pendingStatus;
+
+  /// No description provided for @inProgressStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get inProgressStatus;
+
+  /// No description provided for @completedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedStatus;
+
+  /// No description provided for @deliveredStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get deliveredStatus;
+
+  /// No description provided for @cancelledStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelledStatus;
+
+  /// No description provided for @productAddedToOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'{productName} added to order {orderId}'**
+  String productAddedToOrder(String productName, String orderId);
+
+  /// No description provided for @searchByInvoiceNumberCustomerOrSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by invoice number, customer, or sale'**
+  String get searchByInvoiceNumberCustomerOrSale;
+
+  /// No description provided for @noInvoicesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices found'**
+  String get noInvoicesFound;
+
+  /// No description provided for @createNewInvoiceUsingButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new invoice using the + button'**
+  String get createNewInvoiceUsingButton;
+
+  /// No description provided for @generatePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate PDF'**
+  String get generatePdf;
+
+  /// No description provided for @invoiceDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice Details'**
+  String get invoiceDetails;
+
+  /// No description provided for @invoiceDetailsWithNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice Details - {invoiceNumber}'**
+  String invoiceDetailsWithNumber(String invoiceNumber);
+
+  /// No description provided for @saleInvoiceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Invoice Number'**
+  String get saleInvoiceNumber;
+
+  /// No description provided for @issueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Date'**
+  String get issueDate;
+
+  /// No description provided for @invoicePdfGeneratedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice PDF generated successfully'**
+  String get invoicePdfGeneratedSuccessfully;
+
+  /// No description provided for @deleteInvoiceWithNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Invoice - {invoiceNumber}'**
+  String deleteInvoiceWithNumber(String invoiceNumber);
+
+  /// No description provided for @areYouSureDeleteInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this invoice?'**
+  String get areYouSureDeleteInvoice;
+
+  /// No description provided for @invoiceDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice deleted successfully'**
+  String get invoiceDeletedSuccessfully;
+
+  /// No description provided for @orderCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Created!'**
+  String get orderCreated;
+
+  /// No description provided for @customOrderCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom order created successfully'**
+  String get customOrderCreatedSuccessfully;
+
+  /// No description provided for @advanceReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance Received:'**
+  String get advanceReceived;
+
+  /// No description provided for @printOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Print Order'**
+  String get printOrder;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @printFunctionalityWillBeImplemented.
+  ///
+  /// In en, this message translates to:
+  /// **'Print functionality will be implemented'**
+  String get printFunctionalityWillBeImplemented;
+
+  /// No description provided for @paymentConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Confirmation'**
+  String get paymentConfirmation;
+
+  /// No description provided for @paymentComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Complete'**
+  String get paymentComplete;
+
+  /// No description provided for @paymentInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment in Progress'**
+  String get paymentInProgress;
+
+  /// No description provided for @previouslyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Previously Paid:'**
+  String get previouslyPaid;
+
+  /// No description provided for @thisPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'This Payment:'**
+  String get thisPayment;
+
+  /// No description provided for @newBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'New Balance:'**
+  String get newBalance;
+
+  /// No description provided for @creditDebitCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit/Debit Card'**
+  String get creditDebitCard;
+
+  /// No description provided for @mobilePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Payment'**
+  String get mobilePayment;
+
+  /// No description provided for @check.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get check;
+
+  /// No description provided for @amountExceedsBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount exceeds remaining balance'**
+  String get amountExceedsBalance;
+
+  /// No description provided for @referenceOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference (Optional)'**
+  String get referenceOptional;
+
+  /// No description provided for @transactionReferenceOrReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction reference or receipt number'**
+  String get transactionReferenceOrReceipt;
+
+  /// No description provided for @additionalNotesAboutPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional notes about this payment'**
+  String get additionalNotesAboutPayment;
+
+  /// No description provided for @confirmPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Payment'**
+  String get confirmPayment;
+
+  /// No description provided for @paymentConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Confirmed'**
+  String get paymentConfirmed;
+
+  /// No description provided for @paymentProcessedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment has been processed successfully!'**
+  String get paymentProcessedSuccessfully;
+
+  /// No description provided for @continue_.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continue_;
+
+  /// No description provided for @paymentError.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Error'**
+  String get paymentError;
+
+  /// No description provided for @invalidPaymentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid payment amount. Please check the amount and try again.'**
+  String get invalidPaymentAmount;
+
+  /// No description provided for @paymentProcessingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment processing failed. Please try again.'**
+  String get paymentProcessingFailed;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred: {error}'**
+  String errorOccurred(String error);
+
+  /// No description provided for @paymentWorkflowDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Workflow Dashboard'**
+  String get paymentWorkflowDashboard;
+
+  /// No description provided for @refreshDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Dashboard'**
+  String get refreshDashboard;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
+
+  /// No description provided for @pendingPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Payments'**
+  String get pendingPayments;
+
+  /// No description provided for @completionRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Rate'**
+  String get completionRate;
+
+  /// No description provided for @paymentProgressOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Progress Overview'**
+  String get paymentProgressOverview;
+
+  /// No description provided for @paymentCompletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Completion'**
+  String get paymentCompletion;
+
+  /// No description provided for @recentWorkflowActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Workflow Activities'**
+  String get recentWorkflowActivities;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
+  String minutesAgo(int minutes);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
+  String hoursAgo(int hours);
+
+  /// No description provided for @collected.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected'**
+  String get collected;
+
+  /// No description provided for @updateSaleStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Sale Status'**
+  String get updateSaleStatus;
+
+  /// No description provided for @selectActionToPerform.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an action to perform:'**
+  String get selectActionToPerform;
+
+  /// No description provided for @cancelSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Sale'**
+  String get cancelSale;
+
+  /// No description provided for @returnSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Sale'**
+  String get returnSale;
+
+  /// No description provided for @unknownAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Action'**
+  String get unknownAction;
+
+  /// No description provided for @processAdditionalPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Process additional payment for this sale'**
+  String get processAdditionalPayment;
+
+  /// No description provided for @markSaleAsDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark the sale as delivered to customer'**
+  String get markSaleAsDelivered;
+
+  /// No description provided for @cancelSaleAndRestoreInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this sale and restore inventory'**
+  String get cancelSaleAndRestoreInventory;
+
+  /// No description provided for @processReturnForDeliveredSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Process return for delivered sale'**
+  String get processReturnForDeliveredSale;
+
+  /// No description provided for @noDescriptionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No description available'**
+  String get noDescriptionAvailable;
+
+  /// No description provided for @markedAsDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as delivered'**
+  String get markedAsDelivered;
+
+  /// No description provided for @saleCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale cancelled'**
+  String get saleCancelled;
+
+  /// No description provided for @saleReturned.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale returned'**
+  String get saleReturned;
+
+  /// No description provided for @awaitingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Payment'**
+  String get awaitingPayment;
+
+  /// No description provided for @partialPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial Payment'**
+  String get partialPayment;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Actions'**
+  String get moreActions;
+
+  /// No description provided for @applyDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Discount'**
+  String get applyDiscount;
+
+  /// No description provided for @quickDiscounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Discounts'**
+  String get quickDiscounts;
+
+  /// No description provided for @originalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Price:'**
+  String get originalPrice;
+
+  /// No description provided for @finalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Price:'**
+  String get finalPrice;
+
+  /// No description provided for @addWithDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add with Discount'**
+  String get addWithDiscount;
+
+  /// No description provided for @addedWithDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {productName} with {discount} discount'**
+  String addedWithDiscount(String productName, String discount);
+
+  /// No description provided for @quickAddWithDefaultOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add with default options'**
+  String get quickAddWithDefaultOptions;
+
+  /// No description provided for @setSizeQualityEmbroidery.
+  ///
+  /// In en, this message translates to:
+  /// **'Set size, quality, embroidery, and options'**
+  String get setSizeQualityEmbroidery;
+
+  /// No description provided for @applyDiscountBeforeAdding.
+  ///
+  /// In en, this message translates to:
+  /// **'Add discount before adding to cart'**
+  String get applyDiscountBeforeAdding;
+
+  /// No description provided for @createCustomOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Custom Order'**
+  String get createCustomOrder;
+
+  /// No description provided for @scheduleDeliveryAndAdvance.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule delivery and take advance'**
+  String get scheduleDeliveryAndAdvance;
+
+  /// No description provided for @searchByReceiptCustomerPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by receipt number, customer, or payment'**
+  String get searchByReceiptCustomerPayment;
+
+  /// No description provided for @createNewReceiptUsingButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new receipt using the + button'**
+  String get createNewReceiptUsingButton;
+
+  /// No description provided for @receiptDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt Details - {receiptNumber}'**
+  String receiptDetails(String receiptNumber);
+
+  /// No description provided for @receiptNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt Number'**
+  String get receiptNumber;
+
+  /// No description provided for @generatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated At'**
+  String get generatedAt;
+
+  /// No description provided for @deleteReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Receipt - {receiptNumber}'**
+  String deleteReceipt(String receiptNumber);
+
+  /// No description provided for @areYouSureDeleteReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this receipt?'**
+  String get areYouSureDeleteReceipt;
+
+  /// No description provided for @refunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds'**
+  String get refunds;
+
+  /// No description provided for @searchByReturnCustomerInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by return number, customer, or invoice'**
+  String get searchByReturnCustomerInvoice;
+
+  /// No description provided for @allReasons.
+  ///
+  /// In en, this message translates to:
+  /// **'All Reasons'**
+  String get allReasons;
+
+  /// No description provided for @defective.
+  ///
+  /// In en, this message translates to:
+  /// **'Defective'**
+  String get defective;
+
+  /// No description provided for @wrongSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Size'**
+  String get wrongSize;
+
+  /// No description provided for @wrongColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Color'**
+  String get wrongColor;
+
+  /// No description provided for @qualityIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Issue'**
+  String get qualityIssue;
+
+  /// No description provided for @customerChangedMind.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Changed Mind'**
+  String get customerChangedMind;
+
+  /// No description provided for @damagedInTransit.
+  ///
+  /// In en, this message translates to:
+  /// **'Damaged in Transit'**
+  String get damagedInTransit;
+
+  /// No description provided for @approved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approved;
+
+  /// No description provided for @processed.
+  ///
+  /// In en, this message translates to:
+  /// **'Processed'**
+  String get processed;
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @noReturnsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No returns found'**
+  String get noReturnsFound;
+
+  /// No description provided for @createNewReturnUsingButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new return using the + button'**
+  String get createNewReturnUsingButton;
+
+  /// No description provided for @noRefundsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No refunds found'**
+  String get noRefundsFound;
+
+  /// No description provided for @refundsWillAppearHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds will appear here when returns are processed'**
+  String get refundsWillAppearHere;
+
+  /// No description provided for @approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approve;
+
+  /// No description provided for @approvedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved At'**
+  String get approvedAt;
+
+  /// No description provided for @processedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Processed At'**
+  String get processedAt;
+
+  /// No description provided for @returnStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Statistics'**
+  String get returnStatistics;
+
+  /// No description provided for @totalReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Returns'**
+  String get totalReturns;
+
+  /// No description provided for @approvedReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved Returns'**
+  String get approvedReturns;
+
+  /// No description provided for @totalRefunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Refunds'**
+  String get totalRefunds;
+
+  /// No description provided for @statusBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Status Breakdown'**
+  String get statusBreakdown;
+
+  /// No description provided for @returnDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Details - {returnNumber}'**
+  String returnDetails(String returnNumber);
+
+  /// No description provided for @saleInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Invoice'**
+  String get saleInvoice;
+
+  /// No description provided for @refundDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Details - {refundNumber}'**
+  String refundDetails(String refundNumber);
+
+  /// No description provided for @returnId.
+  ///
+  /// In en, this message translates to:
+  /// **'Return ID'**
+  String get returnId;
+
+  /// No description provided for @approveReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve Return - {returnNumber}'**
+  String approveReturn(String returnNumber);
+
+  /// No description provided for @areYouSureApproveReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to approve this return?'**
+  String get areYouSureApproveReturn;
+
+  /// No description provided for @approvalReasonOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval Reason (Optional)'**
+  String get approvalReasonOptional;
+
+  /// No description provided for @returnApprovedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return approved successfully'**
+  String get returnApprovedSuccessfully;
+
+  /// No description provided for @processReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Return - {returnNumber}'**
+  String processReturn(String returnNumber);
+
+  /// No description provided for @processReturnAndInitiateRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Process this return and initiate refund?'**
+  String get processReturnAndInitiateRefund;
+
+  /// No description provided for @refundAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Amount'**
+  String get refundAmount;
+
+  /// No description provided for @refundMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Method'**
+  String get refundMethod;
+
+  /// No description provided for @refundMethodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cash, Bank Transfer, etc.'**
+  String get refundMethodHint;
+
+  /// No description provided for @returnProcessedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return processed successfully'**
+  String get returnProcessedSuccessfully;
+
+  /// No description provided for @provideValidRefundAmountAndMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide valid refund amount and method'**
+  String get provideValidRefundAmountAndMethod;
+
+  /// No description provided for @cancelReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Return - {returnNumber}'**
+  String cancelReturn(String returnNumber);
+
+  /// No description provided for @areYouSureCancelReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this return?'**
+  String get areYouSureCancelReturn;
+
+  /// No description provided for @cancellationReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation Reason (Required)'**
+  String get cancellationReasonRequired;
+
+  /// No description provided for @provideCancellationReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a cancellation reason'**
+  String get provideCancellationReason;
+
+  /// No description provided for @returnCancelledSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return cancelled successfully'**
+  String get returnCancelledSuccessfully;
+
+  /// No description provided for @editReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Return - {returnNumber}'**
+  String editReturn(String returnNumber);
+
+  /// No description provided for @returnUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return updated successfully'**
+  String get returnUpdatedSuccessfully;
+
+  /// No description provided for @deleteReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Return - {returnNumber}'**
+  String deleteReturn(String returnNumber);
+
+  /// No description provided for @areYouSureDeleteReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this return?'**
+  String get areYouSureDeleteReturn;
+
+  /// No description provided for @returnDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Return deleted successfully'**
+  String get returnDeletedSuccessfully;
+
+  /// No description provided for @processRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Refund - {refundNumber}'**
+  String processRefund(String refundNumber);
+
+  /// No description provided for @referenceNumberOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Number (Optional)'**
+  String get referenceNumberOptional;
+
+  /// No description provided for @processingNotesOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Notes (Optional)'**
+  String get processingNotesOptional;
+
+  /// No description provided for @refundProcessedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund processed successfully'**
+  String get refundProcessedSuccessfully;
+
+  /// No description provided for @processRefundAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Refund'**
+  String get processRefundAction;
+
+  /// No description provided for @editRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Refund - {refundNumber}'**
+  String editRefund(String refundNumber);
+
+  /// No description provided for @amountCannotBeChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount: PKR {amount} (Cannot be changed)'**
+  String amountCannotBeChanged(String amount);
+
+  /// No description provided for @refundUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund updated successfully'**
+  String get refundUpdatedSuccessfully;
+
+  /// No description provided for @deleteRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Refund - {refundNumber}'**
+  String deleteRefund(String refundNumber);
+
+  /// No description provided for @areYouSureDeleteRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this refund?'**
+  String get areYouSureDeleteRefund;
+
+  /// No description provided for @refundDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund deleted successfully'**
+  String get refundDeletedSuccessfully;
+
+  /// No description provided for @createNewSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Sale'**
+  String get createNewSale;
+
+  /// No description provided for @pleaseEnterInvoiceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an invoice number'**
+  String get pleaseEnterInvoiceNumber;
+
+  /// No description provided for @pleaseEnterCustomerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter customer name'**
+  String get pleaseEnterCustomerName;
+
+  /// No description provided for @pleaseEnterCustomerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter customer phone'**
+  String get pleaseEnterCustomerPhone;
+
+  /// No description provided for @overallDiscountRs.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Discount (Rs.)'**
+  String get overallDiscountRs;
+
+  /// No description provided for @invoiced.
+  ///
+  /// In en, this message translates to:
+  /// **'INVOICED'**
+  String get invoiced;
+
+  /// No description provided for @saleItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Items'**
+  String get saleItems;
+
+  /// No description provided for @noSaleItemsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No Sale Items Added'**
+  String get noSaleItemsAdded;
+
+  /// No description provided for @addItemsToSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Add items to this sale'**
+  String get addItemsToSale;
+
+  /// No description provided for @taxConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Configuration'**
+  String get taxConfiguration;
+
+  /// No description provided for @totalTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tax'**
+  String get totalTax;
+
+  /// No description provided for @createSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Sale'**
+  String get createSale;
+
+  /// No description provided for @addSaleItemFunctionalityToBeImplemented.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Sale Item functionality to be implemented'**
+  String get addSaleItemFunctionalityToBeImplemented;
+
+  /// No description provided for @pleaseAddAtLeastOneSaleItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one sale item'**
+  String get pleaseAddAtLeastOneSaleItem;
+
+  /// No description provided for @errorSavingSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving sale: {error}'**
+  String errorSavingSale(String error);
+
+  /// No description provided for @reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get reason;
+
+  /// No description provided for @method.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get method;
+
+  /// No description provided for @process.
+  ///
+  /// In en, this message translates to:
+  /// **'Process'**
+  String get process;
+
+  /// No description provided for @reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get reference;
+
+  /// No description provided for @refundNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Number'**
+  String get refundNumber;
+
+  /// No description provided for @saleDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Date'**
+  String get saleDate;
+
+  /// No description provided for @customerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Phone'**
+  String get customerPhone;
+
+  /// No description provided for @summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get summary;
+
+  /// No description provided for @noSalesRecordsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Sales Records Found'**
+  String get noSalesRecordsFound;
+
+  /// No description provided for @completeFirstSaleMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your first sale to see transaction records here'**
+  String get completeFirstSaleMessage;
+
+  /// No description provided for @printReceiptFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Print receipt for {invoice}'**
+  String printReceiptFor(String invoice);
+
+  /// No description provided for @addCustomTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Custom Tax'**
+  String get addCustomTax;
+
+  /// No description provided for @refreshTaxRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Tax Rates'**
+  String get refreshTaxRates;
+
+  /// No description provided for @noTaxRatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No Tax Rates Available'**
+  String get noTaxRatesAvailable;
+
+  /// No description provided for @contactAdministratorToSetupTaxRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact administrator to set up tax rates'**
+  String get contactAdministratorToSetupTaxRates;
+
+  /// No description provided for @rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get rate;
+
+  /// No description provided for @totalTaxAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tax Amount'**
+  String get totalTaxAmount;
+
+  /// No description provided for @totalTaxPercentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tax Percentage'**
+  String get totalTaxPercentage;
+
+  /// No description provided for @addTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tax'**
+  String get addTax;
+
+  /// No description provided for @saleDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Details'**
+  String get saleDetails;
+
+  /// No description provided for @saleInvoiceDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale Invoice Details'**
+  String get saleInvoiceDetails;
+
+  /// No description provided for @dateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & Time'**
+  String get dateTime;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @noSplitPaymentDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'No split payment details'**
+  String get noSplitPaymentDetails;
+
+  /// No description provided for @overallDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Discount'**
+  String get overallDiscount;
+
+  /// No description provided for @notesRemarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes & Remarks'**
+  String get notesRemarks;
+
+  /// No description provided for @noNotesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes available'**
+  String get noNotesAvailable;
+
+  /// No description provided for @printingReceiptFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Printing receipt for {invoice}'**
+  String printingReceiptFor(String invoice);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

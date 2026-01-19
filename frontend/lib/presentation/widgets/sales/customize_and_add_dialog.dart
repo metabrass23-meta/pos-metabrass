@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -30,13 +31,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Customization options
   int _quantity = 1;
   double _itemDiscount = 0.0;
   bool _isCustomPrice = false;
   bool _hasNotes = false;
 
-  // Advanced customization options
   String _selectedSize = '';
   String _selectedFitting = 'Standard';
   String _selectedEmbroidery = 'None';
@@ -54,17 +53,12 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   @override
   void initState() {
     super.initState();
-
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
-
     _customPriceController.text = widget.product.price.toStringAsFixed(0);
-    _selectedSize = _availableSizes[2]; // Default to 'M'
+    _selectedSize = _availableSizes[2];
   }
 
   @override
@@ -78,17 +72,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   void _handleAddToCart() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
-
       final customPrice = _isCustomPrice ? double.tryParse(_customPriceController.text) ?? widget.product.price : widget.product.price;
       final notes = _buildCustomizationNotes();
-
-      // Calculate additional charges
       final additionalCharges = _calculateAdditionalCharges();
       final finalPrice = customPrice + additionalCharges;
-
-      // Create a modified product if custom price or additional charges apply
       final productToAdd = (additionalCharges > 0 || _isCustomPrice) ? widget.product.copyWith(price: finalPrice) : widget.product;
 
       provider.addToCartWithCustomization(
@@ -105,9 +96,10 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   void _handleSuccess() {
+    final l10n = AppLocalizations.of(context)!;
+
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -115,7 +107,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
               SizedBox(width: context.smallPadding),
               Expanded(
-                child: Text('Customized ${widget.product.name} added to cart', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+                child: Text(l10n.customizedAddedToCart(widget.product.name), style: GoogleFonts.inter(color: AppTheme.pureWhite)),
               ),
             ],
           ),
@@ -140,11 +132,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
 
   double _calculateAdditionalCharges() {
     double charges = 0.0;
-
-    // Size charges
     if (_selectedSize == 'Custom') charges += 2000;
-
-    // Fitting charges
     switch (_selectedFitting) {
       case 'Custom Tailored':
         charges += 3000;
@@ -153,8 +141,6 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         charges += 500;
         break;
     }
-
-    // Embroidery charges
     switch (_selectedEmbroidery) {
       case 'Basic':
         charges += 1500;
@@ -166,8 +152,6 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         charges += 8000;
         break;
     }
-
-    // Fabric quality charges
     switch (_selectedFabricQuality) {
       case 'Premium':
         charges += widget.product.price * 0.3;
@@ -176,11 +160,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         charges += widget.product.price * 0.6;
         break;
     }
-
-    // Additional services
     if (_expressDelivery) charges += 1000;
     if (_giftWrapping) charges += 500;
-
     return charges;
   }
 
@@ -190,47 +171,33 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   String _buildCustomizationNotes() {
+    final l10n = AppLocalizations.of(context)!;
     List<String> notes = [];
-
-    notes.add('Size: $_selectedSize');
-    notes.add('Fitting: $_selectedFitting');
-    if (_selectedEmbroidery != 'None') notes.add('Embroidery: $_selectedEmbroidery');
-    notes.add('Fabric Quality: $_selectedFabricQuality');
+    notes.add('${l10n.size}: $_selectedSize');
+    notes.add('${l10n.fitting}: $_selectedFitting');
+    if (_selectedEmbroidery != 'None') notes.add('${l10n.embroidery}: $_selectedEmbroidery');
+    notes.add('${l10n.fabricQuality}: $_selectedFabricQuality');
     if (_selectedAccentColor != Colors.transparent) {
-      notes.add('Accent Color: ${_getColorName(_selectedAccentColor)}');
+      notes.add('${l10n.accentColor}: ${_getColorName(_selectedAccentColor)}');
     }
-    if (_expressDelivery) notes.add('Express Delivery Required');
-    if (_giftWrapping) notes.add('Gift Wrapping Required');
-
+    if (_expressDelivery) notes.add(l10n.expressDeliveryRequired);
+    if (_giftWrapping) notes.add(l10n.giftWrappingRequired);
     if (_hasNotes && _notesController.text.isNotEmpty) {
-      notes.add('Special Instructions: ${_notesController.text}');
+      notes.add('${l10n.specialInstructions}: ${_notesController.text}');
     }
-
     return notes.join(' • ');
   }
 
-  Map<String, dynamic> _getCustomOptions() {
-    return {
-      'size': _selectedSize,
-      'fitting': _selectedFitting,
-      'embroidery': _selectedEmbroidery,
-      'fabric_quality': _selectedFabricQuality,
-      'accent_color': _getColorName(_selectedAccentColor),
-      'express_delivery': _expressDelivery,
-      'gift_wrapping': _giftWrapping,
-      'additional_charges': _calculateAdditionalCharges(),
-    };
-  }
-
   String _getColorName(Color color) {
-    if (color == Colors.transparent) return 'None';
-    if (color == Colors.red) return 'Red';
-    if (color == Colors.blue) return 'Blue';
-    if (color == Colors.green) return 'Green';
-    if (color == Colors.purple) return 'Purple';
-    if (color == Colors.pink) return 'Pink';
-    if (color == Colors.orange) return 'Orange';
-    return 'Custom';
+    final l10n = AppLocalizations.of(context)!;
+    if (color == Colors.transparent) return l10n.none;
+    if (color == Colors.red) return l10n.red;
+    if (color == Colors.blue) return l10n.blue;
+    if (color == Colors.green) return l10n.green;
+    if (color == Colors.purple) return l10n.purple;
+    if (color == Colors.pink) return l10n.pink;
+    if (color == Colors.orange) return l10n.orange;
+    return l10n.custom;
   }
 
   @override
@@ -281,6 +248,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -303,7 +272,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Customize & Add',
+                  l10n.customizeAndAdd,
                   style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
                 Text(
@@ -353,7 +322,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(height: context.cardPadding),
               _buildAdditionalServices(),
               SizedBox(height: context.cardPadding),
-              _buildSpecialInstructions(),
+              _buildSpecialInstructionsSection(),
               SizedBox(height: context.cardPadding),
               _buildOrderSummary(),
               SizedBox(height: context.cardPadding),
@@ -377,7 +346,6 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left Column
               Expanded(
                 flex: 1,
                 child: Column(
@@ -392,10 +360,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                   ],
                 ),
               ),
-
               SizedBox(width: context.cardPadding),
-
-              // Right Column
               Expanded(
                 flex: 1,
                 child: Column(
@@ -404,7 +369,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     SizedBox(height: context.cardPadding),
                     _buildAdditionalServices(),
                     SizedBox(height: context.cardPadding),
-                    _buildSpecialInstructions(),
+                    _buildSpecialInstructionsSection(),
                     SizedBox(height: context.cardPadding),
                     _buildActionButtons(),
                   ],
@@ -418,6 +383,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildProductInfo() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -433,7 +400,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.inventory_2_outlined, color: Colors.blue, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Product Information',
+                l10n.productInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -483,7 +450,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                         borderRadius: BorderRadius.circular(context.borderRadius('small')),
                       ),
                       child: Text(
-                        'Stock: ${widget.product.quantity} available',
+                        l10n.stockAvailable(widget.product.quantity),
                         style: GoogleFonts.inter(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
@@ -502,6 +469,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildQuantityAndPricing() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -510,212 +479,205 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         border: Border.all(color: Colors.green.withOpacity(0.2)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.shopping_cart_rounded, color: Colors.green, size: context.iconSize('medium')),
-              SizedBox(width: context.smallPadding),
-              Text(
-                'Quantity & Pricing',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-              ),
-            ],
-          ),
-          SizedBox(height: context.cardPadding),
-
-          // Quantity Controls
-          Text(
-            'Quantity',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-          ),
-          SizedBox(height: context.smallPadding),
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _quantity > 1
-                            ? () {
-                                setState(() {
-                                  _quantity--;
-                                  _quantityController.text = _quantity.toString();
-                                });
-                              }
-                            : null,
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                        child: Container(
-                          padding: EdgeInsets.all(context.smallPadding),
-                          child: Icon(Icons.remove, color: _quantity > 1 ? Colors.green : Colors.grey, size: context.iconSize('medium')),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 60,
-                      padding: EdgeInsets.symmetric(vertical: context.smallPadding),
-                      child: TextFormField(
-                        controller: _quantityController,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-                        decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
-                        onChanged: (value) {
-                          final qty = int.tryParse(value) ?? 1;
-                          setState(() => _quantity = qty.clamp(1, widget.product.quantity));
-                        },
-                        validator: (value) {
-                          final qty = int.tryParse(value ?? '') ?? 0;
-                          if (qty < 1) return 'Min 1';
-                          if (qty > widget.product.quantity) return 'Max ${widget.product.quantity}';
-                          return null;
-                        },
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _quantity < widget.product.quantity
-                            ? () {
-                                setState(() {
-                                  _quantity++;
-                                  _quantityController.text = _quantity.toString();
-                                });
-                              }
-                            : null,
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
-                        child: Container(
-                          padding: EdgeInsets.all(context.smallPadding),
-                          child: Icon(
-                            Icons.add,
-                            color: _quantity < widget.product.quantity ? Colors.green : Colors.grey,
-                            size: context.iconSize('medium'),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: context.cardPadding),
-
-          // Custom Price Toggle
-          Row(
-            children: [
-              Text(
-                'Custom Price',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-              ),
-              const Spacer(),
-              Switch.adaptive(
-                value: _isCustomPrice,
-                onChanged: (value) {
-                  setState(() {
-                    _isCustomPrice = value;
-                    if (!value) {
-                      _customPriceController.text = widget.product.price.toStringAsFixed(0);
-                    }
-                  });
-                },
-                activeColor: Colors.green,
-              ),
-            ],
-          ),
-
-          if (_isCustomPrice) ...[
-            SizedBox(height: context.smallPadding),
-            PremiumTextField(
-              label: 'Custom Price (PKR)',
-              controller: _customPriceController,
-              keyboardType: TextInputType.number,
-              prefixIcon: Icons.attach_money_rounded,
-              validator: (value) {
-                final price = double.tryParse(value ?? '');
-                if (price == null || price <= 0) return 'Please enter a valid price';
-                return null;
-              },
-              onChanged: (value) => setState(() {}),
-            ),
-          ],
-
-          SizedBox(height: context.cardPadding),
-
-          // Item Discount
-          Text(
-            'Item Discount (Optional)',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-          ),
-          SizedBox(height: context.smallPadding),
-          Row(
-            children: [5, 10, 15, 20].map((percentage) {
-              final discountAmount = (_currentPrice * percentage) / 100;
-              return Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(right: percentage != 20 ? context.smallPadding / 2 : 0),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _itemDiscount = discountAmount;
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: _itemDiscount == discountAmount ? Colors.orange : Colors.orange.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          color: _itemDiscount == discountAmount ? Colors.orange.withOpacity(0.1) : null,
-                        ),
-                        child: Text(
-                          '$percentage%',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-          if (_itemDiscount > 0) ...[
-            SizedBox(height: context.smallPadding / 2),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => setState(() => _itemDiscount = 0.0),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                    child: Text(
-                      'Clear Discount (PKR ${_itemDiscount.toStringAsFixed(0)})',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+      Row(
+      children: [
+      Icon(Icons.shopping_cart_rounded, color: Colors.green, size: context.iconSize('medium')),
+      SizedBox(width: context.smallPadding),
+      Text(
+        l10n.quantityAndPricing,
+        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
       ),
+      ],
+    ),
+    SizedBox(height: context.cardPadding),
+    Text(
+    l10n.quantity,
+    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    ),
+    SizedBox(height: context.smallPadding),
+    Row(
+    children: [
+    Container(
+    decoration: BoxDecoration(
+    border: Border.all(color: Colors.grey.shade300),
+    borderRadius: BorderRadius.circular(context.borderRadius()),
+    ),
+    child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    Material(
+    color: Colors.transparent,
+    child: InkWell(
+    onTap: _quantity > 1
+    ? () {
+    setState(() {
+    _quantity--;
+    _quantityController.text = _quantity.toString();
+    });
+    }
+        : null,
+    borderRadius: BorderRadius.circular(context.borderRadius()),
+    child: Container(
+    padding: EdgeInsets.all(context.smallPadding),
+    child: Icon(Icons.remove, color: _quantity > 1 ? Colors.green : Colors.grey, size: context.iconSize('medium')),
+    ),
+    ),
+    ),
+    Container(
+    width: 60,
+    padding: EdgeInsets.symmetric(vertical: context.smallPadding),
+    child: TextFormField(
+    controller: _quantityController,
+    keyboardType: TextInputType.number,
+    textAlign: TextAlign.center,
+    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
+    onChanged: (value) {
+    final qty = int.tryParse(value) ?? 1;
+    setState(() => _quantity = qty.clamp(1, widget.product.quantity));
+    },
+    validator: (value) {
+    final qty = int.tryParse(value ?? '') ?? 0;
+    if (qty < 1) return l10n.minQuantity;
+    if (qty > widget.product.quantity) return l10n.maxQuantity(widget.product.quantity);
+    return null;
+    },
+    ),
+    ),
+    Material(
+    color: Colors.transparent,
+    child: InkWell(
+    onTap: _quantity < widget.product.quantity
+    ? () {
+    setState(() {
+    _quantity++;
+    _quantityController.text = _quantity.toString();
+    });
+    }
+        : null,
+    borderRadius: BorderRadius.circular(context.borderRadius()),
+    child: Container(
+    padding: EdgeInsets.all(context.smallPadding),
+    child: Icon(
+    Icons.add,
+    color: _quantity < widget.product.quantity ? Colors.green : Colors.grey,
+    size: context.iconSize('medium'),
+    ),
+    ),
+    ),
+    ),
+    ],
+    ),
+    ),
+    ],
+    ),
+    SizedBox(height: context.cardPadding),
+    Row(
+    children: [
+    Text(
+    l10n.customPrice,
+    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    ),
+    const Spacer(),
+    Switch.adaptive(
+    value: _isCustomPrice,
+    onChanged: (value) {
+    setState(() {
+    _isCustomPrice = value;
+    if (!value) {
+    _customPriceController.text = widget.product.price.toStringAsFixed(0);
+    }
+    });
+    },
+    activeColor: Colors.green,
+    ),
+    ],
+    ),
+    if (_isCustomPrice) ...[
+    SizedBox(height: context.smallPadding),
+    PremiumTextField(
+    label: l10n.customPricePkr,
+    controller: _customPriceController,
+    keyboardType: TextInputType.number,
+    prefixIcon: Icons.attach_money_rounded,
+    validator: (value) {
+    final price = double.tryParse(value ?? '');
+    if (price == null || price <= 0) return l10n.enterValidPrice;
+    return null;
+    },
+    onChanged: (value) => setState(() {}),
+    ),
+    ],
+    SizedBox(height: context.cardPadding),
+    Text(
+    l10n.itemDiscountOptional,
+    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    ),
+    SizedBox(height: context.smallPadding),
+    Row(
+    children: [5, 10, 15, 20].map((percentage) {
+    final discountAmount = (_currentPrice * percentage) / 100;
+    return Expanded(
+    child: Container(
+    margin: EdgeInsets.only(right: percentage != 20 ? context.smallPadding / 2 : 0),
+    child: Material(
+    color: Colors.transparent,
+    child: InkWell(
+    onTap: () {
+    setState(() {
+    _itemDiscount = discountAmount;
+    });
+    },
+    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+    child: Container(
+    padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
+    decoration: BoxDecoration(
+    border: Border.all(color: _itemDiscount == discountAmount ? Colors.orange : Colors.orange.withOpacity(0.3)),
+    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+    color: _itemDiscount == discountAmount ? Colors.orange.withOpacity(0.1) : null,
+    ),
+    child: Text(
+    '$percentage%',
+    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+    textAlign: TextAlign.center,
+    ),
+    ),
+    ),
+    ),
+    ),
+    );
+    }).toList(),
+    ),
+    if (_itemDiscount > 0) ...[
+    SizedBox(height: context.smallPadding / 2),
+    Align(
+    alignment: Alignment.centerRight,
+    child: Material(
+    color: Colors.transparent,
+    child: InkWell(
+    onTap: () => setState(() => _itemDiscount = 0.0),
+    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+    child: Container(
+    padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+    child: Text(
+    l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
+    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
+    ),
+    ),
+    ),
+    ),
+    ),
+    ],
+    ],
+    ),
     );
   }
 
   Widget _buildSizeAndFitting() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -731,16 +693,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.straighten_rounded, color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Size & Fitting',
+                l10n.sizeAndFitting,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Size Selection
           Text(
-            'Size',
+            l10n.size,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -774,12 +734,9 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               );
             }).toList(),
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Fitting Options
           Text(
-            'Fitting Style',
+            l10n.fittingStyle,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -796,16 +753,16 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 items: _fittingOptions
                     .map(
                       (fitting) => DropdownMenuItem<String>(
-                        value: fitting,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                          child: Text(
-                            fitting,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
-                          ),
-                        ),
+                    value: fitting,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                      child: Text(
+                        fitting,
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
-                    )
+                    ),
+                  ),
+                )
                     .toList(),
               ),
             ),
@@ -816,6 +773,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildCustomizationOptions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -831,16 +790,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.palette_rounded, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customization Options',
+                l10n.customizationOptions,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Embroidery Options
           Text(
-            'Embroidery Work',
+            l10n.embroideryWork,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -857,26 +814,23 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 items: _embroideryOptions
                     .map(
                       (embroidery) => DropdownMenuItem<String>(
-                        value: embroidery,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                          child: Text(
-                            embroidery,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
-                          ),
-                        ),
+                    value: embroidery,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                      child: Text(
+                        embroidery,
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
-                    )
+                    ),
+                  ),
+                )
                     .toList(),
               ),
             ),
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Fabric Quality
           Text(
-            'Fabric Quality',
+            l10n.fabricQuality,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -893,26 +847,23 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 items: _fabricQualityOptions
                     .map(
                       (quality) => DropdownMenuItem<String>(
-                        value: quality,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                          child: Text(
-                            quality,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
-                          ),
-                        ),
+                    value: quality,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                      child: Text(
+                        quality,
+                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
-                    )
+                    ),
+                  ),
+                )
                     .toList(),
               ),
             ),
           ),
-
           SizedBox(height: context.cardPadding),
-
-          // Accent Color
           Text(
-            'Accent Color',
+            l10n.accentColor,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -946,6 +897,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildAdditionalServices() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -961,14 +914,12 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.add_box_rounded, color: Colors.teal, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Additional Services',
+                l10n.additionalServices,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Express Delivery
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
@@ -985,11 +936,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Express Delivery',
+                        l10n.expressDelivery,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
-                        'Get your order in 2-3 days (+PKR 1,000)',
+                        l10n.expressDeliveryDesc,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                     ],
@@ -998,10 +949,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ],
             ),
           ),
-
           SizedBox(height: context.smallPadding),
-
-          // Gift Wrapping
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
@@ -1018,11 +966,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Gift Wrapping',
+                        l10n.giftWrapping,
                         style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
-                        'Beautiful gift packaging (+PKR 500)',
+                        l10n.giftWrappingDesc,
                         style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                     ],
@@ -1036,7 +984,9 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     );
   }
 
-  Widget _buildSpecialInstructions() {
+  Widget _buildSpecialInstructionsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -1052,7 +1002,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.note_outlined, color: Colors.indigo, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Special Instructions',
+                l10n.specialInstructions,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
@@ -1070,15 +1020,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ),
             ],
           ),
-
           if (_hasNotes) ...[
             SizedBox(height: context.cardPadding),
             PremiumTextField(
-              label: 'Additional Requirements',
+              label: l10n.additionalRequirements,
               controller: _notesController,
               prefixIcon: Icons.edit_note_rounded,
               maxLines: 4,
-              hint: 'Any special requirements, measurements, design preferences, or delivery instructions...',
+              hint: l10n.additionalRequirementsHint,
             ),
           ],
         ],
@@ -1087,6 +1036,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   }
 
   Widget _buildOrderSummary() {
+    final l10n = AppLocalizations.of(context)!;
     final additionalCharges = _calculateAdditionalCharges();
 
     return Container(
@@ -1104,19 +1054,17 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.receipt_long_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Summary',
+                l10n.orderSummary,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-
-          // Base Price
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Base Price × $_quantity:',
+                l10n.basePriceQuantity(_quantity),
                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -1125,133 +1073,25 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ),
             ],
           ),
-
-          // Additional Charges Breakdown
           if (additionalCharges > 0) ...[
             SizedBox(height: context.smallPadding / 2),
             Divider(color: Colors.grey.shade300),
             SizedBox(height: context.smallPadding / 2),
-
-            // Show breakdown of additional charges
-            if (_selectedSize == 'Custom') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Custom Size:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR 2,000',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
-
-            if (_selectedFitting == 'Custom Tailored') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Custom Tailoring:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR 3,000',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ] else if (_selectedFitting == 'Slim Fit') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Slim Fit:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR 500',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
-
-            if (_selectedEmbroidery != 'None') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '$_selectedEmbroidery:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR ${_getEmbroideryCharge().toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
-
-            if (_selectedFabricQuality != 'Standard') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '$_selectedFabricQuality Fabric:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR ${_getFabricQualityCharge().toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
-
-            if (_expressDelivery) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Express Delivery:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR 1,000',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
-
-            if (_giftWrapping) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Gift Wrapping:',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                  ),
-                  Text(
-                    '+PKR 500',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
-                  ),
-                ],
-              ),
-            ],
+            if (_selectedSize == 'Custom') _buildChargeRow(l10n.customSizeLabel, 2000, l10n),
+            if (_selectedFitting == 'Custom Tailored') _buildChargeRow(l10n.customTailoring, 3000, l10n),
+            if (_selectedFitting == 'Slim Fit') _buildChargeRow(l10n.slimFit, 500, l10n),
+            if (_selectedEmbroidery != 'None') _buildChargeRow('$_selectedEmbroidery', _getEmbroideryCharge(), l10n),
+            if (_selectedFabricQuality != 'Standard') _buildChargeRow('${_selectedFabricQuality} ${l10n.fabric}', _getFabricQualityCharge(), l10n),
+            if (_expressDelivery) _buildChargeRow(l10n.expressDelivery, 1000, l10n),
+            if (_giftWrapping) _buildChargeRow(l10n.giftWrapping, 500, l10n),
           ],
-
-          // Subtotal with charges
           if (additionalCharges > 0) ...[
             SizedBox(height: context.smallPadding / 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Subtotal with Customizations:',
+                  l10n.subtotalWithCustomizations,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                 ),
                 Text(
@@ -1261,15 +1101,13 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ],
             ),
           ],
-
-          // Item Discount
           if (_itemDiscount > 0) ...[
             SizedBox(height: context.smallPadding / 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Item Discount:',
+                  l10n.itemDiscount,
                   style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                 ),
                 Text(
@@ -1279,17 +1117,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ],
             ),
           ],
-
           SizedBox(height: context.smallPadding),
           Divider(color: Colors.grey.shade400, thickness: 1.5),
           SizedBox(height: context.smallPadding),
-
-          // Final Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Amount:',
+                l10n.totalAmount,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
               ),
               Text(
@@ -1298,8 +1133,6 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               ),
             ],
           ),
-
-          // Savings indicator
           if (_itemDiscount > 0) ...[
             SizedBox(height: context.smallPadding / 2),
             Align(
@@ -1308,7 +1141,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                 decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
-                  'You save PKR ${_itemDiscount.toStringAsFixed(0)}',
+                  l10n.youSave(_itemDiscount.toStringAsFixed(0)),
                   style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[800]),
                 ),
               ),
@@ -1319,13 +1152,31 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     );
   }
 
+  Widget _buildChargeRow(String label, double amount, AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '$label:',
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+        ),
+        Text(
+          '+PKR ${amount.toStringAsFixed(0)}',
+          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+        ),
+      ],
+    );
+  }
+
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (context.shouldShowCompactLayout) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PremiumButton(
-            text: 'Add to Cart',
+            text: l10n.addToCart,
             onPressed: _handleAddToCart,
             height: context.buttonHeight,
             icon: Icons.add_shopping_cart_rounded,
@@ -1333,7 +1184,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           ),
           SizedBox(height: context.cardPadding),
           PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             isOutlined: true,
             height: context.buttonHeight,
@@ -1347,7 +1198,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         children: [
           Expanded(
             child: PremiumButton(
-              text: 'Cancel',
+              text: l10n.cancel,
               onPressed: _handleCancel,
               isOutlined: true,
               height: context.buttonHeight / 1.5,
@@ -1359,7 +1210,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           Expanded(
             flex: 2,
             child: PremiumButton(
-              text: 'Add to Cart',
+              text: l10n.addToCart,
               onPressed: _handleAddToCart,
               height: context.buttonHeight / 1.5,
               icon: Icons.add_shopping_cart_rounded,
@@ -1371,7 +1222,6 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     }
   }
 
-  // Helper methods for charge calculations
   double _getEmbroideryCharge() {
     switch (_selectedEmbroidery) {
       case 'Basic':

@@ -770,7 +770,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.cardPadding),
               Expanded(
                 child: PremiumTextField(
-                  label: l10n.maxQuantity,
+                  label: l10n.maximumQuantity,
                   hint: l10n.maximumQuantity,
                   controller: _maxQuantityController,
                   prefixIcon: Icons.numbers_outlined,

@@ -3,8 +3,8 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/models/sales/sale_model.dart';
-
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 
@@ -27,11 +27,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   void initState() {
     super.initState();
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-
     _animationController.forward();
   }
 
@@ -49,6 +46,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   void _handlePrint() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -56,7 +54,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
             Icon(Icons.print_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Printing receipt for ${widget.sale.formattedInvoiceNumber}',
+              l10n.printingReceiptFor(widget.sale.formattedInvoiceNumber),
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
             ),
           ],
@@ -134,6 +132,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -156,7 +156,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Sale Details' : 'Sale Invoice Details',
+                  context.shouldShowCompactLayout ? l10n.saleDetails : l10n.saleInvoiceDetails,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -223,30 +223,17 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Invoice Header Info
           _buildInvoiceHeader(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Customer Information
           _buildCustomerInfo(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Items List
           _buildItemsList(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Payment Information
           _buildPaymentInfo(isCompact),
           SizedBox(height: context.cardPadding),
-
-          // Order Summary
           _buildOrderSummary(isCompact),
-
           if (widget.sale.notes?.isNotEmpty == true) ...[SizedBox(height: context.cardPadding), _buildNotesSection(isCompact)],
-
           SizedBox(height: context.mainPadding),
-
-          // Action Buttons
           _buildActionButtons(isCompact),
         ],
       ),
@@ -254,6 +241,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildInvoiceHeader(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -263,45 +252,45 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
       ),
       child: isCompact
           ? Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInvoiceField(l10n, l10n.invoiceNumber, widget.sale.formattedInvoiceNumber),
+          SizedBox(height: context.smallPadding),
+          _buildInvoiceField(l10n, l10n.saleId, widget.sale.id),
+          SizedBox(height: context.smallPadding),
+          _buildInvoiceField(l10n, l10n.dateTime, widget.sale.dateTimeText),
+          SizedBox(height: context.smallPadding),
+          _buildInvoiceField(l10n, l10n.createdBy, widget.sale.createdBy ?? l10n.unknown),
+        ],
+      )
+          : Row(
+        children: [
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInvoiceField('Invoice Number', widget.sale.formattedInvoiceNumber),
+                _buildInvoiceField(l10n, l10n.invoiceNumber, widget.sale.formattedInvoiceNumber),
                 SizedBox(height: context.smallPadding),
-                _buildInvoiceField('Sale ID', widget.sale.id),
-                SizedBox(height: context.smallPadding),
-                _buildInvoiceField('Date & Time', widget.sale.dateTimeText),
-                SizedBox(height: context.smallPadding),
-                _buildInvoiceField('Created By', widget.sale.createdBy ?? 'Unknown'),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInvoiceField('Invoice Number', widget.sale.formattedInvoiceNumber),
-                      SizedBox(height: context.smallPadding),
-                      _buildInvoiceField('Sale ID', widget.sale.id),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInvoiceField('Date & Time', widget.sale.dateTimeText),
-                      SizedBox(height: context.smallPadding),
-                      _buildInvoiceField('Created By', widget.sale.createdBy ?? 'Unknown'),
-                    ],
-                  ),
-                ),
+                _buildInvoiceField(l10n, l10n.saleId, widget.sale.id),
               ],
             ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInvoiceField(l10n, l10n.dateTime, widget.sale.dateTimeText),
+                SizedBox(height: context.smallPadding),
+                _buildInvoiceField(l10n, l10n.createdBy, widget.sale.createdBy ?? l10n.unknown),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildInvoiceField(String label, String value) {
+  Widget _buildInvoiceField(AppLocalizations l10n, String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -318,6 +307,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildCustomerInfo(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -333,7 +324,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Icon(Icons.person_rounded, color: Colors.green, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Customer Information',
+                l10n.customerInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -342,41 +333,43 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
 
           isCompact
               ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInvoiceField(l10n, l10n.name, widget.sale.customerName),
+              SizedBox(height: context.smallPadding),
+              _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone),
+              SizedBox(height: context.smallPadding),
+              _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId),
+            ],
+          )
+              : Row(
+            children: [
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInvoiceField('Name', widget.sale.customerName),
+                    _buildInvoiceField(l10n, l10n.name, widget.sale.customerName),
                     SizedBox(height: context.smallPadding),
-                    _buildInvoiceField('Phone', widget.sale.customerPhone),
-                    SizedBox(height: context.smallPadding),
-                    _buildInvoiceField('Customer ID', widget.sale.customerId),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildInvoiceField('Name', widget.sale.customerName),
-                          SizedBox(height: context.smallPadding),
-                          _buildInvoiceField('Phone', widget.sale.customerPhone),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [_buildInvoiceField('Customer ID', widget.sale.customerId)],
-                      ),
-                    ),
+                    _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone),
                   ],
                 ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [_buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId)],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
   Widget _buildItemsList(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -392,217 +385,186 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Icon(Icons.shopping_bag_rounded, color: Colors.orange, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Items (${widget.sale.totalItems})',
+                '${l10n.items} (${widget.sale.totalItems})',
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          // Items list
           ...widget.sale.saleItems.asMap().entries.map((entry) {
             final index = entry.key;
             final item = entry.value;
-            return Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(context.smallPadding),
-                  decoration: BoxDecoration(
-                    color: AppTheme.pureWhite,
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Item header
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                            ),
-                            child: Text(
-                              '${index + 1}',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
-                            ),
-                          ),
-                          SizedBox(width: context.smallPadding),
-                          Expanded(
-                            child: Text(
-                              item.productName,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: context.smallPadding),
-
-                      // Item details
-                      isCompact
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Unit Price:',
-                                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
-                                    ),
-                                    Text(
-                                      'PKR ${item.unitPrice.toStringAsFixed(0)}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.subtitleFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.charcoalGray,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: context.smallPadding / 2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Quantity:',
-                                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
-                                    ),
-                                    Text(
-                                      item.quantity.toString(),
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.subtitleFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.charcoalGray,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (item.itemDiscount > 0) ...[
-                                  SizedBox(height: context.smallPadding / 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Discount:',
-                                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
-                                      ),
-                                      Text(
-                                        'PKR ${item.itemDiscount.toStringAsFixed(0)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: context.subtitleFontSize,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.orange,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                                SizedBox(height: context.smallPadding / 2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Line Total:',
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.captionFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                    Text(
-                                      'PKR ${item.lineTotal.toStringAsFixed(0)}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.subtitleFontSize,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.primaryMaroon,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Unit Price: PKR ${item.unitPrice.toStringAsFixed(0)}',
-                                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
-                                      ),
-                                      Text(
-                                        'Quantity: ${item.quantity}',
-                                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      if (item.itemDiscount > 0)
-                                        Text(
-                                          'Discount: PKR ${item.itemDiscount.toStringAsFixed(0)}',
-                                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange),
-                                        ),
-                                      Text(
-                                        'Total: PKR ${item.lineTotal.toStringAsFixed(0)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: context.subtitleFontSize,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppTheme.primaryMaroon,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                      // Customization notes
-                      if (item.customizationNotes != null && item.customizationNotes!.isNotEmpty) ...[
-                        SizedBox(height: context.smallPadding),
-                        Container(
-                          padding: EdgeInsets.all(context.smallPadding / 2),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.note_outlined, color: Colors.blue, size: context.iconSize('small')),
-                              SizedBox(width: context.smallPadding / 2),
-                              Expanded(
-                                child: Text(
-                                  'Note: ${item.customizationNotes}',
-                                  style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (index < widget.sale.saleItems.length - 1) SizedBox(height: context.smallPadding),
-              ],
-            );
+            return _buildSaleItem(l10n, index, item, isCompact);
           }).toList(),
         ],
       ),
     );
   }
 
+  Widget _buildSaleItem(AppLocalizations l10n, int index, SaleItemModel item, bool isCompact) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(context.smallPadding),
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    ),
+                    child: Text(
+                      '${index + 1}',
+                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                    ),
+                  ),
+                  SizedBox(width: context.smallPadding),
+                  Expanded(
+                    child: Text(
+                      item.productName,
+                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.smallPadding),
+              _buildItemDetails(l10n, item, isCompact),
+              if (item.customizationNotes != null && item.customizationNotes!.isNotEmpty) ...[
+                SizedBox(height: context.smallPadding),
+                Container(
+                  padding: EdgeInsets.all(context.smallPadding / 2),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.note_outlined, color: Colors.blue, size: context.iconSize('small')),
+                      SizedBox(width: context.smallPadding / 2),
+                      Expanded(
+                        child: Text(
+                          '${l10n.note}: ${item.customizationNotes}',
+                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (index < widget.sale.saleItems.length - 1) SizedBox(height: context.smallPadding),
+      ],
+    );
+  }
+
+  Widget _buildItemDetails(AppLocalizations l10n, SaleItemModel item, bool isCompact) {
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${l10n.unitPrice}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+              Text(
+                'PKR ${item.unitPrice.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              ),
+            ],
+          ),
+          SizedBox(height: context.smallPadding / 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${l10n.quantity}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+              Text(
+                item.quantity.toString(),
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              ),
+            ],
+          ),
+          if (item.itemDiscount > 0) ...[
+            SizedBox(height: context.smallPadding / 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('${l10n.discount}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+                Text(
+                  'PKR ${item.itemDiscount.toStringAsFixed(0)}',
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
+                ),
+              ],
+            ),
+          ],
+          SizedBox(height: context.smallPadding / 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${l10n.lineTotal}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600])),
+              Text(
+                'PKR ${item.lineTotal.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${l10n.unitPrice}: PKR ${item.unitPrice.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+              ),
+              Text(
+                '${l10n.quantity}: ${item.quantity}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (item.itemDiscount > 0)
+                Text(
+                  '${l10n.discount}: PKR ${item.itemDiscount.toStringAsFixed(0)}',
+                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange),
+                ),
+              Text(
+                '${l10n.total}: PKR ${item.lineTotal.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPaymentInfo(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -618,7 +580,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Icon(_getPaymentMethodIcon(widget.sale.paymentMethod), color: Colors.purple, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Payment Information',
+                l10n.paymentInformation,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
@@ -627,40 +589,39 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
 
           isCompact
               ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInvoiceField(l10n, l10n.paymentMethod, widget.sale.paymentMethod),
+              SizedBox(height: context.smallPadding),
+              _buildInvoiceField(l10n, l10n.amountPaid, 'PKR ${widget.sale.amountPaid.toStringAsFixed(0)}'),
+              if (widget.sale.remainingAmount > 0) ...[
+                SizedBox(height: context.smallPadding),
+                _buildInvoiceField(l10n, l10n.remaining, 'PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}'),
+              ],
+            ],
+          )
+              : Row(
+            children: [
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInvoiceField('Payment Method', widget.sale.paymentMethod),
+                    _buildInvoiceField(l10n, l10n.paymentMethod, widget.sale.paymentMethod),
                     SizedBox(height: context.smallPadding),
-                    _buildInvoiceField('Amount Paid', 'PKR ${widget.sale.amountPaid.toStringAsFixed(0)}'),
-                    if (widget.sale.remainingAmount > 0) ...[
-                      SizedBox(height: context.smallPadding),
-                      _buildInvoiceField('Remaining', 'PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}'),
-                    ],
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildInvoiceField('Payment Method', widget.sale.paymentMethod),
-                          SizedBox(height: context.smallPadding),
-                          _buildInvoiceField('Amount Paid', 'PKR ${widget.sale.amountPaid.toStringAsFixed(0)}'),
-                        ],
-                      ),
-                    ),
-                    if (widget.sale.remainingAmount > 0)
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [_buildInvoiceField('Remaining', 'PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}')],
-                        ),
-                      ),
+                    _buildInvoiceField(l10n, l10n.amountPaid, 'PKR ${widget.sale.amountPaid.toStringAsFixed(0)}'),
                   ],
                 ),
+              ),
+              if (widget.sale.remainingAmount > 0)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [_buildInvoiceField(l10n, l10n.remaining, 'PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}')],
+                  ),
+                ),
+            ],
+          ),
 
-          // Split payment details
           if (widget.sale.splitPaymentDetails != null && widget.sale.splitPaymentDetails!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             Container(
@@ -674,12 +635,12 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Split Payment Details',
+                    l10n.splitPaymentDetails,
                     style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   Text(
-                    widget.sale.splitPaymentDetails?.toString() ?? 'No split payment details',
+                    widget.sale.splitPaymentDetails?.toString() ?? l10n.noSplitPaymentDetails,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                 ],
@@ -692,6 +653,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildOrderSummary(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -707,24 +670,23 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Icon(Icons.calculate_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Order Summary',
+                l10n.orderSummary,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
 
-          // Summary rows
-          _buildSummaryRow('Subtotal', 'PKR ${widget.sale.subtotal.toStringAsFixed(0)}'),
+          _buildSummaryRow(l10n.subtotal, 'PKR ${widget.sale.subtotal.toStringAsFixed(0)}'),
 
           if (widget.sale.overallDiscount > 0) ...[
             SizedBox(height: context.smallPadding / 2),
-            _buildSummaryRow('Overall Discount', '- PKR ${widget.sale.overallDiscount.toStringAsFixed(0)}', Colors.orange),
+            _buildSummaryRow('${l10n.overallDiscount}', '- PKR ${widget.sale.overallDiscount.toStringAsFixed(0)}', Colors.orange),
           ],
 
           if (widget.sale.taxConfiguration.hasTaxes) ...[
             ...widget.sale.taxConfiguration.taxList.map(
-              (tax) => Column(
+                  (tax) => Column(
                 children: [
                   SizedBox(height: context.smallPadding / 2),
                   _buildSummaryRow('${tax.name} (${tax.percentage}%)', 'PKR ${tax.amount.toStringAsFixed(0)}'),
@@ -737,9 +699,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
           Divider(color: Colors.grey.shade400, thickness: 1.5),
           SizedBox(height: context.smallPadding),
 
-          // Grand Total
           _buildSummaryRow(
-            'Grand Total',
+            l10n.grandTotal,
             'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
             AppTheme.primaryMaroon,
             true,
@@ -775,6 +736,8 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildNotesSection(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -790,14 +753,14 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Icon(Icons.note_outlined, color: Colors.grey[700], size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
-                'Notes & Remarks',
+                l10n.notesRemarks,
                 style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
-            widget.sale.notes ?? 'No notes available',
+            widget.sale.notes ?? l10n.noNotesAvailable,
             style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700], height: 1.4),
           ),
         ],
@@ -806,65 +769,68 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
   }
 
   Widget _buildActionButtons(bool isCompact) {
+    final l10n = AppLocalizations.of(context)!;
+
     return isCompact
         ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              PremiumButton(
-                text: 'Print Receipt',
-                onPressed: _handlePrint,
-                height: context.buttonHeight,
-                icon: Icons.print_rounded,
-                backgroundColor: Colors.green,
-              ),
-              SizedBox(height: context.cardPadding),
-              PremiumButton(
-                text: 'Close',
-                onPressed: _handleClose,
-                isOutlined: true,
-                height: context.buttonHeight,
-                backgroundColor: Colors.grey[600],
-                textColor: Colors.grey[600],
-              ),
-            ],
-          )
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PremiumButton(
+          text: l10n.printReceipt,
+          onPressed: _handlePrint,
+          height: context.buttonHeight,
+          icon: Icons.print_rounded,
+          backgroundColor: Colors.green,
+        ),
+        SizedBox(height: context.cardPadding),
+        PremiumButton(
+          text: l10n.close,
+          onPressed: _handleClose,
+          isOutlined: true,
+          height: context.buttonHeight,
+          backgroundColor: Colors.grey[600],
+          textColor: Colors.grey[600],
+        ),
+      ],
+    )
         : Row(
-            children: [
-              Expanded(
-                child: PremiumButton(
-                  text: 'Close',
-                  onPressed: _handleClose,
-                  isOutlined: true,
-                  height: context.buttonHeight / 1.5,
-                  backgroundColor: Colors.grey[600],
-                  textColor: Colors.grey[600],
-                ),
-              ),
-              SizedBox(width: context.cardPadding),
-              Expanded(
-                child: PremiumButton(
-                  text: 'Print Receipt',
-                  onPressed: _handlePrint,
-                  height: context.buttonHeight / 1.5,
-                  icon: Icons.print_rounded,
-                  backgroundColor: Colors.green,
-                ),
-              ),
-            ],
-          );
+      children: [
+        Expanded(
+          child: PremiumButton(
+            text: l10n.close,
+            onPressed: _handleClose,
+            isOutlined: true,
+            height: context.buttonHeight / 1.5,
+            backgroundColor: Colors.grey[600],
+            textColor: Colors.grey[600],
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        Expanded(
+          child: PremiumButton(
+            text: l10n.printReceipt,
+            onPressed: _handlePrint,
+            height: context.buttonHeight / 1.5,
+            icon: Icons.print_rounded,
+            backgroundColor: Colors.green,
+          ),
+        ),
+      ],
+    );
   }
 
   IconData _getPaymentMethodIcon(String method) {
-    switch (method) {
-      case 'Cash':
+    switch (method.toUpperCase()) {
+      case 'CASH':
         return Icons.money_rounded;
-      case 'Card':
+      case 'CARD':
         return Icons.credit_card_rounded;
-      case 'Bank Transfer':
+      case 'BANK_TRANSFER':
+      case 'BANK TRANSFER':
         return Icons.account_balance_rounded;
-      case 'Credit':
+      case 'CREDIT':
         return Icons.account_balance_wallet_rounded;
-      case 'Split':
+      case 'SPLIT':
         return Icons.call_split_rounded;
       default:
         return Icons.payment_rounded;

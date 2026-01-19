@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/return_provider.dart';
 import '../../../src/models/sales/return_model.dart';
 
@@ -35,6 +36,8 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -69,6 +72,8 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -80,7 +85,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
           const Icon(Icons.assignment_return, color: Colors.white),
           const SizedBox(width: 12),
           Text(
-            'Create New Return',
+            l10n.createNewReturn,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ],
@@ -89,20 +94,26 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildBasicInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Basic Information', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.basicInformation, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: TextFormField(
                 controller: _saleIdController,
-                decoration: const InputDecoration(labelText: 'Sale ID', hintText: 'Enter sale ID', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.saleId,
+                  hintText: l10n.enterSaleId,
+                  border: const OutlineInputBorder(),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Sale ID is required';
+                    return l10n.saleIdRequired;
                   }
                   return null;
                 },
@@ -112,10 +123,14 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             Expanded(
               child: TextFormField(
                 controller: _customerIdController,
-                decoration: const InputDecoration(labelText: 'Customer ID', hintText: 'Enter customer ID', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: l10n.customerId,
+                  hintText: l10n.enterCustomerId,
+                  border: const OutlineInputBorder(),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Customer ID is required';
+                    return l10n.customerIdRequired;
                   }
                   return null;
                 },
@@ -126,20 +141,23 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           value: _selectedReason.isEmpty ? null : _selectedReason,
-          decoration: const InputDecoration(labelText: 'Return Reason', border: OutlineInputBorder()),
+          decoration: InputDecoration(
+            labelText: l10n.returnReason,
+            border: const OutlineInputBorder(),
+          ),
           items: [
-            const DropdownMenuItem(value: '', child: Text('Select a reason')),
-            const DropdownMenuItem(value: 'DEFECTIVE', child: Text('Defective Product')),
-            const DropdownMenuItem(value: 'WRONG_SIZE', child: Text('Wrong Size')),
-            const DropdownMenuItem(value: 'WRONG_COLOR', child: Text('Wrong Color')),
-            const DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text('Quality Issue')),
-            const DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text('Customer Changed Mind')),
-            const DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text('Damaged in Transit')),
-            const DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+            DropdownMenuItem(value: '', child: Text(l10n.selectReason)),
+            DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.reasonDefective)),
+            DropdownMenuItem(value: 'WRONG_SIZE', child: Text(l10n.reasonWrongSize)),
+            DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.reasonWrongColor)),
+            DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.reasonQualityIssue)),
+            DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text(l10n.reasonChangeMind)),
+            DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text(l10n.reasonDamagedTransit)),
+            DropdownMenuItem(value: 'OTHER', child: Text(l10n.reasonOther)),
           ],
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please select a return reason';
+              return l10n.selectReturnReason;
             }
             return null;
           },
@@ -153,11 +171,15 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _reasonDetailsController,
-            decoration: const InputDecoration(labelText: 'Reason Details', hintText: 'Please specify the reason', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: l10n.reasonDetails,
+              hintText: l10n.specifyReason,
+              border: const OutlineInputBorder(),
+            ),
             maxLines: 2,
             validator: (value) {
               if (_selectedReason == 'OTHER' && (value == null || value.isEmpty)) {
-                return 'Please provide reason details';
+                return l10n.provideReasonDetails;
               }
               return null;
             },
@@ -168,27 +190,33 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildReturnItemsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Return Items', style: Theme.of(context).textTheme.titleMedium),
-            ElevatedButton.icon(onPressed: _addReturnItem, icon: const Icon(Icons.add), label: const Text('Add Item')),
+            Text(l10n.returnItems, style: Theme.of(context).textTheme.titleMedium),
+            ElevatedButton.icon(
+              onPressed: _addReturnItem,
+              icon: const Icon(Icons.add),
+              label: Text(l10n.addItem),
+            ),
           ],
         ),
         const SizedBox(height: 16),
         if (_returnItems.isEmpty)
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: [
-                  Icon(Icons.inventory_2, size: 48, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No return items added'),
-                  Text('Click "Add Item" to add items to return'),
+                  const Icon(Icons.inventory_2, size: 48, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(l10n.noItemsAdded),
+                  Text(l10n.clickAddItem),
                 ],
               ),
             ),
@@ -207,6 +235,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildReturnItemCard(int index) {
+    final l10n = AppLocalizations.of(context)!;
     final item = _returnItems[index];
 
     return Card(
@@ -219,11 +248,11 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Item ${index + 1}', style: Theme.of(context).textTheme.titleSmall),
+                Text(l10n.item(index + 1), style: Theme.of(context).textTheme.titleSmall),
                 IconButton(
                   onPressed: () => _removeReturnItem(index),
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  tooltip: 'Remove Item',
+                  tooltip: l10n.removeItem,
                 ),
               ],
             ),
@@ -233,13 +262,17 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
                 Expanded(
                   child: TextFormField(
                     initialValue: item['sale_item_id'] ?? '',
-                    decoration: const InputDecoration(labelText: 'Sale Item ID', hintText: 'Enter sale item ID', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.saleItemId,
+                      hintText: l10n.enterSaleItemId,
+                      border: const OutlineInputBorder(),
+                    ),
                     onChanged: (value) {
                       _returnItems[index]['sale_item_id'] = value;
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Sale item ID is required';
+                        return l10n.saleItemIdRequired;
                       }
                       return null;
                     },
@@ -249,18 +282,22 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
                 Expanded(
                   child: TextFormField(
                     initialValue: item['quantity_returned']?.toString() ?? '',
-                    decoration: const InputDecoration(labelText: 'Quantity', hintText: 'Enter quantity', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.quantity,
+                      hintText: l10n.enterQuantity,
+                      border: const OutlineInputBorder(),
+                    ),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       _returnItems[index]['quantity_returned'] = int.tryParse(value) ?? 0;
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Quantity is required';
+                        return l10n.quantityRequired;
                       }
                       final quantity = int.tryParse(value);
                       if (quantity == null || quantity <= 0) {
-                        return 'Quantity must be a positive number';
+                        return l10n.quantityPositive;
                       }
                       return null;
                     },
@@ -274,21 +311,24 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: item['condition'] ?? '',
-                    decoration: const InputDecoration(labelText: 'Condition', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.condition,
+                      border: const OutlineInputBorder(),
+                    ),
                     items: [
-                      const DropdownMenuItem(value: '', child: Text('Select condition')),
-                      const DropdownMenuItem(value: 'NEW', child: Text('New')),
-                      const DropdownMenuItem(value: 'GOOD', child: Text('Good')),
-                      const DropdownMenuItem(value: 'FAIR', child: Text('Fair')),
-                      const DropdownMenuItem(value: 'POOR', child: Text('Poor')),
-                      const DropdownMenuItem(value: 'DAMAGED', child: Text('Damaged')),
+                      DropdownMenuItem(value: '', child: Text(l10n.selectCondition)),
+                      DropdownMenuItem(value: 'NEW', child: Text(l10n.conditionNew)),
+                      DropdownMenuItem(value: 'GOOD', child: Text(l10n.conditionGood)),
+                      DropdownMenuItem(value: 'FAIR', child: Text(l10n.conditionFair)),
+                      DropdownMenuItem(value: 'POOR', child: Text(l10n.conditionPoor)),
+                      DropdownMenuItem(value: 'DAMAGED', child: Text(l10n.conditionDamaged)),
                     ],
                     onChanged: (value) {
                       _returnItems[index]['condition'] = value;
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please select condition';
+                        return l10n.selectConditionError;
                       }
                       return null;
                     },
@@ -298,10 +338,10 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
                 Expanded(
                   child: TextFormField(
                     initialValue: item['condition_notes'] ?? '',
-                    decoration: const InputDecoration(
-                      labelText: 'Condition Notes',
-                      hintText: 'Additional notes about condition',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.conditionNotes,
+                      hintText: l10n.conditionNotesHint,
+                      border: const OutlineInputBorder(),
                     ),
                     maxLines: 2,
                     onChanged: (value) {
@@ -318,14 +358,20 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildNotesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Additional Notes', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.additionalNotes, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 16),
         TextFormField(
           controller: _notesController,
-          decoration: const InputDecoration(labelText: 'Notes', hintText: 'Any additional notes about the return', border: OutlineInputBorder()),
+          decoration: InputDecoration(
+            labelText: l10n.notes,
+            hintText: l10n.notesHint,
+            border: const OutlineInputBorder(),
+          ),
           maxLines: 3,
         ),
       ],
@@ -333,6 +379,8 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   Widget _buildActions() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -342,11 +390,16 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          TextButton(onPressed: _isLoading ? null : () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
           const SizedBox(width: 16),
           ElevatedButton(
             onPressed: _isLoading ? null : _submitReturn,
-            child: _isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Create Return'),
+            child: _isLoading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : Text(l10n.createReturn),
           ),
         ],
       ),
@@ -366,12 +419,19 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   void _submitReturn() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (_returnItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add at least one return item'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.addOneItem),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -392,12 +452,27 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
 
       if (success) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Return created successfully'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.createdSuccessfully),
+            backgroundColor: Colors.green,
+          ),
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.error ?? 'Failed to create return'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(provider.error ?? l10n.failedToCreate),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating return: $e'), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorCreating(e.toString())),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       setState(() {
         _isLoading = false;

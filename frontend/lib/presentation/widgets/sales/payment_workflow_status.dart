@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'payment_confirmation_dialog.dart';
@@ -89,6 +90,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   }
 
   void _showStatusUpdateDialog() {
+    final l10n = AppLocalizations.of(context)!;
     if (_workflowSummary == null) return;
 
     final availableActions = Provider.of<SalesProvider>(context, listen: false).getAvailablePaymentActions(_workflowSummary!);
@@ -96,15 +98,15 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Update Sale Status', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(l10n.updateSaleStatus, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select an action to perform:'),
-            SizedBox(height: 16),
+            Text(l10n.selectActionToPerform),
+            const SizedBox(height: 16),
             ...availableActions.map(
-              (action) => ListTile(
+                  (action) => ListTile(
                 leading: _getActionIcon(action),
                 title: Text(_getActionTitle(action)),
                 subtitle: Text(_getActionDescription(action)),
@@ -116,7 +118,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
             ),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel))],
       ),
     );
   }
@@ -124,49 +126,54 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   Icon _getActionIcon(String action) {
     switch (action) {
       case 'add_payment':
-        return Icon(Icons.payment, color: AppTheme.primaryMaroon);
+        return const Icon(Icons.payment, color: AppTheme.primaryMaroon);
       case 'mark_delivered':
-        return Icon(Icons.local_shipping, color: Colors.green);
+        return const Icon(Icons.local_shipping, color: Colors.green);
       case 'cancel_sale':
-        return Icon(Icons.cancel, color: Colors.red);
+        return const Icon(Icons.cancel, color: Colors.red);
       case 'return_sale':
-        return Icon(Icons.undo, color: Colors.orange);
+        return const Icon(Icons.undo, color: Colors.orange);
       default:
-        return Icon(Icons.info, color: Colors.grey);
+        return const Icon(Icons.info, color: Colors.grey);
     }
   }
 
   String _getActionTitle(String action) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (action) {
       case 'add_payment':
-        return 'Add Payment';
+        return l10n.addPayment;
       case 'mark_delivered':
-        return 'Mark as Delivered';
+        return l10n.markAsDelivered;
       case 'cancel_sale':
-        return 'Cancel Sale';
+        return l10n.cancelSale;
       case 'return_sale':
-        return 'Return Sale';
+        return l10n.returnSale;
       default:
-        return 'Unknown Action';
+        return l10n.unknownAction;
     }
   }
 
   String _getActionDescription(String action) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (action) {
       case 'add_payment':
-        return 'Process additional payment for this sale';
+        return l10n.processAdditionalPayment;
       case 'mark_delivered':
-        return 'Mark the sale as delivered to customer';
+        return l10n.markSaleAsDelivered;
       case 'cancel_sale':
-        return 'Cancel this sale and restore inventory';
+        return l10n.cancelSaleAndRestoreInventory;
       case 'return_sale':
-        return 'Process return for delivered sale';
+        return l10n.processReturnForDeliveredSale;
       default:
-        return 'No description available';
+        return l10n.noDescriptionAvailable;
     }
   }
 
   Future<void> _performAction(String action) async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = Provider.of<SalesProvider>(context, listen: false);
 
     try {
@@ -177,13 +184,13 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
           _showPaymentConfirmationDialog();
           return;
         case 'mark_delivered':
-          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'DELIVERED', notes: 'Marked as delivered');
+          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'DELIVERED', notes: l10n.markedAsDelivered);
           break;
         case 'cancel_sale':
-          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'CANCELLED', notes: 'Sale cancelled');
+          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'CANCELLED', notes: l10n.saleCancelled);
           break;
         case 'return_sale':
-          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'RETURNED', notes: 'Sale returned');
+          success = await provider.updateSaleStatusWithPayment(widget.saleId, 'RETURNED', notes: l10n.saleReturned);
           break;
       }
 
@@ -197,12 +204,12 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   }
 
   Widget _buildProgressIndicator() {
-    if (_workflowSummary == null) return SizedBox.shrink();
+    if (_workflowSummary == null) return const SizedBox.shrink();
 
     final progress = Provider.of<SalesProvider>(context, listen: false).getPaymentWorkflowProgress(_workflowSummary!);
     final isComplete = Provider.of<SalesProvider>(context, listen: false).isPaymentWorkflowComplete(_workflowSummary!);
 
-    return Container(
+    return SizedBox(
       width: 80,
       child: Column(
         children: [
@@ -212,7 +219,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
             valueColor: AlwaysStoppedAnimation<Color>(isComplete ? Colors.green : AppTheme.primaryMaroon),
             minHeight: 6,
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             '${progress.toStringAsFixed(0)}%',
             style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
@@ -223,10 +230,10 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   }
 
   Widget _buildStatusChip() {
-    if (_workflowSummary == null) return SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    if (_workflowSummary == null) return const SizedBox.shrink();
 
     final currentStep = _workflowSummary!['current_workflow_step'] as String? ?? '';
-    final nextAction = _workflowSummary!['next_action'] as String? ?? '';
 
     Color chipColor;
     String chipText;
@@ -234,23 +241,23 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
     switch (currentStep) {
       case 'awaiting_payment':
         chipColor = Colors.red;
-        chipText = 'Awaiting Payment';
+        chipText = l10n.awaitingPayment;
         break;
       case 'partial_payment':
         chipColor = Colors.orange;
-        chipText = 'Partial Payment';
+        chipText = l10n.partialPayment;
         break;
       case 'payment_complete':
         chipColor = Colors.green;
-        chipText = 'Payment Complete';
+        chipText = l10n.paymentComplete;
         break;
       default:
         chipColor = Colors.grey;
-        chipText = 'Unknown';
+        chipText = l10n.unknown;
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: chipColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -264,42 +271,38 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   }
 
   Widget _buildActionButtons() {
-    if (_workflowSummary == null) return SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    if (_workflowSummary == null) return const SizedBox.shrink();
 
     final availableActions = Provider.of<SalesProvider>(context, listen: false).getAvailablePaymentActions(_workflowSummary!);
 
-    if (availableActions.isEmpty) return SizedBox.shrink();
+    if (availableActions.isEmpty) return const SizedBox.shrink();
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Payment Button
         if (availableActions.contains('add_payment'))
           Container(
-            margin: EdgeInsets.only(right: 8),
+            margin: const EdgeInsets.only(right: 8),
             child: ElevatedButton.icon(
               onPressed: _showPaymentConfirmationDialog,
-              icon: Icon(Icons.payment, size: 16),
-              label: Text('Payment', style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600)),
+              icon: const Icon(Icons.payment, size: 16),
+              label: Text(l10n.payment, style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                minimumSize: Size(0, 28),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                minimumSize: const Size(0, 28),
               ),
             ),
           ),
-
-        // More Actions Button
         if (availableActions.length > 1)
-          Container(
-            child: IconButton(
-              onPressed: _showStatusUpdateDialog,
-              icon: Icon(Icons.more_vert, size: 20),
-              padding: EdgeInsets.all(4),
-              constraints: BoxConstraints(minWidth: 32, minHeight: 32),
-              style: IconButton.styleFrom(backgroundColor: Colors.grey[200], foregroundColor: Colors.grey[700]),
-            ),
+          IconButton(
+            onPressed: _showStatusUpdateDialog,
+            icon: const Icon(Icons.more_vert, size: 20),
+            padding: const EdgeInsets.all(4),
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            style: IconButton.styleFrom(backgroundColor: Colors.grey[200], foregroundColor: Colors.grey[700]),
           ),
       ],
     );
@@ -308,7 +311,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Container(
+      return const SizedBox(
         width: 120,
         height: 40,
         child: Center(
@@ -321,27 +324,22 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
       );
     }
 
-    return Container(
+    return SizedBox(
       width: 120,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Progress and Status Row
           Row(
             children: [
               _buildProgressIndicator(),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(child: _buildStatusChip()),
             ],
           ),
-
-          SizedBox(height: 8),
-
-          // Action Buttons
+          const SizedBox(height: 8),
           _buildActionButtons(),
         ],
       ),
     );
   }
 }
-

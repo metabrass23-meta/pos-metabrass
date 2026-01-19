@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/invoice_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import 'create_invoice_dialog.dart';
@@ -33,6 +34,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Column(
         children: [
@@ -43,12 +46,14 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateInvoiceDialog(context),
         child: const Icon(Icons.add),
-        tooltip: 'Create Invoice',
+        tooltip: l10n.createInvoice,
       ),
     );
   }
 
   Widget _buildFilters() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
@@ -56,17 +61,17 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Filters', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.filters, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    decoration: const InputDecoration(
-                      labelText: 'Search',
-                      hintText: 'Search by invoice number, customer, or sale',
-                      prefixIcon: Icon(Icons.search),
+                    decoration: InputDecoration(
+                      labelText: l10n.search,
+                      hintText: l10n.searchByInvoiceNumberCustomerOrSale,
+                      prefixIcon: const Icon(Icons.search),
                     ),
                     onChanged: (value) => context.read<InvoiceProvider>().setFilters(search: value),
                   ),
@@ -75,16 +80,16 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
+                    decoration: InputDecoration(labelText: l10n.status, border: const OutlineInputBorder()),
                     items: [
-                      const DropdownMenuItem(value: '', child: Text('All Statuses')),
-                      const DropdownMenuItem(value: 'DRAFT', child: Text('Draft')),
-                      const DropdownMenuItem(value: 'ISSUED', child: Text('Issued')),
-                      const DropdownMenuItem(value: 'SENT', child: Text('Sent')),
-                      const DropdownMenuItem(value: 'VIEWED', child: Text('Viewed')),
-                      const DropdownMenuItem(value: 'PAID', child: Text('Paid')),
-                      const DropdownMenuItem(value: 'OVERDUE', child: Text('Overdue')),
-                      const DropdownMenuItem(value: 'CANCELLED', child: Text('Cancelled')),
+                      DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
+                      DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
+                      DropdownMenuItem(value: 'ISSUED', child: Text(l10n.issued)),
+                      DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
+                      DropdownMenuItem(value: 'VIEWED', child: Text(l10n.viewed)),
+                      DropdownMenuItem(value: 'PAID', child: Text(l10n.paid)),
+                      DropdownMenuItem(value: 'OVERDUE', child: Text(l10n.overdue)),
+                      DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -104,7 +109,7 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
                     });
                     context.read<InvoiceProvider>().clearFilters();
                   },
-                  child: const Text('Clear Filters'),
+                  child: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -115,6 +120,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   Widget _buildInvoicesList() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<InvoiceProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -126,8 +133,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Error: ${provider.error}'),
-                ElevatedButton(onPressed: () => provider.refresh(), child: const Text('Retry')),
+                Text('${l10n.error}: ${provider.error}'),
+                ElevatedButton(onPressed: () => provider.refresh(), child: Text(l10n.retry)),
               ],
             ),
           );
@@ -136,14 +143,14 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
         final invoices = provider.filteredInvoices;
 
         if (invoices.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt_long, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No invoices found'),
-                Text('Create a new invoice using the + button'),
+                const Icon(Icons.receipt_long, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(l10n.noInvoicesFound),
+                Text(l10n.createNewInvoiceUsingButton),
               ],
             ),
           );
@@ -161,6 +168,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   Widget _buildInvoiceCard(InvoiceModel invoice, InvoiceProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: ListTile(
@@ -172,15 +181,15 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Amount: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
-            Text('Customer: ${invoice.customerName}'),
-            Text('Status: ${invoice.statusDisplay}'),
-            Text('Issue Date: ${invoice.formattedIssueDate}'),
-            if (invoice.dueDate != null) Text('Due Date: ${invoice.formattedDueDate}'),
+            Text('${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+            Text('${l10n.customer}: ${invoice.customerName}'),
+            Text('${l10n.status}: ${invoice.statusDisplay}'),
+            Text('${l10n.issueDate}: ${invoice.formattedIssueDate}'),
+            if (invoice.dueDate != null) Text('${l10n.dueDate}: ${invoice.formattedDueDate}'),
             if (invoice.isOverdue)
               Text(
-                'OVERDUE!',
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                l10n.overdue,
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
           ],
         ),
@@ -215,44 +224,46 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   List<PopupMenuEntry<String>> _buildInvoiceActionMenu(InvoiceModel invoice) {
+    final l10n = AppLocalizations.of(context)!;
+
     return [
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'view',
         child: Row(
           children: [
-            Icon(Icons.visibility, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('View'),
+            const Icon(Icons.visibility, color: Colors.blue),
+            const SizedBox(width: 8),
+            Text(l10n.view),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'edit',
         child: Row(
           children: [
-            Icon(Icons.edit, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Edit'),
+            const Icon(Icons.edit, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(l10n.edit),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'generate_pdf',
         child: Row(
           children: [
-            Icon(Icons.picture_as_pdf, color: Colors.green),
-            SizedBox(width: 8),
-            Text('Generate PDF'),
+            const Icon(Icons.picture_as_pdf, color: Colors.green),
+            const SizedBox(width: 8),
+            Text(l10n.generatePdf),
           ],
         ),
       ),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'delete',
         child: Row(
           children: [
-            Icon(Icons.delete, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Delete'),
+            const Icon(Icons.delete, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(l10n.delete),
           ],
         ),
       ),
@@ -281,29 +292,31 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   void _showInvoiceDetails(InvoiceModel invoice, InvoiceProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Invoice Details - ${invoice.invoiceNumber}'),
+        title: Text(l10n.invoiceDetailsWithNumber(invoice.invoiceNumber)),
         content: SizedBox(
           width: 400,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Invoice Number', invoice.invoiceNumber),
-              _buildDetailRow('Sale Invoice Number', invoice.saleInvoiceNumber),
-              _buildDetailRow('Customer', invoice.customerName),
-              _buildDetailRow('Amount', 'PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
-              _buildDetailRow('Status', invoice.statusDisplay),
-              _buildDetailRow('Issue Date', invoice.formattedIssueDate),
-              if (invoice.dueDate != null) _buildDetailRow('Due Date', invoice.formattedDueDate),
-              if (invoice.notes?.isNotEmpty == true) _buildDetailRow('Notes', invoice.notes!),
-              if (invoice.termsConditions?.isNotEmpty == true) _buildDetailRow('Terms & Conditions', invoice.termsConditions!),
+              _buildDetailRow(l10n.invoiceNumber, invoice.invoiceNumber),
+              _buildDetailRow(l10n.saleInvoiceNumber, invoice.saleInvoiceNumber),
+              _buildDetailRow(l10n.customer, invoice.customerName),
+              _buildDetailRow(l10n.amount, 'PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+              _buildDetailRow(l10n.status, invoice.statusDisplay),
+              _buildDetailRow(l10n.issueDate, invoice.formattedIssueDate),
+              if (invoice.dueDate != null) _buildDetailRow(l10n.dueDate, invoice.formattedDueDate),
+              if (invoice.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, invoice.notes!),
+              if (invoice.termsConditions?.isNotEmpty == true) _buildDetailRow(l10n.termsAndConditions, invoice.termsConditions!),
             ],
           ),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
       ),
     );
   }
@@ -316,42 +329,48 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   void _generateInvoicePdf(InvoiceModel invoice, InvoiceProvider provider) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final success = await provider.generateInvoicePdf(invoice.id);
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invoice PDF generated successfully'), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.invoicePdfGeneratedSuccessfully), backgroundColor: Colors.green),
+      );
     }
   }
 
   void _showDeleteInvoiceDialog(InvoiceModel invoice, InvoiceProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Invoice - ${invoice.invoiceNumber}'),
+        title: Text(l10n.deleteInvoiceWithNumber(invoice.invoiceNumber)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Are you sure you want to delete this invoice?'),
+            Text(l10n.areYouSureDeleteInvoice),
             const SizedBox(height: 8),
-            Text('Amount: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+            Text('${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
             const SizedBox(height: 8),
-            const Text('This action cannot be undone.', style: TextStyle(color: Colors.red)),
+            Text(l10n.actionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.deleteInvoice(invoice.id);
               if (success && mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Invoice deleted successfully'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.invoiceDeletedSuccessfully), backgroundColor: Colors.green),
+                );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

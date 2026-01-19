@@ -1,8 +1,8 @@
-// Existing Orders Dialog
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
@@ -19,7 +19,7 @@ class ExistingOrdersDialog extends StatefulWidget {
 class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
   @override
   Widget build(BuildContext context) {
-    // This would fetch actual orders from OrderProvider
+    final l10n = AppLocalizations.of(context)!;
     final existingOrders = _getExistingOrdersForProduct();
 
     return Dialog(
@@ -50,7 +50,6 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
@@ -80,7 +79,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Existing Orders',
+                          l10n.existingOrders,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
@@ -118,7 +117,6 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
               ),
             ),
 
-            // Content
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(context.cardPadding),
@@ -126,7 +124,6 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
               ),
             ),
 
-            // Action Buttons
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               child: Row(
@@ -153,7 +150,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                                 Icon(Icons.add_rounded, color: Colors.blue, size: context.iconSize('medium')),
                                 SizedBox(width: context.smallPadding),
                                 Text(
-                                  'Create New Order',
+                                  l10n.createNewOrder,
                                   style: GoogleFonts.inter(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
@@ -177,6 +174,8 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
   }
 
   Widget _buildOrderCard(Map<String, dynamic> order) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: EdgeInsets.only(bottom: context.cardPadding),
       padding: EdgeInsets.all(context.cardPadding),
@@ -237,7 +236,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                   borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 ),
                 child: Text(
-                  order['status'],
+                  _getLocalizedStatus(order['status'], l10n),
                   style: GoogleFonts.inter(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
@@ -255,7 +254,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Order Date',
+                    l10n.orderDate,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
@@ -272,7 +271,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Delivery Date',
+                    l10n.deliveryDate,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
@@ -289,7 +288,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Amount',
+                    l10n.amount,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
@@ -348,7 +347,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                           Icon(Icons.add_rounded, size: context.iconSize('small'), color: Colors.blue),
                           SizedBox(width: context.smallPadding / 2),
                           Text(
-                            'Add to Order',
+                            l10n.addToOrder,
                             style: GoogleFonts.inter(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w600,
@@ -388,6 +387,23 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
     );
   }
 
+  String _getLocalizedStatus(String status, AppLocalizations l10n) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return l10n.pendingStatus;
+      case 'in progress':
+        return l10n.inProgressStatus;
+      case 'completed':
+        return l10n.completedStatus;
+      case 'delivered':
+        return l10n.deliveredStatus;
+      case 'cancelled':
+        return l10n.cancelledStatus;
+      default:
+        return status;
+    }
+  }
+
   Color _getOrderStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -406,7 +422,6 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
   }
 
   List<Map<String, dynamic>> _getExistingOrdersForProduct() {
-    // This would fetch from OrderProvider in real implementation
     return [
       {
         'id': 'ORD001',
@@ -432,10 +447,12 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
   }
 
   void _addToExistingOrder(Map<String, dynamic> order) {
+    final l10n = AppLocalizations.of(context)!;
+
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${widget.product.name} added to order ${order['id']}'),
+        content: Text(l10n.productAddedToOrder(widget.product.name, order['id'])),
         backgroundColor: Colors.blue,
       ),
     );

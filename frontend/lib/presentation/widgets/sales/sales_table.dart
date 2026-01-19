@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -108,56 +109,29 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible
     return ResponsiveBreakpoints.responsive(context, tablet: 1400.0, small: 1600.0, medium: 1800.0, large: 2000.0, ultrawide: 2200.0);
   }
 
   Widget _buildTableHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Sale ID
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, 'Sale ID')),
-
-        // Invoice Number
-        Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Invoice #')),
-
-        // Customer
-        Container(width: columnWidths[2], child: _buildHeaderCell(context, 'Customer')),
-
-        // Items
-        Container(width: columnWidths[3], child: _buildHeaderCell(context, 'Items')),
-
-        // Subtotal
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Subtotal')),
-
-        // Discount
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'Discount')),
-
-        // GST
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, 'GST')),
-
-        // Grand Total
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, 'Grand Total')),
-
-        // Amount Paid
-        Container(width: columnWidths[8], child: _buildHeaderCell(context, 'Paid')),
-
-        // Remaining
-        Container(width: columnWidths[9], child: _buildHeaderCell(context, 'Remaining')),
-
-        // Payment Method
-        Container(width: columnWidths[10], child: _buildHeaderCell(context, 'Payment')),
-
-        // Date
-        Container(width: columnWidths[11], child: _buildHeaderCell(context, 'Date')),
-
-        // Status
-        Container(width: columnWidths[12], child: _buildHeaderCell(context, 'Status')),
-
-        // Actions
-        Container(width: columnWidths[13], child: _buildHeaderCell(context, 'Actions')),
+        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.saleId)),
+        Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.invoiceNumber)),
+        Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.customer)),
+        Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.items)),
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.subtotal)),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.discount)),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.gst)),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.grandTotal)),
+        Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.paid)),
+        Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.remaining)),
+        Container(width: columnWidths[10], child: _buildHeaderCell(context, l10n.payment)),
+        Container(width: columnWidths[11], child: _buildHeaderCell(context, l10n.date)),
+        Container(width: columnWidths[12], child: _buildHeaderCell(context, l10n.status)),
+        Container(width: columnWidths[13], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
@@ -189,6 +163,7 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   Widget _buildTableRow(BuildContext context, SaleModel sale, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
@@ -281,21 +256,21 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: sale.overallDiscount > 0
                 ? Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    ),
-                    child: Text(
-                      'PKR ${sale.overallDiscount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
-                    ),
-                  )
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                'PKR ${sale.overallDiscount.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+              ),
+            )
                 : Text(
-                    '-',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[500]),
-                    textAlign: TextAlign.center,
-                  ),
+              '-',
+              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
           ),
 
           // GST
@@ -341,24 +316,24 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: sale.remainingAmount > 0
                 ? Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-                    decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-                    child: Text(
-                      'PKR ${sale.remainingAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
-                    ),
-                  )
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              child: Text(
+                'PKR ${sale.remainingAmount.toStringAsFixed(0)}',
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+              ),
+            )
                 : Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                    ),
-                    child: Text(
-                      'Paid',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
-                    ),
-                  ),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                l10n.paid,
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+              ),
+            ),
           ),
 
           // Payment Method
@@ -378,7 +353,7 @@ class _SalesTableState extends State<SalesTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
-                      sale.paymentMethod,
+                      _getLocalizedPaymentMethod(l10n, sale.paymentMethod),
                       style: GoogleFonts.inter(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
@@ -421,7 +396,7 @@ class _SalesTableState extends State<SalesTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
-                      sale.status,
+                      _getLocalizedStatus(l10n, sale.status),
                       style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: sale.statusColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -443,7 +418,51 @@ class _SalesTableState extends State<SalesTable> {
     );
   }
 
+  String _getLocalizedPaymentMethod(AppLocalizations l10n, String method) {
+    switch (method.toUpperCase()) {
+      case 'CASH':
+        return l10n.cash;
+      case 'CARD':
+        return l10n.card;
+      case 'BANK_TRANSFER':
+      case 'BANK TRANSFER':
+        return l10n.bankTransfer;
+      case 'MOBILE_PAYMENT':
+      case 'MOBILE PAYMENT':
+        return l10n.mobilePayment;
+      case 'CREDIT':
+        return l10n.credit;
+      case 'SPLIT':
+        return l10n.split;
+      default:
+        return method;
+    }
+  }
+
+  String _getLocalizedStatus(AppLocalizations l10n, String status) {
+    switch (status.toUpperCase()) {
+      case 'DRAFT':
+        return l10n.draft;
+      case 'CONFIRMED':
+        return l10n.confirmed;
+      case 'INVOICED':
+        return l10n.invoiced;
+      case 'PAID':
+        return l10n.paid;
+      case 'DELIVERED':
+        return l10n.delivered;
+      case 'CANCELLED':
+        return l10n.cancelled;
+      case 'RETURNED':
+        return l10n.returned;
+      default:
+        return status;
+    }
+  }
+
   Widget _buildActions(BuildContext context, SaleModel sale) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -484,9 +503,12 @@ class _SalesTableState extends State<SalesTable> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Print receipt for ${sale.formattedInvoiceNumber}'), backgroundColor: Colors.green));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l10n.printReceiptFor(sale.formattedInvoiceNumber)),
+                  backgroundColor: Colors.green,
+                ),
+              );
             },
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
@@ -517,6 +539,8 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -531,7 +555,7 @@ class _SalesTableState extends State<SalesTable> {
           SizedBox(height: context.mainPadding),
 
           Text(
-            'No Sales Records Found',
+            l10n.noSalesRecordsFound,
             style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
@@ -542,7 +566,7 @@ class _SalesTableState extends State<SalesTable> {
               maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
             ),
             child: Text(
-              'Complete your first sale to see transaction records here',
+              l10n.completeFirstSaleMessage,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -553,16 +577,17 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   Color _getPaymentMethodColor(String method) {
-    switch (method) {
-      case 'Cash':
+    switch (method.toUpperCase()) {
+      case 'CASH':
         return Colors.green;
-      case 'Card':
+      case 'CARD':
         return Colors.blue;
-      case 'Bank Transfer':
+      case 'BANK_TRANSFER':
+      case 'BANK TRANSFER':
         return Colors.purple;
-      case 'Credit':
+      case 'CREDIT':
         return Colors.orange;
-      case 'Split':
+      case 'SPLIT':
         return Colors.indigo;
       default:
         return Colors.grey;
@@ -570,16 +595,17 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   IconData _getPaymentMethodIcon(String method) {
-    switch (method) {
-      case 'Cash':
+    switch (method.toUpperCase()) {
+      case 'CASH':
         return Icons.money_rounded;
-      case 'Card':
+      case 'CARD':
         return Icons.credit_card_rounded;
-      case 'Bank Transfer':
+      case 'BANK_TRANSFER':
+      case 'BANK TRANSFER':
         return Icons.account_balance_rounded;
-      case 'Credit':
+      case 'CREDIT':
         return Icons.account_balance_wallet_rounded;
-      case 'Split':
+      case 'SPLIT':
         return Icons.call_split_rounded;
       default:
         return Icons.payment_rounded;

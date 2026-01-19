@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -56,6 +57,8 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -63,7 +66,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
             Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
-              'Sale record deleted successfully!',
+              l10n.saleDeletedSuccessfully,
               style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
@@ -148,6 +151,8 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -170,7 +175,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Delete Sale' : 'Delete Sale Record',
+                  context.shouldShowCompactLayout ? l10n.deleteSale : l10n.deleteSaleRecord,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -181,7 +186,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'This action cannot be undone',
+                    l10n.actionCannotBeUndone,
                     style: GoogleFonts.inter(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -209,12 +214,13 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
   }
 
   Widget _buildContent({required bool isCompact}) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.all(context.cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Warning Icon
           Center(
             child: Container(
               width: ResponsiveBreakpoints.responsive(context, tablet: 5.w, small: 5.w, medium: 5.w, large: 5.w, ultrawide: 5.w),
@@ -226,16 +232,14 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
           SizedBox(height: context.mainPadding),
 
-          // Confirmation Text
           Text(
-            isCompact ? 'Are you sure you want to delete this sale?' : 'Are you absolutely sure you want to delete this sale record?',
+            isCompact ? l10n.areYouSureDeleteSale : l10n.areYouAbsolutelySure,
             style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
 
           SizedBox(height: context.cardPadding),
 
-          // Sale Details Card
           Container(
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
@@ -245,7 +249,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
             ),
             child: Column(
               children: [
-                // Header Row
                 Row(
                   children: [
                     Container(
@@ -282,7 +285,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
                 SizedBox(height: context.smallPadding),
 
-                // Customer Info
                 Row(
                   children: [
                     Icon(Icons.person_rounded, color: Colors.grey[600], size: context.iconSize('small')),
@@ -307,7 +309,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
                 SizedBox(height: context.smallPadding),
 
-                // Financial Details
                 if (isCompact)
                   Column(
                     children: [
@@ -315,7 +316,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Items:',
+                            '${l10n.items}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -329,7 +330,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Grand Total:',
+                            '${l10n.grandTotal}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -343,7 +344,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Amount Paid:',
+                            '${l10n.amountPaid}:',
                             style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
@@ -358,7 +359,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Remaining:',
+                              '${l10n.remaining}:',
                               style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                             ),
                             Text(
@@ -378,11 +379,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Items: ${widget.sale.totalItems}',
+                              '${l10n.items}: ${widget.sale.totalItems}',
                               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                             ),
                             Text(
-                              'Total: PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
+                              '${l10n.total}: PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
                               style: GoogleFonts.inter(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w700,
@@ -397,12 +398,12 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'Paid: PKR ${widget.sale.amountPaid.toStringAsFixed(0)}',
+                              '${l10n.paid}: PKR ${widget.sale.amountPaid.toStringAsFixed(0)}',
                               style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
                             ),
                             if (widget.sale.remainingAmount > 0)
                               Text(
-                                'Due: PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}',
+                                '${l10n.due}: PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}',
                                 style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                               ),
                           ],
@@ -413,7 +414,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
                 SizedBox(height: context.smallPadding),
 
-                // Date and Payment Method
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -421,7 +421,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Date:',
+                          '${l10n.date}:',
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Text(
@@ -434,7 +434,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Payment:',
+                          '${l10n.payment}:',
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Row(
@@ -461,7 +461,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                   ],
                 ),
 
-                // Notes if any
                 if (widget.sale.notes?.isNotEmpty == true) ...[
                   SizedBox(height: context.smallPadding),
                   Align(
@@ -470,7 +469,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Notes:',
+                          '${l10n.notes}:',
                           style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Text(
@@ -489,7 +488,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
           SizedBox(height: context.cardPadding),
 
-          // Warning Message
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
@@ -499,9 +497,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
-                    isCompact
-                        ? 'This will permanently delete the sale record and all associated data.'
-                        : 'This will permanently delete the sale record, payment information, and all associated data. This action cannot be undone.',
+                    isCompact ? l10n.permanentDeleteWarningShort : l10n.permanentDeleteWarningLong,
                     style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
@@ -511,7 +507,6 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
           SizedBox(height: context.mainPadding),
 
-          // Action Buttons
           ResponsiveBreakpoints.responsive(
             context,
             tablet: _buildCompactButtons(),
@@ -526,11 +521,13 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
   }
 
   Widget _buildCompactButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         PremiumButton(
-          text: 'Cancel',
+          text: l10n.cancel,
           onPressed: _handleCancel,
           height: context.buttonHeight,
           backgroundColor: Colors.grey[600],
@@ -540,7 +537,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
         Consumer<SalesProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: provider.isLoading ? 'Deleting...' : 'Delete Sale',
+              text: provider.isLoading ? l10n.deleting : l10n.deleteSaleButton,
               onPressed: provider.isLoading ? null : _handleDelete,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
@@ -554,12 +551,14 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
   }
 
   Widget _buildDesktopButtons() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: PremiumButton(
-            text: 'Cancel',
+            text: l10n.cancel,
             onPressed: _handleCancel,
             height: context.buttonHeight / 1.5,
             backgroundColor: Colors.grey[600],
@@ -572,7 +571,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
           child: Consumer<SalesProvider>(
             builder: (context, provider, child) {
               return PremiumButton(
-                text: provider.isLoading ? 'Deleting...' : 'Delete',
+                text: provider.isLoading ? l10n.deleting : l10n.delete,
                 onPressed: provider.isLoading ? null : _handleDelete,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
