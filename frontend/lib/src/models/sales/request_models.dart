@@ -7,6 +7,7 @@ class CreateSaleRequest {
   final double overallDiscount;
   final TaxConfiguration taxConfiguration;
   final String paymentMethod;
+  final double? amountPaid; 
   final Map<String, dynamic>? splitPaymentDetails;
   final String? notes;
   final List<CreateSaleItemRequest> saleItems;
@@ -17,6 +18,7 @@ class CreateSaleRequest {
     required this.overallDiscount,
     required this.taxConfiguration,
     required this.paymentMethod,
+    this.amountPaid,
     this.splitPaymentDetails,
     this.notes,
     required this.saleItems,
@@ -29,6 +31,7 @@ class CreateSaleRequest {
       'overall_discount': overallDiscount.toString(),
       'tax_configuration': taxConfiguration.toJson(),
       'payment_method': paymentMethod,
+      'amount_paid': amountPaid?.toString(),
       'split_payment_details': splitPaymentDetails,
       'notes': notes,
       'sale_items': saleItems.map((item) => item.toJson()).toList(),

@@ -30,6 +30,14 @@ class _SalesPageState extends State<SalesPage> {
   String _selectedCategory = 'All';
 
   @override
+ void initState() {
+  super.initState();
+  // Initialize SalesProvider to load products
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Provider.of<SalesProvider>(context, listen: false).initialize();
+  });
+  }
+  @override
   void dispose() {
     _searchController.dispose();
     _customerSearchController.dispose();

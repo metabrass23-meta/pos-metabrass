@@ -403,6 +403,7 @@ class SalesProvider extends ChangeNotifier {
         overallDiscount: _overallDiscount,
         taxConfiguration: _taxConfiguration,
         paymentMethod: paymentMethod,
+        amountPaid: amountPaid,
         notes: notes,
         saleItems: saleItems,
       );

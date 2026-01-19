@@ -392,7 +392,7 @@ class _CartSidebarState extends State<CartSidebar> {
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () => provider.removeFromCart(item.productId),
+                  onTap: () => provider.removeFromCart(item.id),
                   borderRadius: BorderRadius.circular(context.borderRadius()),
                   child: Container(
                     padding: EdgeInsets.all(context.smallPadding / 2),
@@ -441,7 +441,7 @@ class _CartSidebarState extends State<CartSidebar> {
                     child: InkWell(
                       onTap: item.quantity > 1
                           ? () => provider.updateCartItemQuantity(
-                        item.productId,
+                        item.id,
                         item.quantity - 1,
                       )
                           : null,
@@ -493,7 +493,7 @@ class _CartSidebarState extends State<CartSidebar> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => provider.updateCartItemQuantity(
-                        item.productId,
+                        item.id,
                         item.quantity + 1,
                       ),
                       borderRadius: BorderRadius.circular(

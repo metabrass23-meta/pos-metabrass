@@ -17,7 +17,8 @@ class CheckoutDialog extends StatefulWidget {
   State<CheckoutDialog> createState() => _CheckoutDialogState();
 }
 
-class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProviderStateMixin {
+class _CheckoutDialogState extends State<CheckoutDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _amountPaidController = TextEditingController();
   final _overallDiscountController = TextEditingController();
@@ -42,19 +43,27 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
     _animationController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
       _amountPaidController.text = provider.cartGrandTotal.toStringAsFixed(0);
-      _overallDiscountController.text = provider.overallDiscount.toStringAsFixed(0);
+      _overallDiscountController.text = provider.overallDiscount
+          .toStringAsFixed(0);
       _gstController.text = provider.gstPercentage.toStringAsFixed(0);
       _taxController.text = provider.taxPercentage.toStringAsFixed(0);
       _notesController.text = '';
-      _selectedPaymentMethod = 'CASH';
+      _selectedPaymentMethod = 'Cash';
     });
   }
 
@@ -76,24 +85,69 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   void _handleCheckout() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
-      provider.setOverallDiscount(double.tryParse(_overallDiscountController.text) ?? 0.0);
+      provider.setOverallDiscount(
+        double.tryParse(_overallDiscountController.text) ?? 0.0,
+      );
 
       final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
       final notes = _notesController.text.trim();
+      final backendPaymentMethod = _translatePaymentMethod(
+        _selectedPaymentMethod,
+      );
 
-      await provider.createSaleFromCart(paymentMethod: _selectedPaymentMethod, amountPaid: amountPaid, notes: notes.isNotEmpty ? notes : null);
+      final success = await provider.createSaleFromCart(
+        paymentMethod: backendPaymentMethod,
+        amountPaid: amountPaid,
+        notes: notes.isNotEmpty ? notes : null,
+      );
 
       if (mounted) {
-        _showSuccessDialog();
+        if (success) {
+          _showSuccessDialog();
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(provider.errorMessage ?? 'Failed to create sale'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
 
-  void _showSuccessDialog() {
-    showDialog(context: context, barrierDismissible: false, builder: (context) => _buildSuccessDialog());
+  String _translatePaymentMethod(String displayMethod) {
+    switch (displayMethod) {
+      case 'Cash':
+        return 'CASH';
+      case 'Card':
+        return 'CARD';
+      case 'Bank Transfer':
+        return 'BANK_TRANSFER';
+      case 'Credit':
+        return 'CREDIT';
+      case 'Split':
+        return 'SPLIT';
+      default:
+        return 'CASH';
+    }
   }
 
-  Widget _buildNextStepItem({required IconData icon, required String title, required String description, required Color color}) {
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _buildSuccessDialog(),
+    );
+  }
+
+  Widget _buildNextStepItem({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -106,9 +160,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 12, color: color),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: color,
+                  ),
                 ),
-                Text(description, style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600])),
+                Text(
+                  description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
+                ),
               ],
             ),
           ),
@@ -120,7 +184,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
   void _navigateToSalesManagement() {
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.navigateToSalesManagementToContinue), backgroundColor: AppTheme.primaryMaroon)
+      SnackBar(
+        content: Text(l10n.navigateToSalesManagementToContinue),
+        backgroundColor: AppTheme.primaryMaroon,
+      ),
     );
   }
 
@@ -134,7 +201,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
     if (_isSplitPayment) {
       final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
       final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
-      final bankAmount = double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+      final bankAmount =
+          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
       final totalAmount = cashAmount + cardAmount + bankAmount;
 
       setState(() {
@@ -156,15 +224,35 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 85.w, large: 75.w, ultrawide: 65.w),
-                  maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 95.h, small: 90.h, medium: 85.h, large: 80.h, ultrawide: 75.h),
+                  maxWidth: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 95.w,
+                    small: 90.w,
+                    medium: 85.w,
+                    large: 75.w,
+                    ultrawide: 65.w,
+                  ),
+                  maxHeight: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 95.h,
+                    small: 90.h,
+                    medium: 85.h,
+                    large: 80.h,
+                    ultrawide: 75.h,
+                  ),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -197,7 +285,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -207,8 +297,15 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.payment_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.payment_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -216,7 +313,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.checkout : l10n.checkoutAndPayment,
+                  context.shouldShowCompactLayout
+                      ? l10n.checkout
+                      : l10n.checkoutAndPayment,
                   style: GoogleFonts.playfairDisplay(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -243,16 +342,26 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               builder: (context, provider, child) {
                 return Container(
                   padding: EdgeInsets.all(context.smallPadding),
-                  decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.15), borderRadius: BorderRadius.circular(context.borderRadius())),
+                  decoration: BoxDecoration(
+                    color: AppTheme.pureWhite.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
+                  ),
                   child: Column(
                     children: [
                       Text(
                         '${provider.cartTotalItems} ${l10n.items}',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.pureWhite.withOpacity(0.8)),
+                        style: GoogleFonts.inter(
+                          fontSize: context.captionFontSize,
+                          color: AppTheme.pureWhite.withOpacity(0.8),
+                        ),
                       ),
                       Text(
                         'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                        style: GoogleFonts.inter(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.pureWhite,
+                        ),
                       ),
                     ],
                   ),
@@ -267,7 +376,11 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -292,7 +405,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               SizedBox(height: context.cardPadding),
               _buildPaymentMethodCard(),
               SizedBox(height: context.cardPadding),
-              if (_showAdvancedOptions) ...[_buildAdvancedOptionsCard(), SizedBox(height: context.cardPadding)],
+              if (_showAdvancedOptions) ...[
+                _buildAdvancedOptionsCard(),
+                SizedBox(height: context.cardPadding),
+              ],
               _buildActionButtons(),
             ],
           ),
@@ -318,7 +434,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 child: Column(
                   children: [
                     _buildOrderSummaryCard(),
-                    if (_showAdvancedOptions) ...[SizedBox(height: context.cardPadding), _buildAdvancedOptionsCard()],
+                    if (_showAdvancedOptions) ...[
+                      SizedBox(height: context.cardPadding),
+                      _buildAdvancedOptionsCard(),
+                    ],
                   ],
                 ),
               ),
@@ -357,11 +476,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             children: [
               Row(
                 children: [
-                  Icon(Icons.receipt_long_rounded, color: Colors.blue, size: context.iconSize('medium')),
+                  Icon(
+                    Icons.receipt_long_rounded,
+                    color: Colors.blue,
+                    size: context.iconSize('medium'),
+                  ),
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.orderSummary,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.charcoalGray,
+                    ),
                   ),
                 ],
               ),
@@ -369,7 +496,11 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               if (provider.selectedCustomer != null) ...[
                 Row(
                   children: [
-                    Icon(Icons.person_rounded, color: Colors.grey[600], size: context.iconSize('small')),
+                    Icon(
+                      Icons.person_rounded,
+                      color: Colors.grey[600],
+                      size: context.iconSize('small'),
+                    ),
                     SizedBox(width: context.smallPadding / 2),
                     Expanded(
                       child: Column(
@@ -377,11 +508,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                         children: [
                           Text(
                             provider.selectedCustomer!.name,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: GoogleFonts.inter(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.charcoalGray,
+                            ),
                           ),
                           Text(
                             provider.selectedCustomer!.phone,
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                            style: GoogleFonts.inter(
+                              fontSize: context.captionFontSize,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
@@ -397,11 +535,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 children: [
                   Text(
                     '${l10n.items} (${provider.cartTotalItems})',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      color: AppTheme.charcoalGray,
+                    ),
                   ),
                   Text(
                     'PKR ${provider.cartSubtotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: GoogleFonts.inter(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.charcoalGray,
+                    ),
                   ),
                 ],
               ),
@@ -412,11 +557,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.discount,
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: Colors.orange[700],
+                      ),
                     ),
                     Text(
                       '- PKR ${provider.overallDiscount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange[700],
+                      ),
                     ),
                   ],
                 ),
@@ -428,11 +580,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   children: [
                     Text(
                       'GST (${provider.gstPercentage}%)',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: AppTheme.charcoalGray,
+                      ),
                     ),
                     Text(
                       'PKR ${provider.cartGstAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.charcoalGray,
+                      ),
                     ),
                   ],
                 ),
@@ -444,11 +603,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   children: [
                     Text(
                       '${l10n.tax} (${provider.taxPercentage}%)',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        color: AppTheme.charcoalGray,
+                      ),
                     ),
                     Text(
                       'PKR ${provider.cartTaxAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: GoogleFonts.inter(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.charcoalGray,
+                      ),
                     ),
                   ],
                 ),
@@ -461,11 +627,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 children: [
                   Text(
                     l10n.grandTotal,
-                    style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                    style: GoogleFonts.inter(
+                      fontSize: context.headerFontSize * 0.8,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.charcoalGray,
+                    ),
                   ),
                   Text(
                     'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                    style: GoogleFonts.inter(
+                      fontSize: context.headerFontSize * 0.8,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primaryMaroon,
+                    ),
                   ),
                 ],
               ),
@@ -491,11 +665,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
         children: [
           Row(
             children: [
-              Icon(Icons.payment_rounded, color: Colors.green, size: context.iconSize('medium')),
+              Icon(
+                Icons.payment_rounded,
+                color: Colors.green,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentMethod,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -515,24 +697,40 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                     _isSplitPayment = value == 'Split';
                   });
                 },
-                items: [l10n.cash, l10n.card, l10n.bankTransfer, l10n.credit, l10n.split].map((method) {
-                  return DropdownMenuItem<String>(
-                    value: method,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                      child: Row(
-                        children: [
-                          Icon(_getPaymentMethodIcon(method), color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
-                          SizedBox(width: context.smallPadding),
-                          Text(
-                            method,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                items:
+                    [
+                      l10n.cash,
+                      l10n.card,
+                      l10n.bankTransfer,
+                      l10n.credit,
+                      l10n.split,
+                    ].map((method) {
+                      return DropdownMenuItem<String>(
+                        value: method,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.cardPadding / 2,
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _getPaymentMethodIcon(method),
+                                color: AppTheme.primaryMaroon,
+                                size: context.iconSize('medium'),
+                              ),
+                              SizedBox(width: context.smallPadding),
+                              Text(
+                                method,
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
           ),
@@ -540,7 +738,11 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
           if (_isSplitPayment) ...[
             Text(
               l10n.splitPaymentDetails,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: GoogleFonts.inter(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
             ),
             SizedBox(height: context.smallPadding),
             PremiumTextField(
@@ -577,13 +779,15 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             validator: (value) {
               if (value?.isEmpty ?? true) return l10n.pleaseEnterAmountPaid;
               final amount = double.tryParse(value!);
-              if (amount == null || amount < 0) return l10n.pleaseEnterValidAmount;
+              if (amount == null || amount < 0)
+                return l10n.pleaseEnterValidAmount;
               return null;
             },
           ),
           Consumer<SalesProvider>(
             builder: (context, provider, child) {
-              final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
+              final amountPaid =
+                  double.tryParse(_amountPaidController.text) ?? 0.0;
               final grandTotal = provider.cartGrandTotal;
               final difference = amountPaid - grandTotal;
 
@@ -593,9 +797,15 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                 margin: EdgeInsets.only(top: context.smallPadding),
                 padding: EdgeInsets.all(context.smallPadding),
                 decoration: BoxDecoration(
-                  color: difference > 0 ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                  color: difference > 0
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.orange.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(color: difference > 0 ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3)),
+                  border: Border.all(
+                    color: difference > 0
+                        ? Colors.green.withOpacity(0.3)
+                        : Colors.orange.withOpacity(0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -605,7 +815,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
-                        color: difference > 0 ? Colors.green[700] : Colors.orange[700],
+                        color: difference > 0
+                            ? Colors.green[700]
+                            : Colors.orange[700],
                       ),
                     ),
                     Text(
@@ -613,7 +825,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                       style: GoogleFonts.inter(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w700,
-                        color: difference > 0 ? Colors.green[700] : Colors.orange[700],
+                        color: difference > 0
+                            ? Colors.green[700]
+                            : Colors.orange[700],
                       ),
                     ),
                   ],
@@ -625,7 +839,8 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => setState(() => _showAdvancedOptions = !_showAdvancedOptions),
+              onTap: () =>
+                  setState(() => _showAdvancedOptions = !_showAdvancedOptions),
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
@@ -637,14 +852,22 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      _showAdvancedOptions ? Icons.expand_less : Icons.expand_more,
+                      _showAdvancedOptions
+                          ? Icons.expand_less
+                          : Icons.expand_more,
                       color: AppTheme.primaryMaroon,
                       size: context.iconSize('medium'),
                     ),
                     SizedBox(width: context.smallPadding),
                     Text(
-                      _showAdvancedOptions ? l10n.hideAdvancedOptions : l10n.showAdvancedOptions,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                      _showAdvancedOptions
+                          ? l10n.hideAdvancedOptions
+                          : l10n.showAdvancedOptions,
+                      style: GoogleFonts.inter(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.primaryMaroon,
+                      ),
                     ),
                   ],
                 ),
@@ -671,11 +894,19 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
         children: [
           Row(
             children: [
-              Icon(Icons.settings_rounded, color: Colors.orange, size: context.iconSize('medium')),
+              Icon(
+                Icons.settings_rounded,
+                color: Colors.orange,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.advancedOptions,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -686,7 +917,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             keyboardType: TextInputType.number,
             prefixIcon: Icons.local_offer_rounded,
             onChanged: (value) {
-              final provider = Provider.of<SalesProvider>(context, listen: false);
+              final provider = Provider.of<SalesProvider>(
+                context,
+                listen: false,
+              );
               provider.setOverallDiscount(double.tryParse(value) ?? 0.0);
             },
           ),
@@ -764,7 +998,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
               Expanded(
                 flex: 2,
                 child: PremiumButton(
-                  text: provider.isLoading ? l10n.processing : l10n.completeSale,
+                  text: provider.isLoading
+                      ? l10n.processing
+                      : l10n.completeSale,
                   onPressed: provider.isLoading ? null : _handleCheckout,
                   isLoading: provider.isLoading,
                   height: context.buttonHeight / 1.5,
@@ -786,13 +1022,24 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
       backgroundColor: Colors.transparent,
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 75.w, medium: 65.w, large: 55.w, ultrawide: 45.w),
+          maxWidth: ResponsiveBreakpoints.responsive(
+            context,
+            tablet: 85.w,
+            small: 75.w,
+            medium: 65.w,
+            large: 55.w,
+            ultrawide: 45.w,
+          ),
         ),
         decoration: BoxDecoration(
           color: AppTheme.pureWhite,
           borderRadius: BorderRadius.circular(context.borderRadius('large')),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: context.shadowBlur('heavy'),
+              offset: Offset(0, context.cardPadding),
+            ),
           ],
         ),
         child: Column(
@@ -801,7 +1048,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
             Container(
               padding: EdgeInsets.all(context.cardPadding),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Colors.green, Colors.greenAccent]),
+                gradient: const LinearGradient(
+                  colors: [Colors.green, Colors.greenAccent],
+                ),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(context.borderRadius('large')),
                   topRight: Radius.circular(context.borderRadius('large')),
@@ -813,9 +1062,15 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                     padding: EdgeInsets.all(context.smallPadding),
                     decoration: BoxDecoration(
                       color: AppTheme.pureWhite.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
                     ),
-                    child: Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      color: AppTheme.pureWhite,
+                      size: context.iconSize('large'),
+                    ),
                   ),
                   SizedBox(width: context.cardPadding),
                   Expanded(
@@ -832,7 +1087,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                         ),
                         Text(
                           l10n.transactionProcessedSuccessfully,
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
+                          style: GoogleFonts.inter(
+                            fontSize: context.subtitleFontSize,
+                            color: AppTheme.pureWhite.withOpacity(0.9),
+                          ),
                         ),
                       ],
                     ),
@@ -850,8 +1108,12 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                         padding: EdgeInsets.all(context.cardPadding),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(context.borderRadius()),
-                          border: Border.all(color: Colors.green.withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius(),
+                          ),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.3),
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -860,7 +1122,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               children: [
                                 Text(
                                   '${l10n.invoiceNumber}:',
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    color: AppTheme.charcoalGray,
+                                  ),
                                 ),
                                 Text(
                                   'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
@@ -878,11 +1143,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               children: [
                                 Text(
                                   '${l10n.totalAmount}:',
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    color: AppTheme.charcoalGray,
+                                  ),
                                 ),
                                 Text(
                                   'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.green,
+                                  ),
                                 ),
                               ],
                             ),
@@ -892,11 +1164,18 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                               children: [
                                 Text(
                                   '${l10n.paymentMethod}:',
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    color: AppTheme.charcoalGray,
+                                  ),
                                 ),
                                 Text(
                                   _selectedPaymentMethod,
-                                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                                  style: GoogleFonts.inter(
+                                    fontSize: context.bodyFontSize,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.charcoalGray,
+                                  ),
                                 ),
                               ],
                             ),
@@ -912,27 +1191,46 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.blue),
-                            borderRadius: BorderRadius.circular(context.borderRadius()),
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius(),
+                            ),
                           ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(l10n.printFunctionalityToBeImplemented), backgroundColor: Colors.blue)
+                                  SnackBar(
+                                    content: Text(
+                                      l10n.printFunctionalityToBeImplemented,
+                                    ),
+                                    backgroundColor: Colors.blue,
+                                  ),
                                 );
                               },
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius(),
+                              ),
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.cardPadding / 1.5,
+                                ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.print_rounded, color: Colors.blue, size: context.iconSize('medium')),
+                                    Icon(
+                                      Icons.print_rounded,
+                                      color: Colors.blue,
+                                      size: context.iconSize('medium'),
+                                    ),
                                     SizedBox(width: context.smallPadding),
                                     Text(
                                       l10n.printReceipt,
-                                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                                      style: GoogleFonts.inter(
+                                        fontSize: context.bodyFontSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.blue,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -945,8 +1243,15 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-                            borderRadius: BorderRadius.circular(context.borderRadius()),
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppTheme.primaryMaroon,
+                                AppTheme.secondaryMaroon,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius(),
+                            ),
                           ),
                           child: Material(
                             color: Colors.transparent,
@@ -955,13 +1260,21 @@ class _CheckoutDialogState extends State<CheckoutDialog> with SingleTickerProvid
                                 Navigator.of(context).pop();
                                 Navigator.of(context).pop();
                               },
-                              borderRadius: BorderRadius.circular(context.borderRadius()),
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius(),
+                              ),
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: context.cardPadding / 1.5),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.cardPadding / 1.5,
+                                ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.done_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                                    Icon(
+                                      Icons.done_rounded,
+                                      color: AppTheme.pureWhite,
+                                      size: context.iconSize('medium'),
+                                    ),
                                     SizedBox(width: context.smallPadding),
                                     Text(
                                       l10n.newSale,
