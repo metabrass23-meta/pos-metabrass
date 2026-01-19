@@ -408,13 +408,22 @@ class SalesProvider extends ChangeNotifier {
         saleItems: saleItems,
       );
 
+      // 🔍 ADD THIS DEBUG LOG
+      debugPrint('🚀 Creating sale with payload: ${request.toJson()}');
+
       final success = await createSale(request);
+
+      // 🔍 ADD THIS DEBUG LOG
+      debugPrint('✅ Sale creation result: $success');
+      debugPrint('❌ Error: $_errorMessage');
+
       if (success) {
         clearCart();
         setSelectedCustomer(null);
       }
       return success;
     } catch (e) {
+      debugPrint('💥 Exception in createSaleFromCart: $e');
       _setError('Error creating sale from cart: $e');
       return false;
     }

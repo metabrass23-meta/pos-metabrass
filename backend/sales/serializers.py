@@ -28,47 +28,27 @@ class TaxRateSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'created_at', 'updated_at')
 
 
-class SaleItemSerializer(serializers.ModelSerializer):
-    """Complete serializer for SaleItem model"""
+class SaleItemCreateSerializer(serializers.Serializer):
+    """Nested serializer for creating sale items within a sale"""
     
-    # Product details
-    product_id = serializers.UUIDField(source='product.id', read_only=True)
-    product_name = serializers.CharField(read_only=True)
+    product = serializers.UUIDField(help_text="Product UUID")
+    unit_price = serializers.DecimalField(max_digits=12, decimal_places=2)
+    quantity = serializers.IntegerField()
+    item_discount = serializers.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    customization_notes = serializers.CharField(max_length=500, required=False, allow_blank=True)
     
-    # Computed fields
-    discounted_unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    total_before_discount = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
-    discount_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    formatted_line_total = serializers.CharField(read_only=True)
-    product_info_at_sale = serializers.JSONField(read_only=True)
-    
-    class Meta:
-        model = SaleItem
-        fields = (
-            'id', 'sale', 'order_item', 'product', 'product_id', 'product_name',
-            'unit_price', 'quantity', 'item_discount', 'line_total',
-            'customization_notes', 'discounted_unit_price', 'total_before_discount',
-            'discount_percentage', 'formatted_line_total', 'product_info_at_sale',
-            'is_active', 'created_at', 'updated_at'
-        )
-        read_only_fields = (
-            'id', 'product_id', 'product_name', 'line_total', 'discounted_unit_price',
-            'total_before_discount', 'discount_percentage', 'formatted_line_total',
-            'product_info_at_sale', 'created_at', 'updated_at'
-        )
+    def validate_product(self, value):
+        """Validate product exists and is active"""
+        try:
+            product = Product.objects.get(id=value, is_active=True)
+            return product
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Invalid product or product is not active.")
     
     def validate_quantity(self, value):
-        """Validate quantity against available stock"""
+        """Validate quantity"""
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than zero.")
-        
-        # Check if we have a product to validate against
-        if self.instance and self.instance.product:
-            if value > self.instance.product.quantity:
-                raise serializers.ValidationError(
-                    f"Insufficient stock. Only {self.instance.product.quantity} available."
-                )
-        
         return value
     
     def validate_unit_price(self, value):
@@ -81,48 +61,136 @@ class SaleItemSerializer(serializers.ModelSerializer):
         """Validate item discount"""
         if value < 0:
             raise serializers.ValidationError("Item discount cannot be negative.")
-        
-        # Get the unit price for validation
-        unit_price = self.initial_data.get('unit_price', 0)
-        quantity = self.initial_data.get('quantity', 1)
-        max_discount = unit_price * quantity
-        
-        if value > max_discount:
-            raise serializers.ValidationError(
-                f"Item discount cannot exceed line total (PKR {max_discount:,.2f})."
-            )
-        
         return value
 
 
-class SaleItemCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating sale items"""
+class SalesCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating sales WITH sale_items support"""
+    
+    # Add sale_items as write-only field
+    sale_items = SaleItemCreateSerializer(many=True, write_only=True)
+    
+    # Add amount_paid as optional field
+    amount_paid = serializers.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Amount paid immediately"
+    )
+    
+    class Meta:
+        model = Sales
+        fields = (
+            'order_id', 
+            'customer', 
+            'overall_discount', 
+            'tax_configuration',
+            'payment_method', 
+            'amount_paid',
+            'split_payment_details', 
+            'notes',
+            'sale_items'
+        )
+    
+    def validate_customer(self, value):
+        """Validate customer exists and is active"""
+        if not value.is_active:
+            raise serializers.ValidationError("Customer must be active.")
+        return value
+    
+    def validate_tax_configuration(self, value):
+        """Validate tax configuration for new sales"""
+        if not value:
+            # Use default tax configuration if none provided
+            return {}
+        
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Tax configuration must be a valid JSON object.")
+        
+        # Validate each tax entry
+        for tax_type, tax_data in value.items():
+            if not isinstance(tax_data, dict):
+                raise serializers.ValidationError(f"Tax data for {tax_type} must be a valid object.")
+            
+            if 'percentage' not in tax_data:
+                raise serializers.ValidationError(f"Tax data for {tax_type} must include percentage.")
+            
+            percentage = tax_data['percentage']
+            if not isinstance(percentage, (int, float, Decimal)) or percentage < 0 or percentage > 100:
+                raise serializers.ValidationError(f"Tax percentage for {tax_type} must be between 0 and 100.")
+        
+        return value
+    
+    def validate_amount_paid(self, value):
+        """Validate amount paid"""
+        if value < 0:
+            raise serializers.ValidationError("Amount paid cannot be negative.")
+        return value
+    
+    def validate_sale_items(self, value):
+        """Validate sale items list is not empty"""
+        if not value:
+            raise serializers.ValidationError("At least one sale item is required.")
+        return value
+    
+    def create(self, validated_data):
+        """Create sale with items in a transaction"""
+        from django.db import transaction
+        
+        # Extract sale_items from validated_data
+        sale_items_data = validated_data.pop('sale_items')
+        
+        # Extract amount_paid if present
+        amount_paid = validated_data.pop('amount_paid', Decimal('0.00'))
+        
+        with transaction.atomic():
+            # Create the sale
+            validated_data['amount_paid'] = amount_paid
+            sale = Sales.objects.create(**validated_data)
+            
+            # Create sale items
+            for item_data in sale_items_data:
+                product = item_data['product']
+                
+                SaleItem.objects.create(
+                    sale=sale,
+                    product=product,
+                    unit_price=item_data['unit_price'],
+                    quantity=item_data['quantity'],
+                    item_discount=item_data.get('item_discount', Decimal('0.00')),
+                    customization_notes=item_data.get('customization_notes', '')
+                )
+            
+            # Recalculate sale totals
+            sale.recalculate_totals()
+            
+        return sale
+
+
+class SaleItemSerializer(serializers.ModelSerializer):
+    """Complete serializer for SaleItem model"""
+    
+    product_id = serializers.UUIDField(source='product.id', read_only=True)
+    product_name = serializers.CharField(read_only=True)
+    discounted_unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    total_before_discount = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    discount_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    formatted_line_total = serializers.CharField(read_only=True)
     
     class Meta:
         model = SaleItem
         fields = (
-            'sale', 'order_item', 'product', 'unit_price', 'quantity',
-            'item_discount', 'customization_notes'
+            'id', 'sale', 'order_item', 'product', 'product_id', 'product_name',
+            'unit_price', 'quantity', 'item_discount', 'line_total',
+            'customization_notes', 'discounted_unit_price', 'total_before_discount',
+            'discount_percentage', 'formatted_line_total',
+            'is_active', 'created_at', 'updated_at'
         )
-    
-    def validate(self, data):
-        """Validate sale item data"""
-        product = data.get('product')
-        quantity = data.get('quantity', 0)
-        unit_price = data.get('unit_price', 0)
-        
-        if product and quantity > product.quantity:
-            raise serializers.ValidationError(
-                f"Insufficient stock. Only {product.quantity} available for {product.name}."
-            )
-        
-        if unit_price < 0:
-            raise serializers.ValidationError("Unit price cannot be negative.")
-        
-        if quantity <= 0:
-            raise serializers.ValidationError("Quantity must be greater than zero.")
-        
-        return data
+        read_only_fields = (
+            'id', 'product_id', 'product_name', 'line_total', 'discounted_unit_price',
+            'total_before_discount', 'discount_percentage', 'formatted_line_total',
+            'created_at', 'updated_at'
+        )
 
 
 class SaleItemUpdateSerializer(serializers.ModelSerializer):
@@ -230,56 +298,6 @@ class SalesSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Amount paid cannot be negative.")
         return value
-
-
-class SalesCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating sales"""
-    
-    class Meta:
-        model = Sales
-        fields = (
-            'order_id', 'customer', 'overall_discount', 'tax_configuration',
-            'payment_method', 'split_payment_details', 'notes'
-        )
-    
-    def validate_customer(self, value):
-        """Validate customer exists and is active"""
-        if not value.is_active:
-            raise serializers.ValidationError("Customer must be active.")
-        return value
-    
-    def validate_tax_configuration(self, value):
-        """Validate tax configuration for new sales"""
-        if not value:
-            # Use default tax configuration if none provided
-            return {}
-        
-        if not isinstance(value, dict):
-            raise serializers.ValidationError("Tax configuration must be a valid JSON object.")
-        
-        # Validate each tax entry
-        for tax_type, tax_data in value.items():
-            if not isinstance(tax_data, dict):
-                raise serializers.ValidationError(f"Tax data for {tax_type} must be a valid object.")
-            
-            if 'percentage' not in tax_data:
-                raise serializers.ValidationError(f"Tax data for {tax_type} must include percentage.")
-            
-            percentage = tax_data['percentage']
-            if not isinstance(percentage, (int, float, Decimal)) or percentage < 0 or percentage > 100:
-                raise serializers.ValidationError(f"Tax percentage for {tax_type} must be between 0 and 100.")
-        
-        return value
-    
-    def create(self, validated_data):
-        """Create sale with proper tax configuration"""
-        # Ensure tax configuration is set
-        if 'tax_configuration' not in validated_data or not validated_data['tax_configuration']:
-            # Create a temporary instance to get default tax configuration
-            temp_sale = Sales()
-            validated_data['tax_configuration'] = temp_sale.get_default_tax_configuration()
-        
-        return super().create(validated_data)
 
 
 class SalesUpdateSerializer(serializers.ModelSerializer):
