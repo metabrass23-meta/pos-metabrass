@@ -81,7 +81,27 @@ class SettingsScreen extends StatelessWidget {
             'Urdu',
             'ur',
             appProvider.currentLanguage == 'ur',
-            () => appProvider.setLanguage('ur'),
+            () {
+              appProvider.setLanguage('ur');
+              debugPrint('🌐 Language changed to Urdu');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text('زبان اردو میں تبدیل کردی گئی'),
+                    ],
+                  ),
+                  duration: Duration(seconds: 2),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            },
           ),
           const Divider(height: 1),
           _buildLanguageTile(
@@ -90,7 +110,27 @@ class SettingsScreen extends StatelessWidget {
             'English',
             'en',
             appProvider.currentLanguage == 'en',
-            () => appProvider.setLanguage('en'),
+            () {
+              appProvider.setLanguage('en');
+              debugPrint('🌐 Language changed to English');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text('Language changed to English'),
+                    ],
+                  ),
+                  duration: Duration(seconds: 2),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -112,63 +152,109 @@ class SettingsScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primaryMaroon.withOpacity(0.1)
-              : Colors.grey[100],
-          shape: BoxShape.circle,
+              : Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(context.borderRadius('small')),
         ),
-        child: Text(
-          code.toUpperCase(),
-          style: GoogleFonts.inter(
-            fontSize: context.captionFontSize,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? AppTheme.primaryMaroon : Colors.grey,
-          ),
+        child: Icon(
+          Icons.language_rounded,
+          color: isSelected ? AppTheme.primaryMaroon : Colors.grey[600],
+          size: context.iconSize('medium'),
         ),
       ),
       title: Text(
         title,
         style: GoogleFonts.inter(
-          fontSize: context.bodyFontSize,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          fontSize: context.subtitleFontSize,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          color: isSelected ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
         ),
       ),
       subtitle: Text(
         subtitle,
         style: GoogleFonts.inter(
           fontSize: context.captionFontSize,
-          color: Colors.grey,
+          color: Colors.grey[600],
         ),
       ),
       trailing: isSelected
-          ? const Icon(
+          ? Icon(
               Icons.check_circle_rounded,
               color: AppTheme.primaryMaroon,
+              size: context.iconSize('medium'),
             )
-          : null,
+          : Icon(
+              Icons.circle_outlined,
+              color: Colors.grey[400],
+              size: context.iconSize('medium'),
+            ),
     );
   }
 
   Widget _buildThemeCard(
-    BuildContext context,
-    AppProvider appProvider,
-    AppLocalizations l10n,
-  ) {
+      BuildContext context, AppProvider appProvider, AppLocalizations l10n) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
       child: SwitchListTile(
-        activeColor: AppTheme.primaryMaroon,
+        value: appProvider.isDarkMode,
+        onChanged: (value) {
+          appProvider.toggleTheme();
+          debugPrint('🎨 Theme toggled to: ${value ? "Dark" : "Light"}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    value ? Icons.dark_mode : Icons.light_mode,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    value ? 'Dark mode enabled' : 'Light mode enabled',
+                  ),
+                ],
+              ),
+              duration: Duration(seconds: 2),
+              backgroundColor: AppTheme.primaryMaroon,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        },
         title: Text(
           l10n.darkMode,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize),
+          style: GoogleFonts.inter(
+            fontSize: context.subtitleFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.charcoalGray,
+          ),
         ),
         subtitle: Text(
           l10n.enableDarkThemeForApplication,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize),
+          style: GoogleFonts.inter(
+            fontSize: context.captionFontSize,
+            color: Colors.grey[600],
+          ),
         ),
-        value: appProvider.isDarkMode,
-        onChanged: (value) => appProvider.toggleTheme(),
+        secondary: Container(
+          padding: EdgeInsets.all(context.smallPadding / 2),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryMaroon.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+          ),
+          child: Icon(
+            appProvider.isDarkMode
+                ? Icons.dark_mode_rounded
+                : Icons.light_mode_rounded,
+            color: AppTheme.primaryMaroon,
+            size: context.iconSize('medium'),
+          ),
+        ),
+        activeColor: AppTheme.primaryMaroon,
       ),
     );
   }
@@ -182,40 +268,45 @@ class SettingsScreen extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  width: 3.w,
-                  height: 3.w,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.primaryMaroon,
+                  padding: EdgeInsets.all(context.smallPadding),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMaroon.withOpacity(0.1),
+                    borderRadius:
+                        BorderRadius.circular(context.borderRadius('small')),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Image.asset('assets/images/logo.png'),
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    color: AppTheme.primaryMaroon,
+                    size: context.iconSize('large'),
                   ),
                 ),
                 SizedBox(width: context.smallPadding),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.alNoorFashionPOS,
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.alNoorFashionPOS,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: context.headerFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoalGray,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${l10n.version} 1.0.0',
-                      style: GoogleFonts.inter(
-                        fontSize: context.captionFontSize,
-                        color: Colors.grey,
+                      Text(
+                        '${l10n.version} 1.0.0',
+                        style: GoogleFonts.inter(
+                          fontSize: context.captionFontSize,
+                          color: Colors.grey[600],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -223,9 +314,9 @@ class SettingsScreen extends StatelessWidget {
             Text(
               l10n.aPremiumPointOfSaleSolution,
               style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                color: Colors.grey[600],
-                height: 1.4,
+                fontSize: context.subtitleFontSize,
+                color: Colors.grey[700],
+                height: 1.5,
               ),
             ),
           ],

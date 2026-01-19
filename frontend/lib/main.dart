@@ -93,14 +93,24 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReceiptProvider()),
         ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
-      child: Consumer2<AuthProvider, ProfitLossProvider>(
-        builder: (context, authProvider, profitLossProvider, child) {
+      child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
+        builder: (context, authProvider, profitLossProvider, appProvider, child) {
+          
+          // ✅ FIX 1: Initialize AppProvider (ADDED)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!appProvider.isInitialized) {
+              appProvider.initialize();
+            }
+          });
+
+          // Existing: Initialize AuthProvider
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.initial) {
               authProvider.initialize();
             }
           });
 
+          // Existing: Initialize ProfitLossProvider
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.authenticated) {
               if (profitLossProvider.profitLossHistory.isEmpty &&
@@ -119,7 +129,10 @@ class MaqboolFabricApp extends StatelessWidget {
                 darkTheme: AppTheme.darkTheme,
                 themeMode: ThemeMode.light,
                 navigatorKey: navigatorKey,
-                locale: const Locale('ur'),
+                
+                // ✅ FIX 2: Wire locale to AppProvider (CHANGED)
+                locale: appProvider.locale,  // Changed from: const Locale('ur')
+                
                 supportedLocales: const [
                   Locale('ur'),
                   Locale('en'),
