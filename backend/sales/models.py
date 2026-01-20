@@ -1032,6 +1032,12 @@ class Sales(models.Model):
         default=Decimal('17.00'),
         help_text="GST tax rate (default 17% for Pakistan)"
     )
+    
+    tax_configuration = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Flexible tax configuration as JSON"
+    )
     tax_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,

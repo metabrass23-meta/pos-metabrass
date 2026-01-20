@@ -99,10 +99,10 @@ class SalesCreateSerializer(serializers.ModelSerializer):
             
             sale_items_data = validated_data.pop('sale_items', [])
             
-            # HOTFIX: Remove tax_configuration if it exists in validated_data but not in model
-            if 'tax_configuration' in validated_data:
-                logger.warning("⚠️ Removing tax_configuration from validated_data as it might be missing from model")
-                validated_data.pop('tax_configuration')
+            # HOTFIX REVERTED: tax_configuration is now in model
+            # if 'tax_configuration' in validated_data:
+            #    logger.warning("⚠️ Removing tax_configuration from validated_data as it might be missing from model")
+            #    validated_data.pop('tax_configuration')
             
             # Get created_by from context
             created_by = None
