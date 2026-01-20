@@ -3,6 +3,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
+import '../../../src/providers/sales_provider.dart';
+import '../../../src/providers/order_provider.dart';
+import '../../../src/providers/product_provider.dart';
+import '../../../src/providers/category_provider.dart';
+import '../../../src/providers/customer_provider.dart';
+import '../../../src/providers/vendor_provider.dart';
+import '../../../src/providers/labor_provider.dart';
+import '../../../src/providers/receivables_provider.dart';
+import '../../../src/providers/payables_provider.dart';
+import '../../../src/providers/advance_payment_provider.dart';
+import '../../../src/providers/payment_provider.dart';
+import '../../../src/providers/expenses_provider.dart';
+import '../../../src/providers/zakat_provider.dart';
+import '../../../src/providers/return_provider.dart';
+import '../../../src/providers/invoice_provider.dart';
+import '../../../src/providers/receipt_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 import '../../../l10n/app_localizations.dart';
@@ -71,107 +87,107 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   onPressed: authProvider.isLoading
                       ? null
                       : () async {
-                          debugPrint('Logout button pressed');
-                          Navigator.of(dialogContext).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppTheme.pureWhite,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: context.smallPadding),
-                                  Text(
-                                    AppLocalizations.of(context)!.loggingOut,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.captionFontSize,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              backgroundColor: AppTheme.primaryMaroon,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  context.borderRadius('medium'),
+                    debugPrint('Logout button pressed');
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppTheme.pureWhite,
                                 ),
                               ),
-                              margin: EdgeInsets.all(context.mainPadding),
-                              duration: const Duration(seconds: 2),
                             ),
-                          );
-                          try {
-                            await authProvider.logout();
-                            debugPrint('Logout completed successfully');
-                            if (mounted) {
-                              debugPrint('Navigating to /login');
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/login',
-                                (route) => false,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!.logoutSuccess,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.captionFontSize,
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      context.borderRadius('medium'),
-                                    ),
-                                  ),
-                                  margin: EdgeInsets.all(context.mainPadding),
-                                ),
-                              );
-                            } else {
-                              debugPrint(
-                                'Context not mounted, skipping navigation',
-                              );
-                            }
-                          } catch (e) {
-                            debugPrint('Logout error: $e');
-                            if (mounted) {
-                              debugPrint('Navigating to /login after error');
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/login',
-                                (route) => false,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!.logoutError,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.captionFontSize,
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      context.borderRadius('medium'),
-                                    ),
-                                  ),
-                                  margin: EdgeInsets.all(context.mainPadding),
-                                ),
-                              );
-                            } else {
-                              debugPrint(
-                                'Context not mounted after error, skipping navigation',
-                              );
-                            }
-                          }
-                        },
+                            SizedBox(width: context.smallPadding),
+                            Text(
+                              AppLocalizations.of(context)!.loggingOut,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: AppTheme.primaryMaroon,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            context.borderRadius('medium'),
+                          ),
+                        ),
+                        margin: EdgeInsets.all(context.mainPadding),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    try {
+                      await authProvider.logout();
+                      debugPrint('Logout completed successfully');
+                      if (mounted) {
+                        debugPrint('Navigating to /login');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/login',
+                              (route) => false,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(context)!.logoutSuccess,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
+                            ),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius('medium'),
+                              ),
+                            ),
+                            margin: EdgeInsets.all(context.mainPadding),
+                          ),
+                        );
+                      } else {
+                        debugPrint(
+                          'Context not mounted, skipping navigation',
+                        );
+                      }
+                    } catch (e) {
+                      debugPrint('Logout error: $e');
+                      if (mounted) {
+                        debugPrint('Navigating to /login after error');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/login',
+                              (route) => false,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              AppLocalizations.of(context)!.logoutError,
+                              style: GoogleFonts.inter(
+                                fontSize: context.captionFontSize,
+                              ),
+                            ),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius('medium'),
+                              ),
+                            ),
+                            margin: EdgeInsets.all(context.mainPadding),
+                          ),
+                        );
+                      } else {
+                        debugPrint(
+                          'Context not mounted after error, skipping navigation',
+                        );
+                      }
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryMaroon,
                     foregroundColor: AppTheme.pureWhite,
@@ -184,22 +200,22 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   ),
                   child: authProvider.isLoading
                       ? SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppTheme.pureWhite,
-                            ),
-                          ),
-                        )
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.pureWhite,
+                      ),
+                    ),
+                  )
                       : Text(
-                          'Logout',
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    'Logout',
+                    style: GoogleFonts.inter(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 );
               },
             ),
@@ -229,28 +245,28 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           child: widget.isExpanded
               ? Row(
-                  children: [
-                    Icon(
-                      Icons.logout_rounded,
-                      color: Colors.red.shade300,
-                      size: context.iconSize('small'),
-                    ),
-                    SizedBox(width: context.smallPadding),
-                    Text(
-                      AppLocalizations.of(context)!.logout,
-                      style: GoogleFonts.inter(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.pureWhite,
-                      ),
-                    ),
-                  ],
-                )
-              : Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red.shade300,
-                  size: context.iconSize('medium'),
+            children: [
+              Icon(
+                Icons.logout_rounded,
+                color: Colors.red.shade300,
+                size: context.iconSize('small'),
+              ),
+              SizedBox(width: context.smallPadding),
+              Text(
+                AppLocalizations.of(context)!.logout,
+                style: GoogleFonts.inter(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
                 ),
+              ),
+            ],
+          )
+              : Icon(
+            Icons.logout_rounded,
+            color: Colors.red.shade300,
+            size: context.iconSize('medium'),
+          ),
         ),
       ),
     );
@@ -271,60 +287,79 @@ class PremiumSidebar extends StatelessWidget {
     required this.onToggle,
   });
 
-  // Menu items now use localized strings
+  // Menu items with REAL dynamic counts from providers
   List<Map<String, dynamic>> getMenuItems(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // Get real counts from providers
+    final salesCount = context.watch<SalesProvider>().sales.length.toString();
+    final ordersCount = context.watch<OrderProvider>().orders.length.toString();
+    final productsCount = context.watch<ProductProvider>().products.length.toString();
+    final categoriesCount = context.watch<CategoryProvider>().categories.length.toString();
+    final customersCount = context.watch<CustomerProvider>().customers.length.toString();
+    final vendorsCount = context.watch<VendorProvider>().vendors.length.toString();
+    final laborsCount = context.watch<LaborProvider>().labors.length.toString();
+    final receivablesCount = context.watch<ReceivablesProvider>().receivables.length.toString();
+    final payablesCount = context.watch<PayablesProvider>().payables.length.toString();
+    final advancePaymentsCount = context.watch<AdvancePaymentProvider>().advancePayments.length.toString();
+    final paymentsCount = context.watch<PaymentProvider>().payments.length.toString();
+    final expensesCount = context.watch<ExpensesProvider>().expenses.length.toString();
+    final zakatCount = context.watch<ZakatProvider>().zakatRecords.length.toString();
+    final returnsCount = context.watch<ReturnProvider>().returns.length.toString();
+    final invoicesCount = context.watch<InvoiceProvider>().invoices.length.toString();
+    final receiptsCount = context.watch<ReceiptProvider>().receipts.length.toString();
+
     return [
       // Main Overview
       {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null},
 
       // Core Business Operations
-      {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': '23'},
-      {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': '7'},
+      {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
+      {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': ordersCount},
 
       // Inventory & Products
       {
         'icon': Icons.inventory_2_rounded,
         'title': l10n.products,
-        'badge': '432',
+        'badge': productsCount,
       },
-      {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': '11'},
+      {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount},
 
       // People & Relationships
-      {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': '156'},
-      {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': '8'},
+      {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': customersCount},
+      {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': vendorsCount},
       {
         'icon': Icons.engineering_rounded,
         'title': l10n.labor,
-        'badge': '14731',
+        'badge': laborsCount,
       },
 
       // Financial Management
       {
         'icon': Icons.account_balance_wallet_rounded,
         'title': l10n.receivables,
-        'badge': '15',
+        'badge': receivablesCount,
       },
-      {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': '9'},
+      {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': payablesCount},
       {
         'icon': Icons.payments_rounded,
         'title': l10n.advancePayment,
-        'badge': '12',
+        'badge': advancePaymentsCount,
       },
-      {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': '3'},
+      {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': paymentsCount},
       {
         'icon': Icons.account_balance_rounded,
         'title': l10n.expenses,
-        'badge': '16',
+        'badge': expensesCount,
       },
 
       // Special Accounts & Reports
       {
         'icon': Icons.account_circle_rounded,
         'title': l10n.principalAccount,
-        'badge': '0',
+        'badge': null,
       },
-      {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': '4'},
+      {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': zakatCount},
       {
         'icon': Icons.calculate_rounded,
         'title': l10n.profitLoss,
@@ -336,14 +371,14 @@ class PremiumSidebar extends StatelessWidget {
       {
         'icon': Icons.assignment_return_rounded,
         'title': l10n.returns,
-        'badge': null,
+        'badge': returnsCount,
       },
       {
         'icon': Icons.receipt_long_rounded,
         'title': l10n.invoices,
-        'badge': null,
+        'badge': invoicesCount,
       },
-      {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': null},
+      {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': receiptsCount},
 
       // System
       {'icon': Icons.settings_rounded, 'title': l10n.settings, 'badge': null},
@@ -498,11 +533,11 @@ class PremiumSidebar extends StatelessWidget {
                               ),
                               border: isSelected
                                   ? Border.all(
-                                      color: AppTheme.pureWhite.withOpacity(
-                                        0.3,
-                                      ),
-                                      width: 0.05.w,
-                                    )
+                                color: AppTheme.pureWhite.withOpacity(
+                                  0.3,
+                                ),
+                                width: 0.05.w,
+                              )
                                   : null,
                             ),
                             child: Row(
@@ -543,8 +578,8 @@ class PremiumSidebar extends StatelessWidget {
                                         color: isSelected
                                             ? AppTheme.pureWhite
                                             : AppTheme.pureWhite.withOpacity(
-                                                0.85,
-                                              ),
+                                          0.85,
+                                        ),
                                         letterSpacing: 0.2,
                                       ),
                                     ),
@@ -573,12 +608,12 @@ class PremiumSidebar extends StatelessWidget {
                                             : item['badge'] == '4'
                                             ? Colors.pink.withOpacity(0.9)
                                             : (item['badge'] == '5' ||
-                                                  item['badge'] == '12' ||
-                                                  item['badge'] == '23')
+                                            item['badge'] == '12' ||
+                                            item['badge'] == '23')
                                             ? Colors.orange.withOpacity(0.9)
                                             : AppTheme.accentGold.withOpacity(
-                                                0.9,
-                                              ),
+                                          0.9,
+                                        ),
                                         borderRadius: BorderRadius.circular(
                                           context.borderRadius('small'),
                                         ),

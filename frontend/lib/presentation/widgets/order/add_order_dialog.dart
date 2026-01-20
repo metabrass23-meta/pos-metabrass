@@ -255,7 +255,6 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
       ),
     );
   }
-
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
