@@ -996,16 +996,21 @@ class Sales(models.Model):
         'customers.Customer',
         on_delete=models.PROTECT,
         related_name='sales',
-        help_text="Customer making the purchase"
+        null=True,
+        blank=True,
+        help_text="Customer making the purchase (optional for walk-in sales)"
     )
     
     # Cached customer information for historical accuracy
     customer_name = models.CharField(
         max_length=200,
+        default='Walk-in Customer',
         help_text="Cached customer name at time of sale"
     )
     customer_phone = models.CharField(
         max_length=20,
+        default='',
+        blank=True,
         help_text="Cached customer contact at time of sale"
     )
     customer_email = models.EmailField(
@@ -1120,7 +1125,7 @@ class Sales(models.Model):
         verbose_name_plural = 'Sales'
         ordering = ['-date_of_sale', '-created_at']
         indexes = [
-               models.Index(fields=['date_of_sale', '-created_at']),
+            models.Index(fields=['date_of_sale', '-created_at']),
             models.Index(fields=['status', 'is_active']),
             models.Index(fields=['invoice_number']),
             models.Index(fields=['customer']),
@@ -1136,62 +1141,59 @@ class Sales(models.Model):
     def __str__(self):
         return f"{self.invoice_number} - {self.customer_name} ({self.get_status_display()})"
     
- # 🔧 FINAL FIX: backend/sales/models.py
-
-# Location: Line ~555 in the clean() method
-# Replace the entire clean() method with this:
-
-def clean(self):
-    """Validate model data"""
-    if self.subtotal < 0:
-        raise ValidationError({'subtotal': 'Subtotal cannot be negative.'})
+    def clean(self):
+        """Validate model data"""
+        if self.subtotal < 0:
+            raise ValidationError({'subtotal': 'Subtotal cannot be negative.'})
+        
+        if self.overall_discount < 0:
+            raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
+        
+        if self.overall_discount > self.subtotal:
+            raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
+        
+        if self.gst_percentage < 0 or self.gst_percentage > 100:
+            raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})
+        
+        if self.amount_paid < 0:
+            raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
+        
+        # ✅ REMOVED: Allow partial payments for wholesale business model
+        # The validation "amount_paid > grand_total" has been removed
+        # to support partial payments and flexible payment scenarios
+        
+        # Validate split payment details
+        if self.payment_method == 'SPLIT' and not self.split_payment_details:
+            raise ValidationError({'split_payment_details': 'Split payment details are required when payment method is Split.'})
     
-    if self.overall_discount < 0:
-        raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
-    
-    if self.overall_discount > self.subtotal:
-        raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
-    
-    if self.gst_percentage < 0 or self.gst_percentage > 100:
-        raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})
-    
-    if self.amount_paid < 0:
-        raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
-    
-    # ✅ REMOVED: Allow partial payments
-    # The validation "amount_paid > grand_total" has been removed
-    # to allow partial payments and flexible payment scenarios
-    
-    # Validate split payment details
-    if self.payment_method == 'SPLIT' and not self.split_payment_details:
-        raise ValidationError({'split_payment_details': 'Split payment details are required when payment method is Split.'})
     def save(self, *args, **kwargs):
         """Auto-calculate financial fields and validate before saving"""
         # Cache customer information if not set
-        if self.customer and not self.customer_name:
-            self.customer_name = self.customer.name
-        
-        if self.customer and not self.customer_phone:
-            self.customer_phone = self.customer.phone
-        
-        if self.customer and not self.customer_email:
-            self.customer_email = self.customer.email
+        if self.customer:
+            if not self.customer_name or self.customer_name == 'Walk-in Customer':
+                self.customer_name = self.customer.name
+            
+            if not self.customer_phone:
+                self.customer_phone = self.customer.phone
+            
+            if not self.customer_email:
+                self.customer_email = self.customer.email
         
         # Calculate tax amount
-        if self.subtotal and self.overall_discount and self.gst_percentage:
+        if self.subtotal and self.overall_discount is not None and self.gst_percentage:
             taxable_amount = self.subtotal - self.overall_discount
             self.tax_amount = (taxable_amount * self.gst_percentage) / 100
         
         # Calculate grand total
-        if self.subtotal and self.overall_discount and self.tax_amount:
+        if self.subtotal is not None and self.overall_discount is not None and self.tax_amount is not None:
             self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
         
         # Calculate remaining amount
-        if self.grand_total and self.amount_paid:
+        if self.grand_total is not None and self.amount_paid is not None:
             self.remaining_amount = self.grand_total - self.amount_paid
         
         # Update payment status
-        if self.grand_total and self.amount_paid:
+        if self.grand_total and self.amount_paid is not None:
             self.is_fully_paid = self.amount_paid >= self.grand_total
         
         self.full_clean()
@@ -1228,7 +1230,8 @@ def clean(self):
     def authorized_initials(self):
         """Initials of sales person who created the sale"""
         if self.created_by:
-            return ''.join([name[0].upper() for name in self.created_by.full_name.split()])
+            full_name = getattr(self.created_by, 'full_name', None) or self.created_by.username
+            return ''.join([name[0].upper() for name in full_name.split()])
         return ''
     
     @property
@@ -1268,6 +1271,13 @@ def clean(self):
             'gst_amount': self.tax_amount,
             'tax_rate_display': f"{self.gst_percentage}%"
         }
+    
+    @property
+    def tax_summary_display(self):
+        """Summary of tax for display"""
+        if self.gst_percentage > 0:
+            return f"GST {self.gst_percentage}%"
+        return "No Tax"
     
     def can_be_cancelled(self):
         """Check if sale can be cancelled"""
@@ -1323,14 +1333,6 @@ def clean(self):
             # Define fields to update
             update_fields = ['subtotal', 'tax_amount', 'grand_total', 'remaining_amount', 'is_fully_paid']
             
-            # Only include tax_configuration if it exists on the model
-            # (Checks if the field is actually part of the model definition to avoid errors)
-            # This is a runtime check since we're uncertain about the schema state
-            # for field in self._meta.fields:
-            #     if field.name == 'tax_configuration':
-            #         update_fields.append('tax_configuration')
-            #         break
-            
             self.save(update_fields=update_fields)
             logger.info(f"✅ Recalculated totals for {self.invoice_number}: {self.grand_total}")
             
@@ -1380,15 +1382,6 @@ class SaleItem(models.Model):
         related_name='sale_items',
         help_text="Parent sale transaction"
     )
-    # order_item = models.ForeignKey(
-    #     'order_items.OrderItem',
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True,
-    #     related_name='sale_items',
-    #     help_text="Optional: Order item this sale item was created from",
-    #     to_field='id'
-    # )
     order_item = models.UUIDField(
         null=True,
         blank=True,
