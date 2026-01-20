@@ -35,7 +35,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   DateTime? _saleDate;
   String _selectedPaymentMethod = 'CASH';
   double _overallDiscount = 0.0;
-
+  double _amountPaid = 0.0;
   @override
   void initState() {
     super.initState();
@@ -54,6 +54,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       _saleItems = List.from(widget.sale!.saleItems);
       _selectedPaymentMethod = widget.sale!.paymentMethod;
       _overallDiscount = widget.sale!.overallDiscount;
+      _amountPaid = widget.sale!.amountPaid;
     } else {
       _invoiceNumberController.text = '';
       _customerNameController.text = '';
@@ -645,7 +646,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           taxConfiguration: _taxConfiguration,
           paymentMethod: _selectedPaymentMethod,
           notes: _notesController.text.trim(),
-          saleItems: saleItems,
+          saleItems: saleItems, amountPaid: _amountPaid,
         );
 
         final success = await provider.createSale(request);
