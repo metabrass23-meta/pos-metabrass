@@ -339,7 +339,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(height: context.smallPadding),
               _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone),
               SizedBox(height: context.smallPadding),
-              _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId),
+              _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId!),
             ],
           )
               : Row(
@@ -357,7 +357,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId)],
+                  children: [_buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId!)],
                 ),
               ),
             ],
