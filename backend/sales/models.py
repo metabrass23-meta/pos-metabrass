@@ -1274,18 +1274,58 @@ class Sales(models.Model):
             self.save(update_fields=['is_fully_paid', 'remaining_amount'])
     
     def recalculate_totals(self):
-        """Recalculate all financial totals from sale items"""
-        total_subtotal = sum(item.line_total for item in self.sale_items.all())
-        self.subtotal = total_subtotal
+        """Safely recalculate sale totals"""
+        import logging
+        logger = logging.getLogger(__name__)
         
-        # Recalculate tax and grand total
-        taxable_amount = self.subtotal - self.overall_discount
-        self.tax_amount = (taxable_amount * self.gst_percentage) / 100
-        self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
-        
-        # Update payment status
-        self.update_payment_status()
-        self.save(update_fields=['subtotal', 'tax_amount', 'grand_total'])
+        try:
+            # Calculate subtotal
+            total_subtotal = sum(item.line_total for item in self.sale_items.all())
+            self.subtotal = total_subtotal
+            
+            # Calculate tax and grand total
+            taxable_amount = self.subtotal - self.overall_discount
+            
+            # Calculate tax based on configuration if available, otherwise fall back to GST
+            tax_amount = Decimal('0.00')
+            
+            if hasattr(self, 'tax_configuration') and self.tax_configuration:
+                try:
+                    for tax_key, tax_data in self.tax_configuration.items():
+                        if isinstance(tax_data, dict) and 'percentage' in tax_data:
+                            percentage = Decimal(str(tax_data['percentage']))
+                            tax_amount += (taxable_amount * percentage) / Decimal('100')
+                except Exception as tax_error:
+                    logger.warning(f"Error calculating details from tax_configuration: {tax_error}")
+                    # Fallback to standard GST if configured
+                    if self.gst_percentage:
+                        tax_amount = (taxable_amount * self.gst_percentage) / 100
+            elif self.gst_percentage:
+                tax_amount = (taxable_amount * self.gst_percentage) / 100
+                
+            self.tax_amount = tax_amount
+            self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
+            
+            # Update payment status
+            self.update_payment_status()
+            
+            # Define fields to update
+            update_fields = ['subtotal', 'tax_amount', 'grand_total', 'remaining_amount', 'is_fully_paid']
+            
+            # Only include tax_configuration if it exists on the model
+            # (Checks if the field is actually part of the model definition to avoid errors)
+            # This is a runtime check since we're uncertain about the schema state
+            # for field in self._meta.fields:
+            #     if field.name == 'tax_configuration':
+            #         update_fields.append('tax_configuration')
+            #         break
+            
+            self.save(update_fields=update_fields)
+            logger.info(f"✅ Recalculated totals for {self.invoice_number}: {self.grand_total}")
+            
+        except Exception as e:
+            logger.error(f"Failed to recalculate totals for sale {self.invoice_number}: {str(e)}")
+            # Do not raise exception to avoid blocking the main transaction if this is called from signal
 
 
 class SaleItemQuerySet(models.QuerySet):

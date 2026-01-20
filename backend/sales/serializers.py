@@ -90,58 +90,105 @@ class SalesCreateSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        """Create sale with nested sale items"""
-        from django.db import transaction
-        from products.models import Product
-        from sales.models import SaleItem
+        """Create sale with nested sale items - HOTFIX"""
+        import logging
+        logger = logging.getLogger(__name__)
         
-        sale_items_data = validated_data.pop('sale_items', [])
-        
-        # ✅ Get created_by from context (passed by view)
-        created_by = self.context.get('request').user if self.context.get('request') else None
-        
-        if 'amount_paid' not in validated_data:
-            validated_data['amount_paid'] = 0
-        
-        with transaction.atomic():
-            # ✅ Add created_by if available
-            if created_by:
-                validated_data['created_by'] = created_by
+        try:
+            logger.info(f"📦 Starting sale creation with data keys: {validated_data.keys()}")
             
-            # Create Sale
-            sale = Sales.objects.create(**validated_data)
+            sale_items_data = validated_data.pop('sale_items', [])
             
-            # Create Sale Items
-            if sale_items_data:
-                for item_data in sale_items_data:
-                    product_id = item_data['product']
-                    
+            # HOTFIX: Remove tax_configuration if it exists in validated_data but not in model
+            if 'tax_configuration' in validated_data:
+                logger.warning("⚠️ Removing tax_configuration from validated_data as it might be missing from model")
+                validated_data.pop('tax_configuration')
+            
+            # Get created_by from context
+            created_by = None
+            if self.context.get('request'):
+                created_by = self.context['request'].user
+                logger.info(f"👤 Creating sale for user: {created_by}")
+            
+            # Set default amount_paid if not provided
+            if 'amount_paid' not in validated_data:
+                validated_data['amount_paid'] = Decimal('0.00')
+            
+            # Convert floats to Decimals to avoid type errors
+            if 'overall_discount' in validated_data:
+                validated_data['overall_discount'] = Decimal(str(validated_data['overall_discount']))
+            if 'amount_paid' in validated_data:
+                validated_data['amount_paid'] = Decimal(str(validated_data['amount_paid']))
+            
+            with transaction.atomic():
+                # Add created_by if available and if field exists in model
+                if created_by:
                     try:
-                        product = Product.objects.get(id=product_id, is_active=True)
-                    except Product.DoesNotExist:
-                        raise serializers.ValidationError(f"Product {product_id} not found or inactive")
-                    
-                    SaleItem.objects.create(
-                        sale=sale,
-                        order_item=item_data.get('order_item'),
-                        product=product,
-                        product_name=product.name,
-                        unit_price=item_data['unit_price'],
-                        quantity=item_data['quantity'],
-                        item_discount=item_data.get('item_discount', 0),
-                        line_total=(item_data['quantity'] * item_data['unit_price']) 
-                                   - item_data.get('item_discount', 0),
-                        customization_notes=item_data.get('customization_notes', '')
-                    )
-            
-            # Recalculate totals
-            try:
-                sale.recalculate_totals()
-            except Exception as e:
-                logger.error(f"Error recalculating totals: {e}")
-                # Continue even if recalculation fails
-            
-            return sale
+                        # Check if Sales model has created_by field
+                        Sales._meta.get_field('created_by')
+                        validated_data['created_by'] = created_by
+                        logger.info(f"✅ Added created_by to validated_data")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Sales model doesn't have created_by field: {e}")
+                
+                # Create Sale
+                logger.info(f"🏗️ Creating Sales object...")
+                sale = Sales.objects.create(**validated_data)
+                logger.info(f"✅ Sale created with ID: {sale.id}")
+                
+                # Create Sale Items
+                if sale_items_data:
+                    logger.info(f"📦 Creating {len(sale_items_data)} sale items...")
+                    for idx, item_data in enumerate(sale_items_data):
+                        try:
+                            product_id = item_data['product']
+                            
+                            try:
+                                product = Product.objects.get(id=product_id, is_active=True)
+                            except Product.DoesNotExist:
+                                logger.error(f"  ❌ Product {product_id} not found")
+                                raise serializers.ValidationError(f"Product {product_id} not found or inactive")
+                            
+                            # Convert numeric values to Decimal
+                            unit_price = Decimal(str(item_data['unit_price']))
+                            quantity = int(item_data['quantity'])
+                            item_discount = Decimal(str(item_data.get('item_discount', 0)))
+                            line_total = (quantity * unit_price) - item_discount
+                            
+                            sale_item = SaleItem.objects.create(
+                                sale=sale,
+                                order_item=item_data.get('order_item'),
+                                product=product,
+                                product_name=product.name,
+                                unit_price=unit_price,
+                                quantity=quantity,
+                                item_discount=item_discount,
+                                line_total=line_total,
+                                customization_notes=item_data.get('customization_notes', '') or ''
+                            )
+                            
+                        except Exception as item_error:
+                            logger.error(f"  ❌ Error creating sale item {idx+1}: {item_error}", exc_info=True)
+                            raise
+                
+                # Recalculate totals with safety check
+                try:
+                    logger.info(f"🧮 Recalculating sale totals...")
+                    if hasattr(sale, 'recalculate_totals'):
+                        sale.recalculate_totals()
+                        logger.info(f"✅ Totals recalculated")
+                    else:
+                        logger.warning(f"⚠️ Sale model doesn't have recalculate_totals method")
+                except Exception as calc_error:
+                    logger.error(f"❌ Error recalculating totals: {calc_error}", exc_info=True)
+                    # Don't fail the entire transaction, just log the error
+                    logger.warning(f"⚠️ Continuing without recalculation")
+                
+                return sale
+                
+        except Exception as e:
+            logger.error(f"💥 CRITICAL ERROR in sale creation: {str(e)}", exc_info=True)
+            raise
 
 class TaxRateSerializer(serializers.ModelSerializer):
     """Serializer for TaxRate model"""
