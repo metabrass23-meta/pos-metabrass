@@ -132,8 +132,7 @@ class MaqboolFabricApp extends StatelessWidget {
                 themeMode: ThemeMode.light,
                 navigatorKey: navigatorKey,
                 
-                // ✅ FIX 2: Wire locale to AppProvider (CHANGED)
-                locale: appProvider.locale,  // Changed from: const Locale('ur')
+                locale: appProvider.locale,
                 
                 supportedLocales: const [
                   Locale('ur'),
