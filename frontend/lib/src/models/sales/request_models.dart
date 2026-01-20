@@ -31,9 +31,11 @@ class CreateSaleRequest {
       'overall_discount': overallDiscount.toString(),
       'tax_configuration': taxConfiguration.toJson(),
       'payment_method': paymentMethod,
-      'amount_paid': amountPaid.toString(),
-      'split_payment_details': splitPaymentDetails,
-      'notes': notes,
+      'amount_paid': amountPaid?.toString() ?? '0.0',
+      // 🔥 FIX: Don't send null - send empty dict or omit the field
+      if (splitPaymentDetails != null) 'split_payment_details': splitPaymentDetails,
+      // 🔥 FIX: Don't send null - send empty string or omit the field  
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
       'sale_items': saleItems.map((item) => item.toJson()).toList(),
     };
   }

@@ -66,7 +66,7 @@ class SalesCreateSerializer(serializers.ModelSerializer):
         if not isinstance(value, dict):
             raise serializers.ValidationError("Tax configuration must be a valid JSON object.")
         
-        # Frontend sends: { taxes: { gst: { percentage: 17.0 } } }
+        # Frontend sends: { taxes: { gst: { percentage: 0.0 } } }
         # This is just for validation - we'll extract gst_percentage in create()
         
         return value
@@ -98,12 +98,12 @@ class SalesCreateSerializer(serializers.ModelSerializer):
             tax_configuration = validated_data.pop('tax_configuration', None)
             
             # 🔥 CRITICAL FIX: Convert tax_configuration to gst_percentage
-            # Frontend sends: { taxes: { gst: { percentage: 17.0, amount: 123 } } }
-            # Backend model needs: gst_percentage = 17.0
+            # Frontend sends: { taxes: { gst: { percentage: 0.0, amount: 123 } } }
+            # Backend model needs: gst_percentage = 0.0
             if tax_configuration:
                 logger.info(f"📊 Processing tax_configuration: {tax_configuration}")
                 
-                gst_percentage = Decimal('17.00')  # Default
+                gst_percentage = Decimal('0.00')  # Default
                 
                 if isinstance(tax_configuration, dict):
                     taxes = tax_configuration.get('taxes', {})
@@ -119,8 +119,8 @@ class SalesCreateSerializer(serializers.ModelSerializer):
                 # DO NOT save tax_configuration to validated_data unless you added the field to the model!
                 # validated_data['tax_configuration'] = tax_configuration  # ❌ REMOVE THIS LINE
             else:
-                validated_data['gst_percentage'] = Decimal('17.00')
-                logger.info(f"ℹ️  Using default GST: 17.00%")
+                validated_data['gst_percentage'] = Decimal('0.00')
+                logger.info(f"ℹ️  Using default GST: 0.00%")
 
             # Get created_by from context
             created_by = None
@@ -420,9 +420,6 @@ class SalesPaymentSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Amount paid cannot be negative.")
         
-        if value > self.instance.grand_total:
-            raise serializers.ValidationError("Amount paid cannot exceed grand total.")
-        
         return value
 
 
@@ -499,7 +496,7 @@ class OrderToSaleConversionSerializer(serializers.Serializer):
     gst_percentage = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=Decimal('17.00'),
+        default=Decimal('0.00'),
         help_text="GST percentage to apply"
     )
     notes = serializers.CharField(

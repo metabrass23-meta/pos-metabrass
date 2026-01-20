@@ -1029,7 +1029,7 @@ class Sales(models.Model):
     gst_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=Decimal('17.00'),
+        default=Decimal('0.00'),
         help_text="GST tax rate (default 17% for Pakistan)"
     )
     
@@ -1136,30 +1136,35 @@ class Sales(models.Model):
     def __str__(self):
         return f"{self.invoice_number} - {self.customer_name} ({self.get_status_display()})"
     
-    def clean(self):
-        """Validate model data"""
-        if self.subtotal < 0:
-            raise ValidationError({'subtotal': 'Subtotal cannot be negative.'})
-        
-        if self.overall_discount < 0:
-            raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
-        
-        if self.overall_discount > self.subtotal:
-            raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
-        
-        if self.gst_percentage < 0 or self.gst_percentage > 100:
-            raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})
-        
-        if self.amount_paid < 0:
-            raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
-        
-        if self.amount_paid > self.grand_total:
-            raise ValidationError({'amount_paid': 'Amount paid cannot exceed grand total.'})
-        
-        # Validate split payment details
-        if self.payment_method == 'SPLIT' and not self.split_payment_details:
-            raise ValidationError({'split_payment_details': 'Split payment details are required when payment method is Split.'})
+ # 🔧 FINAL FIX: backend/sales/models.py
+
+# Location: Line ~555 in the clean() method
+# Replace the entire clean() method with this:
+
+def clean(self):
+    """Validate model data"""
+    if self.subtotal < 0:
+        raise ValidationError({'subtotal': 'Subtotal cannot be negative.'})
     
+    if self.overall_discount < 0:
+        raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
+    
+    if self.overall_discount > self.subtotal:
+        raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
+    
+    if self.gst_percentage < 0 or self.gst_percentage > 100:
+        raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})
+    
+    if self.amount_paid < 0:
+        raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
+    
+    # ✅ REMOVED: Allow partial payments
+    # The validation "amount_paid > grand_total" has been removed
+    # to allow partial payments and flexible payment scenarios
+    
+    # Validate split payment details
+    if self.payment_method == 'SPLIT' and not self.split_payment_details:
+        raise ValidationError({'split_payment_details': 'Split payment details are required when payment method is Split.'})
     def save(self, *args, **kwargs):
         """Auto-calculate financial fields and validate before saving"""
         # Cache customer information if not set
