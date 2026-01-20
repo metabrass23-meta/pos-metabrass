@@ -23,6 +23,9 @@ from .serializers import (
     ReceiptCreateSerializer, ReceiptSerializer, ReceiptUpdateSerializer, ReceiptListSerializer
 )
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Function-based views for Sales
@@ -98,12 +101,22 @@ def list_sales(request):
 @permission_classes([IsAuthenticated])
 def create_sale(request):
     """Create a new sale"""
-    serializer = SalesCreateSerializer(data=request.data)
+    logger.info(f"📥 Received sale creation request from user: {request.user}")
+    logger.info(f"📦 Request data: {request.data}")
+    
+    # ✅ Pass request in context
+    serializer = SalesCreateSerializer(data=request.data, context={'request': request})
     
     if serializer.is_valid():
+        logger.info(f"✅ Serializer validation passed")
+        logger.info(f"📋 Validated data: {serializer.validated_data}")
+        
         try:
             with transaction.atomic():
-                sale = serializer.save(created_by=request.user)
+                logger.info(f"🔄 Starting transaction for sale creation")
+                # ✅ Don't pass created_by here - serializer gets it from context
+                sale = serializer.save()
+                logger.info(f"✅ Sale created with ID: {sale.id}")
                 
                 return Response({
                     'success': True,
@@ -112,17 +125,19 @@ def create_sale(request):
                 }, status=status.HTTP_201_CREATED)
                 
         except Exception as e:
+            logger.error(f"❌ Error creating sale: {str(e)}", exc_info=True)
             return Response({
                 'success': False,
                 'message': 'Failed to create sale.',
                 'errors': {'detail': str(e)}
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    return Response({
-        'success': False,
-        'message': 'Sale creation failed.',
-        'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        logger.error(f"❌ Serializer validation failed: {serializer.errors}")
+        return Response({
+            'success': False,
+            'message': 'Sale creation failed.',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])

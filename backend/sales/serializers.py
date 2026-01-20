@@ -10,6 +10,9 @@ from customers.models import Customer
 from products.models import Product
 from orders.models import Order
 from order_items.models import OrderItem
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CartSaleItemSerializer(serializers.Serializer):
     """Serializer for sale items when creating from cart"""
@@ -94,16 +97,29 @@ class SalesCreateSerializer(serializers.ModelSerializer):
         
         sale_items_data = validated_data.pop('sale_items', [])
         
+        # ✅ Get created_by from context (passed by view)
+        created_by = self.context.get('request').user if self.context.get('request') else None
+        
         if 'amount_paid' not in validated_data:
             validated_data['amount_paid'] = 0
         
         with transaction.atomic():
+            # ✅ Add created_by if available
+            if created_by:
+                validated_data['created_by'] = created_by
+            
+            # Create Sale
             sale = Sales.objects.create(**validated_data)
             
+            # Create Sale Items
             if sale_items_data:
                 for item_data in sale_items_data:
                     product_id = item_data['product']
-                    product = Product.objects.get(id=product_id)
+                    
+                    try:
+                        product = Product.objects.get(id=product_id, is_active=True)
+                    except Product.DoesNotExist:
+                        raise serializers.ValidationError(f"Product {product_id} not found or inactive")
                     
                     SaleItem.objects.create(
                         sale=sale,
@@ -113,11 +129,17 @@ class SalesCreateSerializer(serializers.ModelSerializer):
                         unit_price=item_data['unit_price'],
                         quantity=item_data['quantity'],
                         item_discount=item_data.get('item_discount', 0),
-                        line_total=(item_data['quantity'] * item_data['unit_price']) - item_data.get('item_discount', 0),
+                        line_total=(item_data['quantity'] * item_data['unit_price']) 
+                                   - item_data.get('item_discount', 0),
                         customization_notes=item_data.get('customization_notes', '')
                     )
             
-            sale.recalculate_totals()
+            # Recalculate totals
+            try:
+                sale.recalculate_totals()
+            except Exception as e:
+                logger.error(f"Error recalculating totals: {e}")
+                # Continue even if recalculation fails
             
             return sale
 
