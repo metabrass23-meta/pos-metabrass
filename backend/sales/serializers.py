@@ -11,6 +11,115 @@ from products.models import Product
 from orders.models import Order
 from order_items.models import OrderItem
 
+class CartSaleItemSerializer(serializers.Serializer):
+    """Serializer for sale items when creating from cart"""
+    order_item = serializers.UUIDField(required=False, allow_null=True)
+    product = serializers.UUIDField(required=True)
+    unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=True)
+    quantity = serializers.IntegerField(required=True, min_value=1)
+    item_discount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, default=0)
+    customization_notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
+    def validate_product(self, value):
+        """Validate product exists"""
+        from products.models import Product
+        try:
+            product = Product.objects.get(id=value, is_active=True)
+            return value
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found or inactive.")
+    
+    def validate_quantity(self, value):
+        """Validate quantity"""
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than zero.")
+        return value
+
+class SalesCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating sales with nested sale items"""
+    sale_items = CartSaleItemSerializer(many=True, required=False)
+    amount_paid = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
+    
+    class Meta:
+        model = Sales
+        fields = (
+            'order_id', 'customer', 'overall_discount', 'tax_configuration',
+            'payment_method', 'amount_paid', 'split_payment_details', 'notes', 'sale_items'
+        )
+    
+    def validate_customer(self, value):
+        """Validate customer exists and is active - allow None for walk-in sales"""
+        if value and not value.is_active:
+            raise serializers.ValidationError("Customer must be active.")
+        return value
+    
+    def validate_tax_configuration(self, value):
+        """Validate tax configuration for new sales"""
+        if not value:
+            return {}
+        
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Tax configuration must be a valid JSON object.")
+        
+        for tax_type, tax_data in value.items():
+            if not isinstance(tax_data, dict):
+                raise serializers.ValidationError(f"Tax data for {tax_type} must be a valid object.")
+            
+            if 'percentage' not in tax_data:
+                raise serializers.ValidationError(f"Tax data for {tax_type} must include percentage.")
+            
+            percentage = tax_data['percentage']
+            if not isinstance(percentage, (int, float, Decimal)) or percentage < 0 or percentage > 100:
+                raise serializers.ValidationError(f"Tax percentage for {tax_type} must be between 0 and 100.")
+        
+        return value
+    
+    def validate(self, data):
+        """Cross-field validation"""
+        if not data.get('sale_items') and not data.get('order_id'):
+            raise serializers.ValidationError("Either sale_items or order_id must be provided.")
+        
+        if data.get('payment_method') == 'SPLIT':
+            split_details = data.get('split_payment_details')
+            if not split_details:
+                raise serializers.ValidationError("Split payment details required for SPLIT payment method.")
+        
+        return data
+    
+    def create(self, validated_data):
+        """Create sale with nested sale items"""
+        from django.db import transaction
+        from products.models import Product
+        from sales.models import SaleItem
+        
+        sale_items_data = validated_data.pop('sale_items', [])
+        
+        if 'amount_paid' not in validated_data:
+            validated_data['amount_paid'] = 0
+        
+        with transaction.atomic():
+            sale = Sales.objects.create(**validated_data)
+            
+            if sale_items_data:
+                for item_data in sale_items_data:
+                    product_id = item_data['product']
+                    product = Product.objects.get(id=product_id)
+                    
+                    SaleItem.objects.create(
+                        sale=sale,
+                        order_item=item_data.get('order_item'),
+                        product=product,
+                        product_name=product.name,
+                        unit_price=item_data['unit_price'],
+                        quantity=item_data['quantity'],
+                        item_discount=item_data.get('item_discount', 0),
+                        line_total=(item_data['quantity'] * item_data['unit_price']) - item_data.get('item_discount', 0),
+                        customization_notes=item_data.get('customization_notes', '')
+                    )
+            
+            sale.recalculate_totals()
+            
+            return sale
 
 class TaxRateSerializer(serializers.ModelSerializer):
     """Serializer for TaxRate model"""
@@ -62,109 +171,6 @@ class SaleItemCreateSerializer(serializers.Serializer):
         if value < 0:
             raise serializers.ValidationError("Item discount cannot be negative.")
         return value
-
-
-class SalesCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating sales WITH sale_items support"""
-    
-    # Add sale_items as write-only field
-    sale_items = SaleItemCreateSerializer(many=True, write_only=True)
-    
-    # Add amount_paid as optional field
-    amount_paid = serializers.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Amount paid immediately"
-    )
-    
-    class Meta:
-        model = Sales
-        fields = (
-            'order_id', 
-            'customer', 
-            'overall_discount', 
-            'tax_configuration',
-            'payment_method', 
-            'amount_paid',
-            'split_payment_details', 
-            'notes',
-            'sale_items'
-        )
-    
-    def validate_customer(self, value):
-        """Validate customer exists and is active"""
-        if not value.is_active:
-            raise serializers.ValidationError("Customer must be active.")
-        return value
-    
-    def validate_tax_configuration(self, value):
-        """Validate tax configuration for new sales"""
-        if not value:
-            # Use default tax configuration if none provided
-            return {}
-        
-        if not isinstance(value, dict):
-            raise serializers.ValidationError("Tax configuration must be a valid JSON object.")
-        
-        # Validate each tax entry
-        for tax_type, tax_data in value.items():
-            if not isinstance(tax_data, dict):
-                raise serializers.ValidationError(f"Tax data for {tax_type} must be a valid object.")
-            
-            if 'percentage' not in tax_data:
-                raise serializers.ValidationError(f"Tax data for {tax_type} must include percentage.")
-            
-            percentage = tax_data['percentage']
-            if not isinstance(percentage, (int, float, Decimal)) or percentage < 0 or percentage > 100:
-                raise serializers.ValidationError(f"Tax percentage for {tax_type} must be between 0 and 100.")
-        
-        return value
-    
-    def validate_amount_paid(self, value):
-        """Validate amount paid"""
-        if value < 0:
-            raise serializers.ValidationError("Amount paid cannot be negative.")
-        return value
-    
-    def validate_sale_items(self, value):
-        """Validate sale items list is not empty"""
-        if not value:
-            raise serializers.ValidationError("At least one sale item is required.")
-        return value
-    
-    def create(self, validated_data):
-        """Create sale with items in a transaction"""
-        from django.db import transaction
-        
-        # Extract sale_items from validated_data
-        sale_items_data = validated_data.pop('sale_items')
-        
-        # Extract amount_paid if present
-        amount_paid = validated_data.pop('amount_paid', Decimal('0.00'))
-        
-        with transaction.atomic():
-            # Create the sale
-            validated_data['amount_paid'] = amount_paid
-            sale = Sales.objects.create(**validated_data)
-            
-            # Create sale items
-            for item_data in sale_items_data:
-                product = item_data['product']
-                
-                SaleItem.objects.create(
-                    sale=sale,
-                    product=product,
-                    unit_price=item_data['unit_price'],
-                    quantity=item_data['quantity'],
-                    item_discount=item_data.get('item_discount', Decimal('0.00')),
-                    customization_notes=item_data.get('customization_notes', '')
-                )
-            
-            # Recalculate sale totals
-            sale.recalculate_totals()
-            
-        return sale
 
 
 class SaleItemSerializer(serializers.ModelSerializer):

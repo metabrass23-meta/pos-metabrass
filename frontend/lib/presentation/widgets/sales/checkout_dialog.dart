@@ -82,40 +82,104 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     super.dispose();
   }
 
-  void _handleCheckout() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final provider = Provider.of<SalesProvider>(context, listen: false);
-      provider.setOverallDiscount(
-        double.tryParse(_overallDiscountController.text) ?? 0.0,
-      );
-
-      final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
-      final notes = _notesController.text.trim();
-      final backendPaymentMethod = _translatePaymentMethod(
-        _selectedPaymentMethod,
-      );
-
-      final success = await provider.createSaleFromCart(
-        paymentMethod: backendPaymentMethod,
-        amountPaid: amountPaid,
-        notes: notes.isNotEmpty ? notes : null,
-      );
-
-      if (mounted) {
-        if (success) {
-          _showSuccessDialog();
-        } else {
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(provider.errorMessage ?? 'Failed to create sale'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
+  Future<void> _handleCheckout() async {
+  if (!_formKey.currentState!.validate()) {
+    return;
   }
+  
+  if (provider.currentCart.isEmpty) {
+    _showErrorDialog('Empty Cart', 'Please add items before checkout.');
+    return;
+  }
+  
+  // REMOVED: Customer validation - now optional
+  // if (_selectedCustomer == null) {
+  //   _showErrorDialog('No Customer', 'Please select a customer.');
+  //   return;
+  // }
+  
+  final double amount = double.tryParse(_amountController.text) ?? 0;
+  
+  // Show loading
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => Center(child: CircularProgressIndicator()),
+  );
+  
+  try {
+    final bool success = await apiService.createSaleFromCart(
+      customer: _selectedCustomer?.id,  // Can be null
+      overallDiscount: cart.totalDiscount,
+      paymentMethod: _selectedPaymentMethod,
+      amountPaid: amount,
+      notes: _notesController.text.trim().isEmpty 
+        ? null 
+        : _notesController.text.trim(),
+      saleItems: cart.items.map((item) => {
+        'product': item.product.id,
+        'unit_price': item.product.price,
+        'quantity': item.quantity,
+        'item_discount': item.discount,
+      }).toList(),
+    );
+    
+    Navigator.pop(context); // Close loading
+    
+    if (success) {
+      _showSuccessDialog('Sale completed successfully!');
+      cart.clearCart();
+      _clearForm();
+    } else {
+      _showErrorDialog('Failed', 'Sale creation failed.');
+    }
+    
+  } catch (e) {
+    Navigator.pop(context); // Close loading
+    _showErrorDialog(
+      'Error',
+      e.toString().replaceAll('Exception: ', ''),
+    );
+  }
+}
+
+void _showErrorDialog(String title, String message) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('OK'),
+        ),
+      ],
+    ),
+  );
+}
+
+void _showSuccessDialog(String message) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.check_circle, color: Colors.green),
+          SizedBox(width: 8),
+          Text('Success'),
+        ],
+      ),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('OK'),
+        ),
+      ],
+    ),
+  );
+}
 
   String _translatePaymentMethod(String displayMethod) {
     switch (displayMethod) {
@@ -132,14 +196,6 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       default:
         return 'CASH';
     }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _buildSuccessDialog(),
-    );
   }
 
   Widget _buildNextStepItem({

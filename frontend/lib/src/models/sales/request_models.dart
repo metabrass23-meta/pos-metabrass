@@ -3,7 +3,7 @@ import './sale_model.dart';
 /// Request model for creating a new sale
 class CreateSaleRequest {
   final String? orderId;
-  final String customerId;
+  final String? customerId;
   final double overallDiscount;
   final TaxConfiguration taxConfiguration;
   final String paymentMethod;
@@ -14,11 +14,11 @@ class CreateSaleRequest {
 
   CreateSaleRequest({
     this.orderId,
-    required this.customerId,
+    this.customerId,
     required this.overallDiscount,
     required this.taxConfiguration,
     required this.paymentMethod,
-    this.amountPaid,
+    required this.amountPaid,
     this.splitPaymentDetails,
     this.notes,
     required this.saleItems,
@@ -31,7 +31,7 @@ class CreateSaleRequest {
       'overall_discount': overallDiscount.toString(),
       'tax_configuration': taxConfiguration.toJson(),
       'payment_method': paymentMethod,
-      'amount_paid': amountPaid?.toString(),
+      'amount_paid': amountPaid.toString(),
       'split_payment_details': splitPaymentDetails,
       'notes': notes,
       'sale_items': saleItems.map((item) => item.toJson()).toList(),
