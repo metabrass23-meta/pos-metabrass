@@ -58,8 +58,8 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
       _amountPaidController.text = provider.cartGrandTotal.toStringAsFixed(0);
-      _overallDiscountController.text = provider.overallDiscount
-          .toStringAsFixed(0);
+      _overallDiscountController.text =
+          provider.overallDiscount.toStringAsFixed(0);
       _gstController.text = provider.gstPercentage.toStringAsFixed(0);
       _taxController.text = provider.taxPercentage.toStringAsFixed(0);
       _notesController.text = '';
@@ -82,39 +82,395 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     super.dispose();
   }
 
-  void _handleCheckout() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final provider = Provider.of<SalesProvider>(context, listen: false);
-      provider.setOverallDiscount(
-        double.tryParse(_overallDiscountController.text) ?? 0.0,
-      );
+  Future<void> _handleCheckout() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
-      final notes = _notesController.text.trim();
-      final backendPaymentMethod = _translatePaymentMethod(
-        _selectedPaymentMethod,
-      );
+    final provider = Provider.of<SalesProvider>(context, listen: false);
 
-      final success = await provider.createSaleFromCart(
+    // Validate cart is not empty
+    if (provider.currentCart.isEmpty) {
+      _showErrorDialog('Empty Cart', 'Please add items before checkout.');
+      return;
+    }
+
+    // Parse amount paid
+    final double amountPaid =
+        double.tryParse(_amountPaidController.text) ?? 0.0;
+    if (amountPaid < 0) {
+      _showErrorDialog(
+          'Invalid Amount', 'Amount paid cannot be negative.');
+      return;
+    }
+
+    // Translate payment method to backend format
+    final String backendPaymentMethod = _translatePaymentMethod(_selectedPaymentMethod);
+
+    // Prepare split payment details if applicable
+    Map<String, dynamic>? splitPaymentDetails;
+    if (_isSplitPayment) {
+      final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
+      final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
+      final bankAmount =
+          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+
+      splitPaymentDetails = {
+        'cash': cashAmount,
+        'card': cardAmount,
+        'bank_transfer': bankAmount,
+      };
+    }
+
+    // Prepare notes (null if empty)
+    final String? notes = _notesController.text.trim().isEmpty
+        ? null
+        : _notesController.text.trim();
+
+    try {
+      // Call provider method to create sale from cart
+      final bool success = await provider.createSaleFromCart(
         paymentMethod: backendPaymentMethod,
         amountPaid: amountPaid,
-        notes: notes.isNotEmpty ? notes : null,
+        notes: notes,
       );
 
-      if (mounted) {
-        if (success) {
-          _showSuccessDialog();
-        } else {
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(provider.errorMessage ?? 'Failed to create sale'),
-              backgroundColor: Colors.red,
-            ),
-          );
+      if (!mounted) return;
+
+      if (success) {
+        // Show success dialog
+        await _showSuccessDialog();
+        
+        // Close checkout dialog and return to sales screen
+        if (mounted) {
+          Navigator.of(context).pop();
         }
+      } else {
+        // Show error from provider
+        _showErrorDialog(
+          'Sale Failed',
+          provider.errorMessage ?? 'Failed to complete sale. Please try again.',
+        );
       }
+    } catch (e) {
+      if (!mounted) return;
+      _showErrorDialog(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+      );
     }
+  }
+
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red),
+            SizedBox(width: 8),
+            Text(title),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showSuccessDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = Provider.of<SalesProvider>(context, listen: false);
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: ResponsiveBreakpoints.responsive(
+              context,
+              tablet: 85.w,
+              small: 75.w,
+              medium: 65.w,
+              large: 55.w,
+              ultrawide: 45.w,
+            ),
+          ),
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: context.shadowBlur('heavy'),
+                offset: Offset(0, context.cardPadding),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success Header
+              Container(
+                padding: EdgeInsets.all(context.cardPadding),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.green, Colors.greenAccent],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(context.smallPadding),
+                      decoration: BoxDecoration(
+                        color: AppTheme.pureWhite.withOpacity(0.2),
+                        borderRadius:
+                            BorderRadius.circular(context.borderRadius()),
+                      ),
+                      child: Icon(
+                        Icons.check_circle_rounded,
+                        color: AppTheme.pureWhite,
+                        size: context.iconSize('large'),
+                      ),
+                    ),
+                    SizedBox(width: context.cardPadding),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.saleCompleted,
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: context.headerFontSize,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.pureWhite,
+                            ),
+                          ),
+                          Text(
+                            l10n.transactionProcessedSuccessfully,
+                            style: GoogleFonts.inter(
+                              fontSize: context.subtitleFontSize,
+                              color: AppTheme.pureWhite.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Success Details
+              Padding(
+                padding: EdgeInsets.all(context.cardPadding),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(context.cardPadding),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius:
+                            BorderRadius.circular(context.borderRadius()),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${l10n.invoiceNumber}:',
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                              Text(
+                                'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.primaryMaroon,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: context.smallPadding),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${l10n.totalAmount}:',
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                              Text(
+                                'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: context.smallPadding),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${l10n.paymentMethod}:',
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                              Text(
+                                _selectedPaymentMethod,
+                                style: GoogleFonts.inter(
+                                  fontSize: context.bodyFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: context.cardPadding),
+
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue),
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius(),
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.printFunctionalityToBeImplemented,
+                                      ),
+                                      backgroundColor: Colors.blue,
+                                    ),
+                                  );
+                                },
+                                borderRadius: BorderRadius.circular(
+                                  context.borderRadius(),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: context.cardPadding / 1.5,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.print_rounded,
+                                        color: Colors.blue,
+                                        size: context.iconSize('medium'),
+                                      ),
+                                      SizedBox(width: context.smallPadding),
+                                      Text(
+                                        l10n.printReceipt,
+                                        style: GoogleFonts.inter(
+                                          fontSize: context.bodyFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: context.cardPadding),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppTheme.primaryMaroon,
+                                  AppTheme.secondaryMaroon,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                context.borderRadius(),
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).pop(); // Close success dialog
+                                },
+                                borderRadius: BorderRadius.circular(
+                                  context.borderRadius(),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: context.cardPadding / 1.5,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.done_rounded,
+                                        color: AppTheme.pureWhite,
+                                        size: context.iconSize('medium'),
+                                      ),
+                                      SizedBox(width: context.smallPadding),
+                                      Text(
+                                        l10n.newSale,
+                                        style: GoogleFonts.inter(
+                                          fontSize: context.bodyFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppTheme.pureWhite,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   String _translatePaymentMethod(String displayMethod) {
@@ -132,63 +488,6 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       default:
         return 'CASH';
     }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _buildSuccessDialog(),
-    );
-  }
-
-  Widget _buildNextStepItem({
-    required IconData icon,
-    required String title,
-    required String description,
-    required Color color,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 16),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 10,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _navigateToSalesManagement() {
-    final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.navigateToSalesManagementToContinue),
-        backgroundColor: AppTheme.primaryMaroon,
-      ),
-    );
   }
 
   void _handleCancel() {
@@ -697,40 +996,39 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                     _isSplitPayment = value == 'Split';
                   });
                 },
-                items:
-                    [
-                      l10n.cash,
-                      l10n.card,
-                      l10n.bankTransfer,
-                      l10n.credit,
-                      l10n.split,
-                    ].map((method) {
-                      return DropdownMenuItem<String>(
-                        value: method,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.cardPadding / 2,
+                items: [
+                  l10n.cash,
+                  l10n.card,
+                  l10n.bankTransfer,
+                  l10n.credit,
+                  l10n.split,
+                ].map((method) {
+                  return DropdownMenuItem<String>(
+                    value: method,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.cardPadding / 2,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getPaymentMethodIcon(method),
+                            color: AppTheme.primaryMaroon,
+                            size: context.iconSize('medium'),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                _getPaymentMethodIcon(method),
-                                color: AppTheme.primaryMaroon,
-                                size: context.iconSize('medium'),
-                              ),
-                              SizedBox(width: context.smallPadding),
-                              Text(
-                                method,
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
+                          SizedBox(width: context.smallPadding),
+                          Text(
+                            method,
+                            style: GoogleFonts.inter(
+                              fontSize: context.bodyFontSize,
+                              color: AppTheme.charcoalGray,
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -1012,293 +1310,6 @@ class _CheckoutDialogState extends State<CheckoutDialog>
           );
         }
       },
-    );
-  }
-
-  Widget _buildSuccessDialog() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 85.w,
-            small: 75.w,
-            medium: 65.w,
-            large: 55.w,
-            ultrawide: 45.w,
-          ),
-        ),
-        decoration: BoxDecoration(
-          color: AppTheme.pureWhite,
-          borderRadius: BorderRadius.circular(context.borderRadius('large')),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: context.shadowBlur('heavy'),
-              offset: Offset(0, context.cardPadding),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.green, Colors.greenAccent],
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(context.borderRadius('large')),
-                  topRight: Radius.circular(context.borderRadius('large')),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(context.smallPadding),
-                    decoration: BoxDecoration(
-                      color: AppTheme.pureWhite.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(
-                        context.borderRadius(),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.check_circle_rounded,
-                      color: AppTheme.pureWhite,
-                      size: context.iconSize('large'),
-                    ),
-                  ),
-                  SizedBox(width: context.cardPadding),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.saleCompleted,
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: context.headerFontSize,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.pureWhite,
-                          ),
-                        ),
-                        Text(
-                          l10n.transactionProcessedSuccessfully,
-                          style: GoogleFonts.inter(
-                            fontSize: context.subtitleFontSize,
-                            color: AppTheme.pureWhite.withOpacity(0.9),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(context.cardPadding),
-              child: Column(
-                children: [
-                  Consumer<SalesProvider>(
-                    builder: (context, provider, child) {
-                      return Container(
-                        padding: EdgeInsets.all(context.cardPadding),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius(),
-                          ),
-                          border: Border.all(
-                            color: Colors.green.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${l10n.invoiceNumber}:',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    color: AppTheme.charcoalGray,
-                                  ),
-                                ),
-                                Text(
-                                  'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.primaryMaroon,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: context.smallPadding),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${l10n.totalAmount}:',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    color: AppTheme.charcoalGray,
-                                  ),
-                                ),
-                                Text(
-                                  'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: context.smallPadding),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${l10n.paymentMethod}:',
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    color: AppTheme.charcoalGray,
-                                  ),
-                                ),
-                                Text(
-                                  _selectedPaymentMethod,
-                                  style: GoogleFonts.inter(
-                                    fontSize: context.bodyFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.charcoalGray,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: context.cardPadding),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue),
-                            borderRadius: BorderRadius.circular(
-                              context.borderRadius(),
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      l10n.printFunctionalityToBeImplemented,
-                                    ),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius(),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.cardPadding / 1.5,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.print_rounded,
-                                      color: Colors.blue,
-                                      size: context.iconSize('medium'),
-                                    ),
-                                    SizedBox(width: context.smallPadding),
-                                    Text(
-                                      l10n.printReceipt,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: context.cardPadding),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppTheme.primaryMaroon,
-                                AppTheme.secondaryMaroon,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              context.borderRadius(),
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop();
-                              },
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius(),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.cardPadding / 1.5,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.done_rounded,
-                                      color: AppTheme.pureWhite,
-                                      size: context.iconSize('medium'),
-                                    ),
-                                    SizedBox(width: context.smallPadding),
-                                    Text(
-                                      l10n.newSale,
-                                      style: GoogleFonts.inter(
-                                        fontSize: context.bodyFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.pureWhite,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

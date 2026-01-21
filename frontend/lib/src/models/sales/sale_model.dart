@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
 
-// Tax Rate Model
+// ============================================================================
+// HELPER FUNCTIONS - Robust parsing for API responses with string numbers
+// ============================================================================
+
+/// Helper function to safely parse numeric values from API (handles both strings and numbers)
+double _parseDouble(dynamic value) {
+  if (value == null) return 0.0;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) {
+    return double.tryParse(value) ?? 0.0;
+  }
+  return 0.0;
+}
+
+int _parseInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is double) return value.toInt();
+  if (value is String) {
+    return int.tryParse(value) ?? 0;
+  }
+  return 0;
+}
+
+// ============================================================================
+// TAX RATE MODEL
+// ============================================================================
+
 class TaxRateModel {
   final String id;
   final String name;
@@ -59,7 +87,7 @@ class TaxRateModel {
       id: json['id'] as String,
       name: json['name'] as String,
       taxType: json['tax_type'] as String,
-      percentage: (json['percentage'] as num).toDouble(),
+      percentage: _parseDouble(json['percentage']), // ✅ FIXED
       isActive: json['is_active'] as bool? ?? true,
       description: json['description'] as String?,
       effectiveFrom: DateTime.parse(json['effective_from'] as String),
@@ -111,7 +139,10 @@ class TaxRateModel {
   }
 }
 
-// Tax Configuration Model
+// ============================================================================
+// TAX CONFIGURATION MODEL
+// ============================================================================
+
 class TaxConfiguration {
   final Map<String, TaxConfigItem> taxes;
 
@@ -166,29 +197,47 @@ class TaxConfiguration {
   }
 }
 
-// Individual Tax Configuration Item
+// ============================================================================
+// INDIVIDUAL TAX CONFIGURATION ITEM
+// ============================================================================
+
 class TaxConfigItem {
   final String name;
   final double percentage;
   final double amount;
   final String? description;
 
-  TaxConfigItem({required this.name, required this.percentage, required this.amount, this.description});
+  TaxConfigItem({
+    required this.name,
+    required this.percentage,
+    required this.amount,
+    this.description,
+  });
 
   factory TaxConfigItem.fromJson(Map<String, dynamic> json) {
     return TaxConfigItem(
       name: json['name'] as String? ?? '',
-      percentage: (json['percentage'] as num?)?.toDouble() ?? 0.0,
-      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      percentage: _parseDouble(json['percentage']), // ✅ FIXED
+      amount: _parseDouble(json['amount']), // ✅ FIXED
       description: json['description'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'percentage': percentage, 'amount': amount, 'description': description};
+    return {
+      'name': name,
+      'percentage': percentage,
+      'amount': amount,
+      'description': description,
+    };
   }
 
-  TaxConfigItem copyWith({String? name, double? percentage, double? amount, String? description}) {
+  TaxConfigItem copyWith({
+    String? name,
+    double? percentage,
+    double? amount,
+    String? description,
+  }) {
     return TaxConfigItem(
       name: name ?? this.name,
       percentage: percentage ?? this.percentage,
@@ -198,7 +247,10 @@ class TaxConfigItem {
   }
 }
 
-// Sale Item Model
+// ============================================================================
+// SALE ITEM MODEL
+// ============================================================================
+
 class SaleItemModel {
   final String id;
   final String saleId;
@@ -243,10 +295,10 @@ class SaleItemModel {
       orderItemId: json['order_item'] as String?,
       productId: json['product'] as String,
       productName: json['product_name'] as String,
-      unitPrice: (json['unit_price'] as num).toDouble(),
-      quantity: json['quantity'] as int,
-      itemDiscount: (json['item_discount'] as num).toDouble(),
-      lineTotal: (json['line_total'] as num).toDouble(),
+      unitPrice: _parseDouble(json['unit_price']), // ✅ FIXED
+      quantity: _parseInt(json['quantity']), // ✅ FIXED
+      itemDiscount: _parseDouble(json['item_discount']), // ✅ FIXED
+      lineTotal: _parseDouble(json['line_total']), // ✅ FIXED
       customizationNotes: json['customization_notes'] as String?,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -305,12 +357,15 @@ class SaleItemModel {
   }
 }
 
-// Main Sale Model
+// ============================================================================
+// MAIN SALE MODEL
+// ============================================================================
+
 class SaleModel {
   final String id;
   final String invoiceNumber;
   final String? orderId;
-  final String customerId;
+  final String? customerId; // ✅ FIXED: Made nullable for walk-in customers
   final String customerName;
   final String customerPhone;
   final String? customerEmail;
@@ -427,7 +482,7 @@ class SaleModel {
     required this.id,
     required this.invoiceNumber,
     this.orderId,
-    required this.customerId,
+    this.customerId, // ✅ FIXED: Made nullable
     required this.customerName,
     required this.customerPhone,
     this.customerEmail,
@@ -457,18 +512,19 @@ class SaleModel {
       id: json['id'] as String,
       invoiceNumber: json['invoice_number'] as String,
       orderId: json['order_id'] as String?,
-      customerId: json['customer_id'] as String,
-      customerName: json['customer_name'] as String,
-      customerPhone: json['customer_phone'] as String,
+      customerId: json['customer_id'] as String?, // ✅ FIXED: Nullable
+      customerName: json['customer_name'] as String? ?? 'Walk-in Customer',
+      customerPhone: json['customer_phone'] as String? ?? '',
       customerEmail: json['customer_email'] as String?,
-      subtotal: (json['subtotal'] as num).toDouble(),
-      overallDiscount: (json['overall_discount'] as num).toDouble(),
+      // ✅ FIXED: All numeric fields now use _parseDouble
+      subtotal: _parseDouble(json['subtotal']),
+      overallDiscount: _parseDouble(json['overall_discount']),
       taxConfiguration: TaxConfiguration.fromJson(json['tax_configuration'] as Map<String, dynamic>? ?? {}),
-      gstPercentage: (json['gst_percentage'] as num).toDouble(),
-      taxAmount: (json['tax_amount'] as num).toDouble(),
-      grandTotal: (json['grand_total'] as num).toDouble(),
-      amountPaid: (json['amount_paid'] as num).toDouble(),
-      remainingAmount: (json['remaining_amount'] as num).toDouble(),
+      gstPercentage: _parseDouble(json['gst_percentage']),
+      taxAmount: _parseDouble(json['tax_amount']),
+      grandTotal: _parseDouble(json['grand_total']),
+      amountPaid: _parseDouble(json['amount_paid']),
+      remainingAmount: _parseDouble(json['remaining_amount']),
       isFullyPaid: json['is_fully_paid'] as bool? ?? false,
       paymentMethod: json['payment_method'] as String,
       splitPaymentDetails: json['split_payment_details'] as Map<String, dynamic>?,
@@ -479,7 +535,10 @@ class SaleModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       createdBy: json['created_by'] as String?,
-      saleItems: (json['sale_items'] as List<dynamic>?)?.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>)).toList() ?? [],
+      saleItems: (json['sale_items'] as List<dynamic>?)
+              ?.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -573,7 +632,10 @@ class SaleModel {
   }
 }
 
-// Invoice Model
+// ============================================================================
+// INVOICE MODEL
+// ============================================================================
+
 class InvoiceModel {
   final String id;
   final String saleId;
@@ -673,7 +735,7 @@ class InvoiceModel {
       saleId: json['sale'] as String,
       saleInvoiceNumber: json['sale_invoice_number'] as String,
       customerName: json['customer_name'] as String,
-      grandTotal: (json['grand_total'] as num).toDouble(),
+      grandTotal: _parseDouble(json['grand_total']), // ✅ FIXED
       invoiceNumber: json['invoice_number'] as String,
       issueDate: DateTime.parse(json['issue_date'] as String),
       dueDate: json['due_date'] != null ? DateTime.parse(json['due_date'] as String) : null,
@@ -760,7 +822,10 @@ class InvoiceModel {
   }
 }
 
-// Receipt Model
+// ============================================================================
+// RECEIPT MODEL
+// ============================================================================
+
 class ReceiptModel {
   final String id;
   final String saleId;
@@ -845,7 +910,7 @@ class ReceiptModel {
       saleInvoiceNumber: json['sale_invoice_number'] as String,
       customerName: json['customer_name'] as String,
       paymentId: json['payment'] as String,
-      paymentAmount: (json['payment_amount'] as num).toDouble(),
+      paymentAmount: _parseDouble(json['payment_amount']), // ✅ FIXED
       paymentMethod: json['payment_method'] as String,
       receiptNumber: json['receipt_number'] as String,
       generatedAt: DateTime.parse(json['generated_at'] as String),

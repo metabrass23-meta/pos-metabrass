@@ -212,7 +212,79 @@ class SalesService {
       return ApiResponse<SalesStatisticsResponse>(success: false, message: 'An unexpected error occurred while getting sales statistics');
     }
   }
+  
+  Future<bool> createSaleFromCart({
+  String? orderId,
+  String? customer,  // NOW NULLABLE - for walk-in sales
+  required double overallDiscount,
+  Map<String, dynamic> taxConfiguration = const {},
+  required String paymentMethod,
+  required double amountPaid,
+  Map<String, dynamic>? splitPaymentDetails,
+  String? notes,
+  required List<Map<String, dynamic>> saleItems,
+}) async {
+  try {
+    print('🚀 Creating sale with payload: ${jsonEncode({
+      'order_id': orderId,
+      'customer': customer,
+      'overall_discount': overallDiscount,
+      'tax_configuration': taxConfiguration,
+      'payment_method': paymentMethod,
+      'amount_paid': amountPaid,
+      'split_payment_details': splitPaymentDetails,
+      'notes': notes,
+      'sale_items': saleItems,
+    })}');
 
+    final response = await _apiClient.post(
+      '/sales/create/',
+      data: {
+        'order_id': orderId,
+        'customer': customer,
+        'overall_discount': overallDiscount,
+        'tax_configuration': taxConfiguration,
+        'payment_method': paymentMethod,
+        'amount_paid': amountPaid,
+        'split_payment_details': splitPaymentDetails,
+        'notes': notes,
+        'sale_items': saleItems,
+      },
+    );
+
+    if (response.statusCode == 201 && response.data['success'] == true) {
+      print('✅ Sale created successfully');
+      return true;
+    }
+
+    throw Exception(response.data['message'] ?? 'Sale creation failed');
+    
+  } on DioException catch (e) {
+    print('DioException: $e');
+    
+    String errorMessage = 'Server error. Please try again.';
+    
+    if (e.response != null) {
+      final statusCode = e.response!.statusCode;
+      final responseData = e.response!.data;
+      
+      if (statusCode == 400 && responseData is Map) {
+        if (responseData.containsKey('errors')) {
+          final errors = responseData['errors'];
+          errorMessage = errors is Map 
+            ? errors.values.join(', ') 
+            : errors.toString();
+        } else if (responseData.containsKey('message')) {
+          errorMessage = responseData['message'];
+        }
+      } else if (statusCode == 500) {
+        errorMessage = 'Server error. Please contact support.';
+      }
+    }
+    
+    throw Exception(errorMessage);
+  }
+}
   /// Create sale from order
   Future<ApiResponse<SaleModel>> createSaleFromOrder(CreateSaleFromOrderRequest request) async {
     try {

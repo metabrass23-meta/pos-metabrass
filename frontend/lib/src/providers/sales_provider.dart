@@ -380,11 +380,6 @@ class SalesProvider extends ChangeNotifier {
       return false;
     }
 
-    if (_selectedCustomer == null) {
-      _setError('Please select a customer');
-      return false;
-    }
-
     try {
       final saleItems = _cartItems
           .map(
@@ -399,7 +394,7 @@ class SalesProvider extends ChangeNotifier {
           .toList();
 
       final request = CreateSaleRequest(
-        customerId: _selectedCustomer!.id,
+        customerId: _selectedCustomer?.id,
         overallDiscount: _overallDiscount,
         taxConfiguration: _taxConfiguration,
         paymentMethod: paymentMethod,

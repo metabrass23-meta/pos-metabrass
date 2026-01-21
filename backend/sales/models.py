@@ -996,16 +996,21 @@ class Sales(models.Model):
         'customers.Customer',
         on_delete=models.PROTECT,
         related_name='sales',
-        help_text="Customer making the purchase"
+        null=True,
+        blank=True,
+        help_text="Customer making the purchase (optional for walk-in sales)"
     )
     
     # Cached customer information for historical accuracy
     customer_name = models.CharField(
         max_length=200,
+        default='Walk-in Customer',
         help_text="Cached customer name at time of sale"
     )
     customer_phone = models.CharField(
         max_length=20,
+        default='',
+        blank=True,
         help_text="Cached customer contact at time of sale"
     )
     customer_email = models.EmailField(
@@ -1029,8 +1034,14 @@ class Sales(models.Model):
     gst_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        default=Decimal('17.00'),
+        default=Decimal('0.00'),
         help_text="GST tax rate (default 17% for Pakistan)"
+    )
+    
+    tax_configuration = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Flexible tax configuration as JSON"
     )
     tax_amount = models.DecimalField(
         max_digits=12,
@@ -1114,7 +1125,7 @@ class Sales(models.Model):
         verbose_name_plural = 'Sales'
         ordering = ['-date_of_sale', '-created_at']
         indexes = [
-               models.Index(fields=['date_of_sale', '-created_at']),
+            models.Index(fields=['date_of_sale', '-created_at']),
             models.Index(fields=['status', 'is_active']),
             models.Index(fields=['invoice_number']),
             models.Index(fields=['customer']),
@@ -1147,8 +1158,9 @@ class Sales(models.Model):
         if self.amount_paid < 0:
             raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
         
-        if self.amount_paid > self.grand_total:
-            raise ValidationError({'amount_paid': 'Amount paid cannot exceed grand total.'})
+        # ✅ REMOVED: Allow partial payments for wholesale business model
+        # The validation "amount_paid > grand_total" has been removed
+        # to support partial payments and flexible payment scenarios
         
         # Validate split payment details
         if self.payment_method == 'SPLIT' and not self.split_payment_details:
@@ -1157,30 +1169,31 @@ class Sales(models.Model):
     def save(self, *args, **kwargs):
         """Auto-calculate financial fields and validate before saving"""
         # Cache customer information if not set
-        if self.customer and not self.customer_name:
-            self.customer_name = self.customer.name
-        
-        if self.customer and not self.customer_phone:
-            self.customer_phone = self.customer.phone
-        
-        if self.customer and not self.customer_email:
-            self.customer_email = self.customer.email
+        if self.customer:
+            if not self.customer_name or self.customer_name == 'Walk-in Customer':
+                self.customer_name = self.customer.name
+            
+            if not self.customer_phone:
+                self.customer_phone = self.customer.phone
+            
+            if not self.customer_email:
+                self.customer_email = self.customer.email
         
         # Calculate tax amount
-        if self.subtotal and self.overall_discount and self.gst_percentage:
+        if self.subtotal and self.overall_discount is not None and self.gst_percentage:
             taxable_amount = self.subtotal - self.overall_discount
             self.tax_amount = (taxable_amount * self.gst_percentage) / 100
         
         # Calculate grand total
-        if self.subtotal and self.overall_discount and self.tax_amount:
+        if self.subtotal is not None and self.overall_discount is not None and self.tax_amount is not None:
             self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
         
         # Calculate remaining amount
-        if self.grand_total and self.amount_paid:
+        if self.grand_total is not None and self.amount_paid is not None:
             self.remaining_amount = self.grand_total - self.amount_paid
         
         # Update payment status
-        if self.grand_total and self.amount_paid:
+        if self.grand_total and self.amount_paid is not None:
             self.is_fully_paid = self.amount_paid >= self.grand_total
         
         self.full_clean()
@@ -1217,7 +1230,8 @@ class Sales(models.Model):
     def authorized_initials(self):
         """Initials of sales person who created the sale"""
         if self.created_by:
-            return ''.join([name[0].upper() for name in self.created_by.full_name.split()])
+            full_name = getattr(self.created_by, 'full_name', None) or self.created_by.username
+            return ''.join([name[0].upper() for name in full_name.split()])
         return ''
     
     @property
@@ -1258,6 +1272,13 @@ class Sales(models.Model):
             'tax_rate_display': f"{self.gst_percentage}%"
         }
     
+    @property
+    def tax_summary_display(self):
+        """Summary of tax for display"""
+        if self.gst_percentage > 0:
+            return f"GST {self.gst_percentage}%"
+        return "No Tax"
+    
     def can_be_cancelled(self):
         """Check if sale can be cancelled"""
         return self.status in ['DRAFT', 'CONFIRMED', 'INVOICED']
@@ -1274,18 +1295,50 @@ class Sales(models.Model):
             self.save(update_fields=['is_fully_paid', 'remaining_amount'])
     
     def recalculate_totals(self):
-        """Recalculate all financial totals from sale items"""
-        total_subtotal = sum(item.line_total for item in self.sale_items.all())
-        self.subtotal = total_subtotal
+        """Safely recalculate sale totals"""
+        import logging
+        logger = logging.getLogger(__name__)
         
-        # Recalculate tax and grand total
-        taxable_amount = self.subtotal - self.overall_discount
-        self.tax_amount = (taxable_amount * self.gst_percentage) / 100
-        self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
-        
-        # Update payment status
-        self.update_payment_status()
-        self.save(update_fields=['subtotal', 'tax_amount', 'grand_total'])
+        try:
+            # Calculate subtotal
+            total_subtotal = sum(item.line_total for item in self.sale_items.all())
+            self.subtotal = total_subtotal
+            
+            # Calculate tax and grand total
+            taxable_amount = self.subtotal - self.overall_discount
+            
+            # Calculate tax based on configuration if available, otherwise fall back to GST
+            tax_amount = Decimal('0.00')
+            
+            if hasattr(self, 'tax_configuration') and self.tax_configuration:
+                try:
+                    for tax_key, tax_data in self.tax_configuration.items():
+                        if isinstance(tax_data, dict) and 'percentage' in tax_data:
+                            percentage = Decimal(str(tax_data['percentage']))
+                            tax_amount += (taxable_amount * percentage) / Decimal('100')
+                except Exception as tax_error:
+                    logger.warning(f"Error calculating details from tax_configuration: {tax_error}")
+                    # Fallback to standard GST if configured
+                    if self.gst_percentage:
+                        tax_amount = (taxable_amount * self.gst_percentage) / 100
+            elif self.gst_percentage:
+                tax_amount = (taxable_amount * self.gst_percentage) / 100
+                
+            self.tax_amount = tax_amount
+            self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
+            
+            # Update payment status
+            self.update_payment_status()
+            
+            # Define fields to update
+            update_fields = ['subtotal', 'tax_amount', 'grand_total', 'remaining_amount', 'is_fully_paid']
+            
+            self.save(update_fields=update_fields)
+            logger.info(f"✅ Recalculated totals for {self.invoice_number}: {self.grand_total}")
+            
+        except Exception as e:
+            logger.error(f"Failed to recalculate totals for sale {self.invoice_number}: {str(e)}")
+            # Do not raise exception to avoid blocking the main transaction if this is called from signal
 
 
 class SaleItemQuerySet(models.QuerySet):
@@ -1329,15 +1382,6 @@ class SaleItem(models.Model):
         related_name='sale_items',
         help_text="Parent sale transaction"
     )
-    # order_item = models.ForeignKey(
-    #     'order_items.OrderItem',
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True,
-    #     related_name='sale_items',
-    #     help_text="Optional: Order item this sale item was created from",
-    #     to_field='id'
-    # )
     order_item = models.UUIDField(
         null=True,
         blank=True,

@@ -105,7 +105,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 itemDiscount: 0.0,
                 customizationNotes: _getCustomizationNotes(),
               ),
-            ],
+            ], amountPaid: widget.product.price,
           ),
         );
 
