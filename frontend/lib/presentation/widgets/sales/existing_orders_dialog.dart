@@ -8,7 +8,7 @@ import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 
 class ExistingOrdersDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const ExistingOrdersDialog({super.key, required this.product});
 

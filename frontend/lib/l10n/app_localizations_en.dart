@@ -491,7 +491,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Premium POS';
 
   @override
-  String get welcomeToPos => 'Welcome to Maqbool Fabrics POS';
+  String get welcomeToPos => 'Welcome to Al Noor Fabrics POS';
 
   @override
   String get welcomeTagline => 'Crafting Excellence in Every Stitch - Your Premium Fashion Management System';
@@ -3533,6 +3533,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get withDeduction => 'With Deduction';
 
   @override
+  String get purchases => 'Purchases';
+
+  @override
   String get regularPayment => 'Regular Payment';
 
   @override
@@ -6479,4 +6482,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String printingReceiptFor(String invoice) {
     return 'Printing receipt for $invoice';
   }
+
+  @override
+  String get deletePurchase => 'Delete Purchase';
+
+  @override
+  String get confirmDelete => 'Are you sure you want to delete this purchase?';
+
+  @override
+  String get deleteSuccess => 'Purchase deleted successfully';
+
+  @override
+  String get editPurchase => 'Edit Purchase';
+
+  @override
+  String get apply => 'Apply';
 }

@@ -9,7 +9,7 @@ import '../globals/text_button.dart';
 import '../../../l10n/app_localizations.dart';
 
 class ViewProductDetailsDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const ViewProductDetailsDialog({super.key, required this.product});
 

@@ -115,7 +115,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   late Animation<double> _fadeAnimation;
 
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
   String _searchQuery = '';
   bool _showInactiveOnly = false;
 
@@ -537,7 +537,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
 
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: l10n.selectProduct,
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -689,11 +689,11 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.allProducts),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
+      DropdownItem<ProductModel?>(value: null, label: l10n.allProducts),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
     ];
   }
 

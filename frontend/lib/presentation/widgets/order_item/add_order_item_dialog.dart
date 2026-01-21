@@ -29,7 +29,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
 
   // Selected models for dropdowns
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   @override
   void initState() {
@@ -350,7 +350,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
   Widget _buildProductDropdown(AppLocalizations l10n) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: '${l10n.selectProduct} *',
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -502,11 +502,11 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.selectAProduct),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
+      DropdownItem<ProductModel?>(value: null, label: l10n.selectAProduct),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
     ];
   }
 }

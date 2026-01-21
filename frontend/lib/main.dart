@@ -21,6 +21,7 @@ import 'package:frontend/src/providers/payment_provider.dart';
 import 'package:frontend/src/providers/prinicipal_acc_provider.dart';
 import 'package:frontend/src/providers/product_provider.dart';
 import 'package:frontend/src/providers/profit_loss/profit_loss_provider.dart';
+import 'package:frontend/src/providers/purchase_provider.dart';
 import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/tax_rates_provider.dart';
@@ -88,6 +89,7 @@ class MaqboolFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ExpensesProvider()),
         ChangeNotifierProvider(create: (_) => VendorLedgerProvider()),
         ChangeNotifierProvider(create: (_) => ZakatProvider()),
+        ChangeNotifierProvider(create: (_) => PurchaseProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
         ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
         ChangeNotifierProvider(create: (_) => ReturnProvider()),

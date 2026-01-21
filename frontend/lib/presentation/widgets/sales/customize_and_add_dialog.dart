@@ -12,7 +12,7 @@ import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class CustomizeAndAddDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const CustomizeAndAddDialog({super.key, required this.product});
 

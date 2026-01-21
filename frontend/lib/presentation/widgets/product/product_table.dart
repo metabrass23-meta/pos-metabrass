@@ -9,11 +9,16 @@ import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 
 class EnhancedProductTable extends StatefulWidget {
-  final Function(Product) onEdit;
-  final Function(Product) onDelete;
-  final Function(Product) onView;
+  final Function(ProductModel) onEdit;
+  final Function(ProductModel) onDelete;
+  final Function(ProductModel) onView;
 
-  const EnhancedProductTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
+  const EnhancedProductTable({
+    super.key,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onView,
+  });
 
   @override
   State<EnhancedProductTable> createState() => _EnhancedProductTableState();
@@ -36,7 +41,13 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(0, context.smallPadding),
+          )
+        ],
       ),
       child: Consumer<ProductProvider>(
         builder: (context, provider, child) {
@@ -54,57 +65,67 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             return _buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                // Table Header with Horizontal Scroll
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
+          // Use LayoutBuilder to get the available height for the table
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return Scrollbar(
+                controller: _horizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _horizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: _getTableWidth(context),
+                      maxHeight: constraints.maxHeight, // Force height to fill parent
                     ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _horizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
-                  ),
-                ),
-
-                // Table Content with Synchronized Scroll
-                Expanded(
-                  child: Scrollbar(
-                    controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.products.length,
-                          itemBuilder: (context, index) {
-                            final product = provider.products[index];
-                            return _buildTableRow(context, product, index);
-                          },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 1. Fixed Header Section
+                        Container(
+                          width: _getTableWidth(context),
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: context.cardPadding * 0.85,
+                              horizontal: context.cardPadding / 2
+                          ),
+                          child: _buildTableHeader(context),
                         ),
-                      ),
+
+                        // 2. Scrollable Data Section
+                        Expanded(
+                          child: Container(
+                            width: _getTableWidth(context),
+                            child: Scrollbar(
+                              controller: _verticalController,
+                              thumbVisibility: true,
+                              child: ListView.builder(
+                                controller: _verticalController,
+                                physics: const ClampingScrollPhysics(),
+                                itemCount: provider.products.length,
+                                itemBuilder: (context, index) {
+                                  final product = provider.products[index];
+                                  return _buildTableRow(context, product, index);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -112,7 +133,6 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible, adjusted for removed Product ID column
     return ResponsiveBreakpoints.responsive(
       context,
       tablet: 1800.0 + 120.0,
@@ -123,46 +143,24 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     );
   }
 
+  // ... (Keep the rest of your methods exactly the same: _buildTableHeader, _getColumnWidths, _buildHeaderCell, _buildTableRow, _buildActions, _buildEmptyState, _getColorFromName, _formatDate, _getRelativeDate) ...
+
   Widget _buildTableHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Row(
       children: [
-        // Product Name
-        Container(
-          width: columnWidths[0],
-          child: _buildHeaderCell(context, l10n.productName),
-        ),
-
-        // Details
+        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.productName)),
         Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.details)),
-
-        // Price
         Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.price)),
-
-        // Cost Price
         Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.costPrice)),
-
-        // Color
         Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.color)),
-
-        // Fabric
         Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.fabric)),
-
-        // Quantity
         Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.quantity)),
-
-        // Stock Status
         Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.stockStatus)),
-
-        // Pieces
         Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.pieces)),
-
-        // Created Date
         Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.createdDate)),
-
-        // Actions
         Container(width: columnWidths[10], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
@@ -170,17 +168,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      200.0, // Product Name
-      250.0, // Details
-      120.0, // Price
-      120.0, // Cost Price
-      120.0, // Color
-      120.0, // Fabric
-      100.0, // Quantity
-      130.0, // Stock Status
-      180.0, // Pieces
-      150.0, // Created Date
-      280.0, // Actions
+      200.0, 250.0, 120.0, 120.0, 120.0, 120.0, 100.0, 130.0, 180.0, 150.0, 280.0,
     ];
   }
 
@@ -191,7 +179,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, Product product, int index) {
+  Widget _buildTableRow(BuildContext context, ProductModel product, int index) {
     final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
@@ -445,7 +433,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     );
   }
 
-  Widget _buildActions(BuildContext context, Product product) {
+  Widget _buildActions(BuildContext context, ProductModel product) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -575,40 +563,23 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
   Color _getColorFromName(String colorName) {
     switch (colorName.toLowerCase()) {
-      case 'red':
-        return Colors.red;
-      case 'blue':
-        return Colors.blue;
-      case 'green':
-        return Colors.green;
-      case 'yellow':
-        return Colors.yellow;
-      case 'orange':
-        return Colors.orange;
-      case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
-      case 'black':
-        return Colors.black;
-      case 'white':
-        return Colors.grey;
-      case 'brown':
-        return Colors.brown;
-      case 'gray':
-        return Colors.grey;
-      case 'navy':
-        return Colors.indigo;
-      case 'maroon':
-        return const Color(0xFF800000);
-      case 'gold':
-        return const Color(0xFFFFD700);
-      case 'silver':
-        return Colors.grey[400]!;
-      case 'beige':
-        return const Color(0xFFF5F5DC);
-      default:
-        return Colors.grey;
+      case 'red': return Colors.red;
+      case 'blue': return Colors.blue;
+      case 'green': return Colors.green;
+      case 'yellow': return Colors.yellow;
+      case 'orange': return Colors.orange;
+      case 'purple': return Colors.purple;
+      case 'pink': return Colors.pink;
+      case 'black': return Colors.black;
+      case 'white': return Colors.grey;
+      case 'brown': return Colors.brown;
+      case 'gray': return Colors.grey;
+      case 'navy': return Colors.indigo;
+      case 'maroon': return const Color(0xFF800000);
+      case 'gold': return const Color(0xFFFFD700);
+      case 'silver': return Colors.grey[400]!;
+      case 'beige': return const Color(0xFFF5F5DC);
+      default: return Colors.grey;
     }
   }
 
@@ -623,21 +594,18 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     final targetDate = DateTime(date.year, date.month, date.day);
     final difference = today.difference(targetDate).inDays;
 
-    if (difference == 0) {
-      return l10n.today;
-    } else if (difference == 1) {
-      return l10n.yesterday;
-    } else if (difference < 7) {
-      return l10n.daysAgo(difference);
-    } else if (difference < 30) {
+    if (difference == 0) return l10n.today;
+    if (difference == 1) return l10n.yesterday;
+    if (difference < 7) return l10n.daysAgo(difference);
+    if (difference < 30) {
       final weeks = (difference / 7).floor();
       return weeks == 1 ? l10n.oneWeekAgo : l10n.weeksAgo(weeks);
-    } else if (difference < 365) {
+    }
+    if (difference < 365) {
       final months = (difference / 30).floor();
       return months == 1 ? l10n.oneMonthAgo : l10n.monthsAgo(months);
-    } else {
-      final years = (difference / 365).floor();
-      return years == 1 ? l10n.oneYearAgo : l10n.yearsAgo(years);
     }
+    final years = (difference / 365).floor();
+    return years == 1 ? l10n.oneYearAgo : l10n.yearsAgo(years);
   }
 }

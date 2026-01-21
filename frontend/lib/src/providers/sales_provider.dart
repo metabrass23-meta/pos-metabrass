@@ -93,7 +93,7 @@ class SalesProvider extends ChangeNotifier {
 
   // Customer and Product management
   List<CustomerModel> _customers = [];
-  List<Product> _products = [];
+  List<ProductModel> _products = [];
 
   // Getters
   List<SaleModel> get sales => _sales;
@@ -139,7 +139,7 @@ class SalesProvider extends ChangeNotifier {
   // Customer and Product getters
   CustomerModel? get selectedCustomer => _selectedCustomer;
   List<CustomerModel> get customers => _customers;
-  List<Product> get products => _products;
+  List<ProductModel> get products => _products;
 
   // Sales statistics getter
   Map<String, dynamic>? get salesStats => _statistics;
@@ -337,12 +337,12 @@ class SalesProvider extends ChangeNotifier {
   }
 
   /// Product management methods
-  void addProduct(Product product) {
+  void addProduct(ProductModel product) {
     _products.add(product);
     notifyListeners();
   }
 
-  void updateProduct(Product product) {
+  void updateProduct(ProductModel product) {
     final index = _products.indexWhere((p) => p.id == product.id);
     if (index != -1) {
       _products[index] = product;

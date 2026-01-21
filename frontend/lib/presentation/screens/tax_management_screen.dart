@@ -445,22 +445,29 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildTaxConfiguration() {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.pureWhite,
-            borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-            boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur(), offset: Offset(0, 2))],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite,
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur(), offset: Offset(0, 2))],
+            ),
+            child: SingleChildScrollView(
+              child: TaxConfigurationWidget(
+                isEditable: false,
+                onConfigurationChanged: (config) {},
+              ),
+            ),
           ),
-          child: TaxConfigurationWidget(
-            isEditable: false,
-            onConfigurationChanged: (config) {},
-          ),
-        ),
-        SizedBox(height: context.cardPadding),
-        _buildStatisticsCard(),
-      ],
+          SizedBox(height: context.cardPadding),
+          _buildStatisticsCard(),
+        ],
+      ),
     );
   }
 
@@ -484,14 +491,20 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
                 style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(l10n.totalTaxRates, provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
-                  ),
-                  SizedBox(width: context.smallPadding),
-                  Expanded(child: _buildStatItem(l10n.activeRates, provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green)),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatItem(l10n.totalTaxRates, provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
+                      ),
+                      SizedBox(width: context.smallPadding),
+                      Expanded(
+                        child: _buildStatItem(l10n.activeRates, provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -501,24 +514,33 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: EdgeInsets.all(context.smallPadding),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: context.iconSize('medium')),
-          SizedBox(height: context.smallPadding / 2),
-          Text(
-            value,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w700, color: color),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          padding: EdgeInsets.all(context.smallPadding),
+          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: context.iconSize('medium')),
+              SizedBox(height: context.smallPadding / 2),
+              Text(
+                value,
+                style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w700, color: color),
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: context.smallPadding / 4),
+              Text(
+                label,
+                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          Text(
-            label,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

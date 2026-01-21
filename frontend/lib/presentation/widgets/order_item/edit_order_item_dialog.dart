@@ -32,7 +32,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
   // Selected models for dropdowns
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -119,7 +119,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
       // Find and set the current product
       final currentProduct = productProvider.products.firstWhere(
             (product) => product.id == widget.orderItem.productId,
-        orElse: () => Product(
+        orElse: () => ProductModel(
           id: widget.orderItem.productId,
           name: widget.orderItem.productName,
           detail: '',
@@ -406,7 +406,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: l10n.selectProduct,
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -431,11 +431,11 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.selectAProduct),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')),
+      DropdownItem<ProductModel?>(value: null, label: l10n.selectAProduct),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')),
     ];
   }
 

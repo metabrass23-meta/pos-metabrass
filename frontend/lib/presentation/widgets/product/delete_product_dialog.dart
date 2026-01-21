@@ -10,7 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 
 class DeleteProductDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const DeleteProductDialog({
     super.key,

@@ -1,14 +1,3 @@
-// /**
-//  * FIXED Dashboard Provider with API call loop prevention
-//  * File: frontend/lib/src/providers/dashboard_provider.dart
-//  * 
-//  * Changes:
-//  * - Added debouncing for refresh calls
-//  * - Added polling with limits to prevent infinite loops
-//  * - Added proper error handling
-//  * - Added retry logic with exponential backoff
-//  */
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frontend/src/models/analytics/dashboard_analytics.dart';
@@ -30,7 +19,7 @@ class DashboardProvider extends ChangeNotifier {
   static const int MAX_POLLS = 100;  // Prevent infinite polling
   DateTime? _lastApiCall;
   static const Duration MIN_API_CALL_INTERVAL = Duration(seconds: 2);
-  
+
   // Retry logic
   int _retryCount = 0;
   static const int MAX_RETRIES = 3;
@@ -44,23 +33,36 @@ class DashboardProvider extends ChangeNotifier {
   DashboardAnalyticsModel? get analytics => _analytics;
   bool get isPolling => _pollingTimer != null && _pollingTimer!.isActive;
 
+  // UPDATED: Matches the Sidebar & DashboardContent order exactly
   final List<String> _menuTitles = [
-    'Dashboard',
-    'Categories',
-    'Products',
-    'Labor',
-    'Vendors',
-    'Customers',
-    'Advance',
-    'Payment',
-    'Sales',
-    'Expenses',
-    'Stock',
-    'Reports',
-    'Settings',
+    'Dashboard',          // 0
+    'Sales',              // 1
+    'Orders',             // 2
+    'Purchases',          // 3 (New)
+    'Products',           // 4
+    'Categories',         // 5
+    'Customers',          // 6
+    'Vendors',            // 7
+    'Labor',              // 8
+    'Receivables',        // 9
+    'Payables',           // 10
+    'Advance Payments',   // 11
+    'Payments',           // 12
+    'Expenses',           // 13
+    'Principal Account',  // 14
+    'Zakat',              // 15
+    'Profit & Loss',      // 16
+    'Tax Management',     // 17
+    'Returns',            // 18
+    'Invoices',           // 19
+    'Receipts',           // 20
+    'Settings',           // 21
   ];
 
-  String get currentPageTitle => _menuTitles[_selectedMenuIndex];
+  String get currentPageTitle =>
+      (_selectedMenuIndex >= 0 && _selectedMenuIndex < _menuTitles.length)
+          ? _menuTitles[_selectedMenuIndex]
+          : 'Unknown';
 
   void toggleSidebar() {
     _isSidebarExpanded = !_isSidebarExpanded;
@@ -104,14 +106,14 @@ class DashboardProvider extends ChangeNotifier {
       } else {
         _errorMessage = response.message;
         debugPrint('❌ Dashboard analytics failed: ${response.message}');
-        
+
         // Retry logic with exponential backoff
         await _handleRetry();
       }
     } catch (e) {
       _errorMessage = 'Failed to load dashboard analytics: ${e.toString()}';
       debugPrint('❌ Dashboard analytics error: $e');
-      
+
       // Retry logic
       await _handleRetry();
     } finally {
@@ -125,9 +127,9 @@ class DashboardProvider extends ChangeNotifier {
     if (_retryCount < MAX_RETRIES) {
       _retryCount++;
       final retryDelay = INITIAL_RETRY_DELAY * _retryCount;
-      
+
       debugPrint('⏳ Retrying in ${retryDelay.inSeconds}s (attempt $_retryCount/$MAX_RETRIES)');
-      
+
       await Future.delayed(retryDelay);
       await loadDashboardAnalytics();
     } else {
@@ -147,13 +149,13 @@ class DashboardProvider extends ChangeNotifier {
   // Start polling with limits to prevent infinite loops
   void startPolling({Duration interval = const Duration(minutes: 5)}) {
     stopPolling();  // Stop any existing polling
-    
+
     debugPrint('🔄 Starting dashboard polling (interval: ${interval.inMinutes}min, max polls: $MAX_POLLS)');
-    
+
     _pollCount = 0;
     _pollingTimer = Timer.periodic(interval, (timer) {
       _pollCount++;
-      
+
       if (_pollCount > MAX_POLLS) {
         stopPolling();
         debugPrint('⚠️ Max poll count ($MAX_POLLS) reached. Stopping automatic refresh.');
@@ -161,7 +163,7 @@ class DashboardProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      
+
       debugPrint('🔄 Polling dashboard analytics (count: $_pollCount/$MAX_POLLS)');
       refreshData();
     });
@@ -249,56 +251,56 @@ class DashboardProvider extends ChangeNotifier {
       'activeVendors': _analytics!.activeVendors,
     };
   }
-  // Add after the vendorStats getter
 
-// Recent orders data
-List<Map<String, dynamic>> get recentOrders {
-  if (_analytics == null || _analytics!.recentTransactions.isEmpty) {
-    return [];
-  }
-  
-  // Convert recent transactions to order format
-  return _analytics!.recentTransactions.take(5).map((transaction) {
-    return {
-      'id': transaction.id,
-      'customer': transaction.customer,
-      'amount': transaction.amount,
-      'status': transaction.status,
-      'date': transaction.date,
-      'type': transaction.type,
-    };
-  }).toList();
-}
+  // Recent orders data
+  List<Map<String, dynamic>> get recentOrders {
+    if (_analytics == null || _analytics!.recentTransactions.isEmpty) {
+      return [];
+    }
 
-// Sales chart data
-List<Map<String, double>> get salesChart {
-  if (_analytics == null || _analytics!.salesTrend.isEmpty) {
-    return [];
+    // Convert recent transactions to order format
+    return _analytics!.recentTransactions.take(5).map((transaction) {
+      return {
+        'id': transaction.id,
+        'customer': transaction.customer,
+        'amount': transaction.amount,
+        'status': transaction.status,
+        'date': transaction.date,
+        'type': transaction.type,
+      };
+    }).toList();
   }
-  
-  return _analytics!.salesTrend.map((trend) {
-    return {
-      'sales': trend.sales,
-    };
-  }).toList();
-}
+
+  // Sales chart data
+  List<Map<String, double>> get salesChart {
+    if (_analytics == null || _analytics!.salesTrend.isEmpty) {
+      return [];
+    }
+
+    return _analytics!.salesTrend.map((trend) {
+      return {
+        'sales': trend.sales,
+      };
+    }).toList();
+  }
+
   // Quick actions for dashboard
   List<Map<String, dynamic>> get quickActions => [
-        {
-          'title': 'New Sale',
-          'subtitle': 'Create new order',
-          'icon': Icons.add_shopping_cart_rounded,
-          'color': Colors.green,
-          'index': 8,
-        },
-        {
-          'title': 'Add Product',
-          'subtitle': 'Register new item',
-          'icon': Icons.inventory_2_rounded,
-          'color': Colors.blue,
-          'index': 2,
-        },
-      ];
+    {
+      'title': 'New Sale',
+      'subtitle': 'Create new order',
+      'icon': Icons.add_shopping_cart_rounded,
+      'color': Colors.green,
+      'index': 1, // Points to Sales Screen (Index 1)
+    },
+    {
+      'title': 'Add Product',
+      'subtitle': 'Register new item',
+      'icon': Icons.inventory_2_rounded,
+      'color': Colors.blue,
+      'index': 4, // Points to Product Screen (Index 4)
+    },
+  ];
 
   // Handle quick actions
   void handleQuickAction(int pageIndex) {

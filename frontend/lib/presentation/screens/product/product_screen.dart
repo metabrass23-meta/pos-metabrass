@@ -48,7 +48,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showEditProductDialog(Product product) {
+  void _showEditProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -56,7 +56,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showDeleteProductDialog(Product product) {
+  void _showDeleteProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -64,7 +64,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showViewProductDialog(Product product) {
+  void _showViewProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: true,

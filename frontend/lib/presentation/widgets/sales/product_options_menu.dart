@@ -9,7 +9,7 @@ import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 
 class ProductOptionsMenu extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
   final VoidCallback? onCustomizeAndAdd;
   final VoidCallback? onCreateCustomOrder;
   final VoidCallback? onApplyDiscount;

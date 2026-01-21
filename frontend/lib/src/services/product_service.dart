@@ -84,17 +84,17 @@ class ProductService {
   }
 
   /// Get a specific product by ID - FIXED
-  Future<ApiResponse<Product>> getProductById(String id) async {
+  Future<ApiResponse<ProductModel>> getProductById(String id) async {
     try {
       final response = await _apiClient.get(ApiConfig.getProductById(id));
 
       if (response.statusCode == 200) {
         // FIXED: Parse from response.data['data'] or response.data['product']
-        final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
+        final ProductModel product = ProductModel.fromJson(response.data['data'] ?? response.data['product']);
 
-        return ApiResponse<Product>(success: true, message: 'Product loaded successfully', data: product);
+        return ApiResponse<ProductModel>(success: true, message: 'Product loaded successfully', data: product);
       } else {
-        return ApiResponse<Product>(
+        return ApiResponse<ProductModel>(
           success: false,
           message: response.data['message'] ?? 'Failed to get product',
           errors: response.data['errors'] as Map<String, dynamic>?,
@@ -103,15 +103,15 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Get product by ID DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+      return ApiResponse<ProductModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Get product by ID error: ${e.toString()}');
-      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while getting product');
+      return ApiResponse<ProductModel>(success: false, message: 'An unexpected error occurred while getting product');
     }
   }
 
   /// Create a new product - FIXED
-  Future<ApiResponse<Product>> createProduct({
+  Future<ApiResponse<ProductModel>> createProduct({
     required String name,
     required String detail,
     required double price,
@@ -143,9 +143,9 @@ class ProductService {
 
       if (response.statusCode == 201) {
         // FIXED: Parse from response.data['data'] or response.data['product']
-        final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
+        final ProductModel product = ProductModel.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product created successfully', data: product);
+        final apiResponse = ApiResponse<ProductModel>(success: true, message: response.data['message'] ?? 'Product created successfully', data: product);
 
         // Update cache with new product
         if (apiResponse.data != null) {
@@ -154,7 +154,7 @@ class ProductService {
 
         return apiResponse;
       } else {
-        return ApiResponse<Product>(
+        return ApiResponse<ProductModel>(
           success: false,
           message: response.data['message'] ?? 'Failed to create product',
           errors: response.data['errors'] as Map<String, dynamic>?,
@@ -163,15 +163,15 @@ class ProductService {
     } on DioException catch (e) {
       DebugHelper.printError('Create product DioException', e);
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+      return ApiResponse<ProductModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       DebugHelper.printError('Create product', e);
-      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while creating product: ${e.toString()}');
+      return ApiResponse<ProductModel>(success: false, message: 'An unexpected error occurred while creating product: ${e.toString()}');
     }
   }
 
   /// Update an existing product - FIXED
-  Future<ApiResponse<Product>> updateProduct({
+  Future<ApiResponse<ProductModel>> updateProduct({
     required String id,
     String? name,
     String? detail,
@@ -200,9 +200,9 @@ class ProductService {
 
       if (response.statusCode == 200) {
         // FIXED: Parse from response.data['data'] or response.data['product']
-        final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
+        final ProductModel product = ProductModel.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product updated successfully', data: product);
+        final apiResponse = ApiResponse<ProductModel>(success: true, message: response.data['message'] ?? 'Product updated successfully', data: product);
 
         // Update cache with updated product
         if (apiResponse.data != null) {
@@ -211,7 +211,7 @@ class ProductService {
 
         return apiResponse;
       } else {
-        return ApiResponse<Product>(
+        return ApiResponse<ProductModel>(
           success: false,
           message: response.data['message'] ?? 'Failed to update product',
           errors: response.data['errors'] as Map<String, dynamic>?,
@@ -220,10 +220,10 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Update product DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+      return ApiResponse<ProductModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Update product error: ${e.toString()}');
-      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while updating product');
+      return ApiResponse<ProductModel>(success: false, message: 'An unexpected error occurred while updating product');
     }
   }
 
@@ -282,15 +282,15 @@ class ProductService {
   }
 
   /// Restore a soft deleted product - FIXED
-  Future<ApiResponse<Product>> restoreProduct(String id) async {
+  Future<ApiResponse<ProductModel>> restoreProduct(String id) async {
     try {
       final response = await _apiClient.patch(ApiConfig.restoreProduct(id));
 
       if (response.statusCode == 200) {
         // FIXED: Parse from response.data['data'] or response.data['product']
-        final Product product = Product.fromJson(response.data['data'] ?? response.data['product']);
+        final ProductModel product = ProductModel.fromJson(response.data['data'] ?? response.data['product']);
 
-        final apiResponse = ApiResponse<Product>(success: true, message: response.data['message'] ?? 'Product restored successfully', data: product);
+        final apiResponse = ApiResponse<ProductModel>(success: true, message: response.data['message'] ?? 'Product restored successfully', data: product);
 
         // Add restored product back to cache
         if (apiResponse.data != null) {
@@ -299,7 +299,7 @@ class ProductService {
 
         return apiResponse;
       } else {
-        return ApiResponse<Product>(
+        return ApiResponse<ProductModel>(
           success: false,
           message: response.data['message'] ?? 'Failed to restore product',
           errors: response.data['errors'] as Map<String, dynamic>?,
@@ -308,10 +308,10 @@ class ProductService {
     } on DioException catch (e) {
       debugPrint('Restore product DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
-      return ApiResponse<Product>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+      return ApiResponse<ProductModel>(success: false, message: apiError.displayMessage, errors: apiError.errors);
     } catch (e) {
       debugPrint('Restore product error: ${e.toString()}');
-      return ApiResponse<Product>(success: false, message: 'An unexpected error occurred while restoring product');
+      return ApiResponse<ProductModel>(success: false, message: 'An unexpected error occurred while restoring product');
     }
   }
 
@@ -479,7 +479,7 @@ class ProductService {
   }
 
   // Cache management methods
-  Future<void> _cacheProducts(List<Product> products) async {
+  Future<void> _cacheProducts(List<ProductModel> products) async {
     try {
       final productsJson = products.map((product) => product.toJson()).toList();
       await _storageService.saveData(ApiConfig.productsCacheKey, productsJson);
@@ -488,11 +488,11 @@ class ProductService {
     }
   }
 
-  Future<List<Product>> _getCachedProducts() async {
+  Future<List<ProductModel>> _getCachedProducts() async {
     try {
       final cachedData = await _storageService.getData(ApiConfig.productsCacheKey);
       if (cachedData != null && cachedData is List) {
-        return cachedData.map((json) => Product.fromJson(json as Map<String, dynamic>)).toList();
+        return cachedData.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
       }
     } catch (e) {
       debugPrint('Error getting cached products: $e');
@@ -500,7 +500,7 @@ class ProductService {
     return [];
   }
 
-  Future<void> _addProductToCache(Product product) async {
+  Future<void> _addProductToCache(ProductModel product) async {
     try {
       final cachedProducts = await _getCachedProducts();
       cachedProducts.add(product);
@@ -510,7 +510,7 @@ class ProductService {
     }
   }
 
-  Future<void> _updateProductInCache(Product updatedProduct) async {
+  Future<void> _updateProductInCache(ProductModel updatedProduct) async {
     try {
       final cachedProducts = await _getCachedProducts();
       final index = cachedProducts.indexWhere((product) => product.id == updatedProduct.id);

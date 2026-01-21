@@ -123,7 +123,7 @@ class ProductGrid extends StatelessWidget {
     );
   }
 
-  List<Product> _getFilteredProducts(SalesProvider provider) {
+  List<ProductModel> _getFilteredProducts(SalesProvider provider) {
     var products = provider.products;
 
     if (selectedCategory != 'All') {
@@ -160,7 +160,7 @@ class ProductGrid extends StatelessWidget {
 
   Widget _buildEnhancedProductCard(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     final isOutOfStock = product.quantity <= 0;
@@ -583,7 +583,7 @@ class ProductGrid extends StatelessWidget {
 
   Widget _buildExistingOrderIndicator(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     final hasExistingOrders = _hasExistingOrders(product, provider);
@@ -805,26 +805,26 @@ class ProductGrid extends StatelessWidget {
     }
   }
 
-  bool _isCustomizable(Product product) {
+  bool _isCustomizable(ProductModel product) {
     return product.name.toLowerCase().contains('bridal') ||
         product.name.toLowerCase().contains('wedding') ||
         product.name.toLowerCase().contains('formal') ||
         product.price > 50000;
   }
 
-  bool _hasStandardDiscount(Product product) {
+  bool _hasStandardDiscount(ProductModel product) {
     return false;
   }
 
-  double _getOriginalPrice(Product product) {
+  double _getOriginalPrice(ProductModel product) {
     return product.price * 1.1;
   }
 
-  bool _hasExistingOrders(Product product, SalesProvider provider) {
+  bool _hasExistingOrders(ProductModel product, SalesProvider provider) {
     return _getExistingOrderCount(product, provider) > 0;
   }
 
-  int _getExistingOrderCount(Product product, SalesProvider provider) {
+  int _getExistingOrderCount(ProductModel product, SalesProvider provider) {
     if (product.name.toLowerCase().contains('bridal')) return 2;
     if (product.name.toLowerCase().contains('wedding')) return 1;
     return 0;
@@ -873,7 +873,7 @@ class ProductGrid extends StatelessWidget {
   // Action Methods
   void _quickAddToCart(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     provider.addToCartWithCustomization(
@@ -908,7 +908,7 @@ class ProductGrid extends StatelessWidget {
 
   void _showEnhancedAddToCartDialog(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     showDialog(
@@ -919,7 +919,7 @@ class ProductGrid extends StatelessWidget {
 
   void _showDiscountDialog(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     showDialog(
@@ -930,7 +930,7 @@ class ProductGrid extends StatelessWidget {
 
   void _showExistingOrdersDialog(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     showDialog(
@@ -941,7 +941,7 @@ class ProductGrid extends StatelessWidget {
 
   void _showProductOptionsMenu(
       BuildContext context,
-      Product product,
+      ProductModel product,
       SalesProvider provider,
       ) {
     showModalBottomSheet(
@@ -957,14 +957,14 @@ class ProductGrid extends StatelessWidget {
     );
   }
 
-  void _showCustomizeAndAddDialog(BuildContext context, Product product) {
+  void _showCustomizeAndAddDialog(BuildContext context, ProductModel product) {
     showDialog(
       context: context,
       builder: (context) => CustomizeAndAddDialog(product: product),
     );
   }
 
-  void _showCreateCustomOrderDialog(BuildContext context, Product product) {
+  void _showCreateCustomOrderDialog(BuildContext context, ProductModel product) {
     showDialog(
       context: context,
       builder: (context) => CreateCustomOrderDialog(product: product),
@@ -974,7 +974,7 @@ class ProductGrid extends StatelessWidget {
 
 // Discount Dialog (LOCALIZED)
 class DiscountDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const DiscountDialog({super.key, required this.product});
 

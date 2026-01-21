@@ -1511,7 +1511,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
     );
 
     if (result != null) {
-      final product = result['product'] as Product;
+      final product = result['product'] as ProductModel;
       final quantity = result['quantity'] as int;
       final customizationNotes = result['customizationNotes'] as String?;
 

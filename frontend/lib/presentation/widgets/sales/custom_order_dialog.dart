@@ -16,7 +16,7 @@ import '../globals/text_field.dart';
 import 'order_success_dialog.dart';
 
 class CreateCustomOrderDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const CreateCustomOrderDialog({super.key, required this.product});
 

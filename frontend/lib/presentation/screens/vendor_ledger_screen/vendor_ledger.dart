@@ -27,17 +27,20 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint('🔵 VendorLedgerScreen initialized with vendorId: ${widget.vendorId}, vendorName: ${widget.vendorName}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLedger();
     });
   }
 
   Future<void> _loadLedger() async {
+    debugPrint('🔵 Loading ledger for vendor: ${widget.vendorId}');
     final provider = context.read<VendorLedgerProvider>();
     await provider.loadVendorLedger(
       vendorId: widget.vendorId,
       vendorName: widget.vendorName,
     );
+    debugPrint('✅ Ledger loaded successfully');
   }
 
   @override
@@ -112,6 +115,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildLedgerContent(VendorLedgerProvider provider) {
+    debugPrint('📊 Building ledger content with ${provider.ledgerEntries.length} entries');
     return Column(
       children: [
         // Summary Card
@@ -492,6 +496,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildLoadingState() {
+    debugPrint('⏳ Showing loading state');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -513,6 +518,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildErrorState(String message) {
+    debugPrint('❌ Showing error state: $message');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -551,6 +557,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildEmptyState() {
+    debugPrint('📭 Showing empty state');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

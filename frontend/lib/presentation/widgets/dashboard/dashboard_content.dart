@@ -4,6 +4,7 @@ import 'package:frontend/presentation/screens/payables/payables_screen.dart';
 import 'package:frontend/presentation/screens/payment/payment_screen.dart';
 import 'package:frontend/presentation/screens/principal%20acc/principal_acc_screen.dart';
 import 'package:frontend/presentation/screens/product/product_screen.dart';
+import 'package:frontend/presentation/screens/purchases/purchases_screen.dart';
 import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
 import 'package:frontend/presentation/screens/sales/sales_screen.dart';
 import 'package:frontend/presentation/screens/returns/return_management_screen.dart';
@@ -49,56 +50,59 @@ class DashboardContent extends StatelessWidget {
         return const OrderPage();
       case 3:
         // Product Management
-        return const ProductPage();
+        return const PurchasesScreen();
       case 4:
+      // Product Management
+        return const ProductPage();
+      case 5:
         // Category Management
         return const CategoryPage();
-      case 5:
+      case 6:
         // Customer Management
         return const CustomerPage();
-      case 6:
+      case 7:
         // Vendor Management
         return const VendorPage();
-      case 7:
+      case 8:
         // Labor Management
         return const LaborPage();
-      case 8:
+      case 9:
         // Receivables
         return const ReceivablesPage();
-      case 9:
+      case 10:
         // Payables
         return const PayablesPage();
-      case 10:
+      case 11:
         // Advance Payment
         return const AdvancePaymentPage();
-      case 11:
+      case 12:
         // Payment Management
         return const PaymentPage();
-      case 12:
+      case 13:
         // Expenses
         return const ExpensesPage();
-      case 13:
+      case 14:
         // Principal Account
         return const PrincipalAccountPage();
-      case 14:
+      case 15:
         // Zakat Management
         return const ZakatPage();
-      case 15:
+      case 16:
         // Profit & Loss
         return const ProfitLossPage();
-      case 16:
+      case 17:
         // Tax Management
         return const TaxManagementScreen();
-      case 17:
+      case 18:
         // Returns
         return const ReturnManagementScreen();
-      case 18:
+      case 19:
         // Invoices
         return const InvoiceManagementScreen();
-      case 19:
+      case 20:
         // Receipts
         return const ReceiptManagementScreen();
-      case 20:
+      case 21:
         // Settings
         return const SettingsScreen();
       default:

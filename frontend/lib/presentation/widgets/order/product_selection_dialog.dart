@@ -12,7 +12,7 @@ import '../globals/text_button.dart';
 
 class ProductSelectionDialog extends StatefulWidget {
   final List<String>? excludeProductIds;
-  final Function(Product product, int quantity, String? customizationNotes) onProductSelected;
+  final Function(ProductModel product, int quantity, String? customizationNotes) onProductSelected;
 
   const ProductSelectionDialog({super.key, this.excludeProductIds, required this.onProductSelected});
 
@@ -27,9 +27,9 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   final _customizationController = TextEditingController();
 
   String _searchQuery = '';
-  List<Product> _filteredProducts = [];
+  List<ProductModel> _filteredProducts = [];
   bool _isLoading = false;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -79,7 +79,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
 
   void _filterProducts() {
     final provider = Provider.of<ProductProvider>(context, listen: false);
-    List<Product> products = provider.products;
+    List<ProductModel> products = provider.products;
 
     if (widget.excludeProductIds != null) {
       products = products.where((product) => !widget.excludeProductIds!.contains(product.id)).toList();
@@ -108,7 +108,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
     _filterProducts();
   }
 
-  void _selectProduct(Product product) {
+  void _selectProduct(ProductModel product) {
     setState(() {
       _selectedProduct = product;
     });

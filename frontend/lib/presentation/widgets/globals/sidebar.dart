@@ -9,6 +9,7 @@ import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/providers/vendor_provider.dart';
+import '../../../src/providers/purchase_provider.dart'; // Added PurchaseProvider
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -294,6 +295,7 @@ class PremiumSidebar extends StatelessWidget {
     // Get real counts from providers
     final salesCount = context.watch<SalesProvider>().sales.length.toString();
     final ordersCount = context.watch<OrderProvider>().orders.length.toString();
+    final purchasesCount = context.watch<PurchaseProvider>().purchases.length.toString(); // Added Purchase count
     final productsCount = context.watch<ProductProvider>().products.length.toString();
     final categoriesCount = context.watch<CategoryProvider>().categories.length.toString();
     final customersCount = context.watch<CustomerProvider>().customers.length.toString();
@@ -316,6 +318,7 @@ class PremiumSidebar extends StatelessWidget {
       // Core Business Operations
       {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
       {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': ordersCount},
+      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount}, // Added Purchases Item
 
       // Inventory & Products
       {

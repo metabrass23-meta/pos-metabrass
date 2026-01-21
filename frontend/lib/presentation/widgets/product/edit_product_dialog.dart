@@ -12,7 +12,7 @@ import '../globals/text_field.dart';
 import '../../../l10n/app_localizations.dart';
 
 class EditProductDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const EditProductDialog({super.key, required this.product});
 

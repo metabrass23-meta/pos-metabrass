@@ -12,7 +12,7 @@ import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class EnhancedAddToCartDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const EnhancedAddToCartDialog({super.key, required this.product});
 

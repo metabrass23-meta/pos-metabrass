@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Product {
+class ProductModel {
   final String id;
   final String name;
   final String detail;
@@ -22,7 +22,7 @@ class Product {
   final int? createdById;
   final String? createdByEmail;
 
-  const Product({
+  const ProductModel({
     required this.id,
     required this.name,
     required this.detail,
@@ -45,8 +45,8 @@ class Product {
     this.createdByEmail,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
       id: json['id'] as String,
       name: json['name'] as String,
       detail: json['detail'] as String? ?? '',
@@ -177,7 +177,7 @@ class Product {
   String get piecesText => pieces.join(', ');
 
   // Copy with method for updates
-  Product copyWith({
+  ProductModel copyWith({
     String? id,
     String? name,
     String? detail,
@@ -199,7 +199,7 @@ class Product {
     int? createdById,
     String? createdByEmail,
   }) {
-    return Product(
+    return ProductModel(
       id: id ?? this.id,
       name: name ?? this.name,
       detail: detail ?? this.detail,
@@ -224,7 +224,7 @@ class Product {
   }
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Product && runtimeType == other.runtimeType && id == other.id;
+  bool operator ==(Object other) => identical(this, other) || other is ProductModel && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -235,7 +235,7 @@ class Product {
 
 // Product API Response Models
 class ProductsListResponse {
-  final List<Product> products;
+  final List<ProductModel> products;
   final PaginationInfo pagination;
   final Map<String, dynamic>? filtersApplied;
 
@@ -243,7 +243,7 @@ class ProductsListResponse {
 
   factory ProductsListResponse.fromJson(Map<String, dynamic> json) {
     return ProductsListResponse(
-      products: (json['products'] as List? ?? []).map((productJson) => Product.fromJson(productJson)).toList(),
+      products: (json['products'] as List? ?? []).map((productJson) => ProductModel.fromJson(productJson)).toList(),
       pagination: PaginationInfo.fromJson(json['pagination'] ?? {}),
       filtersApplied: json['filters_applied'] as Map<String, dynamic>?,
     );
@@ -460,7 +460,7 @@ class ProductStatistics {
   factory ProductStatistics.fromJson(Map<String, dynamic> json) {
     return ProductStatistics(
       totalProducts: json['total_products'] as int? ?? 0,
-      totalInventoryValue: Product._parseDouble(json['total_inventory_value']),
+      totalInventoryValue: ProductModel._parseDouble(json['total_inventory_value']),
       lowStockCount: json['low_stock_count'] as int? ?? 0,
       outOfStockCount: json['out_of_stock_count'] as int? ?? 0,
       categoryBreakdown: (json['category_breakdown'] as List? ?? []).map((item) => CategoryStats.fromJson(item)).toList(),
@@ -493,7 +493,7 @@ class CategoryStats {
       categoryName: json['category__name'] as String? ?? '',
       count: json['count'] as int? ?? 0,
       totalQuantity: json['total_quantity'] as int? ?? 0,
-      totalValue: Product._parseDouble(json['total_value']),
+      totalValue: ProductModel._parseDouble(json['total_value']),
     );
   }
 

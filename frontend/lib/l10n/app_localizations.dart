@@ -1058,7 +1058,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToPos.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Maqbool Fabrics POS'**
+  /// **'Welcome to Al Noor Fabrics POS'**
   String get welcomeToPos;
 
   /// No description provided for @welcomeTagline.
@@ -7055,6 +7055,12 @@ abstract class AppLocalizations {
   /// **'With Deduction'**
   String get withDeduction;
 
+  /// No description provided for @purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases'**
+  String get purchases;
+
   /// No description provided for @regularPayment.
   ///
   /// In en, this message translates to:
@@ -12802,6 +12808,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Printing receipt for {invoice}'**
   String printingReceiptFor(String invoice);
+
+  /// No description provided for @deletePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Purchase'**
+  String get deletePurchase;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this purchase?'**
+  String get confirmDelete;
+
+  /// No description provided for @deleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase deleted successfully'**
+  String get deleteSuccess;
+
+  /// No description provided for @editPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Purchase'**
+  String get editPurchase;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
