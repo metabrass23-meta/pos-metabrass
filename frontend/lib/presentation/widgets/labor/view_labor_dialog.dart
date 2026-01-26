@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
@@ -47,7 +46,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -69,7 +68,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -172,7 +171,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
           SizedBox(height: context.cardPadding),
           Text(
             l10n.loadingLaborDetails,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -205,7 +204,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
               children: [
                 Text(
                   l10n.laborDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -216,7 +215,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.completeLaborInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -231,7 +230,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.labor.id.length > 10 ? '${widget.labor.id.substring(0, 10)}...' : widget.labor.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -296,7 +295,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
             child: Center(
               child: Text(
                 widget.labor.initials,
-                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
               ),
             ),
           ),
@@ -307,7 +306,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
               children: [
                 Text(
                   widget.labor.displayName,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize * 0.8,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -320,7 +319,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${l10n.joined} ${_formatDate(widget.labor.joiningDate)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -331,7 +330,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${widget.labor.workExperienceDays} ${l10n.daysExperience} (${widget.labor.workExperienceYears.toStringAsFixed(1)} ${l10n.years})',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -483,7 +482,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
@@ -505,7 +504,7 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -523,12 +522,12 @@ class _ViewLaborDetailsDialogState extends State<ViewLaborDetailsDialog> with Si
         SizedBox(width: context.smallPadding),
         Text(
           '$label: ',
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
         ),
       ],

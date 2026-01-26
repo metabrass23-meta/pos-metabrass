@@ -125,10 +125,8 @@ class SalesProvider extends ChangeNotifier {
 
   // Cart getters
   List<CartItem> get currentCart => _cartItems;
-  int get cartTotalItems =>
-      _cartItems.fold(0, (sum, item) => sum + item.quantity);
-  double get cartSubtotal =>
-      _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+  int get cartTotalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  double get cartSubtotal => _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
   double get overallDiscount => _overallDiscount;
   double get cartGstAmount => _taxConfiguration.totalTaxAmount;
   double get cartTaxAmount => _taxConfiguration.totalTaxAmount;
@@ -147,10 +145,8 @@ class SalesProvider extends ChangeNotifier {
   // Computed getters
   bool get hasSales => _sales.isNotEmpty;
   int get salesCount => _sales.length;
-  double get totalRevenue =>
-      _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
-  double get totalTaxCollected =>
-      _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
+  double get totalRevenue => _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
+  double get totalTaxCollected => _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
 
   /// Load sales with current filters and pagination
   Future<void> loadSales({bool refresh = false}) async {
@@ -259,7 +255,7 @@ class SalesProvider extends ChangeNotifier {
     String? customizationNotes,
   }) {
     final existingItemIndex = _cartItems.indexWhere(
-      (item) => item.productId == productId,
+          (item) => item.productId == productId,
     );
 
     if (existingItemIndex != -1) {
@@ -309,6 +305,8 @@ class SalesProvider extends ChangeNotifier {
     _cartItems.clear();
     _overallDiscount = 0.0;
     _taxConfiguration = TaxConfiguration();
+    // Keep selected customer or clear? Usually better to keep if user wants to make another sale for same person.
+    // But your logic in createSaleFromCart clears it, so I will match that logic.
     notifyListeners();
   }
 
@@ -384,13 +382,13 @@ class SalesProvider extends ChangeNotifier {
       final saleItems = _cartItems
           .map(
             (item) => CreateSaleItemRequest(
-              productId: item.productId,
-              unitPrice: item.unitPrice,
-              quantity: item.quantity,
-              itemDiscount: item.itemDiscount,
-              customizationNotes: item.customizationNotes,
-            ),
-          )
+          productId: item.productId,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          itemDiscount: item.itemDiscount,
+          customizationNotes: item.customizationNotes,
+        ),
+      )
           .toList();
 
       final request = CreateSaleRequest(
@@ -403,14 +401,14 @@ class SalesProvider extends ChangeNotifier {
         saleItems: saleItems,
       );
 
-      // 🔍 ADD THIS DEBUG LOG
+      // 🔍 DEBUG LOG
       debugPrint('🚀 Creating sale with payload: ${request.toJson()}');
 
       final success = await createSale(request);
 
-      // 🔍 ADD THIS DEBUG LOG
+      // 🔍 DEBUG LOG
       debugPrint('✅ Sale creation result: $success');
-      debugPrint('❌ Error: $_errorMessage');
+      if (!success) debugPrint('❌ Error: $_errorMessage');
 
       if (success) {
         clearCart();
@@ -624,7 +622,7 @@ class SalesProvider extends ChangeNotifier {
       // 1. Calculate Subtotal
       final double subtotal = sale.saleItems.fold(
         0.0,
-        (sum, item) => sum + item.lineTotal,
+            (sum, item) => sum + item.lineTotal,
       );
 
       // 2. Recalculate Taxes
@@ -675,13 +673,13 @@ class SalesProvider extends ChangeNotifier {
 
   /// Create sale from order
   Future<bool> createSaleFromOrder(
-    String orderId, {
-    required String paymentMethod,
-    required double amountPaid,
-    double overallDiscount = 0.0,
-    TaxConfiguration? taxConfiguration,
-    String? notes,
-  }) async {
+      String orderId, {
+        required String paymentMethod,
+        required double amountPaid,
+        double overallDiscount = 0.0,
+        TaxConfiguration? taxConfiguration,
+        String? notes,
+      }) async {
     try {
       final request = CreateSaleFromOrderRequest(
         orderId: orderId,
@@ -895,11 +893,11 @@ class SalesProvider extends ChangeNotifier {
 
   /// Add payment to sale
   Future<bool> addPayment(
-    String saleId,
-    double amount,
-    String method, {
-    Map<String, dynamic>? splitDetails,
-  }) async {
+      String saleId,
+      double amount,
+      String method, {
+        Map<String, dynamic>? splitDetails,
+      }) async {
     try {
       final response = await _salesService.addSalePayment(
         saleId,
@@ -1024,10 +1022,10 @@ class SalesProvider extends ChangeNotifier {
 
   /// Update sale status with payment tracking
   Future<bool> updateSaleStatusWithPayment(
-    String saleId,
-    String newStatus, {
-    String? notes,
-  }) async {
+      String saleId,
+      String newStatus, {
+        String? notes,
+      }) async {
     try {
       final response = await _salesService.updateSaleStatus(saleId, newStatus);
       if (response.success) {
@@ -1046,9 +1044,9 @@ class SalesProvider extends ChangeNotifier {
 
   /// Handle split payments
   Future<bool> handleSplitPayments(
-    String saleId,
-    Map<String, dynamic> splitDetails,
-  ) async {
+      String saleId,
+      Map<String, dynamic> splitDetails,
+      ) async {
     try {
       final response = await _salesService.addPayment(saleId, 0.0, 'SPLIT');
       if (response.success) {
@@ -1109,13 +1107,13 @@ class SalesProvider extends ChangeNotifier {
 
   /// Get payment workflow actions for a sale
   List<String> getAvailablePaymentActions(
-    Map<String, dynamic> workflowSummary,
-  ) {
+      Map<String, dynamic> workflowSummary,
+      ) {
     final actions = <String>[];
 
     if (workflowSummary['workflow_actions'] != null) {
       final workflowActions =
-          workflowSummary['workflow_actions'] as Map<String, dynamic>;
+      workflowSummary['workflow_actions'] as Map<String, dynamic>;
 
       if (workflowActions['can_add_payment'] == true) {
         actions.add('add_payment');
@@ -1156,7 +1154,7 @@ class SalesProvider extends ChangeNotifier {
   double getPaymentWorkflowProgress(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
       final paymentSummary =
-          workflowSummary['payment_summary'] as Map<String, dynamic>;
+      workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['payment_percentage'] as double? ?? 0.0;
     }
     return 0.0;
@@ -1166,7 +1164,7 @@ class SalesProvider extends ChangeNotifier {
   bool isPaymentWorkflowComplete(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
       final paymentSummary =
-          workflowSummary['payment_summary'] as Map<String, dynamic>;
+      workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['is_fully_paid'] as bool? ?? false;
     }
     return false;
@@ -1305,9 +1303,9 @@ class SalesProvider extends ChangeNotifier {
 
   /// Create sale item (Note: Sale items are typically created as part of sale creation)
   Future<bool> createSaleItem(
-    CreateSaleItemRequest request,
-    String saleId,
-  ) async {
+      CreateSaleItemRequest request,
+      String saleId,
+      ) async {
     try {
       final response = await _saleItemService.createSaleItem(request);
       if (response.success && response.data != null) {
@@ -1333,16 +1331,16 @@ class SalesProvider extends ChangeNotifier {
 
   /// Update sale item
   Future<bool> updateSaleItem(
-    String itemId,
-    UpdateSaleItemRequest request,
-  ) async {
+      String itemId,
+      UpdateSaleItemRequest request,
+      ) async {
     try {
       final response = await _saleItemService.updateSaleItem(itemId, request);
       if (response.success && response.data != null) {
         // Update the item in the sale
         for (int i = 0; i < _sales.length; i++) {
           final itemIndex = _sales[i].saleItems.indexWhere(
-            (item) => item.id == itemId,
+                (item) => item.id == itemId,
           );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
@@ -1372,7 +1370,7 @@ class SalesProvider extends ChangeNotifier {
         // Remove the item from the sale
         for (int i = 0; i < _sales.length; i++) {
           final itemIndex = _sales[i].saleItems.indexWhere(
-            (item) => item.id == itemId,
+                (item) => item.id == itemId,
           );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);

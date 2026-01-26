@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -118,7 +117,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.product} ${l10n.addedSuccessfully}!',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -140,7 +139,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -245,7 +244,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   context.shouldShowCompactLayout
                       ? '${l10n.add} ${l10n.product}'
                       : '${l10n.add} ${l10n.newProduct}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -256,7 +255,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.createNewProductEntry,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -390,7 +389,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   Flexible(
                     child: Text(
                       l10n.costPriceInfo,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -497,7 +496,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                   children: [
                     Text(
                       l10n.pieces,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding),
                     Container(
@@ -515,7 +514,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                           return FilterChip(
                             label: Text(
                               piece,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
@@ -542,7 +541,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         l10n.pleaseSelectAtLeastOnePiece,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
                   ],

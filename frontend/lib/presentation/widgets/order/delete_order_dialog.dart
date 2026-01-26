@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_provider.dart';
@@ -108,7 +107,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -196,7 +195,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               children: [
                 Text(
                   '${l10n.delete} ${l10n.orders}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -207,7 +206,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.warning,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -285,12 +284,12 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               children: [
                 Text(
                   '${l10n.delete} ${l10n.warning}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   l10n.logoutMessage,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.4),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.4),
                 ),
               ],
             ),
@@ -322,7 +321,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                 child: Center(
                   child: Text(
                     _getOrderInitials(),
-                    style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.red[700]),
                   ),
                 ),
               ),
@@ -341,14 +340,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                           ),
                           child: Text(
                             widget.order.id,
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                           ),
                         ),
                         SizedBox(width: context.smallPadding),
                         Expanded(
                           child: Text(
                             widget.order.customerName,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -358,7 +357,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                       SizedBox(height: context.smallPadding),
                       Text(
                         widget.order.description,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -378,7 +377,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                 SizedBox(width: context.smallPadding),
                 Text(
                   '${l10n.orders} ${l10n.created}: ${_formatDate(widget.order.createdAt)}',
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                 ),
               ],
             ),
@@ -407,14 +406,14 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.info,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
             '• ${l10n.noData}\n• ${l10n.customers} ${l10n.status}\n• ${l10n.payments} ${l10n.status}\n• ${l10n.warning}',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.5),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray, height: 1.5),
           ),
         ],
       ),
@@ -439,7 +438,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
             },
             title: Text(
               '${l10n.confirm} ${l10n.delete} ${l10n.orders}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
             ),
             activeColor: Colors.red,
             dense: true,
@@ -448,7 +447,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
           SizedBox(height: context.cardPadding),
           Text(
             '${l10n.pleaseSelectSale} ID ${l10n.confirm}:',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -464,10 +463,10 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
                   _confirmationText = value;
                 });
               },
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: widget.order.id,
-                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[400]),
+                hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[400]),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(context.cardPadding / 2),
               ),
@@ -476,7 +475,7 @@ class _DeleteOrderDialogState extends State<DeleteOrderDialog> with SingleTicker
           SizedBox(height: context.smallPadding),
           Text(
             '${l10n.notSpecified}: ${widget.order.id}',
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600], fontStyle: FontStyle.italic),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600], fontStyle: FontStyle.italic),
           ),
         ],
       ),

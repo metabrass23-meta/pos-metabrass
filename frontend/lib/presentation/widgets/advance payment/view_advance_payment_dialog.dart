@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -105,7 +104,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               children: [
                 Text(
                   l10n.advancePaymentDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -116,7 +115,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompletePaymentInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -131,7 +130,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id.substring(0, 8),
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -205,7 +204,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.laborInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -219,17 +218,17 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               children: [
                 Text(
                   widget.payment.laborName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w700, color: Colors.blue[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w700, color: Colors.blue[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   '${l10n.role}: ${widget.payment.laborRole}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   '${l10n.phone}: ${widget.payment.laborPhone}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -257,7 +256,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
               ),
             ],
           ),
@@ -270,12 +269,12 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               children: [
                 Text(
                   l10n.advanceAmount,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
                   widget.payment.formattedAmount,
-                  style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w800, color: Colors.green[700]),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w800, color: Colors.green[700]),
                 ),
                 SizedBox(height: context.smallPadding),
                 Container(
@@ -286,7 +285,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   ),
                   child: Text(
                     widget.payment.statusText,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: widget.payment.statusColor),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: widget.payment.statusColor),
                   ),
                 ),
               ],
@@ -326,14 +325,14 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.date,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -352,14 +351,14 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.time,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.payment.time,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -386,14 +385,14 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.date,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -413,14 +412,14 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.time,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.payment.time,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -445,7 +444,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentDescription,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -460,7 +459,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
             ),
             child: Text(
               widget.payment.description,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
             ),
           ),
         ],
@@ -487,7 +486,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.receiptInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -503,7 +502,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                 Expanded(
                   child: Text(
                     l10n.receiptImageAvailable,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.orange[700]),
                   ),
                 ),
                 Container(
@@ -514,7 +513,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   ),
                   child: Text(
                     l10n.view,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                   ),
                 ),
               ],
@@ -544,7 +543,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.salaryInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -562,12 +561,12 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     children: [
                       Text(
                         l10n.totalSalary,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         widget.payment.formattedTotalSalary,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.indigo[700]),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.indigo[700]),
                       ),
                     ],
                   ),
@@ -582,12 +581,12 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     children: [
                       Text(
                         l10n.remaining,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         widget.payment.formattedRemainingSalary,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
                       ),
                     ],
                   ),
@@ -608,11 +607,11 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                     children: [
                       Text(
                         '${l10n.recordCreated}:',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
                         _formatDateTime(widget.payment.createdAt),
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[700]),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[700]),
                       ),
                     ],
                   ),
@@ -622,7 +621,7 @@ class _ViewAdvancePaymentDialogState extends State<ViewAdvancePaymentDialog> {
                   decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
                     l10n.advancePayment,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
                   ),
                 ),
               ],

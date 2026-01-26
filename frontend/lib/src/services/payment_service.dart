@@ -99,10 +99,6 @@ class PaymentService {
     }
   }
 
-  // ===== PAYMENT VALIDATION =====
-
-  // ===== PAYMENT RECONCILIATION =====
-
   // ===== COMPREHENSIVE PAYMENT MANAGEMENT =====
 
   /// Get list of payments with filtering and pagination
@@ -115,12 +111,10 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
 
         final apiResponse = ApiResponse<PaymentListResponse>(success: true, message: 'Payments loaded successfully', data: paymentsResponse);
 
-        // Cache payments if successful
         if (apiResponse.data != null) {
           await _cachePayments(apiResponse.data!.payments);
         }
@@ -137,7 +131,6 @@ class PaymentService {
       debugPrint('Get payments DioException: ${e.toString()}');
       final apiError = ApiError.fromDioError(e);
 
-      // Try to return cached data if network error
       if (apiError.type == 'network_error') {
         final cachedPayments = await getCachedPayments();
         if (cachedPayments.isNotEmpty) {
@@ -192,10 +185,17 @@ class PaymentService {
     }
   }
 
-  /// Create a new payment
+  /// Create a new payment (FIXED: Uses standard JSON)
   Future<ApiResponse<PaymentModel>> createPayment(CreatePaymentRequest request) async {
     try {
-      final response = await _apiClient.post(ApiConfig.createPayment, data: request.toJson());
+      // NOTE: We are using JSON because the backend is currently configured for JSON.
+      // This means file uploads (receipts) will be ignored for now.
+      // The Date/Time format issue is handled by the updated `request.toJson()` method.
+
+      final response = await _apiClient.post(
+          ApiConfig.createPayment,
+          data: request.toJson()
+      );
 
       DebugHelper.printApiResponse('POST Create Payment', response.data);
 
@@ -330,9 +330,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Search Payments', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Payments search completed successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -359,9 +357,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Labor', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Labor payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -388,9 +384,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Vendor', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Vendor payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -417,9 +411,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Order', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Order payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -446,9 +438,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Sale', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Sale payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -478,9 +468,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Date Range', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Date range payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -507,9 +495,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments by Method', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentListResponse>(success: true, message: 'Method payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
@@ -562,9 +548,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payment Statistics', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentStatisticsResponse statisticsResponse = PaymentStatisticsResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentStatisticsResponse>(success: true, message: 'Payment statistics loaded successfully', data: statisticsResponse);
       } else {
         return ApiResponse<PaymentStatisticsResponse>(
@@ -591,9 +575,7 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payment Summary', response.data);
 
       if (response.statusCode == 200) {
-        // FIXED: Parse from response.data['data'] instead of response.data directly
         final PaymentSummaryResponse summaryResponse = PaymentSummaryResponse.fromJson(response.data['data']);
-
         return ApiResponse<PaymentSummaryResponse>(success: true, message: 'Payment summary loaded successfully', data: summaryResponse);
       } else {
         return ApiResponse<PaymentSummaryResponse>(

@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/screens/advance%20payment/advance_payment_screen.dart';
-import 'package:frontend/presentation/screens/payables/payables_screen.dart';
-import 'package:frontend/presentation/screens/payment/payment_screen.dart';
-import 'package:frontend/presentation/screens/principal%20acc/principal_acc_screen.dart';
-import 'package:frontend/presentation/screens/product/product_screen.dart';
-import 'package:frontend/presentation/screens/purchases/purchases_screen.dart';
-import 'package:frontend/presentation/screens/receivables/receivables_screen.dart';
-import 'package:frontend/presentation/screens/sales/sales_screen.dart';
-import 'package:frontend/presentation/screens/returns/return_management_screen.dart';
-import 'package:frontend/presentation/screens/invoices/invoice_management_screen.dart';
-import 'package:frontend/presentation/screens/receipts/receipt_management_screen.dart';
-import 'package:frontend/presentation/screens/settings/settings_screen.dart';
-import 'package:frontend/presentation/widgets/dashboard/quick_actions_card.dart';
-import 'package:frontend/presentation/widgets/dashboard/recent_orders_card.dart';
-import 'package:frontend/presentation/widgets/dashboard/sales_chart_card.dart';
-import 'package:frontend/presentation/widgets/dashboard/stats_card.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
+
+// Screens
+import '../../screens/advance payment/advance_payment_screen.dart';
 import '../../screens/category/category_screen.dart';
 import '../../screens/customer/customer_screen.dart';
 import '../../screens/expenses/expenses_screen.dart';
+import '../../screens/invoices/invoice_management_screen.dart';
 import '../../screens/labor/labor_screen.dart';
 import '../../screens/order/order_screen.dart';
+import '../../screens/payables/payables_screen.dart';
+import '../../screens/payment/payment_screen.dart';
+import '../../screens/principal acc/principal_acc_screen.dart';
+import '../../screens/product/product_screen.dart';
 import '../../screens/profit loss/profit_loss_screen.dart';
+import '../../screens/purchases/purchases_screen.dart';
+import '../../screens/receipts/receipt_management_screen.dart';
+import '../../screens/receivables/receivables_screen.dart';
+import '../../screens/returns/return_management_screen.dart';
+import '../../screens/sales/sales_screen.dart';
+import '../../screens/settings/settings_screen.dart';
+import '../../screens/tax_management_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
-import '../../screens/tax_management_screen.dart';
+
+// Dashboard Widgets
+// import 'quick_actions_card.dart'; // REMOVED: 4 colored boxes
+import 'recent_orders_card.dart';
+import 'sales_chart_card.dart';
+import 'stats_card.dart';
 
 class DashboardContent extends StatelessWidget {
   final int selectedIndex;
@@ -46,64 +49,44 @@ class DashboardContent extends StatelessWidget {
       case 1:
         return const SalesPage();
       case 2:
-        // Order Management
         return const OrderPage();
       case 3:
-        // Product Management
         return const PurchasesScreen();
       case 4:
-      // Product Management
         return const ProductPage();
       case 5:
-        // Category Management
         return const CategoryPage();
       case 6:
-        // Customer Management
         return const CustomerPage();
       case 7:
-        // Vendor Management
         return const VendorPage();
       case 8:
-        // Labor Management
         return const LaborPage();
       case 9:
-        // Receivables
         return const ReceivablesPage();
       case 10:
-        // Payables
         return const PayablesPage();
       case 11:
-        // Advance Payment
         return const AdvancePaymentPage();
       case 12:
-        // Payment Management
         return const PaymentPage();
       case 13:
-        // Expenses
         return const ExpensesPage();
       case 14:
-        // Principal Account
         return const PrincipalAccountPage();
       case 15:
-        // Zakat Management
         return const ZakatPage();
       case 16:
-        // Profit & Loss
         return const ProfitLossPage();
       case 17:
-        // Tax Management
         return const TaxManagementScreen();
       case 18:
-        // Returns
         return const ReturnManagementScreen();
       case 19:
-        // Invoices
         return const InvoiceManagementScreen();
       case 20:
-        // Receipts
         return const ReceiptManagementScreen();
       case 21:
-        // Settings
         return const SettingsScreen();
       default:
         return _buildPlaceholderContent(context);
@@ -111,99 +94,58 @@ class DashboardContent extends StatelessWidget {
   }
 
   Widget _buildDashboard(BuildContext context) {
-    return Container(
-      padding: context.pagePadding / 2.5,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Section
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+    return Consumer<DashboardProvider>(
+      builder: (context, provider, child) {
+
+        // 1. Initial Loading State
+        if (provider.isLoading && provider.analytics == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // 2. Error State
+        if (provider.errorMessage != null && provider.analytics == null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+                const SizedBox(height: 16),
+                Text(
+                  'Failed to load dashboard data',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 16),
                 ),
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.welcomeToPos,
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: context.headingFontSize,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.pureWhite,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        SizedBox(height: context.formFieldSpacing),
-                        Text(
-                          AppLocalizations.of(context)!.welcomeTagline,
-                          style: GoogleFonts.inter(
-                            fontSize: context.bodyFontSize,
-                            fontWeight: FontWeight.w300,
-                            color: AppTheme.pureWhite.withOpacity(0.9),
-                            height: 1.4,
-                          ),
-                        ),
-                        SizedBox(height: context.formFieldSpacing * 2),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.cardPadding,
-                            vertical: context.smallPadding,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.accentGold,
-                            borderRadius: BorderRadius.circular(
-                              context.borderRadius('small'),
-                            ),
-                          ),
-                          child: Text(
-                            '${AppLocalizations.of(context)!.today}: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                            style: GoogleFonts.inter(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.primaryMaroon,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: context.dialogWidth / 5,
-                    height: context.dialogWidth / 5,
-                    decoration: BoxDecoration(
-                      color: AppTheme.pureWhite.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(context.cardPadding),
-                    ),
-                    child: Image.asset('assets/images/logo.png'),
-                  ),
-                ],
-              ),
+                SizedBox(height: 2.h),
+                ElevatedButton(
+                  onPressed: () => provider.loadDashboardAnalytics(),
+                  child: const Text('Retry'),
+                ),
+              ],
             ),
+          );
+        }
 
-            SizedBox(height: context.formFieldSpacing * 3),
+        // 3. Real Data
+        final stats = provider.dashboardStats;
 
-            // Stats Cards
-            Consumer<DashboardProvider>(
-              builder: (context, provider, child) {
-                final stats = provider.dashboardStats;
-                return LayoutBuilder(
+        return Container(
+          padding: context.pagePadding / 2.5,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Welcome Section
+                _buildWelcomeSection(context),
+
+                SizedBox(height: context.formFieldSpacing * 3),
+
+                // --- STATS CARDS (RESTORED & ACTIVE) ---
+                LayoutBuilder(
                   builder: (context, constraints) {
                     final cardCount = context.statsCardColumns.clamp(2, 4);
                     final cardWidth =
                         (constraints.maxWidth -
                             context.cardPadding * (cardCount - 1)) /
-                        cardCount;
+                            cardCount;
                     return Wrap(
                       spacing: context.cardPadding,
                       runSpacing: context.formFieldSpacing,
@@ -233,9 +175,7 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: AppLocalizations.of(
-                              context,
-                            )!.activeCustomers,
+                            title: AppLocalizations.of(context)!.activeCustomers,
                             value: stats['activeCustomers']['value'],
                             change: stats['activeCustomers']['change'],
                             isPositive: stats['activeCustomers']['isPositive'],
@@ -257,382 +197,93 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: AppLocalizations.of(context)!.pendingReturns,
-                            value: stats['pendingReturns']?['value'] ?? '0',
-                            change: stats['pendingReturns']?['change'] ?? '0%',
-                            isPositive:
-                                stats['pendingReturns']?['isPositive'] ?? false,
-                            icon: Icons.assignment_return_rounded,
+                            title: AppLocalizations.of(context)!.pendingOrders,
+                            value: stats['pendingOrders']?['value'] ?? '0',
+                            change: stats['pendingOrders']?['change'] ?? '0',
+                            isPositive: stats['pendingOrders']?['isPositive'] ?? false,
+                            icon: Icons.pending_actions_rounded,
                             color: Colors.orange,
                           ),
                         ),
                       ],
                     );
                   },
-                );
-              },
-            ),
+                ),
 
-            SizedBox(height: context.formFieldSpacing * 3),
+                SizedBox(height: context.formFieldSpacing * 3),
 
-            // Main Content Row
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left Column
-                    Expanded(
-                      flex: context.tableColumnFlexes[0],
-                      child: Column(
+                // --- Main Content Row (Charts & Recent Orders) ---
+                // Removed QuickActionsCard (the 4 colored boxes)
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Responsive layout
+                    if (constraints.maxWidth < 900) {
+                      return Column(
                         children: [
-                          // Sales Chart
-                          SizedBox(
-                            height: context.chartHeight,
-                            child: const SalesChartCard(),
-                          ),
+                          // Sales Chart (Restored)
+                          // const SizedBox(
+                          //   height: 400,
+                          //   child: SalesChartCard(),
+                          // ),
 
                           SizedBox(height: context.formFieldSpacing * 2),
 
-                          // Quick Actions
-                          const QuickActionsCard(),
+                          // // Recent Orders (Restored)
+                          // const RecentOrdersCard(),
                         ],
-                      ),
-                    ),
+                      );
+                    }
 
-                    SizedBox(width: context.cardPadding),
-
-                    // Right Column
-                    Expanded(
-                      flex: context.tableColumnFlexes[1],
-                      child: const RecentOrdersCard(),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            SizedBox(height: context.formFieldSpacing * 3),
-
-            // Bottom Section - Recent Activity
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(context.cardPadding),
-              decoration: BoxDecoration(
-                color: AppTheme.pureWhite,
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.timeline_outlined,
-                        color: AppTheme.primaryMaroon,
-                        size: context.iconSize('large'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        AppLocalizations.of(context)!.recentActivity,
-                        style: GoogleFonts.inter(
-                          fontSize: context.headerFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.charcoalGray,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: context.formFieldSpacing * 2),
-
-                  // Activity Items
-                  _buildActivityItem(
-                    context,
-                    '${AppLocalizations.of(context)!.newCustomerRegistered}: Aisha Khan',
-                    'Premium customer from Karachi',
-                    '15 minutes ago',
-                    Icons.person_add_rounded,
-                    Colors.indigo,
-                  ),
-                  _buildActivityItem(
-                    context,
-                    '${AppLocalizations.of(context)!.newVendorRegistered}: Ali Textiles',
-                    'Muhammad Ali - Fabric Supplier',
-                    '30 minutes ago',
-                    Icons.store_rounded,
-                    Colors.teal,
-                  ),
-                  _buildActivityItem(
-                    context,
-                    AppLocalizations.of(context)!.customerPurchaseCompleted,
-                    'Zara Sheikh - ₨ 120,000 Wedding Collection',
-                    '2 hours ago',
-                    Icons.shopping_bag_rounded,
-                    Colors.green,
-                  ),
-                  _buildActivityItem(
-                    context,
-                    AppLocalizations.of(context)!.vendorDeliveryReceived,
-                    'Khan Fabrics - Silk Materials',
-                    '5 hours ago',
-                    Icons.local_shipping_rounded,
-                    Colors.purple,
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: context.formFieldSpacing * 3),
-
-            // Performance Metrics Row
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return Row(
-                  children: [
-                    // Monthly Performance
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.all(context.cardPadding),
-                        decoration: BoxDecoration(
-                          color: AppTheme.pureWhite,
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius(),
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left Column (Sales Chart Only)
+                        Expanded(
+                          flex: context.tableColumnFlexes[0],
+                          child: Column(
+                            children: [
+                              // Sales Chart (Restored)
+                              // SizedBox(
+                              //   height: context.chartHeight,
+                              //   child: const SalesChartCard(),
+                              // ),
+                            ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: context.shadowBlur(),
-                              offset: Offset(0, context.smallPadding),
-                            ),
-                          ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.calendar_month_rounded,
-                                  color: Colors.blue,
-                                  size: context.iconSize('medium'),
-                                ),
-                                SizedBox(width: context.smallPadding),
-                                Flexible(
-                                  child: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.monthlyPerformance,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.headerFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.charcoalGray,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
 
-                            SizedBox(height: context.formFieldSpacing * 2),
+                        SizedBox(width: context.cardPadding),
 
-                            _buildMetricRow(
-                              context,
-                              AppLocalizations.of(context)!.revenueTarget,
-                              '₨ 3,00,000',
-                              '82%',
-                              Colors.blue,
-                            ),
-                            _buildMetricRow(
-                              context,
-                              AppLocalizations.of(context)!.customerGrowth,
-                              '200',
-                              '78%',
-                              Colors.indigo,
-                            ),
-                            _buildMetricRow(
-                              context,
-                              AppLocalizations.of(context)!.vendorPartnerships,
-                              '25',
-                              '88%',
-                              Colors.teal,
-                            ),
-                            _buildMetricRow(
-                              context,
-                              AppLocalizations.of(context)!.conversionRate,
-                              '65%',
-                              '92%',
-                              Colors.orange,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                        // Right Column (Recent Orders Restored)
+                        // Expanded(
+                        //   flex: context.tableColumnFlexes[1],
+                        //   child: const RecentOrdersCard(),
+                        // ),
+                      ],
+                    );
+                  },
+                ),
 
-                    SizedBox(width: context.cardPadding),
-
-                    // Top Customers
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.all(context.cardPadding),
-                        decoration: BoxDecoration(
-                          color: AppTheme.pureWhite,
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius(),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: context.shadowBlur(),
-                              offset: Offset(0, context.smallPadding),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.people_rounded,
-                                  color: Colors.indigo,
-                                  size: context.iconSize('medium'),
-                                ),
-                                SizedBox(width: context.smallPadding),
-                                Flexible(
-                                  child: Text(
-                                    AppLocalizations.of(context)!.topCustomers,
-                                    style: GoogleFonts.inter(
-                                      fontSize: context.headerFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.charcoalGray,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: context.formFieldSpacing * 2),
-
-                            _buildCustomerRow(
-                              context,
-                              'Zara Sheikh',
-                              AppLocalizations.of(context)!.vipCustomer,
-                              'Rs. 1,20,000',
-                            ),
-                            _buildCustomerRow(
-                              context,
-                              'Aisha Khan',
-                              AppLocalizations.of(context)!.premiumCustomer,
-                              'Rs. 85,000',
-                            ),
-                            _buildCustomerRow(
-                              context,
-                              'Hina Malik',
-                              AppLocalizations.of(context)!.corporateClient,
-                              'Rs. 95,000',
-                            ),
-                            _buildCustomerRow(
-                              context,
-                              'Fatima Ali',
-                              AppLocalizations.of(context)!.regularCustomer,
-                              'Rs. 45,000',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
+                SizedBox(height: context.formFieldSpacing * 2),
+              ],
             ),
-
-            SizedBox(height: context.formFieldSpacing * 2),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildActivityItem(
-    BuildContext context,
-    String title,
-    String subtitle,
-    String time,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildWelcomeSection(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: context.formFieldSpacing),
+      width: double.infinity,
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(context.borderRadius('small')),
-        border: Border.all(color: color.withOpacity(0.1), width: 0.05.w),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: context.iconSize('large') * 1.5,
-            height: context.iconSize('large') * 1.5,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                context.iconSize('large') * 0.75,
-              ),
-            ),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Text(
-            time,
-            style: GoogleFonts.inter(
-              fontSize: context.captionFontSize * 0.9,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey[500],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricRow(
-    BuildContext context,
-    String label,
-    String value,
-    String percentage,
-    Color color,
-  ) {
-    return Container(
-      margin: EdgeInsets.only(bottom: context.formFieldSpacing),
       child: Row(
         children: [
           Expanded(
@@ -640,100 +291,56 @@ class DashboardContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
+                  AppLocalizations.of(context)!.welcomeToPos,
+                  style: TextStyle(
+                    fontSize: context.headingFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.pureWhite,
+                    letterSpacing: 0.5,
                   ),
                 ),
+                SizedBox(height: context.formFieldSpacing),
                 Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
+                  AppLocalizations.of(context)!.welcomeTagline,
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w300,
+                    color: AppTheme.pureWhite.withOpacity(0.9),
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: context.formFieldSpacing * 2),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.cardPadding,
+                    vertical: context.smallPadding,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.accentGold,
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
+                  ),
+                  child: Text(
+                    '${AppLocalizations.of(context)!.today}: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primaryMaroon,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.smallPadding,
-              vertical: context.smallPadding * 0.5,
-            ),
+            width: context.dialogWidth / 5,
+            height: context.dialogWidth / 5,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                context.borderRadius('small'),
-              ),
+              color: AppTheme.pureWhite.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.cardPadding),
             ),
-            child: Text(
-              percentage,
-              style: GoogleFonts.inter(
-                fontSize: context.captionFontSize,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCustomerRow(
-    BuildContext context,
-    String name,
-    String type,
-    String totalSpent,
-  ) {
-    return Container(
-      margin: EdgeInsets.only(bottom: context.formFieldSpacing),
-      child: Row(
-        children: [
-          Container(
-            width: context.iconSize('medium') * 1.5,
-            height: context.iconSize('medium') * 1.5,
-            decoration: BoxDecoration(
-              color: Colors.indigo.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                context.borderRadius('small'),
-              ),
-            ),
-            child: Icon(
-              Icons.person_rounded,
-              color: Colors.indigo,
-              size: context.iconSize('small'),
-            ),
-          ),
-
-          SizedBox(width: context.smallPadding),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: GoogleFonts.inter(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-                Text(
-                  '$type • $totalSpent',
-                  style: GoogleFonts.inter(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
+            child: Image.asset('assets/images/logo.png'),
           ),
         ],
       ),
@@ -759,8 +366,16 @@ class DashboardContent extends StatelessWidget {
       AppLocalizations.of(context)!.principalAccount,
       AppLocalizations.of(context)!.zakat,
       AppLocalizations.of(context)!.profitLoss,
+      AppLocalizations.of(context)!.taxManagement,
+      AppLocalizations.of(context)!.returns,
+      AppLocalizations.of(context)!.invoices,
+      AppLocalizations.of(context)!.receipts,
       AppLocalizations.of(context)!.settings,
     ];
+
+    final title = (selectedIndex >= 0 && selectedIndex < pageNames.length)
+        ? pageNames[selectedIndex]
+        : 'Unknown';
 
     return Container(
       padding: context.pagePadding,
@@ -796,8 +411,8 @@ class DashboardContent extends StatelessWidget {
             SizedBox(height: context.formFieldSpacing * 4),
 
             Text(
-              '${pageNames[selectedIndex]} ${AppLocalizations.of(context)!.page}',
-              style: GoogleFonts.playfairDisplay(
+              '$title ${AppLocalizations.of(context)!.page}',
+              style: TextStyle(
                 fontSize: context.headingFontSize,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.charcoalGray,
@@ -809,7 +424,7 @@ class DashboardContent extends StatelessWidget {
             Text(
               '${AppLocalizations.of(context)!.underConstruction}\n${AppLocalizations.of(context)!.comingSoon}',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -852,7 +467,7 @@ class DashboardContent extends StatelessWidget {
                   ),
                   child: Text(
                     'Back to Dashboard',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.pureWhite,

@@ -6487,6 +6487,30 @@ class AppLocalizationsUr extends AppLocalizations {
   String get deletePurchase => 'خریداری ختم کریں';
 
   @override
+  String get loadingData => 'ڈیٹا لوڈ ہو رہا ہے...';
+
+  @override
+  String get pendingOrders => 'زیر التوا آرڈرز';
+
+  @override
+  String get returnNumber => 'واپس نمبر';
+
+  @override
+  String get pleaseSelectVendor => 'براہِ کرم وینڈر منتخب کریں';
+
+  @override
+  String get loadingLabors => 'مزدور لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingVendors => 'وینڈرز لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingOrders => 'آرڈرز لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingSales => 'سیلز لوڈ ہو رہی ہیں...';
+
+  @override
   String get confirmDelete => 'کیا آپ واقعی اس خریداری کو حذف کرنا چاہتے ہیں؟';
 
   @override

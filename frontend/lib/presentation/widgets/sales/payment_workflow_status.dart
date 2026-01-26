@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -98,7 +97,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.updateSaleStatus, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text(l10n.updateSaleStatus, style: TextStyle(fontWeight: FontWeight.w600)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,7 +221,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
           const SizedBox(height: 4),
           Text(
             '${progress.toStringAsFixed(0)}%',
-            style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
           ),
         ],
       ),
@@ -265,7 +264,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
       ),
       child: Text(
         chipText,
-        style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: chipColor),
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: chipColor),
       ),
     );
   }
@@ -287,7 +286,7 @@ class _PaymentWorkflowStatusState extends State<PaymentWorkflowStatus> {
             child: ElevatedButton.icon(
               onPressed: _showPaymentConfirmationDialog,
               icon: const Icon(Icons.payment, size: 16),
-              label: Text(l10n.payment, style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600)),
+              label: Text(l10n.payment, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
                 foregroundColor: Colors.white,

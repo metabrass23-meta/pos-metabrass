@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/theme/app_theme.dart';
@@ -81,7 +80,7 @@ class QuickActionsCard extends StatelessWidget {
 
               Text(
                 l10n.quickActions,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 2.2.sp,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -153,7 +152,7 @@ class QuickActionsCard extends StatelessWidget {
                 children: [
                   Text(
                     action['title'],
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 1.8.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -161,7 +160,7 @@ class QuickActionsCard extends StatelessWidget {
                   ),
                   Text(
                     action['subtitle'],
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 1.4.sp,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withOpacity(0.8),

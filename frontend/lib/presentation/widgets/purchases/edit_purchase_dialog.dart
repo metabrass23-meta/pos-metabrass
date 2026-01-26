@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
@@ -103,7 +102,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.editPurchase ?? "Edit Purchase",
-                    style: GoogleFonts.playfairDisplay(
+                    style: TextStyle(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.charcoalGray
@@ -226,7 +225,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Purchased Products",
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: context.bodyFontSize)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: context.bodyFontSize)),
             PremiumButton(
               text: "Add Product Row",
               onPressed: _addItem,
@@ -301,7 +300,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                     children: [
                       Text("Line Total", style: TextStyle(fontSize: 10, color: Colors.grey[500])),
                       Text(item.totalPrice.toStringAsFixed(2),
-                          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppTheme.primaryMaroon)),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryMaroon)),
                     ],
                   ),
                 ),
@@ -332,7 +331,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Total Tax", style: GoogleFonts.inter(color: Colors.grey[600])),
+              Text("Total Tax", style: TextStyle(color: Colors.grey[600])),
               SizedBox(
                   width: 150,
                   child: PremiumTextField(
@@ -354,11 +353,11 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(
+        Text(label, style: TextStyle(
           fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
           fontSize: isTotal ? 18 : 14,
         )),
-        Text(value.toStringAsFixed(2), style: GoogleFonts.inter(
+        Text(value.toStringAsFixed(2), style: TextStyle(
           fontWeight: FontWeight.bold,
           color: AppTheme.primaryMaroon,
           fontSize: isTotal ? 18 : 14,

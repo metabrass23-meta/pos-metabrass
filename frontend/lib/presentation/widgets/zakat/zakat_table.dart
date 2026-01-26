@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/providers/zakat_provider.dart';
@@ -187,7 +186,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -206,7 +205,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -250,7 +249,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
               child: Text(
                 zakat.id,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -266,7 +265,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               children: [
                 Text(
                   zakat.name,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -279,7 +278,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                       Expanded(
                         child: Text(
                           zakat.beneficiaryName,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -290,7 +289,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${l10n.notes}: ${zakat.notes}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -317,14 +316,14 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                           children: [
                             Text(
                               zakat.beneficiaryName,
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             if (zakat.beneficiaryContact != null && zakat.beneficiaryContact!.isNotEmpty)
                               Text(
                                 zakat.beneficiaryContact!,
-                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -343,7 +342,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 zakat.description,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -358,7 +357,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                 children: [
                   Text(
                     zakat.notes ?? l10n.noNotes,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -378,7 +377,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
               child: Text(
                 zakat.formattedAmount,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -392,11 +391,11 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               children: [
                 Text(
                   zakat.formattedDate,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   context.shouldShowCompactLayout ? zakat.formattedTime : zakat.relativeDate,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -447,7 +446,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
               pagination.totalCount,
             ),
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -467,7 +466,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                 ),
                 child: Text(
                   l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 

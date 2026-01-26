@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -110,7 +109,7 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
                   value: item.value,
                   child: Text(
                     item.label,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 10.sp,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.charcoalGray,
@@ -129,7 +128,7 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
           }
               : null,
           validator: widget.validator != null ? (String? value) => widget.validator!(widget.value) : null,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
@@ -177,12 +176,12 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
               borderSide: BorderSide(color: Colors.red, width: 0.2.w),
             ),
             contentPadding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
-            labelStyle: GoogleFonts.inter(
+            labelStyle: TextStyle(
               color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
               fontSize: 10.sp,
               fontWeight: FontWeight.w500,
             ),
-            hintStyle: GoogleFonts.inter(
+            hintStyle: TextStyle(
               color: const Color(0xFF9E9E9E),
               fontSize: 10.sp,
               fontWeight: FontWeight.w400,

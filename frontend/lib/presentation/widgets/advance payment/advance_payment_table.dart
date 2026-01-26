@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/providers/advance_payment_provider.dart';
@@ -21,19 +20,33 @@ class AdvancePaymentTable extends StatefulWidget {
 }
 
 class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
-  final ScrollController _headerHorizontalController = ScrollController();
-  final ScrollController _contentHorizontalController = ScrollController();
-  final ScrollController _verticalController = ScrollController();
+  // Separate controllers for synchronized scrolling
+  late ScrollController _headerHorizontalController;
+  late ScrollController _contentHorizontalController;
+  late ScrollController _verticalController;
   late AdvancePaymentTableHelpers _helpers;
 
   @override
   void initState() {
     super.initState();
+    _headerHorizontalController = ScrollController();
+    _contentHorizontalController = ScrollController();
+    _verticalController = ScrollController();
+
     _helpers = AdvancePaymentTableHelpers(onEdit: widget.onEdit, onDelete: widget.onDelete, onView: widget.onView);
 
+    // Link the header and content horizontal scrolling (Two-way sync)
     _headerHorizontalController.addListener(() {
-      if (_headerHorizontalController.hasClients && _contentHorizontalController.hasClients) {
+      if (_contentHorizontalController.hasClients &&
+          _headerHorizontalController.offset != _contentHorizontalController.offset) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+
+    _contentHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients &&
+          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+        _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
       }
     });
   }
@@ -68,57 +81,63 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             return _helpers.buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _headerHorizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _headerHorizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
+          return Column(
+            children: [
+              // 1. Table Header (Horizontal Scroll)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
                   ),
                 ),
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Container(
+                    width: _getTableWidth(context),
+                    padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
+                    child: _buildTableHeader(context),
+                  ),
+                ),
+              ),
 
-                Expanded(
-                  child: Scrollbar(
+              // 2. Table Content (Vertical + Horizontal Scroll)
+              Expanded(
+                child: Scrollbar(
+                  controller: _verticalController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
                     controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Scrollbar(
                       controller: _contentHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.advancePayments.length,
-                          itemBuilder: (context, index) {
-                            final payment = provider.advancePayments[index];
-                            return _buildTableRow(context, payment, index);
-                          },
+                      thumbVisibility: true,
+                      notificationPredicate: (notification) => notification.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _contentHorizontalController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Container(
+                          width: _getTableWidth(context),
+                          // Use Column instead of ListView for better sync in nested scrolls
+                          child: Column(
+                            children: provider.advancePayments.asMap().entries.map((entry) {
+                              return _buildTableRow(context, entry.value, entry.key);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+              ),
 
-                if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
-              ],
-            ),
+              if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
+            ],
           );
         },
       ),
@@ -183,7 +202,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -202,7 +221,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -245,7 +264,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               ),
               child: Text(
                 payment.id.substring(0, 8),
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -261,7 +280,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               children: [
                 Text(
                   payment.laborName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -274,7 +293,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                       Expanded(
                         child: Text(
                           payment.laborRole,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -285,7 +304,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       payment.description,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -312,14 +331,14 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                           children: [
                             Text(
                               payment.laborRole,
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             if (payment.laborPhone.isNotEmpty)
                               Text(
                                 payment.laborPhone,
-                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -338,7 +357,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payment.description,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -356,7 +375,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               ),
               child: Text(
                 'PKR ${payment.amount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -370,11 +389,11 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               children: [
                 Text(
                   '${payment.date.day}/${payment.date.month}/${payment.date.year}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   context.shouldShowCompactLayout ? payment.time : _getRelativeDate(context, payment.date),
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -431,7 +450,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
               pagination.totalCount,
             ),
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -451,7 +470,7 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
                 ),
                 child: Text(
                   l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 

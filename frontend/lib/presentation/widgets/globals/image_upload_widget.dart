@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '../../../src/theme/app_theme.dart';
@@ -53,12 +52,12 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
           children: [
             Text(
               widget.label,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             if (widget.isRequired)
               Text(
                 ' *',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red.shade600),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red.shade600),
               ),
           ],
         ),
@@ -86,7 +85,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                   icon: Icon(Icons.delete_outline, color: Colors.red.shade600, size: context.iconSize('small')),
                   label: Text(
                     l10n.removeImage,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red.shade600),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red.shade600),
                   ),
                 ),
               ),
@@ -97,7 +96,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                     icon: Icon(Icons.fullscreen, color: AppTheme.primaryMaroon, size: context.iconSize('small')),
                     label: Text(
                       l10n.viewFullScreen,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
+                      style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
                     ),
                   ),
                 ),
@@ -139,7 +138,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         l10n.processing,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
+                        style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.primaryMaroon),
                       ),
                     ],
                   ),
@@ -155,7 +154,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       _selectedImageFile != null || _currentImagePath != null ? l10n.tapToChangeImage : l10n.tapToAddImage,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: _selectedImageFile != null || _currentImagePath != null ? AppTheme.primaryMaroon : Colors.grey.shade600,
                       ),
@@ -164,7 +163,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         '${l10n.supports}: ${widget.allowedExtensions.join(', ').toUpperCase()} (${l10n.max} ${widget.maxFileSizeMB}MB)',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize - 2, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: context.captionFontSize - 2, color: Colors.grey.shade500),
                       ),
                     ],
                   ],
@@ -286,7 +285,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
             appBar: AppBar(
               backgroundColor: Colors.black,
               iconTheme: const IconThemeData(color: Colors.white),
-              title: Text(widget.label, style: GoogleFonts.inter(color: Colors.white)),
+              title: Text(widget.label, style: TextStyle(color: Colors.white)),
             ),
             body: Center(child: InteractiveViewer(child: _selectedImageFile != null ? Image.file(_selectedImageFile!) : _buildImageWidget())),
           ),

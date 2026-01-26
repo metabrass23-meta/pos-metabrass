@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:async';
 import '../../../src/providers/payables_provider.dart';
@@ -237,7 +236,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               children: [
                 Text(
                   l10n.filterPayables,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -248,7 +247,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.applyFiltersToFindSpecificPayables,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -311,7 +310,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         children: [
           Text(
             l10n.search,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           TextField(
@@ -342,7 +341,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         children: [
           Text(
             l10n.statusAndPriority,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -404,7 +403,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
             children: [
               Text(
                 l10n.vendor,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
               PremiumDropdownField<String>(
@@ -445,7 +444,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
         children: [
           Text(
             l10n.dateRanges,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -530,7 +529,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         InkWell(
@@ -562,7 +561,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
                         : l10n.selectDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
                     ),

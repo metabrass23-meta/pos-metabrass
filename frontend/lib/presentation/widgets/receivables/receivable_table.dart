@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -156,7 +155,7 @@ class ReceivablesTable extends StatelessWidget {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: context.bodyFontSize,
         fontWeight: FontWeight.w600,
         color: AppTheme.charcoalGray,
@@ -205,7 +204,7 @@ class ReceivablesTable extends StatelessWidget {
               ),
               child: Text(
                 receivable.id,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primaryMaroon,
@@ -223,7 +222,7 @@ class ReceivablesTable extends StatelessWidget {
               children: [
                 Text(
                   receivable.debtorName,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -235,7 +234,7 @@ class ReceivablesTable extends StatelessWidget {
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     receivable.debtorPhone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey[600],
@@ -245,7 +244,7 @@ class ReceivablesTable extends StatelessWidget {
                   ),
                   Text(
                     'PKR ${receivable.balanceRemaining.toStringAsFixed(0)} ${l10n.remaining}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
                       color: receivable.balanceRemaining > 0 ? Colors.orange : Colors.green,
@@ -285,7 +284,7 @@ class ReceivablesTable extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'PKR ${receivable.amountGiven.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.blue,
@@ -308,7 +307,7 @@ class ReceivablesTable extends StatelessWidget {
                         Expanded(
                           child: Text(
                             'PKR ${receivable.amountReturned.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.green,
@@ -333,7 +332,7 @@ class ReceivablesTable extends StatelessWidget {
                 children: [
                   Text(
                     receivable.reasonOrItem,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.charcoalGray,
@@ -345,7 +344,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       receivable.notes!,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.grey[600],
                       ),
@@ -367,7 +366,7 @@ class ReceivablesTable extends StatelessWidget {
                 children: [
                   Text(
                     receivable.formattedExpectedReturnDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: receivable.isOverdue ? Colors.red : AppTheme.charcoalGray,
@@ -377,7 +376,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${l10n.lent}: ${receivable.formattedDateLent}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey[500],
@@ -388,7 +387,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${receivable.daysOverdue} ${l10n.daysOverdue}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.red,
@@ -417,7 +416,7 @@ class ReceivablesTable extends StatelessWidget {
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     '${receivable.returnPercentage.toStringAsFixed(0)}%',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: receivable.isFullyPaid ? Colors.green : Colors.orange,
@@ -460,7 +459,7 @@ class ReceivablesTable extends StatelessWidget {
                     Expanded(
                       child: Text(
                         receivable.statusText,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
                           color: receivable.statusColor,
@@ -518,7 +517,7 @@ class ReceivablesTable extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.edit,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.blue,
                 ),
@@ -538,7 +537,7 @@ class ReceivablesTable extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.viewDetails,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.green,
                 ),
@@ -558,7 +557,7 @@ class ReceivablesTable extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.deleteText,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.red,
                 ),
@@ -681,7 +680,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       l10n.edit,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.blue,
@@ -721,7 +720,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       l10n.view,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.green,
@@ -761,7 +760,7 @@ class ReceivablesTable extends StatelessWidget {
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       l10n.deleteText,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.red,
@@ -814,7 +813,7 @@ class ReceivablesTable extends StatelessWidget {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.noReceivablesFound,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -834,7 +833,7 @@ class ReceivablesTable extends StatelessWidget {
             ),
             child: Text(
               l10n.startByAddingFirstReceivable,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -842,50 +841,7 @@ class ReceivablesTable extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: context.mainPadding),
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        '${l10n.add} ${l10n.firstReceivable}',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+
         ],
       ),
     );

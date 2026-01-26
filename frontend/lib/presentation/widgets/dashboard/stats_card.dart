@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -132,7 +131,7 @@ class _StatsCardState extends State<StatsCard>
                                 SizedBox(width: context.smallPadding * 0.5),
                                 Text(
                                   widget.change,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: widget.isPositive ? Colors.green : Colors.red,
@@ -148,7 +147,7 @@ class _StatsCardState extends State<StatsCard>
 
                       Text(
                         widget.value,
-                        style: GoogleFonts.playfairDisplay(
+                        style: TextStyle(
                           fontSize: context.headingFontSize,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.charcoalGray,
@@ -160,7 +159,7 @@ class _StatsCardState extends State<StatsCard>
 
                       Text(
                         widget.title,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],

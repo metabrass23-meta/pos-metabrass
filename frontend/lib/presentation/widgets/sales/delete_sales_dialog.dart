@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -67,7 +66,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               l10n.saleDeletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -176,7 +175,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deleteSale : l10n.deleteSaleRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -187,7 +186,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.actionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -234,7 +233,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
 
           Text(
             isCompact ? l10n.areYouSureDeleteSale : l10n.areYouAbsolutelySure,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
 
@@ -259,14 +258,14 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       ),
                       child: Text(
                         widget.sale.id,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
                         widget.sale.formattedInvoiceNumber,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                     ),
                     Container(
@@ -277,7 +276,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       ),
                       child: Text(
                         widget.sale.status,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: widget.sale.statusColor),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: widget.sale.statusColor),
                       ),
                     ),
                   ],
@@ -295,11 +294,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         children: [
                           Text(
                             widget.sale.customerName,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                           Text(
                             widget.sale.customerPhone,
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -317,11 +316,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         children: [
                           Text(
                             '${l10n.items}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             '${widget.sale.totalItems}',
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -331,11 +330,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         children: [
                           Text(
                             '${l10n.grandTotal}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
                           ),
                         ],
                       ),
@@ -345,11 +344,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                         children: [
                           Text(
                             '${l10n.amountPaid}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             'PKR ${widget.sale.amountPaid.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
                           ),
                         ],
                       ),
@@ -360,11 +359,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           children: [
                             Text(
                               '${l10n.remaining}:',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                             ),
                             Text(
                               'PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                             ),
                           ],
                         ),
@@ -380,11 +379,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           children: [
                             Text(
                               '${l10n.items}: ${widget.sale.totalItems}',
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                             ),
                             Text(
                               '${l10n.total}: PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primaryMaroon,
@@ -399,12 +398,12 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                           children: [
                             Text(
                               '${l10n.paid}: PKR ${widget.sale.amountPaid.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
                             ),
                             if (widget.sale.remainingAmount > 0)
                               Text(
                                 '${l10n.due}: PKR ${widget.sale.remainingAmount.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                               ),
                           ],
                         ),
@@ -422,11 +421,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       children: [
                         Text(
                           '${l10n.date}:',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Text(
                           widget.sale.dateTimeText,
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ],
                     ),
@@ -435,7 +434,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       children: [
                         Text(
                           '${l10n.payment}:',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -448,7 +447,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                             SizedBox(width: context.smallPadding / 2),
                             Text(
                               widget.sale.paymentMethod,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: _getPaymentMethodColor(widget.sale.paymentMethod),
@@ -470,11 +469,11 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                       children: [
                         Text(
                           '${l10n.notes}:',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                         ),
                         Text(
                           widget.sale.notes ?? '',
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -498,7 +497,7 @@ class _DeleteSaleDialogState extends State<DeleteSaleDialog> with SingleTickerPr
                 Expanded(
                   child: Text(
                     isCompact ? l10n.permanentDeleteWarningShort : l10n.permanentDeleteWarningLong,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
               ],

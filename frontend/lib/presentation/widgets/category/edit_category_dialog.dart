@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -103,7 +102,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
             SizedBox(width: context.smallPadding),
             Text(
               l10n.categoryUpdatedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -214,7 +213,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
               children: [
                 Text(
                   l10n.editCategory,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -225,7 +224,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateCategoryInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -247,7 +246,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
             ),
             child: Text(
               widget.category.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -342,7 +341,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
               alignment: Alignment.centerRight,
               child: Text(
                 '${_descriptionController.text.length}/200 ${l10n.characters}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: _descriptionController.text.length > 200
@@ -371,7 +370,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog>
                   Expanded(
                     child: Text(
                       '${l10n.lastUpdated}: ${_formatDateTime(widget.category.lastEdited)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w400,
                         color: Colors.blue[700],

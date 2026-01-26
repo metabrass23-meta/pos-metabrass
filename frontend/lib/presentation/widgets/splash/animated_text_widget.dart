@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../src/theme/app_theme.dart';
 import '../../../../src/utils/responsive_breakpoints.dart';
@@ -42,7 +41,7 @@ class AnimatedTextWidget extends StatelessWidget {
                     // Glow background
                     Text(
                       'Al Noor Fashion',
-                      style: GoogleFonts.playfairDisplay(
+                      style: TextStyle(
                         fontSize: context.headingFontSize * 1.2,
                         fontWeight: FontWeight.w900,
                         color: AppTheme.accentGold.withOpacity(0.3),
@@ -65,7 +64,7 @@ class AnimatedTextWidget extends StatelessWidget {
                       ).createShader(bounds),
                       child: Text(
                         'Al Noor Fashion',
-                        style: GoogleFonts.playfairDisplay(
+                        style: TextStyle(
                           fontSize: context.headingFontSize * 1.2,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
@@ -141,7 +140,7 @@ class AnimatedTextWidget extends StatelessWidget {
                   ).createShader(bounds),
                   child: Text(
                     'Premium Bridal & Groom Collections',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.white,

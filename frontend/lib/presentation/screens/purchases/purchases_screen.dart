@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
@@ -94,7 +93,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           children: [
             Text(
               l10n.purchases,
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.charcoalGray,
@@ -102,7 +101,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             ),
             Text(
               "Track and manage inventory supply and purchase records",
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.grey[600],
               ),
@@ -194,7 +193,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 10.sp,
                     color: Colors.grey[500],
                     fontWeight: FontWeight.w500,
@@ -202,7 +201,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.charcoalGray,

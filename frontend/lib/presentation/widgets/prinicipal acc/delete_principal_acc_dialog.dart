@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -66,7 +65,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
             SizedBox(width: context.smallPadding),
             Text(
               l10n.principalAccountEntryDeletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -149,7 +148,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deleteEntry : l10n.deletePrincipalAccountEntry,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -160,7 +159,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.thisActionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -207,7 +206,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
             context.shouldShowCompactLayout
                 ? l10n.areYouSureYouWantToDeleteThisEntry
                 : l10n.areYouAbsolutelySureYouWantToDeleteThisEntry,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -231,7 +230,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                       ),
                       child: Text(
                         widget.account.id,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ),
                     SizedBox(width: context.smallPadding),
@@ -254,7 +253,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                             Expanded(
                               child: Text(
                                 widget.account.sourceModule.replaceAll('_', ' ').toUpperCase(),
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w600,
                                   color: widget.account.sourceModuleColor,
@@ -276,12 +275,12 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                   children: [
                     Text(
                       '${l10n.description}:',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       widget.account.description,
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -299,7 +298,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.type}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
@@ -314,7 +313,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                                 SizedBox(width: context.smallPadding / 2),
                                 Text(
                                   widget.account.type.toUpperCase(),
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w700,
                                     color: widget.account.typeColor,
@@ -334,7 +333,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.amount}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
@@ -344,7 +343,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                             ),
                             child: Text(
                               'PKR ${widget.account.amount.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                             ),
                           ),
                         ],
@@ -364,7 +363,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.balanceAfter}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
@@ -374,7 +373,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                             ),
                             child: Text(
                               'PKR ${widget.account.balanceAfter.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
+                              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
                             ),
                           ),
                         ],
@@ -388,7 +387,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.handledBy}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           widget.account.handledBy != null
                               ? Container(
@@ -410,7 +409,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                                 Flexible(
                                   child: Text(
                                     widget.account.handledBy!,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.captionFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: _getPersonColor(widget.account.handledBy!),
@@ -423,7 +422,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                           )
                               : Text(
                             l10n.notSpecified,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
@@ -447,15 +446,15 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.date}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.account.formattedDate,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                           Text(
                             widget.account.relativeDate,
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -468,11 +467,11 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         children: [
                           Text(
                             '${l10n.time}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.account.formattedTime,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -486,7 +485,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                     children: [
                       Text(
                         '${l10n.sourceID}: ',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
@@ -496,7 +495,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                         ),
                         child: Text(
                           widget.account.sourceId!,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ),
                     ],
@@ -520,7 +519,7 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
                     context.shouldShowCompactLayout
                         ? l10n.thisWillPermanentlyDeleteTheEntry
                         : l10n.thisWillPermanentlyDeleteTheEntryFull,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
               ],

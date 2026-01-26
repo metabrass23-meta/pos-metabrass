@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -91,7 +90,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   children: [
                     Text(
                       l10n.cart,
-                      style: GoogleFonts.playfairDisplay(
+                      style: TextStyle(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.pureWhite,
@@ -99,7 +98,7 @@ class _CartSidebarState extends State<CartSidebar> {
                     ),
                     Text(
                       '${provider.cartTotalItems} ${l10n.items}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: AppTheme.pureWhite.withOpacity(0.9),
                       ),
@@ -148,7 +147,7 @@ class _CartSidebarState extends State<CartSidebar> {
             children: [
               Text(
                 l10n.customer,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -172,7 +171,7 @@ class _CartSidebarState extends State<CartSidebar> {
                       ),
                       child: Text(
                         l10n.selectCustomer,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           color: Colors.grey[500],
                         ),
@@ -189,7 +188,7 @@ class _CartSidebarState extends State<CartSidebar> {
                           ),
                           child: Text(
                             l10n.walkInCustomer,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               color: AppTheme.charcoalGray,
                             ),
@@ -210,7 +209,7 @@ class _CartSidebarState extends State<CartSidebar> {
                               children: [
                                 Text(
                                   customer.name,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: AppTheme.charcoalGray,
@@ -218,7 +217,7 @@ class _CartSidebarState extends State<CartSidebar> {
                                 ),
                                 Text(
                                   customer.phone,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     color: Colors.grey[600],
                                   ),
@@ -259,7 +258,7 @@ class _CartSidebarState extends State<CartSidebar> {
                           children: [
                             Text(
                               provider.selectedCustomer!.name,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.bodyFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.charcoalGray,
@@ -267,7 +266,7 @@ class _CartSidebarState extends State<CartSidebar> {
                             ),
                             Text(
                               provider.selectedCustomer!.phone,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 color: Colors.grey[600],
                               ),
@@ -327,7 +326,7 @@ class _CartSidebarState extends State<CartSidebar> {
           SizedBox(height: context.cardPadding),
           Text(
             l10n.cartIsEmpty,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
               color: Colors.grey[500],
@@ -336,7 +335,7 @@ class _CartSidebarState extends State<CartSidebar> {
           SizedBox(height: context.smallPadding),
           Text(
             l10n.addProductsToStartSale,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[400],
             ),
@@ -380,7 +379,7 @@ class _CartSidebarState extends State<CartSidebar> {
               Expanded(
                 child: Text(
                   item.productName,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -416,14 +415,14 @@ class _CartSidebarState extends State<CartSidebar> {
                 children: [
                   Text(
                     l10n.unitPrice,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       color: Colors.grey[600],
                     ),
                   ),
                   Text(
                     'PKR ${item.unitPrice.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -482,7 +481,7 @@ class _CartSidebarState extends State<CartSidebar> {
                     ),
                     child: Text(
                       item.quantity.toString(),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -539,7 +538,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   ),
                   child: Text(
                     '${l10n.discount}: PKR ${item.itemDiscount.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.orange[700],
@@ -551,7 +550,7 @@ class _CartSidebarState extends State<CartSidebar> {
 
               Text(
                 'PKR ${item.lineTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primaryMaroon,
@@ -582,7 +581,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   Expanded(
                     child: Text(
                       '${l10n.notes}: ${item.customizationNotes}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.blue[700],
                       ),
@@ -623,14 +622,14 @@ class _CartSidebarState extends State<CartSidebar> {
                 children: [
                   Text(
                     l10n.subtotal,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       color: AppTheme.charcoalGray,
                     ),
                   ),
                   Text(
                     'PKR ${provider.cartSubtotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -647,14 +646,14 @@ class _CartSidebarState extends State<CartSidebar> {
                   children: [
                     Text(
                       l10n.discount,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         color: Colors.orange[700],
                       ),
                     ),
                     Text(
                       '- PKR ${provider.overallDiscount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.orange[700],
@@ -671,14 +670,14 @@ class _CartSidebarState extends State<CartSidebar> {
                   children: [
                     Text(
                       'GST (${provider.gstPercentage}%)',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         color: AppTheme.charcoalGray,
                       ),
                     ),
                     Text(
                       'PKR ${provider.cartGstAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -695,14 +694,14 @@ class _CartSidebarState extends State<CartSidebar> {
                   children: [
                     Text(
                       '${l10n.tax} (${provider.taxPercentage}%)',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         color: AppTheme.charcoalGray,
                       ),
                     ),
                     Text(
                       'PKR ${provider.cartTaxAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -722,7 +721,7 @@ class _CartSidebarState extends State<CartSidebar> {
                 children: [
                   Text(
                     l10n.total,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize * 0.9,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.charcoalGray,
@@ -730,7 +729,7 @@ class _CartSidebarState extends State<CartSidebar> {
                   ),
                   Text(
                     'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize * 0.9,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primaryMaroon,
@@ -802,7 +801,7 @@ class _CartSidebarState extends State<CartSidebar> {
                         context.shouldShowCompactLayout
                             ? l10n.checkout
                             : l10n.proceedToCheckout,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -832,7 +831,7 @@ class _CartSidebarState extends State<CartSidebar> {
         ),
         title: Text(
           l10n.clearCart,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -840,7 +839,7 @@ class _CartSidebarState extends State<CartSidebar> {
         ),
         content: Text(
           l10n.clearCartQuestion,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             color: Colors.grey[700],
           ),
@@ -850,7 +849,7 @@ class _CartSidebarState extends State<CartSidebar> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               l10n.cancel,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[600],
@@ -869,7 +868,7 @@ class _CartSidebarState extends State<CartSidebar> {
               },
               child: Text(
                 l10n.clearCart,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.pureWhite,

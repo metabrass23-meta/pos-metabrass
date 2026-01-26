@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -191,7 +190,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               children: [
                 Text(
                   l10n.receivableDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -202,7 +201,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompleteReceivableInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -223,7 +222,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             ),
             child: Text(
               widget.receivable.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -308,7 +307,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.debtorInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -338,7 +337,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
       children: [
         Text(
           l10n.name,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: Colors.grey[600],
@@ -346,7 +345,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
         ),
         Text(
           widget.receivable.debtorName,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.charcoalGray,
@@ -355,7 +354,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
         SizedBox(height: context.cardPadding),
         Text(
           l10n.phone,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: Colors.grey[600],
@@ -363,7 +362,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
         ),
         Text(
           widget.receivable.debtorPhone,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.charcoalGray,
@@ -384,7 +383,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             children: [
               Text(
                 l10n.name,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
@@ -392,7 +391,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               Text(
                 widget.receivable.debtorName,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -407,7 +406,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             children: [
               Text(
                 l10n.phone,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
@@ -415,7 +414,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               Text(
                 widget.receivable.debtorPhone,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -450,7 +449,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountBreakdown,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.green[700],
@@ -464,14 +463,14 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             children: [
               Text(
                 l10n.amountGiven,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   color: Colors.grey[700],
                 ),
               ),
               Text(
                 'PKR ${widget.receivable.amountGiven.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.blue,
@@ -486,14 +485,14 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               children: [
                 Text(
                   l10n.amountReturned,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     color: Colors.grey[700],
                   ),
                 ),
                 Text(
                   'PKR ${widget.receivable.amountReturned.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.green,
@@ -514,7 +513,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             children: [
               Text(
                 l10n.balanceRemaining,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -522,7 +521,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               ),
               Text(
                 'PKR ${widget.receivable.balanceRemaining.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w700,
                   color: widget.receivable.balanceRemaining > 0 ? Colors.orange : Colors.green,
@@ -572,7 +571,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   children: [
                     Text(
                       l10n.status,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -580,7 +579,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     ),
                     Text(
                       widget.receivable.statusText,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: widget.receivable.statusColor,
@@ -601,7 +600,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   ),
                   child: Text(
                     '${widget.receivable.daysOverdue} ${l10n.daysOverdue}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.pureWhite,
@@ -620,7 +619,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   children: [
                     Text(
                       l10n.returnProgress,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -628,7 +627,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     ),
                     Text(
                       '${widget.receivable.returnPercentage.toStringAsFixed(1)}%',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: widget.receivable.statusColor,
@@ -683,7 +682,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.dateLent,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -694,7 +693,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.receivable.formattedDateLent,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -720,7 +719,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.expectedReturnDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -731,7 +730,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.receivable.formattedExpectedReturnDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: widget.receivable.isOverdue ? Colors.red : AppTheme.charcoalGray,
@@ -765,7 +764,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.dateLent,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -776,7 +775,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.receivable.formattedDateLent,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -803,7 +802,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.expectedReturn,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -814,7 +813,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.receivable.formattedExpectedReturnDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: widget.receivable.isOverdue ? Colors.red : AppTheme.charcoalGray,
@@ -850,7 +849,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDetails,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -861,7 +860,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
           SizedBox(height: context.cardPadding),
           Text(
             l10n.reasonItem,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.captionFontSize,
               fontWeight: FontWeight.w500,
               color: Colors.grey[600],
@@ -870,7 +869,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
           SizedBox(height: context.smallPadding / 2),
           Text(
             widget.receivable.reasonOrItem,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w400,
               color: AppTheme.charcoalGray,
@@ -880,7 +879,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             SizedBox(height: context.cardPadding),
             Text(
               l10n.notes,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[600],
@@ -889,7 +888,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
             SizedBox(height: context.smallPadding / 2),
             Text(
               widget.receivable.notes!,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: AppTheme.charcoalGray,
@@ -905,7 +904,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   children: [
                     Text(
                       l10n.created,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -913,7 +912,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     ),
                     Text(
                       _formatDateTime(widget.receivable.createdAt),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.grey[700],
                       ),
@@ -927,7 +926,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                   children: [
                     Text(
                       l10n.lastUpdated,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -935,7 +934,7 @@ class _ViewReceivableDetailsDialogState extends State<ViewReceivableDetailsDialo
                     ),
                     Text(
                       _formatDateTime(widget.receivable.updatedAt),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.grey[700],
                       ),

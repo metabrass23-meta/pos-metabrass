@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/return_provider.dart';
 import '../../../src/models/sales/return_model.dart';
-import 'create_return_dialog.dart';
+import '../../widgets/sales/create_return_dialog.dart';
 
 class ReturnManagementWidget extends StatefulWidget {
   const ReturnManagementWidget({Key? key}) : super(key: key);
@@ -49,9 +49,22 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             Tab(text: l10n.statistics, icon: const Icon(Icons.analytics)),
           ],
         ),
-        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => context.read<ReturnProvider>().refresh())],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<ReturnProvider>().refresh(),
+            tooltip: l10n.refresh,
+          )
+        ],
       ),
-      body: TabBarView(controller: _tabController, children: [_buildReturnsTab(), _buildRefundsTab(), _buildStatisticsTab()]),
+      body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildReturnsTab(),
+            _buildRefundsTab(),
+            _buildStatisticsTab()
+          ]
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateReturnDialog(context),
         tooltip: l10n.createReturn,
@@ -105,22 +118,38 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             const SizedBox(height: 16),
             Row(
               children: [
+                // Search Field
                 Expanded(
+                  flex: 2,
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       labelText: l10n.search,
                       hintText: l10n.searchByReturnCustomerInvoice,
                       prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                     onChanged: (value) => provider.setFilters(search: value),
                   ),
                 ),
                 const SizedBox(width: 16),
+
+                // Status Dropdown
                 Expanded(
+                  flex: 1,
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: InputDecoration(labelText: l10n.status, border: const OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.status,
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    dropdownColor: Colors.white,
                     items: [
                       DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
                       DropdownMenuItem(value: 'PENDING', child: Text(l10n.pending)),
@@ -138,10 +167,20 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                   ),
                 ),
                 const SizedBox(width: 16),
+
+                // Reason Dropdown
                 Expanded(
+                  flex: 1,
                   child: DropdownButtonFormField<String>(
                     value: _selectedReason.isEmpty ? null : _selectedReason,
-                    decoration: InputDecoration(labelText: l10n.reason, border: const OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.reason,
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    dropdownColor: Colors.white,
                     items: [
                       DropdownMenuItem(value: '', child: Text(l10n.allReasons)),
                       DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.defective)),
@@ -163,10 +202,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
               ],
             ),
             const SizedBox(height: 16),
+
+            // Clear Filters Button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
+                TextButton.icon(
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
@@ -175,7 +216,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                     });
                     provider.clearFilters();
                   },
-                  child: Text(l10n.clearFilters),
+                  icon: const Icon(Icons.clear_all),
+                  label: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -196,14 +238,16 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
           children: [
             const Icon(Icons.assignment_return, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
-            Text(l10n.noReturnsFound),
-            Text(l10n.createNewReturnUsingButton),
+            Text(l10n.noReturnsFound, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(l10n.createNewReturnUsingButton, style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
       );
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
       itemCount: returns.length,
       itemBuilder: (context, index) {
         final returnItem = returns[index];
@@ -217,7 +261,9 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 2,
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: _getStatusColor(returnItem.status),
           child: Icon(_getStatusIcon(returnItem.status), color: Colors.white),
@@ -226,11 +272,35 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 4),
             Text('${l10n.customer}: ${returnItem.customerName}'),
             Text('${l10n.invoice}: ${returnItem.saleInvoiceNumber}'),
-            Text('${l10n.reason}: ${returnItem.reason.replaceAll('_', ' ')}'),
-            Text('${l10n.amount}: \$${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
-            Text('${l10n.status}: ${returnItem.status}'),
+            Text(
+              '${l10n.reason}: ${returnItem.reason.replaceAll('_', ' ')}',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  '${l10n.amount}: \$${returnItem.totalReturnAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(returnItem.status).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: _getStatusColor(returnItem.status)),
+                  ),
+                  child: Text(
+                    returnItem.status,
+                    style: TextStyle(color: _getStatusColor(returnItem.status), fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -389,14 +459,16 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
               children: [
                 const Icon(Icons.payment, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text(l10n.noRefundsFound),
-                Text(l10n.refundsWillAppearHere),
+                Text(l10n.noRefundsFound, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Text(l10n.refundsWillAppearHere, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           );
         }
 
         return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 80),
           itemCount: refunds.length,
           itemBuilder: (context, index) {
             final refund = refunds[index];
@@ -412,6 +484,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 2,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getRefundStatusColor(refund.status),
@@ -421,6 +494,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 4),
             Text('${l10n.amount}: \$${refund.amount.toStringAsFixed(2)}'),
             Text('${l10n.method}: ${refund.method.replaceAll('_', ' ')}'),
             Text('${l10n.status}: ${refund.status}'),
@@ -438,31 +512,21 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
   Color _getRefundStatusColor(String status) {
     switch (status) {
-      case 'PENDING':
-        return Colors.orange;
-      case 'PROCESSED':
-        return Colors.green;
-      case 'FAILED':
-        return Colors.red;
-      case 'CANCELLED':
-        return Colors.grey;
-      default:
-        return Colors.grey;
+      case 'PENDING': return Colors.orange;
+      case 'PROCESSED': return Colors.green;
+      case 'FAILED': return Colors.red;
+      case 'CANCELLED': return Colors.grey;
+      default: return Colors.grey;
     }
   }
 
   IconData _getRefundStatusIcon(String status) {
     switch (status) {
-      case 'PENDING':
-        return Icons.schedule;
-      case 'PROCESSED':
-        return Icons.check_circle;
-      case 'FAILED':
-        return Icons.error;
-      case 'CANCELLED':
-        return Icons.cancel;
-      default:
-        return Icons.help;
+      case 'PENDING': return Icons.schedule;
+      case 'PROCESSED': return Icons.check_circle;
+      case 'FAILED': return Icons.error;
+      case 'CANCELLED': return Icons.cancel;
+      default: return Icons.help;
     }
   }
 
@@ -562,6 +626,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       crossAxisCount: MediaQuery.of(context).size.width < 750 ? 2 : 4,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
+      childAspectRatio: 1.5,
       children: [
         _buildStatCard(l10n.totalReturns, statistics['total_returns']?.toString() ?? '0', Icons.assignment_return, Colors.blue),
         _buildStatCard(l10n.pendingReturns, statistics['pending_returns']?.toString() ?? '0', Icons.schedule, Colors.orange),
@@ -579,7 +644,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: color),
+            Icon(icon, size: 36, color: color),
             const SizedBox(height: 8),
             Text(
               value,
@@ -615,7 +680,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
   Widget _buildStatusRow(String status, int count, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Container(
@@ -624,8 +689,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(status)),
-          Text(count.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(status, style: const TextStyle(fontSize: 16))),
+          Text(count.toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ],
       ),
     );
@@ -643,25 +708,32 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       builder: (context) => AlertDialog(
         title: Text(l10n.returnDetails(returnItem.returnNumber)),
         content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow(l10n.saleInvoice, returnItem.saleInvoiceNumber),
-              _buildDetailRow(l10n.customer, returnItem.customerName),
-              _buildDetailRow(l10n.returnDate, returnItem.formattedReturnDate),
-              _buildDetailRow(l10n.status, returnItem.status),
-              _buildDetailRow(l10n.reason, returnItem.reason),
-              if (returnItem.reasonDetails?.isNotEmpty == true) _buildDetailRow(l10n.reasonDetails, returnItem.reasonDetails!),
-              _buildDetailRow(l10n.itemsCount as String, '${returnItem.returnItemsCount}'),
-              _buildDetailRow(l10n.totalAmount, 'PKR ${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
-              if (returnItem.approvedAt != null)
-                _buildDetailRow(l10n.approvedAt, '${returnItem.approvedAt!.day}/${returnItem.approvedAt!.month}/${returnItem.approvedAt!.year}'),
-              if (returnItem.processedAt != null)
-                _buildDetailRow(l10n.processedAt, '${returnItem.processedAt!.day}/${returnItem.processedAt!.month}/${returnItem.processedAt!.year}'),
-              if (returnItem.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, returnItem.notes!),
-            ],
+          width: 450,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(l10n.returnNumber, returnItem.returnNumber),
+                _buildDetailRow(l10n.saleInvoice, returnItem.saleInvoiceNumber),
+                _buildDetailRow(l10n.customer, returnItem.customerName),
+                const Divider(),
+                _buildDetailRow(l10n.returnDate, returnItem.formattedReturnDate),
+                _buildDetailRow(l10n.status, returnItem.status),
+                _buildDetailRow(l10n.reason, returnItem.reason),
+                if (returnItem.reasonDetails?.isNotEmpty == true)
+                  _buildDetailRow(l10n.reasonDetails, returnItem.reasonDetails!),
+                const Divider(),
+                _buildDetailRow(l10n.itemsCount as String, '${returnItem.returnItemsCount}'),
+                _buildDetailRow(l10n.totalAmount, 'PKR ${returnItem.totalReturnAmount.toStringAsFixed(2)}'),
+                if (returnItem.approvedAt != null)
+                  _buildDetailRow(l10n.approvedAt, '${returnItem.approvedAt!.day}/${returnItem.approvedAt!.month}/${returnItem.approvedAt!.year}'),
+                if (returnItem.processedAt != null)
+                  _buildDetailRow(l10n.processedAt, '${returnItem.processedAt!.day}/${returnItem.processedAt!.month}/${returnItem.processedAt!.year}'),
+                if (returnItem.notes?.isNotEmpty == true)
+                  _buildDetailRow(l10n.notes, returnItem.notes!),
+              ],
+            ),
           ),
         ),
         actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
@@ -677,13 +749,14 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       builder: (context) => AlertDialog(
         title: Text(l10n.refundDetails(refund.refundNumber)),
         content: SizedBox(
-          width: 400,
+          width: 450,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildDetailRow(l10n.refundNumber, refund.refundNumber),
               _buildDetailRow(l10n.returnId, refund.returnRequestId),
+              const Divider(),
               _buildDetailRow(l10n.amount, 'PKR ${refund.amount.toStringAsFixed(2)}'),
               _buildDetailRow(l10n.method, refund.method),
               _buildDetailRow(l10n.status, refund.status),
@@ -716,7 +789,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: InputDecoration(labelText: l10n.approvalReasonOptional, border: const OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: l10n.approvalReasonOptional,
+                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white,
+              ),
               maxLines: 3,
             ),
           ],
@@ -818,7 +896,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: InputDecoration(labelText: l10n.cancellationReasonRequired, border: const OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: l10n.cancellationReasonRequired,
+                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white,
+              ),
               maxLines: 3,
             ),
           ],

@@ -3,7 +3,6 @@ import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/presentation/widgets/globals/drop_down.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
@@ -96,7 +95,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               l10n.expenseAddedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -117,7 +116,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -243,7 +242,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addExpense : l10n.addNewExpense,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -254,7 +253,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordNewExpenseEntry,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -394,7 +393,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                               SizedBox(width: context.smallPadding),
                               Text(
                                 l10n.selectDateTime,
-                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                               ),
                             ],
                           ),
@@ -406,7 +405,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                                 children: [
                                   Text(
                                     l10n.date,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -414,7 +413,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                                   ),
                                   Text(
                                     '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
@@ -427,7 +426,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                                 children: [
                                   Text(
                                     l10n.time,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -435,7 +434,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> with SingleTickerPr
                                   ),
                                   Text(
                                     _selectedTime.format(context),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,

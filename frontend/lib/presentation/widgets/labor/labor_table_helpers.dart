@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
@@ -109,7 +108,7 @@ class LaborTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -122,7 +121,7 @@ class LaborTableHelpers {
             children: [
               Icon(Icons.restore, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.restore, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.restore, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -210,7 +209,7 @@ class LaborTableHelpers {
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -237,7 +236,7 @@ class LaborTableHelpers {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -290,7 +289,7 @@ class LaborTableHelpers {
 
           Text(
             l10n.failedToLoadLabors,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -312,7 +311,7 @@ class LaborTableHelpers {
             ),
             child: Text(
               provider.errorMessage ?? l10n.unexpectedErrorOccurred,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -352,7 +351,7 @@ class LaborTableHelpers {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.retry,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -406,7 +405,7 @@ class LaborTableHelpers {
 
           Text(
             l10n.noLaborsFound,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -428,7 +427,7 @@ class LaborTableHelpers {
             ),
             child: Text(
               l10n.startByAddingFirstLabor,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -437,45 +436,6 @@ class LaborTableHelpers {
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will trigger the add labor dialog from parent
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        l10n.addFirstLabor,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

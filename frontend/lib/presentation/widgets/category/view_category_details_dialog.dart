@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -189,7 +188,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               children: [
                 Text(
                   '${l10n.category} ${l10n.info}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -200,7 +199,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     '${l10n.view} ${l10n.category} ${l10n.info}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -221,7 +220,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             ),
             child: Text(
               widget.category.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -313,7 +312,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.category} ${l10n.name}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -348,7 +347,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(width: context.cardPadding),
                 Text(
                   widget.category.name,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize * 1.1,
                     fontWeight: FontWeight.w700,
                     color: Colors.blue[700],
@@ -384,7 +383,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.notes,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -405,7 +404,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               widget.category.description.isEmpty
                   ? l10n.notSpecified
                   : widget.category.description,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: widget.category.description.isEmpty
@@ -455,7 +454,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     '${l10n.date} ${l10n.created}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -466,7 +465,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 _formatDate(widget.category.dateCreated),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -475,7 +474,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 _getRelativeDate(widget.category.dateCreated),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -501,7 +500,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.lastUpdated,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -512,7 +511,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 _formatDate(widget.category.lastEdited),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -521,7 +520,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 _getRelativeDate(widget.category.lastEdited),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -555,7 +554,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                     SizedBox(width: context.smallPadding),
                     Text(
                       '${l10n.date} ${l10n.created}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -566,7 +565,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   _formatDate(widget.category.dateCreated),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -575,7 +574,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   _getRelativeDate(widget.category.dateCreated),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -602,7 +601,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.lastUpdated,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -613,7 +612,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   _formatDate(widget.category.lastEdited),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -622,7 +621,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   _getRelativeDate(widget.category.lastEdited),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -659,7 +658,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.category} ${l10n.info}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -695,7 +694,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 SizedBox(width: context.smallPadding),
                 Text(
                   '${l10n.category} ${l10n.active}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],
@@ -719,7 +718,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
           children: [
             Text(
               '${l10n.type}:',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
               ),
@@ -735,7 +734,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               ),
               child: Text(
                 '${l10n.products} ${l10n.category}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primaryMaroon,
@@ -750,7 +749,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
           children: [
             Text(
               '${l10n.status}:',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
               ),
@@ -766,7 +765,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
               ),
               child: Text(
                 l10n.active,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.green[700],
@@ -790,7 +789,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             children: [
               Text(
                 '${l10n.type}:',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
@@ -808,7 +807,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 ),
                 child: Text(
                   '${l10n.products} ${l10n.category}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryMaroon,
@@ -825,7 +824,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
             children: [
               Text(
                 '${l10n.status}:',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
@@ -843,7 +842,7 @@ class _ViewCategoryDetailsDialogState extends State<ViewCategoryDetailsDialog>
                 ),
                 child: Text(
                   l10n.active,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],

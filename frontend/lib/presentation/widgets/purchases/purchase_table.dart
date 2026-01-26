@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
@@ -74,7 +73,7 @@ class PurchaseTable extends StatelessWidget {
                       DataCell(Text(purchase.vendorDetail?.name ?? "N/A")),
                       DataCell(Text(
                         purchase.total.toStringAsFixed(2),
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppTheme.primaryMaroon
                         ),
@@ -96,7 +95,7 @@ class PurchaseTable extends StatelessWidget {
   Widget _headerText(String text) {
     return Text(
       text.toUpperCase(),
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 12,
         color: AppTheme.charcoalGray.withOpacity(0.8),
@@ -164,7 +163,7 @@ class PurchaseTable extends StatelessWidget {
           SizedBox(height: context.mainPadding),
           Text(
             "No Purchases Found",
-            style: GoogleFonts.playfairDisplay(
+            style: TextStyle(
                 fontSize: 22,
                 color: AppTheme.charcoalGray,
                 fontWeight: FontWeight.bold
@@ -173,7 +172,7 @@ class PurchaseTable extends StatelessWidget {
           SizedBox(height: context.smallPadding / 2),
           Text(
             "Start by recording your first inventory purchase.",
-            style: GoogleFonts.inter(
+            style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600]
             ),

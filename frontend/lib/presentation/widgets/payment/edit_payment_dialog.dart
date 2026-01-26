@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
@@ -131,7 +130,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               l10n.paymentUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -152,7 +151,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -390,7 +389,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editPayment : l10n.editPaymentDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -401,7 +400,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updatePaymentInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -416,7 +415,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -582,7 +581,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                     Expanded(
                       child: Text(
                         '${l10n.netAmount}: PKR ${netAmount.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: netAmount >= 0 ? Colors.green : Colors.red,
@@ -660,7 +659,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                       children: [
                         Text(
                           l10n.finalPaymentForMonth,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
                             color: _isFinalPayment ? Colors.green : AppTheme.charcoalGray,
@@ -668,7 +667,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                         ),
                         Text(
                           _isFinalPayment ? l10n.thisCompletesPaymentForSelectedMonth : l10n.markThisAsFinalPaymentForMonth,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: _isFinalPayment ? Colors.green[700] : Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: _isFinalPayment ? Colors.green[700] : Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -697,7 +696,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                 children: [
                   Text(
                     l10n.receiptImageOptional,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   if (_receiptImagePath == null) ...[
@@ -717,7 +716,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.tapToSelectReceiptImage,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -738,7 +737,7 @@ class _EditPaymentDialogState extends State<EditPaymentDialog> with SingleTicker
                           Expanded(
                             child: Text(
                               l10n.receiptImageSelected,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                             ),
                           ),
                           IconButton(

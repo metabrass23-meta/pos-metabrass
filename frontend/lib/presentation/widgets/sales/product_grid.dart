@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/sales/product_options_menu.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -213,7 +212,7 @@ class ProductGrid extends StatelessWidget {
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               product.fabric,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 color: Colors.grey[500],
                               ),
@@ -262,7 +261,7 @@ class ProductGrid extends StatelessWidget {
                                         const SizedBox(width: 2),
                                         Text(
                                           '%',
-                                          style: GoogleFonts.inter(
+                                          style: TextStyle(
                                             fontSize:
                                             context.captionFontSize * 0.7,
                                             fontWeight: FontWeight.w600,
@@ -287,7 +286,7 @@ class ProductGrid extends StatelessWidget {
                                 ),
                                 child: Text(
                                   product.quantity.toString(),
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize * 0.8,
                                     fontWeight: FontWeight.w600,
                                     color: AppTheme.pureWhite,
@@ -326,7 +325,7 @@ class ProductGrid extends StatelessWidget {
                                 SizedBox(height: context.smallPadding / 2),
                                 Text(
                                   AppLocalizations.of(context)!.outOfStock,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: AppTheme.pureWhite,
@@ -350,7 +349,7 @@ class ProductGrid extends StatelessWidget {
                           Expanded(
                             child: Text(
                               product.name,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.bodyFontSize * 0.9,
                                 fontWeight: FontWeight.w600,
                                 color: isOutOfStock
@@ -377,7 +376,7 @@ class ProductGrid extends StatelessWidget {
                               ),
                               child: Text(
                                 _getCategoryAbbreviation(product.fabric),
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize * 0.8,
                                   fontWeight: FontWeight.w600,
                                   color: _getCategoryColor(product.fabric),
@@ -405,7 +404,7 @@ class ProductGrid extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '${product.color} • ${product.pieces.length} pcs',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: Colors.grey[600],
                               ),
@@ -427,7 +426,7 @@ class ProductGrid extends StatelessWidget {
                         children: [
                           Text(
                             'PKR ${product.price.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w700,
                               color: isOutOfStock
@@ -438,7 +437,7 @@ class ProductGrid extends StatelessWidget {
                           if (_hasStandardDiscount(product) && !isOutOfStock)
                             Text(
                               'PKR ${_getOriginalPrice(product).toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 decoration: TextDecoration.lineThrough,
                                 color: Colors.grey[500],
@@ -492,7 +491,7 @@ class ProductGrid extends StatelessWidget {
                                         ),
                                         Text(
                                           AppLocalizations.of(context)!.add,
-                                          style: GoogleFonts.inter(
+                                          style: TextStyle(
                                             fontSize: context.captionFontSize,
                                             fontWeight: FontWeight.w600,
                                             color: AppTheme.primaryMaroon,
@@ -561,7 +560,7 @@ class ProductGrid extends StatelessWidget {
                               SizedBox(width: context.smallPadding / 3),
                               Text(
                                 AppLocalizations.of(context)!.lowStock,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize * 0.8,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.orange[700],
@@ -615,7 +614,7 @@ class ProductGrid extends StatelessWidget {
               const SizedBox(width: 2),
               Text(
                 _getExistingOrderCount(product, provider).toString(),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize * 0.7,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.pureWhite,
@@ -665,7 +664,7 @@ class ProductGrid extends StatelessWidget {
             searchQuery.isNotEmpty || selectedCategory != 'All'
                 ? AppLocalizations.of(context)!.noProductsFound
                 : AppLocalizations.of(context)!.noProductsAvailable,
-            style: GoogleFonts.playfairDisplay(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -687,7 +686,7 @@ class ProductGrid extends StatelessWidget {
               searchQuery.isNotEmpty || selectedCategory != 'All'
                   ? AppLocalizations.of(context)!.tryAdjustingSearch
                   : AppLocalizations.of(context)!.addProductsToInventory,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -724,7 +723,7 @@ class ProductGrid extends StatelessWidget {
                       SizedBox(width: context.smallPadding),
                       Text(
                         AppLocalizations.of(context)!.clearFilters,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.primaryMaroon,
@@ -891,7 +890,7 @@ class ProductGrid extends StatelessWidget {
             Expanded(
               child: Text(
                 '${product.name} ${AppLocalizations.of(context)!.addToCart}',
-                style: GoogleFonts.inter(color: AppTheme.pureWhite),
+                style: TextStyle(color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -1075,7 +1074,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       children: [
                         Text(
                           l10n.applyDiscount,
-                          style: GoogleFonts.playfairDisplay(
+                          style: TextStyle(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
@@ -1083,7 +1082,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                         ),
                         Text(
                           widget.product.name,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             color: AppTheme.pureWhite.withOpacity(0.9),
                           ),
@@ -1120,7 +1119,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                 children: [
                   Text(
                     l10n.quickDiscounts,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -1164,7 +1163,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                 ),
                                 child: Text(
                                   '$discount%',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.orange[700],
@@ -1195,14 +1194,14 @@ class _DiscountDialogState extends State<DiscountDialog> {
                           children: [
                             Text(
                               l10n.originalPrice,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 color: AppTheme.charcoalGray,
                               ),
                             ),
                             Text(
                               'PKR ${widget.product.price.toStringAsFixed(0)}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
                                 decoration: _calculatedDiscount > 0
@@ -1220,14 +1219,14 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             children: [
                               Text(
                                 l10n.discount,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.subtitleFontSize,
                                   color: Colors.orange[700],
                                 ),
                               ),
                               Text(
                                 '- PKR ${_calculatedDiscount.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.subtitleFontSize,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.orange[700],
@@ -1243,7 +1242,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             children: [
                               Text(
                                 l10n.finalPrice,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.charcoalGray,
@@ -1251,7 +1250,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                               ),
                               Text(
                                 'PKR ${discountedPrice.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.green[700],
@@ -1287,7 +1286,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                 ),
                                 child: Text(
                                   l10n.cancel,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.grey[700],
@@ -1360,7 +1359,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                     SizedBox(width: context.smallPadding),
                                     Text(
                                       l10n.addWithDiscount,
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,
                                         color: AppTheme.pureWhite,

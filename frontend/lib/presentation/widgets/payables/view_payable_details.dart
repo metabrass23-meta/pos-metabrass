@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -142,7 +141,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               children: [
                 Text(
                   l10n.payableDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -153,7 +152,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompletePayableInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -168,7 +167,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payable.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -250,7 +249,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.creditorInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -276,20 +275,20 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
       children: [
         Text(
           l10n.name,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           widget.payable.creditorName,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.cardPadding),
         Text(
           l10n.phoneNumber,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           widget.payable.creditorPhone ?? l10n.notAvailable,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
       ],
     );
@@ -306,11 +305,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             children: [
               Text(
                 l10n.name,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 widget.payable.creditorName,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -321,11 +320,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             children: [
               Text(
                 l10n.phoneNumber,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 widget.payable.creditorPhone ?? l10n.notAvailable,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -352,7 +351,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountBreakdown,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red[700]),
               ),
             ],
           ),
@@ -362,11 +361,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             children: [
               Text(
                 '${l10n.amountBorrowed}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
               ),
               Text(
                 'PKR ${widget.payable.amountBorrowed.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
               ),
             ],
           ),
@@ -377,11 +376,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               children: [
                 Text(
                   '${l10n.amountPaid}:',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
                   'PKR ${widget.payable.amountPaid.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
                 ),
               ],
             ),
@@ -394,11 +393,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
             children: [
               Text(
                 '${l10n.balanceRemaining}:',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${widget.payable.balanceRemaining.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w700,
                   color: widget.payable.balanceRemaining > 0 ? Colors.orange : Colors.green,
@@ -448,11 +447,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   children: [
                     Text(
                       l10n.status,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
                       widget.payable.statusText,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: widget.payable.statusColorValue),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: widget.payable.statusColorValue),
                     ),
                   ],
                 ),
@@ -463,7 +462,7 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
                     l10n.daysOverdueCount(widget.payable.daysOverdue),
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                   ),
                 ),
               ],
@@ -478,11 +477,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   children: [
                     Text(
                       l10n.paymentProgress,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
                       '${widget.payable.paymentPercentage.toStringAsFixed(1)}%',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: widget.payable.statusColorValue,
@@ -534,14 +533,14 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.dateBorrowed,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.payable.formattedDateBorrowed,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -560,14 +559,14 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.expectedRepaymentDate,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.payable.formattedExpectedRepaymentDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: widget.payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
@@ -598,14 +597,14 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.dateBorrowed,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.payable.formattedDateBorrowed,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -625,14 +624,14 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.expectedRepayment,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.payable.formattedExpectedRepaymentDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: widget.payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
@@ -661,30 +660,30 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Text(
             '${l10n.reasonItem}:',
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             widget.payable.reasonOrItem,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
           ),
           if (widget.payable.notes != null && widget.payable.notes!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             Text(
               '${l10n.notes}:',
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
             ),
             SizedBox(height: context.smallPadding / 2),
             Text(
               widget.payable.notes!,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
             ),
           ],
           SizedBox(height: context.cardPadding),
@@ -696,11 +695,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   children: [
                     Text(
                       '${l10n.created}:',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
                       _formatDateTime(widget.payable.createdAt),
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -711,11 +710,11 @@ class _ViewPayableDetailsDialogState extends State<ViewPayableDetailsDialog> wit
                   children: [
                     Text(
                       '${l10n.lastUpdated}:',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
                       widget.payable.updatedAt != null ? _formatDateTime(widget.payable.updatedAt!) : l10n.notUpdated,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[700]),
                     ),
                   ],
                 ),

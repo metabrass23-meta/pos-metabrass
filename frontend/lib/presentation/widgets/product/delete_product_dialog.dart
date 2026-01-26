@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
@@ -114,7 +113,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
             SizedBox(width: context.smallPadding),
             Text(
               l10n.pleaseConfirmAction,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -149,7 +148,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
               _isPermanentDelete
                   ? l10n.productDeletedPermanently
                   : l10n.productDeactivatedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -181,7 +180,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -303,7 +302,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
               children: [
                 Text(
                   _isPermanentDelete ? l10n.deletePermanently : l10n.deactivateProduct,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -316,7 +315,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                     _isPermanentDelete
                         ? l10n.thisActionCannotBeUndone
                         : l10n.productCanBeRestoredLater,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -375,7 +374,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                     Expanded(
                       child: Text(
                         l10n.chooseDeletionType,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
                           color: AppTheme.charcoalGray,
@@ -420,7 +419,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.permanentDelete,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: _isPermanentDelete ? Colors.red : Colors.grey,
@@ -430,7 +429,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               l10n.completelyRemovesFromDatabase,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: _isPermanentDelete ? Colors.red[600] : Colors.grey[600],
                               ),
@@ -474,7 +473,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.deactivate,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: !_isPermanentDelete ? Colors.orange : Colors.grey,
@@ -484,7 +483,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               l10n.hidesButCanBeRestored,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: !_isPermanentDelete ? Colors.orange[600] : Colors.grey[600],
                               ),
@@ -525,7 +524,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                           ),
                           child: Text(
                             widget.product.id,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w600,
                               color: _isPermanentDelete ? Colors.red : Colors.orange,
@@ -538,7 +537,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                         Expanded(
                           child: Text(
                             widget.product.name,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -560,7 +559,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             children: [
                               Text(
                                 '${l10n.detail}:',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey[600],
@@ -570,7 +569,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                                 widget.product.detail.isNotEmpty
                                     ? widget.product.detail
                                     : l10n.noDetailsProvided,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.subtitleFontSize,
                                   fontWeight: FontWeight.w500,
                                   color: widget.product.detail.isNotEmpty
@@ -594,7 +593,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                             children: [
                               Text(
                                 '${l10n.price}:',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey[600],
@@ -602,7 +601,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                               ),
                               Text(
                                 widget.product.formattedPrice,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.charcoalGray,
@@ -626,7 +625,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                         children: [
                           Text(
                             '${l10n.totalInventoryValue}:',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: Colors.blue[700],
@@ -634,7 +633,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                           ),
                           Text(
                             widget.product.formattedTotalValue,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w700,
                               color: Colors.blue[700],
@@ -666,7 +665,7 @@ class _DeleteProductDialogState extends State<DeleteProductDialog>
                     _isPermanentDelete
                         ? l10n.iUnderstandPermanentDelete
                         : l10n.iUnderstandDeactivate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -113,7 +112,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
             SizedBox(width: context.smallPadding),
             Text(
               l10n.pleaseConfirmYouUnderstandThisAction,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -148,7 +147,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
               _isPermanentDelete
                   ? l10n.categoryDeletedPermanently
                   : l10n.categoryDeactivatedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -180,7 +179,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -302,7 +301,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
               children: [
                 Text(
                   _isPermanentDelete ? l10n.deletePermanently : l10n.deactivateCategory,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -315,7 +314,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                     _isPermanentDelete
                         ? l10n.thisActionCannotBeUndone
                         : l10n.categoryCanBeRestoredLater,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -374,7 +373,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                     Expanded(
                       child: Text(
                         l10n.chooseDeletionType,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w500,
                           color: AppTheme.charcoalGray,
@@ -419,7 +418,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.permanentDelete,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: _isPermanentDelete ? Colors.red : Colors.grey,
@@ -429,7 +428,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               l10n.completelyRemovesFromDatabase,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: _isPermanentDelete ? Colors.red[600] : Colors.grey[600],
                               ),
@@ -473,7 +472,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.deactivate,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: !_isPermanentDelete ? Colors.orange : Colors.grey,
@@ -483,7 +482,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               l10n.hidesButCanBeRestored,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 color: !_isPermanentDelete ? Colors.orange[600] : Colors.grey[600],
                               ),
@@ -524,7 +523,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                           ),
                           child: Text(
                             widget.category.id,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w600,
                               color: _isPermanentDelete ? Colors.red : Colors.orange,
@@ -537,7 +536,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                         Expanded(
                           child: Text(
                             widget.category.name,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -554,7 +553,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                         alignment: Alignment.centerLeft,
                         child: Text(
                           widget.category.description,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             fontWeight: FontWeight.w400,
                             color: Colors.grey[600],
@@ -587,7 +586,7 @@ class _DeleteCategoryDialogState extends State<DeleteCategoryDialog>
                     _isPermanentDelete
                         ? l10n.iUnderstandPermanentDeleteCategory
                         : l10n.iUnderstandDeactivateCategory,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],

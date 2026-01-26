@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -124,7 +123,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -134,7 +133,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -159,7 +158,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             children: [
               Text(
                 l10n.receivablesManagement,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -169,7 +168,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.receivablesManagementDescription,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -191,7 +190,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
       children: [
         Text(
           l10n.receivables,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -201,7 +200,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.manageAmountsLent,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -224,7 +223,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
       children: [
         Text(
           l10n.receivables,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -234,7 +233,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.amountsLent,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -280,7 +279,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : '${l10n.add} ${l10n.receivable}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -481,7 +480,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchReceivables,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: AppTheme.charcoalGray,
             ),
@@ -489,7 +488,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               hintText: context.isTablet
                   ? '${l10n.search} ${l10n.receivables}...'
                   : l10n.searchReceivablesHint,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: TextStyle(
                 fontSize: context.bodyFontSize * 0.9,
                 color: Colors.grey[500],
               ),
@@ -549,7 +548,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             SizedBox(width: context.smallPadding),
             Text(
               l10n.filter,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.primaryMaroon,
@@ -587,7 +586,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
             SizedBox(width: context.smallPadding),
             Text(
               l10n.export,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.accentGold,
@@ -636,7 +635,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -653,7 +652,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],

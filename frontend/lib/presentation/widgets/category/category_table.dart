@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -24,12 +23,38 @@ class EnhancedCategoryTable extends StatefulWidget {
 }
 
 class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
-  final ScrollController _horizontalController = ScrollController();
-  final ScrollController _verticalController = ScrollController();
+  // Separate controllers for synchronized scrolling
+  late ScrollController _headerHorizontalController;
+  late ScrollController _contentHorizontalController;
+  late ScrollController _verticalController;
+
+  @override
+  void initState() {
+    super.initState();
+    _headerHorizontalController = ScrollController();
+    _contentHorizontalController = ScrollController();
+    _verticalController = ScrollController();
+
+    // Link the header and content horizontal scrolling (Two-way sync)
+    _headerHorizontalController.addListener(() {
+      if (_contentHorizontalController.hasClients &&
+          _headerHorizontalController.offset != _contentHorizontalController.offset) {
+        _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+
+    _contentHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients &&
+          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+        _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _horizontalController.dispose();
+    _headerHorizontalController.dispose();
+    _contentHorizontalController.dispose();
     _verticalController.dispose();
     super.dispose();
   }
@@ -81,57 +106,64 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             return _buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                // Table Header with Horizontal Scroll
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _horizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
+          return Column(
+            children: [
+              // 1. Table Header (Horizontal Scroll Only)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
                   ),
                 ),
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Container(
+                    width: _getTableWidth(context),
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.cardPadding * 0.85,
+                      horizontal: context.cardPadding / 2,
+                    ),
+                    child: _buildTableHeader(context),
+                  ),
+                ),
+              ),
 
-                // Table Content with Synchronized Scroll
-                Expanded(
-                  child: Scrollbar(
+              // 2. Table Content (Vertical + Horizontal Scroll)
+              Expanded(
+                child: Scrollbar(
+                  controller: _verticalController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
                     controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.categories.length,
-                          itemBuilder: (context, index) {
-                            final category = provider.categories[index];
-                            return _buildTableRow(context, category, index);
-                          },
+                    scrollDirection: Axis.vertical,
+                    child: Scrollbar(
+                      controller: _contentHorizontalController,
+                      thumbVisibility: true,
+                      notificationPredicate: (notification) => notification.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _contentHorizontalController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Container(
+                          width: _getTableWidth(context),
+                          // Use Column instead of ListView for better sync in nested scrolls
+                          child: Column(
+                            children: provider.categories.asMap().entries.map((entry) {
+                              return _buildTableRow(context, entry.value, entry.key);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -139,7 +171,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible - increased for View button
+    // Fixed table width to ensure all columns are visible
     return ResponsiveBreakpoints.responsive(
       context,
       tablet: 1400.0,
@@ -191,19 +223,19 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      120.0, // Category ID
+      120.0, // Category ID (Hidden/Unused in UI)
       200.0, // Name
       300.0, // Description
       150.0, // Date Created
       150.0, // Last Edited
-      280.0, // Actions - increased width for View button
+      280.0, // Actions
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: context.bodyFontSize,
         fontWeight: FontWeight.w600,
         color: AppTheme.charcoalGray,
@@ -237,7 +269,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               category.name,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.charcoalGray,
@@ -254,7 +286,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             child: category.description.isNotEmpty
                 ? Text(
               category.description,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -273,7 +305,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
               ),
               child: Text(
                 l10n.notSpecified,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[500],
@@ -292,7 +324,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
               children: [
                 Text(
                   _formatDate(category.dateCreated),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -300,7 +332,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                 ),
                 Text(
                   _getRelativeDate(category.dateCreated),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -319,7 +351,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
               children: [
                 Text(
                   _formatDate(category.lastEdited),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -327,7 +359,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                 ),
                 Text(
                   _getRelativeDate(category.lastEdited),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -461,7 +493,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
 
           Text(
             '${l10n.noData} ${l10n.category}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -483,7 +515,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             ),
             child: Text(
               '${l10n.add} ${l10n.category} ${l10n.products}',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -492,45 +524,6 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        '${l10n.add} ${l10n.category}',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

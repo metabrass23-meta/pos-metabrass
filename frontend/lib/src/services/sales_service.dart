@@ -18,6 +18,7 @@ class SalesService {
   final StorageService _storageService = StorageService();
 
   /// Get list of sales with pagination and filtering
+  /// FIXED: Manually parses the response to handle 'data' as a List and 'pagination' as a sibling.
   Future<ApiResponse<SalesListResponse>> getSales({SalesListParams? params}) async {
     try {
       final queryParams = params?.toQueryParameters() ?? SalesListParams().toQueryParameters();
@@ -29,13 +30,42 @@ class SalesService {
       final response = await _apiClient.get(ApiConfig.sales, queryParameters: queryParams);
 
       // Debug: Log the response
-      debugPrint('🌐 Response status: ${response.statusCode}');
-      debugPrint('🌐 Response data: ${response.data}');
-
       DebugHelper.printApiResponse('GET Sales', response.data);
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<SalesListResponse>.fromJson(response.data, (data) => SalesListResponse.fromJson(data));
+        // --- FIX START ---
+        // The API returns { "success": true, "data": [...], "pagination": {...} }
+        final responseData = response.data;
+
+        // 1. Extract List<SaleModel>
+        final List<dynamic> salesListJson = responseData['data'] ?? [];
+        final List<SaleModel> sales = salesListJson
+            .map((json) => SaleModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        // 2. Extract Pagination
+        final paginationJson = responseData['pagination'] as Map<String, dynamic>?;
+        final pagination = paginationJson != null
+            ? PaginationInfo.fromJson(paginationJson)
+            : PaginationInfo(
+            currentPage: 1,
+            pageSize: sales.length,
+            totalCount: sales.length,
+            totalPages: 1,
+            hasNext: false,
+            hasPrevious: false
+        );
+
+        // 3. Create the Response Object
+        final salesListResponse = SalesListResponse(sales: sales, pagination: pagination);
+
+        // 4. Wrap in ApiResponse
+        final apiResponse = ApiResponse<SalesListResponse>(
+          success: responseData['success'] ?? true,
+          message: responseData['message'] ?? 'Sales retrieved successfully',
+          data: salesListResponse,
+        );
+        // --- FIX END ---
 
         // Cache sales if successful
         if (apiResponse.success && apiResponse.data != null) {
@@ -76,10 +106,17 @@ class SalesService {
         }
       }
 
-      return ApiResponse<SalesListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
+      return ApiResponse<SalesListResponse>(
+          success: false,
+          message: apiError.displayMessage,
+          errors: apiError.errors
+      );
     } catch (e) {
       DebugHelper.printError('Get sales', e);
-      return ApiResponse<SalesListResponse>(success: false, message: 'An unexpected error occurred while getting sales');
+      return ApiResponse<SalesListResponse>(
+          success: false,
+          message: 'An unexpected error occurred while getting sales: $e'
+      );
     }
   }
 
@@ -212,34 +249,21 @@ class SalesService {
       return ApiResponse<SalesStatisticsResponse>(success: false, message: 'An unexpected error occurred while getting sales statistics');
     }
   }
-  
-  Future<bool> createSaleFromCart({
-  String? orderId,
-  String? customer,  // NOW NULLABLE - for walk-in sales
-  required double overallDiscount,
-  Map<String, dynamic> taxConfiguration = const {},
-  required String paymentMethod,
-  required double amountPaid,
-  Map<String, dynamic>? splitPaymentDetails,
-  String? notes,
-  required List<Map<String, dynamic>> saleItems,
-}) async {
-  try {
-    print('🚀 Creating sale with payload: ${jsonEncode({
-      'order_id': orderId,
-      'customer': customer,
-      'overall_discount': overallDiscount,
-      'tax_configuration': taxConfiguration,
-      'payment_method': paymentMethod,
-      'amount_paid': amountPaid,
-      'split_payment_details': splitPaymentDetails,
-      'notes': notes,
-      'sale_items': saleItems,
-    })}');
 
-    final response = await _apiClient.post(
-      '/sales/create/',
-      data: {
+  // Custom method used by CheckoutDialog
+  Future<bool> createSaleFromCart({
+    String? orderId,
+    String? customer,  // Nullable for walk-in sales
+    required double overallDiscount,
+    Map<String, dynamic> taxConfiguration = const {},
+    required String paymentMethod,
+    required double amountPaid,
+    Map<String, dynamic>? splitPaymentDetails,
+    String? notes,
+    required List<Map<String, dynamic>> saleItems,
+  }) async {
+    try {
+      final payload = {
         'order_id': orderId,
         'customer': customer,
         'overall_discount': overallDiscount,
@@ -249,42 +273,49 @@ class SalesService {
         'split_payment_details': splitPaymentDetails,
         'notes': notes,
         'sale_items': saleItems,
-      },
-    );
+      };
 
-    if (response.statusCode == 201 && response.data['success'] == true) {
-      print('✅ Sale created successfully');
-      return true;
-    }
+      print('🚀 Creating sale with payload: ${jsonEncode(payload)}');
 
-    throw Exception(response.data['message'] ?? 'Sale creation failed');
-    
-  } on DioException catch (e) {
-    print('DioException: $e');
-    
-    String errorMessage = 'Server error. Please try again.';
-    
-    if (e.response != null) {
-      final statusCode = e.response!.statusCode;
-      final responseData = e.response!.data;
-      
-      if (statusCode == 400 && responseData is Map) {
-        if (responseData.containsKey('errors')) {
-          final errors = responseData['errors'];
-          errorMessage = errors is Map 
-            ? errors.values.join(', ') 
-            : errors.toString();
-        } else if (responseData.containsKey('message')) {
-          errorMessage = responseData['message'];
-        }
-      } else if (statusCode == 500) {
-        errorMessage = 'Server error. Please contact support.';
+      final response = await _apiClient.post(
+        '/sales/create/',
+        data: payload,
+      );
+
+      if (response.statusCode == 201 && response.data['success'] == true) {
+        print('✅ Sale created successfully');
+        return true;
       }
+
+      throw Exception(response.data['message'] ?? 'Sale creation failed');
+
+    } on DioException catch (e) {
+      print('DioException: $e');
+
+      String errorMessage = 'Server error. Please try again.';
+
+      if (e.response != null) {
+        final statusCode = e.response!.statusCode;
+        final responseData = e.response!.data;
+
+        if (statusCode == 400 && responseData is Map) {
+          if (responseData.containsKey('errors')) {
+            final errors = responseData['errors'];
+            errorMessage = errors is Map
+                ? errors.values.join(', ')
+                : errors.toString();
+          } else if (responseData.containsKey('message')) {
+            errorMessage = responseData['message'];
+          }
+        } else if (statusCode == 500) {
+          errorMessage = 'Server error. Please contact support.';
+        }
+      }
+
+      throw Exception(errorMessage);
     }
-    
-    throw Exception(errorMessage);
   }
-}
+
   /// Create sale from order
   Future<ApiResponse<SaleModel>> createSaleFromOrder(CreateSaleFromOrderRequest request) async {
     try {
@@ -371,6 +402,26 @@ class SalesService {
       DebugHelper.printApiResponse('GET Customer Sales History', response.data);
 
       if (response.statusCode == 200) {
+        // Apply similar fix for customer history if it uses same structure
+        final responseData = response.data;
+        if (responseData['data'] is List) {
+          final List<dynamic> salesListJson = responseData['data'] ?? [];
+          final List<SaleModel> sales = salesListJson
+              .map((json) => SaleModel.fromJson(json as Map<String, dynamic>))
+              .toList();
+
+          final paginationJson = responseData['pagination'] as Map<String, dynamic>?;
+          final pagination = paginationJson != null
+              ? PaginationInfo.fromJson(paginationJson)
+              : PaginationInfo(currentPage: 1, pageSize: sales.length, totalCount: sales.length, totalPages: 1, hasNext: false, hasPrevious: false);
+
+          return ApiResponse<SalesListResponse>(
+            success: true,
+            message: 'History retrieved',
+            data: SalesListResponse(sales: sales, pagination: pagination),
+          );
+        }
+
         return ApiResponse<SalesListResponse>.fromJson(response.data, (data) => SalesListResponse.fromJson(data));
       } else {
         return ApiResponse<SalesListResponse>(
@@ -442,7 +493,7 @@ class SalesService {
 
   // ===== ADVANCED SALES FEATURES =====
 
-  /// Add payment to sale
+  /// Add payment to sale (Duplicate method alias, keeping for compatibility)
   Future<ApiResponse<void>> addSalePayment(String saleId, double amount, String method) async {
     try {
       final response = await _apiClient.post(ApiConfig.addSalePayment(saleId), data: {'amount': amount, 'method': method});

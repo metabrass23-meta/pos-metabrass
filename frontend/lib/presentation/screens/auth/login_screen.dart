@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../src/providers/auth_provider.dart';
@@ -46,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(
                   child: Text(
                     'Welcome! Please log in with your new account.',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                    style: TextStyle(fontSize: context.captionFontSize),
                   ),
                 ),
               ],
@@ -100,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.loginSuccess,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                    style: TextStyle(fontSize: context.captionFontSize),
                   ),
                 ],
               ),
@@ -135,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Expanded(
                     child: Text(
                       authProvider.errorMessage ?? l10n.loginFailed,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                      style: TextStyle(fontSize: context.captionFontSize),
                     ),
                   ),
                 ],
@@ -204,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     Text(
                       l10n.welcomeBack,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w300,
                         color: AppTheme.pureWhite.withOpacity(0.9),
@@ -215,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     Text(
                       l10n.brandName,
-                      style: GoogleFonts.playfairDisplay(
+                      style: TextStyle(
                         fontSize: context.headingFontSize,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.pureWhite,
@@ -232,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         l10n.tagline,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w300,
                           color: AppTheme.pureWhite.withOpacity(0.8),
@@ -272,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Text(
                             l10n.signIn,
-                            style: GoogleFonts.playfairDisplay(
+                            style: TextStyle(
                               fontSize: context.headingFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -285,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           Text(
                             l10n.accessDashboard,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.headerFontSize,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
@@ -358,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   SnackBar(
                                     content: Text(
                                       l10n.forgotPasswordComingSoon,
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.captionFontSize,
                                       ),
                                     ),
@@ -375,7 +374,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child: Text(
                                 l10n.forgotPassword,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   color: AppTheme.primaryMaroon,
                                   fontWeight: FontWeight.w500,
@@ -445,7 +444,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           children: [
                                             Text(
                                               l10n.loginFailed,
-                                              style: GoogleFonts.inter(
+                                              style: TextStyle(
                                                 color: Colors.red.shade700,
                                                 fontSize: context.bodyFontSize,
                                                 fontWeight: FontWeight.w600,
@@ -456,7 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ),
                                             Text(
                                               authProvider.errorMessage!,
-                                              style: GoogleFonts.inter(
+                                              style: TextStyle(
                                                 color: Colors.red.shade600,
                                                 fontSize:
                                                 context.captionFontSize,
@@ -495,7 +494,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Text(
                                 l10n.noAccount,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   color: Colors.grey[600],
                                 ),
@@ -506,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                                 child: Text(
                                   l10n.signUp,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.headerFontSize,
                                     color: AppTheme.primaryMaroon,
                                     fontWeight: FontWeight.w600,

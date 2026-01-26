@@ -38,7 +38,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     return Scaffold(
       body: Column(
         children: [
+          // --- Filters ---
           _buildFilters(),
+
+          // --- List ---
           Expanded(child: _buildReceiptsList()),
         ],
       ),
@@ -64,25 +67,38 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             const SizedBox(height: 16),
             Row(
               children: [
+                // Search Field
                 Expanded(
+                  flex: 2,
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       labelText: l10n.search,
                       hintText: l10n.searchByReceiptCustomerPayment,
                       prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                     onChanged: (value) => context.read<ReceiptProvider>().setFilters(search: value),
                   ),
                 ),
                 const SizedBox(width: 16),
+
+                // Status Dropdown
                 Expanded(
+                  flex: 1,
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
                     decoration: InputDecoration(
                       labelText: l10n.status,
                       border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
+                    dropdownColor: Colors.white,
                     items: [
                       DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
                       DropdownMenuItem(value: 'GENERATED', child: Text(l10n.generated)),
@@ -98,7 +114,9 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                TextButton(
+
+                // Clear Filters
+                TextButton.icon(
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
@@ -106,7 +124,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                     });
                     context.read<ReceiptProvider>().clearFilters();
                   },
-                  child: Text(l10n.clearFilters),
+                  icon: const Icon(Icons.clear_all),
+                  label: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -130,7 +149,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
                 Text(l10n.error(provider.error!)),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => provider.refresh(),
                   child: Text(l10n.retry),
@@ -149,19 +171,24 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
               children: [
                 const Icon(Icons.receipt, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text(l10n.noReceiptsFound),
-                Text(l10n.createNewReceiptUsingButton),
+                Text(l10n.noReceiptsFound, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Text(l10n.createNewReceiptUsingButton, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: receipts.length,
-          itemBuilder: (context, index) {
-            final receipt = receipts[index];
-            return _buildReceiptCard(receipt, provider);
-          },
+        return RefreshIndicator(
+          onRefresh: () => provider.refresh(),
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 80),
+            itemCount: receipts.length,
+            itemBuilder: (context, index) {
+              final receipt = receipts[index];
+              return _buildReceiptCard(receipt, provider);
+            },
+          ),
         );
       },
     );
@@ -172,19 +199,33 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 2,
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: _getStatusColor(receipt.status),
           child: Icon(_getStatusIcon(receipt.status), color: Colors.white),
         ),
-        title: Text(receipt.receiptNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+            receipt.receiptNumber,
+            style: const TextStyle(fontWeight: FontWeight.bold)
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${l10n.amount}: ${receipt.formattedPaymentAmount}'),
+            const SizedBox(height: 4),
             Text('${l10n.customer}: ${receipt.customerName}'),
-            Text('${l10n.status}: ${receipt.statusDisplay}'),
-            Text('${l10n.generated}: ${receipt.formattedGeneratedDate}'),
+            Text(
+              '${l10n.amount}: ${receipt.formattedPaymentAmount}',
+              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+            ),
+            Row(
+              children: [
+                Text('${l10n.status}: ${receipt.statusDisplay}'),
+                const SizedBox(width: 8),
+                Text('|  ${l10n.generated}: ${receipt.formattedGeneratedDate}'),
+              ],
+            ),
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -198,27 +239,19 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'GENERATED':
-        return Colors.blue;
-      case 'SENT':
-        return Colors.orange;
-      case 'VIEWED':
-        return Colors.green;
-      default:
-        return Colors.grey;
+      case 'GENERATED': return Colors.blue;
+      case 'SENT': return Colors.orange;
+      case 'VIEWED': return Colors.green;
+      default: return Colors.grey;
     }
   }
 
   IconData _getStatusIcon(String status) {
     switch (status) {
-      case 'GENERATED':
-        return Icons.receipt;
-      case 'SENT':
-        return Icons.send;
-      case 'VIEWED':
-        return Icons.visibility;
-      default:
-        return Icons.help;
+      case 'GENERATED': return Icons.receipt;
+      case 'SENT': return Icons.send;
+      case 'VIEWED': return Icons.visibility;
+      default: return Icons.help_outline;
     }
   }
 
@@ -228,33 +261,16 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     return [
       PopupMenuItem(
         value: 'view',
-        child: Row(
-          children: [
-            const Icon(Icons.visibility, color: Colors.blue),
-            const SizedBox(width: 8),
-            Text(l10n.view),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.visibility, color: Colors.blue), const SizedBox(width: 8), Text(l10n.view)]),
       ),
       PopupMenuItem(
         value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange),
-            const SizedBox(width: 8),
-            Text(l10n.edit),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.edit, color: Colors.orange), const SizedBox(width: 8), Text(l10n.edit)]),
       ),
+      const PopupMenuDivider(),
       PopupMenuItem(
         value: 'delete',
-        child: Row(
-          children: [
-            const Icon(Icons.delete, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(l10n.delete),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.delete, color: Colors.red), const SizedBox(width: 8), Text(l10n.delete)]),
       ),
     ];
   }
@@ -285,18 +301,23 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
       builder: (context) => AlertDialog(
         title: Text(l10n.receiptDetails(receipt.receiptNumber)),
         content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow(l10n.receiptNumber, receipt.receiptNumber),
-              _buildDetailRow(l10n.amount, receipt.formattedPaymentAmount),
-              _buildDetailRow(l10n.status, receipt.statusDisplay),
-              _buildDetailRow(l10n.generatedAt, receipt.formattedGeneratedDate),
-              if (receipt.customerName != null) _buildDetailRow(l10n.customer, receipt.customerName!),
-              if (receipt.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, receipt.notes!),
-            ],
+          width: 450,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(l10n.receiptNumber, receipt.receiptNumber),
+                _buildDetailRow(l10n.amount, receipt.formattedPaymentAmount),
+                _buildDetailRow(l10n.status, receipt.statusDisplay),
+                _buildDetailRow(l10n.generatedAt, receipt.formattedGeneratedDate),
+                const Divider(),
+                if (receipt.customerName.isNotEmpty)
+                  _buildDetailRow(l10n.customer, receipt.customerName),
+                if (receipt.notes?.isNotEmpty == true)
+                  _buildDetailRow(l10n.notes, receipt.notes!),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -329,7 +350,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           children: [
             Text(l10n.areYouSureDeleteReceipt),
             const SizedBox(height: 8),
-            Text('${l10n.amount}: ${receipt.formattedPaymentAmount}'),
+            Text(
+              '${l10n.amount}: ${receipt.formattedPaymentAmount}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Text(l10n.thisActionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
@@ -362,15 +386,15 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
-            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold)),
+            width: 140,
+            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
-          Expanded(child: Text(value)),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
       ),
     );

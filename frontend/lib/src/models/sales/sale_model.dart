@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 // ============================================================================
-// HELPER FUNCTIONS - Robust parsing for API responses with string numbers
+// HELPER FUNCTIONS - Robust parsing for API responses
 // ============================================================================
 
-/// Helper function to safely parse numeric values from API (handles both strings and numbers)
+/// Helper function to safely parse numeric values from API (handles strings, numbers, and nulls)
 double _parseDouble(dynamic value) {
   if (value == null) return 0.0;
   if (value is double) return value;
   if (value is int) return value.toDouble();
   if (value is String) {
+    if (value.isEmpty) return 0.0;
     return double.tryParse(value) ?? 0.0;
   }
   return 0.0;
@@ -20,6 +21,7 @@ int _parseInt(dynamic value) {
   if (value is int) return value;
   if (value is double) return value.toInt();
   if (value is String) {
+    if (value.isEmpty) return 0;
     return int.tryParse(value) ?? 0;
   }
   return 0;
@@ -84,16 +86,24 @@ class TaxRateModel {
 
   factory TaxRateModel.fromJson(Map<String, dynamic> json) {
     return TaxRateModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      taxType: json['tax_type'] as String,
-      percentage: _parseDouble(json['percentage']), // ✅ FIXED
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      taxType: json['tax_type'] as String? ?? 'GST',
+      percentage: _parseDouble(json['percentage']),
       isActive: json['is_active'] as bool? ?? true,
       description: json['description'] as String?,
-      effectiveFrom: DateTime.parse(json['effective_from'] as String),
-      effectiveTo: json['effective_to'] != null ? DateTime.parse(json['effective_to'] as String) : null,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      effectiveFrom: json['effective_from'] != null
+          ? DateTime.parse(json['effective_from'] as String)
+          : DateTime.now(),
+      effectiveTo: json['effective_to'] != null
+          ? DateTime.parse(json['effective_to'] as String)
+          : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
     );
   }
 
@@ -217,8 +227,8 @@ class TaxConfigItem {
   factory TaxConfigItem.fromJson(Map<String, dynamic> json) {
     return TaxConfigItem(
       name: json['name'] as String? ?? '',
-      percentage: _parseDouble(json['percentage']), // ✅ FIXED
-      amount: _parseDouble(json['amount']), // ✅ FIXED
+      percentage: _parseDouble(json['percentage']),
+      amount: _parseDouble(json['amount']),
       description: json['description'] as String?,
     );
   }
@@ -269,8 +279,10 @@ class SaleItemModel {
   // Computed properties
   double get totalBeforeDiscount => unitPrice * quantity;
   double get discountAmount => totalBeforeDiscount - lineTotal;
-  double get discountPercentage => totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
-  double get discountedUnitPrice => quantity > 0 ? lineTotal / quantity : unitPrice;
+  double get discountPercentage =>
+      totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
+  double get discountedUnitPrice =>
+      quantity > 0 ? lineTotal / quantity : unitPrice;
 
   SaleItemModel({
     required this.id,
@@ -290,19 +302,23 @@ class SaleItemModel {
 
   factory SaleItemModel.fromJson(Map<String, dynamic> json) {
     return SaleItemModel(
-      id: json['id'] as String,
-      saleId: json['sale'] as String,
+      id: json['id'] as String? ?? '',
+      saleId: json['sale'] as String? ?? '',
       orderItemId: json['order_item'] as String?,
-      productId: json['product'] as String,
-      productName: json['product_name'] as String,
-      unitPrice: _parseDouble(json['unit_price']), // ✅ FIXED
-      quantity: _parseInt(json['quantity']), // ✅ FIXED
-      itemDiscount: _parseDouble(json['item_discount']), // ✅ FIXED
-      lineTotal: _parseDouble(json['line_total']), // ✅ FIXED
+      productId: json['product'] as String? ?? '',
+      productName: json['product_name'] as String? ?? 'Unknown Product',
+      unitPrice: _parseDouble(json['unit_price']),
+      quantity: _parseInt(json['quantity']),
+      itemDiscount: _parseDouble(json['item_discount']),
+      lineTotal: _parseDouble(json['line_total']),
       customizationNotes: json['customization_notes'] as String?,
       isActive: json['is_active'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
     );
   }
 
@@ -365,14 +381,14 @@ class SaleModel {
   final String id;
   final String invoiceNumber;
   final String? orderId;
-  final String? customerId; // ✅ FIXED: Made nullable for walk-in customers
+  final String? customerId;
   final String customerName;
   final String customerPhone;
   final String? customerEmail;
   final double subtotal;
   final double overallDiscount;
   final TaxConfiguration taxConfiguration;
-  final double gstPercentage; // Legacy field for backward compatibility
+  final double gstPercentage;
   final double taxAmount;
   final double grandTotal;
   final double amountPaid;
@@ -391,9 +407,11 @@ class SaleModel {
 
   // Computed properties
   String get formattedInvoiceNumber => '#$invoiceNumber';
-  String get dateTimeText => '${dateOfSale.day}/${dateOfSale.month}/${dateOfSale.year}';
+  String get dateTimeText =>
+      '${dateOfSale.day}/${dateOfSale.month}/${dateOfSale.year}';
   int get totalItems => saleItems.fold(0, (sum, item) => sum + item.quantity);
-  double get paymentPercentage => grandTotal > 0 ? (amountPaid / grandTotal) * 100 : 0;
+  double get paymentPercentage =>
+      grandTotal > 0 ? (amountPaid / grandTotal) * 100 : 0;
   int get salesAgeDays => DateTime.now().difference(dateOfSale).inDays;
 
   bool get isPaid => status == 'PAID';
@@ -443,7 +461,8 @@ class SaleModel {
 
   String get paymentStatusDisplay {
     if (isFullyPaid) return 'Fully Paid';
-    if (amountPaid > 0) return 'Partially Paid (${paymentPercentage.toStringAsFixed(1)}%)';
+    if (amountPaid > 0)
+      return 'Partially Paid (${paymentPercentage.toStringAsFixed(1)}%)';
     return 'Unpaid';
   }
 
@@ -482,7 +501,7 @@ class SaleModel {
     required this.id,
     required this.invoiceNumber,
     this.orderId,
-    this.customerId, // ✅ FIXED: Made nullable
+    this.customerId,
     required this.customerName,
     required this.customerPhone,
     this.customerEmail,
@@ -507,41 +526,65 @@ class SaleModel {
     required this.saleItems,
   });
 
+  // ✅ FIXED: Robust fromJson that handles missing fields in API "List" responses
   factory SaleModel.fromJson(Map<String, dynamic> json) {
     return SaleModel(
-      id: json['id'] as String,
-      invoiceNumber: json['invoice_number'] as String,
+      id: json['id'] as String? ?? '',
+      invoiceNumber: json['invoice_number'] as String? ?? '',
       orderId: json['order_id'] as String?,
-      customerId: json['customer_id'] as String?, // ✅ FIXED: Nullable
+      customerId: json['customer_id'] as String?,
       customerName: json['customer_name'] as String? ?? 'Walk-in Customer',
       customerPhone: json['customer_phone'] as String? ?? '',
       customerEmail: json['customer_email'] as String?,
-      // ✅ FIXED: All numeric fields now use _parseDouble
+
+      // Handle numeric fields safely
       subtotal: _parseDouble(json['subtotal']),
       overallDiscount: _parseDouble(json['overall_discount']),
-      taxConfiguration: TaxConfiguration.fromJson(json['tax_configuration'] as Map<String, dynamic>? ?? {}),
+      taxConfiguration: TaxConfiguration.fromJson(
+          json['tax_configuration'] as Map<String, dynamic>? ?? {}),
       gstPercentage: _parseDouble(json['gst_percentage']),
       taxAmount: _parseDouble(json['tax_amount']),
       grandTotal: _parseDouble(json['grand_total']),
       amountPaid: _parseDouble(json['amount_paid']),
-      remainingAmount: _parseDouble(json['remaining_amount']),
+
+      // Calculate remaining amount if missing (List View doesn't send it)
+      remainingAmount: json['remaining_amount'] != null
+          ? _parseDouble(json['remaining_amount'])
+          : _parseDouble(json['grand_total']) - _parseDouble(json['amount_paid']),
+
       isFullyPaid: json['is_fully_paid'] as bool? ?? false,
-      paymentMethod: json['payment_method'] as String,
+      paymentMethod: json['payment_method'] as String? ?? 'CASH',
       splitPaymentDetails: json['split_payment_details'] as Map<String, dynamic>?,
-      dateOfSale: DateTime.parse(json['date_of_sale'] as String),
-      status: json['status'] as String,
+
+      // Date of Sale
+      dateOfSale: json['date_of_sale'] != null
+          ? DateTime.parse(json['date_of_sale'] as String)
+          : DateTime.now(),
+
+      status: json['status'] as String? ?? 'DRAFT',
       notes: json['notes'] as String?,
       isActive: json['is_active'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+
+      // --- FIX: Use Fallbacks for Missing Dates ---
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : (json['date_of_sale'] != null
+          ? DateTime.parse(json['date_of_sale'] as String)
+          : DateTime.now()),
+
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
+
       createdBy: json['created_by'] as String?,
+
+      // --- FIX: Handle Missing Items List ---
       saleItems: (json['sale_items'] as List<dynamic>?)
-              ?.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>))
-              .toList() ??
+          ?.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>))
+          .toList() ??
           [],
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -658,15 +701,22 @@ class InvoiceModel {
   final String? createdBy;
 
   // Computed properties
-  String get formattedIssueDate => '${issueDate.day}/${issueDate.month}/${issueDate.year}';
-  String get formattedDueDate => dueDate != null ? '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}' : 'Not specified';
+  String get formattedIssueDate =>
+      '${issueDate.day}/${issueDate.month}/${issueDate.year}';
+  String get formattedDueDate => dueDate != null
+      ? '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}'
+      : 'Not specified';
   int get daysUntilDue {
     if (dueDate == null || status == 'PAID' || status == 'CANCELLED') return 0;
     final now = DateTime.now();
     return dueDate!.difference(now).inDays;
   }
 
-  bool get isOverdue => dueDate != null && status != 'PAID' && status != 'CANCELLED' && DateTime.now().isAfter(dueDate!);
+  bool get isOverdue =>
+      dueDate != null &&
+          status != 'PAID' &&
+          status != 'CANCELLED' &&
+          DateTime.now().isAfter(dueDate!);
 
   Color get statusColor {
     switch (status) {
@@ -731,24 +781,36 @@ class InvoiceModel {
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     return InvoiceModel(
-      id: json['id'] as String,
-      saleId: json['sale'] as String,
-      saleInvoiceNumber: json['sale_invoice_number'] as String,
-      customerName: json['customer_name'] as String,
-      grandTotal: _parseDouble(json['grand_total']), // ✅ FIXED
-      invoiceNumber: json['invoice_number'] as String,
-      issueDate: DateTime.parse(json['issue_date'] as String),
-      dueDate: json['due_date'] != null ? DateTime.parse(json['due_date'] as String) : null,
-      status: json['status'] as String,
+      id: json['id'] as String? ?? '',
+      saleId: json['sale'] as String? ?? '',
+      saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
+      customerName: json['customer_name'] as String? ?? '',
+      grandTotal: _parseDouble(json['grand_total']),
+      invoiceNumber: json['invoice_number'] as String? ?? '',
+      issueDate: json['issue_date'] != null
+          ? DateTime.parse(json['issue_date'] as String)
+          : DateTime.now(),
+      dueDate: json['due_date'] != null
+          ? DateTime.parse(json['due_date'] as String)
+          : null,
+      status: json['status'] as String? ?? 'DRAFT',
       notes: json['notes'] as String?,
       termsConditions: json['terms_conditions'] as String?,
       pdfFile: json['pdf_file'] as String?,
       emailSent: json['email_sent'] as bool? ?? false,
-      emailSentAt: json['email_sent_at'] != null ? DateTime.parse(json['email_sent_at'] as String) : null,
-      viewedAt: json['viewed_at'] != null ? DateTime.parse(json['viewed_at'] as String) : null,
+      emailSentAt: json['email_sent_at'] != null
+          ? DateTime.parse(json['email_sent_at'] as String)
+          : null,
+      viewedAt: json['viewed_at'] != null
+          ? DateTime.parse(json['viewed_at'] as String)
+          : null,
       isActive: json['is_active'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
       createdBy: json['created_by'] as String?,
     );
   }
@@ -848,8 +910,10 @@ class ReceiptModel {
   final String? createdBy;
 
   // Computed properties
-  String get formattedGeneratedDate => '${generatedAt.day}/${generatedAt.month}/${generatedAt.year}';
-  String get formattedPaymentAmount => 'PKR ${paymentAmount.toStringAsFixed(2)}';
+  String get formattedGeneratedDate =>
+      '${generatedAt.day}/${generatedAt.month}/${generatedAt.year}';
+  String get formattedPaymentAmount =>
+      'PKR ${paymentAmount.toStringAsFixed(2)}';
 
   Color get statusColor {
     switch (status) {
@@ -905,24 +969,34 @@ class ReceiptModel {
 
   factory ReceiptModel.fromJson(Map<String, dynamic> json) {
     return ReceiptModel(
-      id: json['id'] as String,
-      saleId: json['sale'] as String,
-      saleInvoiceNumber: json['sale_invoice_number'] as String,
-      customerName: json['customer_name'] as String,
-      paymentId: json['payment'] as String,
-      paymentAmount: _parseDouble(json['payment_amount']), // ✅ FIXED
-      paymentMethod: json['payment_method'] as String,
-      receiptNumber: json['receipt_number'] as String,
-      generatedAt: DateTime.parse(json['generated_at'] as String),
-      status: json['status'] as String,
+      id: json['id'] as String? ?? '',
+      saleId: json['sale'] as String? ?? '',
+      saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
+      customerName: json['customer_name'] as String? ?? '',
+      paymentId: json['payment'] as String? ?? '',
+      paymentAmount: _parseDouble(json['payment_amount']),
+      paymentMethod: json['payment_method'] as String? ?? 'CASH',
+      receiptNumber: json['receipt_number'] as String? ?? '',
+      generatedAt: json['generated_at'] != null
+          ? DateTime.parse(json['generated_at'] as String)
+          : DateTime.now(),
+      status: json['status'] as String? ?? 'GENERATED',
       pdfFile: json['pdf_file'] as String?,
       emailSent: json['email_sent'] as bool? ?? false,
-      emailSentAt: json['email_sent_at'] != null ? DateTime.parse(json['email_sent_at'] as String) : null,
-      viewedAt: json['viewed_at'] != null ? DateTime.parse(json['viewed_at'] as String) : null,
+      emailSentAt: json['email_sent_at'] != null
+          ? DateTime.parse(json['email_sent_at'] as String)
+          : null,
+      viewedAt: json['viewed_at'] != null
+          ? DateTime.parse(json['viewed_at'] as String)
+          : null,
       notes: json['notes'] as String?,
       isActive: json['is_active'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : DateTime.now(),
       createdBy: json['created_by'] as String?,
     );
   }

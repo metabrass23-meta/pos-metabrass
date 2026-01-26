@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -87,7 +86,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
           maxLines: widget.maxLines,
           enabled: widget.enabled,
           onChanged: widget.onChanged, // Pass onChanged to TextFormField
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
@@ -146,12 +145,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
               vertical: 2.h,
               horizontal: 2.w,
             ),
-            labelStyle: GoogleFonts.inter(
+            labelStyle: TextStyle(
               color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
               fontSize: 10.sp,
               fontWeight: FontWeight.w500,
             ),
-            hintStyle: GoogleFonts.inter(
+            hintStyle: TextStyle(
               color: const Color(0xFF9E9E9E),
               fontSize: 10.sp,
               fontWeight: FontWeight.w400,

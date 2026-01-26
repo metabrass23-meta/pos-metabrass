@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
@@ -82,7 +81,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
             children: [
               Text(
                 "Purchase Details",
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.charcoalGray,
@@ -90,7 +89,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
               ),
               Text(
                 "Invoice: ${purchase.invoiceNumber}",
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],
                 ),
@@ -138,7 +137,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       children: [
         Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text(value, style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13)),
+        Text(value, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
       ],
     );
   }
@@ -151,7 +150,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: context.smallPadding),
           child: Text(
             "Purchased Items",
-            style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
         ),
         Table(
@@ -200,7 +199,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       padding: const EdgeInsets.all(12.0),
       child: Text(
         text,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
         ),
@@ -226,14 +225,14 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontWeight: isMain ? FontWeight.bold : FontWeight.normal,
             fontSize: isMain ? 18 : 14,
           ),
         ),
         Text(
           NumberFormat.currency(symbol: '', decimalDigits: 2).format(amount),
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isMain ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
             fontSize: isMain ? 20 : 14,

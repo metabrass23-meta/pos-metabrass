@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
@@ -70,7 +69,7 @@ class PaymentReceiptContent extends StatelessWidget {
         children: [
           Text(
             l10n.paymentDetails,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           ResponsiveBreakpoints.responsive(
@@ -94,24 +93,24 @@ class PaymentReceiptContent extends StatelessWidget {
       children: [
         Text(
           l10n.labor,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           payment.laborName ?? l10n.notAvailable,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         Text(
           '${payment.laborRole ?? l10n.notAvailable} • ${payment.laborPhone ?? l10n.notAvailable}',
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
         Text(
           l10n.paymentMonth,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           _formatDate(payment.paymentMonth),
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         if (payment.isFinalPayment) ...[
           SizedBox(height: context.smallPadding / 2),
@@ -120,7 +119,7 @@ class PaymentReceiptContent extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               l10n.finalPaymentForMonth,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
             ),
           ),
         ],
@@ -139,15 +138,15 @@ class PaymentReceiptContent extends StatelessWidget {
             children: [
               Text(
                 l10n.labor,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 payment.laborName ?? l10n.notAvailable,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 '${payment.laborRole ?? l10n.notAvailable} • ${payment.laborPhone ?? l10n.notAvailable}',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -158,11 +157,11 @@ class PaymentReceiptContent extends StatelessWidget {
             children: [
               Text(
                 l10n.paymentMonth,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 _formatDate(payment.paymentMonth),
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               if (payment.isFinalPayment) ...[
                 SizedBox(height: context.smallPadding / 2),
@@ -171,7 +170,7 @@ class PaymentReceiptContent extends StatelessWidget {
                   decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                   child: Text(
                     l10n.finalPayment,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
                   ),
                 ),
               ],
@@ -206,7 +205,7 @@ class PaymentReceiptContent extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 _formatDate(payment.date),
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -222,7 +221,7 @@ class PaymentReceiptContent extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 payment.formattedTime,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -244,7 +243,7 @@ class PaymentReceiptContent extends StatelessWidget {
                 SizedBox(width: context.smallPadding),
                 Text(
                   _formatDate(payment.date),
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -261,7 +260,7 @@ class PaymentReceiptContent extends StatelessWidget {
                 SizedBox(width: context.smallPadding),
                 Text(
                   payment.formattedTime,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -282,12 +281,12 @@ class PaymentReceiptContent extends StatelessWidget {
         children: [
           Text(
             l10n.description,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             payment.description ?? l10n.noDescription,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
           ),
         ],
       ),
@@ -321,11 +320,11 @@ class PaymentReceiptContent extends StatelessWidget {
               children: [
                 Text(
                   l10n.paymentMethod,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 Text(
                   payment.paymentMethod,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: payment.paymentMethodColor),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: payment.paymentMethodColor),
                 ),
               ],
             ),
@@ -335,7 +334,7 @@ class PaymentReceiptContent extends StatelessWidget {
             decoration: BoxDecoration(color: payment.statusColor, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               payment.statusText,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
         ],
@@ -361,7 +360,7 @@ class PaymentReceiptContent extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountBreakdown,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
               ),
             ],
           ),
@@ -371,11 +370,11 @@ class PaymentReceiptContent extends StatelessWidget {
             children: [
               Text(
                 '${l10n.baseAmount}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
               ),
               Text(
                 'PKR ${payment.amountPaid.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -386,11 +385,11 @@ class PaymentReceiptContent extends StatelessWidget {
               children: [
                 Text(
                   '${l10n.bonus}:',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
                   '+PKR ${payment.bonus.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                 ),
               ],
             ),
@@ -402,11 +401,11 @@ class PaymentReceiptContent extends StatelessWidget {
               children: [
                 Text(
                   '${l10n.deduction}:',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
                 ),
                 Text(
                   '-PKR ${payment.deduction.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                 ),
               ],
             ),
@@ -419,11 +418,11 @@ class PaymentReceiptContent extends StatelessWidget {
             children: [
               Text(
                 '${l10n.netAmount}:',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${payment.netAmount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green),
               ),
             ],
           ),
@@ -451,7 +450,7 @@ class PaymentReceiptContent extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.receiptImage,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.green),
               ),
             ],
           ),
@@ -491,13 +490,13 @@ class PaymentReceiptContent extends StatelessWidget {
           SizedBox(height: context.cardPadding),
           Text(
             l10n.noReceiptAvailable,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding),
           Text(
             isCompact ? l10n.noReceiptAvailableShort : l10n.noReceiptAvailableLong,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[400]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.orange[400]),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -514,7 +513,7 @@ class PaymentReceiptContent extends StatelessWidget {
                   SnackBar(
                     content: Text(
                       l10n.receiptUploadedSaveToUpdate,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
+                      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
                     ),
                     backgroundColor: Colors.green,
                     duration: const Duration(seconds: 3),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/customer_provider.dart';
@@ -300,7 +299,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
             SizedBox(width: context.smallPadding),
             Text(
               l10n.orderUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -328,12 +327,12 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 children: [
                   Text(
                     l10n.orderUpdateFailed,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                   ),
                   SizedBox(height: 4),
                   Text(
                     message,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.pureWhite),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.pureWhite),
                   ),
                 ],
               ),
@@ -423,7 +422,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               children: [
                 Text(
                   l10n.editOrder,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -434,7 +433,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateOrderInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -448,7 +447,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.order.id,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -460,7 +459,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                         ),
                         child: Text(
                           _getStatusText(widget.order.status),
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -539,7 +538,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customerInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -556,7 +555,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   child: Center(
                     child: Text(
                       _selectedCustomer!.initials,
-                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.blue[700]),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.blue[700]),
                     ),
                   ),
                 ),
@@ -575,14 +574,14 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                             ),
                             child: Text(
                               _selectedCustomer!.id,
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                             ),
                           ),
                           SizedBox(width: context.smallPadding),
                           Expanded(
                             child: Text(
                               _selectedCustomer!.name,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -592,7 +591,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                         SizedBox(height: context.smallPadding),
                         Text(
                           '${_selectedCustomer!.phone} • ${_selectedCustomer!.email}',
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -612,7 +611,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   SizedBox(width: context.smallPadding),
                   Text(
                     '${l10n.customerSince}: ${_formatDate(_selectedCustomer!.createdAt)}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
                   ),
                 ],
               ),
@@ -642,7 +641,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -669,7 +668,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           SizedBox(height: context.cardPadding),
           Text(
             l10n.orderStatus,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -686,7 +685,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                 SizedBox(width: context.smallPadding / 2),
                 Text(
                   '${l10n.currentStatus}: ${_getStatusText(widget.order.status)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: _getStatusColor(widget.order.status),
@@ -716,7 +715,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   ),
                   child: Text(
                     _getStatusText(status),
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: _selectedStatus == status ? FontWeight.w600 : FontWeight.w500,
                       color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey[700],
@@ -743,7 +742,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                   Expanded(
                     child: Text(
                       '${l10n.validNextStatuses}: ${_getValidNextStatuses(widget.order.status).map((s) => _getStatusText(s)).join(', ')}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -774,7 +773,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.financialInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -842,7 +841,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.deliveryInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -889,7 +888,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
                       _selectedDeliveryDate != null
                           ? '${l10n.expectedDelivery}: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
                           : l10n.selectExpectedDeliveryDate,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         color: _selectedDeliveryDate != null ? AppTheme.charcoalGray : Colors.grey[500],
                       ),

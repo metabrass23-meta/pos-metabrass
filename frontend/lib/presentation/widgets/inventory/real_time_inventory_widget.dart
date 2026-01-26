@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -77,7 +76,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             SizedBox(width: 12),
             Text(
               l10n.realTimeInventory,
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
             ),
           ],
         ),
@@ -107,7 +106,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
         child: Center(
-          child: Text(l10n.noStockInformationAvailable, style: GoogleFonts.poppins(color: Colors.grey[600])),
+          child: Text(l10n.noStockInformationAvailable, style: TextStyle(color: Colors.grey[600])),
         ),
       );
     }
@@ -115,7 +114,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.stockInformation, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(l10n.stockInformation, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         SizedBox(height: 12),
         ...provider.stockInfo.map((stock) => _buildStockItem(stock, l10n)).toList(),
       ],
@@ -163,8 +162,8 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text('${l10n.available}: $availableQuantity', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                Text(productName, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                Text('${l10n.available}: $availableQuantity', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
           ),
@@ -173,7 +172,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             decoration: BoxDecoration(color: statusColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
             child: Text(
               statusText,
-              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor),
             ),
           ),
         ],
@@ -197,7 +196,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             Expanded(
               child: Text(
                 l10n.allProductsHaveSufficientStock,
-                style: GoogleFonts.poppins(color: Colors.green[700], fontWeight: FontWeight.w500),
+                style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -214,7 +213,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             SizedBox(width: 8),
             Text(
               l10n.lowStockAlerts,
-              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.orange[700]),
             ),
             SizedBox(width: 8),
             Container(
@@ -222,7 +221,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
               decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(12)),
               child: Text(
                 '${provider.getLowStockAlertCount()}',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
               ),
             ),
           ],
@@ -276,11 +275,11 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(productName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text('${l10n.category}: $categoryName', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                Text(productName, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                Text('${l10n.category}: $categoryName', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 Text(
                   '${l10n.currentStock}: $currentQuantity',
-                  style: GoogleFonts.poppins(fontSize: 12, color: alertColor, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12, color: alertColor, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -290,7 +289,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             decoration: BoxDecoration(color: alertColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
             child: Text(
               alertLevelText,
-              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: alertColor),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: alertColor),
             ),
           ),
         ],
@@ -305,7 +304,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           child: ElevatedButton.icon(
             onPressed: provider.isLoading ? null : () => _refreshInventory(provider),
             icon: Icon(Icons.refresh, size: 18),
-            label: Text(l10n.refreshStock, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            label: Text(l10n.refreshStock, style: TextStyle(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryMaroon,
               foregroundColor: Colors.white,
@@ -319,7 +318,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           child: OutlinedButton.icon(
             onPressed: provider.isLoading ? null : () => _showLowStockAlerts(provider),
             icon: Icon(Icons.warning, size: 18),
-            label: Text(l10n.viewAlerts, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            label: Text(l10n.viewAlerts, style: TextStyle(fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.primaryMaroon,
               side: BorderSide(color: AppTheme.primaryMaroon),
@@ -350,7 +349,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
           children: [
             Icon(Icons.warning, color: Colors.orange),
             SizedBox(width: 12),
-            Text(l10n.lowStockAlerts, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            Text(l10n.lowStockAlerts, style: TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
         content: SizedBox(
@@ -359,7 +358,7 @@ class _RealTimeInventoryWidgetState extends State<RealTimeInventoryWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (provider.lowStockAlerts.isEmpty)
-                Text(l10n.noLowStockAlertsAtThisTime, style: GoogleFonts.poppins(color: Colors.grey[600]))
+                Text(l10n.noLowStockAlertsAtThisTime, style: TextStyle(color: Colors.grey[600]))
               else
                 ...provider.lowStockAlerts.map((alert) => _buildAlertItem(alert, l10n)).toList(),
             ],

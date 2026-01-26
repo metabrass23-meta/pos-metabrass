@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import 'dart:ui' show Locale;
 
 class AppTheme {
   // Color Palette - Green Look
@@ -52,9 +50,7 @@ class AppTheme {
 
       textTheme: TextTheme(
         displayLarge: TextStyle(
-          fontFamily: isUrdu
-              ? urduFontFamily
-              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamily: fontFamily,
           fontFamilyFallback: isUrdu ? [fallbackUrduFont] : null,
           fontSize: 4.sp,
           fontWeight: FontWeight.w700,
@@ -62,9 +58,7 @@ class AppTheme {
           letterSpacing: isUrdu ? 0 : -0.5,
         ),
         displayMedium: TextStyle(
-          fontFamily: isUrdu
-              ? urduFontFamily
-              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamily: fontFamily,
           fontFamilyFallback: isUrdu ? [fallbackUrduFont] : null,
           fontSize: 3.5.sp,
           fontWeight: FontWeight.w600,
@@ -194,18 +188,14 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         displayLarge: TextStyle(
-          fontFamily: isUrdu
-              ? urduFontFamily
-              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamily: fontFamily,
           fontSize: 4.sp,
           fontWeight: FontWeight.w700,
           color: pureWhite,
           letterSpacing: isUrdu ? 0 : -0.5,
         ),
         displayMedium: TextStyle(
-          fontFamily: isUrdu
-              ? urduFontFamily
-              : GoogleFonts.playfairDisplay().fontFamily,
+          fontFamily: fontFamily,
           fontSize: 3.5.sp,
           fontWeight: FontWeight.w600,
           color: pureWhite,

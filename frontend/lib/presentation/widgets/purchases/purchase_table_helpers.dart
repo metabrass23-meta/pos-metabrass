@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
@@ -47,7 +46,7 @@ class PurchaseTableHelpers {
           SizedBox(width: context.smallPadding / 2),
           Text(
             status.toUpperCase(),
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
               color: baseColor,
@@ -63,7 +62,7 @@ class PurchaseTableHelpers {
   static Widget buildAmountText(double amount, {bool isTotal = false}) {
     return Text(
       NumberFormat.currency(symbol: '', decimalDigits: 2).format(amount),
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
         color: isTotal ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
         fontSize: isTotal ? 14 : 13,
@@ -75,7 +74,7 @@ class PurchaseTableHelpers {
   static Widget buildTableHeader(BuildContext context, String title) {
     return Text(
       title.toUpperCase(),
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w700,
         color: AppTheme.charcoalGray.withOpacity(0.8),

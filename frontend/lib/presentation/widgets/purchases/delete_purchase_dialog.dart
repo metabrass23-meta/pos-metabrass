@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -48,7 +47,7 @@ class DeletePurchaseDialog extends StatelessWidget {
             // Title
             Text(
               l10n.deletePurchase ?? "Delete Purchase",
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.charcoalGray,
@@ -60,7 +59,7 @@ class DeletePurchaseDialog extends StatelessWidget {
             Text(
               "Are you sure you want to delete invoice #${purchase.invoiceNumber}?\n\nThis action cannot be undone and will permanently remove this purchase record.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
@@ -93,7 +92,7 @@ class DeletePurchaseDialog extends StatelessWidget {
             // Warning text
             Text(
               "⚠️ This action is permanent",
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 color: Colors.red.shade700,
                 fontWeight: FontWeight.w600,
@@ -179,7 +178,7 @@ class DeletePurchaseDialog extends StatelessWidget {
       children: [
         Text(
           "$label:",
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: 13,
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
@@ -188,7 +187,7 @@ class DeletePurchaseDialog extends StatelessWidget {
         Flexible(
           child: Text(
             value,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,

@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/services/receipt_image_service.dart';
@@ -194,7 +193,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             SizedBox(width: widget.context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: widget.context.bodyFontSize,
                 color: Colors.white,
               ),
@@ -221,7 +220,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: widget.context.bodyFontSize,
                   color: Colors.white,
                 ),
@@ -248,7 +247,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             SizedBox(width: widget.context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: widget.context.bodyFontSize,
                 color: Colors.white,
               ),
@@ -366,7 +365,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             SizedBox(width: widget.context.smallPadding / 2),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: ResponsiveBreakpoints.responsive(
                   widget.context,
                   tablet: 10,
@@ -448,7 +447,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                     SizedBox(height: widget.context.cardPadding),
                     Text(
                       l10n.clickToSelectReceiptImage,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: widget.context.bodyFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[700],
@@ -459,7 +458,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                       widget.context.shouldShowCompactLayout
                           ? l10n.supportedFormatsShort
                           : l10n.supportedFormats,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: widget.context.captionFontSize,
                         color: Colors.grey[500],
                       ),
@@ -487,7 +486,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                           SizedBox(width: widget.context.smallPadding),
                           Text(
                             l10n.browseFiles,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: widget.context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.blue[600],
@@ -554,7 +553,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                 ),
                 Text(
                   '${(_uploadProgress * 100).toInt()}%',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: widget.context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.blue[700],
@@ -566,7 +565,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
           SizedBox(height: widget.context.cardPadding),
           Text(
             l10n.processingImageFile,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: widget.context.bodyFontSize,
               fontWeight: FontWeight.w500,
               color: Colors.blue[700],
@@ -575,7 +574,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
           SizedBox(height: widget.context.smallPadding),
           Text(
             _getProgressText(),
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: widget.context.captionFontSize,
               color: Colors.blue[600],
             ),
@@ -654,7 +653,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             icon: Icon(Icons.edit, size: widget.context.iconSize('small')),
             label: Text(
               l10n.replaceImage,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: widget.context.captionFontSize,
                 fontWeight: FontWeight.w500,
               ),
@@ -713,7 +712,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                 icon: Icon(Icons.edit, size: widget.context.iconSize('small')),
                 label: Text(
                   l10n.replace,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: widget.context.captionFontSize,
                     fontWeight: FontWeight.w500,
                   ),
@@ -772,7 +771,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
       children: [
         Text(
           l10n.receiptUploadedSuccessfully,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: widget.context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: Colors.green[700],
@@ -789,7 +788,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                 children: [
                   Text(
                     '${l10n.file}: ${_truncateFileName(fileInfo['name'] ?? l10n.unknown)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: widget.context.captionFontSize,
                       color: Colors.green[600],
                     ),
@@ -799,7 +798,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                   SizedBox(height: 2),
                   Text(
                     '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: widget.context.captionFontSize,
                       color: Colors.green[600],
                     ),
@@ -808,7 +807,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
                     SizedBox(height: 2),
                     Text(
                       '${l10n.added}: ${_formatDate(fileInfo['created'])}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: ResponsiveBreakpoints.responsive(
                           widget.context,
                           tablet: 10,
@@ -826,7 +825,7 @@ class _ResponsiveImageUploadWidgetState extends State<ResponsiveImageUploadWidge
             }
             return Text(
               l10n.loadingFileInfo,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: widget.context.captionFontSize,
                 color: Colors.green[600],
               ),
@@ -936,7 +935,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
           SizedBox(width: context.cardPadding),
           Text(
             l10n.receiptImageViewer,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
             ),
@@ -1051,7 +1050,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                   SizedBox(height: this.context.cardPadding),
                   Text(
                     l10n.loadingImage,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: this.context.bodyFontSize,
                       color: Colors.grey[600],
                     ),
@@ -1098,7 +1097,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                 SizedBox(height: this.context.cardPadding),
                 Text(
                   l10n.failedToLoadImage,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: this.context.bodyFontSize,
                     color: Colors.grey[600],
                   ),
@@ -1125,7 +1124,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                   ),
                   child: Text(
                     l10n.openWithExternalViewer,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: this.context.captionFontSize,
                     ),
                   ),
@@ -1174,7 +1173,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
       children: [
         Text(
           '${l10n.file}: ${fileInfo['name'] ?? l10n.unknown}',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
           ),
@@ -1184,7 +1183,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
         SizedBox(height: context.smallPadding / 2),
         Text(
           '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)}',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             color: Colors.grey[600],
           ),
@@ -1205,7 +1204,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                     }
                   },
                   icon: Icon(Icons.open_in_new, size: context.iconSize('small')),
-                  label: Text(l10n.open, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  label: Text(l10n.open, style: TextStyle(fontSize: context.captionFontSize)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
@@ -1222,7 +1221,7 @@ class ResponsiveImageViewDialog extends StatelessWidget {
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: context.smallPadding),
                   ),
-                  child: Text(l10n.close, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                  child: Text(l10n.close, style: TextStyle(fontSize: context.captionFontSize)),
                 ),
               ),
             ],
@@ -1254,14 +1253,14 @@ class ResponsiveImageViewDialog extends StatelessWidget {
             children: [
               Text(
                 '${l10n.file}: ${fileInfo['name'] ?? l10n.unknown}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
                 '${l10n.size}: ${DesktopReceiptImageService.formatFileSize(fileInfo['size'] ?? 0)} • ${l10n.modified}: ${_formatDate(fileInfo['modified'] ?? DateTime.now())}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],
                 ),

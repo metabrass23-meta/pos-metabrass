@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
@@ -115,7 +114,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text(l10n.confirmOrder, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.confirmOrder, style: TextStyle(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -125,7 +124,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.cancel, color: Colors.red, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text(l10n.cancelOrder, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.cancelOrder, style: TextStyle(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -139,7 +138,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.build, color: Colors.blue, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text(l10n.startProduction, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.startProduction, style: TextStyle(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -153,7 +152,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.done_all, color: Colors.green, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text(l10n.markAsReady, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.markAsReady, style: TextStyle(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -167,7 +166,7 @@ class OrderTableHelpers {
               children: [
                 Icon(Icons.local_shipping, color: Colors.purple, size: context.iconSize('small')),
                 SizedBox(width: context.smallPadding),
-                Text(l10n.markAsDelivered, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                Text(l10n.markAsDelivered, style: TextStyle(fontSize: context.captionFontSize)),
               ],
             ),
           ),
@@ -186,7 +185,7 @@ class OrderTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -199,7 +198,7 @@ class OrderTableHelpers {
             children: [
               Icon(Icons.restore, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.restore, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.restore, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -322,7 +321,7 @@ class OrderTableHelpers {
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -344,7 +343,7 @@ class OrderTableHelpers {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -375,7 +374,7 @@ class OrderTableHelpers {
 
           Text(
             l10n.failedToLoadOrders,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -386,7 +385,7 @@ class OrderTableHelpers {
             ),
             child: Text(
               provider.errorMessage ?? l10n.unexpectedErrorOccurred,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -411,7 +410,7 @@ class OrderTableHelpers {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.retry,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -447,7 +446,7 @@ class OrderTableHelpers {
 
           Text(
             l10n.noOrdersFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -458,7 +457,7 @@ class OrderTableHelpers {
             ),
             child: Text(
               l10n.startManagingCustomerOrders,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -485,7 +484,7 @@ class OrderTableHelpers {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.createNewOrder,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -521,7 +520,7 @@ class OrderTableHelpers {
 
           Text(
             l10n.noOrdersFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -532,7 +531,7 @@ class OrderTableHelpers {
             ),
             child: Text(
               '${l10n.noOrdersMatchSearch} "${provider.searchQuery}". ${l10n.tryAdjustingSearchTerms}',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -560,7 +559,7 @@ class OrderTableHelpers {
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.clearSearch,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[700],
@@ -596,7 +595,7 @@ class OrderTableHelpers {
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.createNewOrder,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.pureWhite,

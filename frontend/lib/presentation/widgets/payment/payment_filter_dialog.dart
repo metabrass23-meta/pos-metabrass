@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -233,7 +232,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
           Expanded(
             child: Text(
               l10n.paymentFilters,
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.pureWhite,
@@ -302,17 +301,17 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.search,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           TextField(
             controller: _searchController,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
               hintText: l10n.searchByLaborVendorDescription,
-              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              hintStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(context.borderRadius()),
                 borderSide: BorderSide(color: Colors.grey.shade300),
@@ -352,7 +351,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.entityFilters,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -410,7 +409,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -500,7 +499,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.dateRanges,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -576,7 +575,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountRangePkr,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -587,10 +586,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                 child: TextField(
                   controller: _minAmountController,
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
                     labelText: l10n.minimumAmount,
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
+                    labelStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       borderSide: BorderSide(color: Colors.grey.shade300),
@@ -612,10 +611,10 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                 child: TextField(
                   controller: _maxAmountController,
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
                     labelText: l10n.maximumAmount,
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
+                    labelStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       borderSide: BorderSide(color: Colors.grey.shade300),
@@ -658,7 +657,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.sortOptions,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -713,7 +712,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         InkWell(
@@ -745,7 +744,7 @@ class _PaymentFilterDialogState extends State<PaymentFilterDialog> with SingleTi
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
                         : l10n.selectDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
                     ),

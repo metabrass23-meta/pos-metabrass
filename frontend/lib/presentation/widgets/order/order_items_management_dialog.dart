@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/models/order/order_item_model.dart';
@@ -256,7 +255,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderItemsRefreshedSuccessfully,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ],
           ),
@@ -325,7 +324,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               children: [
                 Text(
                   l10n.orderItemsManagement,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headingFontSize / 2,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -335,18 +334,18 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   _getOrderDisplayName(),
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
                 SizedBox(height: context.smallPadding / 4),
                 Text(
                   '${l10n.status}: ${_getStatusText(widget.order.status)} • ${l10n.total}: PKR ${widget.order.totalAmount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                 ),
                 if (kDebugMode) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     'Debug: Order ID ${widget.order.id}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
                   ),
                 ],
               ],
@@ -379,10 +378,10 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               child: TextField(
                 controller: _searchController,
                 onChanged: _handleSearch,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 decoration: InputDecoration(
                   hintText: l10n.searchOrderItemsByProductDescriptionOrNotes,
-                  hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                  hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                   prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -424,7 +423,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.addItem,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -458,7 +457,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.refresh,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -522,7 +521,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -539,7 +538,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -567,7 +566,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             SizedBox(height: context.mainPadding),
             Text(
               l10n.loadingOrderItems,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
           ],
         ),
@@ -583,12 +582,12 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             SizedBox(height: context.mainPadding),
             Text(
               l10n.errorLoadingOrderItems,
-              style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
             Text(
               _errorMessage!,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: context.mainPadding),
@@ -616,12 +615,12 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
             SizedBox(height: context.mainPadding),
             Text(
               l10n.noOrderItemsFound,
-              style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
             Text(
               l10n.orderDoesntHaveItemsYet,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: context.mainPadding),
@@ -686,7 +685,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
           SizedBox(width: context.smallPadding),
           Text(
             '${l10n.activeSearch}: "$_searchQuery"',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green[700]),
           ),
           const Spacer(),
           InkWell(
@@ -709,7 +708,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     l10n.clearSearch,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
                   ),
                 ],
               ),

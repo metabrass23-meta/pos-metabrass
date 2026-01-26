@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/theme/app_theme.dart';
@@ -134,7 +133,7 @@ class _PremiumButtonState extends State<PremiumButton>
                         ],
                         Text(
                           widget.text,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,

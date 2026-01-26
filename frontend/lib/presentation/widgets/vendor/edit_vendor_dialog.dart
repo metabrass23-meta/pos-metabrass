@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -188,7 +187,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.vendor} ${l10n.updatedSuccessfully}!',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -214,7 +213,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -240,7 +239,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -373,7 +372,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                   context.shouldShowCompactLayout
                       ? '${l10n.edit} ${l10n.vendor}'
                       : '${l10n.edit} ${l10n.vendor} ${l10n.details}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -384,7 +383,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     _hasChanges ? l10n.unsavedChanges : '${l10n.update} ${l10n.vendor} ${l10n.information}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -411,7 +410,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     l10n.modified,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.pureWhite,
@@ -431,7 +430,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             ),
             child: Text(
               widget.vendor.id.length > 8 ? '${widget.vendor.id.substring(0, 8)}...' : widget.vendor.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -722,7 +721,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.charcoalGray,
@@ -745,7 +744,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,

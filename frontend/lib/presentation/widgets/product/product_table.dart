@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
@@ -175,7 +174,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -197,7 +196,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.name,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -210,7 +209,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             child: product.detail.isNotEmpty
                 ? Text(
               product.detail,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             )
@@ -222,7 +221,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 l10n.noDetails,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[500],
@@ -238,7 +237,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.formattedPrice,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -248,7 +247,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.formattedCostPrice,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: product.costPrice != null ? AppTheme.charcoalGray : Colors.grey[500],
@@ -279,7 +278,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                   Expanded(
                     child: Text(
                       product.color,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: _getColorFromName(product.color),
@@ -302,7 +301,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               decoration: BoxDecoration(color: Colors.brown.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 product.fabric,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.brown[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.brown[600]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -315,7 +314,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${product.quantity}',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -331,7 +330,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 product.stockStatusText,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: product.stockStatusColor),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: product.stockStatusColor),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -355,7 +354,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                   ),
                   child: Text(
                     piece,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize * 0.9,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primaryMaroon,
@@ -374,7 +373,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                       ),
                       child: Text(
                         '+${product.pieces.length - 2}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize * 0.9,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
@@ -393,7 +392,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 l10n.noPieces,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[500],
@@ -412,11 +411,11 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               children: [
                 Text(
                   _formatDate(product.createdAt),
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   _getRelativeDate(context, product.createdAt),
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -504,7 +503,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           Text(
             l10n.noProductRecordsFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -515,47 +514,11 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             ),
             child: Text(
               l10n.startByAddingYourFirstProductToManageInventoryEfficiently,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will be handled by the parent widget
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        l10n.addFirstProduct,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

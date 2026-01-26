@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/models/payment/payment_model.dart';
@@ -159,7 +158,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
               children: [
                 Text(
                   widget.payment.hasReceipt ? l10n.paymentReceipt : l10n.noReceiptAvailable,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -170,7 +169,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     widget.payment.hasReceipt ? l10n.viewPaymentDetailsAndReceipt : l10n.addReceiptForThisPayment,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -185,7 +184,7 @@ class _ViewPaymentReceiptDialogState extends State<ViewPaymentReceiptDialog> wit
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payment.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),

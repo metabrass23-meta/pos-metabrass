@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -14,6 +13,7 @@ import '../../widgets/sales/edit_sale_dialog.dart';
 import '../../widgets/sales/product_grid.dart';
 import '../../widgets/sales/sales_table.dart';
 import '../../widgets/sales/view_sales_dialog.dart';
+import '../../widgets/sales/create_return_dialog.dart'; // <--- 1. NEW IMPORT
 import '../../../l10n/app_localizations.dart';
 
 class SalesPage extends StatefulWidget {
@@ -25,18 +25,18 @@ class SalesPage extends StatefulWidget {
 
 class _SalesPageState extends State<SalesPage> {
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _customerSearchController =
-      TextEditingController();
+  final TextEditingController _customerSearchController = TextEditingController();
   String _selectedCategory = 'All';
 
   @override
- void initState() {
-  super.initState();
-  // Initialize SalesProvider to load products
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    Provider.of<SalesProvider>(context, listen: false).initialize();
-  });
+  void initState() {
+    super.initState();
+    // Initialize SalesProvider to load products
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SalesProvider>(context, listen: false).initialize();
+    });
   }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -60,8 +60,16 @@ class _SalesPageState extends State<SalesPage> {
     );
   }
 
+  // 2. NEW METHOD: Show Return Dialog manually
+  void _showCreateReturnDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const CreateReturnDialog(),
+    );
+  }
+
   void _handleViewSale(SaleModel sale) {
-    Navigator.of(context).pop(); // Close history dialog first
+    // Navigator.of(context).pop(); // Optional: Close history dialog first if you want
     showDialog(
       context: context,
       builder: (context) => ViewSaleDialog(sale: sale),
@@ -69,7 +77,7 @@ class _SalesPageState extends State<SalesPage> {
   }
 
   void _handleEditSale(SaleModel sale) {
-    Navigator.of(context).pop(); // Close history dialog first
+    // Navigator.of(context).pop();
     showDialog(
       context: context,
       builder: (context) => EditSaleDialog(sale: sale),
@@ -77,7 +85,7 @@ class _SalesPageState extends State<SalesPage> {
   }
 
   void _handleDeleteSale(SaleModel sale) {
-    Navigator.of(context).pop(); // Close history dialog first
+    // Navigator.of(context).pop();
     showDialog(
       context: context,
       builder: (context) => DeleteSaleDialog(sale: sale),
@@ -158,7 +166,7 @@ class _SalesPageState extends State<SalesPage> {
               SizedBox(height: 3.h),
               Text(
                 AppLocalizations.of(context)!.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -168,7 +176,7 @@ class _SalesPageState extends State<SalesPage> {
               SizedBox(height: 2.h),
               Text(
                 AppLocalizations.of(context)!.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -202,10 +210,8 @@ class _SalesPageState extends State<SalesPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout
-                      ? AppLocalizations.of(context)!.posSystem
-                      : AppLocalizations.of(context)!.posSystem,
-                  style: GoogleFonts.playfairDisplay(
+                  AppLocalizations.of(context)!.posSystem,
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -216,7 +222,7 @@ class _SalesPageState extends State<SalesPage> {
                   SizedBox(height: context.cardPadding / 4),
                   Text(
                     AppLocalizations.of(context)!.selectProductsManageSales,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey[600],
@@ -244,6 +250,52 @@ class _SalesPageState extends State<SalesPage> {
             ),
             SizedBox(width: context.cardPadding),
           ],
+
+          // 3. NEW RETURN BUTTON ADDED HERE
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _showCreateReturnDialog,
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.cardPadding,
+                  vertical: context.cardPadding / 2,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
+                  border: Border.all(
+                    color: Colors.purple.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.assignment_return_outlined,
+                      color: Colors.purple,
+                      size: context.iconSize('medium'),
+                    ),
+                    if (!context.isTablet) ...[
+                      SizedBox(width: context.smallPadding),
+                      Text(
+                        'Return', // Label for the button
+                        style: TextStyle(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.purple,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: context.cardPadding),
 
           // View History Button
           Material(
@@ -276,7 +328,7 @@ class _SalesPageState extends State<SalesPage> {
                       SizedBox(width: context.smallPadding),
                       Text(
                         AppLocalizations.of(context)!.viewHistory,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.primaryMaroon,
@@ -305,7 +357,7 @@ class _SalesPageState extends State<SalesPage> {
               children: [
                 Text(
                   TimeOfDay.now().format(context),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -313,7 +365,7 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 Text(
                   AppLocalizations.of(context)!.currentTime,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     color: Colors.grey[600],
                   ),
@@ -327,11 +379,11 @@ class _SalesPageState extends State<SalesPage> {
   }
 
   Widget _buildQuickStat(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
+      String title,
+      String value,
+      IconData icon,
+      Color color,
+      ) {
     return Container(
       padding: EdgeInsets.all(context.smallPadding),
       decoration: BoxDecoration(
@@ -349,7 +401,7 @@ class _SalesPageState extends State<SalesPage> {
             children: [
               Text(
                 value,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -357,7 +409,7 @@ class _SalesPageState extends State<SalesPage> {
               ),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],
                 ),
@@ -439,7 +491,7 @@ class _SalesPageState extends State<SalesPage> {
                           context.shouldShowCompactLayout
                               ? AppLocalizations.of(context)!.salesHistory
                               : AppLocalizations.of(context)!.salesHistory,
-                          style: GoogleFonts.playfairDisplay(
+                          style: TextStyle(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
@@ -450,7 +502,7 @@ class _SalesPageState extends State<SalesPage> {
                           SizedBox(height: context.smallPadding / 2),
                           Text(
                             AppLocalizations.of(context)!.viewManageSales,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w400,
                               color: AppTheme.pureWhite.withOpacity(0.9),
@@ -478,14 +530,14 @@ class _SalesPageState extends State<SalesPage> {
                             children: [
                               Text(
                                 '${stats?['total_sales'] ?? 0} ${AppLocalizations.of(context)!.sales}',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize,
                                   color: AppTheme.pureWhite.withOpacity(0.8),
                                 ),
                               ),
                               Text(
                                 'PKR ${(stats?['total_revenue'] ?? 0).toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.pureWhite,
@@ -566,13 +618,13 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 child: TextField(
                   onChanged: (value) => provider.searchSales(value),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     color: AppTheme.charcoalGray,
                   ),
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context)!.searchSales,
-                    hintStyle: GoogleFonts.inter(
+                    hintStyle: TextStyle(
                       fontSize: context.bodyFontSize * 0.9,
                       color: Colors.grey[500],
                     ),
@@ -613,13 +665,13 @@ class _SalesPageState extends State<SalesPage> {
                       // Implement status filtering
                     },
                     items: ['All Status', 'Paid', 'Partial', 'Unpaid'].map((
-                      status,
-                    ) {
+                        status,
+                        ) {
                       return DropdownMenuItem(
                         value: status,
                         child: Text(
                           status,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             color: AppTheme.charcoalGray,
                           ),
@@ -650,7 +702,7 @@ class _SalesPageState extends State<SalesPage> {
                             SizedBox(width: context.smallPadding),
                             Text(
                               AppLocalizations.of(context)!.exportingSalesData,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 color: AppTheme.pureWhite,
                               ),
                             ),
@@ -694,7 +746,7 @@ class _SalesPageState extends State<SalesPage> {
                           SizedBox(width: context.smallPadding),
                           Text(
                             AppLocalizations.of(context)!.export,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.green,
@@ -748,13 +800,13 @@ class _SalesPageState extends State<SalesPage> {
           child: TextField(
             controller: _searchController,
             onChanged: (value) => setState(() {}),
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: AppTheme.charcoalGray,
             ),
             decoration: InputDecoration(
               hintText: AppLocalizations.of(context)!.searchProducts,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: TextStyle(
                 fontSize: context.bodyFontSize * 0.9,
                 color: Colors.grey[500],
               ),
@@ -765,16 +817,16 @@ class _SalesPageState extends State<SalesPage> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {});
-                      },
-                      icon: Icon(
-                        Icons.clear_rounded,
-                        color: Colors.grey[500],
-                        size: context.iconSize('small'),
-                      ),
-                    )
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {});
+                },
+                icon: Icon(
+                  Icons.clear_rounded,
+                  color: Colors.grey[500],
+                  size: context.iconSize('small'),
+                ),
+              )
                   : null,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -834,7 +886,7 @@ class _SalesPageState extends State<SalesPage> {
                           ),
                           child: Text(
                             category,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: isSelected
@@ -877,13 +929,13 @@ class _SalesPageState extends State<SalesPage> {
             child: TextField(
               controller: _searchController,
               onChanged: (value) => setState(() {}),
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.searchProductsExpanded,
-                hintStyle: GoogleFonts.inter(
+                hintStyle: TextStyle(
                   fontSize: context.bodyFontSize * 0.9,
                   color: Colors.grey[500],
                 ),
@@ -894,16 +946,16 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {});
-                        },
-                        icon: Icon(
-                          Icons.clear_rounded,
-                          color: Colors.grey[500],
-                          size: context.iconSize('small'),
-                        ),
-                      )
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: Colors.grey[500],
+                    size: context.iconSize('small'),
+                  ),
+                )
                     : null,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(
@@ -943,16 +995,16 @@ class _SalesPageState extends State<SalesPage> {
                     items: categories
                         .map(
                           (category) => DropdownMenuItem(
-                            value: category,
-                            child: Text(
-                              category,
-                              style: GoogleFonts.inter(
-                                fontSize: context.bodyFontSize,
-                                color: AppTheme.charcoalGray,
-                              ),
-                            ),
+                        value: category,
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize,
+                            color: AppTheme.charcoalGray,
                           ),
-                        )
+                        ),
+                      ),
+                    )
                         .toList(),
                   ),
                 );
@@ -986,7 +1038,7 @@ class _SalesPageState extends State<SalesPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 AppLocalizations.of(context)!.filter,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.accentGold,

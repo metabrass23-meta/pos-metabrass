@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+
 import '../../../src/models/payment/payment_model.dart';
+import '../../../src/models/vendor/vendor_model.dart';
+import '../../../src/models/sales/sale_model.dart';
+import '../../../src/models/order/order_model.dart';
+
 import '../../../src/providers/payment_provider.dart';
+import '../../../src/providers/vendor_provider.dart';
+import '../../../src/providers/sales_provider.dart';
+import '../../../src/providers/order_provider.dart';
+
 import '../../../src/theme/app_theme.dart';
 import '../globals/image_upload.dart';
 import '../globals/text_button.dart';
@@ -19,7 +27,8 @@ class AddPaymentDialog extends StatefulWidget {
   State<AddPaymentDialog> createState() => _AddPaymentDialogState();
 }
 
-class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerProviderStateMixin {
+class _AddPaymentDialogState extends State<AddPaymentDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _bonusController = TextEditingController();
@@ -27,10 +36,12 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
   final _descriptionController = TextEditingController();
   final _scrollController = ScrollController();
 
+  // Selected Entities
   PaymentLabor? _selectedLabor;
   String? _selectedVendorId;
   String? _selectedOrderId;
   String? _selectedSaleId;
+
   String? _selectedPaymentMethod;
   String? _selectedPaymentMonth;
   String? _selectedPayerType;
@@ -46,28 +57,42 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+        duration: const Duration(milliseconds: 300), vsync: this);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
     _animationController.forward();
 
     final now = DateTime.now();
-    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
     _selectedPaymentMonth = '${months[now.month - 1]} ${now.year}';
 
     _selectedPayerType = 'LABOR';
 
+    // Load ALL required data for dropdowns
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadLaborers();
+      _loadData();
     });
   }
 
-  Future<void> _loadLaborers() async {
-    final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
-    await paymentProvider.loadLaborers();
+  Future<void> _loadData() async {
+    final context = this.context;
+    // Load Labors
+    await Provider.of<PaymentProvider>(context, listen: false).loadLaborers();
+    // Load Vendors
+    await Provider.of<VendorProvider>(context, listen: false).loadVendors();
+    // Load Sales (for Invoice selection)
+    await Provider.of<SalesProvider>(context, listen: false).loadSales();
+    // Load Orders
+    await Provider.of<OrderProvider>(context, listen: false).loadOrders();
   }
 
   @override
@@ -85,7 +110,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     final l10n = AppLocalizations.of(context)!;
 
     if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedLabor == null && _selectedVendorId == null && _selectedOrderId == null && _selectedSaleId == null) {
+      if (_selectedLabor == null &&
+          _selectedVendorId == null &&
+          _selectedOrderId == null &&
+          _selectedSaleId == null) {
         _showErrorSnackbar(l10n.pleaseSelectAtLeastOneEntity);
         return;
       }
@@ -105,8 +133,11 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       final deduction = double.tryParse(_deductionController.text.trim()) ?? 0.0;
       final netAmount = amount + bonus - deduction;
 
-      if (_selectedLabor != null && netAmount > _selectedLabor!.remainingAmount && !_isFinalPayment) {
-        _showErrorSnackbar(l10n.netAmountCannotExceedRemaining(_selectedLabor!.remainingAmount.toStringAsFixed(0)));
+      if (_selectedLabor != null &&
+          netAmount > _selectedLabor!.remainingAmount &&
+          !_isFinalPayment) {
+        _showErrorSnackbar(l10n.netAmountCannotExceedRemaining(
+            _selectedLabor!.remainingAmount.toStringAsFixed(0)));
         return;
       }
 
@@ -130,7 +161,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         payerId = null;
       }
 
-      final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+      final paymentProvider =
+      Provider.of<PaymentProvider>(context, listen: false);
 
       await paymentProvider.addPayment(
         laborId: _selectedLabor?.id,
@@ -165,18 +197,23 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(Icons.check_circle_rounded,
+                color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Text(
               l10n.paymentAddedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -186,12 +223,16 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(Icons.error_rounded,
+                color: AppTheme.pureWhite, size: context.iconSize('medium')),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -199,7 +240,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.borderRadius())),
       ),
     );
   }
@@ -218,7 +260,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       lastDate: DateTime.now().add(const Duration(days: 30)),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.primaryMaroon)),
+          data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context)
+                  .colorScheme
+                  .copyWith(primary: AppTheme.primaryMaroon)),
           child: child!,
         );
       },
@@ -236,7 +281,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       initialTime: _selectedTime,
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.primaryMaroon)),
+          data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context)
+                  .colorScheme
+                  .copyWith(primary: AppTheme.primaryMaroon)),
           child: child!,
         );
       },
@@ -251,7 +299,20 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
   List<String> _generatePaymentMonths() {
     final List<String> months = [];
     final now = DateTime.now();
-    final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
 
     for (int i = 0; i < 12; i++) {
       months.add('${monthNames[i]} ${now.year - 1}');
@@ -270,7 +331,20 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
 
   String _convertDisplayMonthToApi(String displayMonth) {
     try {
-      final monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      final monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ];
       final parts = displayMonth.split(' ');
       if (parts.length == 2) {
         final monthName = parts[0];
@@ -308,15 +382,29 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
-                  maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 95.h, medium: 85.h, large: 80.h, ultrawide: 75.h),
+                  maxWidth: ResponsiveBreakpoints.responsive(context,
+                      tablet: 95.w,
+                      small: 90.w,
+                      medium: 80.w,
+                      large: 70.w,
+                      ultrawide: 60.w),
+                  maxHeight: ResponsiveBreakpoints.responsive(context,
+                      tablet: 90.h,
+                      small: 95.h,
+                      medium: 85.h,
+                      large: 80.h,
+                      ultrawide: 75.h),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius:
+                  BorderRadius.circular(context.borderRadius('large')),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: context.shadowBlur('heavy'),
+                        offset: Offset(0, context.cardPadding)),
                   ],
                 ),
                 child: Column(
@@ -349,7 +437,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+            colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -359,8 +448,11 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.payments_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+                color: AppTheme.pureWhite.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Icon(Icons.payments_rounded,
+                color: AppTheme.pureWhite, size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -368,8 +460,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.addPayment : l10n.addLaborPayment,
-                  style: GoogleFonts.playfairDisplay(
+                  context.shouldShowCompactLayout
+                      ? l10n.addPayment
+                      : l10n.addLaborPayment, // Could rename this key to generic "Add Payment"
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -380,7 +474,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordNewPaymentWithReceipt,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -397,7 +491,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(Icons.close_rounded,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('medium')),
               ),
             ),
           ),
@@ -470,23 +566,33 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: context.shadowBlur('light'),
+              offset: Offset(0, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.person_outline, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(Icons.person_outline,
+                  color: AppTheme.primaryMaroon,
+                  size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.basicInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          _buildLaborSelection(),
+          _buildPayerSelection(), // Renamed and logic updated
           SizedBox(height: context.cardPadding),
           Row(
             children: [
@@ -509,18 +615,28 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: context.shadowBlur('light'),
+              offset: Offset(0, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.attach_money_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(Icons.attach_money_rounded,
+                  color: AppTheme.primaryMaroon,
+                  size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentAmount,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -534,7 +650,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               Expanded(child: _buildDeductionField()),
             ],
           ),
-          if (_amountController.text.isNotEmpty || _bonusController.text.isNotEmpty || _deductionController.text.isNotEmpty) ...[
+          if (_amountController.text.isNotEmpty ||
+              _bonusController.text.isNotEmpty ||
+              _deductionController.text.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             _buildNetAmountPreview(),
           ],
@@ -552,18 +670,28 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         color: Colors.white,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: context.shadowBlur('light'),
+              offset: Offset(0, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.description_outlined, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(Icons.description_outlined,
+                  color: AppTheme.primaryMaroon,
+                  size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -587,14 +715,21 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: context.shadowBlur('light'),
+              offset: Offset(0, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.receipt_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(Icons.receipt_rounded,
+                  color: AppTheme.primaryMaroon,
+                  size: context.iconSize('medium')),
               SizedBox(width: context.smallPadding),
               Expanded(
                 child: Column(
@@ -602,11 +737,16 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
                   children: [
                     Text(
                       l10n.receiptImageOptional,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(
+                          fontSize: context.bodyFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoalGray),
                     ),
                     Text(
                       l10n.uploadReceiptForBetterRecordKeeping,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(
+                          fontSize: context.captionFontSize,
+                          color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -620,7 +760,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     );
   }
 
-  Widget _buildLaborSelection() {
+  // Updated Payer Selection Widget with Real Data
+  Widget _buildPayerSelection() {
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -637,68 +778,87 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
           onChanged: (String? value) {
             setState(() {
               _selectedPayerType = value;
-              if (value != 'LABOR') _selectedLabor = null;
-              if (value != 'VENDOR') _selectedVendorId = null;
-              if (value != 'CUSTOMER') {
-                _selectedOrderId = null;
-                _selectedSaleId = null;
-              }
+              // Clear previous selections
+              _selectedLabor = null;
+              _selectedVendorId = null;
+              _selectedOrderId = null;
+              _selectedSaleId = null;
             });
           },
-          validator: (value) => value == null ? l10n.pleaseSelectEntityType : null,
+          validator: (value) =>
+          value == null ? l10n.pleaseSelectEntityType : null,
         ),
         if (_selectedPayerType != null) ...[
           SizedBox(height: context.smallPadding),
 
+          // LABOR SELECTION
           if (_selectedPayerType == 'LABOR')
             Consumer<PaymentProvider>(
               builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return _buildLoadingIndicator(l10n.loadingLabors);
+                }
+                if (provider.laborers.isEmpty) {
+                  return _buildEmptyState(l10n.noLaborsFound);
+                }
                 return PremiumDropdownField<PaymentLabor>(
                   label: l10n.selectLabor,
                   hint: l10n.chooseLaborForPayment,
                   value: _selectedLabor,
                   prefixIcon: Icons.person_outline,
                   items: provider.laborers
-                      .map(
-                        (labor) => DropdownItem<PaymentLabor>(
-                      value: labor,
-                      label: '${labor.name} - ${labor.role} (${l10n.remaining}: PKR ${labor.remainingAmount.toStringAsFixed(0)})',
-                    ),
-                  )
+                      .map((labor) => DropdownItem<PaymentLabor>(
+                    value: labor,
+                    label:
+                    '${labor.name} - ${labor.role} (${l10n.remaining}: PKR ${labor.remainingAmount.toStringAsFixed(0)})',
+                  ))
                       .toList(),
                   onChanged: (labor) {
                     setState(() {
                       _selectedLabor = labor;
                     });
                   },
-                  validator: (value) => _selectedPayerType == 'LABOR' && value == null ? l10n.pleaseSelectLabor : null,
+                  validator: (value) => _selectedPayerType == 'LABOR' && value == null
+                      ? l10n.pleaseSelectLabor
+                      : null,
                 );
               },
             ),
 
+          // VENDOR SELECTION (Updated)
           if (_selectedPayerType == 'VENDOR')
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: l10n.vendorId,
-                labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-                prefixIcon: Icon(Icons.business, size: context.iconSize('medium')),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius()), borderSide: BorderSide.none),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: ResponsiveBreakpoints.responsive(context, tablet: 16, small: 18, medium: 20, large: 22, ultrawide: 24),
-                  horizontal: 16,
-                ),
-              ),
-              onChanged: (value) {
-                _selectedVendorId = value.isNotEmpty ? value : null;
-              },
-              validator: (value) {
-                if (_selectedPayerType == 'VENDOR' && (value == null || value.isEmpty)) {
-                  return l10n.pleaseEnterVendorId;
+            Consumer<VendorProvider>(
+              builder: (context, vendorProvider, child) {
+                if (vendorProvider.isLoading) {
+                  return _buildLoadingIndicator("Loading Vendors...");
                 }
-                return null;
+                if (vendorProvider.vendors.isEmpty) {
+                  return _buildEmptyState("No Vendors Found");
+                }
+                return PremiumDropdownField<String>(
+                  label: l10n.selectVendor,
+                  hint: l10n.selectVendor,
+                  value: _selectedVendorId,
+                  prefixIcon: Icons.business,
+                  items: vendorProvider.vendors
+                      .map((vendor) => DropdownItem<String>(
+                    value: vendor.id,
+                    label: vendor.name,
+                  ))
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedVendorId = val;
+                    });
+                  },
+                  validator: (value) => _selectedPayerType == 'VENDOR' && value == null
+                      ? l10n.pleaseSelectVendor
+                      : null,
+                );
               },
             ),
 
+          // CUSTOMER / ORDER / SALE SELECTION (Updated)
           if (_selectedPayerType == 'CUSTOMER')
             Column(
               children: [
@@ -727,39 +887,112 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
                   },
                 ),
                 SizedBox(height: context.smallPadding),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: l10n.enterOrderSaleId(_selectedOrderId != null
-                        ? l10n.order
-                        : _selectedSaleId != null
-                        ? l10n.sale
-                        : '${l10n.order}/${l10n.sale}'),
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize),
-                    prefixIcon: Icon(Icons.receipt, size: context.iconSize('medium')),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius()), borderSide: BorderSide.none),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: ResponsiveBreakpoints.responsive(context, tablet: 16, small: 18, medium: 20, large: 22, ultrawide: 24),
-                      horizontal: 16,
-                    ),
-                  ),
-                  onChanged: (value) {
-                    if (_selectedPayerType == 'CUSTOMER') {
-                      _selectedOrderId = value.isNotEmpty ? value : null;
-                      _selectedSaleId = value.isNotEmpty ? value : null;
-                    }
-                  },
-                  validator: (value) {
-                    if (_selectedPayerType == 'CUSTOMER' && (value == null || value.isEmpty)) {
-                      return '${l10n.pleaseEnter} ${l10n.order}/${l10n.sale} ID';
-                    }
-                    return null;
-                  },
 
-                ),
+                // ORDER DROPDOWN
+                if (_selectedOrderId == null && _selectedSaleId == null) ...[
+                  // Wait for user to pick type
+                ] else if (_selectedSaleId == null) ...[
+                  Consumer<OrderProvider>(
+                    builder: (context, orderProvider, child) {
+                      if (orderProvider.isLoading) {
+                        return _buildLoadingIndicator("Loading Orders...");
+                      }
+                      if (orderProvider.orders.isEmpty) {
+                        return _buildEmptyState("No Orders Found");
+                      }
+                      return PremiumDropdownField<String>(
+                        label: l10n.selectOrder,
+                        hint: "Select an Order",
+                        value: _selectedOrderId,
+                        prefixIcon: Icons.receipt_long,
+                        items: orderProvider.orders.map((order) {
+                          return DropdownItem<String>(
+                            value: order.id,
+                            label: "${order.orderNumber} - ${order.customerName}",
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedOrderId = val;
+                            _selectedSaleId = null; // Ensure mutual exclusivity
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ] else ...[
+                  // SALE DROPDOWN
+                  Consumer<SalesProvider>(
+                      builder: (context, salesProvider, child) {
+                        if (salesProvider.isLoading) {
+                          return _buildLoadingIndicator("Loading Sales...");
+                        }
+                        if (salesProvider.sales.isEmpty) {
+                          return _buildEmptyState("No Sales Found");
+                        }
+                        return PremiumDropdownField<String>(
+                          label: l10n.selectSale,
+                          hint: "Select a Sale Invoice",
+                          value: _selectedSaleId,
+                          prefixIcon: Icons.receipt,
+                          items: salesProvider.sales.map((sale) {
+                            return DropdownItem<String>(
+                              value: sale.id,
+                              label: "${sale.invoiceNumber} - ${sale.customerName} (PKR ${sale.grandTotal.toStringAsFixed(0)})",
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedSaleId = val;
+                              _selectedOrderId = null; // Ensure mutual exclusivity
+                            });
+                          },
+                        );
+                      }
+                  )
+                ],
               ],
             ),
         ],
       ],
+    );
+  }
+
+  // Helper widgets for loading and empty states
+  Widget _buildLoadingIndicator(String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.smallPadding),
+      child: Row(
+        children: [
+          SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: AppTheme.primaryMaroon)),
+          SizedBox(width: context.smallPadding),
+          Text(text, style: TextStyle(color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+          vertical: context.smallPadding, horizontal: context.smallPadding),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius('small')),
+        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded,
+              size: context.iconSize('small'), color: Colors.orange[700]),
+          SizedBox(width: context.smallPadding),
+          Text(text, style: TextStyle(color: Colors.orange[700])),
+        ],
+      ),
     );
   }
 
@@ -771,13 +1004,16 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       hint: l10n.selectPaymentMonth,
       value: _selectedPaymentMonth,
       prefixIcon: Icons.calendar_month,
-      items: _generatePaymentMonths().map((month) => DropdownItem<String>(value: month, label: month)).toList(),
+      items: _generatePaymentMonths()
+          .map((month) => DropdownItem<String>(value: month, label: month))
+          .toList(),
       onChanged: (month) {
         setState(() {
           _selectedPaymentMonth = month;
         });
       },
-      validator: (value) => value == null ? l10n.pleaseSelectPaymentMonth : null,
+      validator: (value) =>
+      value == null ? l10n.pleaseSelectPaymentMonth : null,
     );
   }
 
@@ -791,13 +1027,17 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
           hint: l10n.selectPaymentMethod,
           value: _selectedPaymentMethod,
           prefixIcon: Icons.payment,
-          items: PaymentProvider.staticPaymentMethods.map((method) => DropdownItem<String>(value: method, label: method)).toList(),
+          items: PaymentProvider.staticPaymentMethods
+              .map((method) =>
+              DropdownItem<String>(value: method, label: method))
+              .toList(),
           onChanged: (method) {
             setState(() {
               _selectedPaymentMethod = method;
             });
           },
-          validator: (value) => value == null ? l10n.pleaseSelectPaymentMethod : null,
+          validator: (value) =>
+          value == null ? l10n.pleaseSelectPaymentMethod : null,
         );
       },
     );
@@ -843,7 +1083,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
 
     return PremiumTextField(
       label: l10n.paymentAmountPkr,
-      hint: context.shouldShowCompactLayout ? l10n.enterAmount : l10n.enterPaymentAmountPkr,
+      hint: context.shouldShowCompactLayout
+          ? l10n.enterAmount
+          : l10n.enterPaymentAmountPkr,
       controller: _amountController,
       prefixIcon: Icons.attach_money_rounded,
       keyboardType: TextInputType.number,
@@ -870,7 +1112,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       validator: (value) {
         if (value != null && value.isNotEmpty) {
           final bonus = double.tryParse(value);
-          if (bonus == null || bonus < 0) return l10n.pleaseEnterValidBonusAmount;
+          if (bonus == null || bonus < 0)
+            return l10n.pleaseEnterValidBonusAmount;
         }
         return null;
       },
@@ -890,7 +1133,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
       validator: (value) {
         if (value != null && value.isNotEmpty) {
           final deduction = double.tryParse(value);
-          if (deduction == null || deduction < 0) return l10n.pleaseEnterValidDeductionAmount;
+          if (deduction == null || deduction < 0)
+            return l10n.pleaseEnterValidDeductionAmount;
         }
         return null;
       },
@@ -902,13 +1146,17 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
 
     return PremiumTextField(
       label: l10n.description,
-      hint: context.shouldShowCompactLayout ? l10n.enterNotes : l10n.enterPaymentDescriptionOrNotes,
+      hint: context.shouldShowCompactLayout
+          ? l10n.enterNotes
+          : l10n.enterPaymentDescriptionOrNotes,
       controller: _descriptionController,
       prefixIcon: Icons.description_outlined,
-      maxLines: ResponsiveBreakpoints.responsive(context, tablet: 2, small: 3, medium: 3, large: 4, ultrawide: 4),
+      maxLines: ResponsiveBreakpoints.responsive(
+          context, tablet: 2, small: 3, medium: 3, large: 4, ultrawide: 4),
       validator: (value) {
         if (value?.isEmpty ?? true) return l10n.pleaseEnterDescription;
-        if (value!.length < 5) return l10n.descriptionMustBeAtLeast5Characters;
+        if (value!.length < 5)
+          return l10n.descriptionMustBeAtLeast5Characters;
         return null;
       },
     );
@@ -925,7 +1173,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
             child: PremiumTextField(
               label: l10n.date,
               hint: l10n.selectDate,
-              controller: TextEditingController(text: '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
+              controller: TextEditingController(
+                  text:
+                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
               prefixIcon: Icons.calendar_today,
               enabled: false,
             ),
@@ -939,7 +1189,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               label: l10n.time,
               hint: l10n.selectTime,
               controller: TextEditingController(
-                text: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
+                text:
+                '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
               ),
               prefixIcon: Icons.access_time,
               enabled: false,
@@ -956,14 +1207,21 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: _isFinalPayment ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+        color: _isFinalPayment
+            ? Colors.green.withOpacity(0.1)
+            : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: _isFinalPayment ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+        border: Border.all(
+            color: _isFinalPayment
+                ? Colors.green.withOpacity(0.3)
+                : Colors.grey.withOpacity(0.3)),
       ),
       child: Row(
         children: [
           Icon(
-            _isFinalPayment ? Icons.check_circle : Icons.radio_button_unchecked,
+            _isFinalPayment
+                ? Icons.check_circle
+                : Icons.radio_button_unchecked,
             color: _isFinalPayment ? Colors.green : Colors.grey,
             size: context.iconSize('medium'),
           ),
@@ -974,15 +1232,23 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               children: [
                 Text(
                   l10n.finalPaymentForMonth,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
-                    color: _isFinalPayment ? Colors.green : AppTheme.charcoalGray,
+                    color: _isFinalPayment
+                        ? Colors.green
+                        : AppTheme.charcoalGray,
                   ),
                 ),
                 Text(
-                  _isFinalPayment ? l10n.thisCompletesPaymentForSelectedMonth : l10n.markThisAsFinalPaymentForMonth,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, color: _isFinalPayment ? Colors.green[700] : Colors.grey[600]),
+                  _isFinalPayment
+                      ? l10n.thisCompletesPaymentForSelectedMonth
+                      : l10n.markThisAsFinalPaymentForMonth,
+                  style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      color: _isFinalPayment
+                          ? Colors.green[700]
+                          : Colors.grey[600]),
                 ),
               ],
             ),
@@ -1007,13 +1273,20 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: netAmount >= 0 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+        color: netAmount >= 0
+            ? Colors.green.withOpacity(0.1)
+            : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: netAmount >= 0 ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3)),
+        border: Border.all(
+            color: netAmount >= 0
+                ? Colors.green.withOpacity(0.3)
+                : Colors.red.withOpacity(0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.calculate_rounded, color: netAmount >= 0 ? Colors.green : Colors.red, size: context.iconSize('medium')),
+          Icon(Icons.calculate_rounded,
+              color: netAmount >= 0 ? Colors.green : Colors.red,
+              size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Expanded(
             child: Column(
@@ -1021,11 +1294,14 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
               children: [
                 Text(
                   l10n.netPaymentAmount,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${netAmount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: netAmount >= 0 ? Colors.green : Colors.red,
@@ -1033,8 +1309,12 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
                 ),
                 if (_selectedLabor != null) ...[
                   Text(
-                    l10n.remainingAfterPayment((_selectedLabor!.remainingAmount - netAmount).toStringAsFixed(0)),
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    l10n.remainingAfterPayment(
+                        (_selectedLabor!.remainingAmount - netAmount)
+                            .toStringAsFixed(0)),
+                    style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        color: Colors.grey[600]),
                   ),
                 ],
               ],
@@ -1049,7 +1329,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> with SingleTickerPr
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      height: ResponsiveBreakpoints.responsive(context, tablet: 35.h, small: 40.h, medium: 45.h, large: 50.h, ultrawide: 55.h),
+      height: ResponsiveBreakpoints.responsive(context,
+          tablet: 35.h, small: 40.h, medium: 45.h, large: 50.h, ultrawide: 55.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.grey.shade300),

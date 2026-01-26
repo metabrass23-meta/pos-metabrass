@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -19,7 +18,7 @@ class ProfitLossExportDialog extends StatelessWidget {
           SizedBox(width: context.smallPadding),
           Text(
             l10n.exportFormat,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
         ],
       ),
@@ -28,7 +27,7 @@ class ProfitLossExportDialog extends StatelessWidget {
         children: [
           Text(
             l10n.chooseTheFormatForYourProfitAndLossReport,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
           SizedBox(height: context.cardPadding),
           _buildExportOption(
@@ -55,7 +54,7 @@ class ProfitLossExportDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
             l10n.cancel,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
       ],
@@ -87,12 +86,12 @@ class ProfitLossExportDialog extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     description,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                 ],
               ),

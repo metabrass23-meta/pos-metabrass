@@ -6487,6 +6487,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deletePurchase => 'Delete Purchase';
 
   @override
+  String get loadingData => 'Loading data...';
+
+  @override
+  String get pendingOrders => 'Pending orders';
+
+  @override
+  String get returnNumber => 'Return Number';
+
+  @override
+  String get pleaseSelectVendor => 'Please select a vendor';
+
+  @override
+  String get loadingLabors => 'Loading labors...';
+
+  @override
+  String get loadingVendors => 'Loading vendors...';
+
+  @override
+  String get loadingOrders => 'Loading orders...';
+
+  @override
+  String get loadingSales => 'Loading sales...';
+
+  @override
   String get confirmDelete => 'Are you sure you want to delete this purchase?';
 
   @override

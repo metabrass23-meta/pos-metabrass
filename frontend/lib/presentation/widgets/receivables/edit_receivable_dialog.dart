@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -130,7 +129,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
             SizedBox(width: context.smallPadding),
             Text(
               l10n.receivableUpdatedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -161,7 +160,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -370,7 +369,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editReceivable : l10n.editReceivableDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -381,7 +380,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateReceivableInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -402,7 +401,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
             ),
             child: Text(
               widget.receivable.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -527,7 +526,7 @@ class _EditReceivableDialogState extends State<EditReceivableDialog> with Single
                     Expanded(
                       child: Text(
                         '${l10n.balanceRemaining} PKR ${balanceRemaining.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: balanceRemaining >= 0 ? Colors.orange : Colors.red,

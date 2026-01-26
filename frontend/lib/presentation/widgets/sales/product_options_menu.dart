@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -74,7 +73,7 @@ class ProductOptionsMenu extends StatelessWidget {
                       children: [
                         Text(
                           product.name,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
                             color: AppTheme.charcoalGray,
@@ -84,7 +83,7 @@ class ProductOptionsMenu extends StatelessWidget {
                         ),
                         Text(
                           'PKR ${product.price.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primaryMaroon,
@@ -126,7 +125,7 @@ class ProductOptionsMenu extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 '${product.name} ${l10n.addToCart}',
-                                style: GoogleFonts.inter(color: AppTheme.pureWhite),
+                                style: TextStyle(color: AppTheme.pureWhite),
                               ),
                             ),
                           ],
@@ -224,7 +223,7 @@ class ProductOptionsMenu extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -232,7 +231,7 @@ class ProductOptionsMenu extends StatelessWidget {
                     ),
                     Text(
                       subtitle,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.grey[600],
                       ),

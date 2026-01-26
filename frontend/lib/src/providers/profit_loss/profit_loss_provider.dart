@@ -146,7 +146,7 @@ class ProfitLossProvider extends ChangeNotifier {
 
         // Add to history if it's new
         final existingIndex = _profitLossHistory.indexWhere(
-          (p) => p.id == response.data!.id,
+              (p) => p.id == response.data!.id,
         );
 
         if (existingIndex == -1) {
@@ -209,12 +209,10 @@ class ProfitLossProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         _dashboardData = response.data!;
       } else {
-        // Don't set error for dashboard - it's optional
         debugPrint('Dashboard data not available: ${response.message}');
         _dashboardData = null;
       }
     } catch (e) {
-      // Don't set error for dashboard - it's optional
       debugPrint('Dashboard data error: ${e.toString()}');
       _dashboardData = null;
     } finally {
@@ -227,16 +225,15 @@ class ProfitLossProvider extends ChangeNotifier {
     clearError();
 
     try {
-      // Load all data concurrently but handle individual failures gracefully
       await Future.wait([
         loadProfitLossRecords().catchError(
-          (e) => debugPrint('Error loading records: $e'),
+              (e) => debugPrint('Error loading records: $e'),
         ),
         loadDashboardData().catchError(
-          (e) => debugPrint('Error loading dashboard: $e'),
+              (e) => debugPrint('Error loading dashboard: $e'),
         ),
         loadProductProfitability().catchError(
-          (e) => debugPrint('Error loading profitability: $e'),
+              (e) => debugPrint('Error loading profitability: $e'),
         ),
       ]);
     } catch (e) {
@@ -250,7 +247,7 @@ class ProfitLossProvider extends ChangeNotifier {
     await refreshData();
   }
 
-  // Load product profitability
+  // Load product profitability with Deduplication Fix
   Future<void> loadProductProfitability({
     DateTime? startDate,
     DateTime? endDate,
@@ -265,7 +262,20 @@ class ProfitLossProvider extends ChangeNotifier {
       );
 
       if (response.success && response.data != null) {
-        _productProfitability = response.data!;
+        // --- FIX: Deduplicate products by ID ---
+        // If the API sends the same product multiple times (e.g. ungrouped sales),
+        // we filter them here to ensure unique Product IDs.
+        final Map<String, ProductProfitability> uniqueProducts = {};
+
+        for (var item in response.data!) {
+          // If we already have this product, we can choose to keep the first one
+          // or manually aggregate them. For now, we keep the first occurrence.
+          if (!uniqueProducts.containsKey(item.productId)) {
+            uniqueProducts[item.productId] = item;
+          }
+        }
+
+        _productProfitability = uniqueProducts.values.toList();
         notifyListeners();
       } else {
         _setError(response.message ?? 'Failed to load product profitability');
@@ -454,13 +464,13 @@ class ProfitLossProvider extends ChangeNotifier {
       return _profitLossHistory
           .map(
             (data) => {
-              'period': data.formattedPeriod,
-              'profit': data.netProfit,
-              'income': data.totalSalesIncome,
-              'expenses': data.totalExpensesCalculated,
-              'date': data.startDate,
-            },
-          )
+          'period': data.formattedPeriod,
+          'profit': data.netProfit,
+          'income': data.totalSalesIncome,
+          'expenses': data.totalExpensesCalculated,
+          'date': data.startDate,
+        },
+      )
           .toList();
     } catch (e) {
       debugPrint('Error getting profit trend: $e');
@@ -496,9 +506,7 @@ class ProfitLossProvider extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      // Use the provided format or default to PDF
       final exportFormat = format ?? 'pdf';
-
       String? filePath;
       String customPeriod = _getCustomPeriodDisplay();
 
@@ -519,7 +527,6 @@ class ProfitLossProvider extends ChangeNotifier {
       }
 
       if (filePath != null) {
-        // Open the exported file
         await ProfitLossExportService.openExportedFile(filePath);
         _setSuccess(
           'P&L Report exported successfully as ${exportFormat.toUpperCase()}',
@@ -534,7 +541,6 @@ class ProfitLossProvider extends ChangeNotifier {
     }
   }
 
-  /// Get custom period display string
   String _getCustomPeriodDisplay() {
     if (_selectedPeriodType.toLowerCase() == 'custom') {
       return 'Custom (${_formatDate(_customStartDate)} - ${_formatDate(_customEndDate)})';
@@ -542,7 +548,6 @@ class ProfitLossProvider extends ChangeNotifier {
     return '';
   }
 
-  /// Format date for display
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
@@ -556,7 +561,7 @@ class ProfitLossProvider extends ChangeNotifier {
       try {
         averageProfit =
             _profitLossHistory.map((p) => p.netProfit).reduce((a, b) => a + b) /
-            _profitLossHistory.length;
+                _profitLossHistory.length;
       } catch (e) {
         debugPrint('Error calculating average profit: $e');
         averageProfit = 0.0;
@@ -577,7 +582,6 @@ class ProfitLossProvider extends ChangeNotifier {
     try {
       if (_currentProfitLoss == null) return false;
 
-      // Check for negative values that shouldn't be negative
       if (_currentProfitLoss!.totalSalesIncome < 0 ||
           _currentProfitLoss!.totalLaborPayments < 0 ||
           _currentProfitLoss!.totalVendorPayments < 0 ||
@@ -593,7 +597,7 @@ class ProfitLossProvider extends ChangeNotifier {
     }
   }
 
-  // Clear all data (for testing or reset purposes)
+  // Clear all data
   void clearAllData() {
     _profitLossHistory.clear();
     _currentProfitLoss = null;

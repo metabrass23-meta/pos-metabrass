@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
@@ -80,7 +79,7 @@ class _PurchaseFilterDialogState extends State<PurchaseFilterDialog> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   l10n.filter ?? "Filter Purchases",
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.charcoalGray,

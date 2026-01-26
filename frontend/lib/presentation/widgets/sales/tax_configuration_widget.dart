@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -142,7 +141,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
           Expanded(
             child: Text(
               l10n.taxConfiguration,
-              style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
           if (widget.isEditable)
@@ -195,12 +194,12 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
             SizedBox(height: context.smallPadding),
             Text(
               l10n.noTaxRatesAvailable,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
             ),
             SizedBox(height: context.smallPadding / 2),
             Text(
               l10n.contactAdministratorToSetupTaxRates,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
+              style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -241,7 +240,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
                     children: [
                       Text(
                         rate.name,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: isEnabled ? AppTheme.primaryMaroon : AppTheme.lightGray,
@@ -249,7 +248,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
                       ),
                       Text(
                         rate.taxTypeDisplay,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           color: isEnabled ? AppTheme.primaryMaroon.withOpacity(0.7) : AppTheme.lightGray,
                         ),
@@ -274,14 +273,14 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
                       Expanded(
                         child: Text(
                           '${l10n.rate}: ${rate.percentage.toStringAsFixed(2)}%',
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                         ),
                       ),
                       if (rate.description?.isNotEmpty == true)
                         Expanded(
                           child: Text(
                             rate.description!,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               color: AppTheme.charcoalGray.withOpacity(0.7),
                               fontStyle: FontStyle.italic,
@@ -307,7 +306,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
         Expanded(
           child: Text(
             '${l10n.amount}:',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
         ),
         SizedBox(width: context.smallPadding),
@@ -332,7 +331,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
               ),
               contentPadding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
             ),
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             onChanged: (value) {
               final newAmount = double.tryParse(value) ?? 0.0;
               _updateTaxAmount(taxType, newAmount);
@@ -353,7 +352,7 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
         icon: Icon(Icons.add_circle_outline_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('small')),
         label: Text(
           l10n.addCustomTax,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
         ),
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: AppTheme.primaryMaroon),
@@ -383,11 +382,11 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
             children: [
               Text(
                 '${l10n.totalTaxAmount}:',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               Text(
                 'Rs. ${_taxConfiguration.totalTaxAmount.toStringAsFixed(2)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -397,11 +396,11 @@ class _TaxConfigurationWidgetState extends State<TaxConfigurationWidget> {
             children: [
               Text(
                 '${l10n.totalTaxPercentage}:',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
+                style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
               ),
               Text(
                 '${_taxConfiguration.totalTaxPercentage.toStringAsFixed(2)}%',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -461,7 +460,7 @@ class _AddCustomTaxDialogState extends State<_AddCustomTaxDialog> {
     return AlertDialog(
       title: Text(
         l10n.addCustomTax,
-        style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
       ),
       content: Form(
         key: _formKey,
@@ -515,7 +514,7 @@ class _AddCustomTaxDialogState extends State<_AddCustomTaxDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel, style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
+          child: Text(l10n.cancel, style: TextStyle(color: AppTheme.charcoalGray)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -528,7 +527,7 @@ class _AddCustomTaxDialogState extends State<_AddCustomTaxDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: Text(l10n.addTax, style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+          child: Text(l10n.addTax, style: TextStyle(color: AppTheme.pureWhite)),
         ),
       ],
     );

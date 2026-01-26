@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../src/theme/app_theme.dart';
 import '../../../../src/utils/responsive_breakpoints.dart';
@@ -164,7 +163,7 @@ class PremiumProgressWidget extends StatelessWidget {
               ).createShader(bounds),
               child: Text(
                 'Crafting your exclusive fashion experience...',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize * 1.1,
                   fontWeight: FontWeight.w300,
                   color: Colors.white,

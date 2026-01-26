@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -71,7 +70,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
             SizedBox(width: context.smallPadding),
             Text(
               l10n.orderItemDeletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -93,7 +92,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -174,7 +173,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               children: [
                 Text(
                   l10n.deleteOrderItem,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -185,7 +184,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.removeThisOrderItemPermanently,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -199,7 +198,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.orderItem.id,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -208,7 +207,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.orderItem.productName,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -298,12 +297,12 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               children: [
                 Text(
                   '⚠️ ${l10n.irreversibleAction}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   l10n.deleteWarningMessage,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[600]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.red[600]),
                 ),
               ],
             ),
@@ -332,7 +331,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderItemSummary,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -376,7 +375,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.impactAnalysis,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -422,7 +421,7 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.finalConfirmation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -439,12 +438,12 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
               children: [
                 Text(
                   l10n.areYouSureDeleteOrderItem,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
                   l10n.deleteOrderItemWarningPoints,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -469,11 +468,11 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
             children: [
               Text(
                 label,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 value,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -499,11 +498,11 @@ class _DeleteOrderItemDialogState extends State<DeleteOrderItemDialog> with Sing
             children: [
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
               ),
               Text(
                 description,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[700]),
               ),
             ],
           ),

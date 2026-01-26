@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../src/providers/auth_provider.dart';
@@ -44,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
           SnackBar(
             content: Text(
               l10n.pleaseAcceptTerms,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize),
+              style: TextStyle(fontSize: context.captionFontSize),
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
@@ -88,7 +87,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   Expanded(
                     child: Text(
                       l10n.accountCreatedSuccessfully,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                      style: TextStyle(fontSize: context.captionFontSize),
                     ),
                   ),
                 ],
@@ -128,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   Expanded(
                     child: Text(
                       authProvider.errorMessage ?? l10n.registrationFailedMessage,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                      style: TextStyle(fontSize: context.captionFontSize),
                     ),
                   ),
                 ],
@@ -196,7 +195,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     Text(
                       l10n.joinOur,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.headerFontSize,
                         fontWeight: FontWeight.w300,
                         color: AppTheme.pureWhite.withOpacity(0.9),
@@ -207,7 +206,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     Text(
                       l10n.premiumFamily,
-                      style: GoogleFonts.playfairDisplay(
+                      style: TextStyle(
                         fontSize: context.headingFontSize,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.pureWhite,
@@ -222,7 +221,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Text(
                         l10n.signupWelcomeMessage,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w300,
                           color: AppTheme.pureWhite.withOpacity(0.8),
@@ -259,7 +258,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         children: [
                           Text(
                             l10n.createAccount,
-                            style: GoogleFonts.playfairDisplay(
+                            style: TextStyle(
                               fontSize: context.headingFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -272,7 +271,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           Text(
                             l10n.joinExclusiveCommunity,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.headerFontSize,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
@@ -415,14 +414,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                         children: [
                                           TextSpan(
                                             text: l10n.iAgreeToThe,
-                                            style: GoogleFonts.inter(
+                                            style: TextStyle(
                                               fontSize: context.bodyFontSize,
                                               color: Colors.grey[600],
                                             ),
                                           ),
                                           TextSpan(
                                             text: l10n.termsOfService,
-                                            style: GoogleFonts.inter(
+                                            style: TextStyle(
                                               fontSize: context.bodyFontSize,
                                               color: AppTheme.primaryMaroon,
                                               fontWeight: FontWeight.w500,
@@ -431,14 +430,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                           ),
                                           TextSpan(
                                             text: l10n.and,
-                                            style: GoogleFonts.inter(
+                                            style: TextStyle(
                                               fontSize: context.bodyFontSize,
                                               color: Colors.grey[600],
                                             ),
                                           ),
                                           TextSpan(
                                             text: l10n.privacyPolicy,
-                                            style: GoogleFonts.inter(
+                                            style: TextStyle(
                                               fontSize: context.bodyFontSize,
                                               color: AppTheme.primaryMaroon,
                                               fontWeight: FontWeight.w500,
@@ -502,7 +501,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           children: [
                                             Text(
                                               l10n.registrationFailed,
-                                              style: GoogleFonts.inter(
+                                              style: TextStyle(
                                                 color: Colors.red.shade700,
                                                 fontSize: context.bodyFontSize,
                                                 fontWeight: FontWeight.w600,
@@ -511,7 +510,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             SizedBox(height: context.smallPadding / 2),
                                             Text(
                                               authProvider.errorMessage!,
-                                              style: GoogleFonts.inter(
+                                              style: TextStyle(
                                                 color: Colors.red.shade600,
                                                 fontSize: context.captionFontSize,
                                                 height: 1.4,
@@ -546,7 +545,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             children: [
                               Text(
                                 l10n.alreadyHaveAccount,
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.bodyFontSize,
                                   color: Colors.grey[600],
                                 ),
@@ -557,7 +556,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 },
                                 child: Text(
                                   l10n.signIn,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.headerFontSize,
                                     color: AppTheme.primaryMaroon,
                                     fontWeight: FontWeight.w600,

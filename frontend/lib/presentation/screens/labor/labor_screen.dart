@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/models/labor/labor_model.dart';
@@ -97,7 +96,7 @@ class _LaborPageState extends State<LaborPage> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -134,7 +133,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.preparingExport,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -161,7 +160,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.labor} ${l10n.dataExportCompleted}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -245,7 +244,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -255,7 +254,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -280,7 +279,7 @@ class _LaborPageState extends State<LaborPage> {
             children: [
               Text(
                 l10n.laborManagement,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -290,7 +289,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.laborManagementDescription,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -312,7 +311,7 @@ class _LaborPageState extends State<LaborPage> {
       children: [
         Text(
           l10n.laborManagement,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -322,7 +321,7 @@ class _LaborPageState extends State<LaborPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.organizeAndManageLaborWorkforce,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -345,7 +344,7 @@ class _LaborPageState extends State<LaborPage> {
       children: [
         Text(
           l10n.labors,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -355,7 +354,7 @@ class _LaborPageState extends State<LaborPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.manageLaborWorkforce,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -395,7 +394,7 @@ class _LaborPageState extends State<LaborPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : '${l10n.add} ${l10n.labor}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -509,7 +508,7 @@ class _LaborPageState extends State<LaborPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -526,7 +525,7 @@ class _LaborPageState extends State<LaborPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -635,12 +634,12 @@ class _LaborPageState extends State<LaborPage> {
             provider.searchLabors(value);
           }
         },
-        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         decoration: InputDecoration(
           hintText: context.isTablet
               ? '${l10n.search} ${l10n.labors}...'
               : l10n.searchLaborsHint,
-          hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+          hintStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
           suffixIcon: provider.searchQuery != null && provider.searchQuery!.isNotEmpty
               ? IconButton(
@@ -690,7 +689,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 provider.showInactive ? l10n.hideInactive : l10n.showInactive,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
@@ -740,7 +739,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 filterCount > 0 ? '${l10n.filters} ($filterCount)' : l10n.filter,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: filterCount > 0 ? AppTheme.accentGold : AppTheme.primaryMaroon,
@@ -775,7 +774,7 @@ class _LaborPageState extends State<LaborPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.export,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.accentGold,
@@ -836,7 +835,7 @@ class _LaborPageState extends State<LaborPage> {
               children: [
                 Text(
                   filter,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w500,
                     color: AppTheme.primaryMaroon,
@@ -868,7 +867,7 @@ class _LaborPageState extends State<LaborPage> {
               onTap: provider.clearAllFilters,
               child: Text(
                 l10n.clearAll,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.red[700],

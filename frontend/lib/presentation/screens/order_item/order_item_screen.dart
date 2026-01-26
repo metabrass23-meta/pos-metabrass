@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/order_item_provider.dart';
@@ -95,7 +94,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.orderItems} ${l10n.success.toLowerCase()}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ],
           ),
@@ -118,7 +117,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -215,13 +214,13 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -243,7 +242,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
             children: [
               Text(
                 '${l10n.orderItems} ${l10n.manageInventory}',
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -253,7 +252,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.productManagementDescription,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -274,7 +273,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         // Page Title
         Text(
           '${l10n.orderItems} ${l10n.manageInventory}',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -284,7 +283,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.manageInventory,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -303,7 +302,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         // Compact Page Title
         Text(
           l10n.orderItems,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -313,7 +312,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.manageInventory,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -345,7 +344,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : '${l10n.add} ${l10n.orderItems}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -499,10 +498,10 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
           // Use debounced search to avoid too many API calls
           provider.searchOrderItemsDebounced(value);
         },
-        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         decoration: InputDecoration(
           hintText: context.isTablet ? '${l10n.search} ${l10n.items}...' : '${l10n.searchProductsHint}',
-          hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+          hintStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
@@ -561,7 +560,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(width: context.smallPadding),
               Text(
                 provider.showInactive ? l10n.hideInactive : l10n.showInactive,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
@@ -609,7 +608,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(width: context.smallPadding),
               Text(
                 hasActiveFilters ? '${l10n.filter} ($filterCount)' : l10n.filter,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
@@ -662,7 +661,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.filter}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.accentGold),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.accentGold),
               ),
             ],
           ),
@@ -685,7 +684,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
                     children: [
                       Text(
                         filter.value,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
                       ),
                       SizedBox(width: context.smallPadding / 2),
                       Icon(Icons.close, size: context.iconSize('small'), color: AppTheme.accentGold),
@@ -744,7 +743,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -761,7 +760,7 @@ class _OrderItemScreenState extends State<OrderItemScreen> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

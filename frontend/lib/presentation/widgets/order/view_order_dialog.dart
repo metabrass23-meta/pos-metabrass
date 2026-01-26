@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -110,7 +109,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.viewOrder : l10n.orderDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -121,7 +120,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.completeOrderInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -135,7 +134,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           '${l10n.orderID}: ${widget.order.id.substring(0, 8)}...',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -147,7 +146,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                         ),
                         child: Text(
                           _getStatusText(widget.order.status),
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -236,7 +235,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -269,7 +268,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customerInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -302,7 +301,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.financialInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -337,7 +336,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderItems,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -357,7 +356,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
                 Expanded(
                   child: Text(
                     l10n.orderItemsManagedSeparately,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.purple[700]),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.purple[700]),
                   ),
                 ),
               ],
@@ -371,11 +370,11 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
             children: [
               Text(
                 '${l10n.totalItems}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
               Text(
                 '${widget.order.orderSummary['total_items'] ?? 0}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -385,11 +384,11 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
             children: [
               Text(
                 '${l10n.totalQuantity}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
               Text(
                 '${widget.order.orderSummary['total_quantity'] ?? 0}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -417,7 +416,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.deliveryInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -451,7 +450,7 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -477,14 +476,14 @@ class _ViewOrderDialogState extends State<ViewOrderDialog> with SingleTickerProv
             flex: 2,
             child: Text(
               '$label:',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
         ],

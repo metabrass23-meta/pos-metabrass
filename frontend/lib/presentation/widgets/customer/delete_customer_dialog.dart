@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -156,7 +155,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -276,7 +275,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
               children: [
                 Text(
                   _isPermanentDelete ? 'Delete Permanently' : 'Deactivate Customer',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -289,7 +288,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                     _isPermanentDelete
                         ? 'This action cannot be undone'
                         : 'Customer can be restored later',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -395,7 +394,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
               children: [
                 Text(
                   _isPermanentDelete ? 'Permanent Deletion Warning' : 'Deactivation Notice',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w700,
                     color: _isPermanentDelete ? Colors.red[700] : Colors.orange[700],
@@ -406,7 +405,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                   _isPermanentDelete
                       ? 'This will permanently remove all customer data from the database. This action cannot be reversed.'
                       : 'This will deactivate the customer but preserve all data. The customer can be restored later.',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     color: AppTheme.charcoalGray,
                     height: 1.4,
@@ -440,7 +439,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
               SizedBox(width: context.smallPadding),
               Text(
                 'Choose deletion type:',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,
@@ -525,7 +524,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             SizedBox(height: context.smallPadding),
             Text(
               title,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: isSelected ? color : Colors.grey,
@@ -535,7 +534,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             SizedBox(height: context.smallPadding / 2),
             Text(
               subtitle,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize * 0.9,
                 color: isSelected ? color : Colors.grey[600],
               ),
@@ -573,7 +572,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                 child: Center(
                   child: Text(
                     _getCustomerInitials(),
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: _isPermanentDelete ? Colors.red[700] : Colors.orange[700],
@@ -599,7 +598,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                           ),
                           child: Text(
                             widget.customer.id,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w600,
                               color: _isPermanentDelete ? Colors.red : Colors.orange,
@@ -610,7 +609,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                         Expanded(
                           child: Text(
                             widget.customer.name,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -624,7 +623,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                       SizedBox(height: context.smallPadding),
                       Text(
                         '${widget.customer.phone} • ${widget.customer.email}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w400,
                           color: Colors.grey[600],
@@ -656,7 +655,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                   SizedBox(width: context.smallPadding),
                   Text(
                     'Customer since: ${_formatDate(widget.customer.createdAt)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.blue[700],
@@ -692,7 +691,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
               SizedBox(width: context.smallPadding),
               Text(
                 'Impact Assessment',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -705,7 +704,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             _isPermanentDelete
                 ? '• All customer data will be permanently removed\n• Order history will be anonymized\n• Contact information will be deleted\n• This action cannot be undone'
                 : '• Customer will be hidden from active lists\n• All data will be preserved\n• Customer can be restored later\n• Order history remains intact',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               color: AppTheme.charcoalGray,
               height: 1.5,
@@ -737,7 +736,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
               _isPermanentDelete
                   ? 'I understand this will permanently delete the customer and cannot be undone'
                   : 'I understand this will deactivate the customer',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: (_isPermanentDelete ? Colors.red : Colors.orange)[700],
@@ -752,7 +751,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             SizedBox(height: context.cardPadding),
             Text(
               'Type the customer name to confirm permanent deletion:',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.red[700],
@@ -768,13 +767,13 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
                     _confirmationText = value;
                   });
                 },
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: AppTheme.charcoalGray,
                 ),
                 decoration: InputDecoration(
                   hintText: widget.customer.name,
-                  hintStyle: GoogleFonts.inter(
+                  hintStyle: TextStyle(
                     fontSize: context.bodyFontSize,
                     color: Colors.grey[400],
                   ),
@@ -786,7 +785,7 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
             SizedBox(height: context.smallPadding),
             Text(
               'Expected: ${widget.customer.name}',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 color: Colors.grey[600],
                 fontStyle: FontStyle.italic,

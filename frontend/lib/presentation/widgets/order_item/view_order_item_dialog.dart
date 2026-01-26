@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_item_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -128,7 +127,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               children: [
                 Text(
                   l10n.viewOrderItem,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -139,7 +138,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.completeOrderItemInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -153,7 +152,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.orderItem.id.length > 8 ? '${widget.orderItem.id.substring(0, 8)}...' : widget.orderItem.id,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -164,7 +163,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                           widget.orderItem.productName.length > 15
                               ? '${widget.orderItem.productName.substring(0, 15)}...'
                               : widget.orderItem.productName,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -300,7 +299,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.basicInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -330,7 +329,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.productDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -374,7 +373,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                   Expanded(
                     child: Text(
                       l10n.noAdditionalProductDetailsAvailable,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey[600],
@@ -408,7 +407,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.financialInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -442,7 +441,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -476,7 +475,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.statusInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -512,7 +511,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.timestamps,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -544,7 +543,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customizationNotes,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -559,7 +558,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
             ),
             child: Text(
               widget.orderItem.customizationNotes.isNotEmpty ? widget.orderItem.customizationNotes : l10n.noCustomizationNotesAvailable,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: widget.orderItem.customizationNotes.isNotEmpty ? Colors.amber[800] : Colors.grey[600],
@@ -587,11 +586,11 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
             children: [
               Text(
                 label,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Text(
                 value,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -620,7 +619,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
             children: [
               Text(
                 label,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
@@ -631,7 +630,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                 ),
                 child: Text(
                   value ? l10n.active : l10n.inactive,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: value ? Colors.green[700] : Colors.red[700],

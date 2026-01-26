@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
@@ -181,7 +180,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -209,7 +208,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               ),
               child: Text(
                 payment.id.substring(0, 8),
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -226,7 +225,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               children: [
                 Text(
                   payment.laborName ?? l10n.notAvailable,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -239,7 +238,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                       Expanded(
                         child: Text(
                           payment.laborRole ?? l10n.notAvailable,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -250,7 +249,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${l10n.desc}: ${payment.description}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -278,14 +277,14 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                           children: [
                             Text(
                               payment.laborRole ?? l10n.notAvailable,
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             if (payment.laborPhone != null && payment.laborPhone!.isNotEmpty)
                               Text(
                                 payment.laborPhone!,
-                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -305,7 +304,7 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payment.description?.isNotEmpty == true ? payment.description! : l10n.noDescription,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -326,14 +325,14 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
                 children: [
                   Text(
                     'PKR ${payment.amountPaid.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
                     textAlign: TextAlign.center,
                   ),
                   if (payment.bonus > 0 || payment.deduction > 0) ...[
                     SizedBox(height: 2),
                     Text(
                       '${l10n.net}: PKR ${payment.netAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -351,11 +350,11 @@ class _EnhancedPaymentTableState extends State<EnhancedPaymentTable> {
               children: [
                 Text(
                   '${payment.date.day}/${payment.date.month}/${payment.date.year}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   context.shouldShowCompactLayout ? payment.formattedTime : '${payment.formattedTime} • ${payment.formattedDate}',
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),

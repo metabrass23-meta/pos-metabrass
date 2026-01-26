@@ -3,7 +3,6 @@ import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/presentation/widgets/globals/drop_down.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
@@ -95,7 +94,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               l10n.expenseUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -116,7 +115,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -213,7 +212,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editExpense : l10n.editExpenseRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -224,7 +223,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateExpenseInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -239,7 +238,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.expense.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -373,7 +372,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                               SizedBox(width: context.smallPadding),
                               Text(
                                 l10n.selectDateTime,
-                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                               ),
                             ],
                           ),
@@ -385,7 +384,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                                 children: [
                                   Text(
                                     l10n.date,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -393,7 +392,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                                   ),
                                   Text(
                                     '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
@@ -406,7 +405,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                                 children: [
                                   Text(
                                     l10n.time,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -414,7 +413,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> with SingleTicker
                                   ),
                                   Text(
                                     _selectedTime.format(context),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,

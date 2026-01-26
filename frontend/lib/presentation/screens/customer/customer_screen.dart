@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -103,7 +102,7 @@ class _CustomerPageState extends State<CustomerPage> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -141,7 +140,7 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customerDataExported,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -212,7 +211,7 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -222,7 +221,7 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -247,7 +246,7 @@ class _CustomerPageState extends State<CustomerPage> {
             children: [
               Text(
                 l10n.customerManagement,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -257,7 +256,7 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.customerManagementDescription,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -280,7 +279,7 @@ class _CustomerPageState extends State<CustomerPage> {
       children: [
         Text(
           l10n.customerManagement,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -290,7 +289,7 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.customerManagementShortDescription,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -311,7 +310,7 @@ class _CustomerPageState extends State<CustomerPage> {
       children: [
         Text(
           l10n.customers,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -321,7 +320,7 @@ class _CustomerPageState extends State<CustomerPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.customerManagementShortDescription,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -365,7 +364,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : l10n.addCustomer,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -567,7 +566,7 @@ class _CustomerPageState extends State<CustomerPage> {
       child: TextField(
         controller: _searchController,
         onChanged: provider.searchCustomers,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.bodyFontSize,
           color: AppTheme.charcoalGray,
         ),
@@ -575,7 +574,7 @@ class _CustomerPageState extends State<CustomerPage> {
           hintText: context.isTablet
               ? l10n.searchCustomersShortHint
               : l10n.searchCustomersHint,
-          hintStyle: GoogleFonts.inter(
+          hintStyle: TextStyle(
             fontSize: context.bodyFontSize * 0.9,
             color: Colors.grey[500],
           ),
@@ -644,7 +643,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 provider.showInactive
                     ? l10n.hideInactive
                     : l10n.showInactive,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive
@@ -703,7 +702,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 hasActiveFilters
                     ? '${l10n.filter} (${_getActiveFilterCount(provider)})'
                     : l10n.filter,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: hasActiveFilters
@@ -747,7 +746,7 @@ class _CustomerPageState extends State<CustomerPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.export,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.accentGold,
@@ -811,7 +810,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 children: [
                   Text(
                     filter,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primaryMaroon,
@@ -847,7 +846,7 @@ class _CustomerPageState extends State<CustomerPage> {
               onTap: provider.clearAllFilters,
               child: Text(
                 l10n.clearAll,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.red[700],
@@ -928,7 +927,7 @@ class _CustomerPageState extends State<CustomerPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -945,7 +944,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -979,7 +978,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: 2.h),
             Text(
               '${l10n.error}: $message',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.red[700],
@@ -989,7 +988,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: 1.h),
             Text(
               l10n.pleaseTryAgainOrContactSupport,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 3.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -1018,7 +1017,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: 2.h),
             Text(
               l10n.loadingCustomers,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -1044,7 +1043,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: 2.h),
             Text(
               l10n.noCustomersFound,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 4.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[600],
@@ -1054,7 +1053,7 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(height: 1.h),
             Text(
               l10n.adjustFilters,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: 3.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],

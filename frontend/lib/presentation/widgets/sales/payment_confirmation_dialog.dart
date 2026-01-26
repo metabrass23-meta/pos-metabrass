@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -8,7 +7,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
-import '../globals/text_field.dart';
+import '../globals/text_field.dart'; // ✅ Use PremiumTextField
 
 class PaymentConfirmationDialog extends StatefulWidget {
   final String saleId;
@@ -60,7 +59,11 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
     final remainingAmount = widget.grandTotal - widget.amountPaid;
     _amountController.text = remainingAmount.toStringAsFixed(2);
     _isPartialPayment = remainingAmount < widget.grandTotal;
-    _loadWorkflowSummary();
+
+    // Defer provider call to after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadWorkflowSummary();
+    });
   }
 
   @override
@@ -104,6 +107,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
         previousAmountPaid: widget.amountPaid,
       )) {
         _showErrorDialog(l10n.invalidPaymentAmount);
+        setState(() => _isLoading = false);
         return;
       }
 
@@ -148,7 +152,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 24),
             const SizedBox(width: 12),
-            Text(l10n.paymentConfirmed, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            Text(l10n.paymentConfirmed, style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
         content: Column(
@@ -163,8 +167,8 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Close success dialog
+              Navigator.of(context).pop(); // Close payment dialog
               widget.onPaymentConfirmed?.call(true);
             },
             child: Text(l10n.continue_),
@@ -184,7 +188,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
           children: [
             const Icon(Icons.error, color: Colors.red, size: 24),
             const SizedBox(width: 12),
-            Text(l10n.paymentError, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            Text(l10n.paymentError, style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
         content: Text(message),
@@ -208,7 +212,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.paymentSummary, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(l10n.paymentSummary, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
           const SizedBox(height: 12),
           _buildSummaryRow(l10n.invoice, widget.invoiceNumber),
           _buildSummaryRow('${l10n.customer}:', widget.customerName),
@@ -233,10 +237,10 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: GoogleFonts.poppins(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14)),
+          Expanded(child: Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14))),
           Text(
             value,
-            style: GoogleFonts.poppins(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14, color: color),
+            style: TextStyle(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14, color: color),
           ),
         ],
       ),
@@ -258,10 +262,10 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.paymentProgress, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(l10n.paymentProgress, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
               Text(
                 '${progress.toStringAsFixed(1)}%',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -275,7 +279,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
           const SizedBox(height: 8),
           Text(
             isComplete ? l10n.paymentComplete : l10n.paymentInProgress,
-            style: GoogleFonts.poppins(fontSize: 12, color: isComplete ? Colors.green : Colors.orange),
+            style: TextStyle(fontSize: 12, color: isComplete ? Colors.green : Colors.orange),
           ),
         ],
       ),
@@ -293,10 +297,11 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
         child: Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
-            constraints: BoxConstraints(maxWidth: 500, maxHeight: 0.8.sh),
+            constraints: BoxConstraints(maxWidth: 500, maxHeight: 80.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // --- Header ---
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: const BoxDecoration(
@@ -310,7 +315,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                       Expanded(
                         child: Text(
                           l10n.paymentConfirmation,
-                          style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                         ),
                       ),
                       IconButton(
@@ -322,6 +327,8 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                     ],
                   ),
                 ),
+
+                // --- Content ---
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
@@ -332,14 +339,17 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                         children: [
                           _buildWorkflowProgress(),
                           _buildPaymentSummary(),
+
                           const SizedBox(height: 24),
-                          Text(l10n.paymentMethod, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
-                          const SizedBox(height: 8),
+
+                          // Payment Method
                           DropdownButtonFormField<String>(
                             value: _selectedPaymentMethod,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              labelText: l10n.paymentMethod,
+                              border: const OutlineInputBorder(),
+                              filled: true,
+                              fillColor: Colors.white,
                             ),
                             items: [
                               DropdownMenuItem(value: 'CASH', child: Text(l10n.cash)),
@@ -353,63 +363,48 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                                 _selectedPaymentMethod = value!;
                               });
                             },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return l10n.pleaseSelectPaymentMethod;
-                              }
-                              return null;
-                            },
+                            validator: (value) => (value == null || value.isEmpty) ? l10n.pleaseSelectPaymentMethod : null,
                           ),
+
                           const SizedBox(height: 16),
-                          Text(l10n.paymentAmount, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
-                          const SizedBox(height: 8),
-                          TextFormField(
+
+                          // Amount
+                          PremiumTextField(
+                            label: l10n.paymentAmount,
+                            hint: l10n.enterAmount,
                             controller: _amountController,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              prefixText: 'PKR ',
-                              hintText: l10n.enterAmount,
-                            ),
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return l10n.pleaseEnterPaymentAmount;
-                              }
+                              if (value == null || value.isEmpty) return l10n.pleaseEnterPaymentAmount;
                               final amount = double.tryParse(value);
-                              if (amount == null || amount <= 0) {
-                                return l10n.pleaseEnterValidAmount;
-                              }
-                              if (amount > (widget.grandTotal - widget.amountPaid)) {
-                                return l10n.amountExceedsBalance;
-                              }
+                              if (amount == null || amount <= 0) return l10n.pleaseEnterValidAmount;
+                              if (amount > (widget.grandTotal - widget.amountPaid)) return l10n.amountExceedsBalance;
                               return null;
                             },
                           ),
+
                           const SizedBox(height: 16),
-                          Text(l10n.referenceOptional, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
-                          const SizedBox(height: 8),
-                          TextFormField(
+
+                          // Reference
+                          PremiumTextField(
+                            label: l10n.referenceOptional,
+                            hint: l10n.transactionReferenceOrReceipt,
                             controller: _referenceController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              hintText: l10n.transactionReferenceOrReceipt,
-                            ),
                           ),
+
                           const SizedBox(height: 16),
-                          Text(l10n.notesOptional, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 16)),
-                          const SizedBox(height: 8),
-                          TextFormField(
+
+                          // Notes
+                          PremiumTextField(
+                            label: l10n.notesOptional,
+                            hint: l10n.additionalNotesAboutPayment,
                             controller: _notesController,
                             maxLines: 3,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              hintText: l10n.additionalNotesAboutPayment,
-                            ),
                           ),
+
                           const SizedBox(height: 24),
+
+                          // Actions
                           Row(
                             children: [
                               Expanded(
@@ -424,7 +419,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                                   ),
                                   child: Text(
                                     l10n.cancel,
-                                    style: GoogleFonts.poppins(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
+                                    style: const TextStyle(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ),
@@ -445,7 +440,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                                   )
                                       : Text(
                                     l10n.confirmPayment,
-                                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ),

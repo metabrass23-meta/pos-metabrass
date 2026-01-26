@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Request model for creating a new payment
 class CreatePaymentRequest {
   final String? laborId;
   final String? vendorId;
@@ -44,32 +43,39 @@ class CreatePaymentRequest {
     this.receiptImagePath,
   });
 
+  /// Convert to JSON with Strict Formatting for Django
   Map<String, dynamic> toJson() {
-    return {
-      'labor': laborId,
-      'vendor': vendorId,
-      'order': orderId,
-      'sale': saleId,
+    final Map<String, dynamic> data = {
       'payer_type': payerType,
-      'payer_id': payerId,
-      'labor_name': laborName,
-      'labor_phone': laborPhone,
-      'labor_role': laborRole,
-      'amount_paid': amountPaid.toString(),
-      'bonus': bonus.toString(),
-      'deduction': deduction.toString(),
-      'payment_month': paymentMonth.toIso8601String(),
-      'is_final_payment': isFinalPayment,
-      'payment_method': paymentMethod,
-      'description': description,
-      'date': date.toIso8601String(),
+      'amount_paid': amountPaid,
+      'bonus': bonus,
+      'deduction': deduction,
+      // FIX 1: Format Date strictly as YYYY-MM-DD
+      'payment_month': paymentMonth.toIso8601String().split('T')[0],
+      'date': date.toIso8601String().split('T')[0],
+      // FIX 2: Format Time strictly as HH:MM:SS
       'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:00',
-      'receipt_image_path': receiptImagePath,
+      'payment_method': paymentMethod,
+      'is_final_payment': isFinalPayment,
     };
+
+    if (laborId != null) data['labor'] = laborId;
+    if (vendorId != null) data['vendor'] = vendorId;
+    if (orderId != null) data['order'] = orderId;
+    if (saleId != null) data['sale'] = saleId;
+    if (payerId != null) data['payer_id'] = payerId;
+    if (laborName != null) data['labor_name'] = laborName;
+    if (laborPhone != null) data['labor_phone'] = laborPhone;
+    if (laborRole != null) data['labor_role'] = laborRole;
+    if (description != null && description!.isNotEmpty) data['description'] = description;
+
+    // NOTE: We cannot send 'receipt_image_path' in JSON.
+    // To upload images, the backend must be updated to support Multipart.
+
+    return data;
   }
 }
 
-/// Request model for updating a payment
 class UpdatePaymentRequest {
   final String? laborId;
   final String? vendorId;
@@ -115,23 +121,33 @@ class UpdatePaymentRequest {
     if (saleId != null) data['sale'] = saleId;
     if (payerType != null) data['payer_type'] = payerType;
     if (payerId != null) data['payer_id'] = payerId;
-    if (amountPaid != null) data['amount_paid'] = amountPaid.toString();
-    if (bonus != null) data['bonus'] = bonus.toString();
-    if (deduction != null) data['deduction'] = deduction.toString();
-    if (paymentMonth != null) data['payment_month'] = paymentMonth!.toIso8601String();
+    if (amountPaid != null) data['amount_paid'] = amountPaid;
+    if (bonus != null) data['bonus'] = bonus;
+    if (deduction != null) data['deduction'] = deduction;
+
+    // FIX: Strict Date Formatting
+    if (paymentMonth != null) {
+      data['payment_month'] = paymentMonth!.toIso8601String().split('T')[0];
+    }
+
     if (isFinalPayment != null) data['is_final_payment'] = isFinalPayment;
     if (paymentMethod != null) data['payment_method'] = paymentMethod;
     if (description != null) data['description'] = description;
-    if (date != null) data['date'] = date!.toIso8601String();
+
+    // FIX: Strict Date Formatting
+    if (date != null) {
+      data['date'] = date!.toIso8601String().split('T')[0];
+    }
+
+    // FIX: Strict Time Formatting
     if (time != null) {
       data['time'] = '${time!.hour.toString().padLeft(2, '0')}:${time!.minute.toString().padLeft(2, '0')}:00';
     }
-    if (receiptImagePath != null) data['receipt_image_path'] = receiptImagePath;
+
     return data;
   }
 }
 
-/// Request model for payment filtering
 class PaymentFilterRequest {
   final String? payerType;
   final String? paymentMethod;
@@ -176,8 +192,11 @@ class PaymentFilterRequest {
     if (orderId != null) params['order_id'] = orderId;
     if (saleId != null) params['sale_id'] = saleId;
     if (isFinalPayment != null) params['is_final_payment'] = isFinalPayment.toString();
-    if (startDate != null) params['start_date'] = startDate!.toIso8601String();
-    if (endDate != null) params['end_date'] = endDate!.toIso8601String();
+
+    // FIX: Date Formatting
+    if (startDate != null) params['start_date'] = startDate!.toIso8601String().split('T')[0];
+    if (endDate != null) params['end_date'] = endDate!.toIso8601String().split('T')[0];
+
     if (minAmount != null) params['min_amount'] = minAmount.toString();
     if (maxAmount != null) params['max_amount'] = maxAmount.toString();
     if (search != null) params['search'] = search;
@@ -188,7 +207,6 @@ class PaymentFilterRequest {
   }
 }
 
-/// Request model for bulk payment actions
 class BulkPaymentActionRequest {
   final List<String> paymentIds;
   final String action;
@@ -201,7 +219,6 @@ class BulkPaymentActionRequest {
   }
 }
 
-/// Request model for payment statistics
 class PaymentStatisticsRequest {
   final DateTime? startDate;
   final DateTime? endDate;
@@ -213,8 +230,11 @@ class PaymentStatisticsRequest {
 
   Map<String, dynamic> toQueryParameters() {
     final Map<String, dynamic> params = {};
-    if (startDate != null) params['start_date'] = startDate!.toIso8601String();
-    if (endDate != null) params['end_date'] = endDate!.toIso8601String();
+
+    // FIX: Date Formatting
+    if (startDate != null) params['start_date'] = startDate!.toIso8601String().split('T')[0];
+    if (endDate != null) params['end_date'] = endDate!.toIso8601String().split('T')[0];
+
     if (payerType != null) params['payer_type'] = payerType;
     if (paymentMethod != null) params['payment_method'] = paymentMethod;
     if (groupBy != null) params['group_by'] = groupBy;

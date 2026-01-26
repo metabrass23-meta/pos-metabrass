@@ -1,4 +1,4 @@
-import '../zakat/zakat_model.dart';
+import 'zakat_model.dart';
 
 class ZakatsListResponse {
   final List<Zakat> zakats;

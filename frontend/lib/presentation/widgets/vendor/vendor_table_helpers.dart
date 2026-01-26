@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
@@ -129,7 +128,7 @@ class VendorTableHelpers {
             children: [
               Icon(Icons.visibility_off, color: Colors.orange, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.deactivate, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.deactivate, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -142,7 +141,7 @@ class VendorTableHelpers {
             children: [
               Icon(Icons.restore, color: Colors.green, size: context.iconSize('small')),
               SizedBox(width: context.smallPadding),
-              Text(l10n.restore, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+              Text(l10n.restore, style: TextStyle(fontSize: context.captionFontSize)),
             ],
           ),
         ),
@@ -238,7 +237,7 @@ class VendorTableHelpers {
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -271,7 +270,7 @@ class VendorTableHelpers {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -330,7 +329,7 @@ class VendorTableHelpers {
 
           Text(
             '${l10n.failedToLoad} ${l10n.vendor}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -352,7 +351,7 @@ class VendorTableHelpers {
             ),
             child: Text(
               provider.errorMessage ?? l10n.unexpectedError,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -392,7 +391,7 @@ class VendorTableHelpers {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.retry,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -450,7 +449,7 @@ class VendorTableHelpers {
 
           Text(
             '${l10n.noVendorsFound}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -472,7 +471,7 @@ class VendorTableHelpers {
             ),
             child: Text(
               l10n.startByAddingFirstVendor,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -481,51 +480,6 @@ class VendorTableHelpers {
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
-              ),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will trigger the add vendor dialog from parent
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.cardPadding * 0.6,
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        '${l10n.add} ${l10n.firstVendor}',
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

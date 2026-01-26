@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/order_provider.dart';
@@ -244,7 +243,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.orders} ${l10n.success}!',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -265,7 +264,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -368,7 +367,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.newOrder : '${l10n.add} ${l10n.orders}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -379,7 +378,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.createOrder,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -473,7 +472,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           SizedBox(height: context.smallPadding),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               color: isActive
@@ -609,7 +608,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
 
                 Text(
                   l10n.status,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
@@ -658,7 +657,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     ),
                     label: Text(
                       '${l10n.add} ${l10n.products}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600
                       ),
@@ -691,7 +690,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       SizedBox(width: context.smallPadding),
                       Text(
                         '${l10n.products} (${_orderItems.length})',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.charcoalGray,
@@ -868,7 +867,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                             _selectedDeliveryDate != null
                                 ? '${l10n.dueDate}: ${_selectedDeliveryDate!.day.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.month.toString().padLeft(2, '0')}/${_selectedDeliveryDate!.year}'
                                 : l10n.dueDate,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               color: _selectedDeliveryDate != null
                                   ? Colors.black87
@@ -914,7 +913,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
         SizedBox(width: context.cardPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w700,
             color: Colors.black87,
@@ -954,7 +953,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -988,7 +987,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             child: Center(
               child: Text(
                 _selectedCustomer!.initials,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.shouldShowCompactLayout ? 16 : 20,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.pureWhite,
@@ -1014,7 +1013,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       ),
                       child: Text(
                         _selectedCustomer!.id,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.primaryMaroon,
@@ -1025,7 +1024,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     Expanded(
                       child: Text(
                         _selectedCustomer!.name,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.charcoalGray,
@@ -1042,7 +1041,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       SizedBox(width: context.smallPadding / 2),
                       Text(
                         _selectedCustomer!.phone,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           color: AppTheme.charcoalGray,
                         ),
@@ -1053,7 +1052,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       Expanded(
                         child: Text(
                           _selectedCustomer!.email,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             color: AppTheme.charcoalGray,
                           ),
@@ -1103,7 +1102,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               _getStatusText(status),
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? color : AppTheme.lightGray,
@@ -1155,7 +1154,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               children: [
                 Text(
                   item.productName,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
@@ -1175,7 +1174,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                       ),
                       child: Text(
                         '${l10n.quantity}: ${item.quantity}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.primaryMaroon,
@@ -1185,7 +1184,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                     SizedBox(width: context.smallPadding),
                     Text(
                       'PKR ${item.unitPrice.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[700],
                       ),
@@ -1196,7 +1195,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     '${l10n.notes}: ${item.customizationNotes}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       color: Colors.grey[600],
                       fontStyle: FontStyle.italic,
@@ -1213,7 +1212,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             children: [
               Text(
                 'PKR ${item.lineTotal.toStringAsFixed(2)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.primaryMaroon,
@@ -1281,7 +1280,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.total} ${l10n.amount}:',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -1291,7 +1290,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           ),
           Text(
             'PKR ${_totalAmount.toStringAsFixed(2)}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize,
               fontWeight: FontWeight.w700,
               color: AppTheme.primaryMaroon,
@@ -1322,7 +1321,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           SizedBox(height: context.cardPadding),
           Text(
             l10n.noProductsFound,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
               color: Colors.grey[600],
@@ -1331,7 +1330,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           SizedBox(height: context.smallPadding),
           Text(
             l10n.addProductsToStartSale,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
             ),
@@ -1354,7 +1353,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
             width: context.shouldShowCompactLayout ? 80 : 120,
             child: Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.lightGray,
@@ -1365,7 +1364,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
                 color: valueColor ?? AppTheme.charcoalGray,

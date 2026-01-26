@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/vendor/vendor_model.dart';
 import '../../../src/providers/vendor_provider.dart';
@@ -67,7 +66,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -99,7 +98,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -232,7 +231,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
           SizedBox(height: context.cardPadding),
           Text(
             '${l10n.loading} ${l10n.vendor} ${l10n.details}...',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w500,
               color: Colors.grey[600],
@@ -278,7 +277,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               children: [
                 Text(
                   '${l10n.vendor} ${l10n.details}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -289,7 +288,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     '${l10n.complete} ${l10n.vendor} ${l10n.information}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -312,7 +311,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               widget.vendor.id.length > 10
                   ? '${widget.vendor.id.substring(0, 10)}...'
                   : widget.vendor.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -386,7 +385,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
             child: Center(
               child: Text(
                 widget.vendor.initials,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.pureWhite,
@@ -401,7 +400,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               children: [
                 Text(
                   widget.vendor.displayName,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize * 0.8,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -418,7 +417,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${l10n.vendor} ${l10n.since} ${widget.vendor.formattedCreatedAt}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
                       ),
@@ -436,7 +435,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${widget.vendor.vendorAgeDays} ${l10n.daysOld} (${widget.vendor.relativeCreatedAt})',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
                       ),
@@ -530,7 +529,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.activitySummary,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -547,7 +546,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   children: [
                     Text(
                       l10n.totalOrders,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -556,7 +555,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       '${widget.vendor.paymentsCount}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -571,7 +570,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                   children: [
                     Text(
                       l10n.totalAmount,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -580,7 +579,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       'PKR ${widget.vendor.totalPaymentsAmount.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -618,7 +617,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -640,7 +639,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
         SizedBox(width: context.smallPadding),
         Text(
           '$label: ',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.subtitleFontSize,
             fontWeight: FontWeight.w500,
             color: Colors.grey[600],
@@ -649,7 +648,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,

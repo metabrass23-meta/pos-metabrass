@@ -12815,6 +12815,54 @@ abstract class AppLocalizations {
   /// **'Delete Purchase'**
   String get deletePurchase;
 
+  /// No description provided for @loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading data...'**
+  String get loadingData;
+
+  /// No description provided for @pendingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending orders'**
+  String get pendingOrders;
+
+  /// No description provided for @returnNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Number'**
+  String get returnNumber;
+
+  /// No description provided for @pleaseSelectVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a vendor'**
+  String get pleaseSelectVendor;
+
+  /// No description provided for @loadingLabors.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading labors...'**
+  String get loadingLabors;
+
+  /// No description provided for @loadingVendors.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading vendors...'**
+  String get loadingVendors;
+
+  /// No description provided for @loadingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading orders...'**
+  String get loadingOrders;
+
+  /// No description provided for @loadingSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading sales...'**
+  String get loadingSales;
+
   /// No description provided for @confirmDelete.
   ///
   /// In en, this message translates to:

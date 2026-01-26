@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:async';
 import '../../../src/providers/expenses_provider.dart';
@@ -222,7 +221,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
               children: [
                 Text(
                   l10n.filterExpenseRecords,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -233,7 +232,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.refineExpenseList,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -316,7 +315,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -332,10 +331,10 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
 
     return TextFormField(
       controller: _searchController,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
         hintText: l10n.searchByExpenseHint,
-        hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+        hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -362,10 +361,10 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
       children: [
         TextFormField(
           controller: _categoryController,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
           decoration: InputDecoration(
             hintText: l10n.enterExpenseCategory,
-            hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+            hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
             prefixIcon: Icon(Icons.category_outlined, color: Colors.grey[500], size: context.iconSize('medium')),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -402,7 +401,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
       children: [
         Text(
           l10n.selectWithdrawalAuthority,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         ...(_withdrawalOptions.map(
@@ -416,7 +415,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
             },
             title: Text(
               person,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
             activeColor: AppTheme.primaryMaroon,
             dense: true,
@@ -431,7 +430,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
           icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
           label: Text(
             l10n.clearWithdrawalFilter,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
       ],
@@ -464,7 +463,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.selectDateRange,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                           ),
                         ],
                       ),
@@ -473,7 +472,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                         _dateFrom != null && _dateTo != null
                             ? '${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year} - ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}'
                             : l10n.noDateRangeSelected,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
                         ),
@@ -500,7 +499,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                   icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
                   label: Text(
                     l10n.clearDateRange,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red[600]),
                   ),
                 ),
               ),
@@ -524,7 +523,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
         ),
       ),
     );

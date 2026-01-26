@@ -65,6 +65,9 @@ class OrderModel {
     required this.deliveryStatus,
   });
 
+  // ✅ ADDED: orderNumber getter (Derived from ID for display)
+  String get orderNumber => "ORD-${id.substring(0, 8).toUpperCase()}";
+
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'] as String,

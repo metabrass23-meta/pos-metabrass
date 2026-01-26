@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_model.dart';
 import '../../../src/providers/order_provider.dart';
@@ -225,7 +224,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -244,7 +243,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -291,7 +290,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 ),
                 child: Text(
                   '#${order.id.length >= 8 ? order.id.substring(0, 8) : order.id}',
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -308,14 +307,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 children: [
                   Text(
                     order.customerName.isNotEmpty ? order.customerName : l10n.notAvailable,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     order.customerPhone.isNotEmpty ? order.customerPhone : l10n.noPhone,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -329,7 +328,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               constraints: BoxConstraints(maxWidth: columnWidths[2]),
               child: Text(
                 order.description.isNotEmpty ? order.description : l10n.noDescription,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -345,7 +344,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   if (order.totalAmount > 0) ...[
                     Text(
                       'PKR ${order.totalAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -353,7 +352,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                       SizedBox(height: context.smallPadding / 4),
                       Text(
                         '${l10n.due}: PKR ${order.remainingAmount.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.red),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -361,7 +360,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                       SizedBox(height: context.smallPadding / 4),
                       Text(
                         l10n.fullyPaid,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.green),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.green),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -378,14 +377,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                             children: [
                               Text(
                                 '${totalItems} ${totalItems == 1 ? l10n.item : l10n.items}',
-                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+                                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: context.smallPadding / 4),
                               Text(
                                 '${l10n.qty}: ${totalQuantity}',
-                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue[600]),
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -397,14 +396,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                             children: [
                               Text(
                                 l10n.noItems,
-                                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: context.smallPadding / 4),
                               Text(
                                 l10n.addItemsToSeeTotal,
-                                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.blue),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -431,7 +430,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 ),
                 child: Text(
                   _helpers.getStatusText(order.status),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: _helpers.getStatusColor(order.status),
@@ -452,7 +451,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 children: [
                   Text(
                     order.expectedDeliveryDate != null ? _helpers.formatDate(order.expectedDeliveryDate!) : l10n.noDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: order.isOverdue ? Colors.red : AppTheme.charcoalGray,
@@ -463,14 +462,14 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   if (order.isOverdue) ...[
                     Text(
                       l10n.overdue,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ] else if (order.daysUntilDelivery != null && order.daysUntilDelivery! <= 3 && order.daysUntilDelivery! >= 0) ...[
                     Text(
                       '${order.daysUntilDelivery} ${l10n.days}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -494,7 +493,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         padding: EdgeInsets.all(context.cardPadding),
         child: Text(
           '${l10n.errorDisplayingOrder}: ${e.toString()}',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red),
+          style: TextStyle(fontSize: context.bodyFontSize, color: Colors.red),
         ),
       );
     }
@@ -517,7 +516,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         children: [
           Text(
             '${l10n.showing} ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} ${l10n.outOf} ${pagination.totalCount} ${l10n.orders}',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -537,7 +536,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 ),
                 child: Text(
                   '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 

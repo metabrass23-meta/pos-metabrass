@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -265,7 +264,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             Expanded(
               child: Text(
                 '${l10n.pleaseFixFollowingErrors}\n$errorMessages',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -299,7 +298,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               l10n.laborCreatedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -331,7 +330,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -402,7 +401,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.charcoalGray,
@@ -425,7 +424,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,
@@ -520,7 +519,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addLabor : l10n.addNewLabor,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -531,7 +530,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.createNewLaborRecord,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),

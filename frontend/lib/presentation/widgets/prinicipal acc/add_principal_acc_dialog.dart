@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -108,7 +107,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
             SizedBox(width: context.smallPadding),
             Text(
               l10n.principalAccountEntryAddedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -129,7 +128,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -255,7 +254,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addEntry : l10n.addPrincipalAccountEntry,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -266,7 +265,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordANewLedgerTransaction,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -369,7 +368,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                           SizedBox(width: context.smallPadding),
                           Text(
                             type == 'credit' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
-                            style: GoogleFonts.inter(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -500,7 +499,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                               SizedBox(width: context.smallPadding),
                               Text(
                                 l10n.selectDateTime,
-                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                               ),
                             ],
                           ),
@@ -512,7 +511,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                 children: [
                                   Text(
                                     l10n.date,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -520,7 +519,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                   ),
                                   Text(
                                     '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
@@ -533,7 +532,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                 children: [
                                   Text(
                                     l10n.time,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -541,7 +540,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                   ),
                                   Text(
                                     _selectedTime.format(context),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
