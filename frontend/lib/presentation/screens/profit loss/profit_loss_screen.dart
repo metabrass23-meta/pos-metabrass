@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -103,13 +102,13 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -134,7 +133,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                   SizedBox(width: context.cardPadding),
                   Text(
                     l10n.profitLossStatement,
-                    style: GoogleFonts.playfairDisplay(
+                    style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.charcoalGray,
@@ -146,13 +145,13 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.profitLossStatementDescription,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
               if (provider.currentProfitLoss != null) ...[
                 SizedBox(height: context.smallPadding),
                 Text(
                   '${l10n.period}: ${provider.currentProfitLoss!.formattedPeriod}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ],
             ],
@@ -175,7 +174,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             SizedBox(width: context.cardPadding),
             Text(
               l10n.profitLoss,
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.charcoalGray,
@@ -187,13 +186,13 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.financialPerformanceAnalysis,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         if (provider.currentProfitLoss != null) ...[
           SizedBox(height: context.smallPadding),
           Text(
             '${l10n.period}: ${provider.currentProfitLoss!.formattedPeriod}',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
         ],
         SizedBox(height: context.cardPadding),
@@ -214,7 +213,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               l10n.profitLossShort,
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.charcoalGray,
@@ -226,13 +225,13 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.financialAnalysis,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         if (provider.currentProfitLoss != null) ...[
           SizedBox(height: context.smallPadding),
           Text(
             provider.currentProfitLoss!.formattedPeriod,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
         ],
         SizedBox(height: context.cardPadding),
@@ -271,7 +270,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                     SizedBox(width: context.smallPadding),
                     Text(
                       '${l10n.preparing} ${format.toUpperCase()} ${l10n.export.toLowerCase()}...',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.white),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.white),
                     ),
                   ],
                 ),
@@ -314,7 +313,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.export : '${l10n.export} ${l10n.report}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.accentGold,
@@ -344,7 +343,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
           SizedBox(height: context.mainPadding),
           Text(
             l10n.calculatingProfitLoss,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -369,7 +368,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
           Expanded(
             child: Text(
               provider.errorMessage ?? l10n.unexpectedError,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red.shade700),
+              style: TextStyle(fontSize: context.bodyFontSize, color: Colors.red.shade700),
             ),
           ),
           TextButton(
@@ -379,7 +378,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             },
             child: Text(
               l10n.retry,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red.shade600),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red.shade600),
             ),
           ),
           IconButton(
@@ -411,7 +410,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
           Expanded(
             child: Text(
               provider.successMessage ?? l10n.operationCompletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.green.shade700),
+              style: TextStyle(fontSize: context.bodyFontSize, color: Colors.green.shade700),
             ),
           ),
           IconButton(
@@ -441,12 +440,12 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
           SizedBox(height: context.mainPadding),
           Text(
             l10n.noFinancialDataAvailable,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             l10n.selectPeriodToViewAnalysis,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -469,8 +468,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
         unselectedLabelColor: Colors.grey[600],
         indicatorColor: Colors.transparent,
         indicatorWeight: 1,
-        labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500),
         tabs: [
           Tab(icon: Icon(Icons.analytics_rounded), text: l10n.overview),
           Tab(icon: Icon(Icons.trending_up_rounded), text: l10n.dashboard),
@@ -538,7 +537,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.expenseBreakdown,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -564,18 +563,18 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                       children: [
                         Text(
                           item['category'],
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                         ),
                         Text(
                           '${(item['percentage'] as double).toStringAsFixed(1)}% ${l10n.ofExpenses}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                         ),
                       ],
                     ),
                   ),
                   Text(
                     'PKR ${(item['amount'] as double).toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: item['color']),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: item['color']),
                   ),
                 ],
               ),
@@ -591,11 +590,11 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                 children: [
                   Text(
                     l10n.totalExpenses,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                   ),
                   Text(
                     data.formattedTotalExpenses,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red),
                   ),
                 ],
               ),
@@ -609,7 +608,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                   children: [
                     Text(
                       data.isProfitable ? l10n.profitable : l10n.loss,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w700,
                         color: data.isProfitable ? Colors.green : Colors.red,
@@ -617,7 +616,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                     ),
                     Text(
                       data.formattedNetProfit,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w700,
                         color: data.isProfitable ? Colors.green : Colors.red,
@@ -674,7 +673,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                     : Icon(Icons.refresh_rounded, size: context.iconSize('small')),
                 label: Text(
                   provider.isLoading ? l10n.refreshing : l10n.refresh,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryMaroon,
@@ -694,7 +693,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
                 icon: Icon(Icons.clear_rounded, size: context.iconSize('small')),
                 label: Text(
                   l10n.clearErrors,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.primaryMaroon,

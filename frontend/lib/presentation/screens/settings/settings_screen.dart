@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
@@ -22,7 +21,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           Text(
             l10n.settings,
-            style: GoogleFonts.playfairDisplay(
+            style: TextStyle(
               fontSize: context.headingFontSize,
               fontWeight: FontWeight.w700,
               color: AppTheme.charcoalGray,
@@ -58,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
       padding: EdgeInsets.only(bottom: context.smallPadding),
       child: Text(
         title,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.headerFontSize,
           fontWeight: FontWeight.w600,
           color: AppTheme.primaryMaroon,
@@ -163,7 +162,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.subtitleFontSize,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -171,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.captionFontSize,
           color: Colors.grey[600],
         ),
@@ -227,7 +226,7 @@ class SettingsScreen extends StatelessWidget {
         },
         title: Text(
           l10n.darkMode,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.subtitleFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.charcoalGray,
@@ -235,7 +234,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         subtitle: Text(
           l10n.enableDarkThemeForApplication,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             color: Colors.grey[600],
           ),
@@ -292,7 +291,7 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       Text(
                         l10n.alNoorFashionPOS,
-                        style: GoogleFonts.playfairDisplay(
+                        style: TextStyle(
                           fontSize: context.headerFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.charcoalGray,
@@ -300,7 +299,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       Text(
                         '${l10n.version} 1.0.0',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           color: Colors.grey[600],
                         ),
@@ -313,7 +312,7 @@ class SettingsScreen extends StatelessWidget {
             SizedBox(height: context.smallPadding),
             Text(
               l10n.aPremiumPointOfSaleSolution,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
                 height: 1.5,

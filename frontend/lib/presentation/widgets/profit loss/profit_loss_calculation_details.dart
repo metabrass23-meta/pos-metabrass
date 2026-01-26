@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -53,7 +52,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.calculationSummary,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -202,7 +201,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ),
             ],
@@ -210,12 +209,12 @@ class ProfitLossCalculationDetails extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: color),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: color),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             description,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -243,7 +242,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.sourceRecordsBreakdown,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -387,19 +386,19 @@ class ProfitLossCalculationDetails extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             count,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: color),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: color),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             amount,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
         ],
@@ -426,7 +425,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.calculationFormula,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -503,17 +502,17 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         children: [
           Text(
             step,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             description,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             calculation,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
         ],
       ),
@@ -533,17 +532,17 @@ class ProfitLossCalculationDetails extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: color),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w700, color: color),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             formula,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -569,7 +568,7 @@ class ProfitLossCalculationDetails extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.periodInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -657,13 +656,13 @@ class ProfitLossCalculationDetails extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -693,12 +692,12 @@ class ProfitLossCalculationDetails extends StatelessWidget {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.noCalculationDataAvailable,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             l10n.calculationDetailsWillAppearHere,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],

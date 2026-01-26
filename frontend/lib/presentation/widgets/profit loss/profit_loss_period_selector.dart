@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
@@ -107,7 +106,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.selectDateRange,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.primaryMaroon,
@@ -123,7 +122,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         children: [
                           Text(
                             l10n.from,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -131,7 +130,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                           ),
                           Text(
                             '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customStartDate.year}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -150,7 +149,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         children: [
                           Text(
                             l10n.to,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -158,7 +157,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                           ),
                           Text(
                             '${provider.customEndDate.day}/${provider.customEndDate.month}/${provider.customEndDate.year}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -225,7 +224,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                         SizedBox(width: context.smallPadding),
                         Text(
                           l10n.selectDateRange,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
                             color: AppTheme.primaryMaroon,
@@ -241,7 +240,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                           children: [
                             Text(
                               l10n.from,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -249,7 +248,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                             ),
                             Text(
                               '${provider.customStartDate.day}/${provider.customStartDate.month}/${provider.customEndDate.year}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.charcoalGray,
@@ -266,7 +265,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                           children: [
                             Text(
                               l10n.to,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -274,7 +273,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
                             ),
                             Text(
                               '${provider.customEndDate.day}/${provider.customEndDate.month}/${provider.customEndDate.year}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.charcoalGray,
@@ -315,7 +314,7 @@ class ProfitLossPeriodSelector extends StatelessWidget {
         ),
         child: Text(
           _getPeriodDisplayName(context, period),
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
@@ -492,7 +491,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                           Expanded(
                             child: Text(
                               l10n.selectDateRange,
-                              style: GoogleFonts.playfairDisplay(
+                              style: TextStyle(
                                 fontSize: context.headerFontSize,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.pureWhite,
@@ -541,7 +540,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       SizedBox(width: context.smallPadding),
                                       Text(
                                         l10n.startDate,
-                                        style: GoogleFonts.inter(
+                                        style: TextStyle(
                                           fontSize: context.bodyFontSize,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.green,
@@ -552,7 +551,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                   SizedBox(height: context.smallPadding),
                                   Text(
                                     '${_startDate.day}/${_startDate.month}/${_startDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize * 1.2,
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.charcoalGray,
@@ -588,7 +587,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                       SizedBox(width: context.smallPadding),
                                       Text(
                                         l10n.endDate,
-                                        style: GoogleFonts.inter(
+                                        style: TextStyle(
                                           fontSize: context.bodyFontSize,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.red,
@@ -599,7 +598,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                   SizedBox(height: context.smallPadding),
                                   Text(
                                     '${_endDate.day}/${_endDate.month}/${_endDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize * 1.2,
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.charcoalGray,
@@ -628,7 +627,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                     ),
                                     child: Text(
                                       l10n.cancel,
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.grey[600],
@@ -652,7 +651,7 @@ class _CustomDateRangeDialogState extends State<_CustomDateRangeDialog> with Sin
                                     ),
                                     child: Text(
                                       l10n.applyRange,
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,
                                         color: AppTheme.pureWhite,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_provider.dart';
 import '../../../src/models/order/order_model.dart';
@@ -77,7 +76,7 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 'Data refreshed successfully',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ],
           ),
@@ -100,7 +99,7 @@ class _OrderPageState extends State<OrderPage> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -158,13 +157,13 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(height: 3.h),
               Text(
                 'Screen Too Small',
-                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 'This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.',
-                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -185,13 +184,13 @@ class _OrderPageState extends State<OrderPage> {
             SizedBox(height: 2.h),
             Text(
               'Error: $message',
-              style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Colors.red[600]),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: Colors.red[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.h),
             Text(
               'Please try again later or contact support.',
-              style: GoogleFonts.inter(fontSize: 12.sp, fontWeight: FontWeight.w400, color: Colors.red[600]),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400, color: Colors.red[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 2.h),
@@ -203,7 +202,7 @@ class _OrderPageState extends State<OrderPage> {
               icon: Icon(Icons.refresh_rounded, color: AppTheme.pureWhite),
               label: Text(
                 'Retry',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
@@ -227,7 +226,7 @@ class _OrderPageState extends State<OrderPage> {
             children: [
               Text(
                 'Order Management',
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -237,7 +236,7 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 'Track and manage customer orders with comprehensive tools',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -256,7 +255,7 @@ class _OrderPageState extends State<OrderPage> {
         // Page Title
         Text(
           'Order Management',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -266,7 +265,7 @@ class _OrderPageState extends State<OrderPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Track and manage customer orders',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -283,7 +282,7 @@ class _OrderPageState extends State<OrderPage> {
         // Compact Page Title
         Text(
           'Orders',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -293,7 +292,7 @@ class _OrderPageState extends State<OrderPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           'Manage customer orders',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
 
@@ -323,7 +322,7 @@ class _OrderPageState extends State<OrderPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? 'Add' : 'Add Order',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -454,10 +453,10 @@ class _OrderPageState extends State<OrderPage> {
       child: TextField(
         controller: _searchController,
         onChanged: provider.searchOrders,
-        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         decoration: InputDecoration(
           hintText: context.isTablet ? 'Search orders...' : 'Search orders by customer, product, description...',
-          hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+          hintStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -502,7 +501,7 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 hasActiveFilter ? 'Status: ${_getStatusDisplayName(provider.currentStatusFilter)}' : 'Filter Status',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: hasActiveFilter ? AppTheme.accentGold : Colors.grey[600],
@@ -540,7 +539,7 @@ class _OrderPageState extends State<OrderPage> {
       builder: (context) => AlertDialog(
         title: Text(
           'Filter by Status',
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -583,7 +582,7 @@ class _OrderPageState extends State<OrderPage> {
             SizedBox(width: context.smallPadding),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -615,7 +614,7 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 'Refresh',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
             ],
           ],
@@ -650,7 +649,7 @@ class _OrderPageState extends State<OrderPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -667,7 +666,7 @@ class _OrderPageState extends State<OrderPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -690,13 +689,13 @@ class _OrderPageState extends State<OrderPage> {
             SizedBox(height: 2.h),
             Text(
               'Loading orders...',
-              style: GoogleFonts.inter(fontSize: 4.sp, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: 4.sp, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.h),
             Text(
               'Please wait while we fetch your data',
-              style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -716,13 +715,13 @@ class _OrderPageState extends State<OrderPage> {
             SizedBox(height: 2.h),
             Text(
               'No orders found',
-              style: GoogleFonts.inter(fontSize: 12.sp, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.h),
             Text(
               'Try adjusting your filters or adding new orders.',
-              style: GoogleFonts.inter(fontSize: 11.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 2.h),
@@ -734,7 +733,7 @@ class _OrderPageState extends State<OrderPage> {
               icon: Icon(Icons.refresh_rounded, color: AppTheme.pureWhite),
               label: Text(
                 'Refresh Data',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMaroon,
@@ -825,7 +824,7 @@ class _OrderPageState extends State<OrderPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 'Active Filters',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
               ),
               const Spacer(),
               InkWell(
@@ -845,7 +844,7 @@ class _OrderPageState extends State<OrderPage> {
                       SizedBox(width: context.smallPadding / 2),
                       Text(
                         'Clear All',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red[700]),
                       ),
                     ],
                   ),
@@ -870,7 +869,7 @@ class _OrderPageState extends State<OrderPage> {
                   children: [
                     Text(
                       filterText,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     InkWell(

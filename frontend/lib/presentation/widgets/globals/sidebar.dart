@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
@@ -9,6 +8,7 @@ import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/providers/vendor_provider.dart';
+import '../../../src/providers/purchase_provider.dart'; // Added PurchaseProvider
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -53,7 +53,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               SizedBox(width: context.smallPadding),
               Text(
                 AppLocalizations.of(context)!.confirmLogout,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -63,7 +63,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           content: Text(
             AppLocalizations.of(context)!.logoutMessage,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
               height: 1.4,
@@ -74,7 +74,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 AppLocalizations.of(context)!.cancel,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
@@ -106,7 +106,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                             SizedBox(width: context.smallPadding),
                             Text(
                               AppLocalizations.of(context)!.loggingOut,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                               ),
                             ),
@@ -136,7 +136,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                           SnackBar(
                             content: Text(
                               AppLocalizations.of(context)!.logoutSuccess,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                               ),
                             ),
@@ -167,7 +167,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                           SnackBar(
                             content: Text(
                               AppLocalizations.of(context)!.logoutError,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                               ),
                             ),
@@ -211,7 +211,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   )
                       : Text(
                     'Logout',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                     ),
@@ -254,7 +254,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               SizedBox(width: context.smallPadding),
               Text(
                 AppLocalizations.of(context)!.logout,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -294,6 +294,7 @@ class PremiumSidebar extends StatelessWidget {
     // Get real counts from providers
     final salesCount = context.watch<SalesProvider>().sales.length.toString();
     final ordersCount = context.watch<OrderProvider>().orders.length.toString();
+    final purchasesCount = context.watch<PurchaseProvider>().purchases.length.toString(); // Added Purchase count
     final productsCount = context.watch<ProductProvider>().products.length.toString();
     final categoriesCount = context.watch<CategoryProvider>().categories.length.toString();
     final customersCount = context.watch<CustomerProvider>().customers.length.toString();
@@ -316,6 +317,7 @@ class PremiumSidebar extends StatelessWidget {
       // Core Business Operations
       {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
       {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': ordersCount},
+      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount}, // Added Purchases Item
 
       // Inventory & Products
       {
@@ -447,7 +449,7 @@ class PremiumSidebar extends StatelessWidget {
                       children: [
                         Text(
                           AppLocalizations.of(context)!.brandName,
-                          style: GoogleFonts.playfairDisplay(
+                          style: TextStyle(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
@@ -456,7 +458,7 @@ class PremiumSidebar extends StatelessWidget {
                         ),
                         Text(
                           AppLocalizations.of(context)!.brandTagline,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.captionFontSize,
                             fontWeight: FontWeight.w300,
                             color: AppTheme.pureWhite.withOpacity(0.8),
@@ -570,7 +572,7 @@ class PremiumSidebar extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       item['title'],
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: isSelected
                                             ? FontWeight.w600
@@ -620,7 +622,7 @@ class PremiumSidebar extends StatelessWidget {
                                       ),
                                       child: Text(
                                         item['badge'],
-                                        style: GoogleFonts.inter(
+                                        style: TextStyle(
                                           fontSize: context.captionFontSize,
                                           fontWeight: FontWeight.w600,
                                           color: AppTheme.pureWhite,
@@ -668,7 +670,7 @@ class PremiumSidebar extends StatelessWidget {
                               user?.fullName.isNotEmpty == true
                                   ? user!.fullName[0].toUpperCase()
                                   : 'U',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.bodyFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.primaryMaroon,
@@ -682,7 +684,7 @@ class PremiumSidebar extends StatelessWidget {
                               children: [
                                 Text(
                                   user?.fullName ?? 'User',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w500,
                                     color: AppTheme.pureWhite,
@@ -691,7 +693,7 @@ class PremiumSidebar extends StatelessWidget {
                                 ),
                                 Text(
                                   user?.email ?? 'user@email.com',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.captionFontSize,
                                     fontWeight: FontWeight.w300,
                                     color: AppTheme.pureWhite.withOpacity(0.7),

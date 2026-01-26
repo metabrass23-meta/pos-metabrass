@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
@@ -12,7 +11,7 @@ import '../globals/text_field.dart';
 import '../../../l10n/app_localizations.dart';
 
 class EditProductDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const EditProductDialog({super.key, required this.product});
 
@@ -187,7 +186,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               l10n.productUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -209,7 +208,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -289,7 +288,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editProduct : l10n.editProductDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -300,7 +299,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateProductInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -315,7 +314,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.product.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -444,7 +443,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                     Flexible(
                       child: Text(
                         l10n.costPriceInfo,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
                       ),
                     ),
                   ],
@@ -491,7 +490,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         SizedBox(width: context.smallPadding),
                         Text(
                           l10n.loadingCategories,
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -513,7 +512,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         Expanded(
                           child: Text(
                             l10n.noCategoriesAvailablePleaseAddCategoriesFirst,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.orange[700]),
+                            style: TextStyle(fontSize: context.bodyFontSize, color: Colors.orange[700]),
                           ),
                         ),
                       ],
@@ -538,7 +537,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         ),
                         child: Text(
                           '${l10n.productCategory}: ${widget.product.categoryName} ${widget.product.categoryId != null ? '(ID: ${widget.product.categoryId})' : '(${l10n.noId})'}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.blue[700]),
                         ),
                       ),
                       SizedBox(height: context.smallPadding),
@@ -610,7 +609,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                   children: [
                     Text(
                       l10n.pieces,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding),
                     Container(
@@ -628,7 +627,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                           return FilterChip(
                             label: Text(
                               piece,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
@@ -655,7 +654,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         l10n.pleaseSelectAtLeastOnePiece,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
                       ),
                     ],
                   ],

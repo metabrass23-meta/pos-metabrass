@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -115,7 +114,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           Expanded(
             child: Text(
               widget.sale == null ? l10n.createNewSale : l10n.editSale,
-              style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
             ),
           ),
           IconButton(
@@ -165,7 +164,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         children: [
           Text(
             l10n.basicInformation,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -340,7 +339,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             children: [
               Text(
                 l10n.saleItems,
-                style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
               ElevatedButton.icon(
@@ -348,7 +347,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
                 label: Text(
                   l10n.addItem,
-                  style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -372,12 +371,12 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             SizedBox(height: context.cardPadding),
             Text(
               l10n.noSaleItemsAdded,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
             ),
             SizedBox(height: context.smallPadding),
             Text(
               l10n.addItemsToSale,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
+              style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
             ),
           ],
         ),
@@ -406,25 +405,25 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 flex: 2,
                 child: Text(
                   item.productName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
               ),
               Expanded(
                 child: Text(
                   l10n.qty(item.quantity),
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
               ),
               Expanded(
                 child: Text(
                   'Rs. ${item.unitPrice.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
               ),
               Expanded(
                 child: Text(
                   'Rs. ${item.lineTotal.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
               IconButton(
@@ -453,7 +452,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         children: [
           Text(
             l10n.taxConfiguration,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           TaxConfigurationWidget(
@@ -488,7 +487,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         children: [
           Text(
             l10n.summary,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           _buildSummaryRow(l10n.subtotal, subtotal),
@@ -509,7 +508,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: isTotal ? context.headingFontSize : context.bodyFontSize,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
               color: AppTheme.charcoalGray,
@@ -517,7 +516,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           ),
           Text(
             'Rs. ${amount.toStringAsFixed(2)}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: isTotal ? context.headingFontSize : context.bodyFontSize,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
               color: isTotal ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -547,7 +546,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               l10n.cancel,
-              style: GoogleFonts.inter(color: AppTheme.charcoalGray, fontWeight: FontWeight.w500),
+              style: TextStyle(color: AppTheme.charcoalGray, fontWeight: FontWeight.w500),
             ),
           ),
           SizedBox(width: context.cardPadding),
@@ -561,7 +560,7 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             )
                 : Text(
               widget.sale == null ? l10n.createSale : l10n.updateSale,
-              style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+              style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
             ),
           ),
         ],

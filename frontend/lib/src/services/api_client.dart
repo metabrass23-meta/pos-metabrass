@@ -23,7 +23,6 @@ class ApiClient {
       validateStatus: (status) => status != null && status < 500,
     ));
 
-    // Add interceptors
     _dio.interceptors.add(_createInterceptor());
 
     if (kDebugMode) {

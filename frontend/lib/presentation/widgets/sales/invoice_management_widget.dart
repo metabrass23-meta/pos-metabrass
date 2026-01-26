@@ -16,11 +16,11 @@ class InvoiceManagementWidget extends StatefulWidget {
 class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedStatus = '';
-  String _selectedCustomer = '';
 
   @override
   void initState() {
     super.initState();
+    // Initialize data after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InvoiceProvider>().initialize();
     });
@@ -39,7 +39,10 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
     return Scaffold(
       body: Column(
         children: [
+          // --- Filters Section ---
           _buildFilters(),
+
+          // --- Invoices List ---
           Expanded(child: _buildInvoicesList()),
         ],
       ),
@@ -65,22 +68,33 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
             const SizedBox(height: 16),
             Row(
               children: [
+                // Search Field
                 Expanded(
+                  flex: 2,
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       labelText: l10n.search,
                       hintText: l10n.searchByInvoiceNumberCustomerOrSale,
                       prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     onChanged: (value) => context.read<InvoiceProvider>().setFilters(search: value),
                   ),
                 ),
                 const SizedBox(width: 16),
+
+                // Status Dropdown
                 Expanded(
+                  flex: 1,
                   child: DropdownButtonFormField<String>(
                     value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: InputDecoration(labelText: l10n.status, border: const OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: l10n.status,
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
                     items: [
                       DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
                       DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
@@ -100,16 +114,18 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                TextButton(
+
+                // Clear Filters Button
+                TextButton.icon(
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
                       _selectedStatus = '';
-                      _selectedCustomer = '';
                     });
                     context.read<InvoiceProvider>().clearFilters();
                   },
-                  child: Text(l10n.clearFilters),
+                  icon: const Icon(Icons.clear_all),
+                  label: Text(l10n.clearFilters),
                 ),
               ],
             ),
@@ -133,8 +149,14 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
                 Text('${l10n.error}: ${provider.error}'),
-                ElevatedButton(onPressed: () => provider.refresh(), child: Text(l10n.retry)),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                    onPressed: () => provider.refresh(),
+                    child: Text(l10n.retry)
+                ),
               ],
             ),
           );
@@ -149,19 +171,24 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
               children: [
                 const Icon(Icons.receipt_long, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text(l10n.noInvoicesFound),
-                Text(l10n.createNewInvoiceUsingButton),
+                Text(l10n.noInvoicesFound, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Text(l10n.createNewInvoiceUsingButton, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: invoices.length,
-          itemBuilder: (context, index) {
-            final invoice = invoices[index];
-            return _buildInvoiceCard(invoice, provider);
-          },
+        return RefreshIndicator(
+          onRefresh: () => provider.refresh(),
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 80), // Space for FAB
+            itemCount: invoices.length,
+            itemBuilder: (context, index) {
+              final invoice = invoices[index];
+              return _buildInvoiceCard(invoice, provider);
+            },
+          ),
         );
       },
     );
@@ -172,24 +199,40 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 2,
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: invoice.statusColor,
           child: Icon(_getStatusIcon(invoice.status), color: Colors.white),
         ),
-        title: Text(invoice.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+            invoice.invoiceNumber,
+            style: const TextStyle(fontWeight: FontWeight.bold)
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+            const SizedBox(height: 4),
             Text('${l10n.customer}: ${invoice.customerName}'),
-            Text('${l10n.status}: ${invoice.statusDisplay}'),
-            Text('${l10n.issueDate}: ${invoice.formattedIssueDate}'),
-            if (invoice.dueDate != null) Text('${l10n.dueDate}: ${invoice.formattedDueDate}'),
+            Text(
+              '${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}',
+              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+            ),
+            Row(
+              children: [
+                Text('${l10n.status}: ${invoice.statusDisplay}'),
+                const SizedBox(width: 8),
+                Text('|  ${l10n.issueDate}: ${invoice.formattedIssueDate}'),
+              ],
+            ),
             if (invoice.isOverdue)
-              Text(
-                l10n.overdue,
-                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  l10n.overdue,
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
               ),
           ],
         ),
@@ -204,22 +247,14 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
 
   IconData _getStatusIcon(String status) {
     switch (status) {
-      case 'DRAFT':
-        return Icons.edit;
-      case 'ISSUED':
-        return Icons.receipt_long;
-      case 'SENT':
-        return Icons.send;
-      case 'VIEWED':
-        return Icons.visibility;
-      case 'PAID':
-        return Icons.check_circle;
-      case 'OVERDUE':
-        return Icons.warning;
-      case 'CANCELLED':
-        return Icons.cancel;
-      default:
-        return Icons.help;
+      case 'DRAFT': return Icons.edit_note;
+      case 'ISSUED': return Icons.receipt_long;
+      case 'SENT': return Icons.send;
+      case 'VIEWED': return Icons.visibility;
+      case 'PAID': return Icons.check_circle;
+      case 'OVERDUE': return Icons.warning;
+      case 'CANCELLED': return Icons.cancel;
+      default: return Icons.help_outline;
     }
   }
 
@@ -229,43 +264,20 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
     return [
       PopupMenuItem(
         value: 'view',
-        child: Row(
-          children: [
-            const Icon(Icons.visibility, color: Colors.blue),
-            const SizedBox(width: 8),
-            Text(l10n.view),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.visibility, color: Colors.blue), const SizedBox(width: 8), Text(l10n.view)]),
       ),
       PopupMenuItem(
         value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange),
-            const SizedBox(width: 8),
-            Text(l10n.edit),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.edit, color: Colors.orange), const SizedBox(width: 8), Text(l10n.edit)]),
       ),
       PopupMenuItem(
         value: 'generate_pdf',
-        child: Row(
-          children: [
-            const Icon(Icons.picture_as_pdf, color: Colors.green),
-            const SizedBox(width: 8),
-            Text(l10n.generatePdf),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.picture_as_pdf, color: Colors.green), const SizedBox(width: 8), Text(l10n.generatePdf)]),
       ),
+      const PopupMenuDivider(),
       PopupMenuItem(
         value: 'delete',
-        child: Row(
-          children: [
-            const Icon(Icons.delete, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(l10n.delete),
-          ],
-        ),
+        child: Row(children: [const Icon(Icons.delete, color: Colors.red), const SizedBox(width: 8), Text(l10n.delete)]),
       ),
     ];
   }
@@ -299,21 +311,27 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
       builder: (context) => AlertDialog(
         title: Text(l10n.invoiceDetailsWithNumber(invoice.invoiceNumber)),
         content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow(l10n.invoiceNumber, invoice.invoiceNumber),
-              _buildDetailRow(l10n.saleInvoiceNumber, invoice.saleInvoiceNumber),
-              _buildDetailRow(l10n.customer, invoice.customerName),
-              _buildDetailRow(l10n.amount, 'PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
-              _buildDetailRow(l10n.status, invoice.statusDisplay),
-              _buildDetailRow(l10n.issueDate, invoice.formattedIssueDate),
-              if (invoice.dueDate != null) _buildDetailRow(l10n.dueDate, invoice.formattedDueDate),
-              if (invoice.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, invoice.notes!),
-              if (invoice.termsConditions?.isNotEmpty == true) _buildDetailRow(l10n.termsAndConditions, invoice.termsConditions!),
-            ],
+          width: 450,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(l10n.invoiceNumber, invoice.invoiceNumber),
+                _buildDetailRow(l10n.saleInvoiceNumber, invoice.saleInvoiceNumber),
+                _buildDetailRow(l10n.customer, invoice.customerName),
+                _buildDetailRow(l10n.amount, 'PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+                const Divider(),
+                _buildDetailRow(l10n.status, invoice.statusDisplay),
+                _buildDetailRow(l10n.issueDate, invoice.formattedIssueDate),
+                if (invoice.dueDate != null) _buildDetailRow(l10n.dueDate, invoice.formattedDueDate),
+                const Divider(),
+                if (invoice.notes?.isNotEmpty == true)
+                  _buildDetailRow(l10n.notes, invoice.notes!),
+                if (invoice.termsConditions?.isNotEmpty == true)
+                  _buildDetailRow(l10n.termsAndConditions, invoice.termsConditions!),
+              ],
+            ),
           ),
         ),
         actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
@@ -352,7 +370,10 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           children: [
             Text(l10n.areYouSureDeleteInvoice),
             const SizedBox(height: 8),
-            Text('${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}'),
+            Text(
+              '${l10n.amount}: PKR ${invoice.grandTotal.toStringAsFixed(2)}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             Text(l10n.actionCannotBeUndone, style: const TextStyle(color: Colors.red)),
           ],
@@ -379,15 +400,15 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
-            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold)),
+            width: 140,
+            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
-          Expanded(child: Text(value)),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
       ),
     );

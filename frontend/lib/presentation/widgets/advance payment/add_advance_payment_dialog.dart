@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:io';
@@ -9,11 +8,11 @@ import '../../../src/providers/labor_provider.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
-import '../../widgets/globals/image_upload_widget.dart';
-import '../../widgets/globals/text_button.dart';
-import '../../widgets/globals/text_field.dart';
-import '../../widgets/globals/drop_down.dart';
-import '../../widgets/globals/custom_date_picker.dart';
+import '../globals/image_upload_widget.dart';
+import '../globals/text_button.dart';
+import '../globals/text_field.dart';
+import '../globals/drop_down.dart';
+import '../globals/custom_date_picker.dart';
 
 class AddAdvancePaymentDialog extends StatefulWidget {
   const AddAdvancePaymentDialog({super.key});
@@ -240,7 +239,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -282,11 +281,11 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
                   children: [
                     Text(
                       l10n.receiptImageOptional,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     Text(
                       l10n.uploadReceiptImageForBetterRecordKeeping,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -440,7 +439,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
               Expanded(
                 child: Text(
                   l10n.salaryCalculation,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ),
             ],
@@ -475,7 +474,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
             flex: 2,
             child: Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: isBold ? FontWeight.w600 : FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -486,7 +485,7 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
             flex: 1,
             child: Text(
               value,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: isBold ? FontWeight.w700 : FontWeight.w600, color: color),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: isBold ? FontWeight.w700 : FontWeight.w600, color: color),
               textAlign: TextAlign.end,
             ),
           ),

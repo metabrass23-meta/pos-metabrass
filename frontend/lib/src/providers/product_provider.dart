@@ -11,8 +11,8 @@ class ProductProvider extends ChangeNotifier {
   final CategoryService _categoryService = CategoryService();
 
   // State variables
-  List<Product> _products = [];
-  List<Product> _filteredProducts = [];
+  List<ProductModel> _products = [];
+  List<ProductModel> _filteredProducts = [];
   List<CategoryModel> _categories = [];
   ProductStatistics? _statistics;
 
@@ -31,8 +31,8 @@ class ProductProvider extends ChangeNotifier {
   ProductFilters _currentFilters = const ProductFilters();
 
   // Getters
-  List<Product> get products => _filteredProducts;
-  List<Product> get allProducts => _products;
+  List<ProductModel> get products => _filteredProducts;
+  List<ProductModel> get allProducts => _products;
   List<CategoryModel> get categories => _categories;
   ProductStatistics? get statistics => _statistics;
   String get searchQuery => _searchQuery;
@@ -496,7 +496,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get product by ID
-  Product? getProductById(String id) {
+  ProductModel? getProductById(String id) {
     try {
       return _products.firstWhere((product) => product.id == id);
     } catch (e) {
@@ -505,7 +505,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get low stock products
-  Future<List<Product>> getLowStockProducts({int threshold = 5}) async {
+  Future<List<ProductModel>> getLowStockProducts({int threshold = 5}) async {
     try {
       final response = await _productService.getLowStockProducts(threshold: threshold);
       if (response.success && response.data != null) {
@@ -518,7 +518,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get products by category
-  Future<List<Product>> getProductsByCategory(String categoryId) async {
+  Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
     try {
       final response = await _productService.getProductsByCategory(categoryId: categoryId);
       if (response.success && response.data != null) {
@@ -583,7 +583,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get products that need attention (low/out of stock)
-  List<Product> get productsNeedingAttention {
+  List<ProductModel> get productsNeedingAttention {
     return _products.where((product) => product.isLowStock || product.isOutOfStock).toList();
   }
 
@@ -625,7 +625,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Filter products locally
-  List<Product> filterProducts({
+  List<ProductModel> filterProducts({
     String? color,
     String? fabric,
     double? minPrice,
@@ -685,21 +685,21 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get recent products
-  List<Product> get recentProducts {
-    final recent = List<Product>.from(_products);
+  List<ProductModel> get recentProducts {
+    final recent = List<ProductModel>.from(_products);
     recent.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return recent.take(10).toList();
   }
 
   /// Get top value products
-  List<Product> get topValueProducts {
-    final sortedProducts = List<Product>.from(_products);
+  List<ProductModel> get topValueProducts {
+    final sortedProducts = List<ProductModel>.from(_products);
     sortedProducts.sort((a, b) => b.totalValue.compareTo(a.totalValue));
     return sortedProducts.take(5).toList();
   }
 
   /// Get products by status
-  Map<String, List<Product>> get productsByStatus => {
+  Map<String, List<ProductModel>> get productsByStatus => {
     'inStock': _products.where((p) => p.isHighStock || p.isMediumStock).toList(),
     'lowStock': _products.where((p) => p.isLowStock).toList(),
     'outOfStock': _products.where((p) => p.isOutOfStock).toList(),
@@ -727,7 +727,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Manually refresh product in list (helper method for external updates)
-  void refreshProductInList(Product updatedProduct) {
+  void refreshProductInList(ProductModel updatedProduct) {
     final index = _products.indexWhere((product) => product.id == updatedProduct.id);
     if (index != -1) {
       _products[index] = updatedProduct;

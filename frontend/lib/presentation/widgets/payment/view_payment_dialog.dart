@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/models/payment/payment_request_models.dart';
@@ -122,7 +121,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
           Expanded(
             child: Text(
               _isEditing ? l10n.editPayment : l10n.viewPaymentDetails,
-              style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           IconButton(
@@ -151,7 +150,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
               onPressed: () => setState(() => _isEditing = false),
               child: Text(
                 l10n.cancel,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
             ),
             SizedBox(width: context.smallPadding),
@@ -164,7 +163,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
               ),
               child: Text(
                 l10n.saveChanges,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
               ),
             ),
           ] else ...[
@@ -172,7 +171,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
               onPressed: () => setState(() => _isEditing = true),
               child: Text(
                 l10n.edit,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.primaryMaroon),
               ),
             ),
             SizedBox(width: context.smallPadding),
@@ -185,7 +184,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
               ),
               child: Text(
                 l10n.close,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -321,7 +320,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: CheckboxListTile(
-                    title: Text(l10n.finalPayment, style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
+                    title: Text(l10n.finalPayment, style: TextStyle(fontSize: context.bodyFontSize)),
                     value: _isFinalPayment,
                     onChanged: (value) => setState(() => _isFinalPayment = value ?? false),
                     contentPadding: EdgeInsets.zero,
@@ -364,7 +363,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           title,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         ...children,
@@ -385,7 +384,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
         TextFormField(
@@ -415,7 +414,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
         DropdownButtonFormField<String>(
@@ -440,7 +439,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           l10n.date,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
         InkWell(
@@ -462,7 +461,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}', style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
+                Text('${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}', style: TextStyle(fontSize: context.bodyFontSize)),
                 Icon(Icons.calendar_today, size: context.iconSize('small')),
               ],
             ),
@@ -480,7 +479,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           l10n.time,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: 4),
         InkWell(
@@ -497,7 +496,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(_selectedTime.format(context), style: GoogleFonts.inter(fontSize: context.bodyFontSize)),
+                Text(_selectedTime.format(context), style: TextStyle(fontSize: context.bodyFontSize)),
                 Icon(Icons.access_time, size: context.iconSize('small')),
               ],
             ),
@@ -513,7 +512,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
       children: [
         Text(
           title,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Container(
@@ -540,17 +539,17 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             width: 120,
             child: Text(
               label,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
             ),
           ),
           Text(
             ': ',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
           ),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
             ),
           ),
         ],
@@ -582,7 +581,7 @@ class _ViewPaymentDialogState extends State<ViewPaymentDialog> {
             SizedBox(width: context.smallPadding / 2),
             Text(
               l10n.receiptAvailable,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
             ),
           ],
         ),

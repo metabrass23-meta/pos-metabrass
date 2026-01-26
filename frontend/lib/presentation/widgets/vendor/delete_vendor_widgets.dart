@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/models/vendor/vendor_model.dart';
@@ -59,7 +58,7 @@ class DeleteVendorHeader extends StatelessWidget {
               children: [
                 Text(
                   isPermanentDelete ? l10n.deletePermanently : l10n.deactivateVendor,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -72,7 +71,7 @@ class DeleteVendorHeader extends StatelessWidget {
                     isPermanentDelete
                         ? l10n.actionCannotBeUndone
                         : l10n.vendorCanBeRestoredLater,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -93,7 +92,7 @@ class DeleteVendorHeader extends StatelessWidget {
             ),
             child: Text(
               vendor.id.length > 8 ? '${vendor.id.substring(0, 8)}...' : vendor.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -207,7 +206,7 @@ class DeleteVendorContent extends StatelessWidget {
               children: [
                 Text(
                   isPermanentDelete ? l10n.permanentDeletionWarning : l10n.deactivationNotice,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w700,
                     color: isPermanentDelete ? Colors.red[700] : Colors.orange[700],
@@ -218,7 +217,7 @@ class DeleteVendorContent extends StatelessWidget {
                   isPermanentDelete
                       ? l10n.permanentDeletionWarningMessage
                       : l10n.deactivationNoticeMessage,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     color: AppTheme.charcoalGray,
                     height: 1.4,
@@ -254,7 +253,7 @@ class DeleteVendorContent extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.chooseDeletionType,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -371,7 +370,7 @@ class DeleteVendorContent extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: isSelected ? color : Colors.grey,
@@ -380,7 +379,7 @@ class DeleteVendorContent extends StatelessWidget {
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     subtitle,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       color: isSelected ? color.withOpacity(0.8) : Colors.grey[600],
                     ),
@@ -422,7 +421,7 @@ class DeleteVendorContent extends StatelessWidget {
                 child: Center(
                   child: Text(
                     vendor.initials,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: isPermanentDelete ? Colors.red[700] : Colors.orange[700],
@@ -437,7 +436,7 @@ class DeleteVendorContent extends StatelessWidget {
                   children: [
                     Text(
                       vendor.name,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.headerFontSize * 0.8,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.charcoalGray,
@@ -447,7 +446,7 @@ class DeleteVendorContent extends StatelessWidget {
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       vendor.businessName,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -458,7 +457,7 @@ class DeleteVendorContent extends StatelessWidget {
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         '${vendor.phone} | ${vendor.cnic}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w400,
                           color: Colors.grey[600],
@@ -490,7 +489,7 @@ class DeleteVendorContent extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '${l10n.vendorSince}: ${vendor.formattedCreatedAt} (${vendor.vendorAgeDays} ${l10n.days})',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.blue[700],
@@ -524,7 +523,7 @@ class DeleteVendorContent extends StatelessWidget {
               isPermanentDelete
                   ? l10n.understandPermanentDeletion
                   : l10n.understandDeactivation,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: (isPermanentDelete ? Colors.red : Colors.orange)[700],
@@ -540,7 +539,7 @@ class DeleteVendorContent extends StatelessWidget {
               onChanged: (value) => onUnderstandConsequencesChange(value ?? false),
               title: Text(
                 l10n.understandActionCannotBeUndone,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.red[700],
@@ -553,7 +552,7 @@ class DeleteVendorContent extends StatelessWidget {
             SizedBox(height: context.cardPadding),
             Text(
               l10n.typeVendorNameToConfirm,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.red[700],
@@ -567,13 +566,13 @@ class DeleteVendorContent extends StatelessWidget {
               ),
               child: TextFormField(
                 controller: confirmationController,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: AppTheme.charcoalGray,
                 ),
                 decoration: InputDecoration(
                   hintText: vendor.name,
-                  hintStyle: GoogleFonts.inter(
+                  hintStyle: TextStyle(
                     fontSize: context.bodyFontSize,
                     color: Colors.grey[400],
                   ),
@@ -585,7 +584,7 @@ class DeleteVendorContent extends StatelessWidget {
             SizedBox(height: context.smallPadding),
             Text(
               '${l10n.expected}: ${vendor.name}',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 color: Colors.grey[600],
                 fontStyle: FontStyle.italic,

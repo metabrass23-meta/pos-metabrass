@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/providers/product_provider.dart';
@@ -32,7 +31,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
   // Selected models for dropdowns
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -119,7 +118,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
       // Find and set the current product
       final currentProduct = productProvider.products.firstWhere(
             (product) => product.id == widget.orderItem.productId,
-        orElse: () => Product(
+        orElse: () => ProductModel(
           id: widget.orderItem.productId,
           name: widget.orderItem.productName,
           detail: '',
@@ -211,7 +210,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
             SizedBox(width: context.smallPadding),
             Text(
               l10n.orderItemUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -233,7 +232,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -266,7 +265,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding / 2),
         InkWell(
@@ -290,7 +289,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                     value != null
                         ? items.firstWhere((item) => item.value == value, orElse: () => DropdownItem<T?>(value: null, label: '')).label
                         : hint,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
+                    style: TextStyle(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
                   ),
                 ),
                 Icon(Icons.arrow_drop_down_rounded, color: Colors.grey[600]),
@@ -328,14 +327,14 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                 children: [
                   Text(
                     '${l10n.select} ${T == OrderModel ? l10n.order : l10n.product}',
-                    style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.cardPadding),
                   TextField(
                     controller: searchController,
                     decoration: InputDecoration(
                       hintText: searchHint ?? l10n.search,
-                      hintStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+                      hintStyle: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                     ),
@@ -359,7 +358,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                         return ListTile(
                           title: Text(
                             item.label,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
                           ),
                           onTap: () {
                             onChanged(item.value);
@@ -406,7 +405,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: l10n.selectProduct,
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -431,11 +430,11 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.selectAProduct),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')),
+      DropdownItem<ProductModel?>(value: null, label: l10n.selectAProduct),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')),
     ];
   }
 
@@ -501,7 +500,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               children: [
                 Text(
                   l10n.editOrderItem,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -512,7 +511,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateOrderItemInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -526,7 +525,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.orderItem.id,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -535,7 +534,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.orderItem.productName,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -619,7 +618,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.productInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -663,7 +662,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderItemDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -749,7 +748,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.lineTotal,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -766,11 +765,11 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
               children: [
                 Text(
                   '${l10n.lineTotal}:',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 ),
                 Text(
                   'PKR ${_lineTotal.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
                 ),
               ],
             ),

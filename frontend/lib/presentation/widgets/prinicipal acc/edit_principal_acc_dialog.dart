@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -98,7 +97,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             SizedBox(width: context.smallPadding),
             Text(
               l10n.principalAccountEntryUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -119,7 +118,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -239,7 +238,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editEntry : l10n.editPrincipalAccountEntry,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -250,7 +249,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updateTransactionInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -265,7 +264,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.account.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -362,7 +361,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                           SizedBox(width: context.smallPadding),
                           Text(
                             type == 'credit' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
-                            style: GoogleFonts.inter(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -493,7 +492,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                               SizedBox(width: context.smallPadding),
                               Text(
                                 l10n.selectDateTime,
-                                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                               ),
                             ],
                           ),
@@ -505,7 +504,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                                 children: [
                                   Text(
                                     l10n.date,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -513,7 +512,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                                   ),
                                   Text(
                                     '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
@@ -526,7 +525,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                                 children: [
                                   Text(
                                     l10n.time,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
                                       color: AppTheme.charcoalGray.withOpacity(0.7),
@@ -534,7 +533,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
                                   ),
                                   Text(
                                     _selectedTime.format(context),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,

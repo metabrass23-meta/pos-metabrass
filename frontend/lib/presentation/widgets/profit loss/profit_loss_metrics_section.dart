@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../src/data/profit_loss_data.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -187,7 +186,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
                       ),
                       Text(
                         '${changePercent.abs().toStringAsFixed(1)}%',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: isPositive ? Colors.green : Colors.red,
@@ -202,12 +201,12 @@ class ProfitLossMetricsSection extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -255,7 +254,7 @@ class ProfitLossMetricsSection extends StatelessWidget {
                       SizedBox(width: context.smallPadding / 2),
                       Text(
                         '${changePercent.abs().toStringAsFixed(1)}%',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                       ),
                     ],
                   ),
@@ -266,12 +265,12 @@ class ProfitLossMetricsSection extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             data.formattedNetProfit,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w800, color: AppTheme.pureWhite),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w800, color: AppTheme.pureWhite),
           ),
           SizedBox(height: context.smallPadding / 2),
           Text(
             data.isProfitable ? l10n.netProfit : l10n.netLoss,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite.withOpacity(0.9)),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite.withOpacity(0.9)),
           ),
         ],
       ),

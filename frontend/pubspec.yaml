@@ -22,7 +22,6 @@ dependencies:
   bitsdojo_window:
   desktop_multi_window:
   sizer:
-  google_fonts:
   flutter_svg:
   animations:
   flutter_animate:
@@ -38,6 +37,7 @@ dependencies:
   excel: ^2.1.0
   open_file: ^3.3.2
   flutter_localization: ^0.3.3
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:

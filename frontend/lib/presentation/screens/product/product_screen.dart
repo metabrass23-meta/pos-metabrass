@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
@@ -48,7 +47,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showEditProductDialog(Product product) {
+  void _showEditProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -56,7 +55,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showDeleteProductDialog(Product product) {
+  void _showDeleteProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -64,7 +63,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _showViewProductDialog(Product product) {
+  void _showViewProductDialog(ProductModel product) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -97,7 +96,7 @@ class _ProductPageState extends State<ProductPage> {
             SizedBox(width: context.smallPadding),
             Text(
               '${AppLocalizations.of(context)!.exportCompleted} ${data.length} ${AppLocalizations.of(context)!.products.toLowerCase()} ${AppLocalizations.of(context)!.export.toLowerCase()}.',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -191,7 +190,7 @@ class _ProductPageState extends State<ProductPage> {
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: Colors.red[700],
               ),
@@ -204,7 +203,7 @@ class _ProductPageState extends State<ProductPage> {
             },
             child: Text(
               AppLocalizations.of(context)!.retry,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.red[700],
@@ -233,7 +232,7 @@ class _ProductPageState extends State<ProductPage> {
               SizedBox(height: 3.h),
               Text(
                 AppLocalizations.of(context)!.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -243,7 +242,7 @@ class _ProductPageState extends State<ProductPage> {
               SizedBox(height: 2.h),
               Text(
                 AppLocalizations.of(context)!.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -266,7 +265,7 @@ class _ProductPageState extends State<ProductPage> {
             children: [
               Text(
                 AppLocalizations.of(context)!.productsManagement,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -276,7 +275,7 @@ class _ProductPageState extends State<ProductPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 AppLocalizations.of(context)!.productManagementDescription,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -296,7 +295,7 @@ class _ProductPageState extends State<ProductPage> {
       children: [
         Text(
           AppLocalizations.of(context)!.productsManagement,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -306,7 +305,7 @@ class _ProductPageState extends State<ProductPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           AppLocalizations.of(context)!.manageInventory,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -324,7 +323,7 @@ class _ProductPageState extends State<ProductPage> {
       children: [
         Text(
           AppLocalizations.of(context)!.products,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -334,7 +333,7 @@ class _ProductPageState extends State<ProductPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           AppLocalizations.of(context)!.manageInventory,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -377,7 +376,7 @@ class _ProductPageState extends State<ProductPage> {
                   context.isTablet
                       ? AppLocalizations.of(context)!.add
                       : AppLocalizations.of(context)!.addProduct,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -565,7 +564,7 @@ class _ProductPageState extends State<ProductPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchProducts,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: AppTheme.charcoalGray,
             ),
@@ -573,7 +572,7 @@ class _ProductPageState extends State<ProductPage> {
               hintText: context.isTablet
                   ? AppLocalizations.of(context)!.searchProductsShortHint
                   : AppLocalizations.of(context)!.searchProductsHint,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: TextStyle(
                 fontSize: context.bodyFontSize * 0.9,
                 color: Colors.grey[500],
               ),
@@ -634,7 +633,7 @@ class _ProductPageState extends State<ProductPage> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     AppLocalizations.of(context)!.filter,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primaryMaroon,
@@ -679,7 +678,7 @@ class _ProductPageState extends State<ProductPage> {
                   SizedBox(width: context.smallPadding),
                   Text(
                     AppLocalizations.of(context)!.export,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.accentGold,
@@ -734,7 +733,7 @@ class _ProductPageState extends State<ProductPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -751,7 +750,7 @@ class _ProductPageState extends State<ProductPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],

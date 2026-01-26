@@ -1,220 +1,266 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
-import '../../../src/providers/dashboard_provider.dart';
-import '../../../src/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
-
-class SalesChartCard extends StatelessWidget {
-  const SalesChartCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      height: 35.h,
-      padding: EdgeInsets.all(2.w),
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(2.w),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 1.w,
-            offset: Offset(0, 0.5.w),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(1.w),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(1.w),
-                ),
-                child: Icon(
-                  Icons.show_chart_rounded,
-                  color: Colors.blue,
-                  size: 2.5.sp,
-                ),
-              ),
-
-              SizedBox(width: 1.5.w),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.salesOverview,
-                      style: GoogleFonts.inter(
-                        fontSize: 2.2.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
-                    ),
-                    Text(
-                      l10n.lastSixMonthsPerformance,
-                      style: GoogleFonts.inter(
-                        fontSize: 1.5.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 1.5.w, vertical: 0.8.h),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryMaroon.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(1.w),
-                ),
-                child: Text(
-                  l10n.sixMonths,
-                  style: GoogleFonts.inter(
-                    fontSize: 1.5.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primaryMaroon,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 3.h),
-
-          Expanded(
-            child: Consumer<DashboardProvider>(
-              builder: (context, provider, child) {
-                final chartData = provider.salesChart;
-
-                return CustomPaint(
-                  size: Size(double.infinity, double.infinity),
-                  painter: SalesChartPainter(chartData ),
-                );
-              },
-            ),
-          ),
-
-          SizedBox(height: 2.h),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLegendItem(l10n.sales, AppTheme.primaryMaroon),
-              SizedBox(width: 3.w),
-              _buildLegendItem(l10n.target, AppTheme.accentGold),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 1.w,
-          height: 1.w,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(0.5.w),
-          ),
-        ),
-        SizedBox(width: 0.8.w),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 1.5.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SalesChartPainter extends CustomPainter {
-  final List<Map<String, double>> data;
-
-  SalesChartPainter(this.data);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppTheme.primaryMaroon
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final gradientPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          AppTheme.primaryMaroon.withOpacity(0.3),
-          AppTheme.primaryMaroon.withOpacity(0.05),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    if (data.isEmpty) return;
-
-    final maxValue = data.map((e) => e['sales']!).reduce((a, b) => a > b ? a : b);
-    final minValue = data.map((e) => e['sales']!).reduce((a, b) => a < b ? a : b);
-
-    final path = Path();
-    final gradientPath = Path();
-
-    for (int i = 0; i < data.length; i++) {
-      final x = (i / (data.length - 1)) * size.width;
-      final y = size.height - ((data[i]['sales']! - minValue) / (maxValue - minValue)) * size.height;
-
-      if (i == 0) {
-        path.moveTo(x, y);
-        gradientPath.moveTo(x, size.height);
-        gradientPath.lineTo(x, y);
-      } else {
-        path.lineTo(x, y);
-        gradientPath.lineTo(x, y);
-      }
-
-      canvas.drawCircle(
-        Offset(x, y),
-        4,
-        Paint()
-          ..color = AppTheme.primaryMaroon
-          ..style = PaintingStyle.fill,
-      );
-
-      canvas.drawCircle(
-        Offset(x, y),
-        4,
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2,
-      );
-    }
-
-    gradientPath.lineTo(size.width, size.height);
-    gradientPath.close();
-
-    canvas.drawPath(gradientPath, gradientPaint);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
+// import 'package:fl_chart/fl_chart.dart';
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:sizer/sizer.dart';
+//
+// import '../../../src/providers/dashboard_provider.dart';
+// import '../../../src/theme/app_theme.dart';
+// import '../../../l10n/app_localizations.dart';
+//
+// class SalesChartCard extends StatelessWidget {
+//   const SalesChartCard({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final l10n = AppLocalizations.of(context)!;
+//
+//     return Container(
+//       height: 45.h,
+//       padding: EdgeInsets.all(2.w),
+//       decoration: BoxDecoration(
+//         color: AppTheme.pureWhite,
+//         borderRadius: BorderRadius.circular(2.w),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.05),
+//             blurRadius: 1.w,
+//             offset: Offset(0, 0.5.w),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           // --- Header ---
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Row(
+//                 children: [
+//                   Container(
+//                     padding: EdgeInsets.all(1.w),
+//                     decoration: BoxDecoration(
+//                       color: AppTheme.primaryMaroon.withOpacity(0.1),
+//                       borderRadius: BorderRadius.circular(1.w),
+//                     ),
+//                     child: Icon(
+//                       Icons.show_chart_rounded,
+//                       color: AppTheme.primaryMaroon,
+//                       size: 2.5.sp,
+//                     ),
+//                   ),
+//                   SizedBox(width: 2.w),
+//                   Text(
+//                     l10n.salesOverview,
+//                     style: TextStyle(
+//                       fontSize: 2.2.sp,
+//                       fontWeight: FontWeight.w600,
+//                       color: AppTheme.charcoalGray,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//
+//           SizedBox(height: 3.h),
+//
+//           // --- Chart Area ---
+//           Expanded(
+//             child: Consumer<DashboardProvider>(
+//               builder: (context, provider, child) {
+//                 if (provider.isLoading && provider.salesChart.isEmpty) {
+//                   return const Center(child: CircularProgressIndicator());
+//                 }
+//
+//                 if (provider.salesChart.isEmpty) {
+//                   return Center(
+//                     child: Column(
+//                       mainAxisAlignment: MainAxisAlignment.center,
+//                       children: [
+//                         Icon(Icons.bar_chart_rounded, size: 8.sp, color: Colors.grey[300]),
+//                         SizedBox(height: 1.h),
+//                         Text(
+//                           "No sales data available yet",
+//                           style: TextStyle(color: Colors.grey[500], fontSize: 1.5.sp),
+//                         ),
+//                       ],
+//                     ),
+//                   );
+//                 }
+//
+//                 // Prepare Data
+//                 List<FlSpot> spots = [];
+//                 List<String> bottomTitles = [];
+//                 double maxSales = 0;
+//
+//                 for (int i = 0; i < provider.salesChart.length; i++) {
+//                   final item = provider.salesChart[i];
+//
+//                   // Improved Safe Parsing: Handles int, double, and String
+//                   double salesValue = 0.0;
+//                   if (item['sales'] is num) {
+//                     salesValue = (item['sales'] as num).toDouble();
+//                   } else if (item['sales'] is String) {
+//                     salesValue = double.tryParse(item['sales']) ?? 0.0;
+//                   }
+//
+//                   final month = item['month'] as String? ?? '';
+//
+//                   spots.add(FlSpot(i.toDouble(), salesValue));
+//                   bottomTitles.add(month);
+//
+//                   if (salesValue > maxSales) {
+//                     maxSales = salesValue;
+//                   }
+//                 }
+//
+//                 // Dynamic Y-Axis Max
+//                 double maxY = maxSales * 1.2;
+//                 if (maxY == 0) maxY = 100;
+//
+//                 // Dynamic X-Axis Interval
+//                 double interval = 1.0;
+//                 if (bottomTitles.length > 6) {
+//                   interval = (bottomTitles.length / 6).ceilToDouble();
+//                 }
+//
+//                 return LineChart(
+//                   LineChartData(
+//                     gridData: FlGridData(
+//                       show: true,
+//                       drawVerticalLine: false,
+//                       horizontalInterval: maxY / 5, // Creates about 5 grid lines
+//                       getDrawingHorizontalLine: (value) {
+//                         return FlLine(
+//                           color: Colors.grey[200],
+//                           strokeWidth: 1,
+//                         );
+//                       },
+//                     ),
+//                     titlesData: FlTitlesData(
+//                       show: true,
+//                       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+//                       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+//                       bottomTitles: AxisTitles(
+//                         sideTitles: SideTitles(
+//                           showTitles: true,
+//                           reservedSize: 4.h,
+//                           interval: interval,
+//                           getTitlesWidget: (value, meta) {
+//                             int index = value.toInt();
+//                             if (index >= 0 && index < bottomTitles.length) {
+//                               return Padding(
+//                                 padding: EdgeInsets.only(top: 1.h),
+//                                 child: Text(
+//                                   bottomTitles[index],
+//                                   style: TextStyle(
+//                                     color: Colors.grey[600],
+//                                     fontSize: 1.1.sp,
+//                                     fontWeight: FontWeight.w500,
+//                                   ),
+//                                 ),
+//                               );
+//                             }
+//                             return const SizedBox.shrink();
+//                           },
+//                         ),
+//                       ),
+//                       leftTitles: AxisTitles(
+//                         sideTitles: SideTitles(
+//                           showTitles: true,
+//                           interval: maxY / 5,
+//                           reservedSize: 10.w, // Ensure space for labels like '1.5k'
+//                           getTitlesWidget: (value, meta) {
+//                             if (value == 0) return const SizedBox.shrink();
+//
+//                             String text;
+//                             if (value >= 1000000) {
+//                               text = '${(value / 1000000).toStringAsFixed(1)}M';
+//                             } else if (value >= 1000) {
+//                               text = '${(value / 1000).toStringAsFixed(0)}k';
+//                             } else {
+//                               text = value.toInt().toString();
+//                             }
+//
+//                             return Text(
+//                               text,
+//                               style: TextStyle(
+//                                 color: Colors.grey[500],
+//                                 fontSize: 1.1.sp,
+//                               ),
+//                               textAlign: TextAlign.left,
+//                             );
+//                           },
+//                         ),
+//                       ),
+//                     ),
+//                     borderData: FlBorderData(show: false),
+//                     minX: 0,
+//                     maxX: (spots.length - 1).toDouble(),
+//                     minY: 0,
+//                     maxY: maxY,
+//                     lineBarsData: [
+//                       LineChartBarData(
+//                         spots: spots,
+//                         isCurved: true,
+//                         curveSmoothness: 0.35,
+//                         color: AppTheme.primaryMaroon,
+//                         barWidth: 0.3.w,
+//                         isStrokeCapRound: true,
+//                         dotData: FlDotData(
+//                           show: true, // Always show dots for visibility
+//                           getDotPainter: (spot, percent, barData, index) {
+//                             return FlDotCirclePainter(
+//                               radius: 1.2.w, // Slightly larger dots
+//                               color: Colors.white,
+//                               strokeWidth: 0.3.w,
+//                               strokeColor: AppTheme.primaryMaroon,
+//                             );
+//                           },
+//                         ),
+//                         belowBarData: BarAreaData(
+//                           show: true,
+//                           gradient: LinearGradient(
+//                             begin: Alignment.topCenter,
+//                             end: Alignment.bottomCenter,
+//                             colors: [
+//                               AppTheme.primaryMaroon.withOpacity(0.25),
+//                               AppTheme.primaryMaroon.withOpacity(0.01),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                     lineTouchData: LineTouchData(
+//                       enabled: true,
+//                       touchTooltipData: LineTouchTooltipData(
+//                         getTooltipColor: (touchedSpot) => AppTheme.primaryMaroon,
+//                         tooltipBorderRadius:BorderRadius.all(Radius.circular(2.w)) ,
+//                         tooltipPadding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+//                         tooltipMargin: 2.h,
+//                         getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+//                           return touchedBarSpots.map((barSpot) {
+//                             return LineTooltipItem(
+//                               '${barSpot.y.toStringAsFixed(0)} PKR',
+//                               TextStyle(
+//                                 color: Colors.white,
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 1.4.sp,
+//                               ),
+//                             );
+//                           }).toList();
+//                         },
+//                       ),
+//                       handleBuiltInTouches: true,
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

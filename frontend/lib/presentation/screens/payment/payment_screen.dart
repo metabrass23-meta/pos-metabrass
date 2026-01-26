@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
@@ -123,7 +122,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           Expanded(
                             child: Text(
                               provider.errorMessage ?? l10n.unexpectedError,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.red[700]),
+                              style: TextStyle(fontSize: context.bodyFontSize, color: Colors.red[700]),
                             ),
                           ),
                           TextButton(
@@ -174,13 +173,13 @@ class _PaymentPageState extends State<PaymentPage> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: 6.sp, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -201,7 +200,7 @@ class _PaymentPageState extends State<PaymentPage> {
             children: [
               Text(
                 l10n.paymentManagement,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -211,7 +210,7 @@ class _PaymentPageState extends State<PaymentPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 l10n.paymentManagementDescription,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -229,7 +228,7 @@ class _PaymentPageState extends State<PaymentPage> {
       children: [
         Text(
           l10n.paymentManagement,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -239,7 +238,7 @@ class _PaymentPageState extends State<PaymentPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.trackManageSalaryPayments,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
         SizedBox(width: double.infinity, child: _buildAddButton()),
@@ -255,7 +254,7 @@ class _PaymentPageState extends State<PaymentPage> {
       children: [
         Text(
           l10n.payments,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -265,7 +264,7 @@ class _PaymentPageState extends State<PaymentPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           l10n.trackSalaryPayments,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         ),
         SizedBox(height: context.cardPadding),
         SizedBox(width: double.infinity, child: _buildAddButton()),
@@ -295,7 +294,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : '${l10n.add} ${l10n.payment}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -467,10 +466,10 @@ class _PaymentPageState extends State<PaymentPage> {
           return TextField(
             controller: _searchController,
             onChanged: provider.searchPayments,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
             decoration: InputDecoration(
               hintText: context.isTablet ? '${l10n.search} ${l10n.payments}...' : l10n.searchPaymentsHint,
-              hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
+              hintStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[500]),
               prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: context.iconSize('medium')),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -515,7 +514,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.filter,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                     ),
                   ],
                 ],
@@ -545,7 +544,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.refresh,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                       ),
                     ],
                   ],
@@ -582,7 +581,7 @@ class _PaymentPageState extends State<PaymentPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -599,7 +598,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

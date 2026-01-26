@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/services/customer_service.dart';
@@ -97,7 +96,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -129,7 +128,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -270,7 +269,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
           SizedBox(height: context.cardPadding),
           Text(
             'Loading customer details...',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w500,
               color: Colors.grey[600],
@@ -314,7 +313,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               children: [
                 Text(
                   'Customer Details',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -325,7 +324,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     'Complete customer information',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -348,7 +347,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               widget.customer.id.length > 10
                   ? '${widget.customer.id.substring(0, 10)}...'
                   : widget.customer.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -392,7 +391,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               SizedBox(height: context.cardPadding),
               Text(
                 'Failed to load customer details',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[600],
                 ),
@@ -402,7 +401,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                 onPressed: _loadFullCustomerDetails,
                 child: Text(
                   'Retry',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryMaroon,
@@ -470,7 +469,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             child: Center(
               child: Text(
                 _fullCustomerDetails!.initials,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.pureWhite,
@@ -485,7 +484,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               children: [
                 Text(
                   _fullCustomerDetails!.displayName,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize * 0.8,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -502,7 +501,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Customer since ${_fullCustomerDetails!.formattedCreatedAt}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
                       ),
@@ -520,7 +519,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${_fullCustomerDetails!.customerAgeDays} days old (${_fullCustomerDetails!.relativeCreatedAt})',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.grey[600],
                       ),
@@ -662,7 +661,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Verification Status',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -684,7 +683,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Phone ${_fullCustomerDetails!.phoneVerified ? 'Verified' : 'Unverified'}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: _fullCustomerDetails!.phoneVerified ? Colors.green[700] : Colors.red[700],
@@ -704,7 +703,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       'Email ${_fullCustomerDetails!.emailVerified ? 'Verified' : 'Unverified'}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: _fullCustomerDetails!.emailVerified ? Colors.green[700] : Colors.red[700],
@@ -762,7 +761,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Activity Timeline',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -779,7 +778,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                   children: [
                     Text(
                       'Last Order',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -790,7 +789,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                       _fullCustomerDetails!.lastOrderDate != null
                           ? _fullCustomerDetails!.formattedLastOrderDate
                           : 'No orders yet',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: _fullCustomerDetails!.lastOrderDate != null
@@ -807,7 +806,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                   children: [
                     Text(
                       'Last Contact',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -818,7 +817,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
                       _fullCustomerDetails!.lastContactDate != null
                           ? _fullCustomerDetails!.formattedLastContactDate
                           : 'No contact yet',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: _fullCustomerDetails!.lastContactDate != null
@@ -857,7 +856,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Quick Actions',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -927,7 +926,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
               Expanded(
                 child: Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[600],
@@ -940,7 +939,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
           SizedBox(height: context.smallPadding),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -977,7 +976,7 @@ class _ViewCustomerDetailsDialogState extends State<ViewCustomerDetailsDialog>
             SizedBox(width: context.smallPadding / 2),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: color,

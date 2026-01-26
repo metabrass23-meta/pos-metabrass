@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -12,7 +11,7 @@ import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class CustomizeAndAddDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const CustomizeAndAddDialog({super.key, required this.product});
 
@@ -107,7 +106,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
               SizedBox(width: context.smallPadding),
               Expanded(
-                child: Text(l10n.customizedAddedToCart(widget.product.name), style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+                child: Text(l10n.customizedAddedToCart(widget.product.name), style: TextStyle(color: AppTheme.pureWhite)),
               ),
             ],
           ),
@@ -273,11 +272,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               children: [
                 Text(
                   l10n.customizeAndAdd,
-                  style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
                 Text(
                   widget.product.name,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -401,7 +400,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.productInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -421,7 +420,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                   children: [
                     Text(
                       widget.product.name,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Row(
@@ -438,7 +437,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                         SizedBox(width: context.smallPadding / 2),
                         Text(
                           '${widget.product.color} • ${widget.product.fabric}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -451,7 +450,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                       ),
                       child: Text(
                         l10n.stockAvailable(widget.product.quantity),
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
                           color: widget.product.stockStatusColor,
@@ -487,14 +486,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
       SizedBox(width: context.smallPadding),
       Text(
         l10n.quantityAndPricing,
-        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
       ),
       ],
     ),
     SizedBox(height: context.cardPadding),
     Text(
     l10n.quantity,
-    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
     ),
     SizedBox(height: context.smallPadding),
     Row(
@@ -532,7 +531,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     controller: _quantityController,
     keyboardType: TextInputType.number,
     textAlign: TextAlign.center,
-    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
     decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
     onChanged: (value) {
     final qty = int.tryParse(value) ?? 1;
@@ -578,7 +577,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     children: [
     Text(
     l10n.customPrice,
-    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
     ),
     const Spacer(),
     Switch.adaptive(
@@ -613,7 +612,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     SizedBox(height: context.cardPadding),
     Text(
     l10n.itemDiscountOptional,
-    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
     ),
     SizedBox(height: context.smallPadding),
     Row(
@@ -640,7 +639,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     ),
     child: Text(
     '$percentage%',
-    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
     textAlign: TextAlign.center,
     ),
     ),
@@ -663,7 +662,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
     child: Text(
     l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
-    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
+    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
     ),
     ),
     ),
@@ -694,14 +693,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.sizeAndFitting,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Text(
             l10n.size,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Wrap(
@@ -723,7 +722,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     ),
                     child: Text(
                       size,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: isSelected ? Colors.purple : Colors.grey[600],
@@ -737,7 +736,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           SizedBox(height: context.cardPadding),
           Text(
             l10n.fittingStyle,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -758,7 +757,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
                         fitting,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                     ),
                   ),
@@ -791,14 +790,14 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customizationOptions,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Text(
             l10n.embroideryWork,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -819,7 +818,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
                         embroidery,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                     ),
                   ),
@@ -831,7 +830,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           SizedBox(height: context.cardPadding),
           Text(
             l10n.fabricQuality,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -852,7 +851,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
                         quality,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                     ),
                   ),
@@ -864,7 +863,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           SizedBox(height: context.cardPadding),
           Text(
             l10n.accentColor,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Wrap(
@@ -915,7 +914,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalServices,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -937,11 +936,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     children: [
                       Text(
                         l10n.expressDelivery,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
                         l10n.expressDeliveryDesc,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -967,11 +966,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                     children: [
                       Text(
                         l10n.giftWrapping,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
                         l10n.giftWrappingDesc,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -1003,7 +1002,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.specialInstructions,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
               Switch.adaptive(
@@ -1055,7 +1054,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderSummary,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -1065,11 +1064,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
             children: [
               Text(
                 l10n.basePriceQuantity(_quantity),
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${(_currentPrice * _quantity).toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -1092,11 +1091,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               children: [
                 Text(
                   l10n.subtotalWithCustomizations,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${((_currentPrice + additionalCharges) * _quantity).toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -1108,11 +1107,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
               children: [
                 Text(
                   l10n.itemDiscount,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                 ),
                 Text(
                   '- PKR ${_itemDiscount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 ),
               ],
             ),
@@ -1125,11 +1124,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
             children: [
               Text(
                 l10n.totalAmount,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${_lineTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
               ),
             ],
           ),
@@ -1142,7 +1141,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
                   l10n.youSave(_itemDiscount.toStringAsFixed(0)),
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[800]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[800]),
                 ),
               ),
             ),
@@ -1158,11 +1157,11 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
       children: [
         Text(
           '$label:',
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+          style: TextStyle(fontSize: context.captionFontSize, color: Colors.blue[700]),
         ),
         Text(
           '+PKR ${amount.toStringAsFixed(0)}',
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
         ),
       ],
     );

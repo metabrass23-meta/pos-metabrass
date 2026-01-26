@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -16,7 +15,7 @@ import '../globals/text_field.dart';
 import 'order_success_dialog.dart';
 
 class CreateCustomOrderDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const CreateCustomOrderDialog({super.key, required this.product});
 
@@ -252,11 +251,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               children: [
                 Text(
                   context.shouldShowCompactLayout ? 'Custom Order' : 'Create Custom Order',
-                  style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
                 Text(
                   widget.product.name,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -375,7 +374,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 'Product Information',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -397,12 +396,12 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       widget.product.name,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       widget.product.detail,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -421,7 +420,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         SizedBox(width: context.smallPadding / 2),
                         Text(
                           '${widget.product.color} • ${widget.product.fabric}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -433,11 +432,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 children: [
                   Text(
                     'Base Price',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     'PKR ${widget.product.price.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.purple),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.purple),
                   ),
                 ],
               ),
@@ -465,7 +464,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 'Customer Selection',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -488,7 +487,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
                         'Select Customer *',
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                       ),
                     ),
                     onChanged: (customer) => setState(() => _selectedCustomer = customer),
@@ -504,7 +503,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                                 children: [
                                   Text(
                                     customer.name,
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.bodyFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: AppTheme.charcoalGray,
@@ -512,7 +511,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                                   ),
                                   Text(
                                     customer.phone,
-                                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                                   ),
                                 ],
                               ),
@@ -545,11 +544,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       children: [
                         Text(
                           _selectedCustomer!.name,
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                         Text(
                           '${_selectedCustomer!.phone} • ${_selectedCustomer!.email ?? 'No email'}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -580,7 +579,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 'Order Details',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -590,7 +589,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
           // Quantity
           Text(
             'Quantity',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Row(
@@ -629,7 +628,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         controller: _quantityController,
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
                         onChanged: (value) {
                           final qty = int.tryParse(value) ?? 1;
@@ -671,7 +670,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
           // Delivery Date
           Text(
             'Delivery Date',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -703,7 +702,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       Expanded(
                         child: Text(
                           '${_selectedDeliveryDate.day}/${_selectedDeliveryDate.month}/${_selectedDeliveryDate.year}',
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                         ),
                       ),
                       Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
@@ -735,7 +734,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 'Customization Options',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -783,7 +782,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Add Custom Option',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.green),
                     ),
                   ],
                 ),
@@ -809,11 +808,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         children: [
                           Text(
                             option['label'],
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                           Text(
                             option['value'],
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -856,7 +855,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
               SizedBox(width: context.smallPadding),
               Text(
                 'Pricing Details',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -912,7 +911,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
           // Quick Advance Percentage Buttons
           Text(
             'Quick Advance Options',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding / 2),
           Row(
@@ -940,7 +939,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         ),
                         child: Text(
                           '$percentage%',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.indigo[700]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.indigo[700]),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -968,11 +967,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Base Price × $_quantity:',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
                     ),
                     Text(
                       'PKR ${(widget.product.price * _quantity).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -982,11 +981,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Total Amount:',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                     ),
                     Text(
                       'PKR ${_totalAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.indigo),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.indigo),
                     ),
                   ],
                 ),
@@ -996,11 +995,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Advance Payment:',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.green[700]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.green[700]),
                     ),
                     Text(
                       'PKR ${_advanceAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
                     ),
                   ],
                 ),
@@ -1010,11 +1009,11 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                   children: [
                     Text(
                       'Remaining Amount:',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                     ),
                     Text(
                       'PKR ${(_totalAmount - _advanceAmount).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                     ),
                   ],
                 ),
@@ -1116,7 +1115,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                     SizedBox(width: context.smallPadding),
                     Text(
                       'Add Custom Option',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),

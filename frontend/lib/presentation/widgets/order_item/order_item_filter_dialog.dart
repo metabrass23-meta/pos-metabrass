@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/providers/product_provider.dart';
@@ -115,7 +114,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
   late Animation<double> _fadeAnimation;
 
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
   String _searchQuery = '';
   bool _showInactiveOnly = false;
 
@@ -361,7 +360,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               children: [
                 Text(
                   l10n.orderItemFilters,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -372,7 +371,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.customizeOrderItemSearch,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -417,7 +416,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
           Expanded(
             child: Text(
               '${l10n.activeFilters}: ${_getActiveFiltersText(l10n)}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -427,7 +426,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             decoration: BoxDecoration(color: AppTheme.primaryMaroon, borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Text(
               '$_activeFiltersCount',
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
         ],
@@ -493,7 +492,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.basicFilters,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -537,7 +536,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
 
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: l10n.selectProduct,
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -568,7 +567,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding / 2),
         InkWell(
@@ -592,7 +591,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                     value != null
                         ? items.firstWhere((item) => item.value == value, orElse: () => DropdownItem<T?>(value: null, label: '')).label
                         : hint,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
+                    style: TextStyle(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
                   ),
                 ),
                 Icon(Icons.arrow_drop_down_rounded, color: Colors.grey[600]),
@@ -630,14 +629,14 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 children: [
                   Text(
                     '${l10n.select} ${T == OrderModel ? l10n.order : l10n.product}',
-                    style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.cardPadding),
                   TextField(
                     controller: searchController,
                     decoration: InputDecoration(
                       hintText: searchHint ?? l10n.search,
-                      hintStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+                      hintStyle: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                     ),
@@ -661,7 +660,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                         return ListTile(
                           title: Text(
                             item.label,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
                           ),
                           onTap: () {
                             onChanged(item.value);
@@ -689,11 +688,11 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.allProducts),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
+      DropdownItem<ProductModel?>(value: null, label: l10n.allProducts),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
     ];
   }
 
@@ -716,7 +715,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.searchAndTextFilters,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -751,7 +750,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.numericRangeFilters,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -827,7 +826,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.dateAndStatusFilters,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -864,7 +863,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 child: CheckboxListTile(
                   title: Text(
                     l10n.showInactiveItems,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
                   ),
                   value: _showInactiveOnly,
                   onChanged: (value) => setState(() => _showInactiveOnly = value ?? false),
@@ -876,7 +875,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 child: CheckboxListTile(
                   title: Text(
                     l10n.hasCustomizationNotes,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
                   ),
                   value: _hasCustomization,
                   onChanged: (value) => setState(() => _hasCustomization = value ?? false),
@@ -910,7 +909,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
               SizedBox(width: context.cardPadding),
               Text(
                 l10n.sortingOptions,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/order/order_item_model.dart';
 import '../../../src/providers/order_item_provider.dart';
@@ -189,7 +188,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -208,7 +207,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -250,7 +249,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
               children: [
                 Text(
                   orderItem.productName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -272,7 +271,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
                       Expanded(
                         child: Text(
                           orderItem.productColor!,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -290,7 +289,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               orderItem.customizationNotes.isNotEmpty ? orderItem.customizationNotes : 'No customization notes',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: orderItem.customizationNotes.isNotEmpty ? AppTheme.charcoalGray : Colors.grey[500],
@@ -314,7 +313,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
               ),
               child: Text(
                 '${orderItem.quantity ?? 0}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -326,7 +325,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${(orderItem.unitPrice ?? 0).toStringAsFixed(0)}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -345,7 +344,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
               ),
               child: Text(
                 'PKR ${(orderItem.lineTotal ?? 0).toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -366,7 +365,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
               ),
               child: Text(
                 _helpers.getStatusText(orderItem.isActive),
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
                   color: _helpers.getStatusColor(orderItem.isActive),
@@ -406,7 +405,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
           // Results info
           Text(
             'Showing ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} of ${pagination.totalCount} items',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -427,7 +426,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
                 ),
                 child: Text(
                   '${pagination.currentPage} of ${pagination.totalPages}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 

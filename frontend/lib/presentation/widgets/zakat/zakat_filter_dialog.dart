@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:async';
 import '../../../src/providers/zakat_provider.dart';
@@ -227,7 +226,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
               children: [
                 Text(
                   l10n.filterZakatRecords,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -238,7 +237,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.refineYourZakatList,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -325,7 +324,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -341,10 +340,10 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
 
     return TextFormField(
       controller: _searchController,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
         hintText: l10n.searchByNameDescriptionBeneficiaryOrNotes,
-        hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+        hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -378,7 +377,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           },
           title: Text(
             l10n.showInactiveRecordsOnly,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           activeColor: AppTheme.primaryMaroon,
           dense: true,
@@ -395,7 +394,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                 Expanded(
                   child: Text(
                     l10n.onlyDeactivatedZakatRecordsWillBeShown,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.orange[700]),
                   ),
                 ),
               ],
@@ -412,10 +411,10 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
       children: [
         TextFormField(
           controller: _beneficiaryController,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
           decoration: InputDecoration(
             hintText: l10n.enterBeneficiaryName,
-            hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+            hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
             prefixIcon: Icon(Icons.person_outline, color: Colors.grey[500], size: context.iconSize('medium')),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -452,7 +451,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
       children: [
         Text(
           l10n.selectAuthorizationAuthority,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         ...(_authorityOptions.map(
@@ -466,7 +465,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             },
             title: Text(
               authority,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
             activeColor: AppTheme.primaryMaroon,
             dense: true,
@@ -481,7 +480,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
           label: Text(
             l10n.clearAuthorityFilter,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
       ],
@@ -514,7 +513,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.selectDateRange,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                           ),
                         ],
                       ),
@@ -523,7 +522,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                         _dateFrom != null && _dateTo != null
                             ? '${_dateFrom!.day}/${_dateFrom!.month}/${_dateFrom!.year} - ${_dateTo!.day}/${_dateTo!.month}/${_dateTo!.year}'
                             : l10n.noDateRangeSelected,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
                         ),
@@ -550,7 +549,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                   icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
                   label: Text(
                     l10n.clearDateRange,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red[600]),
                   ),
                 ),
               ),
@@ -574,7 +573,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
         ),
       ),
     );

@@ -1,4 +1,4 @@
-import './sale_model.dart';
+import 'sale_model.dart';
 
 /// Request model for creating a new sale
 class CreateSaleRequest {

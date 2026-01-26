@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -147,7 +146,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
             SizedBox(width: context.smallPadding),
             Text(
               'Customer added successfully!',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -179,7 +178,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -289,7 +288,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
               children: [
                 Text(
                   context.shouldShowCompactLayout ? 'Add Customer' : 'Add New Customer',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -300,7 +299,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     'Create a new customer profile',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -405,7 +404,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 'Customer Type',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -450,7 +449,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                         SizedBox(width: context.smallPadding / 2),
                         Text(
                           type == 'BUSINESS' ? 'Business' : 'Individual',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             fontWeight: FontWeight.w600,
                             color: _selectedCustomerType == type
@@ -729,7 +728,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.charcoalGray,
@@ -761,7 +760,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,

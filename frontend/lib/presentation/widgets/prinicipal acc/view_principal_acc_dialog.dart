@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/theme/app_theme.dart';
@@ -139,7 +138,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               children: [
                 Text(
                   l10n.principalAccountDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -150,7 +149,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompleteTransactionInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -165,7 +164,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.account.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -242,7 +241,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -260,7 +259,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     children: [
                       Text(
                         l10n.type,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Row(
@@ -270,7 +269,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                           SizedBox(width: context.smallPadding / 2),
                           Text(
                             widget.account.type.toUpperCase(),
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: widget.account.typeColor),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: widget.account.typeColor),
                           ),
                         ],
                       ),
@@ -291,12 +290,12 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     children: [
                       Text(
                         l10n.amount,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Text(
                         'PKR ${widget.account.amount.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.headerFontSize * 0.8,
                           fontWeight: FontWeight.w800,
                           color: widget.account.typeColor,
@@ -332,7 +331,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.sourceModuleInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -351,7 +350,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     children: [
                       Text(
                         l10n.module,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Row(
@@ -364,7 +363,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                           SizedBox(width: context.smallPadding / 2),
                           Text(
                             widget.account.sourceModule.replaceAll('_', ' ').toUpperCase(),
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w700,
                               color: widget.account.sourceModuleColor,
@@ -390,7 +389,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                       children: [
                         Text(
                           l10n.sourceID,
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                         ),
                         SizedBox(height: context.smallPadding / 2),
                         Container(
@@ -401,7 +400,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                           ),
                           child: Text(
                             widget.account.sourceId!,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w700,
                               color: widget.account.sourceModuleColor,
@@ -438,7 +437,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.balanceInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
               ),
             ],
           ),
@@ -451,12 +450,12 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               children: [
                 Text(
                   l10n.balanceAfterTransaction,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
                   'PKR ${widget.account.balanceAfter.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w800, color: Colors.blue[700]),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w800, color: Colors.blue[700]),
                 ),
               ],
             ),
@@ -485,7 +484,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.handlerInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -509,7 +508,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                 SizedBox(width: context.cardPadding),
                 Text(
                   widget.account.handledBy!,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize * 1.1,
                     fontWeight: FontWeight.w700,
                     color: _getPersonColor(widget.account.handledBy!),
@@ -552,19 +551,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.date,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.formattedDate,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.relativeDate,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -583,14 +582,14 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.time,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.formattedTime,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -617,19 +616,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.date,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.formattedDate,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.relativeDate,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -649,14 +648,14 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.time,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.formattedTime,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
               ],
             ),
@@ -681,7 +680,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDescription,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -696,7 +695,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             ),
             child: Text(
               widget.account.description,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
             ),
           ),
           SizedBox(height: context.cardPadding),
@@ -708,11 +707,11 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   children: [
                     Text(
                       '${l10n.recordCreated}:',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                     Text(
                       _formatDateTime(widget.account.dateTime),
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -722,7 +721,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                 decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
                   l10n.ledgerEntry,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
                 ),
               ),
             ],
@@ -751,7 +750,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalNotes,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -766,7 +765,7 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             ),
             child: Text(
               widget.account.notes!,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
             ),
           ),
         ],

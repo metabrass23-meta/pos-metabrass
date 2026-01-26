@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -21,13 +20,39 @@ class SalesTable extends StatefulWidget {
 }
 
 class _SalesTableState extends State<SalesTable> {
-  final ScrollController _horizontalController = ScrollController();
-  final ScrollController _verticalController = ScrollController();
+  // Separate controllers for accurate synchronization
+  late ScrollController _headerScrollController;
+  late ScrollController _contentHorizontalScrollController;
+  late ScrollController _verticalScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _headerScrollController = ScrollController();
+    _contentHorizontalScrollController = ScrollController();
+    _verticalScrollController = ScrollController();
+
+    // Link the header and content horizontal scrolling
+    _headerScrollController.addListener(() {
+      if (_contentHorizontalScrollController.hasClients &&
+          _headerScrollController.offset != _contentHorizontalScrollController.offset) {
+        _contentHorizontalScrollController.jumpTo(_headerScrollController.offset);
+      }
+    });
+
+    _contentHorizontalScrollController.addListener(() {
+      if (_headerScrollController.hasClients &&
+          _contentHorizontalScrollController.offset != _headerScrollController.offset) {
+        _headerScrollController.jumpTo(_contentHorizontalScrollController.offset);
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _horizontalController.dispose();
-    _verticalController.dispose();
+    _headerScrollController.dispose();
+    _contentHorizontalScrollController.dispose();
+    _verticalScrollController.dispose();
     super.dispose();
   }
 
@@ -37,7 +62,13 @@ class _SalesTableState extends State<SalesTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: context.shadowBlur(),
+              offset: Offset(0, context.smallPadding)
+          )
+        ],
       ),
       child: Consumer<SalesProvider>(
         builder: (context, provider, child) {
@@ -55,53 +86,61 @@ class _SalesTableState extends State<SalesTable> {
             return _buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                // Table Header with Horizontal Scroll
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _horizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(width: _getTableWidth(context), padding: EdgeInsets.all(context.cardPadding), child: _buildTableHeader(context)),
+          return Column(
+            children: [
+              // 1. Table Header (Horizontal Scroll)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
                   ),
                 ),
+                child: SingleChildScrollView(
+                  controller: _headerScrollController, // Controlled by header controller
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Container(
+                      width: _getTableWidth(context),
+                      padding: EdgeInsets.all(context.cardPadding),
+                      child: _buildTableHeader(context)
+                  ),
+                ),
+              ),
 
-                // Table Content with Synchronized Scroll
-                Expanded(
-                  child: Scrollbar(
-                    controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.sales.length,
-                          itemBuilder: (context, index) {
-                            final sale = provider.sales[index];
-                            return _buildTableRow(context, sale, index);
-                          },
+              // 2. Table Content (Vertical + Horizontal Scroll)
+              Expanded(
+                child: Scrollbar(
+                  controller: _verticalScrollController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
+                    controller: _verticalScrollController, // Vertical Scrolling
+                    scrollDirection: Axis.vertical,
+                    child: Scrollbar(
+                      controller: _contentHorizontalScrollController,
+                      thumbVisibility: true,
+                      notificationPredicate: (notification) => notification.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _contentHorizontalScrollController, // Controlled by content horizontal controller
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Container(
+                          width: _getTableWidth(context),
+                          // Use Column instead of ListView inside SingleChildScrollView to avoid conflicts
+                          child: Column(
+                            children: provider.sales.asMap().entries.map((entry) {
+                              return _buildTableRow(context, entry.value, entry.key);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -158,7 +197,7 @@ class _SalesTableState extends State<SalesTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -186,8 +225,10 @@ class _SalesTableState extends State<SalesTable> {
               ),
               child: Text(
                 sale.id,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -198,7 +239,7 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.formattedInvoiceNumber,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -211,13 +252,13 @@ class _SalesTableState extends State<SalesTable> {
               children: [
                 Text(
                   sale.customerName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   sale.customerPhone,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -234,7 +275,7 @@ class _SalesTableState extends State<SalesTable> {
               decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 sale.totalItems.toString(),
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -246,7 +287,7 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.subtotal.toStringAsFixed(0)}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -263,12 +304,12 @@ class _SalesTableState extends State<SalesTable> {
               ),
               child: Text(
                 'PKR ${sale.overallDiscount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
               ),
             )
                 : Text(
               '-',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[500]),
+              style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -279,7 +320,7 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${sale.gstPercentage}%',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -295,7 +336,7 @@ class _SalesTableState extends State<SalesTable> {
               ),
               child: Text(
                 'PKR ${sale.grandTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
               ),
             ),
           ),
@@ -306,7 +347,7 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.amountPaid.toStringAsFixed(0)}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
             ),
           ),
 
@@ -320,7 +361,7 @@ class _SalesTableState extends State<SalesTable> {
               decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${sale.remainingAmount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
               ),
             )
                 : Container(
@@ -331,7 +372,7 @@ class _SalesTableState extends State<SalesTable> {
               ),
               child: Text(
                 l10n.paid,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
               ),
             ),
           ),
@@ -354,7 +395,7 @@ class _SalesTableState extends State<SalesTable> {
                   Expanded(
                     child: Text(
                       _getLocalizedPaymentMethod(l10n, sale.paymentMethod),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: _getPaymentMethodColor(sale.paymentMethod),
@@ -374,7 +415,7 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.dateTimeText,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -397,7 +438,7 @@ class _SalesTableState extends State<SalesTable> {
                   Expanded(
                     child: Text(
                       _getLocalizedStatus(l10n, sale.status),
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: sale.statusColor),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: sale.statusColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -556,7 +597,7 @@ class _SalesTableState extends State<SalesTable> {
 
           Text(
             l10n.noSalesRecordsFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -567,7 +608,7 @@ class _SalesTableState extends State<SalesTable> {
             ),
             child: Text(
               l10n.completeFirstSaleMessage,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),

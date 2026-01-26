@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
@@ -87,7 +86,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
             SizedBox(width: context.smallPadding),
             Text(
               l10n.advancePaymentDeletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -109,7 +108,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -213,7 +212,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deletePayment : l10n.deleteAdvancePayment,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -224,7 +223,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.thisActionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -269,7 +268,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
           SizedBox(height: context.mainPadding),
           Text(
             isCompact ? l10n.areYouSureDeleteThisPayment : l10n.areYouAbsolutelySureDeleteAdvancePayment,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -292,14 +291,14 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                       ),
                       child: Text(
                         widget.payment.id,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
                         widget.payment.laborName,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -314,11 +313,11 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                         children: [
                           Text(
                             '${l10n.amount}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             'PKR ${widget.payment.amount.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -329,11 +328,11 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                         children: [
                           Text(
                             '${l10n.date}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             '${widget.payment.date.day}/${widget.payment.date.month}/${widget.payment.date.year}',
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -348,11 +347,11 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                     children: [
                       Text(
                         '${l10n.description}:',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
                         widget.payment.description,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
                       ),
                     ],
                   ),
@@ -371,7 +370,7 @@ class _DeleteAdvancePaymentDialogState extends State<DeleteAdvancePaymentDialog>
                 Expanded(
                   child: Text(
                     isCompact ? l10n.thisWillPermanentlyDeleteThePaymentRecord : l10n.thisWillPermanentlyDeleteAdvancePaymentRecord,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
               ],

@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 import '../models/sales/return_model.dart';
 import '../models/api_response.dart';
+import '../utils/storage_service.dart';
 
 class ReturnService {
   static final ReturnService _instance = ReturnService._internal();
@@ -9,8 +11,39 @@ class ReturnService {
   ReturnService._internal();
 
   final Dio _dio = Dio();
+  final StorageService _storageService = StorageService();
 
+  // ✅ CRITICAL FIX: Gets Token from Storage and uses 'Token' prefix (not Bearer)
+  Future<Options> _getAuthOptions() async {
+    final token = await _storageService.getToken() ?? '';
+
+    if (token.isEmpty) {
+      debugPrint('⚠️ [ReturnService] Warning: No Auth Token found in StorageService!');
+    } else {
+      // debugPrint('🔑 [ReturnService] Using Token: ${token.substring(0, 5)}...');
+    }
+
+    return Options(
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        // Django DRF TokenAuthentication expects "Token <key>", NOT "Bearer <key>"
+        'Authorization': 'Token $token',
+      },
+      validateStatus: (status) {
+        return status! < 500; // Handle 400/401 errors manually
+      },
+    );
+  }
+
+  String _getUrl(String endpoint) {
+    return '${ApiConfig.baseUrl}$endpoint';
+  }
+
+  // ---------------------------------------------------------------------------
   // Return Management
+  // ---------------------------------------------------------------------------
+
   Future<ApiResponse<List<ReturnModel>>> getReturns({
     String? search,
     String? status,
@@ -20,9 +53,13 @@ class ReturnService {
     int? page,
     int? pageSize,
   }) async {
+    final url = _getUrl(ApiConfig.returnsEndpoint);
+    debugPrint('🚀 [ReturnService] GET $url');
+
     try {
       final response = await _dio.get(
-        ApiConfig.returnsEndpoint,
+        url,
+        options: await _getAuthOptions(),
         queryParameters: {
           if (search != null && search.isNotEmpty) 'search': search,
           if (status != null && status.isNotEmpty) 'status': status,
@@ -35,29 +72,35 @@ class ReturnService {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['results'] ?? response.data;
+        // Handle Pagination: Check if 'results' key exists, otherwise use data as list
+        final List<dynamic> data = (response.data is Map && response.data.containsKey('results'))
+            ? response.data['results']
+            : (response.data is List ? response.data : []);
+
         final returns = data.map((json) => ReturnModel.fromJson(json)).toList();
+        debugPrint('✅ [ReturnService] Loaded ${returns.length} returns');
         return ApiResponse<List<ReturnModel>>(success: true, data: returns, message: 'Returns loaded successfully');
       } else {
-        return ApiResponse<List<ReturnModel>>(success: false, data: null, message: response.data['message'] ?? 'Failed to load returns');
+        debugPrint('❌ [ReturnService] Failed: ${response.data}');
+        return ApiResponse<List<ReturnModel>>(success: false, data: null, message: response.data['detail'] ?? 'Failed to load returns');
       }
     } catch (e) {
+      debugPrint('🛑 [ReturnService] Exception: $e');
       return ApiResponse<List<ReturnModel>>(success: false, data: null, message: 'Error loading returns: $e');
     }
   }
 
   Future<ApiResponse<ReturnModel>> getReturn(String id) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/');
     try {
-      final response = await _dio.get('${ApiConfig.returnsEndpoint}$id/');
-
+      final response = await _dio.get(url, options: await _getAuthOptions());
       if (response.statusCode == 200) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return loaded successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Return loaded');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to load return');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to load');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error loading return: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
@@ -69,9 +112,13 @@ class ReturnService {
     String? notes,
     required List<Map<String, dynamic>> returnItems,
   }) async {
+    final url = _getUrl(ApiConfig.returnsEndpoint);
+    debugPrint('🚀 [ReturnService] POST $url');
+
     try {
       final response = await _dio.post(
-        ApiConfig.returnsEndpoint,
+        url,
+        options: await _getAuthOptions(),
         data: {
           'sale': saleId,
           'customer': customerId,
@@ -83,101 +130,110 @@ class ReturnService {
       );
 
       if (response.statusCode == 201) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return created successfully');
+        debugPrint('✅ [ReturnService] Created Successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Return created');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to create return');
+        debugPrint('❌ [ReturnService] Failed: ${response.data}');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to create');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error creating return: $e');
+      debugPrint('🛑 [ReturnService] Exception: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<ReturnModel>> updateReturn({required String id, String? reason, String? reasonDetails, String? notes}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/');
     try {
       final response = await _dio.patch(
-        '${ApiConfig.returnsEndpoint}$id/',
+        url,
+        options: await _getAuthOptions(),
         data: {if (reason != null) 'reason': reason, if (reasonDetails != null) 'reason_details': reasonDetails, if (notes != null) 'notes': notes},
       );
-
       if (response.statusCode == 200) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return updated successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Updated successfully');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to update return');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to update');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error updating return: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<bool>> deleteReturn(String id) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/');
     try {
-      final response = await _dio.delete('${ApiConfig.returnsEndpoint}$id/');
-
+      final response = await _dio.delete(url, options: await _getAuthOptions());
       if (response.statusCode == 204) {
-        return ApiResponse<bool>(success: true, data: true, message: 'Return deleted successfully');
+        return ApiResponse<bool>(success: true, data: true, message: 'Deleted successfully');
       } else {
-        return ApiResponse<bool>(success: false, data: false, message: response.data['message'] ?? 'Failed to delete return');
+        return ApiResponse<bool>(success: false, data: false, message: response.data['detail'] ?? 'Failed to delete');
       }
     } catch (e) {
-      return ApiResponse<bool>(success: false, data: false, message: 'Error deleting return: $e');
+      return ApiResponse<bool>(success: false, data: false, message: 'Error: $e');
     }
   }
 
-  // Return Workflow
+  // --- Workflow Actions ---
+
   Future<ApiResponse<ReturnModel>> approveReturn({required String id, String? reason}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/approve/');
+    debugPrint('🚀 [ReturnService] POST $url');
     try {
       final response = await _dio.patch(
-        '${ApiConfig.returnsEndpoint}$id/approve/',
+        url,
+        options: await _getAuthOptions(),
         data: {'action': 'approve', if (reason != null) 'reason': reason},
       );
-
       if (response.statusCode == 200) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return approved successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Approved successfully');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to approve return');
+        debugPrint('❌ [ReturnService] Approve Failed: ${response.data}');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to approve');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error approving return: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<ReturnModel>> rejectReturn({required String id, required String reason}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/approve/');
     try {
-      final response = await _dio.patch('${ApiConfig.returnsEndpoint}$id/approve/', data: {'action': 'reject', 'reason': reason});
-
+      final response = await _dio.patch(
+          url,
+          options: await _getAuthOptions(),
+          data: {'action': 'reject', 'reason': reason}
+      );
       if (response.statusCode == 200) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return rejected successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Rejected successfully');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to reject return');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to reject');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error rejecting return: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<ReturnModel>> processReturn({required String id, double? refundAmount, String? refundMethod}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}$id/process/');
     try {
       final response = await _dio.patch(
-        '${ApiConfig.returnsEndpoint}$id/process/',
+        url,
+        options: await _getAuthOptions(),
         data: {if (refundAmount != null) 'refund_amount': refundAmount, if (refundMethod != null) 'refund_method': refundMethod},
       );
-
       if (response.statusCode == 200) {
-        final returnModel = ReturnModel.fromJson(response.data);
-        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return processed successfully');
+        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Processed successfully');
       } else {
-        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to process return');
+        return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to process');
       }
     } catch (e) {
-      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error processing return: $e');
+      return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
-  // Refund Management
+  // --- Refund Management ---
+
   Future<ApiResponse<List<RefundModel>>> getRefunds({
     String? search,
     String? status,
@@ -187,9 +243,12 @@ class ReturnService {
     int? page,
     int? pageSize,
   }) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/');
+    debugPrint('🚀 [ReturnService] GET $url');
     try {
       final response = await _dio.get(
-        '${ApiConfig.returnsEndpoint}refunds/',
+        url,
+        options: await _getAuthOptions(),
         queryParameters: {
           if (search != null && search.isNotEmpty) 'search': search,
           if (status != null && status.isNotEmpty) 'status': status,
@@ -200,31 +259,32 @@ class ReturnService {
           if (pageSize != null) 'page_size': pageSize,
         },
       );
-
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['results'] ?? response.data;
+        final List<dynamic> data = (response.data is Map && response.data.containsKey('results'))
+            ? response.data['results']
+            : (response.data is List ? response.data : []);
+
         final refunds = data.map((json) => RefundModel.fromJson(json)).toList();
-        return ApiResponse<List<RefundModel>>(success: true, data: refunds, message: 'Refunds loaded successfully');
+        return ApiResponse<List<RefundModel>>(success: true, data: refunds, message: 'Refunds loaded');
       } else {
-        return ApiResponse<List<RefundModel>>(success: false, data: null, message: response.data['message'] ?? 'Failed to load refunds');
+        return ApiResponse<List<RefundModel>>(success: false, data: null, message: response.data['detail'] ?? 'Failed to load');
       }
     } catch (e) {
-      return ApiResponse<List<RefundModel>>(success: false, data: null, message: 'Error loading refunds: $e');
+      return ApiResponse<List<RefundModel>>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<RefundModel>> getRefund(String id) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/');
     try {
-      final response = await _dio.get('${ApiConfig.returnsEndpoint}refunds/$id/');
-
+      final response = await _dio.get(url, options: await _getAuthOptions());
       if (response.statusCode == 200) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund loaded successfully');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Loaded');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to load refund');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error loading refund: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
@@ -235,9 +295,11 @@ class ReturnService {
     String? notes,
     String? referenceNumber,
   }) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/');
     try {
       final response = await _dio.post(
-        '${ApiConfig.returnsEndpoint}refunds/',
+        url,
+        options: await _getAuthOptions(),
         data: {
           'return_request': returnRequestId,
           'amount': amount,
@@ -246,147 +308,136 @@ class ReturnService {
           if (referenceNumber != null) 'reference_number': referenceNumber,
         },
       );
-
       if (response.statusCode == 201) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund created successfully');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Created');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to create refund');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error creating refund: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<RefundModel>> updateRefund({required String id, String? method, String? notes, String? referenceNumber}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/');
     try {
       final response = await _dio.patch(
-        '${ApiConfig.returnsEndpoint}refunds/$id/',
-        data: {
-          if (method != null) 'method': method,
-          if (notes != null) 'notes': notes,
-          if (referenceNumber != null) 'reference_number': referenceNumber,
-        },
+        url,
+        options: await _getAuthOptions(),
+        data: {if (method != null) 'method': method, if (notes != null) 'notes': notes, if (referenceNumber != null) 'reference_number': referenceNumber},
       );
-
       if (response.statusCode == 200) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund updated successfully');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Updated');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to update refund');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error updating refund: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<bool>> deleteRefund(String id) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/');
     try {
-      final response = await _dio.delete('${ApiConfig.returnsEndpoint}refunds/$id/');
-
+      final response = await _dio.delete(url, options: await _getAuthOptions());
       if (response.statusCode == 204) {
-        return ApiResponse<bool>(success: true, data: true, message: 'Refund deleted successfully');
+        return ApiResponse<bool>(success: true, data: true, message: 'Deleted');
       } else {
-        return ApiResponse<bool>(success: false, data: false, message: response.data['message'] ?? 'Failed to delete refund');
+        return ApiResponse<bool>(success: false, data: false, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<bool>(success: false, data: false, message: 'Error deleting refund: $e');
+      return ApiResponse<bool>(success: false, data: false, message: 'Error: $e');
     }
   }
 
-  // Refund Processing
   Future<ApiResponse<RefundModel>> processRefund({required String id, String? referenceNumber, String? notes}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/process/');
     try {
       final response = await _dio.patch(
-        '${ApiConfig.returnsEndpoint}refunds/$id/process/',
+        url,
+        options: await _getAuthOptions(),
         data: {if (referenceNumber != null) 'reference_number': referenceNumber, if (notes != null) 'notes': notes},
       );
-
       if (response.statusCode == 200) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund processed successfully');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Processed');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to process refund');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error processing refund: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<RefundModel>> failRefund({required String id, String? notes}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/fail/');
     try {
-      final response = await _dio.patch('${ApiConfig.returnsEndpoint}refunds/$id/fail/', data: {if (notes != null) 'notes': notes});
-
+      final response = await _dio.patch(url, options: await _getAuthOptions(), data: {if (notes != null) 'notes': notes});
       if (response.statusCode == 200) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund marked as failed');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Marked failed');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to mark refund as failed');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error marking refund as failed: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<RefundModel>> cancelRefund({required String id, String? notes}) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}refunds/$id/cancel/');
     try {
-      final response = await _dio.patch('${ApiConfig.returnsEndpoint}refunds/$id/cancel/', data: {if (notes != null) 'notes': notes});
-
+      final response = await _dio.patch(url, options: await _getAuthOptions(), data: {if (notes != null) 'notes': notes});
       if (response.statusCode == 200) {
-        final refundModel = RefundModel.fromJson(response.data);
-        return ApiResponse<RefundModel>(success: true, data: refundModel, message: 'Refund cancelled successfully');
+        return ApiResponse<RefundModel>(success: true, data: RefundModel.fromJson(response.data), message: 'Cancelled');
       } else {
-        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['message'] ?? 'Failed to cancel refund');
+        return ApiResponse<RefundModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error cancelling refund: $e');
+      return ApiResponse<RefundModel>(success: false, data: null, message: 'Error: $e');
     }
   }
 
-  // Statistics and Reports
-  Future<ApiResponse<Map<String, dynamic>>> getReturnStatistics() async {
-    try {
-      final response = await _dio.get('${ApiConfig.returnsEndpoint}statistics/');
+  // --- Statistics and History ---
 
+  Future<ApiResponse<Map<String, dynamic>>> getReturnStatistics() async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}statistics/');
+    debugPrint('🚀 [ReturnService] GET Stats $url');
+    try {
+      final response = await _dio.get(url, options: await _getAuthOptions());
       if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'Statistics loaded successfully');
+        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'Stats loaded');
       } else {
-        return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: response.data['message'] ?? 'Failed to load statistics');
+        return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error loading statistics: $e');
+      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<Map<String, dynamic>>> getCustomerReturnHistory(String customerId) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}customer/$customerId/history/');
     try {
-      final response = await _dio.get('${ApiConfig.returnsEndpoint}customer/$customerId/history/');
-
+      final response = await _dio.get(url, options: await _getAuthOptions());
       if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'Customer history loaded successfully');
+        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'History loaded');
       } else {
-        return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: response.data['message'] ?? 'Failed to load customer history');
+        return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error loading customer history: $e');
+      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error: $e');
     }
   }
 
   Future<ApiResponse<Map<String, dynamic>>> getSaleReturnDetails(String saleId) async {
+    final url = _getUrl('${ApiConfig.returnsEndpoint}sale/$saleId/returns/');
     try {
-      final response = await _dio.get('${ApiConfig.returnsEndpoint}sale/$saleId/returns/');
-
+      final response = await _dio.get(url, options: await _getAuthOptions());
       if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'Sale return details loaded successfully');
+        return ApiResponse<Map<String, dynamic>>(success: true, data: response.data, message: 'Details loaded');
       } else {
-        return ApiResponse<Map<String, dynamic>>(
-          success: false,
-          data: null,
-          message: response.data['message'] ?? 'Failed to load sale return details',
-        );
+        return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: response.data['detail'] ?? 'Failed');
       }
     } catch (e) {
-      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error loading sale return details: $e');
+      return ApiResponse<Map<String, dynamic>>(success: false, data: null, message: 'Error: $e');
     }
   }
 }

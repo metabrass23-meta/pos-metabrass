@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/labor/labor_model.dart';
 import '../../../src/providers/labor_provider.dart';
@@ -26,23 +25,46 @@ class EnhancedLaborTable extends StatefulWidget {
 }
 
 class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
-  final ScrollController _horizontalController = ScrollController();
-  final ScrollController _verticalController = ScrollController();
+  // Separate controllers for synchronized scrolling
+  late ScrollController _headerHorizontalController;
+  late ScrollController _contentHorizontalController;
+  late ScrollController _verticalController;
   late LaborTableHelpers _helpers;
 
   @override
   void initState() {
     super.initState();
+    // Initialize ALL controllers immediately
+    _headerHorizontalController = ScrollController();
+    _contentHorizontalController = ScrollController();
+    _verticalController = ScrollController();
+
     _helpers = LaborTableHelpers(
       onEdit: widget.onEdit,
       onDelete: widget.onDelete,
       onView: widget.onView,
     );
+
+    // Link the header and content horizontal scrolling (Two-way sync)
+    _headerHorizontalController.addListener(() {
+      if (_contentHorizontalController.hasClients &&
+          _headerHorizontalController.offset != _contentHorizontalController.offset) {
+        _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+
+    _contentHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients &&
+          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+        _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
+      }
+    });
   }
 
   @override
   void dispose() {
-    _horizontalController.dispose();
+    _headerHorizontalController.dispose();
+    _contentHorizontalController.dispose();
     _verticalController.dispose();
     super.dispose();
   }
@@ -75,59 +97,67 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             return _helpers.buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _horizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(
-                          vertical: context.cardPadding * 0.85,
-                          horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
+          return Column(
+            children: [
+              // 1. Table Header (Horizontal Scroll Only)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
                   ),
                 ),
-                Expanded(
-                  child: Scrollbar(
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Container(
+                    width: _getTableWidth(context),
+                    padding: EdgeInsets.symmetric(
+                        vertical: context.cardPadding * 0.85,
+                        horizontal: context.cardPadding / 2),
+                    child: _buildTableHeader(context),
+                  ),
+                ),
+              ),
+
+              // 2. Table Content (Vertical + Horizontal Scroll)
+              Expanded(
+                child: Scrollbar(
+                  controller: _verticalController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
                     controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.labors.length,
-                          itemBuilder: (context, index) {
-                            final labor = provider.labors[index];
-                            return _buildTableRow(context, labor, index);
-                          },
+                    scrollDirection: Axis.vertical,
+                    child: Scrollbar(
+                      controller: _contentHorizontalController,
+                      thumbVisibility: true,
+                      notificationPredicate: (notification) => notification.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _contentHorizontalController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Container(
+                          width: _getTableWidth(context),
+                          // Use Column instead of ListView for smoother nested scrolling
+                          child: Column(
+                            children: provider.labors.asMap().entries.map((entry) {
+                              return _buildTableRow(context, entry.value, entry.key);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                if (provider.paginationInfo != null &&
-                    provider.paginationInfo!.totalPages > 1)
-                  _buildPaginationControls(context, provider),
-              ],
-            ),
+              ),
+
+              if (provider.paginationInfo != null &&
+                  provider.paginationInfo!.totalPages > 1)
+                _buildPaginationControls(context, provider),
+            ],
           );
         },
       ),
@@ -249,7 +279,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: context.bodyFontSize,
         fontWeight: FontWeight.w600,
         color: AppTheme.charcoalGray,
@@ -273,7 +303,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -323,7 +353,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               children: [
                 Text(
                   labor.name,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -344,7 +374,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                           ),
                           child: Text(
                             l10n.newLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: 8,
                               fontWeight: FontWeight.w600,
                               color: Colors.green,
@@ -361,7 +391,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                           ),
                           child: Text(
                             l10n.recentLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: Colors.blue,
@@ -380,7 +410,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.formattedPhone,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -394,7 +424,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.cnic,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -408,7 +438,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.designation,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -423,7 +453,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 'PKR ${labor.salary.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -436,7 +466,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 labor.city,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,
@@ -462,7 +492,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               ),
               child: Text(
                 labor.isActive ? l10n.active : l10n.inactive,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
                   color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive'),
@@ -479,7 +509,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               children: [
                 Text(
                   _formatDate(labor.joiningDate),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -487,7 +517,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                 ),
                 Text(
                   _formatDate(labor.joiningDate),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -523,7 +553,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
         children: [
           Text(
             '${l10n.showing} ${((pagination.currentPage - 1) * pagination.pageSize) + 1}-${pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize} ${l10n.outOf} ${pagination.totalCount} ${l10n.labors}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[600],
             ),
@@ -549,7 +579,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                 ),
                 child: Text(
                   '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryMaroon,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -9,6 +8,7 @@ import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
+import 'order_success_dialog.dart'; // ✅ Import Success Dialog
 
 class CheckoutDialog extends StatefulWidget {
   const CheckoutDialog({super.key});
@@ -95,25 +95,22 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       return;
     }
 
-    // Parse amount paid
-    final double amountPaid =
-        double.tryParse(_amountPaidController.text) ?? 0.0;
+    // ✅ CAPTURE VALUES BEFORE CLEARING CART
+    final double capturedTotalAmount = provider.cartGrandTotal;
+    final double amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
+    final String paymentMethod = _translatePaymentMethod(_selectedPaymentMethod);
+
     if (amountPaid < 0) {
-      _showErrorDialog(
-          'Invalid Amount', 'Amount paid cannot be negative.');
+      _showErrorDialog('Invalid Amount', 'Amount paid cannot be negative.');
       return;
     }
-
-    // Translate payment method to backend format
-    final String backendPaymentMethod = _translatePaymentMethod(_selectedPaymentMethod);
 
     // Prepare split payment details if applicable
     Map<String, dynamic>? splitPaymentDetails;
     if (_isSplitPayment) {
       final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
       final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
-      final bankAmount =
-          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+      final bankAmount = double.tryParse(_bankTransferAmountController.text) ?? 0.0;
 
       splitPaymentDetails = {
         'cash': cashAmount,
@@ -130,7 +127,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     try {
       // Call provider method to create sale from cart
       final bool success = await provider.createSaleFromCart(
-        paymentMethod: backendPaymentMethod,
+        paymentMethod: paymentMethod,
         amountPaid: amountPaid,
         notes: notes,
       );
@@ -138,13 +135,19 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       if (!mounted) return;
 
       if (success) {
-        // Show success dialog
-        await _showSuccessDialog();
-        
-        // Close checkout dialog and return to sales screen
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
+        // ✅ Close Checkout Dialog FIRST (to avoid stacking dialogs)
+        Navigator.of(context).pop();
+
+        // ✅ Show Success Dialog using CAPTURED VALUES
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => OrderSuccessDialog(
+            totalPrice: capturedTotalAmount, // ✅ Use Captured Value
+            advanceAmount: amountPaid,       // ✅ Use Captured Value
+            deliveryDate: DateTime.now(),    // Or today's date for immediate sale
+          ),
+        );
       } else {
         // Show error from provider
         _showErrorDialog(
@@ -167,8 +170,8 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.red),
-            SizedBox(width: 8),
+            const Icon(Icons.error_outline, color: Colors.red),
+            const SizedBox(width: 8),
             Text(title),
           ],
         ),
@@ -176,299 +179,9 @@ class _CheckoutDialogState extends State<CheckoutDialog>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _showSuccessDialog() async {
-    final l10n = AppLocalizations.of(context)!;
-    final provider = Provider.of<SalesProvider>(context, listen: false);
-
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 85.w,
-              small: 75.w,
-              medium: 65.w,
-              large: 55.w,
-              ultrawide: 45.w,
-            ),
-          ),
-          decoration: BoxDecoration(
-            color: AppTheme.pureWhite,
-            borderRadius: BorderRadius.circular(context.borderRadius('large')),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: context.shadowBlur('heavy'),
-                offset: Offset(0, context.cardPadding),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Success Header
-              Container(
-                padding: EdgeInsets.all(context.cardPadding),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.green, Colors.greenAccent],
-                  ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(context.smallPadding),
-                      decoration: BoxDecoration(
-                        color: AppTheme.pureWhite.withOpacity(0.2),
-                        borderRadius:
-                            BorderRadius.circular(context.borderRadius()),
-                      ),
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('large'),
-                      ),
-                    ),
-                    SizedBox(width: context.cardPadding),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.saleCompleted,
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: context.headerFontSize,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.pureWhite,
-                            ),
-                          ),
-                          Text(
-                            l10n.transactionProcessedSuccessfully,
-                            style: GoogleFonts.inter(
-                              fontSize: context.subtitleFontSize,
-                              color: AppTheme.pureWhite.withOpacity(0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Success Details
-              Padding(
-                padding: EdgeInsets.all(context.cardPadding),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(context.cardPadding),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius:
-                            BorderRadius.circular(context.borderRadius()),
-                        border: Border.all(
-                          color: Colors.green.withOpacity(0.3),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${l10n.invoiceNumber}:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                              Text(
-                                'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.primaryMaroon,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: context.smallPadding),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${l10n.totalAmount}:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                              Text(
-                                'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: context.smallPadding),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${l10n.paymentMethod}:',
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                              Text(
-                                _selectedPaymentMethod,
-                                style: GoogleFonts.inter(
-                                  fontSize: context.bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.charcoalGray,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: context.cardPadding),
-
-                    // Action Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.blue),
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius(),
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        l10n.printFunctionalityToBeImplemented,
-                                      ),
-                                      backgroundColor: Colors.blue,
-                                    ),
-                                  );
-                                },
-                                borderRadius: BorderRadius.circular(
-                                  context.borderRadius(),
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: context.cardPadding / 1.5,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.print_rounded,
-                                        color: Colors.blue,
-                                        size: context.iconSize('medium'),
-                                      ),
-                                      SizedBox(width: context.smallPadding),
-                                      Text(
-                                        l10n.printReceipt,
-                                        style: GoogleFonts.inter(
-                                          fontSize: context.bodyFontSize,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: context.cardPadding),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  AppTheme.primaryMaroon,
-                                  AppTheme.secondaryMaroon,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius(),
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop(); // Close success dialog
-                                },
-                                borderRadius: BorderRadius.circular(
-                                  context.borderRadius(),
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: context.cardPadding / 1.5,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.done_rounded,
-                                        color: AppTheme.pureWhite,
-                                        size: context.iconSize('medium'),
-                                      ),
-                                      SizedBox(width: context.smallPadding),
-                                      Text(
-                                        l10n.newSale,
-                                        style: GoogleFonts.inter(
-                                          fontSize: context.bodyFontSize,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppTheme.pureWhite,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -500,8 +213,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     if (_isSplitPayment) {
       final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
       final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
-      final bankAmount =
-          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+      final bankAmount = double.tryParse(_bankTransferAmountController.text) ?? 0.0;
       final totalAmount = cashAmount + cardAmount + bankAmount;
 
       setState(() {
@@ -615,7 +327,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   context.shouldShowCompactLayout
                       ? l10n.checkout
                       : l10n.checkoutAndPayment,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -626,7 +338,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.completeTheSaleTransaction,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -649,14 +361,14 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                     children: [
                       Text(
                         '${provider.cartTotalItems} ${l10n.items}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           color: AppTheme.pureWhite.withOpacity(0.8),
                         ),
                       ),
                       Text(
                         'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.pureWhite,
@@ -783,7 +495,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.orderSummary,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -807,7 +519,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                         children: [
                           Text(
                             provider.selectedCustomer!.name,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -815,7 +527,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                           ),
                           Text(
                             provider.selectedCustomer!.phone,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               color: Colors.grey[600],
                             ),
@@ -834,14 +546,14 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                 children: [
                   Text(
                     '${l10n.items} (${provider.cartTotalItems})',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       color: AppTheme.charcoalGray,
                     ),
                   ),
                   Text(
                     'PKR ${provider.cartSubtotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -856,14 +568,14 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   children: [
                     Text(
                       l10n.discount,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: Colors.orange[700],
                       ),
                     ),
                     Text(
                       '- PKR ${provider.overallDiscount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.orange[700],
@@ -879,14 +591,14 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   children: [
                     Text(
                       'GST (${provider.gstPercentage}%)',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: AppTheme.charcoalGray,
                       ),
                     ),
                     Text(
                       'PKR ${provider.cartGstAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -902,14 +614,14 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   children: [
                     Text(
                       '${l10n.tax} (${provider.taxPercentage}%)',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         color: AppTheme.charcoalGray,
                       ),
                     ),
                     Text(
                       'PKR ${provider.cartTaxAmount.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -926,7 +638,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                 children: [
                   Text(
                     l10n.grandTotal,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize * 0.8,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.charcoalGray,
@@ -934,7 +646,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   ),
                   Text(
                     'PKR ${provider.cartGrandTotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize * 0.8,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primaryMaroon,
@@ -972,7 +684,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentMethod,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -1019,7 +731,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                           SizedBox(width: context.smallPadding),
                           Text(
                             method,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               color: AppTheme.charcoalGray,
                             ),
@@ -1036,7 +748,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
           if (_isSplitPayment) ...[
             Text(
               l10n.splitPaymentDetails,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.charcoalGray,
@@ -1110,7 +822,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                   children: [
                     Text(
                       difference > 0 ? l10n.change : l10n.remaining,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w600,
                         color: difference > 0
@@ -1120,7 +832,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                     ),
                     Text(
                       'PKR ${difference.abs().toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w700,
                         color: difference > 0
@@ -1161,7 +873,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                       _showAdvancedOptions
                           ? l10n.hideAdvancedOptions
                           : l10n.showAdvancedOptions,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w500,
                         color: AppTheme.primaryMaroon,
@@ -1200,7 +912,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.advancedOptions,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -207,7 +206,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
               children: [
                 Text(
                   'Filter Customers',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -218,7 +217,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     'Refine your customer list with advanced filters',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -335,7 +334,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -397,7 +396,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
           children: [
             Text(
               'City',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -406,13 +405,13 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _cityController,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
                 hintText: 'Enter city name',
-                hintStyle: GoogleFonts.inter(
+                hintStyle: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
                 ),
@@ -455,7 +454,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
           children: [
             Text(
               'Country',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -464,13 +463,13 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _countryController,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
                 hintText: 'Enter country name',
-                hintStyle: GoogleFonts.inter(
+                hintStyle: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
                 ),
@@ -543,7 +542,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.subtitleFontSize,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             color: isSelected ? AppTheme.primaryMaroon : Colors.grey[700],
@@ -575,7 +574,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,

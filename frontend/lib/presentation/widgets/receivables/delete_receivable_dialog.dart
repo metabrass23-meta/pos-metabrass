@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -82,7 +81,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
             SizedBox(width: context.smallPadding),
             Text(
               l10n.receivableDeletedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -237,7 +236,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deleteReceivable : l10n.deleteReceivableRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -248,7 +247,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.thisActionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -320,7 +319,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
             isCompact
                 ? l10n.areYouSureDeleteReceivable
                 : l10n.areYouAbsolutelySureDeleteReceivable,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -353,7 +352,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                       ),
                       child: Text(
                         widget.receivable.id,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.red,
@@ -364,7 +363,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                     Expanded(
                       child: Text(
                         widget.receivable.debtorName,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.charcoalGray,
@@ -383,7 +382,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         children: [
                           Text(
                             l10n.amountGivenLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -391,7 +390,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           ),
                           Text(
                             'PKR ${widget.receivable.amountGiven.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -406,7 +405,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         children: [
                           Text(
                             l10n.balanceRemainingLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -414,7 +413,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           ),
                           Text(
                             'PKR ${widget.receivable.balanceRemaining.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: widget.receivable.balanceRemaining > 0 ? Colors.orange : Colors.green,
@@ -434,7 +433,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         children: [
                           Text(
                             l10n.phoneLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -442,7 +441,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           ),
                           Text(
                             widget.receivable.debtorPhone,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -457,7 +456,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         children: [
                           Text(
                             l10n.statusLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -474,7 +473,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                             ),
                             child: Text(
                               widget.receivable.statusText,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: widget.receivable.statusColor,
@@ -495,7 +494,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                         children: [
                           Text(
                             l10n.expectedReturnLabel,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -503,7 +502,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           ),
                           Text(
                             widget.receivable.formattedExpectedReturnDate,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: widget.receivable.isOverdue ? Colors.red : AppTheme.charcoalGray,
@@ -519,7 +518,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                           children: [
                             Text(
                               l10n.daysOverdueLabel,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey[600],
@@ -527,7 +526,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                             ),
                             Text(
                               '${widget.receivable.daysOverdue} ${l10n.days}',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.subtitleFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.red,
@@ -547,7 +546,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                     children: [
                       Text(
                         l10n.reasonItemLabel,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
@@ -555,7 +554,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                       ),
                       Text(
                         widget.receivable.reasonOrItem,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w400,
                           color: AppTheme.charcoalGray,
@@ -587,7 +586,7 @@ class _DeleteReceivableDialogState extends State<DeleteReceivableDialog> with Si
                     isCompact
                         ? l10n.willPermanentlyDeleteReceivable
                         : l10n.willPermanentlyDeleteReceivableAndData,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.orange[700],

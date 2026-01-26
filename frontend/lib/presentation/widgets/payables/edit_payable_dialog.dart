@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -124,7 +123,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               l10n.payableUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -145,7 +144,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -308,7 +307,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editPayable : l10n.editPayableDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -319,7 +318,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.updatePayableInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -334,7 +333,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.payable.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -456,7 +455,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                         SizedBox(width: context.smallPadding),
                         Text(
                           l10n.paymentSummary,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
                             color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
@@ -467,19 +466,19 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
                     SizedBox(height: context.smallPadding),
                     Text(
                       '${l10n.currentPaid}: PKR ${widget.payable.amountPaid.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
                     ),
                     Text(
                       '${l10n.additionalPayment}: PKR ${(double.tryParse(_amountPaidController.text) ?? 0.0).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.bodyFontSize - 2, color: Colors.grey[600]),
                     ),
                     Text(
                       '${l10n.totalAfterUpdate}: PKR ${(widget.payable.amountPaid + (double.tryParse(_amountPaidController.text) ?? 0.0)).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize - 2, fontWeight: FontWeight.w600, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: context.bodyFontSize - 2, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                     ),
                     Text(
                       '${l10n.balanceRemaining}: PKR ${balanceRemaining.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: balanceRemaining >= 0 ? Colors.orange : Colors.red,

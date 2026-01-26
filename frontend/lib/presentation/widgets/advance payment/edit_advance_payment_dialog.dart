@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 import '../../../src/models/advance_payment/advance_payment_model.dart';
 import '../../../src/models/labor/labor_model.dart';
@@ -138,7 +137,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             SizedBox(width: context.smallPadding),
             Text(
               l10n.advancePaymentUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -160,7 +159,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -214,7 +213,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
           Expanded(
             child: Text(
               l10n.editAdvancePayment,
-              style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           IconButton(
@@ -248,7 +247,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                 children: [
                   Text(
                     l10n.laborInformation,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   Row(
@@ -258,7 +257,7 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                         backgroundColor: AppTheme.primaryMaroon,
                         child: Text(
                           _selectedLabor.initials,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding),
@@ -268,11 +267,11 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                           children: [
                             Text(
                               _selectedLabor.name,
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
                             ),
                             Text(
                               _selectedLabor.designation,
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -355,12 +354,12 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.date,
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                             ),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -400,12 +399,12 @@ class _EditAdvancePaymentDialogState extends State<EditAdvancePaymentDialog> {
                             SizedBox(height: context.smallPadding),
                             Text(
                               l10n.time,
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                             ),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
                               _selectedTime.format(context),
-                              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),

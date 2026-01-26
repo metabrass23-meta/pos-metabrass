@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0002_initial'),  # Update this to your latest migration
+        ('products', '0002_product_barcode_product_sku_and_more'),
     ]
 
     operations = [

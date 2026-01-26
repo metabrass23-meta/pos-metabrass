@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/providers/vendor_provider.dart';
@@ -120,7 +119,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             SizedBox(width: context.smallPadding),
             Text(
               l10n.payableAddedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -142,7 +141,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -283,7 +282,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addPayable : l10n.addNewPayable,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -294,7 +293,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordAmountOwedToCreditor,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -395,7 +394,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.creditorInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -457,7 +456,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -523,7 +522,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalDetails,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -625,7 +624,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.dateInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -688,11 +687,11 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
               children: [
                 Text(
                   l10n.balanceRemaining,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${balanceRemaining.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
@@ -720,7 +719,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
           Expanded(
             child: Text(
               daysDifference > 0 ? l10n.borrowingPeriodDays(daysDifference) : l10n.pleaseSelectAValidRepaymentDate,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700]),
+              style: TextStyle(fontSize: context.captionFontSize, color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700]),
             ),
           ),
         ],

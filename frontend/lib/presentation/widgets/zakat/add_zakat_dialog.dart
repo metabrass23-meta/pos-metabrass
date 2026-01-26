@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/custom_date_picker.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -108,7 +107,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               l10n.zakatRecordAddedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -130,7 +129,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -250,7 +249,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addZakat : l10n.addNewZakatRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -261,7 +260,7 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordYourZakatContribution,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -384,11 +383,11 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.authorizedBy,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       ),
                       Text(
                         ' *',
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ],
                   ),
@@ -399,14 +398,14 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                       isExpanded: true,
                       hint: Text(
                         l10n.selectAuthorizingPerson,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                       ),
                       items: ZakatAuthorities.authorities.map((String authority) {
                         return DropdownMenuItem<String>(
                           value: authority,
                           child: Text(
                             authority,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                           ),
                         );
                       }).toList(),
@@ -440,14 +439,14 @@ class _AddZakatDialogState extends State<AddZakatDialog> with SingleTickerProvid
                         SizedBox(width: context.smallPadding),
                         Text(
                           l10n.dateAndTime,
-                          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ],
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} ${l10n.at} ${_selectedTime.format(context)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),

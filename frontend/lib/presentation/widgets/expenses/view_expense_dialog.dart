@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
@@ -190,7 +189,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               children: [
                 Text(
                   l10n.expenseDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -201,7 +200,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompleteExpenseInfo,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -222,7 +221,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
             ),
             child: Text(
               widget.expense.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -312,7 +311,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.expenseCategory,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -330,7 +329,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
             ),
             child: Text(
               widget.expense.expense,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize * 1.1,
                 fontWeight: FontWeight.w700,
                 color: Colors.orange[700],
@@ -365,7 +364,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.red[700],
@@ -385,7 +384,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               children: [
                 Text(
                   l10n.totalAmount,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[700],
@@ -394,7 +393,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 SizedBox(height: context.smallPadding),
                 Text(
                   'PKR ${widget.expense.amount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w800,
                     color: Colors.red[700],
@@ -431,7 +430,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.withdrawalInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -466,7 +465,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 SizedBox(width: context.cardPadding),
                 Text(
                   widget.expense.withdrawalBy,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize * 1.1,
                     fontWeight: FontWeight.w700,
                     color: widget.expense.personColor,
@@ -512,7 +511,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.date,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -523,7 +522,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.expense.formattedDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -532,7 +531,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.expense.relativeDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -558,7 +557,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.time,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -569,7 +568,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.expense.formattedTime,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -603,7 +602,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.date,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -614,7 +613,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.expense.formattedDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -623,7 +622,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.expense.relativeDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -650,7 +649,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.time,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -661,7 +660,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.expense.formattedTime,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -697,7 +696,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.expenseDescription,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -716,7 +715,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
             ),
             child: Text(
               widget.expense.description,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: AppTheme.charcoalGray,
@@ -733,7 +732,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                   children: [
                     Text(
                       l10n.recordCreated,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -741,7 +740,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                     ),
                     Text(
                       _formatDateTime(widget.expense.dateTime),
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         color: Colors.grey[700],
                       ),
@@ -760,7 +759,7 @@ class _ViewExpenseDetailsDialogState extends State<ViewExpenseDetailsDialog>
                 ),
                 child: Text(
                   l10n.expenseRecord,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],

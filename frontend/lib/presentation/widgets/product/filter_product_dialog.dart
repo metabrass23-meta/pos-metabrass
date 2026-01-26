@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
@@ -125,7 +124,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -147,7 +146,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -228,7 +227,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               children: [
                 Text(
                   l10n.filterAndSortProducts,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -239,7 +238,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.refineYourProductList,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -315,7 +314,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -365,7 +364,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
           children: [
             Text(
               l10n.color,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
             Wrap(
@@ -381,7 +380,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             SizedBox(height: context.cardPadding),
             Text(
               l10n.fabric,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             SizedBox(height: context.smallPadding),
             Wrap(
@@ -474,7 +473,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       children: [
         Text(
           l10n.sortBy,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Wrap(
@@ -499,7 +498,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         SizedBox(height: context.cardPadding),
         Text(
           l10n.sortOrder,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Wrap(
@@ -527,7 +526,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.subtitleFontSize,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             color: isSelected ? AppTheme.primaryMaroon : Colors.grey[700],

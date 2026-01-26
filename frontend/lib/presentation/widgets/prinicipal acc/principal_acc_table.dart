@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -131,7 +130,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               children: [
                 Text(
                   l10n.currentBalance,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
                     color: AppTheme.pureWhite.withOpacity(0.9),
@@ -139,7 +138,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                 ),
                 Text(
                   'PKR ${provider.currentBalance?.currentBalance.toStringAsFixed(0) ?? '0'}',
-                  style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
               ],
             ),
@@ -149,7 +148,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
             child: Text(
               '${provider.accounts.length} ${l10n.transactions}',
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
         ],
@@ -199,7 +198,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -226,7 +225,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               ),
               child: Text(
                 account.id,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ),
           ),
@@ -248,7 +247,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   Expanded(
                     child: Text(
                       account.sourceModule.replaceAll('_', ' ').toUpperCase(),
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: account.sourceModuleColor),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: account.sourceModuleColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -263,7 +262,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               account.description,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -285,7 +284,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     account.type.toUpperCase(),
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
                   ),
                 ],
               ),
@@ -303,7 +302,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               ),
               child: Text(
                 'PKR ${account.amount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
               ),
             ),
           ),
@@ -316,7 +315,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${account.balanceAfter.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
               ),
             ),
           ),
@@ -344,7 +343,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   Expanded(
                     child: Text(
                       account.handledBy!,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: _getPersonColor(account.handledBy!),
@@ -358,7 +357,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             )
                 : Text(
               l10n.notSpecified,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey[600],
@@ -375,11 +374,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               children: [
                 Text(
                   account.formattedDate,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   account.relativeDate,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -398,7 +397,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     account.formattedTime,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
                   ),
                 ],
               ),
@@ -496,7 +495,7 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.noPrincipalAccountRecordsFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -505,41 +504,8 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             ),
             child: Text(
               l10n.startByAddingYourFirstPrincipalAccountEntry,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(height: context.mainPadding),
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        l10n.addFirstEntry,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           ),
         ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -43,7 +42,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
           SizedBox(height: context.cardPadding),
           Text(
             l10n.loadingDashboardData,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -199,14 +198,14 @@ class ProfitLossDashboardSection extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
             '${growth.toStringAsFixed(1)}%',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w700,
               color: isPositive
@@ -239,7 +238,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
                     : isNegative
                     ? l10n.decreased
                     : l10n.noChange,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: isPositive
                       ? Colors.green
@@ -289,7 +288,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w600,
               color: isCurrent ? AppTheme.primaryMaroon : Colors.grey[600],
@@ -298,7 +297,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
           SizedBox(height: context.smallPadding),
           Text(
             periodData.period,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[500]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[500]),
           ),
           SizedBox(height: context.cardPadding),
 
@@ -342,7 +341,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.businessTrends,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -387,14 +386,14 @@ class ProfitLossDashboardSection extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
         ),
         Icon(trendIcon, color: color, size: context.iconSize('small')),
         SizedBox(width: context.smallPadding / 2),
         Text(
           status,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
         ),
       ],
     );
@@ -419,7 +418,7 @@ class ProfitLossDashboardSection extends StatelessWidget {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.expenseBreakdown,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -449,12 +448,12 @@ class ProfitLossDashboardSection extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
         ),
         Text(
           'PKR ${amount.toStringAsFixed(0)}',
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: color),
         ),
       ],
     );
@@ -468,12 +467,12 @@ class ProfitLossDashboardSection extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
           ),
         ),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
       ],
     );

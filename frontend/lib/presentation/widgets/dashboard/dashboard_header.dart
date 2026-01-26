@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../src/theme/app_theme.dart';
@@ -51,7 +50,7 @@ class DashboardHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -60,7 +59,7 @@ class DashboardHeader extends StatelessWidget {
                 ),
                 Text(
                   _getSubtitle(context),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 9.6.sp,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -85,13 +84,13 @@ class DashboardHeader extends StatelessWidget {
               child: TextField(
                 controller: searchController,
                 onChanged: onSearchChanged,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 9.8.sp,
                   color: AppTheme.charcoalGray,
                 ),
                 decoration: InputDecoration(
                   hintText: l10n.searchPlaceholder,
-                  hintStyle: GoogleFonts.inter(
+                  hintStyle: TextStyle(
                     fontSize: 10.6.sp,
                     color: Colors.grey[500],
                   ),
@@ -147,7 +146,7 @@ class DashboardHeader extends StatelessWidget {
                           SizedBox(width: 0.8.w),
                           Text(
                             l10n.addNew,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: 10.6.sp,
                               fontWeight: FontWeight.w500,
                               color: AppTheme.pureWhite,
@@ -215,7 +214,7 @@ class DashboardHeader extends StatelessWidget {
                       backgroundColor: AppTheme.primaryMaroon,
                       child: Text(
                         'A',
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -212,7 +211,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -231,7 +230,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
@@ -276,7 +275,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               ),
               child: Text(
                 payable.id.substring(0, 8),
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -293,7 +292,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               children: [
                 Text(
                   payable.creditorName,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -302,7 +301,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     payable.reasonOrItem,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -312,7 +311,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       '${l10n.notes}: ${payable.notes}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -329,7 +328,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payable.reasonOrItem,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -350,7 +349,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payable.notes ?? l10n.noNotes,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -372,7 +371,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   ),
                   child: Text(
                     payable.formattedAmountBorrowed,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -380,7 +379,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     '${l10n.paid}: ${payable.formattedAmountPaid}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green[600]),
                   ),
                 ],
               ],
@@ -396,11 +395,11 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               children: [
                 Text(
                   payable.formattedExpectedRepaymentDate,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   context.shouldShowCompactLayout ? payable.relativeExpectedRepaymentDate : (payable.repaymentStatus ?? l10n.due),
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -454,7 +453,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize,
               pagination.totalCount,
             ),
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
           ),
 
           const Spacer(),
@@ -477,7 +476,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                 ),
                 child: Text(
                   l10n.pageOfPages(pagination.currentPage, pagination.totalPages),
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
 

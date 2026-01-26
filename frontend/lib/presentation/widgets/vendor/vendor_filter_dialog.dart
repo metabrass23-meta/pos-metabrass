@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -206,7 +205,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               children: [
                 Text(
                   '${l10n.filter} ${l10n.vendor}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -217,7 +216,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.refineVendorList,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -312,7 +311,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -332,10 +331,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
 
     return TextFormField(
       controller: _searchController,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
       decoration: InputDecoration(
         hintText: l10n.searchVendorsHint,
-        hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+        hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
         prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -372,7 +371,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           },
           title: Text(
             l10n.showInactiveVendorsOnly,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w500,
               color: AppTheme.charcoalGray,
@@ -396,7 +395,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
                 Expanded(
                   child: Text(
                     l10n.onlyDeactivatedVendorsShown,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.orange[700]),
                   ),
                 ),
               ],
@@ -417,7 +416,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           children: [
             Text(
               l10n.city,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -426,10 +425,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _cityController,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: '${l10n.enterEmail} ${l10n.city}',
-                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.location_city_outlined,
                   color: Colors.grey[500],
@@ -478,7 +477,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           children: [
             Text(
               l10n.area,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -487,10 +486,10 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _areaController,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               decoration: InputDecoration(
                 hintText: '${l10n.enterEmail} ${l10n.area}',
-                hintStyle: GoogleFonts.inter(fontSize: context.bodyFontSize, color: Colors.grey[500]),
+                hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
                 prefixIcon: Icon(
                   Icons.map_outlined,
                   color: Colors.grey[500],
@@ -547,7 +546,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,

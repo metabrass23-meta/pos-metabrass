@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/receipt_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
+import '../../widgets/globals/text_field.dart'; // ✅ Use PremiumTextField
 
 class EditReceiptDialog extends StatefulWidget {
   final ReceiptModel receipt;
@@ -38,6 +39,7 @@ class _EditReceiptDialogState extends State<EditReceiptDialog> {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         width: 500,
         padding: const EdgeInsets.all(24),
@@ -47,25 +49,34 @@ class _EditReceiptDialogState extends State<EditReceiptDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // --- Header ---
               Row(
                 children: [
                   Icon(Icons.edit, color: Theme.of(context).primaryColor),
                   const SizedBox(width: 12),
-                  Text(
-                    l10n.editReceiptWithNumber(widget.receipt.receiptNumber),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      l10n.editReceiptWithNumber(widget.receipt.receiptNumber),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
 
+              // --- Status Dropdown ---
               DropdownButtonFormField<String>(
                 value: _selectedStatus,
                 decoration: InputDecoration(
                   labelText: l10n.statusRequired,
                   border: const OutlineInputBorder(),
                   hintText: l10n.selectReceiptStatus,
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
+                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                dropdownColor: Colors.white,
                 items: [
                   DropdownMenuItem(value: 'GENERATED', child: Text(l10n.generated)),
                   DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
@@ -86,18 +97,17 @@ class _EditReceiptDialogState extends State<EditReceiptDialog> {
 
               const SizedBox(height: 16),
 
-              TextFormField(
+              // --- Notes ---
+              PremiumTextField(
+                label: l10n.notes,
+                hint: l10n.additionalReceiptNotes,
                 controller: _notesController,
-                decoration: InputDecoration(
-                  labelText: l10n.notes,
-                  hintText: l10n.additionalReceiptNotes,
-                  border: const OutlineInputBorder(),
-                ),
                 maxLines: 3,
               ),
 
               const SizedBox(height: 24),
 
+              // --- Actions ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -109,7 +119,11 @@ class _EditReceiptDialogState extends State<EditReceiptDialog> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _updateReceipt,
                     child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
                         : Text(l10n.updateReceipt),
                   ),
                 ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/advance_payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -208,7 +207,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               children: [
                 Text(
                   l10n.filterAdvancePayments,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -219,7 +218,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.applyFiltersToFindSpecificAdvancePayments,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -286,7 +285,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         children: [
           Text(
             l10n.search,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           TextField(
@@ -319,7 +318,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
             children: [
               Text(
                 l10n.labor,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
               PremiumDropdownField<String>(
@@ -362,7 +361,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountRangePkr,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -373,10 +372,10 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                 child: TextField(
                   controller: _minAmountController,
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
                     labelText: l10n.minimumAmount,
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
+                    labelStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       borderSide: BorderSide(color: Colors.grey.shade300),
@@ -398,10 +397,10 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                 child: TextField(
                   controller: _maxAmountController,
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                   decoration: InputDecoration(
                     labelText: l10n.maximumAmount,
-                    labelStyle: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
+                    labelStyle: TextStyle(fontSize: context.bodyFontSize * 0.9, color: Colors.grey[600]),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(context.borderRadius()),
                       borderSide: BorderSide(color: Colors.grey.shade300),
@@ -440,7 +439,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         children: [
           Text(
             l10n.receiptAndSorting,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -496,7 +495,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               ),
               Text(
                 l10n.sortAscending,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -520,7 +519,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         children: [
           Text(
             l10n.dateRange,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -574,7 +573,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
         children: [
           Text(
             l10n.advancedOptions,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -591,7 +590,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               Expanded(
                 child: Text(
                   l10n.showInactiveRecords,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
               ),
             ],
@@ -615,7 +614,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         InkWell(
@@ -647,7 +646,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
                     selectedDate != null
                         ? '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}'
                         : l10n.selectDate,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       color: selectedDate != null ? AppTheme.charcoalGray : Colors.grey.shade500,
                     ),

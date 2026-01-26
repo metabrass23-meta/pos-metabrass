@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -12,7 +11,7 @@ import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
 class EnhancedAddToCartDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const EnhancedAddToCartDialog({super.key, required this.product});
 
@@ -94,7 +93,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
               SizedBox(width: context.smallPadding),
               Expanded(
-                child: Text('${widget.product.name} ${l10n.addedToCart}', style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+                child: Text('${widget.product.name} ${l10n.addedToCart}', style: TextStyle(color: AppTheme.pureWhite)),
               ),
             ],
           ),
@@ -185,11 +184,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   l10n.addToCart,
-                  style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
                 ),
                 Text(
                   widget.product.name,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.pureWhite.withOpacity(0.9)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -260,7 +259,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   widget.product.name,
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Row(
@@ -277,7 +276,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       '${widget.product.color} • ${widget.product.fabric}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -290,7 +289,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   ),
                   child: Text(
                     '${l10n.stockAvailable}: ${widget.product.quantity}',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: widget.product.stockStatusColor),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: widget.product.stockStatusColor),
                   ),
                 ),
               ],
@@ -309,7 +308,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
       children: [
         Text(
           l10n.quantity,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Row(
@@ -347,7 +346,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                       controller: _quantityController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
                       onChanged: (value) {
                         final qty = int.tryParse(value) ?? 1;
@@ -412,7 +411,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                       ),
                       child: Text(
                         qty.toString(),
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: _quantity == qty ? AppTheme.primaryMaroon : Colors.grey[600],
@@ -439,7 +438,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
           children: [
             Text(
               l10n.price,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             const Spacer(),
             Switch.adaptive(
@@ -457,7 +456,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             SizedBox(width: context.smallPadding),
             Text(
               l10n.customPrice,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -489,11 +488,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   '${l10n.unitPrice}:',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   'PKR ${widget.product.price.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
                 ),
               ],
             ),
@@ -511,7 +510,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
       children: [
         Text(
           l10n.itemDiscountOptional,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
 
@@ -540,7 +539,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                         ),
                         child: Text(
                           '$percentage%',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -555,7 +554,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${_itemDiscount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600]),
               ),
             ),
           ],
@@ -575,7 +574,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   child: Text(
                     l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.red),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
                   ),
 
                 ),
@@ -596,7 +595,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
           children: [
             Text(
               l10n.customizationNotes,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             ),
             const Spacer(),
             Switch.adaptive(
@@ -645,11 +644,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 '${l10n.unitPrice}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${_currentPrice.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -659,11 +658,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 '${l10n.quantity}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 _quantity.toString(),
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -673,11 +672,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 '${l10n.subtotal}:',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${(_currentPrice * _quantity).toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -689,11 +688,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
               children: [
                 Text(
                   '${l10n.discount}:',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.orange[700]),
                 ),
                 Text(
                   '- PKR ${_itemDiscount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 ),
               ],
             ),
@@ -707,11 +706,11 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             children: [
               Text(
                 '${l10n.total}:',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
               ),
               Text(
                 'PKR ${_lineTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
               ),
             ],
           ),

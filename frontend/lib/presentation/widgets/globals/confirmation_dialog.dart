@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/widgets/globals/text_button.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:frontend/src/theme/app_theme.dart';
@@ -137,7 +136,7 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
           Expanded(
             child: Text(
               widget.title,
-              style: GoogleFonts.playfairDisplay(
+              style: TextStyle(
                 fontSize: context.headerFontSize,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.pureWhite,
@@ -171,7 +170,7 @@ class ConfirmationDialogState extends State<ConfirmationDialog> with SingleTicke
         children: [
           Text(
             widget.message,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               fontWeight: FontWeight.w400,
               color: AppTheme.charcoalGray,

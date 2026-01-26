@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/zakat_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -87,7 +86,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             SizedBox(width: context.smallPadding),
             Text(
               l10n.zakatRecordDeletedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -119,7 +118,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -237,7 +236,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deleteZakat : l10n.deleteZakatRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -248,7 +247,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.thisActionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -320,7 +319,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
             context.shouldShowCompactLayout
                 ? l10n.areYouSureYouWantToDeleteThisZakatRecord
                 : l10n.areYouAbsolutelySureYouWantToDeleteThisZakatRecord,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize * 1.1,
               fontWeight: FontWeight.w600,
               color: AppTheme.charcoalGray,
@@ -354,7 +353,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                       ),
                       child: Text(
                         widget.zakat.id,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.red,
@@ -365,7 +364,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                     Expanded(
                       child: Text(
                         widget.zakat.name,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.charcoalGray,
@@ -386,7 +385,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         children: [
                           Text(
                             '${l10n.beneficiary}:',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -406,7 +405,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                                 child: Center(
                                   child: Text(
                                     _getBeneficiaryInitials(widget.zakat.beneficiaryName),
-                                    style: GoogleFonts.inter(
+                                    style: TextStyle(
                                       fontSize: context.captionFontSize,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.blue,
@@ -418,7 +417,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                               Expanded(
                                 child: Text(
                                   widget.zakat.beneficiaryName,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.subtitleFontSize,
                                     fontWeight: FontWeight.w500,
                                     color: AppTheme.charcoalGray,
@@ -438,7 +437,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         children: [
                           Text(
                             '${l10n.amount}:',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -456,7 +455,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                             ),
                             child: Text(
                               widget.zakat.formattedAmount,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.bodyFontSize,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.primaryMaroon,
@@ -476,7 +475,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                   children: [
                     Text(
                       '${l10n.description}:',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -485,7 +484,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                     SizedBox(height: context.smallPadding / 4),
                     Text(
                       widget.zakat.description,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w500,
                         color: AppTheme.charcoalGray,
@@ -506,7 +505,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         children: [
                           Text(
                             '${l10n.dateAndTime}:',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -515,7 +514,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                           SizedBox(height: context.smallPadding / 4),
                           Text(
                             widget.zakat.formattedDate,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.charcoalGray,
@@ -523,7 +522,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                           ),
                           Text(
                             widget.zakat.formattedTime,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
@@ -539,7 +538,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                         children: [
                           Text(
                             '${l10n.authorizedBy}:',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey[600],
@@ -557,7 +556,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                             ),
                             child: Text(
                               widget.zakat.authorizedInitials,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.indigo,
@@ -567,7 +566,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                           SizedBox(height: context.smallPadding / 4),
                           Text(
                             widget.zakat.authorizedBy,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey[600],
@@ -606,7 +605,7 @@ class _DeleteZakatDialogState extends State<DeleteZakatDialog> with SingleTicker
                     context.shouldShowCompactLayout
                         ? l10n.thisWillPermanentlyDeleteTheZakatRecord
                         : l10n.thisWillPermanentlyDeleteTheZakatRecordAndAllAssociatedData,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.orange[700],

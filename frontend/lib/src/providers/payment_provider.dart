@@ -743,7 +743,7 @@ class PaymentProvider extends ChangeNotifier {
     }
   }
 
-  /// Load laborers
+  /// Load laborers (FIXED: Handles 0 remaining salary)
   Future<void> loadLaborers() async {
     _setLoading(true);
     _clearMessages();
@@ -752,6 +752,23 @@ class PaymentProvider extends ChangeNotifier {
       final response = await _laborService.getLabors();
       if (response.success && response.data != null) {
         _labors = response.data!.labors;
+
+        _laborers = _labors.map((labor) {
+          // FIX: If remainingMonthlySalary > 0, use it.
+          // Otherwise, fallback to salary (assuming new month or data issue).
+          final displayAmount = labor.remainingMonthlySalary > 0
+              ? labor.remainingMonthlySalary
+              : labor.salary;
+
+          return PaymentLabor(
+            id: labor.id,
+            name: labor.name,
+            role: labor.designation,
+            remainingAmount: displayAmount,
+            phone: labor.formattedPhone,
+          );
+        }).toList();
+
         notifyListeners();
       } else {
         _setError(response.message);
@@ -816,13 +833,13 @@ class PaymentProvider extends ChangeNotifier {
         .take(5)
         .map(
           (payment) => {
-            'id': payment.id,
-            'amount': payment.amountPaid,
-            'date': payment.date.toIso8601String(),
-            'method': payment.paymentMethod,
-            'payer_type': payment.payerType ?? 'LABOR',
-          },
-        )
+        'id': payment.id,
+        'amount': payment.amountPaid,
+        'date': payment.date.toIso8601String(),
+        'method': payment.paymentMethod,
+        'payer_type': payment.payerType ?? 'LABOR',
+      },
+    )
         .toList();
 
     // Sort top payers by amount
@@ -906,9 +923,9 @@ class PaymentProvider extends ChangeNotifier {
 
     return _payments
         .where((payment) {
-          final paymentMonth = DateTime(payment.paymentMonth.year, payment.paymentMonth.month);
-          return paymentMonth.isAtSameMomentAs(thisMonth);
-        })
+      final paymentMonth = DateTime(payment.paymentMonth.year, payment.paymentMonth.month);
+      return paymentMonth.isAtSameMomentAs(thisMonth);
+    })
         .fold(0.0, (sum, payment) => sum + payment.amountPaid);
   }
 
@@ -922,8 +939,8 @@ class PaymentProvider extends ChangeNotifier {
 
     return _payments
         .where((payment) {
-          return payment.date.isAfter(startOfWeek.subtract(const Duration(days: 1))) && payment.date.isBefore(endOfWeek.add(const Duration(days: 1)));
-        })
+      return payment.date.isAfter(startOfWeek.subtract(const Duration(days: 1))) && payment.date.isBefore(endOfWeek.add(const Duration(days: 1)));
+    })
         .fold(0.0, (sum, payment) => sum + payment.amountPaid);
   }
 }

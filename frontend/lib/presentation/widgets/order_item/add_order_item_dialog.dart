@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../src/providers/order_item_provider.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/order_provider.dart';
@@ -29,7 +28,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
 
   // Selected models for dropdowns
   OrderModel? _selectedOrder;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   @override
   void initState() {
@@ -99,7 +98,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                 children: [
                   Text(
                     l10n.addNewOrderItem,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -195,7 +194,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
                       l10n.cancel,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                     ),
                   ),
                   SizedBox(width: context.cardPadding),
@@ -209,7 +208,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                     ),
                     child: Text(
                       l10n.addOrderItem,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, letterSpacing: 0.1),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, letterSpacing: 0.1),
                     ),
                   ),
                 ],
@@ -236,10 +235,10 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
         labelText: label,
         prefixText: prefixText,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-        labelStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+        labelStyle: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
         contentPadding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding),
       ),
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
       keyboardType: keyboardType,
       maxLines: maxLines,
       validator: validator,
@@ -256,7 +255,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
           SnackBar(
             content: Text(
               l10n.pleaseSelectAnOrder,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
             ),
             backgroundColor: Colors.red,
           ),
@@ -269,7 +268,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
           SnackBar(
             content: Text(
               l10n.pleaseSelectAProduct,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
             ),
             backgroundColor: Colors.red,
           ),
@@ -296,7 +295,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
             SnackBar(
               content: Text(
                 l10n.orderItemCreatedSuccessfully,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
               ),
               backgroundColor: Colors.green,
             ),
@@ -306,7 +305,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
             SnackBar(
               content: Text(
                 l10n.failedToCreateOrderItem,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
               ),
               backgroundColor: Colors.red,
             ),
@@ -318,7 +317,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
           SnackBar(
             content: Text(
               '${l10n.error}: $error',
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500),
             ),
             backgroundColor: Colors.red,
           ),
@@ -350,7 +349,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
   Widget _buildProductDropdown(AppLocalizations l10n) {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
-        return _buildSearchableDropdown<Product>(
+        return _buildSearchableDropdown<ProductModel>(
           label: '${l10n.selectProduct} *',
           hint: l10n.typeProductNameToSearch,
           value: _selectedProduct,
@@ -381,7 +380,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding / 2),
         InkWell(
@@ -405,7 +404,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                     value != null
                         ? items.firstWhere((item) => item.value == value, orElse: () => DropdownItem<T?>(value: null, label: '')).label
                         : hint,
-                    style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
+                    style: TextStyle(fontSize: context.bodyFontSize, color: value != null ? AppTheme.charcoalGray : Colors.grey[500]),
                   ),
                 ),
                 Icon(Icons.arrow_drop_down_rounded, color: Colors.grey[600]),
@@ -443,14 +442,14 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                 children: [
                   Text(
                     '${l10n.select} ${T == OrderModel ? l10n.order : l10n.product}',
-                    style: GoogleFonts.inter(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.cardPadding),
                   TextField(
                     controller: searchController,
                     decoration: InputDecoration(
                       hintText: searchHint ?? l10n.search,
-                      hintStyle: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
+                      hintStyle: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                     ),
@@ -474,7 +473,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                         return ListTile(
                           title: Text(
                             item.label,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400),
                           ),
                           onTap: () {
                             onChanged(item.value);
@@ -502,11 +501,11 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
     ];
   }
 
-  List<DropdownItem<Product?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
+  List<DropdownItem<ProductModel?>> _getProductDropdownItems(ProductProvider productProvider, AppLocalizations l10n) {
     final products = productProvider.products;
     return [
-      DropdownItem<Product?>(value: null, label: l10n.selectAProduct),
-      ...products.map((product) => DropdownItem<Product?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
+      DropdownItem<ProductModel?>(value: null, label: l10n.selectAProduct),
+      ...products.map((product) => DropdownItem<ProductModel?>(value: product, label: '${product.name} - ${product.id.substring(0, 8)}...')).toList(),
     ];
   }
 }

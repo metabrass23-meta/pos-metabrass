@@ -124,7 +124,7 @@ class VendorLedgerResponse {
     return VendorLedgerResponse(
       success: json['success'] ?? false,
       message: json['message']?.toString(),
-      ledgerEntries: (data['entries'] as List?)
+      ledgerEntries: (data['ledger_entries'] as List?)  // Changed from 'entries' to 'ledger_entries'
           ?.map((e) => VendorLedgerEntry.fromJson(e))
           .toList() ??
           [],

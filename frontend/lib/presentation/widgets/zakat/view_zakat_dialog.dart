@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/zakat/zakat_model.dart';
 import '../../../src/theme/app_theme.dart';
@@ -189,7 +188,7 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
               children: [
                 Text(
                   l10n.zakatDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -200,7 +199,7 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.viewCompleteZakatContributionInformation,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -221,7 +220,7 @@ class _ViewZakatDetailsDialogState extends State<ViewZakatDetailsDialog>
             ),
             child: Text(
               widget.zakat.id,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.pureWhite,
@@ -323,7 +322,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.zakatTitle,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -341,7 +340,7 @@ class ZakatDetailCards {
             ),
             child: Text(
               zakat.name,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize * 1.1,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.primaryMaroon,
@@ -375,7 +374,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.zakatAmount,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.green[700],
@@ -401,7 +400,7 @@ class ZakatDetailCards {
                 SizedBox(height: context.smallPadding),
                 Text(
                   l10n.contributionAmount,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey[700],
@@ -410,7 +409,7 @@ class ZakatDetailCards {
                 SizedBox(height: context.smallPadding),
                 Text(
                   zakat.formattedAmount,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w800,
                     color: Colors.green[700],
@@ -447,7 +446,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.beneficiaryInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -478,7 +477,7 @@ class ZakatDetailCards {
                       child: Center(
                         child: Text(
                           _getBeneficiaryInitials(zakat.beneficiaryName),
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.bodyFontSize,
                             fontWeight: FontWeight.w600,
                             color: AppTheme.pureWhite,
@@ -493,7 +492,7 @@ class ZakatDetailCards {
                         children: [
                           Text(
                             zakat.beneficiaryName,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize * 1.1,
                               fontWeight: FontWeight.w700,
                               color: Colors.blue[700],
@@ -512,7 +511,7 @@ class ZakatDetailCards {
                                 SizedBox(width: context.smallPadding / 2),
                                 Text(
                                   zakat.beneficiaryContact!,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.subtitleFontSize,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.blue[600],
@@ -566,7 +565,7 @@ class ZakatDetailCards {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.date,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -577,7 +576,7 @@ class ZakatDetailCards {
               SizedBox(height: context.smallPadding / 2),
               Text(
                 zakat.formattedDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -586,7 +585,7 @@ class ZakatDetailCards {
               SizedBox(height: context.smallPadding / 2),
               Text(
                 zakat.relativeDate,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -612,7 +611,7 @@ class ZakatDetailCards {
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.time,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
@@ -623,7 +622,7 @@ class ZakatDetailCards {
               SizedBox(height: context.smallPadding / 2),
               Text(
                 zakat.formattedTime,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -657,7 +656,7 @@ class ZakatDetailCards {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.date,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -668,7 +667,7 @@ class ZakatDetailCards {
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   zakat.formattedDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -677,7 +676,7 @@ class ZakatDetailCards {
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   zakat.relativeDate,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -708,7 +707,7 @@ class ZakatDetailCards {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.time,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[600],
@@ -719,7 +718,7 @@ class ZakatDetailCards {
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   zakat.formattedTime,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -755,7 +754,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.descriptionAndPurpose,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -774,7 +773,7 @@ class ZakatDetailCards {
             ),
             child: Text(
               zakat.description,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: AppTheme.charcoalGray,
@@ -810,7 +809,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalNotes,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -828,7 +827,7 @@ class ZakatDetailCards {
             ),
             child: Text(
               zakat.notes!,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w400,
                 color: AppTheme.charcoalGray,
@@ -864,7 +863,7 @@ class ZakatDetailCards {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.authorizationAndStatus,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -900,7 +899,7 @@ class ZakatDetailCards {
                 SizedBox(width: context.smallPadding),
                 Text(
                   zakat.statusDisplayName,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],
@@ -924,7 +923,7 @@ class ZakatDetailCards {
           children: [
             Text(
               '${l10n.authorizedBy}:',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 color: Colors.grey[700],
               ),
@@ -940,7 +939,7 @@ class ZakatDetailCards {
               ),
               child: Text(
                 zakat.authorizedInitials,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.indigo,
@@ -952,7 +951,7 @@ class ZakatDetailCards {
         SizedBox(height: context.smallPadding),
         Text(
           zakat.authorizedBy,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -971,7 +970,7 @@ class ZakatDetailCards {
       children: [
         Text(
           '${l10n.authorizedBy}:',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: Colors.grey[600],
@@ -991,7 +990,7 @@ class ZakatDetailCards {
               ),
               child: Text(
                 zakat.authorizedInitials,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.indigo,
@@ -1002,7 +1001,7 @@ class ZakatDetailCards {
             Expanded(
               child: Text(
                 zakat.authorizedBy,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,

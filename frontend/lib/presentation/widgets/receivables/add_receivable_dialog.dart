@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -117,7 +116,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
             SizedBox(width: context.smallPadding),
             Text(
               l10n.receivableAddedSuccessfully,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.pureWhite,
@@ -149,7 +148,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -332,7 +331,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.addReceivable : l10n.addNewReceivable,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -343,7 +342,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.recordAmountLentToCustomerOrSupplier,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -458,7 +457,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.debtorInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -526,7 +525,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.amountDetails,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -606,7 +605,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDetails,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -684,7 +683,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.dateInformation,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -759,7 +758,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               children: [
                 Text(
                   l10n.balanceRemaining,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w500,
                     color: AppTheme.charcoalGray,
@@ -767,7 +766,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
                 ),
                 Text(
                   'PKR ${balanceRemaining.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: balanceRemaining >= 0 ? Colors.orange : Colors.red,
@@ -804,7 +803,7 @@ class _AddReceivableDialogState extends State<AddReceivableDialog> with SingleTi
               daysDifference > 0
                   ? '${l10n.lendingPeriod} $daysDifference ${l10n.days}'
                   : l10n.pleaseSelectValidReturnDate,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.captionFontSize,
                 color: daysDifference > 0 ? Colors.blue[700] : Colors.red[700],
               ),

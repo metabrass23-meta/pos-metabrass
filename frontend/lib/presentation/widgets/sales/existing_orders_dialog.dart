@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -8,7 +7,7 @@ import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 
 class ExistingOrdersDialog extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const ExistingOrdersDialog({super.key, required this.product});
 
@@ -80,7 +79,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                       children: [
                         Text(
                           l10n.existingOrders,
-                          style: GoogleFonts.playfairDisplay(
+                          style: TextStyle(
                             fontSize: context.headerFontSize,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
@@ -88,7 +87,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                         ),
                         Text(
                           widget.product.name,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.subtitleFontSize,
                             color: AppTheme.pureWhite.withOpacity(0.9),
                           ),
@@ -151,7 +150,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                                 SizedBox(width: context.smallPadding),
                                 Text(
                                   l10n.createNewOrder,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.blue,
@@ -199,7 +198,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 ),
                 child: Text(
                   order['id'],
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: _getOrderStatusColor(order['status']),
@@ -213,7 +212,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                   children: [
                     Text(
                       order['customerName'],
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.charcoalGray,
@@ -221,7 +220,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                     ),
                     Text(
                       order['phone'],
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -237,7 +236,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 ),
                 child: Text(
                   _getLocalizedStatus(order['status'], l10n),
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w600,
                     color: _getOrderStatusColor(order['status']),
@@ -255,11 +254,11 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     l10n.orderDate,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     order['orderDate'],
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -272,11 +271,11 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     l10n.deliveryDate,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     order['deliveryDate'],
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
@@ -289,11 +288,11 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                 children: [
                   Text(
                     l10n.amount,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     'PKR ${order['amount']}',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primaryMaroon,
@@ -318,7 +317,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                   Expanded(
                     child: Text(
                       order['notes'],
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.blue[700]),
                     ),
                   ),
                 ],
@@ -348,7 +347,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
                           SizedBox(width: context.smallPadding / 2),
                           Text(
                             l10n.addToOrder,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                               fontWeight: FontWeight.w600,
                               color: Colors.blue,

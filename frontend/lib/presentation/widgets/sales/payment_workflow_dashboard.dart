@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -103,7 +102,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             children: [
               Text(
                 l10n.paymentWorkflowDashboard,
-                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
               IconButton(
                 onPressed: _loadDashboardData,
@@ -127,7 +126,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             )
           else
             Center(
-              child: Text(l10n.noDataAvailable, style: GoogleFonts.poppins(color: Colors.grey)),
+              child: Text(l10n.noDataAvailable, style: TextStyle(color: Colors.grey)),
             ),
         ],
       ),
@@ -192,12 +191,12 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
           const SizedBox(height: 8),
           Text(
             value,
-            style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: color),
           ),
           const SizedBox(height: 4),
           Text(
             title,
-            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -224,7 +223,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
         children: [
           Text(
             l10n.paymentProgressOverview,
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
           const SizedBox(height: 16),
           Column(
@@ -232,10 +231,10 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.paymentCompletion, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                  Text(l10n.paymentCompletion, style: TextStyle(fontWeight: FontWeight.w500)),
                   Text(
                     '${completionRate.toStringAsFixed(1)}%',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                    style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                   ),
                 ],
               ),
@@ -288,14 +287,14 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: color),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: color),
           ),
           const SizedBox(height: 4),
           Text(
             'PKR ${amount.toStringAsFixed(0)}',
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: color),
           ),
-          Text('${percentage.toStringAsFixed(1)}%', style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600])),
+          Text('${percentage.toStringAsFixed(1)}%', style: TextStyle(fontSize: 10, color: Colors.grey[600])),
         ],
       ),
     );
@@ -317,7 +316,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
         children: [
           Text(
             l10n.recentWorkflowActivities,
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
           const SizedBox(height: 16),
           ...activities.map((activity) => _buildActivityItem(activity)).toList(),
@@ -366,13 +365,13 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(description, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500)),
+                Text(description, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                 if (amount != null)
                   Text(
                     'PKR ${amount.toStringAsFixed(0)}',
-                    style: GoogleFonts.poppins(fontSize: 10, color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 10, color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
                   ),
-                Text(_formatTimestamp(timestamp), style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600])),
+                Text(_formatTimestamp(timestamp), style: TextStyle(fontSize: 10, color: Colors.grey[600])),
               ],
             ),
           ),
@@ -381,7 +380,7 @@ class _PaymentWorkflowDashboardState extends State<PaymentWorkflowDashboard> {
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
             child: Text(
               status.toUpperCase(),
-              style: GoogleFonts.poppins(fontSize: 8, fontWeight: FontWeight.w600, color: color),
+              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: color),
             ),
           ),
         ],

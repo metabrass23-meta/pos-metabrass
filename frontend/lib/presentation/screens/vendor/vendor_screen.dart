@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -103,7 +102,7 @@ class _VendorPageState extends State<VendorPage> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -144,7 +143,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.export}...',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -176,7 +175,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.vendor} ${l10n.exportCompleted}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
@@ -278,7 +277,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(height: 3.h),
               Text(
                 l10n.screenTooSmall,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: 6.sp,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -288,7 +287,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(height: 2.h),
               Text(
                 l10n.screenTooSmallMessage,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: 3.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -314,7 +313,7 @@ class _VendorPageState extends State<VendorPage> {
             children: [
               Text(
                 '${l10n.vendor} ${l10n.customerManagement}',
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headingFontSize / 1.5,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.charcoalGray,
@@ -324,7 +323,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(height: context.cardPadding / 4),
               Text(
                 '${l10n.manageProductCategories} ${l10n.vendor}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey[600],
@@ -349,7 +348,7 @@ class _VendorPageState extends State<VendorPage> {
         // Page Title
         Text(
           '${l10n.vendor} ${l10n.customerManagement}',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headingFontSize / 1.5,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -359,7 +358,7 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           '${l10n.manageProductCategories} ${l10n.vendor}',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -385,7 +384,7 @@ class _VendorPageState extends State<VendorPage> {
         // Compact Page Title
         Text(
           l10n.vendor,
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w700,
             color: AppTheme.charcoalGray,
@@ -395,7 +394,7 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(height: context.cardPadding / 4),
         Text(
           '${l10n.customerManagementShortDescription} ${l10n.vendor}',
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w400,
             color: Colors.grey[600],
@@ -443,7 +442,7 @@ class _VendorPageState extends State<VendorPage> {
                 SizedBox(width: context.smallPadding),
                 Text(
                   context.isTablet ? l10n.add : '${l10n.add} ${l10n.vendor}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.pureWhite,
@@ -668,7 +667,7 @@ class _VendorPageState extends State<VendorPage> {
         onChanged: (value) {
           provider.searchVendors(value);
         },
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.bodyFontSize,
           color: AppTheme.charcoalGray,
         ),
@@ -676,7 +675,7 @@ class _VendorPageState extends State<VendorPage> {
           hintText: context.isTablet
               ? '${l10n.search} ${l10n.vendor}...'
               : l10n.searchVendorsHint,
-          hintStyle: GoogleFonts.inter(
+          hintStyle: TextStyle(
             fontSize: context.bodyFontSize * 0.9,
             color: Colors.grey[500],
           ),
@@ -737,7 +736,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 provider.showInactive ? l10n.hideInactive : l10n.showInactive,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
@@ -790,7 +789,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 hasActiveFilters ? '${l10n.filter} ($filterCount)' : l10n.filter,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
@@ -832,7 +831,7 @@ class _VendorPageState extends State<VendorPage> {
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.export,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.accentGold,
@@ -887,7 +886,7 @@ class _VendorPageState extends State<VendorPage> {
               children: [
                 Text(
                   filter,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w500,
                     color: AppTheme.primaryMaroon,
@@ -924,7 +923,7 @@ class _VendorPageState extends State<VendorPage> {
               onTap: provider.clearAllFilters,
               child: Text(
                 l10n.clearAll,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.red[700],
@@ -989,7 +988,7 @@ class _VendorPageState extends State<VendorPage> {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 10.8.sp,
@@ -1006,7 +1005,7 @@ class _VendorPageState extends State<VendorPage> {
                 ),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],

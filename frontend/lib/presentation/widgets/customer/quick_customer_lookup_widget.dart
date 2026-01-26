@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -128,7 +127,7 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
             SizedBox(width: 8),
             Text(
               'Customer Lookup',
-              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
             ),
           ],
         ),
@@ -181,7 +180,7 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
               ElevatedButton.icon(
                 onPressed: _showCreateCustomerDialog,
                 icon: Icon(Icons.person_add, size: 18),
-                label: Text('New', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                label: Text('New', style: TextStyle(fontWeight: FontWeight.w600)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryMaroon,
                   foregroundColor: Colors.white,
@@ -230,7 +229,7 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
                 SizedBox(width: 8),
                 Text(
                   'Found ${_searchResults.length} customer(s)',
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ],
             ),
@@ -258,7 +257,7 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
               backgroundColor: AppTheme.primaryMaroon.withOpacity(0.2),
               child: Text(
                 customer.initials,
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ),
 
@@ -269,12 +268,12 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(customer.displayName, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text(customer.displayName, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   SizedBox(height: 4),
-                  Text(customer.phone, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                  Text(customer.phone, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                   if (customer.email.isNotEmpty) ...[
                     SizedBox(height: 2),
-                    Text(customer.email, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                    Text(customer.email, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                   ],
                 ],
               ),
@@ -289,12 +288,12 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
                   decoration: BoxDecoration(color: _getStatusColor(customer.status).withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                   child: Text(
                     customer.statusDisplay,
-                    style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: _getStatusColor(customer.status)),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _getStatusColor(customer.status)),
                   ),
                 ),
                 SizedBox(height: 4),
                 if (customer.totalSalesCount > 0)
-                  Text('${customer.totalSalesCount} sales', style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[600])),
+                  Text('${customer.totalSalesCount} sales', style: TextStyle(fontSize: 10, color: Colors.grey[600])),
               ],
             ),
           ],
@@ -316,7 +315,7 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
           Icon(Icons.error, color: Colors.red, size: 20),
           SizedBox(width: 12),
           Expanded(
-            child: Text(_lastError!, style: GoogleFonts.poppins(color: Colors.red[700], fontSize: 14)),
+            child: Text(_lastError!, style: TextStyle(color: Colors.red[700], fontSize: 14)),
           ),
         ],
       ),
@@ -341,10 +340,10 @@ class _QuickCustomerLookupWidgetState extends State<QuickCustomerLookupWidget> {
               children: [
                 Text(
                   'No customers found',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.grey[700]),
+                  style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
                 SizedBox(height: 4),
-                Text('Try a different search term or create a new customer', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                Text('Try a different search term or create a new customer', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
           ),
@@ -427,7 +426,7 @@ class _CreateCustomerDialogState extends State<_CreateCustomerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Create New Customer', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+      title: Text('Create New Customer', style: TextStyle(fontWeight: FontWeight.w600)),
       content: Form(
         key: _formKey,
         child: Column(

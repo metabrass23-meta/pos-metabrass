@@ -34,7 +34,7 @@ class OrderProvider extends ChangeNotifier {
   int get currentPage => _currentPage;
   int get pageSize => _pageSize;
   int get totalCount => _totalCount;
-  int get totalPages => (_totalCount / _pageSize).ceil();
+  int get totalPages => _pageSize > 0 ? (_totalCount / _pageSize).ceil() : 0;
 
   // Sorting getters
   String get sortBy => _sortBy;
@@ -86,6 +86,15 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  // ✅ ADDED: Public method to load orders (Fixed the error)
+  Future<void> loadOrders({bool refresh = false}) async {
+    if (refresh) {
+      _currentPage = 1;
+      _orders.clear();
+    }
+    await _loadOrders();
+  }
+
   /// Load orders from API
   Future<void> _loadOrders() async {
     _setLoading(true);
@@ -106,9 +115,6 @@ class OrderProvider extends ChangeNotifier {
 
       final response = await OrderService().getOrders(params: params);
 
-      debugPrint('OrderProvider: API response received - success: ${response.success}, message: ${response.message}');
-      debugPrint('OrderProvider: Response data: ${response.data}');
-
       if (response.success && response.data != null) {
         final ordersResponse = response.data;
         if (ordersResponse != null) {
@@ -127,19 +133,14 @@ class OrderProvider extends ChangeNotifier {
           _filteredOrders = List.from(_orders);
         }
 
-        debugPrint('OrderProvider: Orders loaded successfully. Count: ${_orders.length}');
-        debugPrint('OrderProvider: First order: ${_orders.isNotEmpty ? _orders.first.toJson() : 'No orders'}');
-
         _setLoading(false);
         notifyListeners();
       } else {
-        debugPrint('OrderProvider: API call failed - ${response.message}');
         _setError(response.message ?? 'Failed to load orders');
         _setLoading(false);
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('OrderProvider: Exception occurred while loading orders: $e');
       _setError('Error loading orders: ${e.toString()}');
       _setLoading(false);
       notifyListeners();
@@ -551,20 +552,21 @@ class OrderProvider extends ChangeNotifier {
   // Helper methods
   void _setLoading(bool loading) {
     _isLoading = loading;
+    notifyListeners();
   }
 
   void _setError(String error) {
     _errorMessage = error;
+    notifyListeners();
   }
 
   void _clearError() {
     _errorMessage = null;
+    notifyListeners();
   }
 
   /// Apply search and filters (for local operations only)
   void _applySearchAndFilters({String? status}) {
-    // This method is now only used for local operations
-    // Most filtering is now handled by the API
     _filteredOrders = List.from(_orders);
   }
 

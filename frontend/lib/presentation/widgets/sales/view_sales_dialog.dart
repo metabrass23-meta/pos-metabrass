@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -55,7 +54,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               l10n.printingReceiptFor(widget.sale.formattedInvoiceNumber),
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -157,7 +156,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.saleDetails : l10n.saleInvoiceDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -168,7 +167,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     widget.sale.formattedInvoiceNumber,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -194,7 +193,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                 SizedBox(width: context.smallPadding / 2),
                 Text(
                   widget.sale.status,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                 ),
               ],
             ),
@@ -296,11 +295,11 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
       ],
     );
@@ -325,7 +324,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.customerInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -386,7 +385,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 '${l10n.items} (${widget.sale.totalItems})',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -425,14 +424,14 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                     ),
                     child: Text(
                       '${index + 1}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
                     ),
                   ),
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Text(
                       item.productName,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -456,7 +455,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                       Expanded(
                         child: Text(
                           '${l10n.note}: ${item.customizationNotes}',
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.blue[700]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.blue[700]),
                         ),
                       ),
                     ],
@@ -479,10 +478,10 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${l10n.unitPrice}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+              Text('${l10n.unitPrice}:', style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600])),
               Text(
                 'PKR ${item.unitPrice.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -490,10 +489,10 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${l10n.quantity}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+              Text('${l10n.quantity}:', style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600])),
               Text(
                 item.quantity.toString(),
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -502,10 +501,10 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${l10n.discount}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600])),
+                Text('${l10n.discount}:', style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600])),
                 Text(
                   'PKR ${item.itemDiscount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
                 ),
               ],
             ),
@@ -514,10 +513,10 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${l10n.lineTotal}:', style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600])),
+              Text('${l10n.lineTotal}:', style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey[600])),
               Text(
                 'PKR ${item.lineTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -533,11 +532,11 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
             children: [
               Text(
                 '${l10n.unitPrice}: PKR ${item.unitPrice.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
               Text(
                 '${l10n.quantity}: ${item.quantity}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -549,11 +548,11 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               if (item.itemDiscount > 0)
                 Text(
                   '${l10n.discount}: PKR ${item.itemDiscount.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.orange),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.orange),
                 ),
               Text(
                 '${l10n.total}: PKR ${item.lineTotal.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
               ),
             ],
           ),
@@ -581,7 +580,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentInformation,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -636,12 +635,12 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                 children: [
                   Text(
                     l10n.splitPaymentDetails,
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   ),
                   SizedBox(height: context.smallPadding),
                   Text(
                     widget.sale.splitPaymentDetails?.toString() ?? l10n.noSplitPaymentDetails,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -671,7 +670,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.orderSummary,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -717,7 +716,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: fontSize ?? context.subtitleFontSize,
             fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
             color: color ?? AppTheme.charcoalGray,
@@ -725,7 +724,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
         ),
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: fontSize ?? context.subtitleFontSize,
             fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
             color: color ?? AppTheme.charcoalGray,
@@ -754,14 +753,14 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.notesRemarks,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.smallPadding),
           Text(
             widget.sale.notes ?? l10n.noNotesAvailable,
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: Colors.grey[700], height: 1.4),
+            style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700], height: 1.4),
           ),
         ],
       ),

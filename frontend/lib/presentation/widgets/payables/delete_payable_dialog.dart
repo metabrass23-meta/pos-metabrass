@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -66,7 +65,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
             SizedBox(width: context.smallPadding),
             Text(
               l10n.payableDeletedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -187,7 +186,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.deletePayable : l10n.deletePayableRecord,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -198,7 +197,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.thisActionCannotBeUndone,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -243,7 +242,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
           SizedBox(height: context.mainPadding),
           Text(
             isCompact ? l10n.areYouSureYouWantToDeleteThisPayable : l10n.areYouAbsolutelySureYouWantToDeleteThisPayableRecord,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize * 1.1, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -266,14 +265,14 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                       ),
                       child: Text(
                         widget.payable.id,
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                       ),
                     ),
                     SizedBox(width: context.smallPadding),
                     Expanded(
                       child: Text(
                         widget.payable.creditorName,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -288,11 +287,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         children: [
                           Text(
                             '${l10n.amountBorrowed}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             'PKR ${widget.payable.amountBorrowed.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -303,11 +302,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         children: [
                           Text(
                             '${l10n.balanceRemaining}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             'PKR ${widget.payable.balanceRemaining.toStringAsFixed(0)}',
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w600,
                               color: widget.payable.balanceRemaining > 0 ? Colors.orange : Colors.green,
@@ -327,11 +326,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         children: [
                           Text(
                             '${l10n.phone}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.payable.creditorPhone ?? l10n.notAvailable,
-                            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -342,7 +341,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         children: [
                           Text(
                             '${l10n.status}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
@@ -352,7 +351,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                             ),
                             child: Text(
                               widget.payable.statusText,
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 fontWeight: FontWeight.w500,
                                 color: widget.payable.statusColorValue,
@@ -373,11 +372,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                         children: [
                           Text(
                             '${l10n.expectedRepayment}:',
-                            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                           ),
                           Text(
                             widget.payable.formattedExpectedRepaymentDate,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.subtitleFontSize,
                               fontWeight: FontWeight.w600,
                               color: widget.payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
@@ -393,11 +392,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                           children: [
                             Text(
                               '${l10n.daysOverdue}:',
-                              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                             ),
                             Text(
                               l10n.daysCount(widget.payable.daysOverdue),
-                              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                             ),
                           ],
                         ),
@@ -413,11 +412,11 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                     children: [
                       Text(
                         '${l10n.reasonItem}:',
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
                       ),
                       Text(
                         widget.payable.reasonOrItem,
-                        style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray),
                       ),
                     ],
                   ),
@@ -436,7 +435,7 @@ class _DeletePayableDialogState extends State<DeletePayableDialog> with SingleTi
                 Expanded(
                   child: Text(
                     isCompact ? l10n.thisWillPermanentlyDeleteThePayableRecord : l10n.thisWillPermanentlyDeleteThePayableRecordAndAllAssociatedData,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange[700]),
                   ),
                 ),
               ],

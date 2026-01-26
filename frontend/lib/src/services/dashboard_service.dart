@@ -17,7 +17,7 @@ class DashboardService {
   /// Get dashboard analytics
   Future<ApiResponse<DashboardAnalyticsModel>> getDashboardAnalytics() async {
     try {
-      debugPrint('🚀 Calling API: ${ApiConfig.dashboardAnalytics}');
+      // Optional: debugPrint('🚀 Calling API: ${ApiConfig.dashboardAnalytics}');
 
       final response = await _apiClient.get(ApiConfig.dashboardAnalytics);
 
@@ -26,7 +26,7 @@ class DashboardService {
       if (response.statusCode == 200) {
         return ApiResponse<DashboardAnalyticsModel>.fromJson(
           response.data,
-          (data) => DashboardAnalyticsModel.fromJson(data),
+              (data) => DashboardAnalyticsModel.fromJson(data),
         );
       } else {
         return ApiResponse<DashboardAnalyticsModel>(

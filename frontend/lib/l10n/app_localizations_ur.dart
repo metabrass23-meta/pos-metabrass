@@ -3533,6 +3533,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get withDeduction => 'کٹوتی کے ساتھ';
 
   @override
+  String get purchases => 'خریداری';
+
+  @override
   String get regularPayment => 'باقاعدہ ادائیگی';
 
   @override
@@ -6479,4 +6482,43 @@ class AppLocalizationsUr extends AppLocalizations {
   String printingReceiptFor(String invoice) {
     return 'رسید پرنٹ کی جا رہی ہے $invoice';
   }
+
+  @override
+  String get deletePurchase => 'خریداری ختم کریں';
+
+  @override
+  String get loadingData => 'ڈیٹا لوڈ ہو رہا ہے...';
+
+  @override
+  String get pendingOrders => 'زیر التوا آرڈرز';
+
+  @override
+  String get returnNumber => 'واپس نمبر';
+
+  @override
+  String get pleaseSelectVendor => 'براہِ کرم وینڈر منتخب کریں';
+
+  @override
+  String get loadingLabors => 'مزدور لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingVendors => 'وینڈرز لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingOrders => 'آرڈرز لوڈ ہو رہے ہیں...';
+
+  @override
+  String get loadingSales => 'سیلز لوڈ ہو رہی ہیں...';
+
+  @override
+  String get confirmDelete => 'کیا آپ واقعی اس خریداری کو حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get deleteSuccess => 'خریداری کامیابی سے حذف ہو گئی۔';
+
+  @override
+  String get editPurchase => 'خریداری میں ترمیم کریں';
+
+  @override
+  String get apply => 'لاگو کریں';
 }

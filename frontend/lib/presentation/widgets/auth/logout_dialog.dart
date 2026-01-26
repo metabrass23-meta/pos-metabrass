@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
@@ -38,7 +37,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               SizedBox(width: context.smallPadding),
               Text(
                 AppLocalizations.of(context)!.confirmLogout,
-                style: GoogleFonts.playfairDisplay(
+                style: TextStyle(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -48,7 +47,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           content: Text(
             AppLocalizations.of(context)!.logoutMessage,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
               height: 1.4,
@@ -59,7 +58,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 AppLocalizations.of(context)!.cancel,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
@@ -89,7 +88,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                         SizedBox(width: context.smallPadding),
                         Text(
                           AppLocalizations.of(context)!.loggingOut,
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                             fontSize: context.captionFontSize,
                           ),
                         ),
@@ -124,7 +123,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                         SnackBar(
                           content: Text(
                             AppLocalizations.of(currentContext)!.logoutSuccess,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                             ),
                           ),
@@ -153,7 +152,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                         SnackBar(
                           content: Text(
                             AppLocalizations.of(currentContext)!.logoutError,
-                            style: GoogleFonts.inter(
+                            style: TextStyle(
                               fontSize: context.captionFontSize,
                             ),
                           ),
@@ -183,7 +182,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               ),
               child: Text(
                 'Logout',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                 ),
@@ -224,7 +223,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               SizedBox(width: context.smallPadding),
               Text(
                 AppLocalizations.of(context)!.logout,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -86,7 +85,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
             SizedBox(width: context.smallPadding),
             Text(
               l10n.saleUpdatedSuccessfully,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -206,7 +205,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.editSale : l10n.editSaleDetails,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -217,7 +216,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     widget.sale.formattedInvoiceNumber,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -232,7 +231,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.sale.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -292,7 +291,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.saleSummaryReadOnly,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -305,11 +304,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.customer,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       widget.sale.customerName,
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -320,11 +319,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.items,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       l10n.itemsCount(widget.sale.totalItems),
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -340,11 +339,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.subtotal,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.subtotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -355,11 +354,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.grandTotal,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
                     ),
                   ],
                 ),
@@ -377,11 +376,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                       children: [
                         Text(
                           l10n.discount,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                         Text(
                           'PKR ${widget.sale.overallDiscount.toStringAsFixed(0)}',
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange),
                         ),
                       ],
                     ),
@@ -393,11 +392,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                       children: [
                         Text(
                           l10n.gst,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                         Text(
                           '${widget.sale.gstPercentage}%',
-                          style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         ),
                       ],
                     ),
@@ -429,14 +428,14 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.editableFields,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
           Text(
             l10n.paymentMethod,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -460,7 +459,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                           SizedBox(width: context.smallPadding),
                           Text(
                             method,
-                            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                           ),
                         ],
                       ),
@@ -487,7 +486,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
           SizedBox(height: context.cardPadding),
           Text(
             l10n.status,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Container(
@@ -534,7 +533,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
           SizedBox(width: context.smallPadding),
           Text(
             status,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
           ),
         ],
       ),
@@ -562,7 +561,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.paymentSummary,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               const Spacer(),
               Container(
@@ -582,7 +581,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                     SizedBox(width: context.smallPadding / 2),
                     Text(
                       calculatedStatus,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: _getStatusColor(_selectedStatus),
@@ -602,11 +601,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.grandTotal,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${widget.sale.grandTotal.toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                     ),
                   ],
                 ),
@@ -617,11 +616,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       l10n.amountPaying,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${(double.tryParse(_amountPaidController.text) ?? 0.0).toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green),
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green),
                     ),
                   ],
                 ),
@@ -632,11 +631,11 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
                   children: [
                     Text(
                       remaining > 0 ? l10n.remaining : l10n.change,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                     Text(
                       'PKR ${remaining.abs().toStringAsFixed(0)}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.subtitleFontSize,
                         fontWeight: FontWeight.w700,
                         color: remaining > 0 ? Colors.red : Colors.blue,

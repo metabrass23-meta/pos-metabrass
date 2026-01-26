@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
@@ -20,16 +19,30 @@ class ExpensesTable extends StatefulWidget {
 }
 
 class _ExpensesTableState extends State<ExpensesTable> {
-  final ScrollController _headerHorizontalController = ScrollController();
-  final ScrollController _contentHorizontalController = ScrollController();
-  final ScrollController _verticalController = ScrollController();
+  // Separate controllers for synchronized scrolling
+  late ScrollController _headerHorizontalController;
+  late ScrollController _contentHorizontalController;
+  late ScrollController _verticalController;
 
   @override
   void initState() {
     super.initState();
+    _headerHorizontalController = ScrollController();
+    _contentHorizontalController = ScrollController();
+    _verticalController = ScrollController();
+
+    // Link the header and content horizontal scrolling (Two-way sync)
     _headerHorizontalController.addListener(() {
-      if (_contentHorizontalController.hasClients) {
+      if (_contentHorizontalController.hasClients &&
+          _headerHorizontalController.offset != _contentHorizontalController.offset) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
+      }
+    });
+
+    _contentHorizontalController.addListener(() {
+      if (_headerHorizontalController.hasClients &&
+          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+        _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
       }
     });
   }
@@ -64,51 +77,61 @@ class _ExpensesTableState extends State<ExpensesTable> {
             return _buildEmptyState(context);
           }
 
-          return Scrollbar(
-            controller: _headerHorizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _headerHorizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(width: _getTableWidth(context), padding: EdgeInsets.all(context.cardPadding), child: _buildTableHeader(context)),
+          return Column(
+            children: [
+              // 1. Table Header (Horizontal Scroll Only)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray.withOpacity(0.5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(context.borderRadius('large')),
+                    topRight: Radius.circular(context.borderRadius('large')),
                   ),
                 ),
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Container(
+                    width: _getTableWidth(context),
+                    padding: EdgeInsets.all(context.cardPadding),
+                    child: _buildTableHeader(context),
+                  ),
+                ),
+              ),
 
-                Expanded(
-                  child: Scrollbar(
+              // 2. Table Content (Vertical + Horizontal Scroll)
+              Expanded(
+                child: Scrollbar(
+                  controller: _verticalController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SingleChildScrollView(
                     controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Scrollbar(
                       controller: _contentHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.expenses.length,
-                          itemBuilder: (context, index) {
-                            final expense = provider.expenses[index];
-                            return _buildTableRow(context, expense, index);
-                          },
+                      thumbVisibility: true,
+                      notificationPredicate: (notification) => notification.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _contentHorizontalController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: Container(
+                          width: _getTableWidth(context),
+                          // Use Column instead of ListView for smoother scrolling inside nested views
+                          child: Column(
+                            children: provider.expenses.asMap().entries.map((entry) {
+                              return _buildTableRow(context, entry.value, entry.key);
+                            }).toList(),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -139,21 +162,21 @@ class _ExpensesTableState extends State<ExpensesTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      130.0,
-      180.0,
-      280.0,
-      140.0,
-      180.0,
-      130.0,
-      120.0,
-      260.0,
+      130.0, // Expense ID
+      180.0, // Expense Name
+      280.0, // Description
+      140.0, // Amount
+      180.0, // Withdrawal By
+      130.0, // Date
+      120.0, // Time
+      260.0, // Actions
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
 
@@ -168,6 +191,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
         children: [
+          // ID
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -179,12 +203,13 @@ class _ExpensesTableState extends State<ExpensesTable> {
               ),
               child: Text(
                 expense.id,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
 
+          // Expense Name
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -193,24 +218,26 @@ class _ExpensesTableState extends State<ExpensesTable> {
               decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 expense.expense,
-                style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
 
+          // Description
           Container(
             width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               expense.description,
-              style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
 
+          // Amount
           Container(
             width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -219,11 +246,12 @@ class _ExpensesTableState extends State<ExpensesTable> {
               decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${expense.amount.toStringAsFixed(0)}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
               ),
             ),
           ),
 
+          // Withdrawal By
           Container(
             width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -246,7 +274,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
                   Expanded(
                     child: Text(
                       expense.withdrawalBy,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: expense.personColor),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: expense.personColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -256,6 +284,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
           ),
 
+          // Date
           Container(
             width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -264,16 +293,17 @@ class _ExpensesTableState extends State<ExpensesTable> {
               children: [
                 Text(
                   expense.formattedDate,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   expense.relativeDate,
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
 
+          // Time
           Container(
             width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -287,13 +317,14 @@ class _ExpensesTableState extends State<ExpensesTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     expense.formattedTime,
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                   ),
                 ],
               ),
             ),
           ),
 
+          // Actions
           Container(
             width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
@@ -372,7 +403,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
 
           Text(
             l10n.noExpenseRecordsFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -383,45 +414,11 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
             child: Text(
               l10n.startAddingFirstExpense,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        l10n.addFirstExpense,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -455,7 +452,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
 
           Text(
             '${l10n.errorLoadingExpenses}: ${provider.errorMessage}',
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.bodyFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
             textAlign: TextAlign.center,
           ),
 
@@ -467,7 +464,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
             ),
             child: Text(
               l10n.pleaseTryAgainLater,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -495,7 +492,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.retryLoading,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,

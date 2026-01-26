@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/profit_loss/profit_loss_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -19,34 +18,24 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
   String _sortBy = 'profitability_rank';
   bool _sortAscending = false;
   String _filterCategory = 'All';
-  List<String> _availableCategories = ['All'];
-  bool _categoriesInitialized = false;
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _updateCategories(List<dynamic> products) {
-    if (products.isNotEmpty) {
-      final categories = products.map((p) => p.productCategory).toSet().toList();
-      if (!listEquals(_availableCategories, ['All', ...categories])) {
-        setState(() {
-          _availableCategories = ['All', ...categories];
-          _categoriesInitialized = true;
-        });
-      }
+  // Helper to ensure the selected category still exists in the new list
+  String _getValidFilterCategory(List<String> availableCategories) {
+    if (availableCategories.contains(_filterCategory)) {
+      return _filterCategory;
     }
+    return 'All';
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ProfitLossProvider>(
       builder: (context, provider, child) {
-        if (provider.productProfitability.isNotEmpty && !_categoriesInitialized) {
-          _updateCategories(provider.productProfitability);
-        }
-
         if (provider.isLoading) {
           return _buildLoadingState(context);
         }
@@ -62,12 +51,28 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           return _buildEmptyState(context);
         }
 
-        final filteredProducts = _getFilteredAndSortedProducts(provider.productProfitability);
+        // Calculate categories dynamically from the data
+        final Set<String> categorySet = {'All'};
+        if (provider.productProfitability.isNotEmpty) {
+          categorySet.addAll(
+              provider.productProfitability.map((p) => p.productCategory.toString()).toSet()
+          );
+        }
+        final List<String> availableCategories = categorySet.toList();
+
+        // Ensure we don't crash if the selected filter is no longer valid
+        // We use a local variable for filtering logic, but we don't setState here to avoid the error.
+        final effectiveFilterCategory = _getValidFilterCategory(availableCategories);
+
+        final filteredProducts = _getFilteredAndSortedProducts(
+            provider.productProfitability,
+            effectiveFilterCategory
+        );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(context, provider),
+            _buildHeader(context, provider, availableCategories, effectiveFilterCategory),
             SizedBox(height: context.cardPadding),
             _buildSummaryStats(context, filteredProducts),
             SizedBox(height: context.cardPadding),
@@ -78,7 +83,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ProfitLossProvider provider) {
+  Widget _buildHeader(BuildContext context, ProfitLossProvider provider, List<String> availableCategories, String currentCategory) {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -101,12 +106,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                   children: [
                     Text(
                       l10n.productProfitabilityAnalysis,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     if (provider.productProfitability.isNotEmpty)
                       Text(
                         l10n.analyzingProductsAcrossDifferentCategories(provider.productProfitability.length),
-                        style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                       ),
                   ],
                 ),
@@ -120,7 +125,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 ),
                 child: Text(
                   l10n.productsCount(provider.productProfitability.length),
-                  style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 ),
               ),
             ],
@@ -130,21 +135,21 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
 
           ResponsiveBreakpoints.responsive(
             context,
-            tablet: _buildMobileFilters(context),
-            small: _buildMobileFilters(context),
-            medium: _buildDesktopFilters(context),
-            large: _buildDesktopFilters(context),
-            ultrawide: _buildDesktopFilters(context),
+            tablet: _buildMobileFilters(context, availableCategories, currentCategory),
+            small: _buildMobileFilters(context, availableCategories, currentCategory),
+            medium: _buildDesktopFilters(context, availableCategories, currentCategory),
+            large: _buildDesktopFilters(context, availableCategories, currentCategory),
+            ultrawide: _buildDesktopFilters(context, availableCategories, currentCategory),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDesktopFilters(BuildContext context) {
+  Widget _buildDesktopFilters(BuildContext context, List<String> availableCategories, String currentCategory) {
     return Row(
       children: [
-        Expanded(flex: 2, child: _buildCategoryFilter(context)),
+        Expanded(flex: 2, child: _buildCategoryFilter(context, availableCategories, currentCategory)),
         SizedBox(width: context.cardPadding),
         Expanded(flex: 3, child: _buildSortOptions(context)),
         SizedBox(width: context.cardPadding),
@@ -153,12 +158,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
     );
   }
 
-  Widget _buildMobileFilters(BuildContext context) {
+  Widget _buildMobileFilters(BuildContext context, List<String> availableCategories, String currentCategory) {
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildCategoryFilter(context)),
+            Expanded(child: _buildCategoryFilter(context, availableCategories, currentCategory)),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildRefreshButton(context)),
           ],
@@ -169,7 +174,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
     );
   }
 
-  Widget _buildCategoryFilter(BuildContext context) {
+  Widget _buildCategoryFilter(BuildContext context, List<String> availableCategories, String currentCategory) {
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -177,11 +182,11 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
       children: [
         Text(
           l10n.category,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
         DropdownButtonFormField<String>(
-          value: _filterCategory,
+          value: currentCategory,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
             border: OutlineInputBorder(
@@ -193,20 +198,22 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
               borderSide: BorderSide(color: Colors.grey[300]!),
             ),
           ),
-          items: _availableCategories.map((category) {
+          items: availableCategories.map((category) {
             return DropdownMenuItem(
               value: category,
               child: Text(
                 category == 'All' ? l10n.all : category,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize),
+                style: TextStyle(fontSize: context.captionFontSize),
                 overflow: TextOverflow.ellipsis,
               ),
             );
           }).toList(),
           onChanged: (value) {
-            setState(() {
-              _filterCategory = value!;
-            });
+            if (value != null) {
+              setState(() {
+                _filterCategory = value;
+              });
+            }
           },
         ),
       ],
@@ -221,7 +228,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
       children: [
         Text(
           l10n.sortBy,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
         Row(
@@ -243,23 +250,23 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 items: [
                   DropdownMenuItem(
                     value: 'profitability_rank',
-                    child: Text(l10n.rank, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.rank, style: TextStyle(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'gross_profit',
-                    child: Text(l10n.profit, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.profit, style: TextStyle(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'units_sold',
-                    child: Text(l10n.unitsSold, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.unitsSold, style: TextStyle(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'product_name',
-                    child: Text(l10n.name, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.name, style: TextStyle(fontSize: context.captionFontSize)),
                   ),
                   DropdownMenuItem(
                     value: 'profit_margin',
-                    child: Text(l10n.marginPercent, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                    child: Text(l10n.marginPercent, style: TextStyle(fontSize: context.captionFontSize)),
                   ),
                 ],
                 onChanged: (value) {
@@ -293,7 +300,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
       children: [
         Text(
           l10n.actions,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
         SizedBox(height: context.smallPadding / 2),
         Container(
@@ -310,7 +317,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                 )
                     : Icon(Icons.refresh_rounded, size: context.iconSize('small')),
-                label: Text(provider.isLoading ? l10n.refreshing : l10n.refresh, style: GoogleFonts.inter(fontSize: context.captionFontSize)),
+                label: Text(provider.isLoading ? l10n.refreshing : l10n.refresh, style: TextStyle(fontSize: context.captionFontSize)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryMaroon,
                   foregroundColor: Colors.white,
@@ -333,7 +340,9 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
     final totalRevenue = products.fold<double>(0.0, (sum, p) => sum + p.totalRevenue);
     final totalProfit = products.fold<double>(0.0, (sum, p) => sum + p.grossProfit);
     final totalCost = products.fold<double>(0.0, (sum, p) => sum + p.totalCost);
-    final avgProfitMargin = products.fold<double>(0.0, (sum, p) => sum + p.profitMargin) / products.length;
+    final avgProfitMargin = products.isNotEmpty
+        ? products.fold<double>(0.0, (sum, p) => sum + p.profitMargin) / products.length
+        : 0.0;
     final profitableProducts = products.where((p) => p.isProfitable).length;
 
     return Container(
@@ -352,7 +361,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
               SizedBox(width: context.smallPadding / 2),
               Text(
                 l10n.summaryStatistics,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -492,7 +501,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           SizedBox(height: context.smallPadding / 2),
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize * 0.9, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.captionFontSize * 0.9, color: Colors.grey[600]),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -500,7 +509,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           SizedBox(height: context.smallPadding / 4),
           Text(
             value,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -535,8 +544,8 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columnSpacing: context.cardPadding,
-        headingTextStyle: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-        dataTextStyle: GoogleFonts.inter(fontSize: context.captionFontSize),
+        headingTextStyle: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        dataTextStyle: TextStyle(fontSize: context.captionFontSize),
         columns: [
           DataColumn(label: Text(l10n.rank)),
           DataColumn(label: Text(l10n.product)),
@@ -552,7 +561,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           return DataRow(
             cells: [
               DataCell(Text('#${product.profitabilityRank}')),
-              DataCell(Text(product.productName, style: GoogleFonts.inter(fontWeight: FontWeight.w500))),
+              DataCell(Text(product.productName, style: TextStyle(fontWeight: FontWeight.w500))),
               DataCell(Text(product.productCategory)),
               DataCell(Text(product.unitsSold.toString())),
               DataCell(Text(product.formattedTotalRevenue)),
@@ -560,13 +569,13 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
               DataCell(
                 Text(
                   product.formattedGrossProfit,
-                  style: GoogleFonts.inter(color: product.isProfitable ? Colors.green : Colors.red, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: product.isProfitable ? Colors.green : Colors.red, fontWeight: FontWeight.w600),
                 ),
               ),
               DataCell(
                 Text(
                   product.formattedProfitMargin,
-                  style: GoogleFonts.inter(color: product.isProfitable ? Colors.green : Colors.red, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: product.isProfitable ? Colors.green : Colors.red, fontWeight: FontWeight.w600),
                 ),
               ),
               DataCell(
@@ -578,7 +587,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                   ),
                   child: Text(
                     product.isProfitable ? l10n.profitable : l10n.loss,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
                       color: product.isProfitable ? Colors.green : Colors.red,
@@ -620,14 +629,14 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                     decoration: BoxDecoration(color: AppTheme.primaryMaroon, borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                     child: Text(
                       '#${product.profitabilityRank}',
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.white),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                   ),
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Text(
                       product.productName,
-                      style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                   ),
                   Container(
@@ -638,7 +647,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                     ),
                     child: Text(
                       product.isProfitable ? l10n.profitable : l10n.loss,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w600,
                         color: product.isProfitable ? Colors.green : Colors.red,
@@ -652,7 +661,7 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
 
               Text(
                 product.productCategory,
-                style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
               ),
 
               SizedBox(height: context.smallPadding),
@@ -671,11 +680,11 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
                 children: [
                   Text(
                     '${l10n.profitMargin}: ',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                   Text(
                     product.formattedProfitMargin,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: product.isProfitable ? Colors.green : Colors.red,
@@ -697,11 +706,11 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
         SizedBox(height: context.smallPadding / 2),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.grey[600]),
+          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
         ),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600),
           textAlign: TextAlign.center,
         ),
       ],
@@ -723,12 +732,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.loadingProductData,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             l10n.pleaseWaitWhileWeFetchTheLatestProfitabilityInformation,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -752,12 +761,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.errorLoadingData,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: Colors.red[600]),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: Colors.red[600]),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             provider.errorMessage ?? l10n.anUnexpectedErrorOccurredWhileLoadingProductData,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -810,12 +819,12 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
           SizedBox(height: context.mainPadding),
           Text(
             l10n.loadingProductData,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             l10n.productProfitabilityDataIsBeingLoaded,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.cardPadding),
@@ -841,10 +850,10 @@ class _ProfitLossProductAnalysisState extends State<ProfitLossProductAnalysis> {
     );
   }
 
-  List<dynamic> _getFilteredAndSortedProducts(List<dynamic> products) {
+  List<dynamic> _getFilteredAndSortedProducts(List<dynamic> products, String effectiveCategory) {
     List<dynamic> filtered = products;
-    if (_filterCategory != 'All') {
-      filtered = products.where((p) => p.productCategory == _filterCategory).toList();
+    if (effectiveCategory != 'All') {
+      filtered = products.where((p) => p.productCategory == effectiveCategory).toList();
     }
 
     filtered.sort((a, b) {

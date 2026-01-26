@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:intl/intl.dart';
 import '../../../src/providers/customer_provider.dart';
@@ -238,7 +237,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
             SizedBox(width: context.smallPadding),
             Text(
               'Customer updated successfully!',
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
             ),
           ],
         ),
@@ -260,7 +259,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -342,7 +341,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
               children: [
                 Text(
                   context.shouldShowCompactLayout ? 'Edit Customer' : 'Edit Customer Details',
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -353,7 +352,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     'Update customer information',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -367,7 +366,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                         decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                         child: Text(
                           widget.customer.customerTypeDisplay,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                       SizedBox(width: context.smallPadding / 2),
@@ -379,7 +378,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                         ),
                         child: Text(
                           widget.customer.statusDisplay,
-                          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+                          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
                         ),
                       ),
                     ],
@@ -393,7 +392,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
             decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
             child: Text(
               widget.customer.id,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -488,7 +487,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
               SizedBox(width: context.smallPadding),
               Text(
                 'Customer Type & Status',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -497,7 +496,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
           // Customer Type Selection
           Text(
             'Customer Type',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Row(
@@ -530,7 +529,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                               SizedBox(width: context.smallPadding / 2),
                               Text(
                                 type == 'BUSINESS' ? 'Business' : 'Individual',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: context.captionFontSize,
                                   fontWeight: FontWeight.w600,
                                   color: _selectedCustomerType == type ? Colors.blue : Colors.grey[600],
@@ -551,7 +550,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
           // Status Selection
           Text(
             'Customer Status',
-            style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
           Wrap(
@@ -574,7 +573,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                       ),
                       child: Text(
                         _getStatusDisplayName(status),
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: _selectedStatus == status ? FontWeight.w600 : FontWeight.w500,
                           color: _selectedStatus == status ? _getStatusColor(status) : Colors.grey[700],
@@ -607,7 +606,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
               SizedBox(width: context.smallPadding),
               Text(
                 'Customer Statistics',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -656,12 +655,12 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
         SizedBox(height: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
         ),
         SizedBox(height: context.smallPadding),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: color),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: color),
         ),
       ],
     );
@@ -788,7 +787,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
               SizedBox(width: context.smallPadding),
               Text(
                 'Verification Status',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -802,7 +801,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                   onChanged: (value) => setState(() => _phoneVerified = value ?? false),
                   title: Text(
                     'Phone Verified',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                   ),
                   activeColor: Colors.green,
                   dense: true,
@@ -815,7 +814,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                   onChanged: (value) => setState(() => _emailVerified = value ?? false),
                   title: Text(
                     'Email Verified',
-                    style: GoogleFonts.inter(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                   ),
                   activeColor: Colors.green,
                   dense: true,
@@ -844,7 +843,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                 SizedBox(width: context.smallPadding),
                 Text(
                   'Account Status: ${widget.customer.isActive ? 'Active' : 'Inactive'}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: widget.customer.isActive ? Colors.green : Colors.red,
@@ -856,7 +855,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     'Account is currently active',
-                    style: GoogleFonts.inter(fontSize: context.captionFontSize, color: Colors.green[700]),
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.green[700]),
                   ),
                 ],
               ],
@@ -939,7 +938,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
                     ),
                     child: Text(
                       country,
-                      style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.accentGold),
                     ),
                   ),
                 ),
@@ -1039,7 +1038,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
       ],
     );

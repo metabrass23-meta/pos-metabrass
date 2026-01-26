@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -73,11 +72,11 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               children: [
                 Text(
                   l10n.taxManagement,
-                  style: GoogleFonts.playfairDisplay(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray),
                 ),
                 Text(
                   l10n.taxManagementDescription,
-                  style: GoogleFonts.inter(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
+                  style: TextStyle(fontSize: context.subtitleFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
                 ),
               ],
             ),
@@ -100,7 +99,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
           icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
           label: Text(
             l10n.addTaxRate,
-            style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+            style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -186,7 +185,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
         children: [
           Text(
             l10n.taxRates,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           const Spacer(),
           _buildFilterChips(),
@@ -275,21 +274,12 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
           SizedBox(height: context.cardPadding),
           Text(
             l10n.noTaxRatesFound,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
+            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
           ),
           SizedBox(height: context.smallPadding),
           Text(
             l10n.addFirstTaxRate,
-            style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
-          ),
-          SizedBox(height: context.cardPadding),
-          ElevatedButton.icon(
-            onPressed: () => _showAddTaxRateDialog(),
-            icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite),
-            label: Text(
-              l10n.addTaxRate,
-              style: GoogleFonts.inter(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
-            ),
+            style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
           ),
         ],
       ),
@@ -323,19 +313,19 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
         ),
         title: Text(
           taxRate.name,
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               taxRate.taxTypeDisplay,
-              style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
+              style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
             ),
             if (taxRate.description?.isNotEmpty == true)
               Text(
                 taxRate.description!,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: AppTheme.charcoalGray.withOpacity(0.5),
                   fontStyle: FontStyle.italic,
@@ -354,7 +344,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               ),
               child: Text(
                 '${taxRate.percentage.toStringAsFixed(2)}%',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
               ),
             ),
             SizedBox(width: context.smallPadding),
@@ -421,7 +411,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
             children: [
               Text(
                 '${l10n.page} ${provider.currentPage} ${l10n.outOf} ${provider.totalPages}',
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
               ),
               Row(
                 children: [
@@ -445,22 +435,29 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildTaxConfiguration() {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.pureWhite,
-            borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-            boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur(), offset: Offset(0, 2))],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite,
+              borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+              boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur(), offset: Offset(0, 2))],
+            ),
+            child: SingleChildScrollView(
+              child: TaxConfigurationWidget(
+                isEditable: false,
+                onConfigurationChanged: (config) {},
+              ),
+            ),
           ),
-          child: TaxConfigurationWidget(
-            isEditable: false,
-            onConfigurationChanged: (config) {},
-          ),
-        ),
-        SizedBox(height: context.cardPadding),
-        _buildStatisticsCard(),
-      ],
+          SizedBox(height: context.cardPadding),
+          _buildStatisticsCard(),
+        ],
+      ),
     );
   }
 
@@ -481,17 +478,23 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
             children: [
               Text(
                 l10n.statistics,
-                style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
               SizedBox(height: context.cardPadding),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(l10n.totalTaxRates, provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
-                  ),
-                  SizedBox(width: context.smallPadding),
-                  Expanded(child: _buildStatItem(l10n.activeRates, provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green)),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatItem(l10n.totalTaxRates, provider.taxRatesCount.toString(), Icons.receipt_long_rounded, AppTheme.primaryMaroon),
+                      ),
+                      SizedBox(width: context.smallPadding),
+                      Expanded(
+                        child: _buildStatItem(l10n.activeRates, provider.activeTaxRatesCount.toString(), Icons.check_circle_rounded, Colors.green),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -501,24 +504,33 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
   }
 
   Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: EdgeInsets.all(context.smallPadding),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: context.iconSize('medium')),
-          SizedBox(height: context.smallPadding / 2),
-          Text(
-            value,
-            style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w700, color: color),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          padding: EdgeInsets.all(context.smallPadding),
+          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: context.iconSize('medium')),
+              SizedBox(height: context.smallPadding / 2),
+              Text(
+                value,
+                style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w700, color: color),
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: context.smallPadding / 4),
+              Text(
+                label,
+                style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          Text(
-            label,
-            style: GoogleFonts.inter(fontSize: context.captionFontSize, color: AppTheme.charcoalGray.withOpacity(0.7)),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -571,16 +583,16 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           l10n.deleteTaxRate,
-          style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
         ),
         content: Text(
           '${l10n.deleteTaxRateConfirmation} "${taxRate.name}"? ${l10n.actionCannotBeUndone}',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel, style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
+            child: Text(l10n.cancel, style: TextStyle(color: AppTheme.charcoalGray)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -588,7 +600,7 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: AppTheme.pureWhite),
-            child: Text(l10n.delete, style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+            child: Text(l10n.delete, style: TextStyle(color: AppTheme.pureWhite)),
           ),
         ],
       ),
@@ -647,7 +659,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
     return AlertDialog(
       title: Text(
         widget.taxRate == null ? l10n.addTaxRate : l10n.editTaxRate,
-        style: GoogleFonts.inter(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+        style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
       ),
       content: Form(
         key: _formKey,
@@ -717,7 +729,7 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
                     child: CheckboxListTile(
                       title: Text(
                         l10n.active,
-                        style: GoogleFonts.inter(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                        style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                       value: _isActive,
                       onChanged: (value) {
@@ -737,11 +749,11 @@ class _TaxRateDialogState extends State<_TaxRateDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel, style: GoogleFonts.inter(color: AppTheme.charcoalGray)),
+          child: Text(l10n.cancel, style: TextStyle(color: AppTheme.charcoalGray)),
         ),
         ElevatedButton(
           onPressed: _saveTaxRate,
-          child: Text(widget.taxRate == null ? l10n.add : l10n.update, style: GoogleFonts.inter(color: AppTheme.pureWhite)),
+          child: Text(widget.taxRate == null ? l10n.add : l10n.update, style: TextStyle(color: AppTheme.pureWhite)),
         ),
       ],
     );

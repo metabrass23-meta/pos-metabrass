@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -90,7 +89,7 @@ class PayablesTableHelpers {
 
           Text(
             l10n.failedToLoadPayables,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -101,7 +100,7 @@ class PayablesTableHelpers {
             ),
             child: Text(
               provider.errorMessage ?? l10n.anUnexpectedErrorOccurred,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
@@ -126,7 +125,7 @@ class PayablesTableHelpers {
                       SizedBox(width: context.smallPadding),
                       Text(
                         l10n.retry,
-                        style: GoogleFonts.inter(
+                        style: TextStyle(
                           fontSize: context.bodyFontSize,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.pureWhite,
@@ -163,7 +162,7 @@ class PayablesTableHelpers {
 
           Text(
             l10n.noPayablesFound,
-            style: GoogleFonts.inter(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
 
           SizedBox(height: context.smallPadding),
@@ -174,53 +173,16 @@ class PayablesTableHelpers {
             ),
             child: Text(
               l10n.startByAddingYourFirstPayableRecordToTrackYourBorrowingsEffectively,
-              style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ),
 
-          SizedBox(height: context.mainPadding),
-
-          Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // This will trigger the add payable dialog from parent
-                },
-                borderRadius: BorderRadius.circular(context.borderRadius()),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.cardPadding * 0.6, vertical: context.cardPadding / 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        l10n.addFirstPayableRecord,
-                        style: GoogleFonts.inter(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  /// Get status color based on payment status
   Color getStatusColor(Payable payable) {
     if (payable.isFullyPaid) return Colors.green;
     if (payable.isOverdueComputed) return Colors.red;
@@ -228,7 +190,6 @@ class PayablesTableHelpers {
     return Colors.blue; // Pending
   }
 
-  /// Get status text
   String getStatusText(BuildContext context, Payable payable) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -281,7 +242,7 @@ class PayablesTableHelpers {
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
@@ -300,7 +261,7 @@ class PayablesTableHelpers {
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
@@ -318,7 +279,7 @@ class PayablesTableHelpers {
       child: Center(
         child: Text(
           getCreditorInitials(payable.creditorName),
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
         ),
       ),
     );
@@ -334,7 +295,7 @@ class PayablesTableHelpers {
         decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
         child: Text(
           l10n.noVendor,
-          style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
+          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
         ),
       );
     }
@@ -344,7 +305,7 @@ class PayablesTableHelpers {
       decoration: BoxDecoration(color: AppTheme.primaryMaroon.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
       child: Text(
         payable.vendorDisplayName,
-        style: GoogleFonts.inter(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../../src/models/vendor/vendor_model.dart';
 import '../../../../../src/providers/vendor_provider.dart';
@@ -274,7 +273,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: context.bodyFontSize,
         fontWeight: FontWeight.w600,
         color: AppTheme.charcoalGray,
@@ -300,7 +299,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                 Flexible(
                   child: Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: isCurrentSort
@@ -361,7 +360,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
               children: [
                 Text(
                   vendor.name,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -373,7 +372,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                   SizedBox(height: 2),
                   Text(
                     vendor.cnic,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey[600],
@@ -392,7 +391,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
             padding: EdgeInsets.only(right: 8),
             child: Text(
               vendor.businessName,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -408,7 +407,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
             padding: EdgeInsets.only(right: 8),
             child: Text(
               vendor.formattedPhone,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -428,7 +427,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                 children: [
                   Text(
                     vendor.city,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.charcoalGray,
@@ -438,7 +437,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                   ),
                   Text(
                     vendor.area,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey[600],
@@ -473,7 +472,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
               ),
               child: Text(
                 vendor.statusDisplayName,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
                   color: helpers.getStatusColor(vendor.statusDisplayName),
@@ -531,7 +530,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
               children: [
                 Text(
                   vendor.formattedCreatedAt,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
@@ -541,7 +540,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                 ),
                 Text(
                   vendor.relativeCreatedAt,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
@@ -581,7 +580,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
         children: [
           Text(
             '${l10n.showing} ${(pagination.currentPage - 1) * pagination.pageSize + 1}-${(pagination.currentPage * pagination.pageSize > pagination.totalCount ? pagination.totalCount : pagination.currentPage * pagination.pageSize)} ${l10n.outOf} ${pagination.totalCount} ${l10n.vendor}',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               color: Colors.grey[600],
             ),
@@ -611,7 +610,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                 ),
                 child: Text(
                   '${pagination.currentPage} ${l10n.outOf} ${pagination.totalPages}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryMaroon,

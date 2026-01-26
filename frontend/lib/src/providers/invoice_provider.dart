@@ -69,9 +69,13 @@ class InvoiceProvider extends ChangeNotifier {
       );
 
       if (response.success && response.data != null) {
-        final data = response.data!;
-        _invoices = (data['data'] as List<dynamic>).map((item) => InvoiceModel.fromJson(item as Map<String, dynamic>)).toList();
-        _pagination = data['pagination'] as Map<String, dynamic>?;
+        // ✅ FIXED: Service now returns List<InvoiceModel> directly
+        _invoices = response.data!;
+
+        // Note: With the simplified service return type, we nullify pagination
+        // to prevent the type error.
+        _pagination = null;
+
         _setSuccess('Invoices loaded successfully');
       } else {
         _setError(response.message);
@@ -250,8 +254,7 @@ class InvoiceProvider extends ChangeNotifier {
   /// Set filters for search and status
   void setFilters({String? search, String? status, String? customerId}) {
     if (search != null) {
-      // Implement search logic if needed
-      // For now, just reload invoices
+      // Implement search logic if needed (or API side search)
     }
     if (status != null) {
       _selectedStatus = status;
@@ -273,7 +276,7 @@ class InvoiceProvider extends ChangeNotifier {
     loadInvoices(refresh: true);
   }
 
-  /// Get filtered invoices based on current filters
+  /// Get filtered invoices based on current filters (Client-side helper)
   List<InvoiceModel> get filteredInvoices {
     List<InvoiceModel> filtered = _invoices;
 
@@ -282,6 +285,8 @@ class InvoiceProvider extends ChangeNotifier {
     }
 
     if (_selectedCustomerId != null && _selectedCustomerId!.isNotEmpty) {
+      // Assuming customerId in state maps to customerName for search,
+      // or modify logic based on actual filtering needs
       filtered = filtered.where((invoice) => invoice.customerName == _selectedCustomerId).toList();
     }
 

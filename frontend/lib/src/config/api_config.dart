@@ -1,7 +1,7 @@
 class ApiConfig {
-  static const String baseUrl =
-      'https://django-flutter-pos-production.up.railway.app/api/v1';
-
+  // static const String baseUrl =
+  //     'https://django-flutter-pos-production.up.railway.app/api/v1';
+  static const String baseUrl = 'http://127.0.0.1:8000/api/v1';
   static const String dashboardAnalytics = '/analytics/dashboard/';
   static const String register = '/auth/register/';
   static const String login = '/auth/login/';
@@ -365,6 +365,10 @@ class ApiConfig {
   static String orderItemsByProduct(String productId) =>
       '/order-items/product/$productId/';
 
+  // Purchases API endpoints
+  static const String purchases = '/purchases/';
+  static String getPurchaseById(String id) => '/purchases/$id/';
+
   static const String expenses = '/expenses/';
   static const String createExpense = '/expenses/';
 
@@ -490,25 +494,13 @@ class ApiConfig {
   static String updatePrincipalAccount(String id) => '/principal-account/$id/';
   static String deletePrincipalAccount(String id) => '/principal-account/$id/';
 
-
-
-
-
-
-
   static String vendorLedger(String id) => '$baseUrl/vendors/$id/ledger/';
-
-
-
-
-
 
   static const String principalAccountBalance = '/principal-account/balance/';
   static const String principalAccountStatistics =
       '/principal-account/statistics/';
   static const String createPrincipalAccountFromModule =
       '/principal-account/create-from-module/';
-
 
   // Cache keys
   static const String profitLossCacheKey = 'profit_loss_records_cache';
@@ -572,6 +564,7 @@ class ApiConfig {
   static const String orderItemsCacheKey = 'cached_order_items';
   static const String salesCacheKey = 'cached_sales';
   static const String saleStatsCacheKey = 'cached_sale_stats';
+  static const String purchasesCacheKey = 'cached_purchases';
 
   // Principal Account cache keys
   static const String principalAccountCacheKey = 'cached_principal_accounts';

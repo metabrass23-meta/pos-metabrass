@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/models/product/product_model.dart';
@@ -12,7 +11,7 @@ import '../globals/text_button.dart';
 
 class ProductSelectionDialog extends StatefulWidget {
   final List<String>? excludeProductIds;
-  final Function(Product product, int quantity, String? customizationNotes) onProductSelected;
+  final Function(ProductModel product, int quantity, String? customizationNotes) onProductSelected;
 
   const ProductSelectionDialog({super.key, this.excludeProductIds, required this.onProductSelected});
 
@@ -27,9 +26,9 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
   final _customizationController = TextEditingController();
 
   String _searchQuery = '';
-  List<Product> _filteredProducts = [];
+  List<ProductModel> _filteredProducts = [];
   bool _isLoading = false;
-  Product? _selectedProduct;
+  ProductModel? _selectedProduct;
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -79,7 +78,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
 
   void _filterProducts() {
     final provider = Provider.of<ProductProvider>(context, listen: false);
-    List<Product> products = provider.products;
+    List<ProductModel> products = provider.products;
 
     if (widget.excludeProductIds != null) {
       products = products.where((product) => !widget.excludeProductIds!.contains(product.id)).toList();
@@ -108,7 +107,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
     _filterProducts();
   }
 
-  void _selectProduct(Product product) {
+  void _selectProduct(ProductModel product) {
     setState(() {
       _selectedProduct = product;
     });
@@ -150,7 +149,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.inter(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
               ),
             ),
           ],
@@ -228,7 +227,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
               children: [
                 Text(
                   context.shouldShowCompactLayout ? l10n.selectProduct : l10n.selectProductForOrder,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -239,7 +238,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.chooseProductToAddToOrder,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -372,7 +371,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                   SizedBox(height: context.cardPadding),
                   Text(
                     _searchQuery.isEmpty ? l10n.noProductsAvailable : l10n.noProductsFound,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -382,7 +381,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     SizedBox(height: context.smallPadding),
                     Text(
                       l10n.tryAdjustingYourSearchTerms,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         color: Colors.grey[600],
                       ),
@@ -445,7 +444,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                               children: [
                                 Text(
                                   product.name,
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black87,
@@ -456,7 +455,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                                 SizedBox(height: context.smallPadding / 2),
                                 Text(
                                   '${product.fabric} • ${product.color}',
-                                  style: GoogleFonts.inter(
+                                  style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     color: Colors.grey[700],
                                   ),
@@ -468,7 +467,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                                   children: [
                                     Text(
                                       'PKR ${product.price.toStringAsFixed(2)}',
-                                      style: GoogleFonts.inter(
+                                      style: TextStyle(
                                         fontSize: context.bodyFontSize,
                                         fontWeight: FontWeight.w600,
                                         color: AppTheme.primaryMaroon,
@@ -486,7 +485,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                                       ),
                                       child: Text(
                                         product.quantity > 0 ? '${l10n.inStock} (${product.quantity})' : l10n.outOfStock,
-                                        style: GoogleFonts.inter(
+                                        style: TextStyle(
                                           fontSize: context.bodyFontSize,
                                           color: product.quantity > 0 ? Colors.green : Colors.red,
                                           fontWeight: FontWeight.w500,
@@ -562,7 +561,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                 child: Center(
                   child: Text(
                     _selectedProduct!.name.isNotEmpty ? _selectedProduct!.name[0].toUpperCase() : 'P',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.pureWhite,
@@ -577,7 +576,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                   children: [
                     Text(
                       _selectedProduct!.name,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -588,7 +587,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       '${_selectedProduct!.fabric} • ${_selectedProduct!.color}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey[700],
@@ -599,7 +598,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     SizedBox(height: context.smallPadding / 2),
                     Text(
                       '${l10n.available}: ${_selectedProduct!.quantity} ${l10n.units}',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w500,
                         color: _selectedProduct!.quantity > 0 ? Colors.green : Colors.red,
@@ -661,7 +660,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     SizedBox(width: context.smallPadding),
                     Text(
                       '${l10n.totalAmount}:',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -671,7 +670,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                 ),
                 Text(
                   'PKR ${(_selectedProduct!.price * (int.tryParse(_quantityController.text) ?? 1)).toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.primaryMaroon,
@@ -742,7 +741,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
       children: [
         Text(
           l10n.unitPrice,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -767,7 +766,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
               SizedBox(width: context.smallPadding),
               Text(
                 'PKR ${_selectedProduct!.price.toStringAsFixed(2)}',
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primaryMaroon,
@@ -787,7 +786,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
         SizedBox(width: context.smallPadding),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w600,
             color: Colors.black87,

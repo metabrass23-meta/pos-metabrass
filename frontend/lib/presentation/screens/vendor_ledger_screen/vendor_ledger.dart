@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:frontend/l10n/app_localizations.dart';
@@ -27,17 +26,20 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint('🔵 VendorLedgerScreen initialized with vendorId: ${widget.vendorId}, vendorName: ${widget.vendorName}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLedger();
     });
   }
 
   Future<void> _loadLedger() async {
+    debugPrint('🔵 Loading ledger for vendor: ${widget.vendorId}');
     final provider = context.read<VendorLedgerProvider>();
     await provider.loadVendorLedger(
       vendorId: widget.vendorId,
       vendorName: widget.vendorName,
     );
+    debugPrint('✅ Ledger loaded successfully');
   }
 
   @override
@@ -78,7 +80,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         children: [
           Text(
             'Vendor Ledger',
-            style: GoogleFonts.playfairDisplay(
+            style: TextStyle(
               fontSize: context.headerFontSize,
               fontWeight: FontWeight.w600,
               color: AppTheme.pureWhite,
@@ -86,7 +88,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           ),
           Text(
             widget.vendorName,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.captionFontSize,
               color: AppTheme.pureWhite.withOpacity(0.8),
             ),
@@ -112,6 +114,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildLedgerContent(VendorLedgerProvider provider) {
+    debugPrint('📊 Building ledger content with ${provider.ledgerEntries.length} entries');
     return Column(
       children: [
         // Summary Card
@@ -217,7 +220,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.smallPadding / 2),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.captionFontSize,
               color: AppTheme.pureWhite.withOpacity(0.8),
             ),
@@ -226,7 +229,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.smallPadding / 4),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: isHighlight
                   ? context.headerFontSize
                   : context.bodyFontSize,
@@ -280,7 +283,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
       flex: flex,
       child: Text(
         text,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.bodyFontSize,
           fontWeight: FontWeight.w600,
           color: AppTheme.charcoalGray,
@@ -363,7 +366,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
       flex: flex,
       child: Text(
         text,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: context.bodyFontSize,
           color: color ?? AppTheme.charcoalGray,
           fontWeight: fontWeight,
@@ -417,7 +420,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         ),
         child: Text(
           type,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w600,
             color: textColor,
@@ -443,7 +446,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         children: [
           Text(
             'Showing ${provider.ledgerEntries.length} of ${provider.totalCount} entries',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
             ),
@@ -470,7 +473,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
                 ),
                 child: Text(
                   'Page ${provider.currentPage} of ${provider.totalPages}',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryMaroon,
@@ -492,6 +495,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildLoadingState() {
+    debugPrint('⏳ Showing loading state');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -502,7 +506,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.mainPadding),
           Text(
             'Loading ledger...',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
             ),
@@ -513,6 +517,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildErrorState(String message) {
+    debugPrint('❌ Showing error state: $message');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -525,7 +530,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.mainPadding),
           Text(
             message,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[600],
             ),
@@ -551,6 +556,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
   }
 
   Widget _buildEmptyState() {
+    debugPrint('📭 Showing empty state');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -563,7 +569,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.mainPadding),
           Text(
             'No ledger entries found',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.headerFontSize,
               fontWeight: FontWeight.w600,
               color: Colors.grey[600],
@@ -572,7 +578,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           SizedBox(height: context.smallPadding),
           Text(
             'This vendor has no transactions yet',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.bodyFontSize,
               color: Colors.grey[500],
             ),
@@ -591,7 +597,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         ),
         title: Text(
           'Transaction Details',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.primaryMaroon,
@@ -637,7 +643,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
             width: 120,
             child: Text(
               '$label:',
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[700],
@@ -647,7 +653,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
@@ -667,7 +673,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         ),
         title: Text(
           'Filter Ledger',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.primaryMaroon,
@@ -675,7 +681,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         ),
         content: Text(
           'Filter functionality coming soon!',
-          style: GoogleFonts.inter(fontSize: context.bodyFontSize),
+          style: TextStyle(fontSize: context.bodyFontSize),
         ),
         actions: [
           TextButton(
@@ -696,7 +702,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
         ),
         title: Text(
           'Export Ledger',
-          style: GoogleFonts.playfairDisplay(
+          style: TextStyle(
             fontSize: context.headerFontSize,
             fontWeight: FontWeight.w600,
             color: AppTheme.primaryMaroon,

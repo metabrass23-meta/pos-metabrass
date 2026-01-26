@@ -1058,7 +1058,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToPos.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Maqbool Fabrics POS'**
+  /// **'Welcome to Al Noor Fabrics POS'**
   String get welcomeToPos;
 
   /// No description provided for @welcomeTagline.
@@ -7055,6 +7055,12 @@ abstract class AppLocalizations {
   /// **'With Deduction'**
   String get withDeduction;
 
+  /// No description provided for @purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases'**
+  String get purchases;
+
   /// No description provided for @regularPayment.
   ///
   /// In en, this message translates to:
@@ -12802,6 +12808,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Printing receipt for {invoice}'**
   String printingReceiptFor(String invoice);
+
+  /// No description provided for @deletePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Purchase'**
+  String get deletePurchase;
+
+  /// No description provided for @loadingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading data...'**
+  String get loadingData;
+
+  /// No description provided for @pendingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending orders'**
+  String get pendingOrders;
+
+  /// No description provided for @returnNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Number'**
+  String get returnNumber;
+
+  /// No description provided for @pleaseSelectVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a vendor'**
+  String get pleaseSelectVendor;
+
+  /// No description provided for @loadingLabors.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading labors...'**
+  String get loadingLabors;
+
+  /// No description provided for @loadingVendors.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading vendors...'**
+  String get loadingVendors;
+
+  /// No description provided for @loadingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading orders...'**
+  String get loadingOrders;
+
+  /// No description provided for @loadingSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading sales...'**
+  String get loadingSales;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this purchase?'**
+  String get confirmDelete;
+
+  /// No description provided for @deleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase deleted successfully'**
+  String get deleteSuccess;
+
+  /// No description provided for @editPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Purchase'**
+  String get editPurchase;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

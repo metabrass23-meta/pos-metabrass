@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
@@ -44,12 +43,14 @@ class OrderSuccessDialog extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildSuccessHeader(context),
-            _buildSuccessContent(context),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildSuccessHeader(context),
+              _buildSuccessContent(context),
+            ],
+          ),
         ),
       ),
     );
@@ -96,8 +97,8 @@ class OrderSuccessDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.orderCreated,
-                  style: GoogleFonts.playfairDisplay(
+                  l10n.saleCompleted, // "Sale Completed"
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 12.sp,
@@ -111,8 +112,8 @@ class OrderSuccessDialog extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  l10n.customOrderCreatedSuccessfully,
-                  style: GoogleFonts.inter(
+                  l10n.transactionProcessedSuccessfully,
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 8.sp,
@@ -159,37 +160,40 @@ class OrderSuccessDialog extends StatelessWidget {
         children: [
           _buildSummaryRow(
             context,
-            l10n.orderId,
-            'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+            l10n.invoiceNumber,
+            'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
             valueColor: Colors.purple,
           ),
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
             l10n.totalAmount,
-            'PKR ${totalPrice.toStringAsFixed(0)}',
+            'PKR ${totalPrice.toStringAsFixed(0)}', // Should show correct price now
             valueColor: Colors.green,
             isHighlight: true,
           ),
+          // If advance/split logic is relevant, show it, otherwise standard sale just uses total
+          if (advanceAmount > 0 && advanceAmount < totalPrice) ...[
+            SizedBox(height: context.smallPadding),
+            _buildSummaryRow(
+              context,
+              l10n.amountPaid,
+              'PKR ${advanceAmount.toStringAsFixed(0)}',
+              valueColor: Colors.blue,
+            ),
+            SizedBox(height: context.smallPadding),
+            _buildSummaryRow(
+              context,
+              l10n.remaining,
+              'PKR ${(totalPrice - advanceAmount).toStringAsFixed(0)}',
+              valueColor: Colors.orange,
+            ),
+          ],
           SizedBox(height: context.smallPadding),
           _buildSummaryRow(
             context,
-            l10n.advanceReceived,
-            'PKR ${advanceAmount.toStringAsFixed(0)}',
-            valueColor: Colors.blue,
-          ),
-          SizedBox(height: context.smallPadding),
-          _buildSummaryRow(
-            context,
-            l10n.remainingAmount,
-            'PKR ${(totalPrice - advanceAmount).toStringAsFixed(0)}',
-            valueColor: Colors.orange,
-          ),
-          SizedBox(height: context.smallPadding),
-          _buildSummaryRow(
-            context,
-            '${l10n.deliveryDate}:',
-            '${deliveryDate.day}/${deliveryDate.month}/${deliveryDate.year}',
+            '${l10n.date}:',
+            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
           ),
         ],
       ),
@@ -208,7 +212,7 @@ class OrderSuccessDialog extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: ResponsiveBreakpoints.responsive(
               context,
               tablet: 8.sp,
@@ -223,7 +227,7 @@ class OrderSuccessDialog extends StatelessWidget {
         ),
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: ResponsiveBreakpoints.responsive(
               context,
               tablet: 8.sp,
@@ -248,7 +252,7 @@ class OrderSuccessDialog extends StatelessWidget {
         Expanded(
           child: _buildActionButton(
             context,
-            label: l10n.printOrder,
+            label: l10n.printReceipt,
             icon: Icons.print_rounded,
             color: Colors.blue,
             onTap: () => _handlePrintOrder(context),
@@ -258,9 +262,9 @@ class OrderSuccessDialog extends StatelessWidget {
         Expanded(
           child: _buildActionButton(
             context,
-            label: l10n.done,
-            icon: Icons.done_rounded,
-            color: Colors.purple,
+            label: l10n.newSale, // "New Sale"
+            icon: Icons.add_shopping_cart_rounded,
+            color: Colors.green, // Green for New Sale
             onTap: () => _handleDone(context),
             isPrimary: true,
           ),
@@ -312,7 +316,7 @@ class OrderSuccessDialog extends StatelessWidget {
                 SizedBox(width: context.smallPadding),
                 Text(
                   label,
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
                       tablet: 8.sp,
@@ -335,25 +339,23 @@ class OrderSuccessDialog extends StatelessWidget {
 
   void _handlePrintOrder(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
+    // Simulate Print logic
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(l10n.printFunctionalityWillBeImplemented),
+        content: Text(l10n.printFunctionalityToBeImplemented),
         backgroundColor: Colors.blue,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
       ),
     );
   }
 
   void _handleDone(BuildContext context) {
-    Navigator.of(context).pop();
+    // ✅ CRITICAL FIX: Only pop once.
+    // The CheckoutDialog already closed itself before opening this dialog.
     Navigator.of(context).pop();
   }
 }
 
+// ... (Keep ConfirmationDialog and LoadingDialog as they were)
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -453,7 +455,7 @@ class ConfirmationDialog extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: ResponsiveBreakpoints.responsive(
                   context,
                   tablet: 11.sp,
@@ -477,7 +479,7 @@ class ConfirmationDialog extends StatelessWidget {
       padding: EdgeInsets.all(context.cardPadding),
       child: Text(
         message,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           fontSize: ResponsiveBreakpoints.responsive(
             context,
             tablet: 9.sp,
@@ -516,7 +518,7 @@ class ConfirmationDialog extends StatelessWidget {
                     ),
                     child: Text(
                       cancelText ?? l10n.cancel,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: ResponsiveBreakpoints.responsive(
                           context,
                           tablet: 9.sp,
@@ -553,7 +555,7 @@ class ConfirmationDialog extends StatelessWidget {
                     ),
                     child: Text(
                       confirmText ?? l10n.confirm,
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: ResponsiveBreakpoints.responsive(
                           context,
                           tablet: 9.sp,
@@ -608,7 +610,7 @@ class LoadingDialog extends StatelessWidget {
             SizedBox(height: context.cardPadding),
             Text(
               message ?? l10n.processing,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: ResponsiveBreakpoints.responsive(
                   context,
                   tablet: 9.sp,

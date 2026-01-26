@@ -63,9 +63,13 @@ class ReceiptProvider extends ChangeNotifier {
       );
 
       if (response.success && response.data != null) {
-        final data = response.data!;
-        _receipts = (data['data'] as List<dynamic>).map((item) => ReceiptModel.fromJson(item as Map<String, dynamic>)).toList();
-        _pagination = data['pagination'] as Map<String, dynamic>?;
+        // ✅ FIXED: The Service already returns List<ReceiptModel>, so we just assign it.
+        _receipts = response.data!;
+
+        // Note: Since we are getting a direct List, we assume standard pagination handling is done
+        // or we nullify pagination map for now to prevent the crash.
+        _pagination = null;
+
         _setSuccess('Receipts loaded successfully');
       } else {
         _setError(response.message);

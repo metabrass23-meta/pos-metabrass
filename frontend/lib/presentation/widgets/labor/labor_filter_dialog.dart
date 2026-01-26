@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
@@ -208,7 +207,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
               children: [
                 Text(
                   l10n.filterLabors,
-                  style: GoogleFonts.playfairDisplay(
+                  style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
@@ -219,7 +218,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                   SizedBox(height: context.smallPadding / 2),
                   Text(
                     l10n.refineYourLaborList,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.pureWhite.withOpacity(0.9),
@@ -313,7 +312,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
@@ -333,13 +332,13 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
 
     return TextFormField(
       controller: _searchController,
-      style: GoogleFonts.inter(
+      style: TextStyle(
         fontSize: context.bodyFontSize,
         color: AppTheme.charcoalGray,
       ),
       decoration: InputDecoration(
         hintText: l10n.searchByNameCnicPhoneDesignation,
-        hintStyle: GoogleFonts.inter(
+        hintStyle: TextStyle(
           fontSize: context.bodyFontSize,
           color: Colors.grey[500],
         ),
@@ -386,7 +385,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
           },
           title: Text(
             l10n.showInactiveLaborsOnly,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: context.subtitleFontSize,
               fontWeight: FontWeight.w500,
               color: AppTheme.charcoalGray,
@@ -414,7 +413,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
                 Expanded(
                   child: Text(
                     l10n.onlyDeactivatedLaborsWillBeShown,
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: context.captionFontSize,
                       color: Colors.orange[700],
                     ),
@@ -437,7 +436,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
           children: [
             Text(
               l10n.city,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -446,13 +445,13 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _cityController,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
                 hintText: l10n.enterCityName,
-                hintStyle: GoogleFonts.inter(
+                hintStyle: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
                 ),
@@ -504,7 +503,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
           children: [
             Text(
               l10n.area,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
@@ -513,13 +512,13 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
             SizedBox(height: context.smallPadding),
             TextFormField(
               controller: _areaController,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 fontSize: context.bodyFontSize,
                 color: AppTheme.charcoalGray,
               ),
               decoration: InputDecoration(
                 hintText: l10n.enterAreaName,
-                hintStyle: GoogleFonts.inter(
+                hintStyle: TextStyle(
                   fontSize: context.bodyFontSize,
                   color: Colors.grey[500],
                 ),
@@ -591,7 +590,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: TextStyle(
             fontSize: context.captionFontSize,
             fontWeight: FontWeight.w500,
             color: AppTheme.accentGold,
