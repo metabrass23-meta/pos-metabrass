@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -7,7 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
-import '../globals/text_field.dart'; // ✅ Use PremiumTextField
+import '../globals/text_field.dart';
 
 class PaymentConfirmationDialog extends StatefulWidget {
   final String saleId;
@@ -51,6 +50,8 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
   @override
   void initState() {
     super.initState();
+    debugPrint("🟢 [PaymentDialog] Initialized for Invoice: ${widget.invoiceNumber}");
+
     _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
     _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
@@ -60,7 +61,6 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
     _amountController.text = remainingAmount.toStringAsFixed(2);
     _isPartialPayment = remainingAmount < widget.grandTotal;
 
-    // Defer provider call to after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadWorkflowSummary();
     });
@@ -76,23 +76,27 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
   }
 
   Future<void> _loadWorkflowSummary() async {
+    debugPrint("🔵 [PaymentDialog] Fetching workflow summary...");
     final provider = Provider.of<SalesProvider>(context, listen: false);
     final summary = await provider.getPaymentWorkflowSummary(widget.saleId);
     if (mounted) {
       setState(() {
         _workflowSummary = summary;
       });
+      debugPrint("✅ [PaymentDialog] Workflow summary loaded.");
     }
   }
 
   void _handlePaymentConfirmation() async {
     final l10n = AppLocalizations.of(context)!;
+    debugPrint("🔘 [PaymentDialog] 'Confirm Payment' Pressed");
 
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      debugPrint("❌ [PaymentDialog] Validation Failed");
+      return;
+    }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final provider = Provider.of<SalesProvider>(context, listen: false);
@@ -100,12 +104,15 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       final reference = _referenceController.text.trim();
       final notes = _notesController.text.trim();
 
+      debugPrint("📋 [PaymentDialog] Data: Amount=$amount, Method=$_selectedPaymentMethod");
+
       if (!provider.validatePaymentWorkflowData(
         amount: amount,
         paymentMethod: _selectedPaymentMethod,
         saleTotal: widget.grandTotal,
         previousAmountPaid: widget.amountPaid,
       )) {
+        debugPrint("❌ [PaymentDialog] Invalid Payment Data (Amount exceeds total?)");
         _showErrorDialog(l10n.invalidPaymentAmount);
         setState(() => _isLoading = false);
         return;
@@ -121,21 +128,20 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       );
 
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
 
         if (success) {
+          debugPrint("✅ [PaymentDialog] Payment Successful!");
           _showSuccessDialog();
         } else {
+          debugPrint("❌ [PaymentDialog] Payment Failed (API Error)");
           _showErrorDialog(l10n.paymentProcessingFailed);
         }
       }
     } catch (e) {
+      debugPrint("🛑 [PaymentDialog] Exception: $e");
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
         _showErrorDialog(l10n.errorOccurred(e.toString()));
       }
     }
@@ -150,28 +156,49 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 24),
+            const Icon(Icons.check_circle, color: Colors.green, size: 30), // Increased Size
             const SizedBox(width: 12),
-            Text(l10n.paymentConfirmed, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(l10n.paymentConfirmed, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 24)), // Increased Size
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.paymentProcessedSuccessfully),
+            Text(l10n.paymentProcessedSuccessfully, style: const TextStyle(fontSize: 18)), // Increased Size
             const SizedBox(height: 16),
             _buildPaymentSummary()
           ],
         ),
         actions: [
-          TextButton(
+          // ✅ PRINT RECEIPT BUTTON ADDED HERE
+          TextButton.icon(
+            onPressed: () {
+              debugPrint("🖨️ [PaymentDialog] 'Print Receipt' Tapped");
+
+              // Placeholder for actual print logic
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Printing Receipt... (Check Logs)")),
+              );
+
+              // FUTURE TODO: Add your printer service call here:
+              // context.read<ReceiptProvider>().printReceipt(widget.saleId);
+            },
+            icon: const Icon(Icons.print, size: 24),
+            label: const Text("Print Receipt", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop(); // Close success dialog
               Navigator.of(context).pop(); // Close payment dialog
               widget.onPaymentConfirmed?.call(true);
             },
-            child: Text(l10n.continue_),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryMaroon,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(l10n.continue_, style: const TextStyle(color: Colors.white, fontSize: 18)), // Increased Size
           ),
         ],
       ),
@@ -186,13 +213,18 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.error, color: Colors.red, size: 24),
+            const Icon(Icons.error, color: Colors.red, size: 30),
             const SizedBox(width: 12),
-            Text(l10n.paymentError, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(l10n.paymentError, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 24)),
           ],
         ),
-        content: Text(message),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.ok))],
+        content: Text(message, style: const TextStyle(fontSize: 18)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.ok, style: const TextStyle(fontSize: 18)),
+          )
+        ],
       ),
     );
   }
@@ -212,7 +244,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.paymentSummary, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(l10n.paymentSummary, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)), // Increased Size
           const SizedBox(height: 12),
           _buildSummaryRow(l10n.invoice, widget.invoiceNumber),
           _buildSummaryRow('${l10n.customer}:', widget.customerName),
@@ -233,14 +265,14 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
 
   Widget _buildSummaryRow(String label, String value, {bool isBold = false, Color? color}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14))),
+          Expanded(child: Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.w700 : FontWeight.w500, fontSize: 16))), // Increased Size
           Text(
             value,
-            style: TextStyle(fontWeight: isBold ? FontWeight.w600 : FontWeight.w500, fontSize: 14, color: color),
+            style: TextStyle(fontWeight: isBold ? FontWeight.w700 : FontWeight.w500, fontSize: 16, color: color), // Increased Size
           ),
         ],
       ),
@@ -262,24 +294,24 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.paymentProgress, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(l10n.paymentProgress, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)), // Increased Size
               Text(
                 '${progress.toStringAsFixed(1)}%',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: isComplete ? Colors.green : AppTheme.primaryMaroon),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           LinearProgressIndicator(
             value: progress / 100,
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation<Color>(isComplete ? Colors.green : AppTheme.primaryMaroon),
-            minHeight: 8,
+            minHeight: 12, // Thicker Bar
           ),
           const SizedBox(height: 8),
           Text(
             isComplete ? l10n.paymentComplete : l10n.paymentInProgress,
-            style: TextStyle(fontSize: 12, color: isComplete ? Colors.green : Colors.orange),
+            style: TextStyle(fontSize: 14, color: isComplete ? Colors.green : Colors.orange, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -297,30 +329,30 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
         child: Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
-            constraints: BoxConstraints(maxWidth: 500, maxHeight: 80.h),
+            constraints: BoxConstraints(maxWidth: 550, maxHeight: 85.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // --- Header ---
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(24),
                   decoration: const BoxDecoration(
                     color: AppTheme.primaryMaroon,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.payment, color: Colors.white, size: 24),
+                      const Icon(Icons.payment, color: Colors.white, size: 28),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           l10n.paymentConfirmation,
-                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700), // Increased Size
                         ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, color: Colors.white),
+                        icon: const Icon(Icons.close, color: Colors.white, size: 28),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -331,7 +363,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                 // --- Content ---
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -347,10 +379,13 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                             value: _selectedPaymentMethod,
                             decoration: InputDecoration(
                               labelText: l10n.paymentMethod,
+                              labelStyle: const TextStyle(fontSize: 18), // Increased Size
                               border: const OutlineInputBorder(),
                               filled: true,
                               fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                             ),
+                            style: const TextStyle(color: Colors.black, fontSize: 18), // Increased Size
                             items: [
                               DropdownMenuItem(value: 'CASH', child: Text(l10n.cash)),
                               DropdownMenuItem(value: 'CARD', child: Text(l10n.creditDebitCard)),
@@ -366,7 +401,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                             validator: (value) => (value == null || value.isEmpty) ? l10n.pleaseSelectPaymentMethod : null,
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           // Amount
                           PremiumTextField(
@@ -383,7 +418,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                             },
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           // Reference
                           PremiumTextField(
@@ -392,7 +427,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                             controller: _referenceController,
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           // Notes
                           PremiumTextField(
@@ -402,7 +437,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                             maxLines: 3,
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 30),
 
                           // Actions
                           Row(
@@ -411,7 +446,7 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                                 child: TextButton(
                                   onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
                                   style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(vertical: 20),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: const BorderSide(color: AppTheme.primaryMaroon),
@@ -419,28 +454,28 @@ class _PaymentConfirmationDialogState extends State<PaymentConfirmationDialog> w
                                   ),
                                   child: Text(
                                     l10n.cancel,
-                                    style: const TextStyle(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w600),
+                                    style: const TextStyle(color: AppTheme.primaryMaroon, fontWeight: FontWeight.w700, fontSize: 18), // Increased Size
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 20),
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: _isLoading ? null : _handlePaymentConfirmation,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.primaryMaroon,
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(vertical: 20),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   ),
                                   child: _isLoading
                                       ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 3, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                                   )
                                       : Text(
                                     l10n.confirmPayment,
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18), // Increased Size
                                   ),
                                 ),
                               ),

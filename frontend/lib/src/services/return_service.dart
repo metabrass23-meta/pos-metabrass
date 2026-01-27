@@ -13,25 +13,21 @@ class ReturnService {
   final Dio _dio = Dio();
   final StorageService _storageService = StorageService();
 
-  // ✅ CRITICAL FIX: Gets Token from Storage and uses 'Token' prefix (not Bearer)
   Future<Options> _getAuthOptions() async {
     final token = await _storageService.getToken() ?? '';
 
     if (token.isEmpty) {
       debugPrint('⚠️ [ReturnService] Warning: No Auth Token found in StorageService!');
-    } else {
-      // debugPrint('🔑 [ReturnService] Using Token: ${token.substring(0, 5)}...');
     }
 
     return Options(
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        // Django DRF TokenAuthentication expects "Token <key>", NOT "Bearer <key>"
         'Authorization': 'Token $token',
       },
       validateStatus: (status) {
-        return status! < 500; // Handle 400/401 errors manually
+        return status! < 500;
       },
     );
   }
@@ -72,7 +68,6 @@ class ReturnService {
       );
 
       if (response.statusCode == 200) {
-        // Handle Pagination: Check if 'results' key exists, otherwise use data as list
         final List<dynamic> data = (response.data is Map && response.data.containsKey('results'))
             ? response.data['results']
             : (response.data is List ? response.data : []);
@@ -106,7 +101,7 @@ class ReturnService {
 
   Future<ApiResponse<ReturnModel>> createReturn({
     required String saleId,
-    required String customerId,
+    String? customerId, // ✅ Changed to nullable
     required String reason,
     String? reasonDetails,
     String? notes,
@@ -121,7 +116,7 @@ class ReturnService {
         options: await _getAuthOptions(),
         data: {
           'sale': saleId,
-          'customer': customerId,
+          'customer': customerId, // Can be null now
           'reason': reason,
           if (reasonDetails != null) 'reason_details': reasonDetails,
           if (notes != null) 'notes': notes,

@@ -41,9 +41,9 @@ class ReturnProvider extends ChangeNotifier {
     return _returns.where((returnItem) {
       bool matchesSearch =
           _searchQuery.isEmpty ||
-          returnItem.returnNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          returnItem.customerName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          returnItem.saleInvoiceNumber.toLowerCase().contains(_searchQuery.toLowerCase());
+              returnItem.returnNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              returnItem.customerName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              returnItem.saleInvoiceNumber.toLowerCase().contains(_searchQuery.toLowerCase());
 
       bool matchesStatus = _statusFilter.isEmpty || returnItem.status == _statusFilter;
       bool matchesReason = _reasonFilter.isEmpty || returnItem.reason == _reasonFilter;
@@ -193,7 +193,7 @@ class ReturnProvider extends ChangeNotifier {
   // Create return
   Future<bool> createReturn({
     required String saleId,
-    required String customerId,
+    String? customerId, // ✅ FIXED: Changed from required String to String?
     required String reason,
     String? reasonDetails,
     String? notes,
@@ -205,7 +205,7 @@ class ReturnProvider extends ChangeNotifier {
     try {
       final response = await _returnService.createReturn(
         saleId: saleId,
-        customerId: customerId,
+        customerId: customerId, // Service will handle null
         reason: reason,
         reasonDetails: reasonDetails,
         notes: notes,

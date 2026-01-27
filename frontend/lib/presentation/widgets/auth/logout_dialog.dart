@@ -111,13 +111,13 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
 
                   await Future.delayed(const Duration(milliseconds: 300));
 
-                  MaqboolFabricApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  AlNoorFabricApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
                     '/login',
                         (route) => false,
                   );
 
                   Future.delayed(const Duration(milliseconds: 500), () {
-                    final currentContext = MaqboolFabricApp.navigatorKey.currentContext;
+                    final currentContext = AlNoorFabricApp.navigatorKey.currentContext;
                     if (currentContext != null) {
                       ScaffoldMessenger.of(currentContext).showSnackBar(
                         SnackBar(
@@ -140,13 +140,13 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                     }
                   });
                 } catch (e) {
-                  MaqboolFabricApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  AlNoorFabricApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
                     '/login',
                         (route) => false,
                   );
 
                   Future.delayed(const Duration(milliseconds: 500), () {
-                    final currentContext = MaqboolFabricApp.navigatorKey.currentContext;
+                    final currentContext = AlNoorFabricApp.navigatorKey.currentContext;
                     if (currentContext != null) {
                       ScaffoldMessenger.of(currentContext).showSnackBar(
                         SnackBar(

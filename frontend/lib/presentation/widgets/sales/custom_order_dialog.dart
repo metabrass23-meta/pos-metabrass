@@ -79,7 +79,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
   void _handleCreateOrder() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedCustomer == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select a customer'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a customer'), backgroundColor: Colors.red));
         return;
       }
 
@@ -89,7 +89,8 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
 
       try {
         // Create a custom sale with advance payment
-        final saleId = await provider.createSale(
+        // ✅ FIX: capture boolean success, not the ID directly
+        final success = await provider.createSale(
           CreateSaleRequest(
             customerId: _selectedCustomer!.id,
             overallDiscount: 0.0,
@@ -104,14 +105,18 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                 itemDiscount: 0.0,
                 customizationNotes: _getCustomizationNotes(),
               ),
-            ], amountPaid: widget.product.price,
+            ],
+            amountPaid: _advanceAmount,
           ),
         );
 
         setState(() => _isLoading = false);
 
-        if (mounted) {
-          _handleSuccess();
+        if (mounted && success) {
+          // ✅ FIX: Get the newly created sale from the top of the list
+          // The provider inserts new sales at index 0
+          final newSale = provider.sales.first;
+          _handleSuccess(newSale.id, newSale.invoiceNumber);
         }
       } catch (e) {
         setState(() => _isLoading = false);
@@ -123,14 +128,20 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
     }
   }
 
-  void _handleSuccess() {
+  void _handleSuccess(String saleId, String invoiceNumber) {
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
 
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => OrderSuccessDialog(totalPrice: _totalAmount, advanceAmount: _advanceAmount, deliveryDate: _selectedDeliveryDate),
+        builder: (context) => OrderSuccessDialog(
+          saleId: saleId, // ✅ Now passed correctly
+          invoiceNumber: invoiceNumber, // ✅ Now passed correctly
+          totalPrice: _totalAmount,
+          advanceAmount: _advanceAmount,
+          deliveryDate: _selectedDeliveryDate,
+        ),
       );
     });
   }
@@ -494,30 +505,30 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                     items: provider.customers
                         .map(
                           (customer) => DropdownMenuItem<CustomerModel?>(
-                            value: customer,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    customer.name,
-                                    style: TextStyle(
-                                      fontSize: context.bodyFontSize,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.charcoalGray,
-                                    ),
-                                  ),
-                                  Text(
-                                    customer.phone,
-                                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
-                                  ),
-                                ],
+                        value: customer,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                customer.name,
+                                style: TextStyle(
+                                  fontSize: context.bodyFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.charcoalGray,
+                                ),
                               ),
-                            ),
+                              Text(
+                                customer.phone,
+                                style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
+                              ),
+                            ],
                           ),
-                        )
+                        ),
+                      ),
+                    )
                         .toList(),
                   ),
                 ),
@@ -607,12 +618,12 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       child: InkWell(
                         onTap: _quantity > 1
                             ? () {
-                                setState(() {
-                                  _quantity--;
-                                  _quantityController.text = _quantity.toString();
-                                });
-                                _updateTotalAmount();
-                              }
+                          setState(() {
+                            _quantity--;
+                            _quantityController.text = _quantity.toString();
+                          });
+                          _updateTotalAmount();
+                        }
                             : null,
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                         child: Container(

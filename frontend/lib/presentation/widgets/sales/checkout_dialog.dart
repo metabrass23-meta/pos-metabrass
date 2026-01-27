@@ -135,17 +135,22 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       if (!mounted) return;
 
       if (success) {
-        // ✅ Close Checkout Dialog FIRST (to avoid stacking dialogs)
+        // ✅ Close Checkout Dialog FIRST
         Navigator.of(context).pop();
 
-        // ✅ Show Success Dialog using CAPTURED VALUES
+        // ✅ GET THE NEW SALE (It is inserted at index 0 in the provider)
+        final newSale = provider.sales.first;
+
+        // ✅ Show Success Dialog with Required Params
         await showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => OrderSuccessDialog(
-            totalPrice: capturedTotalAmount, // ✅ Use Captured Value
-            advanceAmount: amountPaid,       // ✅ Use Captured Value
-            deliveryDate: DateTime.now(),    // Or today's date for immediate sale
+            saleId: newSale.id,                   // ✅ Fix: Pass Sale ID
+            invoiceNumber: newSale.invoiceNumber, // ✅ Fix: Pass Invoice Number
+            totalPrice: capturedTotalAmount,
+            advanceAmount: amountPaid,
+            deliveryDate: DateTime.now(),
           ),
         );
       } else {

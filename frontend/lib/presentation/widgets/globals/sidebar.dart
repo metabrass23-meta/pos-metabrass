@@ -8,7 +8,7 @@ import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/providers/vendor_provider.dart';
-import '../../../src/providers/purchase_provider.dart'; // Added PurchaseProvider
+import '../../../src/providers/purchase_provider.dart';
 import '../../../src/providers/labor_provider.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/providers/payables_provider.dart';
@@ -87,13 +87,12 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                   onPressed: authProvider.isLoading
                       ? null
                       : () async {
-                    debugPrint('Logout button pressed');
                     Navigator.of(dialogContext).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
@@ -125,9 +124,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                     );
                     try {
                       await authProvider.logout();
-                      debugPrint('Logout completed successfully');
                       if (mounted) {
-                        debugPrint('Navigating to /login');
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           '/login',
                               (route) => false,
@@ -150,40 +147,12 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                             margin: EdgeInsets.all(context.mainPadding),
                           ),
                         );
-                      } else {
-                        debugPrint(
-                          'Context not mounted, skipping navigation',
-                        );
                       }
                     } catch (e) {
-                      debugPrint('Logout error: $e');
                       if (mounted) {
-                        debugPrint('Navigating to /login after error');
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           '/login',
                               (route) => false,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context)!.logoutError,
-                              style: TextStyle(
-                                fontSize: context.captionFontSize,
-                              ),
-                            ),
-                            backgroundColor: Colors.green,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                context.borderRadius('medium'),
-                              ),
-                            ),
-                            margin: EdgeInsets.all(context.mainPadding),
-                          ),
-                        );
-                      } else {
-                        debugPrint(
-                          'Context not mounted after error, skipping navigation',
                         );
                       }
                     }
@@ -199,7 +168,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                     elevation: 2,
                   ),
                   child: authProvider.isLoading
-                      ? SizedBox(
+                      ? const SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
@@ -287,14 +256,12 @@ class PremiumSidebar extends StatelessWidget {
     required this.onToggle,
   });
 
-  // Menu items with REAL dynamic counts from providers
   List<Map<String, dynamic>> getMenuItems(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    // Get real counts from providers
     final salesCount = context.watch<SalesProvider>().sales.length.toString();
     final ordersCount = context.watch<OrderProvider>().orders.length.toString();
-    final purchasesCount = context.watch<PurchaseProvider>().purchases.length.toString(); // Added Purchase count
+    final purchasesCount = context.watch<PurchaseProvider>().purchases.length.toString();
     final productsCount = context.watch<ProductProvider>().products.length.toString();
     final categoriesCount = context.watch<CategoryProvider>().categories.length.toString();
     final customersCount = context.watch<CustomerProvider>().customers.length.toString();
@@ -311,78 +278,27 @@ class PremiumSidebar extends StatelessWidget {
     final receiptsCount = context.watch<ReceiptProvider>().receipts.length.toString();
 
     return [
-      // Main Overview
       {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null},
-
-      // Core Business Operations
       {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
       {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': ordersCount},
-      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount}, // Added Purchases Item
-
-      // Inventory & Products
-      {
-        'icon': Icons.inventory_2_rounded,
-        'title': l10n.products,
-        'badge': productsCount,
-      },
+      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount},
+      {'icon': Icons.inventory_2_rounded, 'title': l10n.products, 'badge': productsCount},
       {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount},
-
-      // People & Relationships
       {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': customersCount},
       {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': vendorsCount},
-      {
-        'icon': Icons.engineering_rounded,
-        'title': l10n.labor,
-        'badge': laborsCount,
-      },
-
-      // Financial Management
-      {
-        'icon': Icons.account_balance_wallet_rounded,
-        'title': l10n.receivables,
-        'badge': receivablesCount,
-      },
+      {'icon': Icons.engineering_rounded, 'title': l10n.labor, 'badge': laborsCount},
+      {'icon': Icons.account_balance_wallet_rounded, 'title': l10n.receivables, 'badge': receivablesCount},
       {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': payablesCount},
-      {
-        'icon': Icons.payments_rounded,
-        'title': l10n.advancePayment,
-        'badge': advancePaymentsCount,
-      },
+      {'icon': Icons.payments_rounded, 'title': l10n.advancePayment, 'badge': advancePaymentsCount},
       {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': paymentsCount},
-      {
-        'icon': Icons.account_balance_rounded,
-        'title': l10n.expenses,
-        'badge': expensesCount,
-      },
-
-      // Special Accounts & Reports
-      {
-        'icon': Icons.account_circle_rounded,
-        'title': l10n.principalAccount,
-        'badge': null,
-      },
+      {'icon': Icons.account_balance_rounded, 'title': l10n.expenses, 'badge': expensesCount},
+      {'icon': Icons.account_circle_rounded, 'title': l10n.principalAccount, 'badge': null},
       {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': zakatCount},
-      {
-        'icon': Icons.calculate_rounded,
-        'title': l10n.profitLoss,
-        'badge': null,
-      },
+      {'icon': Icons.calculate_rounded, 'title': l10n.profitLoss, 'badge': null},
       {'icon': Icons.receipt_rounded, 'title': l10n.tax, 'badge': null},
-
-      // Management & Returns
-      {
-        'icon': Icons.assignment_return_rounded,
-        'title': l10n.returns,
-        'badge': returnsCount,
-      },
-      {
-        'icon': Icons.receipt_long_rounded,
-        'title': l10n.invoices,
-        'badge': invoicesCount,
-      },
+      {'icon': Icons.assignment_return_rounded, 'title': l10n.returns, 'badge': returnsCount},
+      {'icon': Icons.receipt_long_rounded, 'title': l10n.invoices, 'badge': invoicesCount},
       {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': receiptsCount},
-
-      // System
       {'icon': Icons.settings_rounded, 'title': l10n.settings, 'badge': null},
     ];
   }
@@ -423,7 +339,6 @@ class PremiumSidebar extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Logo
                 Container(
                   width: 2.5.w,
                   height: 2.5.w,
@@ -450,7 +365,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           AppLocalizations.of(context)!.brandName,
                           style: TextStyle(
-                            fontSize: context.headerFontSize,
+                            fontSize: context.headerFontSize * 1.1, // ✅ Increased
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
                             letterSpacing: 0.5,
@@ -459,7 +374,7 @@ class PremiumSidebar extends StatelessWidget {
                         Text(
                           AppLocalizations.of(context)!.brandTagline,
                           style: TextStyle(
-                            fontSize: context.captionFontSize,
+                            fontSize: context.captionFontSize * 1.1, // ✅ Increased
                             fontWeight: FontWeight.w300,
                             color: AppTheme.pureWhite.withOpacity(0.8),
                           ),
@@ -469,7 +384,6 @@ class PremiumSidebar extends StatelessWidget {
                   ),
                 ],
 
-                // Toggle Button
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -544,7 +458,6 @@ class PremiumSidebar extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                // Icon
                                 Container(
                                   width: context.iconSize('large'),
                                   height: context.iconSize('large'),
@@ -568,12 +481,11 @@ class PremiumSidebar extends StatelessWidget {
                                 if (isExpanded) ...[
                                   SizedBox(width: context.smallPadding),
 
-                                  // Title
                                   Expanded(
                                     child: Text(
                                       item['title'],
                                       style: TextStyle(
-                                        fontSize: context.bodyFontSize,
+                                        fontSize: context.subtitleFontSize * 1.4, // ✅ Increased
                                         fontWeight: isSelected
                                             ? FontWeight.w600
                                             : FontWeight.w400,
@@ -587,7 +499,6 @@ class PremiumSidebar extends StatelessWidget {
                                     ),
                                   ),
 
-                                  // Badge
                                   if (item['badge'] != null) ...[
                                     Container(
                                       padding: EdgeInsets.symmetric(
@@ -595,27 +506,7 @@ class PremiumSidebar extends StatelessWidget {
                                         vertical: context.smallPadding / 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: item['badge'] == '156'
-                                            ? Colors.blue.withOpacity(0.9)
-                                            : item['badge'] == '8'
-                                            ? Colors.green.withOpacity(0.9)
-                                            : item['badge'] == '7'
-                                            ? Colors.purple.withOpacity(0.9)
-                                            : item['badge'] == '15'
-                                            ? Colors.cyan.withOpacity(0.9)
-                                            : item['badge'] == '9'
-                                            ? Colors.red.withOpacity(0.9)
-                                            : item['badge'] == '16'
-                                            ? Colors.yellow.withOpacity(0.9)
-                                            : item['badge'] == '4'
-                                            ? Colors.pink.withOpacity(0.9)
-                                            : (item['badge'] == '5' ||
-                                            item['badge'] == '12' ||
-                                            item['badge'] == '23')
-                                            ? Colors.orange.withOpacity(0.9)
-                                            : AppTheme.accentGold.withOpacity(
-                                          0.9,
-                                        ),
+                                        color: AppTheme.accentGold.withOpacity(0.9),
                                         borderRadius: BorderRadius.circular(
                                           context.borderRadius('small'),
                                         ),
@@ -643,7 +534,7 @@ class PremiumSidebar extends StatelessWidget {
             ),
           ),
 
-          // Footer with User Info and Logout
+          // Footer
           Container(
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
@@ -657,7 +548,6 @@ class PremiumSidebar extends StatelessWidget {
             child: Column(
               children: [
                 if (isExpanded) ...[
-                  // User Info Row with Logout Button
                   Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {
                       final user = authProvider.currentUser;
@@ -685,7 +575,7 @@ class PremiumSidebar extends StatelessWidget {
                                 Text(
                                   user?.fullName ?? 'User',
                                   style: TextStyle(
-                                    fontSize: context.bodyFontSize,
+                                    fontSize: context.bodyFontSize * 1.1, // ✅ Increased
                                     fontWeight: FontWeight.w500,
                                     color: AppTheme.pureWhite,
                                   ),
@@ -694,7 +584,7 @@ class PremiumSidebar extends StatelessWidget {
                                 Text(
                                   user?.email ?? 'user@email.com',
                                   style: TextStyle(
-                                    fontSize: context.captionFontSize,
+                                    fontSize: context.captionFontSize * 1.1, // ✅ Increased
                                     fontWeight: FontWeight.w300,
                                     color: AppTheme.pureWhite.withOpacity(0.7),
                                   ),
@@ -703,15 +593,13 @@ class PremiumSidebar extends StatelessWidget {
                               ],
                             ),
                           ),
-
-                          // Logout Button
-                          LogoutDialogWidget(isExpanded: true),
+                          const LogoutDialogWidget(isExpanded: true),
                         ],
                       );
                     },
                   ),
                 ] else ...[
-                  LogoutDialogWidget(isExpanded: false),
+                  const LogoutDialogWidget(isExpanded: false),
                 ],
               ],
             ),

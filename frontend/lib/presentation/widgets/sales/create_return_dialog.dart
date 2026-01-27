@@ -28,35 +28,34 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
 
   String _selectedReason = '';
   String? _selectedSaleId;
+  String? _selectedCustomerId;
   bool _isLoading = false;
   bool _isFetchingItems = false;
 
-  // Holds data + controllers for each return item
   final List<Map<String, dynamic>> _returnItems = [];
 
   @override
   void initState() {
     super.initState();
+    debugPrint("🟢 [CreateReturnDialog] initState");
 
     if (widget.sale != null) {
       _populateFormFromSale(widget.sale!);
     } else {
+      // ✅ FIX 1: Use 'refresh: true' to clear duplicates and get fresh data
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<SalesProvider>().loadSales();
+        context.read<SalesProvider>().loadSales(refresh: true);
       });
     }
   }
 
-  // Handle Sale Dropdown Selection
   Future<void> _handleSaleSelection(String saleId) async {
+    debugPrint("🔵 [CreateReturnDialog] Sale Selected: $saleId");
+
     setState(() {
       _selectedSaleId = saleId;
       _isFetchingItems = true;
-      // Dispose old controllers before clearing
-      for (var item in _returnItems) {
-        (item['quantity_controller'] as TextEditingController).dispose();
-      }
-      _returnItems.clear();
+      _clearReturnItems();
     });
 
     try {
@@ -66,7 +65,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
         _populateFormFromSale(fullSale);
       }
     } catch (e) {
-      debugPrint("Error fetching sale details: $e");
+      debugPrint("🛑 [CreateReturnDialog] Error fetching details: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -77,16 +76,15 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   void _populateFormFromSale(SaleModel sale) {
+    debugPrint("📝 [CreateReturnDialog] Populating from Sale: ${sale.invoiceNumber}");
     setState(() {
       _selectedSaleId = sale.id;
+      _selectedCustomerId = sale.customerId;
+
       _saleIdController.text = sale.invoiceNumber;
       _customerIdController.text = sale.customerName;
 
-      // Clear existing items and controllers
-      for (var item in _returnItems) {
-        (item['quantity_controller'] as TextEditingController).dispose();
-      }
-      _returnItems.clear();
+      _clearReturnItems();
 
       if (sale.saleItems.isNotEmpty) {
         for (var item in sale.saleItems) {
@@ -94,14 +92,22 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             'sale_item_id': item.id,
             'product_name': item.productName,
             'max_quantity': item.quantity,
-            'condition': 'NEW',
+            'condition': 'new',
             'condition_notes': '',
-            // ✅ Use explicit controller for each item's quantity
             'quantity_controller': TextEditingController(text: '0'),
           });
         }
       }
     });
+  }
+
+  void _clearReturnItems() {
+    for (var item in _returnItems) {
+      if (item['quantity_controller'] is TextEditingController) {
+        (item['quantity_controller'] as TextEditingController).dispose();
+      }
+    }
+    _returnItems.clear();
   }
 
   @override
@@ -111,10 +117,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
     _reasonController.dispose();
     _reasonDetailsController.dispose();
     _notesController.dispose();
-    // ✅ Dispose dynamic item controllers
-    for (var item in _returnItems) {
-      (item['quantity_controller'] as TextEditingController).dispose();
-    }
+    _clearReturnItems();
     super.dispose();
   }
 
@@ -184,21 +187,28 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.basicInformation, style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.basicInformation, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
         const SizedBox(height: 16),
 
         if (widget.sale == null)
           Consumer<SalesProvider>(
             builder: (context, salesProvider, child) {
-              if (salesProvider.isLoading) {
+              if (salesProvider.isLoading && salesProvider.sales.isEmpty) {
                 return const Center(child: LinearProgressIndicator());
               }
+
+              // ✅ FIX 2: Deduplicate sales list to prevent "Multiple items with same value" error
+              final uniqueSales = <String>{};
+              final dedupedSales = salesProvider.sales.where((sale) {
+                return uniqueSales.add(sale.id);
+              }).toList();
 
               return DropdownButtonFormField<String>(
                 value: _selectedSaleId,
                 isExpanded: true,
                 decoration: InputDecoration(
                   labelText: l10n.selectSale,
+                  labelStyle: const TextStyle(color: Colors.black54),
                   border: const OutlineInputBorder(),
                   filled: true,
                   fillColor: Colors.white,
@@ -206,7 +216,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
                 style: const TextStyle(color: Colors.black87, fontSize: 16),
                 dropdownColor: Colors.white,
                 hint: Text(l10n.selectSale, style: const TextStyle(color: Colors.grey)),
-                items: salesProvider.sales.map((sale) {
+                items: dedupedSales.map((sale) {
                   return DropdownMenuItem(
                     value: sale.id,
                     child: Text(
@@ -246,6 +256,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
           value: _selectedReason.isEmpty ? null : _selectedReason,
           decoration: InputDecoration(
             labelText: l10n.returnReason,
+            labelStyle: const TextStyle(color: Colors.black54),
             border: const OutlineInputBorder(),
             filled: true,
             fillColor: Colors.white,
@@ -254,13 +265,13 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
           style: const TextStyle(color: Colors.black87, fontSize: 16),
           items: [
             DropdownMenuItem(value: '', child: Text(l10n.selectReason, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.reasonDefective, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'WRONG_SIZE', child: Text(l10n.reasonWrongSize, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.reasonWrongColor, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.reasonQualityIssue, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text(l10n.reasonChangeMind, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text(l10n.reasonDamagedTransit, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'OTHER', child: Text(l10n.reasonOther, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'defective', child: Text(l10n.reasonDefective, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'wrong_size', child: Text(l10n.reasonWrongSize, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'wrong_color', child: Text(l10n.reasonWrongColor, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'quality_issue', child: Text(l10n.reasonQualityIssue, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'change_mind', child: Text(l10n.reasonChangeMind, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'damaged', child: Text(l10n.reasonDamagedTransit, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'other', child: Text(l10n.reasonOther, style: const TextStyle(color: Colors.black))),
           ],
           validator: (value) {
             if (value == null || value.isEmpty) return l10n.selectReturnReason;
@@ -272,7 +283,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             });
           },
         ),
-        if (_selectedReason == 'OTHER') ...[
+        if (_selectedReason == 'other') ...[
           const SizedBox(height: 16),
           PremiumTextField(
             label: l10n.reasonDetails,
@@ -280,7 +291,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             controller: _reasonDetailsController,
             maxLines: 2,
             validator: (value) {
-              if (_selectedReason == 'OTHER' && (value == null || value.isEmpty)) {
+              if (_selectedReason == 'other' && (value == null || value.isEmpty)) {
                 return l10n.provideReasonDetails;
               }
               return null;
@@ -297,7 +308,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.returnItems, style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.returnItems, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
         const SizedBox(height: 16),
 
         if (_isFetchingItems)
@@ -360,61 +371,82 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    // ✅ Using Controller instead of initialValue for stable editing
-                    controller: item['quantity_controller'],
-                    decoration: InputDecoration(
-                      labelText: l10n.quantity,
-                      hintText: '0',
-                      border: const OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                      suffixText: '/ ${item['max_quantity']}',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return l10n.quantityRequired;
-                      final quantity = int.tryParse(value);
-                      if (quantity == null || quantity < 0) return l10n.quantityPositive;
 
-                      final max = item['max_quantity'] ?? 9999;
-                      if (quantity > max) return 'Max $max';
-                      return null;
-                    },
+            LayoutBuilder(
+              builder: (context, constraints) {
+                bool useColumn = constraints.maxWidth < 300;
+
+                Widget qtyField = TextFormField(
+                  style: const TextStyle(color: Colors.black87, fontSize: 16),
+                  controller: item['quantity_controller'],
+                  decoration: InputDecoration(
+                    labelText: l10n.quantity,
+                    labelStyle: const TextStyle(color: Colors.black54),
+                    hintText: '0',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixText: '/ ${item['max_quantity']}',
+                    suffixStyle: const TextStyle(color: Colors.grey),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: item['condition'] != '' ? item['condition'] : null,
-                    dropdownColor: Colors.white,
-                    decoration: InputDecoration(
-                      labelText: l10n.condition,
-                      border: const OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    ),
-                    items: [
-                      DropdownMenuItem(value: 'NEW', child: Text(l10n.conditionNew, style: const TextStyle(color: Colors.black))),
-                      DropdownMenuItem(value: 'GOOD', child: Text(l10n.conditionGood, style: const TextStyle(color: Colors.black))),
-                      DropdownMenuItem(value: 'FAIR', child: Text(l10n.conditionFair, style: const TextStyle(color: Colors.black))),
-                      DropdownMenuItem(value: 'POOR', child: Text(l10n.conditionPoor, style: const TextStyle(color: Colors.black))),
-                      DropdownMenuItem(value: 'DAMAGED', child: Text(l10n.conditionDamaged, style: const TextStyle(color: Colors.black))),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return l10n.quantityRequired;
+                    final quantity = int.tryParse(value);
+                    if (quantity == null || quantity < 0) return l10n.quantityPositive;
+
+                    final max = item['max_quantity'] ?? 9999;
+                    if (quantity > max) return 'Max $max';
+                    return null;
+                  },
+                );
+
+                Widget conditionDropdown = DropdownButtonFormField<String>(
+                  value: item['condition'] != '' ? item['condition'] : null,
+                  dropdownColor: Colors.white,
+                  style: const TextStyle(color: Colors.black87, fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: l10n.condition,
+                    labelStyle: const TextStyle(color: Colors.black54),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  items: [
+                    DropdownMenuItem(value: 'new', child: Text(l10n.conditionNew, style: const TextStyle(color: Colors.black))),
+                    DropdownMenuItem(value: 'good', child: Text(l10n.conditionGood, style: const TextStyle(color: Colors.black))),
+                    DropdownMenuItem(value: 'fair', child: Text(l10n.conditionFair, style: const TextStyle(color: Colors.black))),
+                    DropdownMenuItem(value: 'poor', child: Text(l10n.conditionPoor, style: const TextStyle(color: Colors.black))),
+                    DropdownMenuItem(value: 'damaged', child: Text(l10n.conditionDamaged, style: const TextStyle(color: Colors.black))),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      item['condition'] = value ?? '';
+                    });
+                  },
+                  validator: (value) => (value == null || value.isEmpty) ? l10n.selectConditionError : null,
+                );
+
+                if (useColumn) {
+                  return Column(
+                    children: [
+                      qtyField,
+                      const SizedBox(height: 12),
+                      conditionDropdown,
                     ],
-                    onChanged: (value) {
-                      setState(() {
-                        item['condition'] = value ?? '';
-                      });
-                    },
-                    validator: (value) => (value == null || value.isEmpty) ? l10n.selectConditionError : null,
-                  ),
-                ),
-              ],
+                  );
+                } else {
+                  return Row(
+                    children: [
+                      Expanded(child: qtyField),
+                      const SizedBox(width: 12),
+                      Expanded(child: conditionDropdown),
+                    ],
+                  );
+                }
+              },
             ),
           ],
         ),
@@ -427,7 +459,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.additionalNotes, style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.additionalNotes, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
         const SizedBox(height: 16),
         PremiumTextField(
           label: l10n.notes,
@@ -469,7 +501,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
             ),
             child: _isLoading
                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : Text(l10n.createReturn, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                : Text(l10n.createReturn, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ],
       ),
@@ -477,6 +509,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
   }
 
   void _submitReturn() async {
+    debugPrint("🔘 [CreateReturnDialog] Submit");
     final l10n = AppLocalizations.of(context)!;
 
     if (!_formKey.currentState!.validate()) return;
@@ -486,7 +519,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
       return;
     }
 
-    // Collect Data from Controllers
+    // Collect Data
     List<Map<String, dynamic>> itemsToSubmit = [];
 
     for (var item in _returnItems) {
@@ -495,8 +528,10 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
 
       if (qty > 0) {
         itemsToSubmit.add({
-          ...item,
-          'quantity_returned': qty, // Override with controller value
+          'sale_item_id': item['sale_item_id'],
+          'quantity_returned': qty,
+          'condition': item['condition'],
+          'condition_notes': item['condition_notes']
         });
       }
     }
@@ -514,7 +549,7 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
       final provider = context.read<ReturnProvider>();
       final success = await provider.createReturn(
         saleId: _selectedSaleId!,
-        customerId: _customerIdController.text,
+        customerId: _selectedCustomerId, // Passing nullable
         reason: _selectedReason,
         reasonDetails: _reasonDetailsController.text.isEmpty ? null : _reasonDetailsController.text,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
@@ -525,7 +560,8 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.createdSuccessfully), backgroundColor: Colors.green));
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.error ?? l10n.failedToCreate), backgroundColor: Colors.red));
+        final errorMsg = provider.error ?? l10n.failedToCreate;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMsg), backgroundColor: Colors.red));
       }
     } catch (e) {
       if (mounted) {

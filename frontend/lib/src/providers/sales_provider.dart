@@ -1,5 +1,8 @@
+import 'dart:typed_data'; // ✅ REQUIRED
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:printing/printing.dart'; // ✅ REQUIRED
+import 'package:pdf/pdf.dart';           // ✅ REQUIRED
 import '../models/sales/sale_model.dart';
 import '../models/sales/request_models.dart';
 import '../services/sales_service.dart';
@@ -305,8 +308,6 @@ class SalesProvider extends ChangeNotifier {
     _cartItems.clear();
     _overallDiscount = 0.0;
     _taxConfiguration = TaxConfiguration();
-    // Keep selected customer or clear? Usually better to keep if user wants to make another sale for same person.
-    // But your logic in createSaleFromCart clears it, so I will match that logic.
     notifyListeners();
   }
 
@@ -401,12 +402,10 @@ class SalesProvider extends ChangeNotifier {
         saleItems: saleItems,
       );
 
-      // 🔍 DEBUG LOG
       debugPrint('🚀 Creating sale with payload: ${request.toJson()}');
 
       final success = await createSale(request);
 
-      // 🔍 DEBUG LOG
       debugPrint('✅ Sale creation result: $success');
       if (!success) debugPrint('❌ Error: $_errorMessage');
 
@@ -1329,6 +1328,7 @@ class SalesProvider extends ChangeNotifier {
     }
   }
 
+
   /// Update sale item
   Future<bool> updateSaleItem(
       String itemId,
@@ -1403,6 +1403,38 @@ class SalesProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error searching sale items: $e');
       return [];
+    }
+  }
+
+  // ✅ UPDATED: Trigger Native Print Dialog
+  Future<bool> generateReceiptPdf(String saleId) async {
+    _setLoading(true);
+    try {
+      final response = await _salesService.generateSaleReceipt(saleId);
+
+      if (response.success && response.data != null) {
+        debugPrint("✅ PDF Bytes received: ${response.data!.length} bytes");
+
+        // ✅ Switch BACK to layoutPdf for standard printing
+        // The 'format' hints to the OS that this is 80mm roll paper
+        await Printing.layoutPdf(
+          onLayout: (PdfPageFormat format) async => response.data!,
+          name: 'Receipt_$saleId',
+          format: PdfPageFormat.roll80,
+        );
+
+        _setSuccess('Receipt sent to printer');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Print Error: $e");
+      _setError('Error generating receipt: $e');
+      return false;
+    } finally {
+      _setLoading(false);
     }
   }
 

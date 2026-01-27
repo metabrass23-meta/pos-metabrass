@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data'; // ✅ REQUIRED for PDF Printing
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
@@ -18,7 +19,6 @@ class SalesService {
   final StorageService _storageService = StorageService();
 
   /// Get list of sales with pagination and filtering
-  /// FIXED: Manually parses the response to handle 'data' as a List and 'pagination' as a sibling.
   Future<ApiResponse<SalesListResponse>> getSales({SalesListParams? params}) async {
     try {
       final queryParams = params?.toQueryParameters() ?? SalesListParams().toQueryParameters();
@@ -33,8 +33,6 @@ class SalesService {
       DebugHelper.printApiResponse('GET Sales', response.data);
 
       if (response.statusCode == 200) {
-        // --- FIX START ---
-        // The API returns { "success": true, "data": [...], "pagination": {...} }
         final responseData = response.data;
 
         // 1. Extract List<SaleModel>
@@ -65,7 +63,6 @@ class SalesService {
           message: responseData['message'] ?? 'Sales retrieved successfully',
           data: salesListResponse,
         );
-        // --- FIX END ---
 
         // Cache sales if successful
         if (apiResponse.success && apiResponse.data != null) {
@@ -316,6 +313,37 @@ class SalesService {
     }
   }
 
+  // ✅ ADDED: Generate Sale Receipt (PDF Bytes)
+  Future<ApiResponse<Uint8List>> generateSaleReceipt(String saleId) async {
+    final url = '/sales/$saleId/print-receipt/';
+    debugPrint('🚀 [SalesService] Printing Receipt: $url');
+
+    try {
+      final response = await _apiClient.post(
+        url,
+        // ✅ CRITICAL: Expect BYTES (Binary) from backend
+        options: Options(responseType: ResponseType.bytes),
+      );
+
+      if (response.statusCode == 200) {
+        return ApiResponse<Uint8List>(
+          success: true,
+          message: 'Receipt generated',
+          // ✅ Convert dynamic response data to Uint8List
+          data: Uint8List.fromList(response.data),
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: 'Failed to generate receipt',
+        );
+      }
+    } catch (e) {
+      debugPrint('🛑 [SalesService] Print Error: $e');
+      return ApiResponse(success: false, message: 'Error: $e');
+    }
+  }
+
   /// Create sale from order
   Future<ApiResponse<SaleModel>> createSaleFromOrder(CreateSaleFromOrderRequest request) async {
     try {
@@ -402,7 +430,6 @@ class SalesService {
       DebugHelper.printApiResponse('GET Customer Sales History', response.data);
 
       if (response.statusCode == 200) {
-        // Apply similar fix for customer history if it uses same structure
         final responseData = response.data;
         if (responseData['data'] is List) {
           final List<dynamic> salesListJson = responseData['data'] ?? [];

@@ -1,21 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../src/providers/sales_provider.dart'; // ✅ CHANGED: Use SalesProvider
 import '../../../src/theme/app_theme.dart';
+import '../globals/text_button.dart'; // ✅ Using PremiumButton
 
-class OrderSuccessDialog extends StatelessWidget {
+class OrderSuccessDialog extends StatefulWidget {
+  final String saleId; // ✅ Required for printing
+  final String invoiceNumber; // ✅ Required for display
   final double totalPrice;
   final double advanceAmount;
   final DateTime deliveryDate;
 
   const OrderSuccessDialog({
     super.key,
+    required this.saleId,
+    required this.invoiceNumber,
     required this.totalPrice,
     required this.advanceAmount,
     required this.deliveryDate,
   });
+
+  @override
+  State<OrderSuccessDialog> createState() => _OrderSuccessDialogState();
+}
+
+class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
+  bool _isPrinting = false; // ✅ State for loading spinner
+
+  // ✅ UPDATED PRINT FUNCTION
+  Future<void> _handlePrintOrder(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    debugPrint("🖨️ [OrderSuccessDialog] Print Receipt requested for ${widget.invoiceNumber}");
+
+    setState(() => _isPrinting = true);
+
+    try {
+      // ✅ Use SalesProvider instead of InvoiceProvider
+      final salesProvider = Provider.of<SalesProvider>(context, listen: false);
+
+      // ✅ Call the new function in SalesProvider
+      final success = await salesProvider.generateReceiptPdf(widget.saleId);
+
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text("Receipt sent to printer/saved"),
+                ],
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          _showError(l10n.errorOccurred("Failed to generate PDF"));
+        }
+      }
+    } catch (e) {
+      if (mounted) _showError(l10n.errorOccurred(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isPrinting = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  void _handleDone(BuildContext context) {
+    // ✅ Only pop once. The CheckoutDialog already closed itself before opening this dialog.
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +145,7 @@ class OrderSuccessDialog extends StatelessWidget {
             child: Icon(
               Icons.check_circle_rounded,
               color: AppTheme.pureWhite,
-              size: ResponsiveBreakpoints.responsive(
-                context,
-                tablet: 16.sp,
-                small: 14.sp,
-                medium: 13.sp,
-                large: 12.sp,
-                ultrawide: 11.sp,
-              ),
+              size: 40, // ✅ Fixed Large Size
             ),
           ),
           SizedBox(width: context.cardPadding),
@@ -97,16 +154,9 @@ class OrderSuccessDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.saleCompleted, // "Sale Completed"
+                  l10n.saleCompleted,
                   style: TextStyle(
-                    fontSize: ResponsiveBreakpoints.responsive(
-                      context,
-                      tablet: 12.sp,
-                      small: 11.sp,
-                      medium: 10.sp,
-                      large: 9.sp,
-                      ultrawide: 8.sp,
-                    ),
+                    fontSize: 24, // ✅ Fixed Large Size
                     fontWeight: FontWeight.w700,
                     color: AppTheme.pureWhite,
                   ),
@@ -114,14 +164,7 @@ class OrderSuccessDialog extends StatelessWidget {
                 Text(
                   l10n.transactionProcessedSuccessfully,
                   style: TextStyle(
-                    fontSize: ResponsiveBreakpoints.responsive(
-                      context,
-                      tablet: 8.sp,
-                      small: 7.5.sp,
-                      medium: 7.sp,
-                      large: 6.5.sp,
-                      ultrawide: 6.sp,
-                    ),
+                    fontSize: 16, // ✅ Fixed Large Size
                     color: AppTheme.pureWhite.withOpacity(0.9),
                   ),
                 ),
@@ -152,48 +195,57 @@ class OrderSuccessDialog extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.1),
+        color: Colors.green.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: Colors.green.withOpacity(0.3)),
       ),
       child: Column(
         children: [
+          // ✅ Invoice Number (Real)
           _buildSummaryRow(
             context,
             l10n.invoiceNumber,
-            'INV-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+            widget.invoiceNumber,
             valueColor: Colors.purple,
+            fontSize: 18,
           ),
-          SizedBox(height: context.smallPadding),
+          SizedBox(height: 12),
+
+          // ✅ Total Amount
           _buildSummaryRow(
             context,
             l10n.totalAmount,
-            'PKR ${totalPrice.toStringAsFixed(0)}', // Should show correct price now
+            'PKR ${widget.totalPrice.toStringAsFixed(0)}',
             valueColor: Colors.green,
             isHighlight: true,
+            fontSize: 26, // ✅ Extra Big for Visibility
           ),
-          // If advance/split logic is relevant, show it, otherwise standard sale just uses total
-          if (advanceAmount > 0 && advanceAmount < totalPrice) ...[
-            SizedBox(height: context.smallPadding),
+
+          if (widget.advanceAmount > 0 && widget.advanceAmount < widget.totalPrice) ...[
+            SizedBox(height: 12),
             _buildSummaryRow(
               context,
               l10n.amountPaid,
-              'PKR ${advanceAmount.toStringAsFixed(0)}',
+              'PKR ${widget.advanceAmount.toStringAsFixed(0)}',
               valueColor: Colors.blue,
+              fontSize: 18,
             ),
-            SizedBox(height: context.smallPadding),
+            SizedBox(height: 12),
             _buildSummaryRow(
               context,
               l10n.remaining,
-              'PKR ${(totalPrice - advanceAmount).toStringAsFixed(0)}',
+              'PKR ${(widget.totalPrice - widget.advanceAmount).toStringAsFixed(0)}',
               valueColor: Colors.orange,
+              fontSize: 18,
             ),
           ],
-          SizedBox(height: context.smallPadding),
+
+          SizedBox(height: 12),
           _buildSummaryRow(
             context,
             '${l10n.date}:',
             '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+            fontSize: 16,
           ),
         ],
       ),
@@ -206,6 +258,7 @@ class OrderSuccessDialog extends StatelessWidget {
       String value, {
         Color? valueColor,
         bool isHighlight = false,
+        double fontSize = 16, // ✅ Default bigger font
       }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,30 +266,16 @@ class OrderSuccessDialog extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 8.sp,
-              small: 7.5.sp,
-              medium: 7.sp,
-              large: 6.5.sp,
-              ultrawide: 6.sp,
-            ),
-            fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w400,
+            fontSize: fontSize,
+            fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w500,
             color: AppTheme.charcoalGray,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: 8.sp,
-              small: 7.5.sp,
-              medium: 7.sp,
-              large: 6.5.sp,
-              ultrawide: 6.sp,
-            ),
-            fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600,
+            fontSize: fontSize,
+            fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w600, // Thicker font
             color: valueColor ?? AppTheme.charcoalGray,
           ),
         ),
@@ -249,113 +288,38 @@ class OrderSuccessDialog extends StatelessWidget {
 
     return Row(
       children: [
+        // ✅ Print Receipt Button using PremiumButton
         Expanded(
-          child: _buildActionButton(
-            context,
-            label: l10n.printReceipt,
-            icon: Icons.print_rounded,
-            color: Colors.blue,
-            onTap: () => _handlePrintOrder(context),
+          child: PremiumButton(
+            text: _isPrinting ? "Printing..." : l10n.printReceipt,
+            onPressed: _isPrinting ? null : () => _handlePrintOrder(context),
+            icon: _isPrinting ? null : Icons.print_rounded,
+            backgroundColor: Colors.blue,
+            isLoading: _isPrinting,
+            height: 60, // ✅ Taller button for easier tapping
           ),
         ),
         SizedBox(width: context.cardPadding),
+
+        // ✅ New Sale Button using PremiumButton
         Expanded(
-          child: _buildActionButton(
-            context,
-            label: l10n.newSale, // "New Sale"
+          child: PremiumButton(
+            text: l10n.newSale,
+            onPressed: () => _handleDone(context),
             icon: Icons.add_shopping_cart_rounded,
-            color: Colors.green, // Green for New Sale
-            onTap: () => _handleDone(context),
-            isPrimary: true,
+            backgroundColor: Colors.green,
+            height: 60, // ✅ Taller button
           ),
         ),
       ],
     );
   }
-
-  Widget _buildActionButton(
-      BuildContext context, {
-        required String label,
-        required IconData icon,
-        required Color color,
-        required VoidCallback onTap,
-        bool isPrimary = false,
-      }) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: isPrimary
-            ? LinearGradient(colors: [color, color.withOpacity(0.8)])
-            : null,
-        border: isPrimary ? null : Border.all(color: color),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              vertical: context.cardPadding / 1.5,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  color: isPrimary ? AppTheme.pureWhite : color,
-                  size: ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: 10.sp,
-                    small: 9.sp,
-                    medium: 8.sp,
-                    large: 7.5.sp,
-                    ultrawide: 7.sp,
-                  ),
-                ),
-                SizedBox(width: context.smallPadding),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: ResponsiveBreakpoints.responsive(
-                      context,
-                      tablet: 8.sp,
-                      small: 7.5.sp,
-                      medium: 7.sp,
-                      large: 6.5.sp,
-                      ultrawide: 6.sp,
-                    ),
-                    fontWeight: FontWeight.w600,
-                    color: isPrimary ? AppTheme.pureWhite : color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _handlePrintOrder(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    // Simulate Print logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.printFunctionalityToBeImplemented),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
-
-  void _handleDone(BuildContext context) {
-    // ✅ CRITICAL FIX: Only pop once.
-    // The CheckoutDialog already closed itself before opening this dialog.
-    Navigator.of(context).pop();
-  }
 }
 
-// ... (Keep ConfirmationDialog and LoadingDialog as they were)
+// --------------------------------------------------------------------------
+// KEPT EXISTING CLASSES BELOW AS REQUESTED
+// --------------------------------------------------------------------------
+
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String message;

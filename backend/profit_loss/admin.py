@@ -255,6 +255,6 @@ class ProfitLossRecordAdmin(admin.ModelAdmin):
 
 
 # Custom admin site configuration
-admin.site.site_header = "Maqbool Fabric - Profit & Loss Management"
+admin.site.site_header = "Al Noor Fabric - Profit & Loss Management"
 admin.site.site_title = "Profit & Loss Admin"
 admin.site.index_title = "Profit & Loss Administration"

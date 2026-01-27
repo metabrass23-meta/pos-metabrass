@@ -20,7 +20,6 @@ class SalesTable extends StatefulWidget {
 }
 
 class _SalesTableState extends State<SalesTable> {
-  // Separate controllers for accurate synchronization
   late ScrollController _headerScrollController;
   late ScrollController _contentHorizontalScrollController;
   late ScrollController _verticalScrollController;

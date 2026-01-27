@@ -9,7 +9,7 @@ from datetime import date
 
 class TaxRate(models.Model):
     """Tax rate configuration for different tax types"""
-    
+
     TAX_TYPE_CHOICES = [
         ('GST', 'General Sales Tax'),
         ('FED', 'Federal Excise Duty'),
@@ -17,64 +17,64 @@ class TaxRate(models.Model):
         ('ADDITIONAL', 'Additional Tax'),
         ('CUSTOM', 'Custom Tax Rate'),
     ]
-    
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False
     )
-    
+
     name = models.CharField(
         max_length=100,
         help_text="Tax rate name (e.g., Standard GST, Reduced GST, FED on Textiles)"
     )
-    
+
     tax_type = models.CharField(
         max_length=20,
         choices=TAX_TYPE_CHOICES,
         default='GST',
         help_text="Type of tax"
     )
-    
+
     percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         help_text="Tax rate percentage (e.g., 17.00 for 17%)"
     )
-    
+
     is_active = models.BooleanField(
         default=True,
         help_text="Whether this tax rate is currently active"
     )
-    
+
     description = models.TextField(
         blank=True,
         help_text="Description of when this tax rate applies"
     )
-    
+
     effective_from = models.DateField(
         default=date.today,
         help_text="Date from which this tax rate is effective"
     )
-    
+
     effective_to = models.DateField(
         null=True,
         blank=True,
         help_text="Date until which this tax rate is effective (null for indefinite)"
     )
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         db_table = 'tax_rates'
         verbose_name = 'Tax Rate'
         verbose_name_plural = 'Tax Rates'
         ordering = ['tax_type', 'effective_from']
-    
+
     def __str__(self):
         return f"{self.name} ({self.percentage}%)"
-    
+
     @property
     def is_currently_effective(self):
         """Check if tax rate is currently effective"""
@@ -86,12 +86,12 @@ class TaxRate(models.Model):
         if self.effective_to and self.effective_to < today:
             return False
         return True
-    
+
     def clean(self):
         """Validate model data"""
         if self.percentage < 0 or self.percentage > 100:
             raise ValidationError({'percentage': 'Tax percentage must be between 0 and 100.'})
-        
+
         if self.effective_to and self.effective_to < self.effective_from:
             raise ValidationError({'effective_to': 'Effective to date cannot be before effective from date.'})
 
@@ -100,12 +100,12 @@ def generate_invoice_number():
     """Generate sequential invoice number in format: INV-YYYY-XXXX"""
     today = date.today()
     year = today.year
-    
+
     # Get the last invoice number for this year
     last_invoice = Sales.objects.filter(
         invoice_number__startswith=f'INV-{year}-'
     ).order_by('-invoice_number').first()
-    
+
     if last_invoice:
         try:
             # Extract the sequence number and increment
@@ -115,13 +115,13 @@ def generate_invoice_number():
             new_sequence = 1
     else:
         new_sequence = 1
-    
+
     return f'INV-{year}-{new_sequence:04d}'
 
 
 class Return(models.Model):
     """Return request model for processing customer returns"""
-    
+
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('APPROVED', 'Approved'),
@@ -129,17 +129,18 @@ class Return(models.Model):
         ('PROCESSED', 'Processed'),
         ('CANCELLED', 'Cancelled'),
     ]
-    
+
     REASON_CHOICES = [
         ('DEFECTIVE', 'Defective Product'),
         ('WRONG_ITEM', 'Wrong Item Received'),
+        ('WRONG_COLOR', 'Wrong Color'),  # ✅ Added Missing Choice
         ('DAMAGED', 'Damaged in Transit'),
         ('SIZE_ISSUE', 'Size/Fit Issue'),
         ('QUALITY_ISSUE', 'Quality Issue'),
         ('CUSTOMER_REQUEST', 'Customer Request'),
         ('OTHER', 'Other'),
     ]
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     return_number = models.CharField(
         max_length=50,
@@ -152,10 +153,13 @@ class Return(models.Model):
         related_name='returns',
         help_text="Original sale for this return"
     )
+    # ✅ FIX APPLIED: Added null=True and blank=True to allow Walk-in Customers
     customer = models.ForeignKey(
         'customers.Customer',
         on_delete=models.CASCADE,
         related_name='returns',
+        null=True,
+        blank=True,
         help_text="Customer requesting the return"
     )
     reason = models.CharField(
@@ -242,9 +246,9 @@ class Return(models.Model):
         related_name='created_returns',
         help_text="User who created this return request"
     )
-    
+
     class Meta:
-        
+
         db_table = 'sales_return'
         verbose_name = 'Return'
         verbose_name_plural = 'Returns'
@@ -257,25 +261,25 @@ class Return(models.Model):
             models.Index(fields=['return_date']),
             models.Index(fields=['is_active']),
         ]
-    
+
     def __str__(self):
         return f"Return {self.return_number} - {self.sale.invoice_number}"
-    
+
     def save(self, *args, **kwargs):
         """Auto-generate return number if not set"""
         if not self.return_number:
             self.return_number = self._generate_return_number()
         super().save(*args, **kwargs)
-    
+
     def _generate_return_number(self):
         """Generate unique return number"""
         today = date.today()
         year = today.year
-        
+
         last_return = Return.objects.filter(
             return_number__startswith=f'RET-{year}-'
         ).order_by('-return_number').first()
-        
+
         if last_return:
             try:
                 last_sequence = int(last_return.return_number.split('-')[-1])
@@ -284,22 +288,22 @@ class Return(models.Model):
                 new_sequence = 1
         else:
             new_sequence = 1
-        
+
         return f'RET-{year}-{new_sequence:04d}'
-    
+
     def approve(self, approved_by_user):
         """Approve the return request"""
         self.status = 'APPROVED'
         self.approved_at = timezone.now()
         self.approved_by = approved_by_user
         self.save(update_fields=['status', 'approved_at', 'approved_by', 'updated_at'])
-    
+
     def reject(self, rejected_by_user, reason):
         """Reject the return request"""
         self.status = 'REJECTED'
         self.notes = f"Rejected: {reason}"
         self.save(update_fields=['status', 'notes', 'updated_at'])
-    
+
     def process(self, processed_by_user, refund_amount=None, refund_method=None):
         """Process the approved return"""
         self.status = 'PROCESSED'
@@ -310,18 +314,18 @@ class Return(models.Model):
         if refund_method is not None:
             self.refund_method = refund_method
         self.save(update_fields=['status', 'processed_at', 'processed_by', 'refund_amount', 'refund_method', 'updated_at'])
-    
+
     def cancel(self, cancelled_by_user, reason):
         """Cancel the return request"""
         self.status = 'CANCELLED'
         self.notes = f"Cancelled: {reason}"
         self.save(update_fields=['status', 'notes', 'updated_at'])
-    
+
     @property
     def total_return_amount(self):
         """Calculate total amount to be returned"""
         return sum(item.return_amount for item in self.return_items.all())
-    
+
     @property
     def items_count(self):
         """Get count of return items"""
@@ -330,7 +334,7 @@ class Return(models.Model):
 
 class ReturnItem(models.Model):
     """Individual items being returned"""
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     return_request = models.ForeignKey(
         Return,
@@ -379,7 +383,7 @@ class ReturnItem(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         db_table = 'sales_return_item'
         verbose_name = 'Return Item'
@@ -390,10 +394,10 @@ class ReturnItem(models.Model):
             models.Index(fields=['sale_item']),
             models.Index(fields=['is_active']),
         ]
-    
+
     def __str__(self):
         return f"{self.sale_item.product.name} x{self.quantity_returned} - Return {self.return_request.return_number}"
-    
+
     def save(self, *args, **kwargs):
         """Auto-calculate return amount if not set"""
         if not self.return_amount:
@@ -403,14 +407,14 @@ class ReturnItem(models.Model):
 
 class Refund(models.Model):
     """Refund processing for returns"""
-    
+
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('PROCESSED', 'Processed'),
         ('FAILED', 'Failed'),
         ('CANCELLED', 'Cancelled'),
     ]
-    
+
     METHOD_CHOICES = [
         ('CASH', 'Cash'),
         ('BANK_TRANSFER', 'Bank Transfer'),
@@ -418,7 +422,7 @@ class Refund(models.Model):
         ('CREDIT_NOTE', 'Credit Note'),
         ('OTHER', 'Other'),
     ]
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     refund_number = models.CharField(
         max_length=50,
@@ -483,7 +487,7 @@ class Refund(models.Model):
         related_name='created_refunds',
         help_text="User who created this refund"
     )
-    
+
     class Meta:
         db_table = 'sales_refund'
         verbose_name = 'Refund'
@@ -496,25 +500,25 @@ class Refund(models.Model):
             models.Index(fields=['method']),
             models.Index(fields=['is_active']),
         ]
-    
+
     def __str__(self):
         return f"Refund {self.refund_number} - {self.return_request.return_number}"
-    
+
     def save(self, *args, **kwargs):
         """Auto-generate refund number if not set"""
         if not self.refund_number:
             self.refund_number = self._generate_refund_number()
         super().save(*args, **kwargs)
-    
+
     def _generate_refund_number(self):
         """Generate unique refund number"""
         today = date.today()
         year = today.year
-        
+
         last_refund = Refund.objects.filter(
             refund_number__startswith=f'REF-{year}-'
         ).order_by('-refund_number').first()
-        
+
         if last_refund:
             try:
                 last_sequence = int(last_refund.refund_number.split('-')[-1])
@@ -523,9 +527,9 @@ class Refund(models.Model):
                 new_sequence = 1
         else:
             new_sequence = 1
-        
+
         return f'REF-{year}-{new_sequence:04d}'
-    
+
     def process(self, processed_by_user, reference_number=None):
         """Process the refund"""
         self.status = 'PROCESSED'
@@ -534,13 +538,13 @@ class Refund(models.Model):
         if reference_number:
             self.reference_number = reference_number
         self.save(update_fields=['status', 'processed_at', 'processed_by', 'reference_number', 'updated_at'])
-    
+
     def fail(self, failed_by_user, reason):
         """Mark refund as failed"""
         self.status = 'FAILED'
         self.notes = f"Failed: {reason}"
         self.save(update_fields=['status', 'notes', 'updated_at'])
-    
+
     def cancel(self, cancelled_by_user, reason):
         """Cancel the refund"""
         self.status = 'CANCELLED'
@@ -550,7 +554,7 @@ class Refund(models.Model):
 
 class Invoice(models.Model):
     """Invoice model for managing sale invoices and receipts"""
-    
+
     INVOICE_STATUS_CHOICES = [
         ('DRAFT', 'Draft'),
         ('ISSUED', 'Issued'),
@@ -560,7 +564,7 @@ class Invoice(models.Model):
         ('OVERDUE', 'Overdue'),
         ('CANCELLED', 'Cancelled'),
     ]
-    
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -634,7 +638,7 @@ class Invoice(models.Model):
         related_name='created_invoices',
         help_text="User who created this invoice"
     )
-    
+
     class Meta:
         db_table = 'sales_invoice'
         verbose_name = 'Invoice'
@@ -648,37 +652,37 @@ class Invoice(models.Model):
             models.Index(fields=['due_date']),
             models.Index(fields=['is_active']),
         ]
-    
+
     def __str__(self):
         return f"Invoice {self.invoice_number} - {self.sale.invoice_number}"
-    
+
     def clean(self):
         """Validate model data"""
         if self.due_date and self.due_date < self.issue_date.date():
             raise ValidationError({'due_date': 'Due date cannot be before issue date.'})
-    
+
     def save(self, *args, **kwargs):
         """Auto-generate invoice number if not set"""
         if not self.invoice_number:
             self.invoice_number = self._generate_invoice_number()
-        
+
         # Auto-set due date if not specified (30 days from issue)
         if not self.due_date:
             from datetime import timedelta
             self.due_date = self.issue_date.date() + timedelta(days=30)
-        
+
         super().save(*args, **kwargs)
-    
+
     def _generate_invoice_number(self):
         """Generate unique invoice number"""
         today = date.today()
         year = today.year
-        
+
         # Get the last invoice number for this year
         last_invoice = Invoice.objects.filter(
             invoice_number__startswith=f'INV-{year}-'
         ).order_by('-invoice_number').first()
-        
+
         if last_invoice:
             try:
                 # Extract the sequence number and increment
@@ -688,16 +692,16 @@ class Invoice(models.Model):
                 new_sequence = 1
         else:
             new_sequence = 1
-        
+
         return f'INV-{year}-{new_sequence:04d}'
-    
+
     @property
     def is_overdue(self):
         """Check if invoice is overdue"""
         if self.due_date and self.status not in ['PAID', 'CANCELLED']:
             return timezone.now().date() > self.due_date
         return False
-    
+
     @property
     def days_until_due(self):
         """Days until payment is due"""
@@ -705,32 +709,32 @@ class Invoice(models.Model):
             delta = self.due_date - timezone.now().date()
             return delta.days
         return 0
-    
+
     @property
     def formatted_due_date(self):
         """Formatted due date for display"""
         if self.due_date:
             return self.due_date.strftime('%d/%m/%Y')
         return 'Not specified'
-    
+
     def mark_as_sent(self):
         """Mark invoice as sent to customer"""
         self.email_sent = True
         self.email_sent_at = timezone.now()
         self.status = 'SENT'
         self.save(update_fields=['email_sent', 'email_sent_at', 'status', 'updated_at'])
-    
+
     def mark_as_viewed(self):
         """Mark invoice as viewed by customer"""
         self.viewed_at = timezone.now()
         self.status = 'VIEWED'
         self.save(update_fields=['viewed_at', 'status', 'updated_at'])
-    
+
     def mark_as_paid(self):
         """Mark invoice as paid"""
         self.status = 'PAID'
         self.save(update_fields=['status', 'updated_at'])
-    
+
     def cancel_invoice(self):
         """Cancel the invoice"""
         self.status = 'CANCELLED'
@@ -739,14 +743,14 @@ class Invoice(models.Model):
 
 class Receipt(models.Model):
     """Receipt model for managing payment receipts"""
-    
+
     RECEIPT_STATUS_CHOICES = [
         ('GENERATED', 'Generated'),
         ('SENT', 'Sent to Customer'),
         ('VIEWED', 'Viewed by Customer'),
         ('ARCHIVED', 'Archived'),
     ]
-    
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -817,7 +821,7 @@ class Receipt(models.Model):
         related_name='created_receipts',
         help_text="User who generated this receipt"
     )
-    
+
     class Meta:
         db_table = 'sales_receipt'
         verbose_name = 'Receipt'
@@ -831,25 +835,25 @@ class Receipt(models.Model):
             models.Index(fields=['generated_at']),
             models.Index(fields=['is_active']),
         ]
-    
+
     def __str__(self):
         return f"Receipt {self.receipt_number} - {self.sale.invoice_number}"
-    
+
     def save(self, *args, **kwargs):
         """Auto-generate receipt number if not set"""
         if not self.receipt_number:
             self.receipt_number = self._generate_receipt_number()
         super().save(*args, **kwargs)
-    
+
     def _generate_receipt_number(self):
         """Generate unique receipt number"""
         today = date.today()
         year = today.year
-        
+
         last_receipt = Receipt.objects.filter(
             receipt_number__startswith=f'RCP-{year}-'
         ).order_by('-receipt_number').first()
-        
+
         if last_receipt:
             try:
                 last_sequence = int(last_receipt.receipt_number.split('-')[-1])
@@ -858,22 +862,22 @@ class Receipt(models.Model):
                 new_sequence = 1
         else:
             new_sequence = 1
-        
+
         return f'RCP-{year}-{new_sequence:04d}'
-    
+
     def mark_as_sent(self):
         """Mark receipt as sent to customer"""
         self.email_sent = True
         self.email_sent_at = timezone.now()
         self.status = 'SENT'
         self.save(update_fields=['email_sent', 'email_sent_at', 'status', 'updated_at'])
-    
+
     def mark_as_viewed(self):
         """Mark receipt as viewed by customer"""
         self.viewed_at = timezone.now()
         self.status = 'VIEWED'
         self.save(update_fields=['viewed_at', 'status', 'updated_at'])
-    
+
     def archive_receipt(self):
         """Archive the receipt"""
         self.status = 'ARCHIVED'
@@ -882,45 +886,45 @@ class Receipt(models.Model):
 
 class SalesQuerySet(models.QuerySet):
     """Custom QuerySet for Sales model"""
-    
+
     def active(self):
         """Get active sales"""
         return self.filter(is_active=True)
-    
+
     def by_status(self, status):
         """Get sales by status"""
         return self.filter(status=status.upper())
-    
+
     def by_customer(self, customer_id):
         """Get sales for a specific customer"""
         return self.filter(customer_id=customer_id)
-    
+
     def by_date_range(self, start_date, end_date):
         """Get sales within date range"""
         return self.filter(date_of_sale__date__range=[start_date, end_date])
-    
+
     def by_payment_method(self, payment_method):
         """Get sales by payment method"""
         return self.filter(payment_method=payment_method.upper())
-    
+
     def paid(self):
         """Get fully paid sales"""
         return self.filter(is_fully_paid=True)
-    
+
     def unpaid(self):
         """Get unpaid or partially paid sales"""
         return self.filter(is_fully_paid=False)
-    
+
     def recent(self, days=30):
         """Get sales from last N days"""
         cutoff_date = timezone.now() - timezone.timedelta(days=days)
         return self.filter(date_of_sale__gte=cutoff_date)
-    
+
     def today(self):
         """Get today's sales"""
         today = date.today()
         return self.filter(date_of_sale__date=today)
-    
+
     def this_month(self):
         """Get this month's sales"""
         today = date.today()
@@ -928,11 +932,11 @@ class SalesQuerySet(models.QuerySet):
             date_of_sale__year=today.year,
             date_of_sale__month=today.month
         )
-    
+
     def this_year(self):
         """Get this year's sales"""
         return self.filter(date_of_sale__year=date.today().year)
-    
+
     def search(self, query):
         """Search sales by invoice number, customer name, phone, or notes"""
         return self.filter(
@@ -942,7 +946,7 @@ class SalesQuerySet(models.QuerySet):
             models.Q(customer_email__icontains=query) |
             models.Q(notes__icontains=query)
         )
-    
+
     def by_order(self, order_id):
         """Get sales created from a specific order"""
         return self.filter(order_id=order_id)
@@ -950,7 +954,7 @@ class SalesQuerySet(models.QuerySet):
 
 class Sales(models.Model):
     """Sales model for managing complete sales transactions"""
-    
+
     # Sale Status Choices
     STATUS_CHOICES = [
         ('DRAFT', 'Draft'),
@@ -961,7 +965,7 @@ class Sales(models.Model):
         ('CANCELLED', 'Cancelled'),
         ('RETURNED', 'Returned'),
     ]
-    
+
     # Payment Method Choices
     PAYMENT_METHOD_CHOICES = [
         ('CASH', 'Cash'),
@@ -971,7 +975,7 @@ class Sales(models.Model):
         ('SPLIT', 'Split Payment'),
         ('CREDIT', 'Credit Sale'),
     ]
-    
+
     # Primary fields
     id = models.UUIDField(
         primary_key=True,
@@ -1000,7 +1004,7 @@ class Sales(models.Model):
         blank=True,
         help_text="Customer making the purchase (optional for walk-in sales)"
     )
-    
+
     # Cached customer information for historical accuracy
     customer_name = models.CharField(
         max_length=200,
@@ -1017,7 +1021,7 @@ class Sales(models.Model):
         blank=True,
         help_text="Cached customer email at time of sale"
     )
-    
+
     # Financial fields
     subtotal = models.DecimalField(
         max_digits=15,
@@ -1037,7 +1041,7 @@ class Sales(models.Model):
         default=Decimal('0.00'),
         help_text="GST tax rate (default 17% for Pakistan)"
     )
-    
+
     tax_configuration = models.JSONField(
         default=dict,
         blank=True,
@@ -1071,7 +1075,7 @@ class Sales(models.Model):
         default=False,
         help_text="Payment completion status"
     )
-    
+
     # Payment details
     payment_method = models.CharField(
         max_length=20,
@@ -1084,7 +1088,7 @@ class Sales(models.Model):
         blank=True,
         help_text="Details for multiple payment methods when payment_method='Split'"
     )
-    
+
     # Sale details
     date_of_sale = models.DateTimeField(
         default=timezone.now,
@@ -1100,7 +1104,7 @@ class Sales(models.Model):
         blank=True,
         help_text="Additional sale information or special instructions"
     )
-    
+
     # System fields
     is_active = models.BooleanField(
         default=True,
@@ -1116,9 +1120,9 @@ class Sales(models.Model):
         related_name='created_sales',
         help_text="Sales person who processed the transaction"
     )
-    
+
     objects = SalesQuerySet.as_manager()
-    
+
     class Meta:
         db_table = 'sales'
         verbose_name = 'Sale'
@@ -1137,95 +1141,95 @@ class Sales(models.Model):
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
         ]
-    
+
     def __str__(self):
         return f"{self.invoice_number} - {self.customer_name} ({self.get_status_display()})"
-    
+
     def clean(self):
         """Validate model data"""
         if self.subtotal < 0:
             raise ValidationError({'subtotal': 'Subtotal cannot be negative.'})
-        
+
         if self.overall_discount < 0:
             raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
-        
+
         if self.overall_discount > self.subtotal:
             raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
-        
+
         if self.gst_percentage < 0 or self.gst_percentage > 100:
             raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})
-        
+
         if self.amount_paid < 0:
             raise ValidationError({'amount_paid': 'Amount paid cannot be negative.'})
-        
+
         # ✅ REMOVED: Allow partial payments for wholesale business model
         # The validation "amount_paid > grand_total" has been removed
         # to support partial payments and flexible payment scenarios
-        
+
         # Validate split payment details
         if self.payment_method == 'SPLIT' and not self.split_payment_details:
             raise ValidationError({'split_payment_details': 'Split payment details are required when payment method is Split.'})
-    
+
     def save(self, *args, **kwargs):
         """Auto-calculate financial fields and validate before saving"""
         # Cache customer information if not set
         if self.customer:
             if not self.customer_name or self.customer_name == 'Walk-in Customer':
                 self.customer_name = self.customer.name
-            
+
             if not self.customer_phone:
                 self.customer_phone = self.customer.phone
-            
+
             if not self.customer_email:
                 self.customer_email = self.customer.email
-        
+
         # Calculate tax amount
         if self.subtotal and self.overall_discount is not None and self.gst_percentage:
             taxable_amount = self.subtotal - self.overall_discount
             self.tax_amount = (taxable_amount * self.gst_percentage) / 100
-        
+
         # Calculate grand total
         if self.subtotal is not None and self.overall_discount is not None and self.tax_amount is not None:
             self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
-        
+
         # Calculate remaining amount
         if self.grand_total is not None and self.amount_paid is not None:
             self.remaining_amount = self.grand_total - self.amount_paid
-        
+
         # Update payment status
         if self.grand_total and self.amount_paid is not None:
             self.is_fully_paid = self.amount_paid >= self.grand_total
-        
+
         self.full_clean()
         super().save(*args, **kwargs)
-    
+
     @property
     def sales_age_days(self):
         """Days since sale was created"""
         return (timezone.now().date() - self.date_of_sale.date()).days
-    
+
     @property
     def formatted_grand_total(self):
         """Currency formatted grand total (PKR format)"""
         return f"PKR {self.grand_total:,.2f}"
-    
+
     @property
     def formatted_remaining_amount(self):
         """Currency formatted outstanding balance"""
         return f"PKR {self.remaining_amount:,.2f}"
-    
+
     @property
     def payment_percentage(self):
         """Percentage of payment completed"""
         if self.grand_total > 0:
             return (self.amount_paid / self.grand_total) * 100
         return 0
-    
+
     @property
     def sales_summary(self):
         """Short summary for display purposes"""
         return f"{self.invoice_number} - {self.customer_name} - {self.formatted_grand_total}"
-    
+
     @property
     def authorized_initials(self):
         """Initials of sales person who created the sale"""
@@ -1233,12 +1237,12 @@ class Sales(models.Model):
             full_name = getattr(self.created_by, 'full_name', None) or self.created_by.username
             return ''.join([name[0].upper() for name in full_name.split()])
         return ''
-    
+
     @property
     def invoice_display(self):
         """Formatted invoice number for display"""
         return f"#{self.invoice_number}"
-    
+
     @property
     def payment_status_display(self):
         """Human readable payment status"""
@@ -1248,19 +1252,19 @@ class Sales(models.Model):
             return f"Partially Paid ({self.payment_percentage:.1f}%)"
         else:
             return "Unpaid"
-    
+
     @property
     def total_items(self):
         """Count of items in this sale"""
         return self.sale_items.count()
-    
+
     @property
     def profit_margin(self):
         """Calculated profit from this sale (if cost data available)"""
         # This would need to be implemented based on product cost data
         # For now, return None
         return None
-    
+
     @property
     def tax_breakdown(self):
         """Detailed tax calculation breakdown"""
@@ -1271,45 +1275,45 @@ class Sales(models.Model):
             'gst_amount': self.tax_amount,
             'tax_rate_display': f"{self.gst_percentage}%"
         }
-    
+
     @property
     def tax_summary_display(self):
         """Summary of tax for display"""
         if self.gst_percentage > 0:
             return f"GST {self.gst_percentage}%"
         return "No Tax"
-    
+
     def can_be_cancelled(self):
         """Check if sale can be cancelled"""
         return self.status in ['DRAFT', 'CONFIRMED', 'INVOICED']
-    
+
     def can_be_returned(self):
         """Check if sale can be returned"""
         return self.status == 'DELIVERED' and self.is_fully_paid
-    
+
     def update_payment_status(self):
         """Update payment status based on amount paid"""
         if self.grand_total > 0:
             self.is_fully_paid = self.amount_paid >= self.grand_total
             self.remaining_amount = max(0, self.grand_total - self.amount_paid)
             self.save(update_fields=['is_fully_paid', 'remaining_amount'])
-    
+
     def recalculate_totals(self):
         """Safely recalculate sale totals"""
         import logging
         logger = logging.getLogger(__name__)
-        
+
         try:
             # Calculate subtotal
             total_subtotal = sum(item.line_total for item in self.sale_items.all())
             self.subtotal = total_subtotal
-            
+
             # Calculate tax and grand total
             taxable_amount = self.subtotal - self.overall_discount
-            
+
             # Calculate tax based on configuration if available, otherwise fall back to GST
             tax_amount = Decimal('0.00')
-            
+
             if hasattr(self, 'tax_configuration') and self.tax_configuration:
                 try:
                     for tax_key, tax_data in self.tax_configuration.items():
@@ -1323,19 +1327,19 @@ class Sales(models.Model):
                         tax_amount = (taxable_amount * self.gst_percentage) / 100
             elif self.gst_percentage:
                 tax_amount = (taxable_amount * self.gst_percentage) / 100
-                
+
             self.tax_amount = tax_amount
             self.grand_total = self.subtotal - self.overall_discount + self.tax_amount
-            
+
             # Update payment status
             self.update_payment_status()
-            
+
             # Define fields to update
             update_fields = ['subtotal', 'tax_amount', 'grand_total', 'remaining_amount', 'is_fully_paid']
-            
+
             self.save(update_fields=update_fields)
             logger.info(f"✅ Recalculated totals for {self.invoice_number}: {self.grand_total}")
-            
+
         except Exception as e:
             logger.error(f"Failed to recalculate totals for sale {self.invoice_number}: {str(e)}")
             # Do not raise exception to avoid blocking the main transaction if this is called from signal
@@ -1343,23 +1347,23 @@ class Sales(models.Model):
 
 class SaleItemQuerySet(models.QuerySet):
     """Custom QuerySet for SaleItem model"""
-    
+
     def active(self):
         """Get active sale items"""
         return self.filter(is_active=True)
-    
+
     def by_sale(self, sale_id):
         """Get items for a specific sale"""
         return self.filter(sale_id=sale_id)
-    
+
     def by_product(self, product_id):
         """Get sale items for a specific product"""
         return self.filter(product_id=product_id)
-    
+
     def by_order_item(self, order_item_id):
         """Get sale items created from a specific order item"""
         return self.filter(order_item=order_item_id)
-    
+
     def search(self, query):
         """Search sale items by product name or customization notes"""
         return self.filter(
@@ -1370,7 +1374,7 @@ class SaleItemQuerySet(models.QuerySet):
 
 class SaleItem(models.Model):
     """Sale Item model for managing individual products within sales"""
-    
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -1426,9 +1430,9 @@ class SaleItem(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     objects = SaleItemQuerySet.as_manager()
-    
+
     class Meta:
         db_table = 'sale_item'
         verbose_name = 'Sale Item'
@@ -1441,74 +1445,74 @@ class SaleItem(models.Model):
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
         ]
-    
+
     def __str__(self):
         return f"{self.product_name} x{self.quantity} in {self.sale.invoice_number}"
-    
+
     def clean(self):
         """Validate model data"""
         if self.quantity <= 0:
             raise ValidationError({'quantity': 'Quantity must be greater than zero.'})
-        
+
         if self.unit_price < 0:
             raise ValidationError({'unit_price': 'Unit price cannot be negative.'})
-        
+
         if self.item_discount < 0:
             raise ValidationError({'item_discount': 'Item discount cannot be negative.'})
-        
+
         # Validate line total calculation
         if self.quantity and self.unit_price:
             expected_total = self.quantity * self.unit_price - self.item_discount
             if self.line_total != expected_total:
                 self.line_total = expected_total
-    
+
     def save(self, *args, **kwargs):
         """Auto-populate fields and calculate totals before saving"""
         # Auto-populate product name and unit price from product if not set
         if self.product and not self.product_name:
             self.product_name = self.product.name
-        
+
         if self.product and not self.unit_price:
             self.unit_price = self.product.price
-        
+
         # Calculate line total
         if self.quantity and self.unit_price:
             self.line_total = (self.quantity * self.unit_price) - self.item_discount
-        
+
         self.full_clean()
         super().save(*args, **kwargs)
-    
+
     @property
     def discounted_unit_price(self):
         """Unit price after item-specific discount"""
         if self.quantity > 0:
             return self.line_total / self.quantity
         return self.unit_price
-    
+
     @property
     def total_before_discount(self):
         """Line total before any discounts applied"""
         return self.quantity * self.unit_price
-    
+
     @property
     def discount_percentage(self):
         """Percentage discount applied to this item"""
         if self.total_before_discount > 0:
             return (self.item_discount / self.total_before_discount) * 100
         return 0
-    
+
     @property
     def item_profit(self):
         """Profit margin for this specific item"""
         # This would need to be implemented based on product cost data
         # For now, return None
         return None
-    
+
     @property
     def formatted_line_total(self):
         """Currency formatted line total"""
         return f"PKR {self.line_total:,.2f}"
-    
+
     @property
     def product_info_at_sale(self):
         """Product details captured at time of sale"""

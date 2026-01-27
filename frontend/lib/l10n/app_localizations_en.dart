@@ -9,13 +9,13 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Maqbool Fashion - Premium POS';
+  String get appTitle => 'Al Noor Fabric - Premium POS';
 
   @override
   String get welcomeBack => 'Welcome Back to';
 
   @override
-  String get brandName => 'Al Noor Fashion';
+  String get brandName => 'Al Noor Fabric';
 
   @override
   String get tagline => 'Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.';

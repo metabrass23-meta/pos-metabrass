@@ -46,14 +46,14 @@ void main() async {
   await StorageService().init();
   ApiClient().init();
 
-  runApp(const MaqboolFabricApp());
+  runApp(const AlNoorFabricApp());
 
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
       appWindow
-        ..minSize = Size(1024, 768)
-        ..maxSize = Size(1920, 1080)
-        ..size = Size(1024, 768)
+        ..minSize = const Size(1400, 770)
+        ..maxSize = const Size(1920, 1080)
+        ..size = const Size(1400, 770)
         ..alignment = Alignment.center
         ..title = "Al Noor Fashion"
         ..show();
@@ -61,8 +61,8 @@ void main() async {
   }
 }
 
-class MaqboolFabricApp extends StatelessWidget {
-  const MaqboolFabricApp({super.key});
+class AlNoorFabricApp extends StatelessWidget {
+  const AlNoorFabricApp({super.key});
 
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -99,22 +99,19 @@ class MaqboolFabricApp extends StatelessWidget {
       ],
       child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
         builder: (context, authProvider, profitLossProvider, appProvider, child) {
-          
-          // ✅ FIX 1: Initialize AppProvider (ADDED)
+
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!appProvider.isInitialized) {
               appProvider.initialize();
             }
           });
 
-          // Existing: Initialize AuthProvider
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.initial) {
               authProvider.initialize();
             }
           });
 
-          // Existing: Initialize ProfitLossProvider
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.state == AuthState.authenticated) {
               if (profitLossProvider.profitLossHistory.isEmpty &&
@@ -133,9 +130,9 @@ class MaqboolFabricApp extends StatelessWidget {
                 darkTheme: AppTheme.darkTheme,
                 themeMode: ThemeMode.light,
                 navigatorKey: navigatorKey,
-                
+
                 locale: appProvider.locale,
-                
+
                 supportedLocales: const [
                   Locale('ur'),
                   Locale('en'),
