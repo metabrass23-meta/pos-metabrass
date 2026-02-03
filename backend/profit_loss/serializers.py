@@ -120,7 +120,7 @@ class ProfitLossSummarySerializer(serializers.Serializer):
         help_text="Total number of products sold"
     )
     average_order_value = serializers.DecimalField(
-        max_digits=12, 
+        max_digits=20, 
         decimal_places=2,
         help_text="Average order value"
     )
@@ -159,7 +159,7 @@ class ProfitLossSummarySerializer(serializers.Serializer):
         help_text="Gross profit (income - COGS)"
     )
     gross_profit_margin_percentage = serializers.DecimalField(
-        max_digits=5, 
+        max_digits=12, 
         decimal_places=2,
         help_text="Gross profit margin as percentage"
     )
@@ -169,7 +169,7 @@ class ProfitLossSummarySerializer(serializers.Serializer):
         help_text="Net profit (gross profit - expenses)"
     )
     profit_margin_percentage = serializers.DecimalField(
-        max_digits=5, 
+        max_digits=12, 
         decimal_places=2,
         help_text="Profit margin as percentage"
     )

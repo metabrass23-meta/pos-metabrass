@@ -48,6 +48,8 @@ class VendorQuerySet(models.QuerySet):
 
 def validate_pakistani_cnic(value):
     """Validate Pakistani CNIC format: 42101-1234567-8"""
+    if value is None or value == '':
+        return  # Allow empty/null values
     pattern = r'^\d{5}-\d{7}-\d{1}$'
     if not re.match(pattern, value):
         raise ValidationError(
@@ -81,8 +83,10 @@ class Vendor(models.Model):
     cnic = models.CharField(
         max_length=15,
         unique=True,
+        null=True,
+        blank=True,
         validators=[validate_pakistani_cnic],
-        help_text="Pakistani CNIC in format: 12345-1234567-1"
+        help_text="Pakistani CNIC in format: 12345-1234567-1 (optional)"
     )
     phone = models.CharField(
         max_length=20,

@@ -140,11 +140,11 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               child: Container(
                 width: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 85.w,
-                  small: 90.w,
-                  medium: 70.w,
-                  large: 60.w,
-                  ultrawide: 50.w,
+                  tablet: 95.w,
+                  small: 98.w,
+                  medium: 80.w,
+                  large: 70.w,
+                  ultrawide: 60.w,
                 ),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -312,7 +312,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: context.bodyFontSize,
+                  fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
                 ),
@@ -372,7 +372,7 @@ class _VendorFilterDialogState extends State<VendorFilterDialog> with SingleTick
           title: Text(
             l10n.showInactiveVendorsOnly,
             style: TextStyle(
-              fontSize: context.subtitleFontSize,
+              fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context),
               fontWeight: FontWeight.w500,
               color: AppTheme.charcoalGray,
             ),

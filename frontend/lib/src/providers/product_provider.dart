@@ -83,6 +83,10 @@ class ProductProvider extends ChangeNotifier {
   ];
 
   final List<String> availablePieces = [
+
+
+
+
     'Blouse',
     'Lehenga',
     'Dupatta',
@@ -258,6 +262,8 @@ class ProductProvider extends ChangeNotifier {
     required List<String> pieces,
     required int quantity,
     required String categoryId,
+    String? barcode,  // Added barcode parameter
+    String? sku,      // Added SKU parameter
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -274,6 +280,8 @@ class ProductProvider extends ChangeNotifier {
         pieces: pieces,
         quantity: quantity,
         categoryId: categoryId,
+        barcode: barcode,  // Include barcode
+        sku: sku,          // Include SKU
       );
 
       if (response.success && response.data != null) {

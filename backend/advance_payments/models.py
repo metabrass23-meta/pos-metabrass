@@ -2,10 +2,9 @@ import uuid
 import os
 from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 

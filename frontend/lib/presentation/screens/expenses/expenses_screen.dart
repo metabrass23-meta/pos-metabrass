@@ -130,6 +130,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             onPressed: () {
                               provider.clearError();
                               provider.loadExpenseRecords();
+                              provider.loadStatistics();
                             },
                             child: Text(l10n.retry),
                           ),
@@ -525,7 +526,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -538,11 +539,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -552,7 +553,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
                 ),
                 Text(
                   title,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

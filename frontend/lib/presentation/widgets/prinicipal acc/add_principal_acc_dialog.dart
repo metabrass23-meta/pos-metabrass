@@ -361,14 +361,14 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                       child: Row(
                         children: [
                           Icon(
-                            type == 'credit' ? Icons.add_circle_outline : Icons.remove_circle_outline,
-                            color: type == 'credit' ? Colors.green : Colors.red,
+                            type.toUpperCase() == 'CREDIT' ? Icons.add_circle_outline : Icons.remove_circle_outline,
+                            color: type.toUpperCase() == 'CREDIT' ? Colors.green : Colors.red,
                             size: context.iconSize('medium'),
                           ),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            type == 'credit' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
-                            style: TextStyle(color: type == 'credit' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
+                            type.toUpperCase() == 'CREDIT' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
+                            style: TextStyle(color: type.toUpperCase() == 'CREDIT' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -712,9 +712,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
   Color _getPersonColor(String person) {
     switch (person) {
-      case 'Parveez Maqbool':
+      case 'Shahzain Baloch':
         return Colors.blue;
-      case 'Zain Maqbool':
+      case 'Huzaifa':
         return Colors.green;
       default:
         return Colors.grey;

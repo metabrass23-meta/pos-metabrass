@@ -8,6 +8,7 @@ import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import 'add_to_cart_dialog.dart';
+import 'checkout_dialog.dart';
 import 'custom_order_dialog.dart';
 import 'customize_and_add_dialog.dart';
 import 'existing_orders_dialog.dart';
@@ -182,7 +183,7 @@ class ProductGrid extends StatelessWidget {
         child: InkWell(
           onTap: isOutOfStock
               ? null
-              : () => _showEnhancedAddToCartDialog(context, product, provider),
+              : () => _handleQuickAddToCart(context, product, provider),
           borderRadius: BorderRadius.circular(context.borderRadius()),
           child: Padding(
             padding: EdgeInsets.all(context.smallPadding),
@@ -453,7 +454,7 @@ class ProductGrid extends StatelessWidget {
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: () => _quickAddToCart(
+                                  onTap: () => _handleAddToCart(
                                     context,
                                     product,
                                     provider,
@@ -499,6 +500,43 @@ class ProductGrid extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.smallPadding / 2),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => _handleCheckoutButton(
+                                  context,
+                                  product,
+                                  provider,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  context.borderRadius('small'),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: context.smallPadding / 2.5,
+                                    horizontal: context.smallPadding / 1.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryMaroon.withOpacity(
+                                      0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      context.borderRadius('small'),
+                                    ),
+                                    border: Border.all(
+                                      color: AppTheme.primaryMaroon
+                                          .withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.shopping_bag_rounded,
+                                    size: context.iconSize('small') * 0.85,
+                                    color: AppTheme.primaryMaroon,
                                   ),
                                 ),
                               ),
@@ -870,7 +908,7 @@ class ProductGrid extends StatelessWidget {
   }
 
   // Action Methods
-  void _quickAddToCart(
+  void _handleAddToCart(
       BuildContext context,
       ProductModel product,
       SalesProvider provider,
@@ -881,27 +919,49 @@ class ProductGrid extends StatelessWidget {
       unitPrice: product.price,
       quantity: 1,
     );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
-            SizedBox(width: context.smallPadding),
-            Expanded(
-              child: Text(
-                '${product.name} ${AppLocalizations.of(context)!.addToCart}',
-                style: TextStyle(color: AppTheme.pureWhite),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
+    // Snackbar removed - no longer shows "added to cart" confirmation
+  }
+
+  void _handleQuickAddToCart(
+      BuildContext context,
+      ProductModel product,
+      SalesProvider provider,
+      ) {
+    // Direct add to cart without dialog (for card tap)
+    provider.addToCartWithCustomization(
+      productId: product.id,
+      productName: product.name,
+      unitPrice: product.price,
+      quantity: 1,
+    );
+    // Snackbar removed - no longer shows "added to cart" confirmation
+  }
+
+  void _handleCheckoutButton(
+      BuildContext context,
+      ProductModel product,
+      SalesProvider provider,
+      ) {
+    // Show add to cart dialog, then open checkout
+    showDialog(
+      context: context,
+      builder: (context) => EnhancedAddToCartDialog(
+        product: product,
+        onItemAdded: () {
+          // After adding to cart, open checkout dialog
+          Navigator.of(context).pop(); // Close add to cart dialog
+          _showCheckoutDialog(context); // Open checkout dialog
+        },
       ),
+    );
+  }
+
+  void _showCheckoutDialog(BuildContext context) {
+    // Import and show checkout dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const CheckoutDialog(),
     );
   }
 
@@ -1331,14 +1391,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                                     ? '${_percentageController.text}%'
                                     : 'PKR ${_calculatedDiscount.toStringAsFixed(0)}';
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      l10n.addedWithDiscount(widget.product.name, discountText),
-                                    ),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
+                                // Snackbar removed - no longer shows "added with discount" confirmation
                               }
                                   : null,
                               borderRadius: BorderRadius.circular(

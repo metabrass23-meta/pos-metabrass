@@ -1,3 +1,5 @@
+// lib/src/providers/customer_provider.dart
+
 import 'package:flutter/material.dart';
 import '../models/customer/customer_api_responses.dart';
 import '../models/customer/customer_model.dart';
@@ -30,6 +32,7 @@ class Customer {
   final bool isNewCustomer;
   final bool isRecentCustomer;
   final int totalSalesCount;
+  final double totalSalesAmount;  // Add total sales amount
   final bool hasRecentSales;
   final String customerTypeDisplay;
   final String statusDisplay;
@@ -60,6 +63,7 @@ class Customer {
     required this.isNewCustomer,
     required this.isRecentCustomer,
     required this.totalSalesCount,
+    required this.totalSalesAmount,  // Add total sales amount
     required this.hasRecentSales,
     required this.customerTypeDisplay,
     required this.statusDisplay,
@@ -93,6 +97,7 @@ class Customer {
       isNewCustomer: model.isNewCustomer,
       isRecentCustomer: model.isRecentCustomer,
       totalSalesCount: model.totalSalesCount,
+      totalSalesAmount: model.totalSalesAmount,  // Add total sales amount
       hasRecentSales: model.hasRecentSales,
       customerTypeDisplay: model.customerTypeDisplay,
       statusDisplay: model.statusDisplay,
@@ -159,6 +164,7 @@ class Customer {
     bool? isNewCustomer,
     bool? isRecentCustomer,
     int? totalSalesCount,
+    double? totalSalesAmount,  // Add total sales amount
     bool? hasRecentSales,
     String? customerTypeDisplay,
     String? statusDisplay,
@@ -189,6 +195,7 @@ class Customer {
       isNewCustomer: isNewCustomer ?? this.isNewCustomer,
       isRecentCustomer: isRecentCustomer ?? this.isRecentCustomer,
       totalSalesCount: totalSalesCount ?? this.totalSalesCount,
+      totalSalesAmount: totalSalesAmount ?? this.totalSalesAmount,  // Add total sales amount
       hasRecentSales: hasRecentSales ?? this.hasRecentSales,
       customerTypeDisplay: customerTypeDisplay ?? this.customerTypeDisplay,
       statusDisplay: statusDisplay ?? this.statusDisplay,
@@ -222,6 +229,7 @@ class Customer {
       'isNewCustomer': isNewCustomer,
       'isRecentCustomer': isRecentCustomer,
       'totalSalesCount': totalSalesCount,
+      'totalSalesAmount': totalSalesAmount,  // Add total sales amount
       'hasRecentSales': hasRecentSales,
       'customerTypeDisplay': customerTypeDisplay,
       'statusDisplay': statusDisplay,
@@ -255,6 +263,7 @@ class Customer {
       isNewCustomer: json['isNewCustomer'],
       isRecentCustomer: json['isRecentCustomer'],
       totalSalesCount: json['totalSalesCount'],
+      totalSalesAmount: (json['totalSalesAmount'] as num?)?.toDouble() ?? 0.0,  // Add total sales amount
       hasRecentSales: json['hasRecentSales'],
       customerTypeDisplay: json['customerTypeDisplay'],
       statusDisplay: json['statusDisplay'],
@@ -288,7 +297,7 @@ class CustomerProvider extends ChangeNotifier {
   String? _verificationFilter;
 
   // Sorting
-  String _sortBy = 'created_at'; // 'name', 'created_at', 'updated_at', 'last_order_date', 'status', 'customer_type'
+  String _sortBy = 'created_at';
   bool _sortAscending = false;
 
   // Statistics
@@ -333,12 +342,13 @@ class CustomerProvider extends ChangeNotifier {
     try {
       final cachedCustomers = await _customerService.getCachedCustomers();
       if (cachedCustomers.isNotEmpty) {
+        debugPrint('📦 [CustomerProvider] Loaded ${cachedCustomers.length} customers from cache.');
         _customers = cachedCustomers.map((customerModel) => Customer.fromCustomerModel(customerModel)).toList();
         _filteredCustomers = List.from(_customers);
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('Failed to load cached customers: $e');
+      debugPrint('⚠️ [CustomerProvider] Failed to load cached customers: $e');
     }
   }
 
@@ -362,6 +372,9 @@ class CustomerProvider extends ChangeNotifier {
       notifyListeners();
     }
 
+    // 🔍 DEBUG: Start Loading
+    debugPrint('🔄 [CustomerProvider] loadCustomers() called. Page: $page');
+
     try {
       final params = CustomerListParams(
         page: page,
@@ -377,6 +390,7 @@ class CustomerProvider extends ChangeNotifier {
         sortOrder: _sortAscending ? 'asc' : 'desc',
       );
 
+      debugPrint('📡 [CustomerProvider] Calling API...');
       final response = await _customerService.getCustomers(params: params);
 
       if (response.success && response.data != null) {
@@ -393,24 +407,31 @@ class CustomerProvider extends ChangeNotifier {
         _selectedCity = city;
         _selectedCountry = country;
         _verificationFilter = verified;
+
         _hasError = false;
         _errorMessage = null;
+
+        // 🔍 DEBUG: Success
+        debugPrint('✅ [CustomerProvider] Success! Loaded ${_customers.length} customers.');
       } else {
-        // If API fails, keep sample data and just log the error
-        debugPrint('Failed to load customers from API: ${response.message}');
-        _hasError = false;
-        // Don't clear existing data
+        // 🔍 DEBUG: API Failure
+        debugPrint('❌ [CustomerProvider] API returned failure: ${response.message}');
+        _hasError = true;
+        _errorMessage = response.message;
       }
-    } catch (e) {
-      // If API call fails, keep sample data and just log the error
-      debugPrint('Error loading customers from API: $e');
-      _hasError = false;
-      // Don't clear existing data
+    } catch (e, stackTrace) {
+      // 🔍 DEBUG: Exception
+      debugPrint('🔴 [CustomerProvider] EXCEPTION caught: $e');
+      debugPrint('Stack Trace: $stackTrace');
+
+      _hasError = true;
+      _errorMessage = e.toString();
     } finally {
       if (showLoadingIndicator) {
         _isLoading = false;
         notifyListeners();
       }
+      debugPrint('🏁 [CustomerProvider] loadCustomers finished.');
     }
   }
 
@@ -539,7 +560,7 @@ class CustomerProvider extends ChangeNotifier {
   Future<bool> addCustomer({
     required String name,
     required String phone,
-    required String email,
+    String? email,
     String? address,
     String? city,
     String? country,
@@ -599,7 +620,7 @@ class CustomerProvider extends ChangeNotifier {
     required String id,
     required String name,
     required String phone,
-    required String email,
+    String? email,
     String? address,
     String? city,
     String? country,

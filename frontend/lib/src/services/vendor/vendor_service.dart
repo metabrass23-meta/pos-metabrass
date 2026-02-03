@@ -154,7 +154,7 @@ class VendorService {
   Future<ApiResponse<VendorModel>> createVendor({
     required String name,
     required String businessName,
-    required String cnic,
+    String? cnic,
     required String phone,
     required String city,
     required String area,
@@ -169,9 +169,16 @@ class VendorService {
         area: area,
       );
 
-      DebugHelper.printJson('Create Vendor Request', request.toJson());
+      final requestData = request.toJson();
+      
+      // Debug: Check if CNIC field is included
+      print('🔍 DEBUG: Request JSON keys: ${requestData.keys.toList()}');
+      print('🔍 DEBUG: CNIC field present: ${requestData.containsKey('cnic')}');
+      print('🔍 DEBUG: CNIC value: "${requestData['cnic']}"');
+      
+      DebugHelper.printJson('Create Vendor Request', requestData);
 
-      final response = await _apiClient.post(ApiConfig.createVendor, data: request.toJson());
+      final response = await _apiClient.post(ApiConfig.createVendor, data: requestData);
 
       DebugHelper.printApiResponse('POST Create Vendor', response.data);
 
@@ -227,7 +234,7 @@ class VendorService {
     required String id,
     required String name,
     required String businessName,
-    required String cnic,
+    String? cnic,
     required String phone,
     required String city,
     required String area,

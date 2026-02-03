@@ -132,11 +132,11 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
               child: Container(
                 width: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 85.w,
-                  small: 90.w,
-                  medium: 70.w,
-                  large: 60.w,
-                  ultrawide: 50.w,
+                  tablet: 95.w,
+                  small: 98.w,
+                  medium: 80.w,
+                  large: 70.w,
+                  ultrawide: 60.w,
                 ),
                 constraints: BoxConstraints(
                   maxWidth: 600,
@@ -335,7 +335,7 @@ class _CustomerFilterDialogState extends State<CustomerFilterDialog>
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: context.bodyFontSize,
+                  fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
                 ),

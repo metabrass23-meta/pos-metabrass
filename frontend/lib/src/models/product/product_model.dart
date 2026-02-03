@@ -21,6 +21,8 @@ class ProductModel {
   final String? createdBy;
   final int? createdById;
   final String? createdByEmail;
+  final String? barcode;  // Added barcode field
+  final String? sku;      // Added SKU field
 
   const ProductModel({
     required this.id,
@@ -43,6 +45,8 @@ class ProductModel {
     this.createdBy,
     this.createdById,
     this.createdByEmail,
+    this.barcode,  // Added barcode parameter
+    this.sku,      // Added SKU parameter
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -69,6 +73,8 @@ class ProductModel {
       createdBy: json['created_by'] as String?,
       createdById: json['created_by_id'] as int?,
       createdByEmail: json['created_by_email'] as String?,
+      barcode: json['barcode'] as String?,  // Parse barcode
+      sku: json['sku'] as String?,        // Parse SKU
     );
   }
 
@@ -119,6 +125,8 @@ class ProductModel {
       'created_by': createdBy,
       'created_by_id': createdById,
       'created_by_email': createdByEmail,
+      'barcode': barcode,  // Include barcode
+      'sku': sku,          // Include SKU
     };
   }
 
@@ -126,6 +134,12 @@ class ProductModel {
   String get formattedPrice => 'PKR ${price.toStringAsFixed(0)}';
   String get formattedCostPrice => costPrice != null ? 'PKR ${costPrice!.toStringAsFixed(0)}' : 'Not Set';
   String get formattedTotalValue => 'PKR ${totalValue.toStringAsFixed(0)}';
+
+  // Barcode and SKU helpers
+  String get displayBarcode => barcode ?? 'No Barcode';
+  String get displaySku => sku ?? 'No SKU';
+  bool get hasBarcode => barcode != null && barcode!.isNotEmpty;
+  bool get hasSku => sku != null && sku!.isNotEmpty;
 
   // Check if cost price is set
   bool get hasCostPrice => costPrice != null && costPrice! > 0;
@@ -198,6 +212,8 @@ class ProductModel {
     String? createdBy,
     int? createdById,
     String? createdByEmail,
+    String? barcode,  // Added barcode parameter
+    String? sku,      // Added SKU parameter
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -220,6 +236,8 @@ class ProductModel {
       createdBy: createdBy ?? this.createdBy,
       createdById: createdById ?? this.createdById,
       createdByEmail: createdByEmail ?? this.createdByEmail,
+      barcode: barcode ?? this.barcode,  // Include barcode
+      sku: sku ?? this.sku,              // Include SKU
     );
   }
 
@@ -304,6 +322,8 @@ class ProductCreateRequest {
   final List<String> pieces;
   final int quantity;
   final String category; // Category UUID
+  final String? barcode; // Added barcode field
+  final String? sku;     // Added SKU field
 
   ProductCreateRequest({
     required this.name,
@@ -315,6 +335,8 @@ class ProductCreateRequest {
     required this.pieces,
     required this.quantity,
     required this.category,
+    this.barcode, // Added barcode parameter
+    this.sku,     // Added SKU parameter
   });
 
   Map<String, dynamic> toJson() {
@@ -332,6 +354,16 @@ class ProductCreateRequest {
     // Only include cost_price if it's not null
     if (costPrice != null) {
       data['cost_price'] = costPrice;
+    }
+
+    // Only include barcode if it's not null
+    if (barcode != null) {
+      data['barcode'] = barcode;
+    }
+
+    // Only include sku if it's not null
+    if (sku != null) {
+      data['sku'] = sku;
     }
 
     return data;
@@ -384,6 +416,8 @@ class ProductFilters {
   final String? stockLevel;
   final double? minPrice;
   final double? maxPrice;
+  final String? barcode;  // Added barcode filter
+  final String? sku;      // Added SKU filter
   final String sortBy;
   final String sortOrder;
 
@@ -395,6 +429,8 @@ class ProductFilters {
     this.stockLevel,
     this.minPrice,
     this.maxPrice,
+    this.barcode,  // Added barcode parameter
+    this.sku,      // Added SKU parameter
     this.sortBy = 'name',
     this.sortOrder = 'asc',
   });
@@ -409,6 +445,8 @@ class ProductFilters {
     if (stockLevel != null && stockLevel!.isNotEmpty) params['stock_level'] = stockLevel!;
     if (minPrice != null) params['min_price'] = minPrice.toString();
     if (maxPrice != null) params['max_price'] = maxPrice.toString();
+    if (barcode != null && barcode!.isNotEmpty) params['barcode'] = barcode!;  // Added barcode parameter
+    if (sku != null && sku!.isNotEmpty) params['sku'] = sku!;              // Added SKU parameter
     params['sort_by'] = sortBy;
     params['sort_order'] = sortOrder;
 
@@ -423,6 +461,8 @@ class ProductFilters {
     String? stockLevel,
     double? minPrice,
     double? maxPrice,
+    String? barcode,  // Added barcode parameter
+    String? sku,      // Added SKU parameter
     String? sortBy,
     String? sortOrder,
   }) {
@@ -434,6 +474,8 @@ class ProductFilters {
       stockLevel: stockLevel ?? this.stockLevel,
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
+      barcode: barcode ?? this.barcode,  // Include barcode
+      sku: sku ?? this.sku,              // Include SKU
       sortBy: sortBy ?? this.sortBy,
       sortOrder: sortOrder ?? this.sortOrder,
     );

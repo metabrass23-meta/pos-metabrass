@@ -780,39 +780,59 @@ class InvoiceModel {
   });
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
-    return InvoiceModel(
-      id: json['id'] as String? ?? '',
-      saleId: json['sale'] as String? ?? '',
-      saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
-      customerName: json['customer_name'] as String? ?? '',
-      grandTotal: _parseDouble(json['grand_total']),
-      invoiceNumber: json['invoice_number'] as String? ?? '',
-      issueDate: json['issue_date'] != null
-          ? DateTime.parse(json['issue_date'] as String)
-          : DateTime.now(),
-      dueDate: json['due_date'] != null
-          ? DateTime.parse(json['due_date'] as String)
-          : null,
-      status: json['status'] as String? ?? 'DRAFT',
-      notes: json['notes'] as String?,
-      termsConditions: json['terms_conditions'] as String?,
-      pdfFile: json['pdf_file'] as String?,
-      emailSent: json['email_sent'] as bool? ?? false,
-      emailSentAt: json['email_sent_at'] != null
-          ? DateTime.parse(json['email_sent_at'] as String)
-          : null,
-      viewedAt: json['viewed_at'] != null
-          ? DateTime.parse(json['viewed_at'] as String)
-          : null,
-      isActive: json['is_active'] as bool? ?? true,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
-          : DateTime.now(),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : DateTime.now(),
-      createdBy: json['created_by'] as String?,
-    );
+    try {
+      debugPrint('🔍 [InvoiceModel] Parsing JSON: $json');
+      
+      // Helper function to handle both int and string types
+      String? _parseString(dynamic value) {
+        if (value == null) return null;
+        if (value is String) return value;
+        if (value is int) return value.toString();
+        if (value is double) return value.toString();
+        return value.toString();
+      }
+      
+      final invoice = InvoiceModel(
+        id: json['id'] as String? ?? '',
+        saleId: json['sale'] as String? ?? '',
+        saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
+        customerName: json['customer_name'] as String? ?? '',
+        grandTotal: _parseDouble(json['grand_total']),
+        invoiceNumber: json['invoice_number'] as String? ?? '',
+        issueDate: json['issue_date'] != null
+            ? DateTime.parse(json['issue_date'] as String)
+            : DateTime.now(),
+        dueDate: json['due_date'] != null
+            ? DateTime.parse(json['due_date'] as String)
+            : null,
+        status: json['status'] as String? ?? 'DRAFT',
+        notes: _parseString(json['notes']),
+        termsConditions: _parseString(json['terms_conditions']),
+        pdfFile: _parseString(json['pdf_file']),
+        emailSent: json['email_sent'] as bool? ?? false,
+        emailSentAt: json['email_sent_at'] != null
+            ? DateTime.parse(json['email_sent_at'] as String)
+            : null,
+        viewedAt: json['viewed_at'] != null
+            ? DateTime.parse(json['viewed_at'] as String)
+            : null,
+        isActive: json['is_active'] as bool? ?? true,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'] as String)
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : DateTime.now(),
+        createdBy: _parseString(json['created_by']),
+      );
+      
+      debugPrint('✅ [InvoiceModel] Successfully parsed invoice: ${invoice.invoiceNumber}');
+      return invoice;
+    } catch (e) {
+      debugPrint('❌ [InvoiceModel] Error parsing JSON: $e');
+      debugPrint('❌ [InvoiceModel] JSON data: $json');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -974,7 +994,7 @@ class ReceiptModel {
       saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
       customerName: json['customer_name'] as String? ?? '',
       paymentId: json['payment'] as String? ?? '',
-      paymentAmount: _parseDouble(json['payment_amount']),
+      paymentAmount: _parseDouble(json['payment_amount'] ?? json['sale_amount'] ?? '0.0'),
       paymentMethod: json['payment_method'] as String? ?? 'CASH',
       receiptNumber: json['receipt_number'] as String? ?? '',
       generatedAt: json['generated_at'] != null

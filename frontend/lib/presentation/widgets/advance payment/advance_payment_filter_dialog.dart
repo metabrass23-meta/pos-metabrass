@@ -8,6 +8,7 @@ import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart';
 import '../globals/custom_date_picker.dart';
 import '../globals/drop_down.dart';
+import '../globals/text_field.dart';
 
 class AdvancePaymentFilterDialog extends StatefulWidget {
   const AdvancePaymentFilterDialog({super.key});
@@ -155,7 +156,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 99.w, small: 98.w, medium: 90.w, large: 85.w, ultrawide: 75.w),
                   maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 95.h, medium: 85.h, large: 80.h, ultrawide: 75.h),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -288,13 +289,15 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
             style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.cardPadding),
-          TextField(
+          PremiumTextField(
+            label: l10n.searchAdvancePayments,
             controller: _searchController,
-            decoration: InputDecoration(
-              hintText: l10n.searchAdvancePayments,
-              prefixIcon: Icon(Icons.search, color: AppTheme.primaryMaroon),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
-            ),
+            prefixIcon: Icons.search,
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
           ),
         ],
       ),
@@ -590,7 +593,7 @@ class _AdvancePaymentFilterDialogState extends State<AdvancePaymentFilterDialog>
               Expanded(
                 child: Text(
                   l10n.showInactiveRecords,
-                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context), color: AppTheme.charcoalGray),
                 ),
               ),
             ],

@@ -132,12 +132,11 @@ class Return(models.Model):
 
     REASON_CHOICES = [
         ('DEFECTIVE', 'Defective Product'),
-        ('WRONG_ITEM', 'Wrong Item Received'),
-        ('WRONG_COLOR', 'Wrong Color'),  # ✅ Added Missing Choice
-        ('DAMAGED', 'Damaged in Transit'),
-        ('SIZE_ISSUE', 'Size/Fit Issue'),
+        ('SIZE_ISSUE', 'Wrong Size'),
+        ('WRONG_COLOR', 'Wrong Color'),
         ('QUALITY_ISSUE', 'Quality Issue'),
-        ('CUSTOMER_REQUEST', 'Customer Request'),
+        ('CUSTOMER_REQUEST', 'Customer Changed Mind'),
+        ('DAMAGED', 'Damaged'),
         ('OTHER', 'Other'),
     ]
 
@@ -291,12 +290,34 @@ class Return(models.Model):
 
         return f'RET-{year}-{new_sequence:04d}'
 
-    def approve(self, approved_by_user):
-        """Approve the return request"""
+    def approve(self, approved_by_user, reason=None):
+        """Approve the return request and create a pending refund"""
         self.status = 'APPROVED'
         self.approved_at = timezone.now()
         self.approved_by = approved_by_user
-        self.save(update_fields=['status', 'approved_at', 'approved_by', 'updated_at'])
+        if reason:
+            self.notes = f"Approved: {reason}"
+        self.save(update_fields=['status', 'approved_at', 'approved_by', 'notes', 'updated_at'])
+        
+        # Auto-create a pending refund with the actual refund amount
+        refund_amount = self.refund_amount or self.total_return_amount
+        print(f"🔍 [Return] Approving return {self.return_number}, refund_amount={refund_amount}, total_return_amount={self.total_return_amount}")
+        
+        if refund_amount > 0:
+            try:
+                refund = Refund.objects.create(
+                    return_request=self,
+                    amount=refund_amount,
+                    method='CASH',  # Default to cash, can be changed later
+                    status='PENDING',
+                    created_by=approved_by_user,
+                    notes=f"Auto-created refund for approved return {self.return_number}"
+                )
+                print(f"✅ [Return] Created refund {refund.refund_number} for amount {refund_amount}")
+            except Exception as e:
+                print(f"❌ [Return] Error creating refund: {e}")
+        else:
+            print(f"⚠️ [Return] No refund created - amount is 0 or less")
 
     def reject(self, rejected_by_user, reason):
         """Reject the return request"""
@@ -364,11 +385,11 @@ class ReturnItem(models.Model):
     condition = models.CharField(
         max_length=20,
         choices=[
-            ('NEW', 'New'),
-            ('LIKE_NEW', 'Like New'),
-            ('GOOD', 'Good'),
-            ('FAIR', 'Fair'),
-            ('POOR', 'Poor'),
+            ('NEW', 'New/Unused'),
+            ('GOOD', 'Good Condition'),
+            ('FAIR', 'Fair Condition'),
+            ('POOR', 'Poor Condition'),
+            ('DAMAGED', 'Damaged'),
         ],
         default='GOOD',
         help_text="Condition of returned item"
@@ -658,8 +679,12 @@ class Invoice(models.Model):
 
     def clean(self):
         """Validate model data"""
-        if self.due_date and self.due_date < self.issue_date.date():
-            raise ValidationError({'due_date': 'Due date cannot be before issue date.'})
+        if self.due_date:
+            # Convert both to date for comparison
+            due_date = self.due_date.date() if hasattr(self.due_date, 'date') else self.due_date
+            issue_date = self.issue_date.date() if hasattr(self.issue_date, 'date') else self.issue_date
+            if due_date < issue_date:
+                raise ValidationError({'due_date': 'Due date cannot be before issue date.'})
 
     def save(self, *args, **kwargs):
         """Auto-generate invoice number if not set"""
@@ -669,7 +694,7 @@ class Invoice(models.Model):
         # Auto-set due date if not specified (30 days from issue)
         if not self.due_date:
             from datetime import timedelta
-            self.due_date = self.issue_date.date() + timedelta(days=30)
+            self.due_date = self.issue_date + timedelta(days=30)
 
         super().save(*args, **kwargs)
 
@@ -699,14 +724,18 @@ class Invoice(models.Model):
     def is_overdue(self):
         """Check if invoice is overdue"""
         if self.due_date and self.status not in ['PAID', 'CANCELLED']:
-            return timezone.now().date() > self.due_date
+            # Convert both to date for comparison
+            due_date = self.due_date.date() if hasattr(self.due_date, 'date') else self.due_date
+            return timezone.now().date() > due_date
         return False
 
     @property
     def days_until_due(self):
         """Days until payment is due"""
         if self.due_date and self.status not in ['PAID', 'CANCELLED']:
-            delta = self.due_date - timezone.now().date()
+            # Convert due_date to date for calculation
+            due_date = self.due_date.date() if hasattr(self.due_date, 'date') else self.due_date
+            delta = due_date - timezone.now().date()
             return delta.days
         return 0
 
@@ -766,7 +795,9 @@ class Receipt(models.Model):
         'payments.Payment',
         on_delete=models.CASCADE,
         related_name='receipts',
-        help_text="Associated payment"
+        null=True,
+        blank=True,
+        help_text="Associated payment (optional for simple receipts)"
     )
     receipt_number = models.CharField(
         max_length=20,
@@ -1153,8 +1184,29 @@ class Sales(models.Model):
         if self.overall_discount < 0:
             raise ValidationError({'overall_discount': 'Discount cannot be negative.'})
 
-        if self.overall_discount > self.subtotal:
-            raise ValidationError({'overall_discount': 'Discount cannot exceed subtotal.'})
+        # Calculate actual subtotal from sale items for validation
+        # This handles the case where subtotal hasn't been calculated yet
+        actual_subtotal = self.subtotal
+        
+        # If subtotal is 0 but we have sale items, calculate from items
+        if actual_subtotal == 0 and hasattr(self, '_sale_items'):
+            actual_subtotal = sum(item.line_total for item in self._sale_items)
+        
+        # If still 0, try to get from the serializer context (during creation)
+        if actual_subtotal == 0 and hasattr(self, '_validated_sale_items_data'):
+            actual_subtotal = Decimal('0.00')
+            for item_data in self._validated_sale_items_data:
+                unit_price = Decimal(str(item_data.get('unit_price', 0)))
+                quantity = int(item_data.get('quantity', 0))
+                item_discount = Decimal(str(item_data.get('item_discount', 0)))
+                line_total = (quantity * unit_price) - item_discount
+                actual_subtotal += line_total
+
+        # Validate overall discount against actual subtotal
+        if actual_subtotal > 0 and self.overall_discount > actual_subtotal:
+            raise ValidationError({
+                'overall_discount': f'Discount cannot exceed subtotal. Discount: {self.overall_discount}, Subtotal: {actual_subtotal}'
+            })
 
         if self.gst_percentage < 0 or self.gst_percentage > 100:
             raise ValidationError({'gst_percentage': 'GST percentage must be between 0 and 100.'})

@@ -45,12 +45,19 @@ class ReceiptProvider extends ChangeNotifier {
 
   /// Load receipts with current filters
   Future<void> loadReceipts({bool refresh = false, int? page, int? pageSize}) async {
-    if (!refresh && _receipts.isNotEmpty) return;
+    debugPrint('🔍 [ReceiptProvider] loadReceipts called: refresh=$refresh, current receipts count=${_receipts.length}');
+    debugPrint('🔍 [ReceiptProvider] Filters: saleId=$_selectedSaleId, paymentId=$_selectedPaymentId, status=$_selectedStatus');
+    
+    if (!refresh && _receipts.isNotEmpty) {
+      debugPrint('🔍 [ReceiptProvider] Skipping load - not refresh and receipts not empty');
+      return;
+    }
 
     _setLoading(true);
     _clearMessages();
 
     try {
+      debugPrint('🔍 [ReceiptProvider] Calling receipt service...');
       final response = await _receiptService.listReceipts(
         saleId: _selectedSaleId,
         paymentId: _selectedPaymentId,
@@ -61,10 +68,13 @@ class ReceiptProvider extends ChangeNotifier {
         page: page,
         pageSize: pageSize,
       );
+      
+      debugPrint('🔍 [ReceiptProvider] Service response: success=${response.success}, data=${response.data != null ? "present" : "null"}');
 
       if (response.success && response.data != null) {
         // ✅ FIXED: The Service already returns List<ReceiptModel>, so we just assign it.
         _receipts = response.data!;
+        debugPrint('🔍 [ReceiptProvider] Loaded ${_receipts.length} receipts');
 
         // Note: Since we are getting a direct List, we assume standard pagination handling is done
         // or we nullify pagination map for now to prevent the crash.
@@ -82,26 +92,90 @@ class ReceiptProvider extends ChangeNotifier {
     }
   }
 
-  /// Create a new receipt
-  Future<bool> createReceipt({required String saleId, required String paymentId, String? notes}) async {
+  /// Create a simple receipt directly from sale (for sales with amount_paid > 0)
+  Future<bool> createSimpleReceipt({
+    required String saleId,
+    String? notes,
+  }) async {
     _setLoading(true);
     _clearMessages();
 
     try {
-      final response = await _receiptService.createReceipt(saleId: saleId, paymentId: paymentId, notes: notes);
+      final response = await _receiptService.createSimpleReceipt(
+        saleId: saleId,
+        notes: notes,
+      );
 
       if (response.success && response.data != null) {
         _receipts.insert(0, response.data!);
-        _setSuccess('Receipt created successfully');
+        _success = response.message;
         notifyListeners();
+        
+        // Auto-generate PDF after successful receipt creation
+        await generateReceiptPdf(response.data!.id);
+        
         return true;
       } else {
-        _setError(response.message);
+        _error = response.message;
+        notifyListeners();
         return false;
       }
     } catch (e) {
-      DebugHelper.printError('Create receipt in provider', e);
-      _setError('Failed to create receipt: $e');
+      _error = 'Failed to create simple receipt: ${e.toString()}';
+      notifyListeners();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Generate PDF for a receipt
+  Future<bool> generateReceiptPdf(String receiptId) async {
+    try {
+      final response = await _receiptService.generateReceiptPdf(receiptId);
+      
+      if (response.success) {
+        debugPrint('✅ Receipt PDF generated successfully');
+        return true;
+      } else {
+        debugPrint('❌ Failed to generate receipt PDF: ${response.message}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Error generating receipt PDF: ${e.toString()}');
+      return false;
+    }
+  }
+
+  /// Create a new receipt
+  Future<bool> createReceipt({
+    required String saleId,
+    required String paymentId,
+    String? notes,
+  }) async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      final response = await _receiptService.createReceipt(
+        saleId: saleId,
+        paymentId: paymentId,
+        notes: notes,
+      );
+
+      if (response.success && response.data != null) {
+        _receipts.insert(0, response.data!);
+        _success = response.message;
+        notifyListeners();
+        return true;
+      } else {
+        _error = response.message;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = 'Failed to create receipt: ${e.toString()}';
+      notifyListeners();
       return false;
     } finally {
       _setLoading(false);
@@ -131,37 +205,6 @@ class ReceiptProvider extends ChangeNotifier {
     } catch (e) {
       DebugHelper.printError('Update receipt in provider', e);
       _setError('Failed to update receipt: $e');
-      return false;
-    } finally {
-      _setLoading(false);
-    }
-    return false;
-  }
-
-  /// Generate PDF for receipt
-  Future<bool> generateReceiptPdf(String id) async {
-    _setLoading(true);
-    _clearMessages();
-
-    try {
-      final response = await _receiptService.generateReceiptPdf(id);
-
-      if (response.success && response.data != null) {
-        // Update receipt status to GENERATED
-        final index = _receipts.indexWhere((receipt) => receipt.id == id);
-        if (index != -1) {
-          _receipts[index] = _receipts[index].copyWith(status: 'GENERATED');
-          _setSuccess('Receipt PDF generated successfully');
-          notifyListeners();
-          return true;
-        }
-      } else {
-        _setError(response.message);
-        return false;
-      }
-    } catch (e) {
-      DebugHelper.printError('Generate receipt PDF in provider', e);
-      _setError('Failed to generate receipt PDF: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -247,12 +290,14 @@ class ReceiptProvider extends ChangeNotifier {
 
   /// Clear all filters
   void clearFilters() {
+    debugPrint('🔍 [ReceiptProvider] Clearing filters...');
     _selectedSaleId = null;
     _selectedPaymentId = null;
     _selectedStatus = null;
     _dateFrom = null;
     _dateTo = null;
     _showInactive = false;
+    debugPrint('🔍 [ReceiptProvider] Filters cleared, reloading receipts...');
     loadReceipts(refresh: true);
   }
 

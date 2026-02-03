@@ -27,6 +27,32 @@ class ApiResponse<T> {
     );
   }
 
+  // Static factory methods
+  factory ApiResponse.success({
+    required T data,
+    String message = 'Success',
+  }) {
+    return ApiResponse<T>(
+      success: true,
+      message: message,
+      data: data,
+      errors: null,
+    );
+  }
+
+  factory ApiResponse.error({
+    required String message,
+    T? data,
+    Map<String, dynamic>? errors,
+  }) {
+    return ApiResponse<T>(
+      success: false,
+      message: message,
+      data: data,
+      errors: errors,
+    );
+  }
+
   Map<String, dynamic> toJson(Object? Function(T)? toJsonT) {
     return {
       'success': success,

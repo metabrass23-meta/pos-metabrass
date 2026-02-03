@@ -25,7 +25,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<ProfitLossProvider>(context, listen: false);
@@ -471,10 +471,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
         labelStyle: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600),
         unselectedLabelStyle: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500),
         tabs: [
-          Tab(icon: Icon(Icons.analytics_rounded), text: l10n.overview),
           Tab(icon: Icon(Icons.trending_up_rounded), text: l10n.dashboard),
           Tab(icon: Icon(Icons.inventory_2_rounded), text: l10n.products),
-          Tab(icon: Icon(Icons.calculate_rounded), text: l10n.details),
         ],
       ),
     );
@@ -484,10 +482,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
     return TabBarView(
       controller: _tabController,
       children: [
-        _buildOverviewTab(provider),
         _buildDashboardTab(provider),
         _buildProductsTab(provider),
-        _buildDetailsTab(provider),
       ],
     );
   }

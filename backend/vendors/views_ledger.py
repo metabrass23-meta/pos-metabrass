@@ -167,7 +167,7 @@ def vendor_ledger(request, vendor_id):
         ledger_entries.sort(key=lambda x: (x['date'], x['time']))
         
         # =====================================================
-        # 4. CALCULATE RUNNING BALANCE
+        # 4. CALCULATE RUNNING BALANCE & TRANSFORM FOR FRONTEND
         # =====================================================
         # Positive balance = We owe vendor
         # Negative balance = Vendor owes us (rare)
@@ -181,6 +181,17 @@ def vendor_ledger(request, vendor_id):
                 running_balance -= Decimal(str(entry['amount']))
             
             entry['balance'] = float(running_balance)
+            
+            # Transform entry to match frontend expectations
+            if entry['transaction_type'] == 'CREDIT':
+                entry['debit'] = 0.0
+                entry['credit'] = float(entry['amount'])
+            else:
+                entry['debit'] = float(entry['amount'])
+                entry['credit'] = 0.0
+            
+            # Map backend type to frontend transaction_type
+            entry['transaction_type'] = entry['type']  # Use 'type' as 'transaction_type' for frontend
         
         # =====================================================
         # 5. FILTER BY TRANSACTION TYPE (if specified)
@@ -209,10 +220,11 @@ def vendor_ledger(request, vendor_id):
             'total_payables_count': len([e for e in ledger_entries if e['type'] == 'PAYABLE']),
             'total_payments': float(total_payments + total_payable_payments),
             'total_payments_count': len([e for e in ledger_entries if e['type'] in ['PAYMENT', 'PAYABLE_PAYMENT']]),
-            'total_credit': float(total_credit),  # What we owe
-            'total_debit': float(total_debit),  # What we paid
+            'total_debits': float(total_debit),  # What we paid (matching frontend)
+            'total_credits': float(total_credit),  # What we owe (matching frontend)
+            'opening_balance': 0.0,  # Starting balance (always 0 for now)
+            'closing_balance': float(running_balance),  # Current running balance
             'outstanding_balance': float(outstanding_balance),  # Net amount we owe
-            'current_balance': float(running_balance),
             'first_transaction_date': ledger_entries[0]['date'] if ledger_entries else None,
             'last_transaction_date': ledger_entries[-1]['date'] if ledger_entries else None,
             'vendor_status': 'CREDITOR' if outstanding_balance > 0 else 'SETTLED',

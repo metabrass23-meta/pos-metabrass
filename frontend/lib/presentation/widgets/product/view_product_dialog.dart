@@ -56,7 +56,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
             child: Transform.scale(
               scale: _scaleAnimation.value.clamp(0.1, 2.0),
               child: Container(
-                width: context.dialogWidth ?? 600,
+                width: context.dialogWidth ?? 700,
                 constraints: BoxConstraints(
                   maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
                   maxHeight: 85.h,
@@ -467,6 +467,70 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
             ],
           ),
         ),
+        SizedBox(height: context.cardPadding),
+        
+        // Barcode Card
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(context.cardPadding),
+          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.qr_code_2_outlined, size: context.iconSize('small'), color: Colors.blue),
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'Barcode',
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.smallPadding / 2),
+              Text(
+                widget.product.displayBarcode,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize * 1.1,
+                  fontWeight: FontWeight.w600,
+                  color: widget.product.hasBarcode ? AppTheme.charcoalGray : Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: context.cardPadding),
+        
+        // SKU Card
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(context.cardPadding),
+          decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.tag_outlined, size: context.iconSize('small'), color: Colors.green),
+                  SizedBox(width: context.smallPadding),
+                  Text(
+                    'SKU',
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.smallPadding / 2),
+              Text(
+                widget.product.displaySku,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize * 1.1,
+                  fontWeight: FontWeight.w600,
+                  color: widget.product.hasSku ? AppTheme.charcoalGray : Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -580,6 +644,72 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
                       fontWeight: FontWeight.w600,
                       color: widget.product.stockStatusColor ?? Colors.grey,
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        
+        // Barcode Card
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(context.cardPadding),
+            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.qr_code_2_outlined, size: context.iconSize('small'), color: Colors.blue),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'Barcode',
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 2),
+                Text(
+                  widget.product.displayBarcode,
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize * 1.1,
+                    fontWeight: FontWeight.w600,
+                    color: widget.product.hasBarcode ? AppTheme.charcoalGray : Colors.grey[500],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: context.cardPadding),
+        
+        // SKU Card
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(context.cardPadding),
+            decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.tag_outlined, size: context.iconSize('small'), color: Colors.green),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      'SKU',
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 2),
+                Text(
+                  widget.product.displaySku,
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize * 1.1,
+                    fontWeight: FontWeight.w600,
+                    color: widget.product.hasSku ? AppTheme.charcoalGray : Colors.grey[500],
                   ),
                 ),
               ],

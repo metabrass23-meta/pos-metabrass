@@ -262,8 +262,13 @@ class Labor(models.Model):
         current_month = today.month
         current_year = today.year
         
+        # Handle null values for existing records
+        if self.current_month is None or self.current_year is None:
+            self.remaining_monthly_salary = self.salary
+            self.current_month = current_month
+            self.current_year = current_year
         # If it's a new month, reset the remaining salary
-        if self.current_month != current_month or self.current_year != current_year:
+        elif self.current_month != current_month or self.current_year != current_year:
             self.remaining_monthly_salary = self.salary
             self.current_month = current_month
             self.current_year = current_year

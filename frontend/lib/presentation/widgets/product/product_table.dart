@@ -82,6 +82,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min, // Use minimum size
                       children: [
                         // 1. Fixed Header Section
                         Container(
@@ -100,8 +101,8 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                           child: _buildTableHeader(context),
                         ),
 
-                        // 2. Scrollable Data Section
-                        Expanded(
+                        // 2. Scrollable Data Section - Use Flexible instead of Expanded
+                        Flexible(
                           child: Container(
                             width: _getTableWidth(context),
                             child: Scrollbar(
@@ -142,7 +143,6 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
     );
   }
 
-  // ... (Keep the rest of your methods exactly the same: _buildTableHeader, _getColumnWidths, _buildHeaderCell, _buildTableRow, _buildActions, _buildEmptyState, _getColorFromName, _formatDate, _getRelativeDate) ...
 
   Widget _buildTableHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -154,20 +154,22 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
         Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.details)),
         Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.price)),
         Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.costPrice)),
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.color)),
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.fabric)),
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.quantity)),
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.stockStatus)),
-        Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.pieces)),
-        Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.createdDate)),
-        Container(width: columnWidths[10], child: _buildHeaderCell(context, l10n.actions)),
+        Container(width: columnWidths[4], child: _buildHeaderCell(context, 'Barcode')),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, 'SKU')),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.color)),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.type)),
+        Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.quantity)),
+        Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.stockStatus)),
+        Container(width: columnWidths[10], child: _buildHeaderCell(context, l10n.pieces)),
+        Container(width: columnWidths[11], child: _buildHeaderCell(context, l10n.createdDate)),
+        Container(width: columnWidths[12], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      200.0, 250.0, 120.0, 120.0, 120.0, 120.0, 100.0, 130.0, 180.0, 150.0, 280.0,
+      200.0, 250.0, 120.0, 120.0, 120.0, 120.0, 120.0, 120.0, 100.0, 130.0, 180.0, 150.0, 280.0,
     ];
   }
 
@@ -255,9 +257,55 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             ),
           ),
 
-          // Color
+          // Barcode
           Container(
             width: columnWidths[4],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(
+                color: product.hasBarcode ? Colors.blue.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                product.displayBarcode,
+                style: TextStyle(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: product.hasBarcode ? Colors.blue[600] : Colors.grey[500],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          // SKU
+          Container(
+            width: columnWidths[5],
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              decoration: BoxDecoration(
+                color: product.hasSku ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              ),
+              child: Text(
+                product.displaySku,
+                style: TextStyle(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: product.hasSku ? Colors.green[600] : Colors.grey[500],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          // Color
+          Container(
+            width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
@@ -292,9 +340,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             ),
           ),
 
-          // Fabric
+          // Type
           Container(
-            width: columnWidths[5],
+            width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
@@ -310,7 +358,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Quantity
           Container(
-            width: columnWidths[6],
+            width: columnWidths[8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${product.quantity}',
@@ -320,7 +368,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Stock Status
           Container(
-            width: columnWidths[7],
+            width: columnWidths[9],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
@@ -338,7 +386,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Pieces
           Container(
-            width: columnWidths[8],
+            width: columnWidths[10],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: product.pieces.isNotEmpty
                 ? Wrap(
@@ -404,7 +452,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Created Date
           Container(
-            width: columnWidths[9],
+            width: columnWidths[11],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,7 +471,7 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
           // Actions
           Container(
-            width: columnWidths[10],
+            width: columnWidths[12],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: _buildActions(context, product),
           ),

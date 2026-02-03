@@ -3,7 +3,11 @@ import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/return_provider.dart';
 import '../../../src/models/sales/return_model.dart';
-import '../../widgets/sales/create_return_dialog.dart';
+import '../../../src/theme/app_theme.dart';
+import '../globals/text_button.dart';
+import '../globals/text_field.dart';
+import 'create_return_dialog.dart';
+
 
 class ReturnManagementWidget extends StatefulWidget {
   const ReturnManagementWidget({Key? key}) : super(key: key);
@@ -21,7 +25,16 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 1, vsync: this); // Only 1 tab now
+    
+    // Add listener to refresh data when switching tabs
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) return;
+      
+      // Only returns tab now
+      context.read<ReturnProvider>().loadReturns();
+    });
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ReturnProvider>().initialize();
     });
@@ -45,8 +58,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
           controller: _tabController,
           tabs: [
             Tab(text: l10n.returns, icon: const Icon(Icons.assignment_return)),
-            Tab(text: l10n.refunds, icon: const Icon(Icons.payment)),
-            Tab(text: l10n.statistics, icon: const Icon(Icons.analytics)),
           ],
         ),
         actions: [
@@ -60,15 +71,14 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       body: TabBarView(
           controller: _tabController,
           children: [
-            _buildReturnsTab(),
-            _buildRefundsTab(),
-            _buildStatisticsTab()
+            _buildReturnsTab()
           ]
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateReturnDialog(context),
         tooltip: l10n.createReturn,
-        child: const Icon(Icons.add),
+        backgroundColor: AppTheme.primaryMaroon,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -78,11 +88,14 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     return Consumer<ReturnProvider>(
       builder: (context, provider, child) {
+        debugPrint('🔍 [ReturnsTab] Provider state: isLoading=${provider.isLoading}, returnsCount=${provider.returns.length}');
+        
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
         if (provider.error != null) {
+          debugPrint('❌ [ReturnsTab] Error: ${provider.error}');
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -93,6 +106,9 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             ),
           );
         }
+
+        final returns = provider.filteredReturns;
+        debugPrint('🔍 [ReturnsTab] Filtered returns: ${returns.length}');
 
         return Column(
           children: [
@@ -106,6 +122,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
   Widget _buildFilters(ReturnProvider provider) {
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
 
     return Card(
       margin: const EdgeInsets.all(8.0),
@@ -116,91 +134,158 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
           children: [
             Text(l10n.filters, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                // Search Field
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: l10n.search,
-                      hintText: l10n.searchByReturnCustomerInvoice,
-                      prefixIcon: const Icon(Icons.search),
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    onChanged: (value) => provider.setFilters(search: value),
-                  ),
+            
+            // Responsive layout
+            if (isSmallScreen) ...[
+              // Small screen - vertical layout
+              PremiumTextField(
+                label: l10n.searchReturns,
+                controller: _searchController,
+                prefixIcon: Icons.search,
+                onChanged: (value) {
+                  provider.setFilters(search: value);
+                },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedStatus.isEmpty ? null : _selectedStatus,
+                decoration: InputDecoration(
+                  labelText: l10n.status,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
-                const SizedBox(width: 16),
+                dropdownColor: Colors.white,
+                isExpanded: true,
+                items: [
+                  DropdownMenuItem(value: '', child: Text(l10n.allStatuses, overflow: TextOverflow.ellipsis)),
+                  DropdownMenuItem(value: 'PENDING', child: Text(l10n.pending, overflow: TextOverflow.ellipsis)),
+                  DropdownMenuItem(value: 'APPROVED', child: Text(l10n.approved, overflow: TextOverflow.ellipsis)),
+                  DropdownMenuItem(value: 'PROCESSED', child: Text(l10n.processed, overflow: TextOverflow.ellipsis)),
+                  DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled, overflow: TextOverflow.ellipsis)),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedStatus = value ?? '';
+                  });
+                  provider.setFilters(status: value);
+                },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedReason.isEmpty ? null : _selectedReason,
+                decoration: InputDecoration(
+                  labelText: l10n.reason,
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                dropdownColor: Colors.white,
+                isExpanded: true,
+                items: [
+                  DropdownMenuItem(value: '', child: Text(l10n.allReasons, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.defective, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'SIZE_ISSUE', child: Text(l10n.wrongSize, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.wrongColor, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.qualityIssue, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'CUSTOMER_REQUEST', child: Text(l10n.customerChangedMind, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'DAMAGED', child: Text(l10n.damagedInTransit, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                  DropdownMenuItem(value: 'OTHER', child: Text(l10n.other, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedReason = value ?? '';
+                  });
+                  provider.setFilters(reason: value);
+                },
+              ),
+            ] else ...[
+              // Large screen - horizontal layout
+              Row(
+                children: [
+                  // Search Field
+                  Expanded(
+                    flex: 2,
+                    child: PremiumTextField(
+                      label: l10n.searchReturns,
+                      controller: _searchController,
+                      prefixIcon: Icons.search,
+                      onChanged: (value) {
+                        provider.setFilters(search: value);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
 
-                // Status Dropdown
-                Expanded(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedStatus.isEmpty ? null : _selectedStatus,
-                    decoration: InputDecoration(
-                      labelText: l10n.status,
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      filled: true,
-                      fillColor: Colors.white,
+                  // Status Dropdown
+                  Expanded(
+                    flex: 1,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedStatus.isEmpty ? null : _selectedStatus,
+                      decoration: InputDecoration(
+                        labelText: l10n.status,
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      dropdownColor: Colors.white,
+                      isExpanded: true,
+                      items: [
+                        DropdownMenuItem(value: '', child: Text(l10n.allStatuses, overflow: TextOverflow.ellipsis)),
+                        DropdownMenuItem(value: 'PENDING', child: Text(l10n.pending, overflow: TextOverflow.ellipsis)),
+                        DropdownMenuItem(value: 'APPROVED', child: Text(l10n.approved, overflow: TextOverflow.ellipsis)),
+                        DropdownMenuItem(value: 'PROCESSED', child: Text(l10n.processed, overflow: TextOverflow.ellipsis)),
+                        DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled, overflow: TextOverflow.ellipsis)),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStatus = value ?? '';
+                        });
+                        provider.setFilters(status: value);
+                      },
                     ),
-                    dropdownColor: Colors.white,
-                    items: [
-                      DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
-                      DropdownMenuItem(value: 'PENDING', child: Text(l10n.pending)),
-                      DropdownMenuItem(value: 'APPROVED', child: Text(l10n.approved)),
-                      DropdownMenuItem(value: 'PROCESSED', child: Text(l10n.processed)),
-                      DropdownMenuItem(value: 'REJECTED', child: Text(l10n.rejected)),
-                      DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedStatus = value ?? '';
-                      });
-                      provider.setFilters(status: value);
-                    },
                   ),
-                ),
-                const SizedBox(width: 16),
+                  const SizedBox(width: 16),
 
-                // Reason Dropdown
-                Expanded(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedReason.isEmpty ? null : _selectedReason,
-                    decoration: InputDecoration(
-                      labelText: l10n.reason,
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      filled: true,
-                      fillColor: Colors.white,
+                  // Reason Dropdown
+                  Expanded(
+                    flex: 1,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedReason.isEmpty ? null : _selectedReason,
+                      decoration: InputDecoration(
+                        labelText: l10n.reason,
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      dropdownColor: Colors.white,
+                      isExpanded: true,
+                      items: [
+                        DropdownMenuItem(value: '', child: Text(l10n.allReasons, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.defective, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'SIZE_ISSUE', child: Text(l10n.wrongSize, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.wrongColor, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.qualityIssue, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'CUSTOMER_REQUEST', child: Text(l10n.customerChangedMind, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'DAMAGED', child: Text(l10n.damagedInTransit, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                        DropdownMenuItem(value: 'OTHER', child: Text(l10n.other, overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: false)),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedReason = value ?? '';
+                        });
+                        provider.setFilters(reason: value);
+                      },
                     ),
-                    dropdownColor: Colors.white,
-                    items: [
-                      DropdownMenuItem(value: '', child: Text(l10n.allReasons)),
-                      DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.defective)),
-                      DropdownMenuItem(value: 'WRONG_SIZE', child: Text(l10n.wrongSize)),
-                      DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.wrongColor)),
-                      DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.qualityIssue)),
-                      DropdownMenuItem(value: 'CUSTOMER_CHANGE_MIND', child: Text(l10n.customerChangedMind)),
-                      DropdownMenuItem(value: 'DAMAGED_IN_TRANSIT', child: Text(l10n.damagedInTransit)),
-                      DropdownMenuItem(value: 'OTHER', child: Text(l10n.other)),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedReason = value ?? '';
-                      });
-                      provider.setFilters(reason: value);
-                    },
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
+            
             const SizedBox(height: 16),
 
             // Clear Filters Button
@@ -262,54 +347,140 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       elevation: 2,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundColor: _getStatusColor(returnItem.status),
-          child: Icon(_getStatusIcon(returnItem.status), color: Colors.white),
-        ),
-        title: Text(returnItem.returnNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
-            Text('${l10n.customer}: ${returnItem.customerName}'),
-            Text('${l10n.invoice}: ${returnItem.saleInvoiceNumber}'),
-            Text(
-              '${l10n.reason}: ${returnItem.reason.replaceAll('_', ' ')}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 4),
             Row(
               children: [
-                Text(
-                  '${l10n.amount}: \$${returnItem.totalReturnAmount.toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                CircleAvatar(
+                  backgroundColor: _getStatusColor(returnItem.status),
+                  child: Icon(_getStatusIcon(returnItem.status), color: Colors.white, size: 20),
                 ),
                 const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(returnItem.returnNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text('${l10n.customer}: ${returnItem.customerName}', style: const TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getStatusColor(returnItem.status).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: _getStatusColor(returnItem.status)),
                   ),
                   child: Text(
-                    returnItem.status,
+                    returnItem.status.replaceAll('_', ' '),
                     style: TextStyle(color: _getStatusColor(returnItem.status), fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.invoice, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(returnItem.saleInvoiceNumber, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.reason, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(returnItem.reason.replaceAll('_', ' '), style: const TextStyle(fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(l10n.amount, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(
+                        'PKR ${returnItem.totalReturnAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (returnItem.returnItemsCount > 0) ...[
+              const SizedBox(height: 8),
+              Text('${l10n.items}: ${returnItem.returnItemsCount}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+            const SizedBox(height: 8),
+            // Action buttons with responsive layout
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Wrap action buttons in a flexible container
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    reverse: true, // Align to right
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: _buildActionButtons(returnItem, provider),
+                    ),
                   ),
                 ),
               ],
             ),
           ],
         ),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) => _handleReturnAction(value, returnItem, provider),
-          itemBuilder: (context) => _buildReturnActionMenu(returnItem),
-        ),
-        onTap: () => _showReturnDetails(returnItem, provider),
       ),
     );
+  }
+
+  List<Widget> _buildActionButtons(ReturnModel returnItem, ReturnProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+    List<Widget> buttons = [];
+
+    // Add action buttons based on status
+    if (returnItem.status == 'PENDING') {
+      buttons.add(
+        PremiumButton(
+          text: l10n.approve,
+          onPressed: () => _showApproveReturnDialog(returnItem, provider),
+          isOutlined: true,
+          width: 80,
+          height: 35,
+        ),
+      );
+      buttons.add(const SizedBox(width: 8));
+      buttons.add(
+        PremiumButton(
+          text: l10n.cancel,
+          onPressed: () async {
+            final success = await provider.deleteReturn(returnItem.id);
+            if (success && mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.returnDeletedSuccessfully), backgroundColor: Colors.green),
+              );
+            }
+          },
+          isOutlined: true,
+          width: 80,
+          height: 35,
+        ),
+      );
+    }
+
+    return buttons;
   }
 
   Color _getStatusColor(String status) {
@@ -365,21 +536,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       );
     }
 
-    if (returnItem.canBeProcessed) {
-      actions.add(
-        PopupMenuItem(
-          value: 'process',
-          child: Row(
-            children: [
-              const Icon(Icons.play_circle, color: Colors.blue),
-              const SizedBox(width: 8),
-              Text(l10n.process),
-            ],
-          ),
-        ),
-      );
-    }
-
     if (returnItem.canBeCancelled) {
       actions.add(
         PopupMenuItem(
@@ -396,16 +552,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     }
 
     actions.addAll([
-      PopupMenuItem(
-        value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange),
-            const SizedBox(width: 8),
-            Text(l10n.edit),
-          ],
-        ),
-      ),
       PopupMenuItem(
         value: 'delete',
         child: Row(
@@ -426,14 +572,8 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       case 'approve':
         _showApproveReturnDialog(returnItem, provider);
         break;
-      case 'process':
-        _showProcessReturnDialog(returnItem, provider);
-        break;
       case 'cancel':
         _showCancelReturnDialog(returnItem, provider);
-        break;
-      case 'edit':
-        _showEditReturnDialog(returnItem, provider);
         break;
       case 'delete':
         _showDeleteReturnDialog(returnItem, provider);
@@ -743,6 +883,9 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
   void _showRefundDetails(RefundModel refund, ReturnProvider provider) {
     final l10n = AppLocalizations.of(context)!;
+    
+    debugPrint('🔍 [RefundDialog] Showing details for refund: ${refund.refundNumber}');
+    debugPrint('🔍 [RefundDialog] Refund data: ID=${refund.id}, ReturnID=${refund.returnRequestId}, Amount=${refund.amount}, Method=${refund.method}, Status=${refund.status}');
 
     showDialog(
       context: context,
@@ -750,22 +893,24 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
         title: Text(l10n.refundDetails(refund.refundNumber)),
         content: SizedBox(
           width: 450,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow(l10n.refundNumber, refund.refundNumber),
-              _buildDetailRow(l10n.returnId, refund.returnRequestId),
-              const Divider(),
-              _buildDetailRow(l10n.amount, 'PKR ${refund.amount.toStringAsFixed(2)}'),
-              _buildDetailRow(l10n.method, refund.method),
-              _buildDetailRow(l10n.status, refund.status),
-              _buildDetailRow(l10n.createdAt, '${refund.createdAt.day}/${refund.createdAt.month}/${refund.createdAt.year}'),
-              if (refund.processedAt != null)
-                _buildDetailRow(l10n.processedAt, '${refund.processedAt!.day}/${refund.processedAt!.month}/${refund.processedAt!.year}'),
-              if (refund.referenceNumber?.isNotEmpty == true) _buildDetailRow(l10n.reference, refund.referenceNumber!),
-              if (refund.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, refund.notes!),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(l10n.refundNumber, refund.refundNumber),
+                _buildDetailRow(l10n.returnId, refund.returnRequestId),
+                const Divider(),
+                _buildDetailRow(l10n.amount, 'PKR ${refund.amount.toStringAsFixed(2)}'),
+                _buildDetailRow(l10n.method, refund.method),
+                _buildDetailRow(l10n.status, refund.status),
+                _buildDetailRow(l10n.createdAt, '${refund.createdAt.day}/${refund.createdAt.month}/${refund.createdAt.year}'),
+                if (refund.processedAt != null)
+                  _buildDetailRow(l10n.processedAt, '${refund.processedAt!.day}/${refund.processedAt!.month}/${refund.processedAt!.year}'),
+                if (refund.referenceNumber?.isNotEmpty == true) _buildDetailRow(l10n.reference, refund.referenceNumber!),
+                if (refund.notes?.isNotEmpty == true) _buildDetailRow(l10n.notes, refund.notes!),
+              ],
+            ),
           ),
         ),
         actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.close))],
@@ -781,27 +926,31 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.approveReturn(returnItem.returnNumber)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.areYouSureApproveReturn),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              decoration: InputDecoration(
-                labelText: l10n.approvalReasonOptional,
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.white,
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.areYouSureApproveReturn),
+              const SizedBox(height: 16),
+              PremiumTextField(
+                label: l10n.approvalReasonOptional,
+                controller: reasonController,
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
-          ElevatedButton(
+          PremiumButton(
+            text: l10n.cancel,
+            onPressed: () => Navigator.of(context).pop(),
+            isOutlined: true,
+          ),
+          const SizedBox(width: 8),
+          PremiumButton(
+            text: l10n.approve,
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.approveReturn(
@@ -814,7 +963,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 );
               }
             },
-            child: Text(l10n.approve),
           ),
         ],
       ),
@@ -830,50 +978,67 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.processReturn(returnItem.returnNumber)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.processReturnAndInitiateRefund),
-            const SizedBox(height: 16),
-            TextField(
-              controller: refundAmountController,
-              decoration: InputDecoration(labelText: l10n.refundAmount, border: const OutlineInputBorder(), prefixText: 'PKR '),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: refundMethodController,
-              decoration: InputDecoration(
-                labelText: l10n.refundMethod,
-                border: const OutlineInputBorder(),
-                hintText: l10n.refundMethodHint,
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.processReturnAndInitiateRefund),
+              const SizedBox(height: 16),
+              PremiumTextField(
+                label: l10n.refundAmount,
+                controller: refundAmountController,
+                keyboardType: TextInputType.number,
+                prefixIcon: Icons.money,
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              PremiumTextField(
+                label: l10n.refundMethod,
+                controller: refundMethodController,
+                hint: l10n.refundMethodHint,
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
-          ElevatedButton(
+          PremiumButton(
+            text: l10n.cancel,
+            onPressed: () => Navigator.of(context).pop(),
+            isOutlined: true,
+          ),
+          const SizedBox(width: 8),
+          PremiumButton(
+            text: l10n.process,
             onPressed: () async {
               Navigator.of(context).pop();
               final refundAmount = double.tryParse(refundAmountController.text.trim());
               final refundMethod = refundMethodController.text.trim();
 
+              debugPrint('🔄 [ReturnDialog] Processing return: amount=$refundAmount, method="$refundMethod"');
+
               if (refundAmount != null && refundMethod.isNotEmpty) {
                 final success = await provider.processReturn(id: returnItem.id, refundAmount: refundAmount, refundMethod: refundMethod);
                 if (success && mounted) {
+                  debugPrint('✅ [ReturnDialog] Process successful');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(l10n.returnProcessedSuccessfully), backgroundColor: Colors.green),
                   );
+                } else {
+                  debugPrint('❌ [ReturnDialog] Process failed');
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to process return'), backgroundColor: Colors.red),
+                    );
+                  }
                 }
               } else {
+                debugPrint('⚠️ [ReturnDialog] Invalid input: amount=$refundAmount, method="$refundMethod"');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(l10n.provideValidRefundAmountAndMethod), backgroundColor: Colors.red),
                 );
               }
             },
-            child: Text(l10n.process),
           ),
         ],
       ),
@@ -888,27 +1053,32 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.cancelReturn(returnItem.returnNumber)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.areYouSureCancelReturn),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              decoration: InputDecoration(
-                labelText: l10n.cancellationReasonRequired,
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.white,
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.areYouSureCancelReturn),
+              const SizedBox(height: 16),
+              PremiumTextField(
+                label: l10n.cancellationReasonRequired,
+                controller: reasonController,
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.no)),
-          ElevatedButton(
+          PremiumButton(
+            text: l10n.no,
+            onPressed: () => Navigator.of(context).pop(),
+            isOutlined: true,
+          ),
+          const SizedBox(width: 8),
+          PremiumButton(
+            text: l10n.cancelReturn(returnItem.returnNumber).split(' - ')[0],
+            backgroundColor: Colors.orange,
             onPressed: () async {
               if (reasonController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -924,8 +1094,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: Text(l10n.cancelReturn(returnItem.returnNumber).split(' - ')[0]),
           ),
         ],
       ),
@@ -948,29 +1116,35 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
+              PremiumTextField(
+                label: l10n.returnReason,
                 controller: reasonController,
-                decoration: InputDecoration(labelText: l10n.returnReason, border: const OutlineInputBorder()),
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
-              TextField(
+              PremiumTextField(
+                label: '${l10n.reasonDetails} (${l10n.notesOptional})',
                 controller: reasonDetailsController,
-                decoration: InputDecoration(labelText: '${l10n.reasonDetails} (${l10n.notesOptional})', border: const OutlineInputBorder()),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
-              TextField(
+              PremiumTextField(
+                label: l10n.notesOptional,
                 controller: notesController,
-                decoration: InputDecoration(labelText: l10n.notesOptional, border: const OutlineInputBorder()),
                 maxLines: 3,
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
-          ElevatedButton(
+          PremiumButton(
+            text: l10n.cancel,
+            onPressed: () => Navigator.of(context).pop(),
+            isOutlined: true,
+          ),
+          const SizedBox(width: 8),
+          PremiumButton(
+            text: l10n.save,
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.updateReturn(
@@ -985,7 +1159,6 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 );
               }
             },
-            child: Text(l10n.update),
           ),
         ],
       ),
@@ -1009,9 +1182,19 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(), 
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+            ),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
             onPressed: () async {
               Navigator.of(context).pop();
               final success = await provider.deleteReturn(returnItem.id);
@@ -1021,7 +1204,10 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
                 );
               }
             },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.delete,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -1190,7 +1376,12 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             width: 120,
             child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
-          Expanded(child: Text(value)),
+          Expanded(
+            child: Text(
+              value.isEmpty ? '-' : value,
+              style: TextStyle(color: value.isEmpty ? Colors.grey : null),
+            ),
+          ),
         ],
       ),
     );

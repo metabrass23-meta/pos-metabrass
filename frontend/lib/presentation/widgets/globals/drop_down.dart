@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 
 class DropdownItem<T> {
   final T value;
@@ -110,7 +111,7 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
                   child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 10.sp,
+                      fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
                       fontWeight: FontWeight.w400,
                       color: AppTheme.charcoalGray,
                     ),
@@ -129,7 +130,7 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
               : null,
           validator: widget.validator != null ? (String? value) => widget.validator!(widget.value) : null,
           style: TextStyle(
-            fontSize: 10.sp,
+            fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
           ),

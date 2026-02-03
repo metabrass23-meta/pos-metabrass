@@ -1,16 +1,22 @@
 import 'dart:typed_data'; // ✅ REQUIRED
+import 'dart:io'; // ✅ REQUIRED for File operations
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:printing/printing.dart'; // ✅ REQUIRED
 import 'package:pdf/pdf.dart';           // ✅ REQUIRED
+import 'package:path_provider/path_provider.dart'; // ✅ REQUIRED for file operations
 import '../models/sales/sale_model.dart';
 import '../models/sales/request_models.dart';
 import '../services/sales_service.dart';
 import '../services/sale_item_service.dart';
 import '../services/customer_service.dart';
 import '../services/product_service.dart';
+import '../config/api_config.dart';
+import '../models/api_response.dart';
+import '../utils/debug_helper.dart';
 import '../models/customer/customer_model.dart';
 import '../models/product/product_model.dart';
+import '../providers/dashboard_provider.dart';
 
 // Cart item model for cart functionality
 class CartItem {
@@ -182,14 +188,17 @@ class SalesProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         if (refresh) {
           _sales = response.data!.sales;
+          debugPrint('🔍 [SalesProvider] Refresh: Set sales to ${_sales.length} items');
         } else {
           _sales.addAll(response.data!.sales);
+          debugPrint('🔍 [SalesProvider] Append: Added ${response.data!.sales.length} items, total now ${_sales.length}');
         }
 
         _totalCount = response.data!.pagination.totalCount;
         _totalPages = response.data!.pagination.totalPages;
         _hasNext = response.data!.pagination.hasNext;
         _hasPrevious = response.data!.pagination.hasPrevious;
+        debugPrint('🔍 [SalesProvider] Pagination updated: page=$_currentPage, totalPages=$_totalPages, hasNext=$_hasNext');
       } else {
         _setError(response.message);
       }
@@ -198,6 +207,27 @@ class SalesProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// Load all sales pages
+  Future<void> loadAllSales() async {
+    debugPrint('🔍 [SalesProvider] Starting loadAllSales...');
+    _sales.clear();
+    _currentPage = 1;
+    
+    // Load first page to get pagination info
+    debugPrint('🔍 [SalesProvider] Loading first page...');
+    await loadSales(refresh: true);
+    debugPrint('🔍 [SalesProvider] After first load: hasNext=$_hasNext, totalPages=$_totalPages, salesCount=${_sales.length}');
+    
+    // Load remaining pages
+    while (_hasNext && _currentPage < _totalPages) {
+      _currentPage++;
+      debugPrint('🔍 [SalesProvider] Loading page $_currentPage...');
+      await loadSales(refresh: false);
+      debugPrint('🔍 [SalesProvider] After page $_currentPage: hasNext=$_hasNext, salesCount=${_sales.length}');
+    }
+    debugPrint('🔍 [SalesProvider] Finished loading all ${_sales.length} sales');
   }
 
   /// Load sales statistics
@@ -266,12 +296,10 @@ class SalesProvider extends ChangeNotifier {
       final existingItem = _cartItems[existingItemIndex];
       _cartItems[existingItemIndex] = existingItem.copyWith(
         quantity: existingItem.quantity + quantity,
-        itemDiscount: itemDiscount,
-        customizationNotes: customizationNotes,
       );
     } else {
       // Add new item
-      final newItem = CartItem(
+      final cartItem = CartItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         productId: productId,
         productName: productName,
@@ -280,9 +308,11 @@ class SalesProvider extends ChangeNotifier {
         itemDiscount: itemDiscount,
         customizationNotes: customizationNotes,
       );
-      _cartItems.add(newItem);
+
+      _cartItems.add(cartItem);
     }
 
+    _clearMessages();
     notifyListeners();
   }
 
@@ -361,14 +391,95 @@ class SalesProvider extends ChangeNotifier {
   }
 
   void setOverallDiscount(double discount) {
+    print('🔍 setOverallDiscount called');
+    print('🔍 Input discount: $discount');
+    print('🔍 Cart subtotal: $cartSubtotal');
+    
+    // Validate discount
+    if (discount < 0) {
+      print('❌ Discount is negative');
+      _setError('Discount cannot be negative');
+      return;
+    }
+    
+    if (discount > cartSubtotal) {
+      print('❌ Discount $discount exceeds subtotal $cartSubtotal');
+      _setError('Discount cannot exceed subtotal');
+      return;
+    }
+    
     _overallDiscount = discount;
+    print('✅ Overall discount set to: $_overallDiscount');
     notifyListeners();
   }
 
   /// Calculate cart totals
   double get cartTotal => cartSubtotal + cartGstAmount - overallDiscount;
 
-  /// Create sale from cart
+  /// Create sale from cart and return the sale ID
+  Future<String?> createSaleFromCartWithId({
+    required String paymentMethod,
+    required double amountPaid,
+    String? notes,
+  }) async {
+    if (_cartItems.isEmpty) {
+      _setError('Cart is empty');
+      return null;
+    }
+
+    try {
+      final saleItems = _cartItems
+          .map(
+            (item) => CreateSaleItemRequest(
+          productId: item.productId,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          itemDiscount: item.itemDiscount,
+          customizationNotes: item.customizationNotes,
+        ),
+      )
+          .toList();
+
+      final request = CreateSaleRequest(
+        customerId: _selectedCustomer?.id,
+        overallDiscount: _overallDiscount,
+        taxConfiguration: _taxConfiguration,
+        paymentMethod: paymentMethod,
+        amountPaid: amountPaid,
+        notes: notes,
+        saleItems: saleItems,
+      );
+
+      debugPrint('🚀 Creating sale with payload: ${request.toJson()}');
+
+      final response = await _salesService.createSale(request);
+
+      if (response.success && response.data != null) {
+        final saleId = response.data!.id;
+        _sales.insert(0, response.data!);
+        _setSuccess('Sale created successfully');
+        
+        // Clear cart after successful sale
+        clearCart();
+        setSelectedCustomer(null);
+        
+        // Refresh products to update stock quantities
+        await loadProducts();
+        
+        // Refresh dashboard to update real-time counts
+        DashboardProvider.refreshDashboard();
+        
+        return saleId;
+      } else {
+        _setError(response.message);
+        return null;
+      }
+    } catch (e) {
+      debugPrint('💥 Exception in createSaleFromCartWithId: $e');
+      _setError('Error creating sale from cart: $e');
+      return null;
+    }
+  }
   Future<bool> createSaleFromCart({
     required String paymentMethod,
     required double amountPaid,
@@ -412,6 +523,12 @@ class SalesProvider extends ChangeNotifier {
       if (success) {
         clearCart();
         setSelectedCustomer(null);
+        
+        // Refresh products to update stock quantities
+        await loadProducts();
+        
+        // Refresh dashboard to update real-time counts
+        DashboardProvider.refreshDashboard();
       }
       return success;
     } catch (e) {
@@ -448,6 +565,13 @@ class SalesProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         _sales.insert(0, response.data!);
         _setSuccess('Sale created successfully');
+        
+        // Refresh products to update stock quantities
+        await loadProducts();
+        
+        // Refresh dashboard to update real-time counts
+        DashboardProvider.refreshDashboard();
+        
         return true;
       } else {
         _setError(response.message);
@@ -717,6 +841,40 @@ class SalesProvider extends ChangeNotifier {
 
   // ===== BULK OPERATIONS =====
 
+  /// Bulk recalculate all sales totals
+  Future<bool> bulkRecalculateTotals() async {
+    _setLoading(true);
+    _clearMessages();
+
+    try {
+      // Get all sales IDs
+      final allSalesIds = _sales.map((sale) => sale.id).toList();
+      
+      if (allSalesIds.isEmpty) {
+        _setError('No sales found to recalculate');
+        return false;
+      }
+
+      _setLoading(false); // Stop loading for info message
+      
+      final response = await _salesService.bulkActionSales(allSalesIds, 'recalculate');
+
+      if (response.success) {
+        await loadSales(refresh: true);
+        _setSuccess('Totals recalculated successfully for ${allSalesIds.length} sales');
+        return true;
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      _setError('Error recalculating sales totals: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   /// Bulk activate sales
   Future<bool> bulkActivateSales(List<String> saleIds) async {
     try {
@@ -863,27 +1021,6 @@ class SalesProvider extends ChangeNotifier {
       }
     } catch (e) {
       _setError('Error returning sales: $e');
-      return false;
-    }
-  }
-
-  /// Bulk recalculate sale totals
-  Future<bool> bulkRecalculateTotals(List<String> saleIds) async {
-    try {
-      final response = await _salesService.bulkActionSales(
-        saleIds,
-        'recalculate',
-      );
-      if (response.success) {
-        await loadSales(refresh: true);
-        _setSuccess('${saleIds.length} sales totals recalculated successfully');
-        return true;
-      } else {
-        _setError(response.message);
-        return false;
-      }
-    } catch (e) {
-      _setError('Error recalculating sales totals: $e');
       return false;
     }
   }
@@ -1329,7 +1466,6 @@ class SalesProvider extends ChangeNotifier {
   }
 
 
-  /// Update sale item
   Future<bool> updateSaleItem(
       String itemId,
       UpdateSaleItemRequest request,
@@ -1337,7 +1473,6 @@ class SalesProvider extends ChangeNotifier {
     try {
       final response = await _saleItemService.updateSaleItem(itemId, request);
       if (response.success && response.data != null) {
-        // Update the item in the sale
         for (int i = 0; i < _sales.length; i++) {
           final itemIndex = _sales[i].saleItems.indexWhere(
                 (item) => item.id == itemId,
@@ -1406,25 +1541,42 @@ class SalesProvider extends ChangeNotifier {
     }
   }
 
-  // ✅ UPDATED: Trigger Native Print Dialog
+  // ✅ UPDATED: Open PDF in System Viewer
   Future<bool> generateReceiptPdf(String saleId) async {
     _setLoading(true);
+    debugPrint("🖨️ [SalesProvider] Starting PDF Generation...");
+
     try {
       final response = await _salesService.generateSaleReceipt(saleId);
 
       if (response.success && response.data != null) {
-        debugPrint("✅ PDF Bytes received: ${response.data!.length} bytes");
+        debugPrint("✅ PDF Bytes received. Opening in system viewer...");
 
-        // ✅ Switch BACK to layoutPdf for standard printing
-        // The 'format' hints to the OS that this is 80mm roll paper
-        await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => response.data!,
-          name: 'Receipt_$saleId',
-          format: PdfPageFormat.roll80,
-        );
-
-        _setSuccess('Receipt sent to printer');
-        return true;
+        try {
+          // ✅ Save PDF to temporary file
+          final directory = await getTemporaryDirectory();
+          final fileName = 'Receipt_$saleId.pdf';
+          final filePath = '${directory.path}/$fileName';
+          
+          final file = File(filePath);
+          await file.writeAsBytes(response.data!);
+          
+          debugPrint("✅ PDF saved to: $filePath");
+          
+          // ✅ Open PDF in system viewer
+          if (Platform.isMacOS || Platform.isWindows) {
+            await Process.run('open', [filePath]);
+          } else if (Platform.isLinux) {
+            await Process.run('xdg-open', [filePath]);
+          }
+          
+          _setSuccess('Receipt opened for printing');
+          return true;
+        } catch (openError) {
+          debugPrint("❌ Failed to open PDF: $openError");
+          _setError('Failed to open receipt: $openError');
+          return false;
+        }
       } else {
         _setError(response.message);
         return false;
@@ -1438,16 +1590,197 @@ class SalesProvider extends ChangeNotifier {
     }
   }
 
-  // Private helper methods
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
+  // ✅ NEW: Generate Invoice PDF (similar to receipt but for invoices)
+  Future<bool> generateInvoicePdf(String invoiceId) async {
+    _setLoading(true);
+    debugPrint("🖨️ [SalesProvider] Starting Invoice PDF Generation...");
+
+    try {
+      final response = await _salesService.generateInvoicePdf(invoiceId);
+
+      if (response.success && response.data != null) {
+        debugPrint("✅ Invoice PDF Bytes received. Opening in system viewer...");
+
+        try {
+          // ✅ Save PDF to temporary file
+          final directory = await getTemporaryDirectory();
+          final fileName = 'Invoice_$invoiceId.pdf';
+          final filePath = '${directory.path}/$fileName';
+          
+          final file = File(filePath);
+          await file.writeAsBytes(response.data!);
+          
+          debugPrint("✅ Invoice PDF saved to: $filePath");
+          
+          // ✅ Open PDF in system viewer
+          if (Platform.isMacOS || Platform.isWindows) {
+            await Process.run('open', [filePath]);
+          } else {
+            await Process.run('xdg-open', [filePath]);
+          }
+          
+          _setSuccess('Invoice opened for printing');
+          return true;
+        } catch (openError) {
+          debugPrint("❌ Failed to open Invoice PDF: $openError");
+          _setError('Failed to open invoice: $openError');
+          return false;
+        }
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Invoice Print Error: $e");
+      _setError('Error generating invoice: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  void _setError(String message) {
-    _errorMessage = message;
-    _successMessage = null;
-    notifyListeners();
+// ✅ NEW: Generate Thermal Print for Sale
+  Future<bool> generateSaleThermalPrint(String saleId) async {
+    _setLoading(true);
+    debugPrint("🖨️ [SalesProvider] Starting Thermal Print Generation...");
+
+    try {
+      final response = await _salesService.generateSaleThermalPrint(saleId);
+
+      if (response.success && response.data != null) {
+        debugPrint("✅ Thermal print data received");
+        
+        // Backend returns thermal data as JSON, not PDF bytes
+        // For now, show the thermal data in a dialog or save as text file
+        final thermalData = response.data as Map<String, dynamic>;
+        
+        try {
+          // Create a simple text receipt from thermal data
+          final receiptText = _generateThermalTextReceipt(thermalData);
+          
+          // Save as text file
+          final directory = await getTemporaryDirectory();
+          final fileName = 'Thermal_Receipt_$saleId.txt';
+          final filePath = '${directory.path}/$fileName';
+          
+          final file = File(filePath);
+          await file.writeAsString(receiptText);
+          
+          debugPrint("✅ Thermal receipt saved to: $filePath");
+          
+          // Open text file in system viewer
+          if (Platform.isMacOS || Platform.isWindows) {
+            await Process.run('open', [filePath]);
+          } else if (Platform.isLinux) {
+            await Process.run('xdg-open', [filePath]);
+          }
+          
+          _setSuccess('Thermal receipt opened for printing');
+          return true;
+        } catch (openError) {
+          debugPrint("❌ Failed to open thermal receipt: $openError");
+          _setError('Failed to open thermal receipt: $openError');
+          return false;
+        }
+      } else {
+        _setError(response.message);
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Thermal Print Error: $e");
+      _setError('Error generating thermal print: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // ✅ Generate thermal-style text receipt
+  String _generateThermalTextReceipt(Map<String, dynamic> thermalData) {
+    final receipt = thermalData['sale'];
+    final items = thermalData['items'] as List;
+    final company = thermalData['company'];
+    
+    final buffer = StringBuffer();
+    
+    // Company header
+    buffer.writeln(company['name'] ?? 'Al Noor');
+    buffer.writeln(company['address'] ?? '');
+    buffer.writeln(company['phone'] ?? '');
+    buffer.writeln('' + '=' * 40);
+    
+    // Receipt details
+    buffer.writeln('Invoice: ${receipt['invoice_number']}');
+    buffer.writeln('Date: ${receipt['date_of_sale']}');
+    buffer.writeln('Customer: ${receipt['customer_name']}');
+    if (receipt['customer_phone'] != null && receipt['customer_phone'].isNotEmpty) {
+      buffer.writeln('Phone: ${receipt['customer_phone']}');
+    }
+    buffer.writeln('' + '-' * 40);
+    
+    // Table header
+    buffer.writeln('Item        Qty  Price   Total');
+    buffer.writeln('' + '-' * 40);
+    
+    // Items
+    for (var item in items) {
+      final itemName = item['name'] as String;
+      final quantity = item['quantity'] as int;
+      final unitPrice = item['unit_price'] as double;
+      final total = item['total'] as double;
+      
+      // Item name (truncate if too long)
+      String displayName = itemName.length > 10 ? itemName.substring(0, 10) : itemName;
+      buffer.writeln('$displayName${' ' * (10 - displayName.length)}${quantity.toString().padLeft(3)}  ${unitPrice.toStringAsFixed(0).padLeft(5)}  ${total.toStringAsFixed(0).padLeft(5)}');
+      
+      // If item name was truncated, show the rest on next line
+      if (itemName.length > 10) {
+        String remainingName = itemName.substring(10);
+        if (remainingName.length > 40) {
+          remainingName = remainingName.substring(0, 40);
+        }
+        buffer.writeln(remainingName);
+      }
+    }
+    
+    buffer.writeln('' + '-' * 40);
+    
+    // Totals
+    buffer.writeln('Subtotal:'.padRight(17) + receipt['subtotal'].toStringAsFixed(0).padLeft(6));
+    
+    if (receipt['overall_discount'] > 0) {
+      buffer.writeln('Discount:'.padRight(17) + '-${receipt['overall_discount'].toStringAsFixed(0)}'.padLeft(6));
+    }
+    
+    if (receipt['tax_amount'] > 0) {
+      buffer.writeln('Tax:'.padRight(17) + receipt['tax_amount'].toStringAsFixed(0).padLeft(6));
+    }
+    
+    // Double line for total
+    buffer.writeln('' + '=' * 40);
+    
+    // Grand Total (larger font simulation)
+    buffer.writeln('TOTAL:'.padRight(17) + receipt['grand_total'].toStringAsFixed(0).padLeft(6));
+    
+    // Double line for total
+    buffer.writeln('' + '=' * 40);
+    
+    // Payment info
+    buffer.writeln('Payment: ${receipt['payment_method']}');
+    buffer.writeln('Paid:'.padRight(17) + receipt['amount_paid'].toStringAsFixed(0).padLeft(6));
+    
+    if (receipt['remaining_amount'] > 0) {
+      buffer.writeln('Due:'.padRight(17) + receipt['remaining_amount'].toStringAsFixed(0).padLeft(6));
+    }
+    
+    buffer.writeln('' + '-' * 40);
+    
+    // Footer
+    buffer.writeln('Thank you for shopping!');
+    buffer.writeln('No Return / Exchange without receipt');
+    buffer.writeln('Visit us again!');
+    
+    return buffer.toString();
   }
 
   void _setSuccess(String message) {
@@ -1459,5 +1792,16 @@ class SalesProvider extends ChangeNotifier {
   void _clearMessages() {
     _errorMessage = null;
     _successMessage = null;
+  }
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
+    _successMessage = null;
+    notifyListeners();
   }
 }

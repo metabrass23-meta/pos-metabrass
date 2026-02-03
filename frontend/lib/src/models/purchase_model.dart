@@ -4,6 +4,7 @@ import 'package:frontend/src/models/vendor/vendor_model.dart';
 class PurchaseModel {
   final String? id;
   final String? vendor;
+  final String? vendorName; // ✅ Added to capture 'vendor_name' from API
   final VendorModel? vendorDetail;
   final String invoiceNumber;
   final DateTime purchaseDate;
@@ -18,6 +19,7 @@ class PurchaseModel {
   PurchaseModel({
     this.id,
     this.vendor,
+    this.vendorName,
     this.vendorDetail,
     required this.invoiceNumber,
     required this.purchaseDate,
@@ -34,6 +36,7 @@ class PurchaseModel {
     return PurchaseModel(
       id: json['id']?.toString(),
       vendor: json['vendor']?.toString(),
+      vendorName: json['vendor_name']?.toString(), // ✅ Parse the name directly
       vendorDetail: json['vendor_detail'] != null
           ? VendorModel.fromJson(json['vendor_detail'])
           : null,
@@ -58,17 +61,16 @@ class PurchaseModel {
     );
   }
 
-  /// ✅ FIXED: Now sends full ISO datetime string instead of just date
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
       'vendor': vendor,
       'invoice_number': invoiceNumber,
-      /// ✅ FIXED: Send full datetime (YYYY-MM-DDTHH:MM:SS) instead of just date
       'purchase_date': purchaseDate.toIso8601String(),
-      'subtotal': subtotal,
-      'tax': tax,
-      'total': total,
+      // Send numbers as Strings to ensure Backend DecimalFields accept them strictly
+      'subtotal': subtotal.toStringAsFixed(2),
+      'tax': tax.toStringAsFixed(2),
+      'total': total.toStringAsFixed(2),
       'status': status,
       'items': items.map((item) => item.toJson()).toList(),
     };
@@ -77,6 +79,7 @@ class PurchaseModel {
   PurchaseModel copyWith({
     String? id,
     String? vendor,
+    String? vendorName,
     String? invoiceNumber,
     DateTime? purchaseDate,
     double? subtotal,
@@ -88,6 +91,7 @@ class PurchaseModel {
     return PurchaseModel(
       id: id ?? this.id,
       vendor: vendor ?? this.vendor,
+      vendorName: vendorName ?? this.vendorName,
       invoiceNumber: invoiceNumber ?? this.invoiceNumber,
       purchaseDate: purchaseDate ?? this.purchaseDate,
       subtotal: subtotal ?? this.subtotal,
@@ -127,7 +131,8 @@ class PurchaseItemModel {
           : null,
       quantity: double.tryParse(json['quantity']?.toString() ?? '0.0') ?? 0.0,
       unitCost: double.tryParse(json['unit_cost']?.toString() ?? '0.0') ?? 0.0,
-      totalPrice: double.tryParse(json['total_price']?.toString() ?? '0.0') ?? 0.0,
+      // Check 'total_cost' (API standard) first, fallback to 'total_price'
+      totalPrice: double.tryParse(json['total_cost']?.toString() ?? json['total_price']?.toString() ?? '0.0') ?? 0.0,
     );
   }
 
@@ -135,9 +140,11 @@ class PurchaseItemModel {
     return {
       if (id != null) 'id': id,
       'product': product,
-      'quantity': quantity,
-      'unit_cost': unitCost,
-      'total_price': totalPrice,
+      // Send as String for DecimalField safety
+      'quantity': quantity.toStringAsFixed(2),
+      'unit_cost': unitCost.toStringAsFixed(2),
+      // ✅ REQUIRED KEY matches Backend Serializer
+      'total_cost': totalPrice.toStringAsFixed(2),
     };
   }
 

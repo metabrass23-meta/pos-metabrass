@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('expense', models.CharField(help_text='Expense title/name', max_length=200)),
                 ('description', models.TextField(help_text='Detailed description of the expense')),
                 ('amount', models.DecimalField(decimal_places=2, help_text='Expense amount', max_digits=12, validators=[django.core.validators.MinValueValidator(Decimal('0.01'))])),
-                ('withdrawal_by', models.CharField(choices=[('Mr. Sheikh Parveez Maqbool', 'Mr. Sheikh Parveez Maqbool'), ('Mr Sheikh Zain Maqbool', 'Mr Sheikh Zain Maqbool')], help_text='Who authorized/made the withdrawal', max_length=50)),
+                ('withdrawal_by', models.CharField(choices=[('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'), ('Mr Huzaifa', 'Mr Huzaifa')], help_text='Who authorized/made the withdrawal', max_length=50)),
                 ('date', models.DateField(help_text='Date of expense')),
                 ('time', models.TimeField(help_text='Time of expense')),
                 ('category', models.CharField(blank=True, help_text='Optional expense category', max_length=100, null=True)),

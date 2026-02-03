@@ -49,6 +49,46 @@ class VendorProvider extends ChangeNotifier {
   String? get selectedArea => _selectedArea;
   String get sortBy => _sortBy;
   bool get sortAscending => _sortAscending;
+
+  /// Apply client-side filtering as fallback
+  List<VendorModel> _applyClientSideFilters(List<VendorModel> vendors) {
+    List<VendorModel> filtered = List.from(vendors);
+
+    // Filter by inactive status
+    if (!_showInactive) {
+      filtered = filtered.where((vendor) => vendor.isActive).toList();
+    }
+
+    // Filter by city
+    if (_selectedCity != null && _selectedCity!.isNotEmpty) {
+      filtered = filtered.where((vendor) => 
+        vendor.city.toLowerCase().contains(_selectedCity!.toLowerCase())
+      ).toList();
+    }
+
+    // Filter by area
+    if (_selectedArea != null && _selectedArea!.isNotEmpty) {
+      filtered = filtered.where((vendor) => 
+        vendor.area.toLowerCase().contains(_selectedArea!.toLowerCase())
+      ).toList();
+    }
+
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered.where((vendor) =>
+        vendor.name.toLowerCase().contains(query) ||
+        vendor.businessName.toLowerCase().contains(query) ||
+        vendor.displayName.toLowerCase().contains(query) ||
+        vendor.phone.toLowerCase().contains(query) ||
+        vendor.city.toLowerCase().contains(query) ||
+        vendor.area.toLowerCase().contains(query) ||
+        vendor.fullAddress.toLowerCase().contains(query)
+      ).toList();
+    }
+
+    return filtered;
+  }
   VendorStatisticsResponse? get vendorStatistics => _vendorStatistics;
   List<VendorCityCount> get cities => _cities;
   List<VendorAreaCount> get areas => _areas;
@@ -95,7 +135,10 @@ class VendorProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         _vendors = response.data!.vendors;
-        _filteredVendors = List.from(_vendors);
+        
+        // Apply client-side filtering as fallback
+        _filteredVendors = _applyClientSideFilters(_vendors);
+        
         _paginationInfo = response.data!.pagination;
         _hasError = false;
         _errorMessage = null;
@@ -209,7 +252,7 @@ class VendorProvider extends ChangeNotifier {
   Future<bool> addVendor({
     required String name,
     required String businessName,
-    required String cnic,
+    String? cnic,
     required String phone,
     required String city,
     required String area,
@@ -253,7 +296,7 @@ class VendorProvider extends ChangeNotifier {
     required String id,
     required String name,
     required String businessName,
-    required String cnic,
+    String? cnic,
     required String phone,
     required String city,
     required String area,
@@ -720,7 +763,7 @@ class VendorProvider extends ChangeNotifier {
           (vendor) =>
       vendor.name.toLowerCase().contains(lowercaseQuery) ||
           vendor.businessName.toLowerCase().contains(lowercaseQuery) ||
-          vendor.cnic.contains(query) ||
+          (vendor.cnic?.contains(query) ?? false) ||
           vendor.phone.contains(query),
     )
         .take(10)
@@ -739,7 +782,7 @@ class VendorProvider extends ChangeNotifier {
   Map<String, String> validateVendorData({
     required String name,
     required String businessName,
-    required String cnic,
+    String? cnic,
     required String phone,
     required String city,
     required String area,
@@ -761,12 +804,12 @@ class VendorProvider extends ChangeNotifier {
     }
 
     // CNIC validation
-    if (cnic.trim().isEmpty) {
-      errors['cnic'] = 'CNIC is required';
-    } else if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
-      errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
-    } else if (vendorExistsByCnic(cnic.trim())) {
-      errors['cnic'] = 'A vendor with this CNIC already exists';
+    if (cnic != null && cnic.trim().isNotEmpty) {
+      if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
+        errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
+      } else if (vendorExistsByCnic(cnic.trim())) {
+        errors['cnic'] = 'A vendor with this CNIC already exists';
+      }
     }
 
     // Phone validation

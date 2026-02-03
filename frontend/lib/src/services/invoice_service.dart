@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import '../config/api_config.dart';
 import '../models/api_response.dart';
-import '../models/sales/sale_model.dart'; // Ensure InvoiceModel is defined here
+import '../models/sales/sale_model.dart';
 import '../utils/storage_service.dart';
 
 class InvoiceService {
@@ -13,27 +14,25 @@ class InvoiceService {
   final Dio _dio = Dio();
   final StorageService _storageService = StorageService();
 
-  // ✅ CRITICAL FIX: Get Token & Use Correct Header Format ('Token' prefix)
   Future<Options> _getAuthOptions() async {
     final token = await _storageService.getToken() ?? '';
-    if (token.isEmpty) {
-      debugPrint('⚠️ [InvoiceService] Warning: No Auth Token found!');
-    }
     return Options(
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Token $token', // Fixed: "Token" instead of "Bearer"
+        'Authorization': 'Token $token',
       },
-      validateStatus: (status) => status! < 500,
+      // ✅ Allow 500 so we can parse the error message from backend
+      validateStatus: (status) => status != null && status < 600,
     );
   }
 
   String _getUrl(String endpoint) {
-    return '${ApiConfig.baseUrl}$endpoint';
+    final fullUrl = '${ApiConfig.baseUrl}$endpoint';
+    debugPrint('🔗 [InvoiceService] Constructed URL: $fullUrl');
+    return fullUrl;
   }
 
-  /// Create a new invoice for a sale
   Future<ApiResponse<InvoiceModel>> createInvoice({
     required String saleId,
     DateTime? dueDate,
@@ -41,25 +40,41 @@ class InvoiceService {
     String? termsConditions,
   }) async {
     final url = _getUrl(ApiConfig.createInvoice);
-    debugPrint('🚀 [InvoiceService] POST $url');
+
+    // ✅ Formatting Date strictly as YYYY-MM-DD
+    final String? formattedDate = dueDate != null
+        ? DateFormat('yyyy-MM-dd').format(dueDate)
+        : null;
+
+    final Map<String, dynamic> data = {
+      'sale': saleId,
+      'status': 'DRAFT',
+      if (formattedDate != null) 'due_date': formattedDate,
+      'notes': notes ?? '',
+      'terms_conditions': termsConditions ?? 'Standard terms apply',
+    };
+
+    debugPrint('🚀 [InvoiceService] Payload: $data');
 
     try {
       final response = await _dio.post(
         url,
         options: await _getAuthOptions(),
-        data: {
-          'sale': saleId,
-          if (dueDate != null) 'due_date': dueDate.toIso8601String(),
-          if (notes != null) 'notes': notes,
-          if (termsConditions != null) 'terms_conditions': termsConditions,
-        },
+        data: data,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('✅ [InvoiceService] Invoice Created');
         return ApiResponse<InvoiceModel>.fromJson(
           response.data,
               (data) => InvoiceModel.fromJson(data),
+        );
+      } else if (response.statusCode == 500) {
+        // ✅ Specific handling for the Backend Crash
+        debugPrint('🔥 [InvoiceService] 500 Error: ${response.data}');
+        return ApiResponse<InvoiceModel>(
+          success: false,
+          message: 'Server Error: The invoice might already exist, or the date format is rejected by the server.',
+          errors: {'detail': 'Backend Logic Error (500)'},
         );
       } else {
         debugPrint('❌ [InvoiceService] Failed: ${response.data}');
@@ -70,85 +85,15 @@ class InvoiceService {
         );
       }
     } catch (e) {
-      debugPrint('🛑 [InvoiceService] Error: $e');
       return ApiResponse<InvoiceModel>(
         success: false,
-        message: 'Error creating invoice: $e',
+        message: 'Connection Error: $e',
       );
     }
   }
 
-  /// Get invoice details by ID
-  Future<ApiResponse<InvoiceModel>> getInvoice(String id) async {
-    final url = _getUrl(ApiConfig.getInvoiceById(id));
-    debugPrint('🚀 [InvoiceService] GET $url');
+  // --- Other Methods (List, Update, Delete, Generate PDF) ---
 
-    try {
-      final response = await _dio.get(url, options: await _getAuthOptions());
-
-      if (response.statusCode == 200) {
-        return ApiResponse<InvoiceModel>.fromJson(
-          response.data,
-              (data) => InvoiceModel.fromJson(data),
-        );
-      } else {
-        return ApiResponse<InvoiceModel>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to get invoice',
-        );
-      }
-    } catch (e) {
-      return ApiResponse<InvoiceModel>(
-        success: false,
-        message: 'Error getting invoice: $e',
-      );
-    }
-  }
-
-  /// Update invoice details
-  Future<ApiResponse<InvoiceModel>> updateInvoice({
-    required String id,
-    DateTime? dueDate,
-    String? notes,
-    String? termsConditions,
-    String? status,
-  }) async {
-    final url = _getUrl(ApiConfig.updateInvoice(id));
-
-    try {
-      final response = await _dio.put(
-        url,
-        options: await _getAuthOptions(),
-        data: {
-          if (dueDate != null) 'due_date': dueDate.toIso8601String(),
-          if (notes != null) 'notes': notes,
-          if (termsConditions != null) 'terms_conditions': termsConditions,
-          if (status != null) 'status': status,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return ApiResponse<InvoiceModel>.fromJson(
-          response.data,
-              (data) => InvoiceModel.fromJson(data),
-        );
-      } else {
-        return ApiResponse<InvoiceModel>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to update invoice',
-          errors: response.data['errors'] as Map<String, dynamic>?,
-        );
-      }
-    } catch (e) {
-      return ApiResponse<InvoiceModel>(
-        success: false,
-        message: 'Error updating invoice: $e',
-      );
-    }
-  }
-
-  /// List invoices with filtering and pagination
-  /// ✅ FIXED: Returns List<InvoiceModel> safely to prevent type crashes
   Future<ApiResponse<List<InvoiceModel>>> listInvoices({
     String? status,
     String? customerId,
@@ -159,8 +104,8 @@ class InvoiceService {
     int? pageSize,
   }) async {
     final url = _getUrl(ApiConfig.invoices);
-    debugPrint('🚀 [InvoiceService] GET List $url');
-
+    debugPrint('🔍 [InvoiceService] Loading invoices from: $url');
+    
     try {
       final response = await _dio.get(
         url,
@@ -171,103 +116,350 @@ class InvoiceService {
           if (dateFrom != null) 'date_from': dateFrom,
           if (dateTo != null) 'date_to': dateTo,
           if (showInactive != null) 'show_inactive': showInactive.toString(),
-          if (page != null) 'page': page,
-          if (pageSize != null) 'page_size': pageSize,
         },
       );
 
-      if (response.statusCode == 200) {
-        // ✅ SAFE PARSING logic for both List and Pagination Maps
-        List<dynamic> listData = [];
+      debugPrint('🔍 [InvoiceService] Response status: ${response.statusCode}');
+      debugPrint('🔍 [InvoiceService] Response data type: ${response.data.runtimeType}');
+      debugPrint('🔍 [InvoiceService] Response data: ${response.data}');
 
-        // Handle pagination structure {"results": [...]} or {"data": [...]}
-        if (response.data is Map<String, dynamic>) {
-          if (response.data.containsKey('results')) {
-            listData = response.data['results'];
-          } else if (response.data.containsKey('data') && response.data['data'] is List) {
-            listData = response.data['data'];
+      if (response.statusCode == 200) {
+        List<dynamic> listData = [];
+        
+        // Handle different response formats
+        if (response.data == null) {
+          debugPrint('🔍 [InvoiceService] Response data is null');
+          return ApiResponse<List<InvoiceModel>>(
+              success: true,
+              data: [],
+              message: 'No invoices found'
+          );
+        } else if (response.data is Map<String, dynamic>) {
+          final dataMap = response.data as Map<String, dynamic>;
+          if (dataMap.containsKey('results')) {
+            listData = dataMap['results'];
+            debugPrint('🔍 [InvoiceService] Found ${listData.length} invoices in results');
+          } else if (dataMap.containsKey('data')) {
+            listData = dataMap['data'];
+            debugPrint('🔍 [InvoiceService] Found ${listData.length} invoices in data');
+          } else {
+            // If it's a map but no results/data, maybe it's empty
+            debugPrint('🔍 [InvoiceService] Map response without results/data: ${dataMap.keys}');
+            listData = [];
+          }
+        } else if (response.data is List) {
+          listData = response.data;
+          debugPrint('🔍 [InvoiceService] Found ${listData.length} invoices in list');
+        } else {
+          debugPrint('🔍 [InvoiceService] Unexpected response format: ${response.data.runtimeType}');
+          listData = [];
+        }
+
+        debugPrint('🔍 [InvoiceService] Total items to parse: ${listData.length}');
+        
+        final invoices = <InvoiceModel>[];
+        for (int i = 0; i < listData.length; i++) {
+          try {
+            final item = listData[i];
+            debugPrint('🔍 [InvoiceService] Parsing item $i: $item');
+            final invoice = InvoiceModel.fromJson(item as Map<String, dynamic>);
+            invoices.add(invoice);
+            debugPrint('✅ [InvoiceService] Successfully parsed item $i: ${invoice.invoiceNumber}');
+          } catch (e) {
+            debugPrint('❌ [InvoiceService] Error parsing item $i: $e');
+            debugPrint('❌ [InvoiceService] Item data: ${listData[i]}');
+            // Continue with other items even if one fails
           }
         }
-        // Handle direct List structure [...]
-        else if (response.data is List) {
-          listData = response.data;
-        }
-
-        final invoices = listData.map((json) => InvoiceModel.fromJson(json)).toList();
-        debugPrint('✅ [InvoiceService] Loaded ${invoices.length} invoices');
-
+        
+        debugPrint('🔍 [InvoiceService] Successfully parsed ${invoices.length} out of ${listData.length} InvoiceModel objects');
+        
         return ApiResponse<List<InvoiceModel>>(
-          success: true,
-          data: invoices,
-          message: 'Invoices list loaded',
+            success: true,
+            data: invoices,
+            message: 'Invoices loaded successfully'
         );
       } else {
-        debugPrint('❌ [InvoiceService] Failed: ${response.data}');
+        debugPrint('❌ [InvoiceService] Failed with status: ${response.statusCode}');
         return ApiResponse<List<InvoiceModel>>(
+            success: false,
+            data: [],
+            message: 'Failed to load invoices: Status ${response.statusCode}'
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [InvoiceService] Exception loading invoices: $e');
+      return ApiResponse<List<InvoiceModel>>(
           success: false,
           data: [],
-          message: response.data['message'] ?? 'Failed to list invoices',
-        );
-      }
-    } catch (e) {
-      debugPrint('🛑 [InvoiceService] Exception: $e');
-      return ApiResponse<List<InvoiceModel>>(
-        success: false,
-        data: [],
-        message: 'Error listing invoices: $e',
+          message: 'Error: $e'
       );
     }
   }
 
-  /// Delete an invoice
-  Future<ApiResponse<bool>> deleteInvoice(String id) async {
-    final url = _getUrl(ApiConfig.deleteInvoice(id));
+  Future<ApiResponse<InvoiceModel>> updateInvoice({
+    required String id,
+    DateTime? dueDate,
+    String? notes,
+    String? termsConditions,
+    String? status,
+  }) async {
+    final url = _getUrl(ApiConfig.updateInvoice(id));
+    final String? formattedDate = dueDate != null
+        ? DateFormat('yyyy-MM-dd').format(dueDate)
+        : null;
+
+    debugPrint('🔍 [InvoiceService] Updating invoice at: $url');
+    debugPrint('🔍 [InvoiceService] Due date: $formattedDate');
+    debugPrint('🔍 [InvoiceService] Status: $status');
+    debugPrint('🔍 [InvoiceService] Notes: $notes');
 
     try {
-      final response = await _dio.delete(
+      final response = await _dio.put(
         url,
         options: await _getAuthOptions(),
+        data: {
+          if (formattedDate != null) 'due_date': formattedDate,
+          if (notes != null) 'notes': notes,
+          if (termsConditions != null) 'terms_conditions': termsConditions,
+          if (status != null) 'status': status,
+        },
       );
 
-      if (response.statusCode == 204 || response.statusCode == 200) {
-        return ApiResponse<bool>(success: true, data: true, message: 'Deleted');
+      debugPrint('🔍 [InvoiceService] Update response status: ${response.statusCode}');
+      debugPrint('🔍 [InvoiceService] Update response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        return ApiResponse<InvoiceModel>.fromJson(
+          response.data,
+              (data) => InvoiceModel.fromJson(data),
+        );
       } else {
-        return ApiResponse<bool>(
+        debugPrint('❌ [InvoiceService] Update failed with status: ${response.statusCode}');
+        return ApiResponse<InvoiceModel>(
           success: false,
-          data: false,
-          message: response.data['message'] ?? 'Failed to delete invoice',
+          message: response.data['message'] ?? 'Failed to update invoice',
         );
       }
     } catch (e) {
-      return ApiResponse<bool>(success: false, data: false, message: 'Error: $e');
+      debugPrint('❌ [InvoiceService] Exception updating invoice: $e');
+      return ApiResponse<InvoiceModel>(
+        success: false,
+        message: 'Error updating invoice: $e',
+      );
     }
   }
 
-  /// Generate PDF for invoice
+  Future<ApiResponse<bool>> deleteInvoice(String id) async {
+    final url = _getUrl(ApiConfig.deleteInvoice(id));
+    
+    debugPrint('🔍 [InvoiceService] Deleting invoice at: $url');
+    
+    try {
+      final response = await _dio.delete(
+        url, 
+        options: await _getAuthOptions(),
+      );
+      
+      debugPrint('🔍 [InvoiceService] Delete response status: ${response.statusCode}');
+      debugPrint('🔍 [InvoiceService] Delete response data: ${response.data}');
+      
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        debugPrint('✅ [InvoiceService] Invoice deleted successfully');
+        return ApiResponse<bool>(
+          success: true,
+          data: true,
+          message: 'Invoice deleted successfully'
+        );
+      } else {
+        debugPrint('❌ [InvoiceService] Delete failed with status: ${response.statusCode}');
+        
+        // Try to extract error message from response
+        String errorMessage = 'Failed to delete invoice';
+        if (response.data is Map && response.data['message'] != null) {
+          errorMessage = response.data['message'];
+        } else if (response.data is String) {
+          errorMessage = response.data;
+        }
+        
+        return ApiResponse<bool>(success: false, message: errorMessage);
+      }
+    } catch (e) {
+      debugPrint('❌ [InvoiceService] Exception deleting invoice: $e');
+      
+      // Extract more detailed error information
+      String errorMessage = 'Error deleting invoice';
+      if (e.toString().contains('SocketException')) {
+        errorMessage = 'Network error: Could not connect to server';
+      } else if (e.toString().contains('TimeoutException')) {
+        errorMessage = 'Request timeout: Server took too long to respond';
+      } else if (e.toString().contains('404')) {
+        errorMessage = 'Invoice not found or already deleted';
+      } else if (e.toString().contains('403')) {
+        errorMessage = 'Permission denied: Cannot delete this invoice';
+      } else if (e.toString().contains('500')) {
+        errorMessage = 'Server error: Delete operation failed';
+      } else {
+        errorMessage = 'Error: $e';
+      }
+      
+      return ApiResponse<bool>(success: false, message: errorMessage);
+    }
+  }
+
   Future<ApiResponse<Map<String, dynamic>>> generateInvoicePdf(String id) async {
     final url = _getUrl(ApiConfig.generateInvoicePdf(id));
-
+    
+    debugPrint('🔍 [InvoiceService] Generating PDF at: $url');
+    
     try {
+      final response = await _dio.post(
+        url, 
+        options: await _getAuthOptions(),
+      );
+      
+      debugPrint('🔍 [InvoiceService] PDF response status: ${response.statusCode}');
+      debugPrint('🔍 [InvoiceService] PDF response data: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        // Check if response contains PDF data or success message
+        if (response.data != null) {
+          debugPrint('✅ [InvoiceService] PDF generated successfully');
+          
+          // If response contains a file URL, we can download it
+          if (response.data['file_url'] != null) {
+            debugPrint('🔍 [InvoiceService] PDF file URL available: ${response.data['file_url']}');
+            // You could add download logic here if needed
+          }
+          
+          // If response contains base64 data, we could decode and save it
+          if (response.data['file_data'] != null) {
+            debugPrint('🔍 [InvoiceService] PDF contains base64 data');
+            // You could add base64 decode and save logic here
+          }
+          
+          return ApiResponse<Map<String, dynamic>>.fromJson(
+              response.data, (d) => d as Map<String, dynamic>
+          );
+        } else {
+          debugPrint('❌ [InvoiceService] PDF response data is null');
+          return ApiResponse<Map<String, dynamic>>(
+            success: false, 
+            message: 'PDF generation returned empty response'
+          );
+        }
+      } else {
+        debugPrint('❌ [InvoiceService] PDF generation failed with status: ${response.statusCode}');
+        debugPrint('❌ [InvoiceService] Response: ${response.data}');
+        
+        // Try to extract error message from response
+        String errorMessage = 'Failed PDF gen';
+        if (response.data is Map && response.data['message'] != null) {
+          errorMessage = response.data['message'];
+        } else if (response.data is String) {
+          errorMessage = response.data;
+        }
+        
+        return ApiResponse<Map<String, dynamic>>(
+          success: false, 
+          message: errorMessage
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [InvoiceService] Exception generating PDF: $e');
+      
+      // Extract more detailed error information
+      String errorMessage = 'Error generating PDF';
+      if (e.toString().contains('SocketException')) {
+        errorMessage = 'Network error: Could not connect to server';
+      } else if (e.toString().contains('TimeoutException')) {
+        errorMessage = 'Request timeout: Server took too long to respond';
+      } else if (e.toString().contains('404')) {
+        errorMessage = 'PDF generation endpoint not found';
+      } else if (e.toString().contains('500')) {
+        errorMessage = 'Server error: PDF generation failed on server';
+      } else {
+        errorMessage = 'Error: $e';
+      }
+      
+      return ApiResponse<Map<String, dynamic>>(
+        success: false, 
+        message: errorMessage
+      );
+    }
+  }
+
+  /// Generate thermal print data for an invoice
+  Future<ApiResponse<Map<String, dynamic>>> generateInvoiceThermalPrint(String invoiceId) async {
+    debugPrint('🔍 [InvoiceService] Generating thermal print for invoice: $invoiceId');
+    
+    try {
+      final url = '${ApiConfig.baseUrl}${ApiConfig.generateInvoiceThermalPrint(invoiceId)}';
+      debugPrint('🔗 [InvoiceService] Constructed URL: $url');
+      debugPrint('🔍 [InvoiceService] Generating thermal print at: $url');
+      
       final response = await _dio.post(
         url,
         options: await _getAuthOptions(),
       );
-
-      if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>.fromJson(
-          response.data,
-              (data) => data as Map<String, dynamic>,
-        );
+      
+      debugPrint('🔍 [InvoiceService] Thermal print response status: ${response.statusCode}');
+      debugPrint('🔍 [InvoiceService] Thermal print response data: ${response.data}');
+      
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data is Map && response.data['success'] == true) {
+          debugPrint('✅ [InvoiceService] Thermal print data generated successfully');
+          return ApiResponse<Map<String, dynamic>>(
+            success: true, 
+            message: 'Thermal print data generated successfully',
+            data: response.data['data'] ?? {}
+          );
+        } else {
+          debugPrint('❌ [InvoiceService] Thermal print generation failed with response: ${response.data}');
+          String errorMessage = 'Failed to generate thermal print data';
+          if (response.data is Map && response.data['message'] != null) {
+            errorMessage = response.data['message'];
+          }
+          return ApiResponse<Map<String, dynamic>>(
+            success: false, 
+            message: errorMessage
+          );
+        }
       } else {
+        debugPrint('❌ [InvoiceService] Thermal print generation failed with status: ${response.statusCode}');
+        debugPrint('❌ [InvoiceService] Response: ${response.data}');
+        
+        String errorMessage = 'Failed thermal print generation';
+        if (response.data is Map && response.data['message'] != null) {
+          errorMessage = response.data['message'];
+        } else if (response.data is String) {
+          errorMessage = response.data;
+        }
+        
         return ApiResponse<Map<String, dynamic>>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to generate PDF',
+          success: false, 
+          message: errorMessage
         );
       }
     } catch (e) {
+      debugPrint('❌ [InvoiceService] Exception generating thermal print: $e');
+      
+      String errorMessage = 'Error generating thermal print';
+      if (e.toString().contains('SocketException')) {
+        errorMessage = 'Network error: Could not connect to server';
+      } else if (e.toString().contains('TimeoutException')) {
+        errorMessage = 'Request timeout: Server took too long to respond';
+      } else if (e.toString().contains('404')) {
+        errorMessage = 'Thermal print endpoint not found';
+      } else if (e.toString().contains('500')) {
+        errorMessage = 'Server error: Thermal print generation failed on server';
+      } else {
+        errorMessage = 'Error: $e';
+      }
+      
       return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'Error: $e',
+        success: false, 
+        message: errorMessage
       );
     }
   }

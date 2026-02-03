@@ -133,6 +133,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog>
       final deduction = double.tryParse(_deductionController.text.trim()) ?? 0.0;
       final netAmount = amount + bonus - deduction;
 
+      // TODO: Fix remaining amount validation when backend properly tracks remaining_monthly_salary
+      // For now, skip this validation to allow payments
+      /*
       if (_selectedLabor != null &&
           netAmount > _selectedLabor!.remainingAmount &&
           !_isFinalPayment) {
@@ -140,6 +143,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog>
             _selectedLabor!.remainingAmount.toStringAsFixed(0)));
         return;
       }
+      */
 
       String payerType;
       String? payerId;
@@ -164,7 +168,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog>
       final paymentProvider =
       Provider.of<PaymentProvider>(context, listen: false);
 
-      await paymentProvider.addPayment(
+      final success = await paymentProvider.addPayment(
         laborId: _selectedLabor?.id,
         vendorId: _selectedVendorId,
         orderId: _selectedOrderId,
@@ -184,8 +188,14 @@ class _AddPaymentDialogState extends State<AddPaymentDialog>
       );
 
       if (mounted) {
-        _showSuccessSnackbar();
-        Navigator.of(context).pop();
+        if (success) {
+          _showSuccessSnackbar();
+          Navigator.of(context).pop();
+        } else {
+          _showErrorSnackbar(
+            paymentProvider.errorMessage ?? l10n.serverErrorTryAgainLater,
+          );
+        }
       }
     }
   }

@@ -125,6 +125,12 @@ class ReturnModel {
   }
 
   factory ReturnModel.fromJson(Map<String, dynamic> json) {
+    debugPrint('🔍 [ReturnModel] Full JSON data: $json');
+    debugPrint('🔍 [ReturnModel] Parsing return data: refund_amount = ${json['refund_amount']}');
+    debugPrint('🔍 [ReturnModel] sale_invoice_number = ${json['sale_invoice_number']}');
+    debugPrint('🔍 [ReturnModel] reason = ${json['reason']}');
+    final totalReturnAmount = double.tryParse(json['refund_amount']?.toString() ?? '0') ?? 0.0;
+    debugPrint('✅ [ReturnModel] Parsed totalReturnAmount: $totalReturnAmount');
     return ReturnModel(
       id: json['id'] ?? '',
       saleId: json['sale'] ?? '',
@@ -137,20 +143,20 @@ class ReturnModel {
       status: json['status'] ?? '',
       reason: json['reason'] ?? '',
       reasonDetails: json['reason_details'],
-      totalReturnAmount: double.tryParse(json['total_return_amount']?.toString() ?? '0') ?? 0.0,
-      refundAmount: double.tryParse(json['refund_amount']?.toString() ?? '0') ?? 0.0,
+      totalReturnAmount: double.tryParse(json['total_return_amount']?.toString() ?? json['refund_amount']?.toString() ?? '0') ?? 0.0,
+      refundAmount: double.tryParse(json['total_return_amount']?.toString() ?? json['refund_amount']?.toString() ?? '0') ?? 0.0,
       refundMethod: json['refund_method'],
       notes: json['notes'],
-      approvedById: json['approved_by'],
+      approvedById: json['approved_by']?.toString(),
       approvedByName: json['approved_by_name'],
       approvedAt: json['approved_at'] != null ? DateTime.parse(json['approved_at']) : null,
-      processedById: json['processed_by'],
+      processedById: json['processed_by']?.toString(),
       processedByName: json['processed_by_name'],
       processedAt: json['processed_at'] != null ? DateTime.parse(json['processed_at']) : null,
       isActive: json['is_active'] ?? true,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      createdById: json['created_by'],
+      createdById: json['created_by']?.toString(),
       createdByName: json['created_by_name'],
       returnItemsCount: json['return_items_count'] ?? 0,
       canBeApproved: json['can_be_approved'] ?? false,
@@ -172,8 +178,7 @@ class ReturnModel {
       'status': status,
       'reason': reason,
       'reason_details': reasonDetails,
-      'total_return_amount': totalReturnAmount,
-      'refund_amount': refundAmount,
+      'refund_amount': totalReturnAmount,
       'refund_method': refundMethod,
       'notes': notes,
       'approved_by': approvedById,
@@ -513,28 +518,49 @@ class RefundModel {
   }
 
   factory RefundModel.fromJson(Map<String, dynamic> json) {
-    return RefundModel(
-      id: json['id'] ?? '',
-      returnRequestId: json['return_request'] ?? '',
-      returnNumber: json['return_number'] ?? '',
-      saleInvoiceNumber: json['sale_invoice_number'] ?? '',
-      customerName: json['customer_name'] ?? '',
-      refundNumber: json['refund_number'] ?? '',
-      refundDate: DateTime.parse(json['refund_date']),
+    debugPrint('🔍 [RefundModel] Parsing refund JSON: $json');
+    
+    final returnRequestId = json['return_request_id']?.toString() ?? json['return_request']?.toString() ?? '';
+    final returnNumber = json['return_number']?.toString() ?? '';
+    final saleInvoiceNumber = json['sale_invoice_number']?.toString() ?? '';
+    final customerName = json['customer_name']?.toString() ?? '';
+    
+    debugPrint('🔍 [RefundModel] Extracted fields:');
+    debugPrint('  - returnRequestId: "$returnRequestId"');
+    debugPrint('  - returnNumber: "$returnNumber"');
+    debugPrint('  - saleInvoiceNumber: "$saleInvoiceNumber"');
+    debugPrint('  - customerName: "$customerName"');
+    
+    final refundModel = RefundModel(
+      id: json['id']?.toString() ?? '',
+      returnRequestId: returnRequestId,
+      returnNumber: returnNumber,
+      saleInvoiceNumber: saleInvoiceNumber,
+      customerName: customerName,
+      refundNumber: json['refund_number']?.toString() ?? '',
+      refundDate: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
       amount: double.tryParse(json['amount']?.toString() ?? '0') ?? 0.0,
-      method: json['method'] ?? '',
-      status: json['status'] ?? '',
-      referenceNumber: json['reference_number'],
-      notes: json['notes'],
-      processedById: json['processed_by'],
-      processedByName: json['processed_by_name'],
+      method: json['method']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      referenceNumber: json['reference_number']?.toString(),
+      notes: json['notes']?.toString(),
+      processedById: json['processed_by']?.toString(),
+      processedByName: json['processed_by_name']?.toString(),
       processedAt: json['processed_at'] != null ? DateTime.parse(json['processed_at']) : null,
       isActive: json['is_active'] ?? true,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      createdById: json['created_by'],
-      createdByName: json['created_by_name'],
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
+      createdById: json['created_by']?.toString(),
+      createdByName: json['created_by_name']?.toString(),
     );
+    
+    debugPrint('✅ [RefundModel] Created RefundModel with:');
+    debugPrint('  - returnRequestId: "${refundModel.returnRequestId}"');
+    debugPrint('  - returnNumber: "${refundModel.returnNumber}"');
+    debugPrint('  - saleInvoiceNumber: "${refundModel.saleInvoiceNumber}"');
+    debugPrint('  - customerName: "${refundModel.customerName}"');
+    
+    return refundModel;
   }
 
   Map<String, dynamic> toJson() {

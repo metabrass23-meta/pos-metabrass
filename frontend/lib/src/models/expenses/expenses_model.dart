@@ -85,9 +85,9 @@ class Expense {
   // Get color for person
   Color get personColor {
     switch (withdrawalBy) {
-      case 'Mr. Sheikh Parveez Maqbool':
+      case 'Mr. Shahzain Baloch':
         return Colors.blue;
-      case 'Mr Sheikh Zain Maqbool':
+      case 'Mr Huzaifa ':
         return Colors.green;
       default:
         return Colors.grey;
@@ -261,8 +261,8 @@ class Expense {
 // Helper class for withdrawal authorities
 class ExpenseAuthorities {
   static const List<String> authorities = [
-    'Mr. Sheikh Parveez Maqbool',
-    'Mr Sheikh Zain Maqbool'
+    'Mr. Shahzain Baloch',
+    'Mr Huzaifa'
   ];
 
   static String getDisplayName(String authority) {

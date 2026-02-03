@@ -135,6 +135,10 @@ class PayableService {
   /// Create a new payable
   Future<ApiResponse<Payable>> createPayable(PayableCreateRequest request) async {
     try {
+      // Debug: Print the request data
+      debugPrint('🔍 DEBUG: Create Payable Request:');
+      debugPrint('📄 Request Data: ${request.toJson()}');
+      
       final response = await _apiClient.post(ApiConfig.createPayable, data: request.toJson());
 
       DebugHelper.printApiResponse('CREATE Payable', response.data);

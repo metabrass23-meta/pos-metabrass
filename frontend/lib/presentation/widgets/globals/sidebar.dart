@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/providers/sales_provider.dart';
-import '../../../src/providers/order_provider.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/providers/customer_provider.dart';
@@ -260,7 +259,6 @@ class PremiumSidebar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final salesCount = context.watch<SalesProvider>().sales.length.toString();
-    final ordersCount = context.watch<OrderProvider>().orders.length.toString();
     final purchasesCount = context.watch<PurchaseProvider>().purchases.length.toString();
     final productsCount = context.watch<ProductProvider>().products.length.toString();
     final categoriesCount = context.watch<CategoryProvider>().categories.length.toString();
@@ -280,7 +278,6 @@ class PremiumSidebar extends StatelessWidget {
     return [
       {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null},
       {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
-      {'icon': Icons.shopping_bag_rounded, 'title': l10n.orders, 'badge': ordersCount},
       {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount},
       {'icon': Icons.inventory_2_rounded, 'title': l10n.products, 'badge': productsCount},
       {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount},
@@ -295,7 +292,6 @@ class PremiumSidebar extends StatelessWidget {
       {'icon': Icons.account_circle_rounded, 'title': l10n.principalAccount, 'badge': null},
       {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': zakatCount},
       {'icon': Icons.calculate_rounded, 'title': l10n.profitLoss, 'badge': null},
-      {'icon': Icons.receipt_rounded, 'title': l10n.tax, 'badge': null},
       {'icon': Icons.assignment_return_rounded, 'title': l10n.returns, 'badge': returnsCount},
       {'icon': Icons.receipt_long_rounded, 'title': l10n.invoices, 'badge': invoicesCount},
       {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': receiptsCount},

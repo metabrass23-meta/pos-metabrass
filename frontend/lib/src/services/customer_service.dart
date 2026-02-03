@@ -21,45 +21,115 @@ class CustomerService {
     try {
       final queryParams = params?.toQueryParameters() ?? CustomerListParams().toQueryParameters();
 
-      // Debug: Log the API call
-      debugPrint('🚀 Calling API: ${ApiConfig.customers}');
-      debugPrint('🌐 Query params: $queryParams');
+      debugPrint('🚀 [CustomerService] GET ${ApiConfig.customers}');
 
       final response = await _apiClient.get(ApiConfig.customers, queryParameters: queryParams);
 
-      // Debug: Log the response
-      debugPrint('🌐 Response status: ${response.statusCode}');
-      debugPrint('🌐 Response data: ${response.data}');
-
-      DebugHelper.printApiResponse('GET Customers', response.data);
-
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<CustomersListResponse>.fromJson(response.data, (data) => CustomersListResponse.fromJson(data));
+        final responseData = response.data;
 
-        // Cache customers if successful
-        if (apiResponse.success && apiResponse.data != null) {
-          await _cacheCustomers(apiResponse.data!.customers);
+        // 🔍 DEBUG: Print raw structure keys
+        debugPrint('📦 [CustomerService] Response Keys: ${responseData.keys.toList()}');
+
+        // ✅ FIX: Robust Parsing Logic for Nested Structure
+        List<CustomerModel> customers = [];
+        PaginationInfo pagination;
+
+        // Check if 'data' is a Map (which contains 'customers' list) or a List directly
+        dynamic dataField = responseData['data'];
+        List<dynamic> listData = [];
+
+        if (dataField is Map) {
+          // Scenario A: data: { "customers": [...], "pagination": {...} }
+          debugPrint('📄 [CustomerService] Data is a Map. Looking for "customers" key.');
+          if (dataField['customers'] != null && dataField['customers'] is List) {
+            listData = dataField['customers'];
+          }
+
+          // Extract Pagination from inside 'data' if present
+          if (dataField['pagination'] != null) {
+            pagination = PaginationInfo.fromJson(dataField['pagination']);
+          } else {
+            // Fallback if pagination is at root level or missing
+            pagination = PaginationInfo(
+                currentPage: 1,
+                pageSize: listData.length > 0 ? listData.length : 20,
+                totalCount: listData.length,
+                totalPages: 1,
+                hasNext: false,
+                hasPrevious: false
+            );
+          }
+        } else if (dataField is List) {
+          // Scenario B: data: [ ... customers ... ]
+          debugPrint('📄 [CustomerService] Data is a List directly.');
+          listData = dataField;
+
+          // Look for pagination at root level
+          if (responseData['pagination'] != null) {
+            pagination = PaginationInfo.fromJson(responseData['pagination']);
+          } else {
+            pagination = PaginationInfo(
+                currentPage: 1,
+                pageSize: listData.length > 0 ? listData.length : 20,
+                totalCount: listData.length,
+                totalPages: 1,
+                hasNext: false,
+                hasPrevious: false
+            );
+          }
+        } else {
+          // Fallback empty
+          listData = [];
+          pagination = PaginationInfo(currentPage: 1, pageSize: 20, totalCount: 0, totalPages: 1, hasNext: false, hasPrevious: false);
         }
 
-        return apiResponse;
+        // Parse the list
+        customers = listData.map((json) {
+          try {
+            return CustomerModel.fromJson(json as Map<String, dynamic>);
+          } catch (e) {
+            debugPrint('⚠️ [CustomerService] Error parsing customer item: $e');
+            return null;
+          }
+        }).whereType<CustomerModel>().toList();
+
+        debugPrint('✅ [CustomerService] Successfully parsed ${customers.length} customers.');
+
+        final listResponse = CustomersListResponse(
+            customers: customers,
+            pagination: pagination
+        );
+
+        // Cache if we got data
+        if (customers.isNotEmpty) {
+          await _cacheCustomers(customers);
+        }
+
+        return ApiResponse<CustomersListResponse>(
+          success: responseData['success'] ?? true,
+          message: responseData['message'] ?? 'Customers retrieved',
+          data: listResponse,
+        );
       } else {
         return ApiResponse<CustomersListResponse>(
           success: false,
-          message: response.data['message'] ?? 'Failed to get customers',
+          message: response.data['message'] ?? 'Failed to get customers (Status ${response.statusCode})',
           errors: response.data['errors'] as Map<String, dynamic>?,
         );
       }
     } on DioException catch (e) {
-      debugPrint('Get customers DioException: ${e.toString()}');
+      debugPrint('❌ [CustomerService] DioException: ${e.message}');
       final apiError = ApiError.fromDioError(e);
 
-      // Try to return cached data if network error
+      // Try cache on network error
       if (apiError.type == 'network_error') {
         final cachedCustomers = await getCachedCustomers();
         if (cachedCustomers.isNotEmpty) {
+          debugPrint('📂 [CustomerService] Returning cached data due to network error.');
           return ApiResponse<CustomersListResponse>(
             success: true,
-            message: 'Showing cached data',
+            message: 'Showing cached data (Offline)',
             data: CustomersListResponse(
               customers: cachedCustomers,
               pagination: PaginationInfo(
@@ -74,13 +144,15 @@ class CustomerService {
           );
         }
       }
-
       return ApiResponse<CustomersListResponse>(success: false, message: apiError.displayMessage, errors: apiError.errors);
-    } catch (e) {
-      DebugHelper.printError('Get customers', e);
-      return ApiResponse<CustomersListResponse>(success: false, message: 'An unexpected error occurred while getting customers');
+    } catch (e, stack) {
+      debugPrint('💥 [CustomerService] UNCAUGHT EXCEPTION: $e');
+      debugPrint(stack.toString());
+      return ApiResponse<CustomersListResponse>(success: false, message: 'Unexpected error: $e');
     }
   }
+
+  // ... (Rest of the file remains exactly the same) ...
 
   /// Get a specific customer by ID
   Future<ApiResponse<CustomerModel>> getCustomerById(String id) async {
@@ -112,7 +184,7 @@ class CustomerService {
   Future<ApiResponse<CustomerModel>> createCustomer({
     required String name,
     required String phone,
-    required String email,
+    String? email,
     String? address,
     String? city,
     String? country,
@@ -172,7 +244,7 @@ class CustomerService {
     required String id,
     required String name,
     required String phone,
-    required String email,
+    String? email,
     String? address,
     String? city,
     String? country,

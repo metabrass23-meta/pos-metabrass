@@ -38,15 +38,6 @@ class ProfitLossExportDialog extends StatelessWidget {
             Colors.red,
                 () => Navigator.of(context).pop('pdf'),
           ),
-          SizedBox(height: context.smallPadding),
-          _buildExportOption(
-            context,
-            l10n.excelSpreadsheet,
-            l10n.dataInSpreadsheetFormatForAnalysis,
-            Icons.table_chart_rounded,
-            Colors.green,
-                () => Navigator.of(context).pop('xlsx'),
-          ),
         ],
       ),
       actions: [

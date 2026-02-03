@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:async';
+import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/invoice_provider.dart';
 import '../../../src/providers/sales_provider.dart';
-import '../../widgets/globals/text_field.dart'; // ✅ Use PremiumTextField
-import '../../widgets/globals/custom_date_picker.dart'; // ✅ Use Syncfusion Picker
+import '../../../src/models/sales/sale_model.dart';
+import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
+import '../../widgets/globals/text_field.dart';
+import '../../widgets/globals/drop_down.dart';
+import '../../widgets/globals/text_button.dart';
+import '../../widgets/globals/custom_date_picker.dart';
 
 class CreateInvoiceDialog extends StatefulWidget {
   const CreateInvoiceDialog({super.key});
@@ -26,14 +33,28 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
   void initState() {
     super.initState();
     _selectedDueDate = DateTime.now().add(const Duration(days: 30));
+
+    // Load sales if empty with delay to prevent API spam
+    Future.microtask(() {
+      final salesProvider = context.read<SalesProvider>();
+      debugPrint('🔍 [CreateInvoiceDialog] Checking SalesProvider state...');
+      debugPrint('🔍 [CreateInvoiceDialog] Sales count: ${salesProvider.sales.length}');
+      debugPrint('🔍 [CreateInvoiceDialog] Is loading: ${salesProvider.isLoading}');
+      
+      if (salesProvider.sales.isEmpty) {
+        debugPrint('🔍 [CreateInvoiceDialog] Loading sales...');
+        salesProvider.loadSales();
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final l10n = AppLocalizations.of(context)!;
+    // Pre-fill terms if needed
     if (_termsController.text.isEmpty) {
-      _termsController.text = l10n.standardTermsAndConditionsApply;
+      final l10n = AppLocalizations.of(context)!;
+      _termsController.text = l10n.standardTermsAndConditionsApply ?? "Standard terms apply";
     }
   }
 
@@ -49,9 +70,10 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('large'))),
+      backgroundColor: Colors.white,
       child: Container(
-        width: 500,
+        width: 500, // Fixed width for dialog consistency
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
@@ -59,127 +81,148 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Header ---
+              // Header
               Row(
                 children: [
-                  Icon(Icons.receipt_long, color: Theme.of(context).primaryColor),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryMaroon.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.receipt_long, color: AppTheme.primaryMaroon),
+                  ),
                   const SizedBox(width: 12),
                   Text(
-                      l10n.createNewInvoice,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+                    l10n.createNewInvoice ?? "Create New Invoice",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const Divider(height: 32),
 
-              // --- 1. Select Sale ---
+              // 1. Select Sale Dropdown
               Consumer<SalesProvider>(
                 builder: (context, salesProvider, child) {
-                  if (salesProvider.sales.isEmpty) {
-                    return Text(l10n.noSalesAvailable);
+                  debugPrint('🔍 [CreateInvoiceDialog] SalesProvider has ${salesProvider.sales.length} sales');
+                  debugPrint('🔍 [CreateInvoiceDialog] SalesProvider loading: ${salesProvider.isLoading}');
+                  
+                  final eligibleSales = salesProvider.sales
+                      .where((sale) => sale.status != 'INVOICED')
+                      .toList();
+                  
+                  debugPrint('🔍 [CreateInvoiceDialog] Found ${eligibleSales.length} eligible sales for invoicing');
+                  
+                  if (eligibleSales.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        border: Border.all(color: Colors.orange.shade200),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.orange.shade700),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              salesProvider.sales.isEmpty 
+                                  ? 'No sales found. Please create some sales first.'
+                                  : 'No eligible sales found. All sales have been invoiced.',
+                              style: TextStyle(color: Colors.orange.shade700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   }
-
-                  return DropdownButtonFormField<String>(
+                  
+                  return PremiumDropdownField<String>(
+                    label: l10n.selectSaleRequired ?? "Select Sale (Required)",
+                    hint: "Choose a sale to create invoice",
                     value: _selectedSaleId,
-                    decoration: InputDecoration(
-                      labelText: l10n.selectSaleRequired,
-                      border: const OutlineInputBorder(),
-                      hintText: l10n.chooseASaleToCreateInvoiceFor,
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    style: const TextStyle(color: Colors.black87, fontSize: 16),
-                    dropdownColor: Colors.white,
-                    items: salesProvider.sales.map((sale) {
-                      return DropdownMenuItem(
+                    items: eligibleSales.map((sale) {
+                      return DropdownItem(
                         value: sale.id,
-                        child: Text(
-                          '${sale.invoiceNumber} - ${sale.customerName} (PKR ${sale.grandTotal.toStringAsFixed(2)})',
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        label: '${sale.invoiceNumber} - ${sale.customerName} (${sale.grandTotal.toStringAsFixed(2)})',
                       );
                     }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSaleId = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.pleaseSelectASale;
-                      }
-                      return null;
-                    },
+                    onChanged: (value) => setState(() => _selectedSaleId = value),
+                    validator: (value) => value == null ? (l10n.pleaseSelectASale ?? "Required") : null,
                   );
                 },
               ),
-
               const SizedBox(height: 16),
 
-              // --- 2. Due Date Picker ---
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.dueDateRequired, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(
-                  _selectedDueDate != null
-                      ? '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}'
-                      : l10n.selectDueDate,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () {
-                    // ✅ FIXED: Using Syncfusion Picker Extension
-                    context.showSyncfusionDateTimePicker(
-                      initialDate: _selectedDueDate ?? DateTime.now(),
-                      initialTime: TimeOfDay.now(),
-                      showTimeInline: false, // Only Date needed
-                      onDateTimeSelected: (date, time) {
-                        setState(() {
-                          _selectedDueDate = date;
-                        });
-                      },
-                    );
-                  },
+              // 2. Due Date Picker
+              InkWell(
+                onTap: () {
+                  context.showSyncfusionDateTimePicker(
+                    initialDate: _selectedDueDate ?? DateTime.now(),
+                    initialTime: TimeOfDay.now(),
+                    showTimeInline: false,
+                    onDateTimeSelected: (date, _) => setState(() => _selectedDueDate = date),
+                  );
+                },
+                child: IgnorePointer(
+                  child: PremiumTextField(
+                    label: l10n.dueDate ?? "Due Date",
+                    controller: TextEditingController(
+                      text: _selectedDueDate != null
+                          ? "${_selectedDueDate!.day}-${_selectedDueDate!.month}-${_selectedDueDate!.year}"
+                          : "",
+                    ),
+                    prefixIcon: Icons.calendar_today,
+                  ),
                 ),
               ),
-
               const SizedBox(height: 16),
 
-              // --- 3. Notes ---
+              // 3. Notes
               PremiumTextField(
-                label: l10n.notes,
-                hint: l10n.additionalInvoiceNotesOptional,
+                label: l10n.notes ?? "Notes",
+                hint: "Additional notes...",
                 controller: _notesController,
-                maxLines: 3,
+                maxLines: 2,
               ),
-
               const SizedBox(height: 16),
 
-              // --- 4. Terms ---
+              // 4. Terms
               PremiumTextField(
-                label: l10n.termsAndConditions,
-                hint: l10n.invoiceTermsAndConditions,
+                label: l10n.termsAndConditions ?? "Terms",
                 controller: _termsController,
-                maxLines: 3,
+                maxLines: 2,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // --- Actions ---
+              // Actions
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-                    child: Text(l10n.cancel),
+                  PremiumButton(
+                    text: l10n.cancel ?? "Cancel",
+                    onPressed: () => Navigator.pop(context),
+                    backgroundColor: Colors.grey,
+                    width: 100,
                   ),
                   const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _createInvoice,
-                    child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : Text(l10n.createInvoice),
+                  Consumer<SalesProvider>(
+                    builder: (context, salesProvider, child) {
+                      final eligibleSales = salesProvider.sales
+                          .where((sale) => sale.status != 'INVOICED')
+                          .toList();
+                      
+                      return PremiumButton(
+                        text: l10n.createInvoice ?? "Create",
+                        onPressed: eligibleSales.isEmpty ? null : _createInvoice,
+                        isLoading: _isLoading,
+                        width: 140,
+                        icon: Icons.check,
+                        backgroundColor: eligibleSales.isEmpty ? Colors.grey : AppTheme.primaryMaroon,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -191,47 +234,42 @@ class _CreateInvoiceDialogState extends State<CreateInvoiceDialog> {
   }
 
   Future<void> _createInvoice() async {
-    final l10n = AppLocalizations.of(context)!;
-
     if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedSaleId == null || _selectedDueDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.pleaseSelectASale), backgroundColor: Colors.red)
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      final invoiceProvider = context.read<InvoiceProvider>();
-      final success = await invoiceProvider.createInvoice(
+      debugPrint('🔍 [CreateInvoiceDialog] Creating invoice for sale: $_selectedSaleId');
+      debugPrint('🔍 [CreateInvoiceDialog] Due date: $_selectedDueDate');
+      debugPrint('🔍 [CreateInvoiceDialog] Notes: ${_notesController.text}');
+      
+      final success = await context.read<InvoiceProvider>().createInvoice(
         saleId: _selectedSaleId!,
         dueDate: _selectedDueDate,
-        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+        // Send null if empty string to be cleaner
+        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
+      debugPrint('🔍 [CreateInvoiceDialog] Create invoice success: $success');
+
       if (success && mounted) {
-        Navigator.of(context).pop();
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.invoiceCreatedSuccessfully), backgroundColor: Colors.green),
+          const SnackBar(content: Text("Invoice Created Successfully"), backgroundColor: Colors.green),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to create invoice"), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
+      debugPrint('❌ [CreateInvoiceDialog] Exception: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.failedToCreateInvoice}: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 }

@@ -96,93 +96,9 @@ class ReceivablesProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   ReceivablesProvider() {
-    _initializeReceivables();
-  }
-
-  void _initializeReceivables() {
-    final now = DateTime.now();
-    _receivables = [
-      Receivable(
-        id: 'REC001',
-        debtorName: 'Ahmed Khan',
-        debtorPhone: '+923001234567',
-        amountGiven: 50000.0,
-        reasonOrItem: 'Business loan for shop expansion',
-        dateLent: now.subtract(const Duration(days: 45)),
-        expectedReturnDate: now.add(const Duration(days: 15)),
-        amountReturned: 20000.0,
-        notes: 'Agreed to return in installments of 10k per month',
-        createdAt: now.subtract(const Duration(days: 45)),
-        updatedAt: now.subtract(const Duration(days: 5)),
-      ),
-      Receivable(
-        id: 'REC002',
-        debtorName: 'Fatima Ali',
-        debtorPhone: '+923009876543',
-        amountGiven: 25000.0,
-        reasonOrItem: 'Wedding dress order advance',
-        dateLent: now.subtract(const Duration(days: 30)),
-        expectedReturnDate: now.subtract(const Duration(days: 5)),
-        amountReturned: 0.0,
-        notes: 'Wedding cancelled, amount to be returned',
-        createdAt: now.subtract(const Duration(days: 30)),
-        updatedAt: now.subtract(const Duration(days: 30)),
-      ),
-      Receivable(
-        id: 'REC003',
-        debtorName: 'Muhammad Hassan',
-        debtorPhone: '+923005555555',
-        amountGiven: 75000.0,
-        reasonOrItem: 'Raw material supply advance',
-        dateLent: now.subtract(const Duration(days: 60)),
-        expectedReturnDate: now.add(const Duration(days: 30)),
-        amountReturned: 40000.0,
-        notes: 'Supplier payment for fabric shipment',
-        createdAt: now.subtract(const Duration(days: 60)),
-        updatedAt: now.subtract(const Duration(days: 10)),
-      ),
-      Receivable(
-        id: 'REC004',
-        debtorName: 'Sara Ahmed',
-        debtorPhone: '+923007777777',
-        amountGiven: 15000.0,
-        reasonOrItem: 'Emergency personal loan',
-        dateLent: now.subtract(const Duration(days: 20)),
-        expectedReturnDate: now.add(const Duration(days: 10)),
-        amountReturned: 15000.0,
-        notes: 'Family emergency loan, returned with thanks',
-        createdAt: now.subtract(const Duration(days: 20)),
-        updatedAt: now.subtract(const Duration(days: 2)),
-      ),
-      Receivable(
-        id: 'REC005',
-        debtorName: 'Ali Raza',
-        debtorPhone: '+923003333333',
-        amountGiven: 35000.0,
-        reasonOrItem: 'Equipment repair advance',
-        dateLent: now.subtract(const Duration(days: 15)),
-        expectedReturnDate: now.add(const Duration(days: 45)),
-        amountReturned: 10000.0,
-        notes: 'Payment for industrial sewing machine repair',
-        createdAt: now.subtract(const Duration(days: 15)),
-        updatedAt: now.subtract(const Duration(days: 7)),
-      ),
-      Receivable(
-        id: 'REC006',
-        debtorName: 'Ayesha Sheikh',
-        debtorPhone: '+923008888888',
-        amountGiven: 20000.0,
-        reasonOrItem: 'Bulk order down payment',
-        dateLent: now.subtract(const Duration(days: 25)),
-        expectedReturnDate: now.subtract(const Duration(days: 10)),
-        amountReturned: 0.0,
-        notes: 'Order cancelled due to quality issues',
-        createdAt: now.subtract(const Duration(days: 25)),
-        updatedAt: now.subtract(const Duration(days: 25)),
-      ),
-    ];
-
-    _filteredReceivables = List.from(_receivables);
+    // Initialize with empty data - no dummy data
+    _receivables = [];
+    _filteredReceivables = [];
   }
 
   void searchReceivables(String query) {

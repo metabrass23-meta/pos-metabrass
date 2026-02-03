@@ -88,13 +88,20 @@ class ReturnService {
   Future<ApiResponse<ReturnModel>> getReturn(String id) async {
     final url = _getUrl('${ApiConfig.returnsEndpoint}$id/');
     try {
+      debugPrint('🔄 [ReturnService] Getting return $id');
       final response = await _dio.get(url, options: await _getAuthOptions());
+      debugPrint('📋 [ReturnService] Response data: ${response.data}');
       if (response.statusCode == 200) {
-        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Return loaded');
+        debugPrint('✅ [ReturnService] Parsing return data...');
+        final returnModel = ReturnModel.fromJson(response.data);
+        debugPrint('✅ [ReturnService] Return parsed successfully: ${returnModel.returnNumber}');
+        return ApiResponse<ReturnModel>(success: true, data: returnModel, message: 'Return loaded');
       } else {
+        debugPrint('❌ [ReturnService] Failed to load return: ${response.data}');
         return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to load');
       }
     } catch (e) {
+      debugPrint('❌ [ReturnService] Error getting return: $e');
       return ApiResponse<ReturnModel>(success: false, data: null, message: 'Error: $e');
     }
   }
@@ -181,7 +188,13 @@ class ReturnService {
         data: {'action': 'approve', if (reason != null) 'reason': reason},
       );
       if (response.statusCode == 200) {
-        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Approved successfully');
+        // After approval, fetch the updated return data
+        final updatedReturn = await getReturn(id);
+        if (updatedReturn.success) {
+          return ApiResponse<ReturnModel>(success: true, data: updatedReturn.data!, message: 'Approved successfully');
+        } else {
+          return ApiResponse<ReturnModel>(success: false, data: null, message: 'Failed to fetch updated return');
+        }
       } else {
         debugPrint('❌ [ReturnService] Approve Failed: ${response.data}');
         return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to approve');
@@ -200,7 +213,13 @@ class ReturnService {
           data: {'action': 'reject', 'reason': reason}
       );
       if (response.statusCode == 200) {
-        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Rejected successfully');
+        // After rejection, fetch the updated return data
+        final updatedReturn = await getReturn(id);
+        if (updatedReturn.success) {
+          return ApiResponse<ReturnModel>(success: true, data: updatedReturn.data!, message: 'Rejected successfully');
+        } else {
+          return ApiResponse<ReturnModel>(success: false, data: null, message: 'Failed to fetch updated return');
+        }
       } else {
         return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to reject');
       }
@@ -218,7 +237,13 @@ class ReturnService {
         data: {if (refundAmount != null) 'refund_amount': refundAmount, if (refundMethod != null) 'refund_method': refundMethod},
       );
       if (response.statusCode == 200) {
-        return ApiResponse<ReturnModel>(success: true, data: ReturnModel.fromJson(response.data), message: 'Processed successfully');
+        // After processing, fetch the updated return data
+        final updatedReturn = await getReturn(id);
+        if (updatedReturn.success) {
+          return ApiResponse<ReturnModel>(success: true, data: updatedReturn.data!, message: 'Processed successfully');
+        } else {
+          return ApiResponse<ReturnModel>(success: false, data: null, message: 'Failed to fetch updated return');
+        }
       } else {
         return ApiResponse<ReturnModel>(success: false, data: null, message: response.data['detail'] ?? 'Failed to process');
       }
@@ -259,7 +284,11 @@ class ReturnService {
             ? response.data['results']
             : (response.data is List ? response.data : []);
 
+        debugPrint('🔍 [ReturnService] Refunds response data: $data');
+        debugPrint('🔍 [ReturnService] Number of refunds: ${data.length}');
+
         final refunds = data.map((json) => RefundModel.fromJson(json)).toList();
+        debugPrint('✅ [ReturnService] Loaded ${refunds.length} refunds');
         return ApiResponse<List<RefundModel>>(success: true, data: refunds, message: 'Refunds loaded');
       } else {
         return ApiResponse<List<RefundModel>>(success: false, data: null, message: response.data['detail'] ?? 'Failed to load');

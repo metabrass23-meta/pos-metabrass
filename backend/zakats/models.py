@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 import uuid
 
@@ -35,8 +35,8 @@ class Zakat(models.Model):
     """Zakat model for tracking Islamic charitable giving"""
     
     AUTHORIZATION_CHOICES = [
-        ('Mr. Sheikh Parveez Maqbool', 'Mr. Sheikh Parveez Maqbool'),
-        ('Mr Sheikh Zain Maqbool', 'Mr Sheikh Zain Maqbool'),
+        ('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'),
+        ('Mr Huzaifa', 'Mr Huzaifa'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

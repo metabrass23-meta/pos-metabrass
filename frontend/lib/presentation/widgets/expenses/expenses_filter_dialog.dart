@@ -30,7 +30,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _withdrawalOptions = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
+  final List<String> _withdrawalOptions = ['Mr. Shahzain Baloch', 'Mr Sheikh Huzaifa'];
 
   final List<String> _commonCategories = ['Office', 'Utilities', 'Transport', 'Marketing', 'Maintenance', 'Supplies', 'Services'];
 
@@ -168,7 +168,7 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 90.w, medium: 70.w, large: 60.w, ultrawide: 50.w),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 98.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(

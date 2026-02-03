@@ -23,6 +23,8 @@ class VendorLedgerScreen extends StatefulWidget {
 }
 
 class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
+  final ScrollController _scrollController = ScrollController();
+  
   @override
   void initState() {
     super.initState();
@@ -30,6 +32,12 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLedger();
     });
+  }
+  
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadLedger() async {
@@ -294,6 +302,7 @@ class _VendorLedgerScreenState extends State<VendorLedgerScreen> {
 
   Widget _buildLedgerTable(List<VendorLedgerEntry> entries) {
     return ListView.separated(
+      controller: _scrollController,
       padding: EdgeInsets.zero,
       itemCount: entries.length,
       separatorBuilder: (context, index) => Divider(

@@ -35,8 +35,8 @@ class Expense(models.Model):
     """Expense model for tracking company expenses and withdrawals"""
     
     WITHDRAWAL_CHOICES = [
-        ('Mr. Sheikh Parveez Maqbool', 'Mr. Sheikh Parveez Maqbool'),
-        ('Mr Sheikh Zain Maqbool', 'Mr Sheikh Zain Maqbool'),
+        ('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'),
+        ('Mr Huzaifa', 'Mr Huzaifa'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

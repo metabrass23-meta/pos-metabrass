@@ -59,19 +59,31 @@ class ProfitLossCalculationView(APIView):
             # Calculate profit and loss
             profit_loss_data = self._calculate_profit_loss(start_date, end_date)
             
-            # Create profit and loss record
+            # Extract values from profit_loss_data
+            total_sales_income = profit_loss_data['total_sales_income']
+            total_cost_of_goods_sold = profit_loss_data['total_cost_of_goods_sold']
+            total_labor_payments = profit_loss_data['total_labor_payments']
+            total_vendor_payments = profit_loss_data['total_vendor_payments']
+            total_expenses = profit_loss_data['total_expenses']
+            total_zakat = profit_loss_data['total_zakat']
+            total_expenses_calculated = total_expenses  # Assuming this is the correct value
+            total_products_sold = profit_loss_data['total_products_sold']
+            average_order_value = profit_loss_data['average_order_value']
+            
+            # Create profit loss record
             profit_loss_record = ProfitLossRecord.objects.create(
                 period_type=period_type,
                 start_date=start_date,
                 end_date=end_date,
-                total_sales_income=profit_loss_data['total_sales_income'],
-                total_cost_of_goods_sold=profit_loss_data['total_cost_of_goods_sold'],
-                total_labor_payments=profit_loss_data['total_labor_payments'],
-                total_vendor_payments=profit_loss_data['total_vendor_payments'],
-                total_expenses=profit_loss_data['total_expenses'],
-                total_zakat=profit_loss_data['total_zakat'],
-                total_products_sold=profit_loss_data['total_products_sold'],
-                average_order_value=profit_loss_data['average_order_value'],
+                total_sales_income=total_sales_income,
+                total_cost_of_goods_sold=total_cost_of_goods_sold,
+                total_labor_payments=total_labor_payments,
+                total_vendor_payments=total_vendor_payments,
+                total_expenses=total_expenses,
+                total_zakat=total_zakat,
+                total_expenses_calculated=total_expenses_calculated,
+                total_products_sold=total_products_sold,
+                average_order_value=average_order_value,
                 calculation_notes=calculation_notes,
                 created_by=request.user
             )
@@ -164,6 +176,9 @@ class ProfitLossCalculationView(APIView):
                 total_sales_income / total_sales_count if total_sales_count > 0 
                 else Decimal('0.00')
             )
+            # Round to 2 decimal places and cap to prevent overflow
+            average_order_value = average_order_value.quantize(Decimal('0.01'))
+            average_order_value = min(average_order_value, Decimal('9999999999.99'))
         except (ZeroDivisionError, TypeError):
             average_order_value = Decimal('0.00')
         

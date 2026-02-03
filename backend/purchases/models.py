@@ -18,7 +18,9 @@ class Purchase(models.Model):
 
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    total = models.DecimalField(max_digits=12, decimal_places=2)
+
+    # ✅ FIX: Added default=0 to prevent crash during initial creation
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     status = models.CharField(
         max_length=20,

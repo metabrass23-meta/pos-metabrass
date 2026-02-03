@@ -629,9 +629,9 @@ class _DeletePrincipalAccountDialogState extends State<DeletePrincipalAccountDia
 
   Color _getPersonColor(String person) {
     switch (person) {
-      case 'Parveez Maqbool':
+      case 'Shahzain Baloch':
         return Colors.blue;
-      case 'Zain Maqbool':
+      case 'Huzaifa':
         return Colors.green;
       default:
         return Colors.grey;

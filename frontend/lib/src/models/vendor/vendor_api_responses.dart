@@ -466,7 +466,7 @@ class VendorTransactionSummary {
 class VendorCreateRequest {
   final String name;
   final String businessName;
-  final String cnic;
+  final String? cnic;
   final String phone;
   final String city;
   final String area;
@@ -474,7 +474,7 @@ class VendorCreateRequest {
   VendorCreateRequest({
     required this.name,
     required this.businessName,
-    required this.cnic,
+    this.cnic,
     required this.phone,
     required this.city,
     required this.area,
@@ -484,7 +484,7 @@ class VendorCreateRequest {
     return {
       'name': name,
       'business_name': businessName,
-      'cnic': cnic,
+      'cnic': cnic?.isEmpty == true ? null : cnic, // Send null if empty, otherwise send value
       'phone': phone,
       'city': city,
       'area': area,
@@ -495,7 +495,7 @@ class VendorCreateRequest {
 class VendorUpdateRequest {
   final String name;
   final String businessName;
-  final String cnic;
+  final String? cnic;
   final String phone;
   final String city;
   final String area;
@@ -503,7 +503,7 @@ class VendorUpdateRequest {
   VendorUpdateRequest({
     required this.name,
     required this.businessName,
-    required this.cnic,
+    this.cnic,
     required this.phone,
     required this.city,
     required this.area,
@@ -513,7 +513,7 @@ class VendorUpdateRequest {
     return {
       'name': name,
       'business_name': businessName,
-      'cnic': cnic,
+      'cnic': cnic?.isEmpty == true ? null : cnic, // Send null if empty, otherwise send value
       'phone': phone,
       'city': city,
       'area': area,

@@ -142,7 +142,7 @@ class _EnhancedDeleteVendorDialogState extends State<EnhancedDeleteVendorDialog>
     } else if (_isPermanentDelete && !_understandConsequences) {
       message = l10n.pleaseConfirmConsequences;
     } else if (_isPermanentDelete && _confirmationText.toLowerCase().trim() != widget.vendor.name.toLowerCase().trim()) {
-      message = l10n.pleaseTypeVendorName;
+      message = l10n.pleaseTypeVendorName as String;
     } else {
       message = l10n.pleaseCompleteConfirmation;
     }

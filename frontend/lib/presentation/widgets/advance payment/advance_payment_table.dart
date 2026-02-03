@@ -219,13 +219,17 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
-                    letterSpacing: 0.2,
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                      letterSpacing: 0.2,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 SizedBox(width: 4),

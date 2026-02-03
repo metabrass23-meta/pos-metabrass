@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(blank=True, help_text='Additional notes or religious considerations', null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('authorized_by', models.CharField(choices=[('Mr. Sheikh Parveez Maqbool', 'Mr. Sheikh Parveez Maqbool'), ('Mr Sheikh Zain Maqbool', 'Mr Sheikh Zain Maqbool')], help_text='Who authorized the Zakat payment', max_length=50)),
+                ('authorized_by', models.CharField(choices=[('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'), ('Mr Huzaifa', 'Mr Huzaifa')], help_text='Who authorized the Zakat payment', max_length=50)),
                 ('is_active', models.BooleanField(default=True, help_text='For soft deletion')),
                 ('created_by', models.ForeignKey(help_text='Who recorded this Zakat entry', on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/invoice_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
-import '../../widgets/globals/text_field.dart'; // ✅ Use PremiumTextField
-import '../../widgets/globals/custom_date_picker.dart'; // ✅ Use Syncfusion Picker
+import '../../widgets/globals/text_field.dart';
+import '../../widgets/globals/drop_down.dart';
+import '../../widgets/globals/text_button.dart';
+import '../../widgets/globals/custom_date_picker.dart';
 
 class EditInvoiceDialog extends StatefulWidget {
   final InvoiceModel invoice;
@@ -55,52 +59,48 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('large'))),
+      backgroundColor: Colors.white,
       child: Container(
         width: 500,
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- Header ---
-              Row(
-                children: [
-                  Icon(Icons.edit, color: Theme.of(context).primaryColor),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      l10n.editInvoiceWithNumber(widget.invoice.invoiceNumber),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- Header ---
+                Row(
+                  children: [
+                    Icon(Icons.edit, color: Theme.of(context).primaryColor),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        l10n.editInvoiceWithNumber(widget.invoice.invoiceNumber),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(height: 24),
 
               // --- Status Dropdown ---
-              DropdownButtonFormField<String>(
+              PremiumDropdownField<String>(
+                label: l10n.statusRequired,
+                hint: l10n.selectInvoiceStatus,
                 value: _selectedStatus,
-                decoration: InputDecoration(
-                  labelText: l10n.statusRequired,
-                  border: const OutlineInputBorder(),
-                  hintText: l10n.selectInvoiceStatus,
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                style: const TextStyle(color: Colors.black87, fontSize: 16),
-                dropdownColor: Colors.white,
                 items: [
-                  DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
-                  DropdownMenuItem(value: 'ISSUED', child: Text(l10n.issued)),
-                  DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
-                  DropdownMenuItem(value: 'VIEWED', child: Text(l10n.viewed)),
-                  DropdownMenuItem(value: 'PAID', child: Text(l10n.paid)),
-                  DropdownMenuItem(value: 'OVERDUE', child: Text(l10n.overdue)),
-                  DropdownMenuItem(value: 'CANCELLED', child: Text(l10n.cancelled)),
+                  DropdownItem(value: 'DRAFT', label: l10n.draft),
+                  DropdownItem(value: 'ISSUED', label: l10n.issued),
+                  DropdownItem(value: 'SENT', label: l10n.sent),
+                  DropdownItem(value: 'VIEWED', label: l10n.viewed),
+                  DropdownItem(value: 'PAID', label: l10n.paid),
+                  DropdownItem(value: 'OVERDUE', label: l10n.overdue),
+                  DropdownItem(value: 'CANCELLED', label: l10n.cancelled),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -186,20 +186,19 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
+                  PremiumButton(
+                    text: l10n.cancel,
                     onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-                    child: Text(l10n.cancel),
+                    isOutlined: true,
+                    width: 100,
                   ),
                   const SizedBox(width: 12),
-                  ElevatedButton(
+                  PremiumButton(
+                    text: l10n.updateInvoice,
                     onPressed: _isLoading ? null : _updateInvoice,
-                    child: _isLoading
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                        : Text(l10n.updateInvoice),
+                    isLoading: _isLoading,
+                    backgroundColor: Theme.of(context).primaryColor,
+                    width: 120,
                   ),
                 ],
               ),
@@ -207,7 +206,7 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Future<void> _updateInvoice() async {
@@ -220,6 +219,11 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
     });
 
     try {
+      debugPrint('🔍 [EditInvoiceDialog] Updating invoice: ${widget.invoice.id}');
+      debugPrint('🔍 [EditInvoiceDialog] Status: $_selectedStatus');
+      debugPrint('🔍 [EditInvoiceDialog] Due date: $_selectedDueDate');
+      debugPrint('🔍 [EditInvoiceDialog] Notes: ${_notesController.text}');
+      
       final invoiceProvider = context.read<InvoiceProvider>();
       final success = await invoiceProvider.updateInvoice(
         id: widget.invoice.id,
@@ -227,6 +231,8 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
         dueDate: _selectedDueDate,
         notes: _notesController.text.isNotEmpty ? _notesController.text : null,
       );
+
+      debugPrint('🔍 [EditInvoiceDialog] Update invoice success: $success');
 
       if (success && mounted) {
         Navigator.of(context).pop();
@@ -236,12 +242,20 @@ class _EditInvoiceDialogState extends State<EditInvoiceDialog> {
             backgroundColor: Colors.green,
           ),
         );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.failedToUpdateInvoice ?? "Failed to update invoice"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
+      debugPrint('❌ [EditInvoiceDialog] Exception: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.failedToUpdateInvoice}: $e'),
+            content: Text('${l10n.failedToUpdateInvoice ?? "Failed to update invoice"}: $e'),
             backgroundColor: Colors.red,
           ),
         );

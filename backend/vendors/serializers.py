@@ -26,6 +26,14 @@ class VendorSerializer(serializers.ModelSerializer):
     total_payments_amount = serializers.SerializerMethodField()
     last_payment_date = serializers.SerializerMethodField()
     
+    # Make CNIC optional
+    cnic = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Pakistani CNIC in format: 12345-1234567-1 (optional)"
+    )
+    
     class Meta:
         model = Vendor
         fields = (
@@ -96,8 +104,8 @@ class VendorSerializer(serializers.ModelSerializer):
 
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+        if value is None or value.strip() == '':
+            return None  # Allow empty/null CNIC
         
         cnic = value.strip()
         
@@ -144,6 +152,13 @@ class VendorSerializer(serializers.ModelSerializer):
 class VendorCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating vendors"""
     
+    cnic = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Pakistani CNIC in format: 12345-1234567-1 (optional)"
+    )
+    
     class Meta:
         model = Vendor
         fields = (
@@ -179,12 +194,12 @@ class VendorCreateSerializer(serializers.ModelSerializer):
 
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+        if value is None or value.strip() == '':
+            return None  # Allow empty/null CNIC
         
         cnic = value.strip()
         
-        # Check uniqueness
+        # Check uniqueness only if CNIC is provided
         if Vendor.objects.filter(cnic=cnic).exists():
             raise serializers.ValidationError("A vendor with this CNIC already exists.")
         
@@ -225,6 +240,13 @@ class VendorCreateSerializer(serializers.ModelSerializer):
 class VendorUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating vendors"""
     
+    cnic = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Pakistani CNIC in format: 12345-1234567-1 (optional)"
+    )
+    
     class Meta:
         model = Vendor
         fields = (
@@ -260,8 +282,8 @@ class VendorUpdateSerializer(serializers.ModelSerializer):
 
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+        if value is None or value.strip() == '':
+            return None  # Allow empty/null CNIC
         
         cnic = value.strip()
         

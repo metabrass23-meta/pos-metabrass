@@ -9,22 +9,28 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Al Noor Fabric - Premium POS';
+  String get appTitle => 'Al Noor - Premium POS';
 
   @override
   String get welcomeBack => 'Welcome Back to';
 
   @override
-  String get brandName => 'Al Noor Fabric';
+  String get brandName => 'Al Noor';
 
   @override
-  String get tagline => 'Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.';
+  String get tagline => 'Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.';
 
   @override
   String get signIn => 'Sign In';
 
   @override
   String get signUp => 'Sign Up';
+
+  @override
+  String get searchReturns => 'Search Returns';
+
+  @override
+  String get serverErrorTryAgainLater => 'Server error. Please try again later.';
 
   @override
   String get accessDashboard => 'Access your premium dashboard';
@@ -34,6 +40,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterEmail => 'Enter your email';
+
+  @override
+  String get deactivatedSuccessfully => 'Deactivated successfully';
+
+  @override
+  String get showing => 'Showing';
+
+  @override
+  String get pleaseConfirmAction => 'Please confirm this action';
+
+  @override
+  String get deletedPermanently => 'Deleted permanently';
+
+  @override
+  String get failedToDelete => 'Failed to delete';
+
+  @override
+  String get pleaseConfirmConsequences => 'This action cannot be undone. Are you sure?';
+
+  @override
+  String pleaseTypeVendorName(Object vendorName) {
+    return 'Please type \'$vendorName\' to confirm';
+  }
+
+  @override
+  String get pleaseCompleteConfirmation => 'Please complete the confirmation step';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get password => 'Password';
@@ -168,9 +203,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vendor => 'Vendor';
 
   @override
-  String get labor => 'Labor';
-
-  @override
   String get zakat => 'Zakat';
 
   @override
@@ -242,7 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get info => 'Info';
 
   @override
-  String get posSystem => 'Point of Sale System';
+  String get posSystem => 'Sales';
 
   @override
   String get selectProductsManageSales => 'Select products and manage sales transactions';
@@ -252,6 +284,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get revenue => 'Revenue';
+
+  @override
+  String get purchasesTagline => 'Track and manage inventory supply and purchase records';
+
+  @override
+  String get newPurchase => 'New Purchase';
+
+  @override
+  String get totalInvestment => 'Total Investment';
+
+  @override
+  String get enterInvoiceRef => 'Enter Invoice Reference';
+
+  @override
+  String get purchaseDate => 'Purchase Date';
+
+  @override
+  String get purchasedProducts => 'Purchased Products';
+
+  @override
+  String get addProductRow => 'Add Product Row';
+
+  @override
+  String get unitCost => 'Unit Cost';
+
+  @override
+  String get taxAdjustment => 'Tax / Adjustment';
+
+  @override
+  String get savePurchase => 'Save Purchase';
+
+  @override
+  String get validationError => 'Validation Error';
+
+  @override
+  String get enterInvoiceNumberError => 'Please enter an Invoice Number.';
+
+  @override
+  String get selectVendorError => 'Please select a Vendor.';
+
+  @override
+  String get addOneProductError => 'Please add at least one product to the purchase.';
+
+  @override
+  String selectProductError(Object itemIndex) {
+    return 'Item #$itemIndex: Please select a product.';
+  }
+
+  @override
+  String invalidQtyError(Object itemIndex) {
+    return 'Item #$itemIndex: Quantity must be greater than 0.';
+  }
+
+  @override
+  String get savePurchaseFailed => 'Failed to save purchase';
+
+  @override
+  String get purchaseDetails => 'Purchase Details';
+
+  @override
+  String get purchasedItems => 'Purchased Items';
+
+  @override
+  String get printInvoice => 'Print Invoice';
+
+  @override
+  String get filterPurchases => 'Filter Purchases';
+
+  @override
+  String get fromDate => 'From Date';
+
+  @override
+  String get toDate => 'To Date';
+
+  @override
+  String get resetAll => 'Reset All';
+
+  @override
+  String get unknownVendor => 'Unknown Vendor';
+
+  @override
+  String get deletePurchaseConfirm => 'Are you sure you want to delete this purchase?';
+
+  @override
+  String get noPurchasesFound => 'No Purchases Found';
+
+  @override
+  String get noPurchasesMatchFilter => 'No purchases match the current filter';
 
   @override
   String get viewHistory => 'View History';
@@ -482,6 +602,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToRefreshCustomers => 'Failed to refresh customers';
 
   @override
+  String get viewLedger => 'View Ledger';
+
+  @override
+  String get addNewCustomer => 'Add New Customer';
+
+  @override
+  String get createNewCustomerProfile => 'Create a new customer profile';
+
+  @override
+  String get customerAddedSuccessfully => 'Customer added successfully';
+
+  @override
+  String get failedToAddCustomer => 'Failed to add customer';
+
+  @override
+  String get lastPurchase => 'Last Purchase';
+
+  @override
   String get logoutMessage => 'Are you sure you want to logout from your account?';
 
   @override
@@ -491,13 +629,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Premium POS';
 
   @override
-  String get welcomeToPos => 'Welcome to Al Noor Fabrics POS';
+  String get welcomeToPos => 'Welcome to Al Noor POS';
 
   @override
-  String get welcomeTagline => 'Crafting Excellence in Every Stitch - Your Premium Fashion Management System';
+  String get welcomeTagline => 'Quality Spare Parts Management - Your Complete Automotive Solution';
 
   @override
   String get today => 'Today';
+
+  @override
+  String get totalIncome => 'Total Income';
+
+  @override
+  String get totalExpenses => 'Total Expenses';
 
   @override
   String get totalOrders => 'Total Orders';
@@ -734,6 +878,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get basicInformation => 'Basic Information';
 
   @override
+  String get contactInformation => 'Contact Information';
+
+  @override
+  String get businessInformation => 'Business Information';
+
+  @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
+  String get locationInformation => 'Location Information';
+
+  @override
   String get fullName => 'Full Name';
 
   @override
@@ -758,40 +914,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterValid => 'Please enter a valid';
 
   @override
-  String get contactInformation => 'Contact Information';
-
-  @override
   String get phoneFormat => '+923001234567';
-
-  @override
-  String get locationInformation => 'Location Information';
-
-  @override
-  String get deletedPermanently => 'deleted permanently';
-
-  @override
-  String get deactivatedSuccessfully => 'deactivated successfully';
-
-  @override
-  String get failedToDelete => 'Failed to delete';
-
-  @override
-  String get pleaseConfirmAction => 'Please confirm that you understand this action';
-
-  @override
-  String get pleaseConfirmConsequences => 'Please confirm that you understand the consequences of permanent deletion';
-
-  @override
-  String get pleaseTypeVendorName => 'Please type the vendor name exactly to confirm permanent deletion';
-
-  @override
-  String get pleaseCompleteConfirmation => 'Please complete all confirmation steps';
-
-  @override
-  String get location => 'Location';
-
-  @override
-  String get showing => 'Showing';
 
   @override
   String get outOf => 'of';
@@ -929,9 +1052,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get costPriceInfo => 'Setting cost price enables profit margin calculations and better financial analysis';
 
   @override
-  String qty(int quantity) {
-    return 'Qty';
-  }
+  String get qty => 'Qty';
 
   @override
   String get colorName => 'Color Name';
@@ -1307,9 +1428,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ofExpenses => 'of expenses';
-
-  @override
-  String get totalExpenses => 'Total Expenses';
 
   @override
   String get profitable => 'PROFITABLE';
@@ -2102,6 +2220,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterFullAddress => 'Enter full address';
 
   @override
+  String get enterCustomerName => 'Enter customer name';
+
+  @override
+  String get enterCustomerFullName => 'Enter customer\'s full name';
+
+  @override
+  String get enterCustomerPhone => 'Enter customer phone number';
+
+  @override
+  String get enterCustomerEmail => 'Enter customer email address';
+
+  @override
+  String get enterCustomerAddress => 'Enter customer address';
+
+  @override
+  String get enterCustomerCity => 'Enter customer city';
+
+  @override
+  String get enterCustomerCountry => 'Enter customer country';
+
+  @override
+  String get enterCustomerBusinessName => 'Enter customer business name';
+
+  @override
+  String get enterCustomerTaxNumber => 'Enter customer tax or NTN number';
+
+  @override
+  String get enterCustomerNotes => 'Enter customer notes';
+
+  @override
   String get enterAdditionalNotes => 'Enter additional notes';
 
   @override
@@ -2415,6 +2563,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get otherExpenses => 'Other Expenses';
 
   @override
+  String get labor => 'Labor';
+
+  @override
   String get vendors => 'Vendors';
 
   @override
@@ -2551,9 +2702,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataInSpreadsheetFormatForAnalysis => 'Data in spreadsheet format for analysis';
-
-  @override
-  String get totalIncome => 'Total Income';
 
   @override
   String get profitMargin => 'Profit Margin';
@@ -3875,9 +4023,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPhone => 'No phone';
 
   @override
-  String item(int itemNumber) {
-    return 'item';
-  }
+  String get item => 'item';
 
   @override
   String get noItems => 'No items';
@@ -4043,9 +4189,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get isOverdue => 'Is Overdue';
-
-  @override
-  String get additionalInformation => 'Additional Information';
 
   @override
   String get conversionStatus => 'Conversion Status';
@@ -4327,7 +4470,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseAcceptTerms => 'Please accept the terms and conditions';
 
   @override
-  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to Al Noor Fashion.';
+  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to Al Noor.';
 
   @override
   String get registrationFailedMessage => 'Registration failed. Please check the details below.';
@@ -5479,7 +5622,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableDarkThemeForApplication => 'Enable dark theme for the application';
 
   @override
-  String get alNoorFashionPOS => 'Al Noor Fashion POS';
+  String get alNoorFashionPOS => 'Al Noor POS';
 
   @override
   String get version => 'Version';
@@ -6484,6 +6627,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get invoiceHash => 'Invoice #';
+
+  @override
+  String get subTotal => 'Subtotal';
+
+  @override
+  String get action => 'Actions';
+
+  @override
   String get deletePurchase => 'Delete Purchase';
 
   @override
@@ -6521,4 +6673,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get apply => 'Apply';
+
+  @override
+  String get scannerTitle => 'Barcode Scanner';
+
+  @override
+  String get scannerReady => 'Ready to scan...';
+
+  @override
+  String get scannerScanning => 'Scanning...';
+
+  @override
+  String get scannerLabel => 'Barcode';
+
+  @override
+  String get scannerHint => 'Type or scan barcode';
+
+  @override
+  String get scannerInvalidFormat => 'Invalid barcode format';
+
+  @override
+  String get scannerDuplicateScan => 'Duplicate barcode scan';
+
+  @override
+  String get scannerProductNotFound => 'Product not found';
+
+  @override
+  String scannerFound(String productName) {
+    return 'Found: $productName';
+  }
+
+  @override
+  String scannerFailed(String error) {
+    return 'Scan failed: $error';
+  }
+
+  @override
+  String scannerAddedToCart(String productName) {
+    return 'Added $productName to cart';
+  }
+
+  @override
+  String get scannerAddToCartFailed => 'Failed to add product to cart';
 }

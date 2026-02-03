@@ -100,13 +100,13 @@ class ProfitLossRecord(models.Model):
         help_text="Net profit (gross profit - total expenses)"
     )
     gross_profit_margin_percentage = models.DecimalField(
-        max_digits=5,
+        max_digits=12,
         decimal_places=2,
         default=Decimal('0.00'),
         help_text="Gross profit margin as percentage of sales"
     )
     profit_margin_percentage = models.DecimalField(
-        max_digits=5,
+        max_digits=12,
         decimal_places=2,
         default=Decimal('0.00'),
         help_text="Net profit margin as percentage of sales"
@@ -118,7 +118,7 @@ class ProfitLossRecord(models.Model):
         help_text="Total number of products sold in this period"
     )
     average_order_value = models.DecimalField(
-        max_digits=12,
+        max_digits=20,
         decimal_places=2,
         default=Decimal('0.00'),
         help_text="Average order value in this period"
@@ -198,13 +198,19 @@ class ProfitLossRecord(models.Model):
         
         # Calculate gross profit margin percentage
         if self.total_sales_income > 0:
-            self.gross_profit_margin_percentage = (self.gross_profit / self.total_sales_income) * 100
+            gross_margin = (self.gross_profit / self.total_sales_income) * 100
+            # Round to 2 decimal places and cap at 99999999.99%
+            self.gross_profit_margin_percentage = gross_margin.quantize(Decimal('0.01'))
+            self.gross_profit_margin_percentage = min(self.gross_profit_margin_percentage, Decimal('99999999.99'))
         else:
             self.gross_profit_margin_percentage = Decimal('0.00')
         
         # Calculate profit margin percentage
         if self.total_sales_income > 0:
-            self.profit_margin_percentage = (self.net_profit / self.total_sales_income) * 100
+            profit_margin = (self.net_profit / self.total_sales_income) * 100
+            # Round to 2 decimal places and cap at 99999999.99%
+            self.profit_margin_percentage = profit_margin.quantize(Decimal('0.01'))
+            self.profit_margin_percentage = min(self.profit_margin_percentage, Decimal('99999999.99'))
         else:
             self.profit_margin_percentage = Decimal('0.00')
         

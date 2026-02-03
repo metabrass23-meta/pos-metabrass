@@ -78,30 +78,45 @@ class _PayablesPageState extends State<PayablesPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
+            // Header Section (now scrolls with content)
+            Container(
+              padding: EdgeInsets.all(context.mainPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: _buildTabletHeader(),
+                    small: _buildMobileHeader(),
+                    medium: _buildDesktopHeader(),
+                    large: _buildDesktopHeader(),
+                    ultrawide: _buildDesktopHeader(),
+                  ),
+                  SizedBox(height: context.mainPadding),
+                  Consumer<PayablesProvider>(
+                    builder: (context, provider, child) {
+                      return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
+                    },
+                  ),
+                  SizedBox(height: context.cardPadding * 0.5),
+                  _buildSearchSection(),
+                  SizedBox(height: context.cardPadding * 0.5),
+                ],
+              ),
             ),
-            SizedBox(height: context.mainPadding),
-            Consumer<PayablesProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: EnhancedPayablesTable(onEdit: _showEditPayableDialog, onDelete: _showDeletePayableDialog, onView: _showViewDetailsDialog),
+            // Table Section with fixed height
+            Container(
+              height: 60.h, // Fixed height for the table
+              padding: EdgeInsets.symmetric(horizontal: context.mainPadding),
+              child: EnhancedPayablesTable(
+                onEdit: _showEditPayableDialog, 
+                onDelete: _showDeletePayableDialog, 
+                onView: _showViewDetailsDialog
+              ),
             ),
           ],
         ),
@@ -507,7 +522,7 @@ class _PayablesPageState extends State<PayablesPage> {
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -520,11 +535,11 @@ class _PayablesPageState extends State<PayablesPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -534,7 +549,7 @@ class _PayablesPageState extends State<PayablesPage> {
                 ),
                 Text(
                   title,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

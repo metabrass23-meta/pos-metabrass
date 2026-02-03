@@ -79,40 +79,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _exportProducts() {
-    final provider = context.read<ProductProvider>();
-    final data = provider.exportProductData();
-
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.download_done,
-              color: AppTheme.pureWhite,
-              size: context.iconSize('medium'),
-            ),
-            SizedBox(width: context.smallPadding),
-            Text(
-              '${AppLocalizations.of(context)!.exportCompleted} ${data.length} ${AppLocalizations.of(context)!.products.toLowerCase()} ${AppLocalizations.of(context)!.export.toLowerCase()}.',
-              style: TextStyle(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.pureWhite,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-        ),
-      ),
-    );
-  }
+  // Export functionality removed
 
   Future<void> _refreshProducts() async {
     await context.read<ProductProvider>().refreshProducts();
@@ -128,43 +95,52 @@ class _ProductPageState extends State<ProductPage> {
       backgroundColor: AppTheme.creamWhite,
       body: RefreshIndicator(
         onRefresh: _refreshProducts,
-        child: Padding(
-          padding: EdgeInsets.all(context.mainPadding / 2),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ResponsiveBreakpoints.responsive(
-                context,
-                tablet: _buildTabletHeader(),
-                small: _buildMobileHeader(),
-                medium: _buildDesktopHeader(),
-                large: _buildDesktopHeader(),
-                ultrawide: _buildDesktopHeader(),
-              ),
-              SizedBox(height: context.mainPadding),
-              Consumer<ProductProvider>(
-                builder: (context, provider, child) {
-                  // Show error message if any
-                  if (provider.errorMessage != null) {
-                    return _buildErrorWidget(provider.errorMessage!);
-                  }
-
-                  return context.statsCardColumns == 2
-                      ? _buildMobileStatsGrid(provider)
-                      : _buildDesktopStatsRow(provider);
-                },
-              ),
-              SizedBox(height: context.cardPadding * 0.5),
-              _buildSearchSection(),
-              SizedBox(height: context.cardPadding * 0.5),
-              Expanded(
-                child: EnhancedProductTable(
-                  onEdit: _showEditProductDialog,
-                  onDelete: _showDeleteProductDialog,
-                  onView: _showViewProductDialog,
+        child: SingleChildScrollView( // Make entire screen scrollable
+          child: Padding(
+            padding: EdgeInsets.all(context.mainPadding / 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, // Use minimum size
+              children: [
+                ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: _buildTabletHeader(),
+                  small: _buildMobileHeader(),
+                  medium: _buildDesktopHeader(),
+                  large: _buildDesktopHeader(),
+                  ultrawide: _buildDesktopHeader(),
                 ),
-              ),
-            ],
+                SizedBox(height: context.mainPadding),
+                Consumer<ProductProvider>(
+                  builder: (context, provider, child) {
+                    // Show error message if any
+                    if (provider.errorMessage != null) {
+                      return _buildErrorWidget(provider.errorMessage!);
+                    }
+
+                    return context.statsCardColumns == 2
+                        ? _buildMobileStatsGrid(provider)
+                        : _buildDesktopStatsRow(provider);
+                  },
+                ),
+                SizedBox(height: context.cardPadding * 0.5),
+                _buildSearchSection(),
+                SizedBox(height: context.cardPadding * 0.5),
+                // Remove Expanded and add height constraint to table
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.6, // Max 60% of screen height
+                  ),
+                  child: EnhancedProductTable(
+                    onEdit: _showEditProductDialog,
+                    onDelete: _showDeleteProductDialog,
+                    onView: _showViewProductDialog,
+                  ),
+                ),
+                // Add bottom padding for scroll space
+                SizedBox(height: context.mainPadding),
+              ],
+            ),
           ),
         ),
       ),
@@ -513,13 +489,12 @@ class _ProductPageState extends State<ProductPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(flex: 3, child: _buildSearchBar()),
+        Expanded(flex: 1, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
         Expanded(flex: 1, child: _buildFilterButton()),
         SizedBox(width: context.smallPadding),
 
         SizedBox(width: context.smallPadding),
-        Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
   }
@@ -533,7 +508,6 @@ class _ProductPageState extends State<ProductPage> {
           children: [
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -549,7 +523,6 @@ class _ProductPageState extends State<ProductPage> {
           children: [
             Expanded(child: _buildFilterButton()),
             SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -617,9 +590,9 @@ class _ProductPageState extends State<ProductPage> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
             decoration: BoxDecoration(
-              color: AppTheme.lightGray,
+              color: AppTheme.lightGray.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(color: Colors.grey.shade300, width: 1),
+              border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -648,50 +621,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  Widget _buildExportButton() {
-    return Container(
-      height: context.buttonHeight / 1.5,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _exportProducts,
-          borderRadius: BorderRadius.circular(context.borderRadius()),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-            decoration: BoxDecoration(
-              color: AppTheme.accentGold.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              border: Border.all(
-                color: AppTheme.accentGold.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.download_rounded,
-                  color: AppTheme.accentGold,
-                  size: context.iconSize('medium'),
-                ),
-                if (!context.isTablet) ...[
-                  SizedBox(width: context.smallPadding),
-                  Text(
-                    AppLocalizations.of(context)!.export,
-                    style: TextStyle(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.accentGold,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Export button removed
 
   Widget _buildStatsCard(
     String title,
@@ -723,7 +653,7 @@ class _ProductPageState extends State<ProductPage> {
                 context.borderRadius('small'),
               ),
             ),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -736,11 +666,11 @@ class _ProductPageState extends State<ProductPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -751,7 +681,7 @@ class _ProductPageState extends State<ProductPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), // Use dashboard-specific size
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
                   ),

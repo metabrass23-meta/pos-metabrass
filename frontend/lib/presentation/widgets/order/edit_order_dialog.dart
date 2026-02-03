@@ -95,6 +95,7 @@ class _EditOrderDialogState extends State<EditOrderDialog> with SingleTickerProv
           isNewCustomer: true,
           isRecentCustomer: false,
           totalSalesCount: 0,
+          totalSalesAmount: 0.0,  // Add total sales amount
           hasRecentSales: false,
           customerTypeDisplay: 'Individual',
           statusDisplay: 'New Customer',

@@ -98,7 +98,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Maqbool Fashion - Premium POS'**
+  /// **'Al Noor - Premium POS'**
   String get appTitle;
 
   /// No description provided for @welcomeBack.
@@ -110,13 +110,13 @@ abstract class AppLocalizations {
   /// No description provided for @brandName.
   ///
   /// In en, this message translates to:
-  /// **'Al Noor Fashion'**
+  /// **'Al Noor'**
   String get brandName;
 
   /// No description provided for @tagline.
   ///
   /// In en, this message translates to:
-  /// **'Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.'**
+  /// **'Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.'**
   String get tagline;
 
   /// No description provided for @signIn.
@@ -130,6 +130,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Up'**
   String get signUp;
+
+  /// No description provided for @searchReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Returns'**
+  String get searchReturns;
+
+  /// No description provided for @serverErrorTryAgainLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get serverErrorTryAgainLater;
 
   /// No description provided for @accessDashboard.
   ///
@@ -148,6 +160,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your email'**
   String get enterEmail;
+
+  /// No description provided for @deactivatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivated successfully'**
+  String get deactivatedSuccessfully;
+
+  /// No description provided for @showing.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing'**
+  String get showing;
+
+  /// No description provided for @pleaseConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm this action'**
+  String get pleaseConfirmAction;
+
+  /// No description provided for @deletedPermanently.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted permanently'**
+  String get deletedPermanently;
+
+  /// No description provided for @failedToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete'**
+  String get failedToDelete;
+
+  /// No description provided for @pleaseConfirmConsequences.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. Are you sure?'**
+  String get pleaseConfirmConsequences;
+
+  /// No description provided for @pleaseTypeVendorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please type \'{vendorName}\' to confirm'**
+  String pleaseTypeVendorName(Object vendorName);
+
+  /// No description provided for @pleaseCompleteConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete the confirmation step'**
+  String get pleaseCompleteConfirmation;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
 
   /// No description provided for @password.
   ///
@@ -413,12 +479,6 @@ abstract class AppLocalizations {
   /// **'Vendor'**
   String get vendor;
 
-  /// No description provided for @labor.
-  ///
-  /// In en, this message translates to:
-  /// **'Labor'**
-  String get labor;
-
   /// No description provided for @zakat.
   ///
   /// In en, this message translates to:
@@ -560,7 +620,7 @@ abstract class AppLocalizations {
   /// No description provided for @posSystem.
   ///
   /// In en, this message translates to:
-  /// **'Point of Sale System'**
+  /// **'Sales'**
   String get posSystem;
 
   /// No description provided for @selectProductsManageSales.
@@ -580,6 +640,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Revenue'**
   String get revenue;
+
+  /// No description provided for @purchasesTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Track and manage inventory supply and purchase records'**
+  String get purchasesTagline;
+
+  /// No description provided for @newPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'New Purchase'**
+  String get newPurchase;
+
+  /// No description provided for @totalInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Investment'**
+  String get totalInvestment;
+
+  /// No description provided for @enterInvoiceRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Invoice Reference'**
+  String get enterInvoiceRef;
+
+  /// No description provided for @purchaseDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Date'**
+  String get purchaseDate;
+
+  /// No description provided for @purchasedProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased Products'**
+  String get purchasedProducts;
+
+  /// No description provided for @addProductRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Product Row'**
+  String get addProductRow;
+
+  /// No description provided for @unitCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Cost'**
+  String get unitCost;
+
+  /// No description provided for @taxAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax / Adjustment'**
+  String get taxAdjustment;
+
+  /// No description provided for @savePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Purchase'**
+  String get savePurchase;
+
+  /// No description provided for @validationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation Error'**
+  String get validationError;
+
+  /// No description provided for @enterInvoiceNumberError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an Invoice Number.'**
+  String get enterInvoiceNumberError;
+
+  /// No description provided for @selectVendorError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a Vendor.'**
+  String get selectVendorError;
+
+  /// No description provided for @addOneProductError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one product to the purchase.'**
+  String get addOneProductError;
+
+  /// No description provided for @selectProductError.
+  ///
+  /// In en, this message translates to:
+  /// **'Item #{itemIndex}: Please select a product.'**
+  String selectProductError(Object itemIndex);
+
+  /// No description provided for @invalidQtyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Item #{itemIndex}: Quantity must be greater than 0.'**
+  String invalidQtyError(Object itemIndex);
+
+  /// No description provided for @savePurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save purchase'**
+  String get savePurchaseFailed;
+
+  /// No description provided for @purchaseDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Details'**
+  String get purchaseDetails;
+
+  /// No description provided for @purchasedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased Items'**
+  String get purchasedItems;
+
+  /// No description provided for @printInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Print Invoice'**
+  String get printInvoice;
+
+  /// No description provided for @filterPurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Purchases'**
+  String get filterPurchases;
+
+  /// No description provided for @fromDate.
+  ///
+  /// In en, this message translates to:
+  /// **'From Date'**
+  String get fromDate;
+
+  /// No description provided for @toDate.
+  ///
+  /// In en, this message translates to:
+  /// **'To Date'**
+  String get toDate;
+
+  /// No description provided for @resetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset All'**
+  String get resetAll;
+
+  /// No description provided for @unknownVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Vendor'**
+  String get unknownVendor;
+
+  /// No description provided for @deletePurchaseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this purchase?'**
+  String get deletePurchaseConfirm;
+
+  /// No description provided for @noPurchasesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Purchases Found'**
+  String get noPurchasesFound;
+
+  /// No description provided for @noPurchasesMatchFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchases match the current filter'**
+  String get noPurchasesMatchFilter;
 
   /// No description provided for @viewHistory.
   ///
@@ -1037,6 +1265,42 @@ abstract class AppLocalizations {
   /// **'Failed to refresh customers'**
   String get failedToRefreshCustomers;
 
+  /// No description provided for @viewLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'View Ledger'**
+  String get viewLedger;
+
+  /// No description provided for @addNewCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Customer'**
+  String get addNewCustomer;
+
+  /// No description provided for @createNewCustomerProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new customer profile'**
+  String get createNewCustomerProfile;
+
+  /// No description provided for @customerAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer added successfully'**
+  String get customerAddedSuccessfully;
+
+  /// No description provided for @failedToAddCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add customer'**
+  String get failedToAddCustomer;
+
+  /// No description provided for @lastPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Purchase'**
+  String get lastPurchase;
+
   /// No description provided for @logoutMessage.
   ///
   /// In en, this message translates to:
@@ -1058,13 +1322,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToPos.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Al Noor Fabrics POS'**
+  /// **'Welcome to Al Noor POS'**
   String get welcomeToPos;
 
   /// No description provided for @welcomeTagline.
   ///
   /// In en, this message translates to:
-  /// **'Crafting Excellence in Every Stitch - Your Premium Fashion Management System'**
+  /// **'Quality Spare Parts Management - Your Complete Automotive Solution'**
   String get welcomeTagline;
 
   /// No description provided for @today.
@@ -1072,6 +1336,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today'**
   String get today;
+
+  /// No description provided for @totalIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Income'**
+  String get totalIncome;
+
+  /// No description provided for @totalExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Expenses'**
+  String get totalExpenses;
 
   /// No description provided for @totalOrders.
   ///
@@ -1541,6 +1817,30 @@ abstract class AppLocalizations {
   /// **'Basic Information'**
   String get basicInformation;
 
+  /// No description provided for @contactInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Information'**
+  String get contactInformation;
+
+  /// No description provided for @businessInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Information'**
+  String get businessInformation;
+
+  /// No description provided for @additionalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Information'**
+  String get additionalInformation;
+
+  /// No description provided for @locationInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Information'**
+  String get locationInformation;
+
   /// No description provided for @fullName.
   ///
   /// In en, this message translates to:
@@ -1589,77 +1889,11 @@ abstract class AppLocalizations {
   /// **'Please enter a valid'**
   String get pleaseEnterValid;
 
-  /// No description provided for @contactInformation.
-  ///
-  /// In en, this message translates to:
-  /// **'Contact Information'**
-  String get contactInformation;
-
   /// No description provided for @phoneFormat.
   ///
   /// In en, this message translates to:
   /// **'+923001234567'**
   String get phoneFormat;
-
-  /// No description provided for @locationInformation.
-  ///
-  /// In en, this message translates to:
-  /// **'Location Information'**
-  String get locationInformation;
-
-  /// No description provided for @deletedPermanently.
-  ///
-  /// In en, this message translates to:
-  /// **'deleted permanently'**
-  String get deletedPermanently;
-
-  /// No description provided for @deactivatedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'deactivated successfully'**
-  String get deactivatedSuccessfully;
-
-  /// No description provided for @failedToDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to delete'**
-  String get failedToDelete;
-
-  /// No description provided for @pleaseConfirmAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Please confirm that you understand this action'**
-  String get pleaseConfirmAction;
-
-  /// No description provided for @pleaseConfirmConsequences.
-  ///
-  /// In en, this message translates to:
-  /// **'Please confirm that you understand the consequences of permanent deletion'**
-  String get pleaseConfirmConsequences;
-
-  /// No description provided for @pleaseTypeVendorName.
-  ///
-  /// In en, this message translates to:
-  /// **'Please type the vendor name exactly to confirm permanent deletion'**
-  String get pleaseTypeVendorName;
-
-  /// No description provided for @pleaseCompleteConfirmation.
-  ///
-  /// In en, this message translates to:
-  /// **'Please complete all confirmation steps'**
-  String get pleaseCompleteConfirmation;
-
-  /// No description provided for @location.
-  ///
-  /// In en, this message translates to:
-  /// **'Location'**
-  String get location;
-
-  /// No description provided for @showing.
-  ///
-  /// In en, this message translates to:
-  /// **'Showing'**
-  String get showing;
 
   /// No description provided for @outOf.
   ///
@@ -1935,7 +2169,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Qty'**
-  String qty(int quantity);
+  String get qty;
 
   /// No description provided for @colorName.
   ///
@@ -2686,12 +2920,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'of expenses'**
   String get ofExpenses;
-
-  /// No description provided for @totalExpenses.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Expenses'**
-  String get totalExpenses;
 
   /// No description provided for @profitable.
   ///
@@ -4265,6 +4493,66 @@ abstract class AppLocalizations {
   /// **'Enter full address'**
   String get enterFullAddress;
 
+  /// No description provided for @enterCustomerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer name'**
+  String get enterCustomerName;
+
+  /// No description provided for @enterCustomerFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer\'s full name'**
+  String get enterCustomerFullName;
+
+  /// No description provided for @enterCustomerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer phone number'**
+  String get enterCustomerPhone;
+
+  /// No description provided for @enterCustomerEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer email address'**
+  String get enterCustomerEmail;
+
+  /// No description provided for @enterCustomerAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer address'**
+  String get enterCustomerAddress;
+
+  /// No description provided for @enterCustomerCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer city'**
+  String get enterCustomerCity;
+
+  /// No description provided for @enterCustomerCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer country'**
+  String get enterCustomerCountry;
+
+  /// No description provided for @enterCustomerBusinessName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer business name'**
+  String get enterCustomerBusinessName;
+
+  /// No description provided for @enterCustomerTaxNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer tax or NTN number'**
+  String get enterCustomerTaxNumber;
+
+  /// No description provided for @enterCustomerNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter customer notes'**
+  String get enterCustomerNotes;
+
   /// No description provided for @enterAdditionalNotes.
   ///
   /// In en, this message translates to:
@@ -4883,6 +5171,12 @@ abstract class AppLocalizations {
   /// **'Other Expenses'**
   String get otherExpenses;
 
+  /// No description provided for @labor.
+  ///
+  /// In en, this message translates to:
+  /// **'Labor'**
+  String get labor;
+
   /// No description provided for @vendors.
   ///
   /// In en, this message translates to:
@@ -5158,12 +5452,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data in spreadsheet format for analysis'**
   String get dataInSpreadsheetFormatForAnalysis;
-
-  /// No description provided for @totalIncome.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Income'**
-  String get totalIncome;
 
   /// No description provided for @profitMargin.
   ///
@@ -7743,7 +8031,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'item'**
-  String item(int itemNumber);
+  String get item;
 
   /// No description provided for @noItems.
   ///
@@ -8074,12 +8362,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Is Overdue'**
   String get isOverdue;
-
-  /// No description provided for @additionalInformation.
-  ///
-  /// In en, this message translates to:
-  /// **'Additional Information'**
-  String get additionalInformation;
 
   /// No description provided for @conversionStatus.
   ///
@@ -8642,7 +8924,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountCreatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Account created successfully! Welcome to Al Noor Fashion.'**
+  /// **'Account created successfully! Welcome to Al Noor.'**
   String get accountCreatedSuccessfully;
 
   /// No description provided for @registrationFailedMessage.
@@ -10922,7 +11204,7 @@ abstract class AppLocalizations {
   /// No description provided for @alNoorFashionPOS.
   ///
   /// In en, this message translates to:
-  /// **'Al Noor Fashion POS'**
+  /// **'Al Noor POS'**
   String get alNoorFashionPOS;
 
   /// No description provided for @version.
@@ -12809,6 +13091,24 @@ abstract class AppLocalizations {
   /// **'Printing receipt for {invoice}'**
   String printingReceiptFor(String invoice);
 
+  /// No description provided for @invoiceHash.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice #'**
+  String get invoiceHash;
+
+  /// No description provided for @subTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get subTotal;
+
+  /// No description provided for @action.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get action;
+
   /// No description provided for @deletePurchase.
   ///
   /// In en, this message translates to:
@@ -12886,6 +13186,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply'**
   String get apply;
+
+  /// No description provided for @scannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode Scanner'**
+  String get scannerTitle;
+
+  /// No description provided for @scannerReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to scan...'**
+  String get scannerReady;
+
+  /// No description provided for @scannerScanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning...'**
+  String get scannerScanning;
+
+  /// No description provided for @scannerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode'**
+  String get scannerLabel;
+
+  /// No description provided for @scannerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type or scan barcode'**
+  String get scannerHint;
+
+  /// No description provided for @scannerInvalidFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid barcode format'**
+  String get scannerInvalidFormat;
+
+  /// No description provided for @scannerDuplicateScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate barcode scan'**
+  String get scannerDuplicateScan;
+
+  /// No description provided for @scannerProductNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found'**
+  String get scannerProductNotFound;
+
+  /// No description provided for @scannerFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Found: {productName}'**
+  String scannerFound(String productName);
+
+  /// No description provided for @scannerFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed: {error}'**
+  String scannerFailed(String error);
+
+  /// No description provided for @scannerAddedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {productName} to cart'**
+  String scannerAddedToCart(String productName);
+
+  /// No description provided for @scannerAddToCartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add product to cart'**
+  String get scannerAddToCartFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -90,6 +90,7 @@ class PaymentProvider extends ChangeNotifier {
 
   /// Load payments with filtering
   Future<void> loadPayments({PaymentFilterRequest? filter, bool refresh = false}) async {
+    // Always load if refresh is explicitly true or if payments list is empty
     if (!refresh && _payments.isNotEmpty) return;
 
     _setLoading(true);
@@ -97,15 +98,19 @@ class PaymentProvider extends ChangeNotifier {
 
     try {
       final response = await _paymentService.getPayments(filter: filter);
+      debugPrint('🔍 Payment Provider Response: success=${response.success}, payments=${response.data?.payments.length ?? 0}');
       if (response.success && response.data != null) {
         _payments = response.data!.payments;
         _pagination = response.data!.pagination;
+        debugPrint('💾 Loaded ${_payments.length} payments into provider');
         _computeStatistics(); // Compute statistics after loading payments
         _setSuccess(response.message);
       } else {
+        debugPrint('❌ Failed to load payments: ${response.message}');
         _setError(response.message);
       }
     } catch (e) {
+      debugPrint('💥 Error loading payments: $e');
       _setError('Error loading payments: $e');
     } finally {
       _setLoading(false);
@@ -754,9 +759,9 @@ class PaymentProvider extends ChangeNotifier {
         _labors = response.data!.labors;
 
         _laborers = _labors.map((labor) {
-          // FIX: If remainingMonthlySalary > 0, use it.
-          // Otherwise, fallback to salary (assuming new month or data issue).
-          final displayAmount = labor.remainingMonthlySalary > 0
+          // Use remainingMonthlySalary if available and > 0
+          // Otherwise, use full salary (assuming no payments yet or new month)
+          final displayAmount = (labor.remainingMonthlySalary != null && labor.remainingMonthlySalary > 0)
               ? labor.remainingMonthlySalary
               : labor.salary;
 

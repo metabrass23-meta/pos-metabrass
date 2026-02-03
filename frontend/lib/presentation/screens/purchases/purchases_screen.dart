@@ -40,8 +40,6 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
       setState(() {
         _activeFilter = result;
       });
-      // You can add logic here to trigger a filtered fetch from the provider
-      // context.read<PurchaseProvider>().fetchPurchases(filter: _activeFilter);
     }
   }
 
@@ -71,13 +69,13 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             SizedBox(height: context.mainPadding),
 
             // Statistics Summary Cards
-            _buildSummaryRow(context),
+            _buildSummaryRow(context, l10n),
 
             SizedBox(height: context.mainPadding),
 
             // Main Data Section: Purchase List Table
-            const Expanded(
-              child: PurchaseTable(),
+            Expanded(
+              child: PurchaseTable(filter: _activeFilter),
             ),
           ],
         ),
@@ -92,15 +90,16 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.purchases,
+              l10n.purchases ?? "Purchases",
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.charcoalGray,
               ),
             ),
+            SizedBox(height: 15,),
             Text(
-              "Track and manage inventory supply and purchase records",
+              l10n.purchasesTagline ?? "Track and manage inventory supply and purchase records",
               style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.grey[600],
@@ -111,21 +110,19 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
         const Spacer(),
         // Desktop Optimized Filter Button
         PremiumButton(
-          text: l10n.apply ?? "Filter",
+          text: l10n.filterPurchases ?? "Filter",
           icon: Icons.filter_alt_outlined,
           onPressed: _showFilterDialog,
           isOutlined: true,
-          width: 140,
           height: 45,
           backgroundColor: AppTheme.charcoalGray,
         ),
         SizedBox(width: context.smallPadding),
         // Primary Action: New Purchase
         PremiumButton(
-          text: "New Purchase",
+          text: l10n.newPurchase ?? "New Purchase",
           icon: Icons.add_rounded,
           onPressed: _showAddPurchaseDialog,
-          width: 200,
           height: 45,
           backgroundColor: AppTheme.primaryMaroon,
         ),
@@ -133,7 +130,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     );
   }
 
-  Widget _buildSummaryRow(BuildContext context) {
+  Widget _buildSummaryRow(BuildContext context, AppLocalizations l10n) {
     return Consumer<PurchaseProvider>(
       builder: (context, provider, child) {
         final totalPurchases = provider.purchases.length;
@@ -143,7 +140,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           children: [
             _buildStatCard(
               context,
-              "Total Records",
+              l10n.totalRecords ?? "Total Records",
               totalPurchases.toString(),
               Icons.inventory_2_outlined,
               Colors.blue,
@@ -151,7 +148,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             SizedBox(width: context.mainPadding),
             _buildStatCard(
               context,
-              "Total Investment",
+              l10n.totalInvestment ?? "Total Investment",
               "Rs. ${totalAmount.toStringAsFixed(2)}",
               Icons.account_balance_wallet_outlined,
               Colors.green,

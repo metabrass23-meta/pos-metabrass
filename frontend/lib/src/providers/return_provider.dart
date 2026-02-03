@@ -78,6 +78,7 @@ class ReturnProvider extends ChangeNotifier {
     _clearError();
 
     try {
+      debugPrint('🔄 [ReturnProvider] Loading returns with filters: search="$search", status="$status", reason="$reason"');
       final response = await _returnService.getReturns(
         search: search,
         status: status,
@@ -90,11 +91,14 @@ class ReturnProvider extends ChangeNotifier {
 
       if (response.success) {
         _returns = response.data!;
+        debugPrint('✅ [ReturnProvider] Loaded ${_returns.length} returns');
         notifyListeners();
       } else {
+        debugPrint('❌ [ReturnProvider] Failed to load returns: ${response.message}');
         _setError(response.message ?? 'Failed to load returns');
       }
     } catch (e) {
+      debugPrint('❌ [ReturnProvider] Error loading returns: $e');
       _setError('Error loading returns: $e');
     } finally {
       _setLoading(false);
@@ -292,23 +296,32 @@ class ReturnProvider extends ChangeNotifier {
     _clearError();
 
     try {
+      debugPrint('🔄 [ReturnProvider] Approving return $id with reason: $reason');
       final response = await _returnService.approveReturn(id: id, reason: reason);
 
       if (response.success) {
-        final index = _returns.indexWhere((r) => r.id == id);
-        if (index != -1) {
-          _returns[index] = response.data!;
-          if (_selectedReturn?.id == id) {
-            _selectedReturn = response.data;
-          }
-          notifyListeners();
-        }
+        debugPrint('✅ [ReturnProvider] Approve successful, reloading returns and refunds...');
+        debugPrint('🔍 [ReturnProvider] Current filters: search="$_searchQuery", status="$_statusFilter", reason="$_reasonFilter"');
+        // Reload returns to get updated data and ensure proper filtering
+        await Future.wait([
+          loadReturns(
+            search: _searchQuery,
+            status: _statusFilter,
+            reason: _reasonFilter,
+            startDate: _startDate,
+            endDate: _endDate,
+          ),
+          loadRefunds() // Also reload refunds to show newly created refunds
+        ]);
+        debugPrint('✅ [ReturnProvider] Returns and refunds reloaded, returns count: ${_returns.length}, refunds count: ${_refunds.length}');
         return true;
       } else {
+        debugPrint('❌ [ReturnProvider] Approve failed: ${response.message}');
         _setError(response.message ?? 'Failed to approve return');
         return false;
       }
     } catch (e) {
+      debugPrint('❌ [ReturnProvider] Approve error: $e');
       _setError('Error approving return: $e');
       return false;
     } finally {
@@ -325,14 +338,14 @@ class ReturnProvider extends ChangeNotifier {
       final response = await _returnService.rejectReturn(id: id, reason: reason);
 
       if (response.success) {
-        final index = _returns.indexWhere((r) => r.id == id);
-        if (index != -1) {
-          _returns[index] = response.data!;
-          if (_selectedReturn?.id == id) {
-            _selectedReturn = response.data;
-          }
-          notifyListeners();
-        }
+        // Reload returns to get updated data and ensure proper filtering
+        await loadReturns(
+          search: _searchQuery,
+          status: _statusFilter,
+          reason: _reasonFilter,
+          startDate: _startDate,
+          endDate: _endDate,
+        );
         return true;
       } else {
         _setError(response.message ?? 'Failed to reject return');
@@ -355,14 +368,17 @@ class ReturnProvider extends ChangeNotifier {
       final response = await _returnService.processReturn(id: id, refundAmount: refundAmount, refundMethod: refundMethod);
 
       if (response.success) {
-        final index = _returns.indexWhere((r) => r.id == id);
-        if (index != -1) {
-          _returns[index] = response.data!;
-          if (_selectedReturn?.id == id) {
-            _selectedReturn = response.data;
-          }
-          notifyListeners();
-        }
+        // Reload returns and refunds to get updated data
+        await Future.wait([
+          loadReturns(
+            search: _searchQuery,
+            status: _statusFilter,
+            reason: _reasonFilter,
+            startDate: _startDate,
+            endDate: _endDate,
+          ),
+          loadRefunds() // Also reload refunds to show updated status
+        ]);
         return true;
       } else {
         _setError(response.message ?? 'Failed to process return');

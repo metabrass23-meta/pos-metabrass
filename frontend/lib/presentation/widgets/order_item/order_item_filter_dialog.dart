@@ -308,7 +308,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 80.w, large: 75.w, ultrawide: 70.w),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 98.w, small: 95.w, medium: 90.w, large: 85.w, ultrawide: 80.w),
                 constraints: BoxConstraints(maxWidth: 800, maxHeight: 90.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -863,7 +863,7 @@ class _OrderItemFilterDialogState extends State<OrderItemFilterDialog> with Sing
                 child: CheckboxListTile(
                   title: Text(
                     l10n.showInactiveItems,
-                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context), fontWeight: FontWeight.w500),
                   ),
                   value: _showInactiveOnly,
                   onChanged: (value) => setState(() => _showInactiveOnly = value ?? false),

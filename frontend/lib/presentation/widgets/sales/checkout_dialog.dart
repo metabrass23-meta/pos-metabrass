@@ -932,11 +932,33 @@ class _CheckoutDialogState extends State<CheckoutDialog>
             keyboardType: TextInputType.number,
             prefixIcon: Icons.local_offer_rounded,
             onChanged: (value) {
-              final provider = Provider.of<SalesProvider>(
-                context,
-                listen: false,
-              );
-              provider.setOverallDiscount(double.tryParse(value) ?? 0.0);
+              print('🔍 Overall discount field changed');
+              print('🔍 Input value: $value');
+              
+              final discount = double.tryParse(value) ?? 0.0;
+              print('🔍 Parsed discount: $discount');
+              
+              final provider = Provider.of<SalesProvider>(context, listen: false);
+              print('🔍 Cart subtotal: ${provider.cartSubtotal}');
+              
+              // Ensure discount doesn't exceed cart subtotal
+              final maxDiscount = provider.cartSubtotal;
+              print('🔍 Maximum allowed discount: $maxDiscount');
+              
+              if (discount >= 0 && discount <= maxDiscount) {
+                provider.setOverallDiscount(discount);
+                print('✅ Set overall discount to: $discount');
+              } else if (discount > maxDiscount) {
+                // Set to maximum allowed discount
+                provider.setOverallDiscount(maxDiscount);
+                _overallDiscountController.text = maxDiscount.toStringAsFixed(0);
+                print('⚠️ Discount exceeded max, set to: $maxDiscount');
+              } else {
+                // Reset to 0 for negative values
+                provider.setOverallDiscount(0.0);
+                _overallDiscountController.text = '0';
+                print('❌ Negative discount, reset to 0');
+              }
             },
           ),
           SizedBox(height: context.smallPadding),

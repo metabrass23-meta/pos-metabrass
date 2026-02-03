@@ -6,7 +6,7 @@ class VendorModel {
   final String businessName;
   final String displayName;
   final String initials;
-  final String cnic;
+  final String? cnic; // Make nullable
   final String phone;
   final String city;
   final String area;
@@ -24,7 +24,7 @@ class VendorModel {
     required this.businessName,
     required this.displayName,
     required this.initials,
-    required this.cnic,
+    this.cnic, // Make nullable
     required this.phone,
     required this.city,
     required this.area,
@@ -44,7 +44,7 @@ class VendorModel {
       businessName: json['business_name'] as String,
       displayName: json['display_name'] as String? ?? '${json['business_name']} (${json['name']})',
       initials: json['initials'] as String? ?? _generateInitials(json['name'] as String),
-      cnic: json['cnic'] as String,
+      cnic: json['cnic'] as String?, // Handle null CNIC
       phone: json['phone'] as String,
       city: json['city'] as String,
       area: json['area'] as String,
@@ -65,7 +65,7 @@ class VendorModel {
       'business_name': businessName,
       'display_name': displayName,
       'initials': initials,
-      'cnic': cnic,
+      'cnic': cnic, // Can be null
       'phone': phone,
       'city': city,
       'area': area,

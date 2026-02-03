@@ -493,7 +493,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               child: Text(
                 labor.isActive ? l10n.active : l10n.inactive,
                 style: TextStyle(
-                  fontSize: context.captionFontSize,
+                  fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
                   fontWeight: FontWeight.w600,
                   color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive'),
                 ),

@@ -265,13 +265,13 @@ class _CreateReturnDialogState extends State<CreateReturnDialog> {
           style: const TextStyle(color: Colors.black87, fontSize: 16),
           items: [
             DropdownMenuItem(value: '', child: Text(l10n.selectReason, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'defective', child: Text(l10n.reasonDefective, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'wrong_size', child: Text(l10n.reasonWrongSize, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'wrong_color', child: Text(l10n.reasonWrongColor, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'quality_issue', child: Text(l10n.reasonQualityIssue, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'change_mind', child: Text(l10n.reasonChangeMind, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'damaged', child: Text(l10n.reasonDamagedTransit, style: const TextStyle(color: Colors.black))),
-            DropdownMenuItem(value: 'other', child: Text(l10n.reasonOther, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'DEFECTIVE', child: Text(l10n.reasonDefective, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'SIZE_ISSUE', child: Text(l10n.reasonWrongSize, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'WRONG_COLOR', child: Text(l10n.reasonWrongColor, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'QUALITY_ISSUE', child: Text(l10n.reasonQualityIssue, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'CUSTOMER_REQUEST', child: Text(l10n.reasonChangeMind, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'DAMAGED', child: Text(l10n.reasonDamagedTransit, style: const TextStyle(color: Colors.black))),
+            DropdownMenuItem(value: 'OTHER', child: Text(l10n.reasonOther, style: const TextStyle(color: Colors.black))),
           ],
           validator: (value) {
             if (value == null || value.isEmpty) return l10n.selectReturnReason;

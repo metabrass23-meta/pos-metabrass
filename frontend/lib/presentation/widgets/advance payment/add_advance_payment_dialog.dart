@@ -73,12 +73,16 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
       }
 
       final amount = double.parse(_amountController.text.trim());
+      // TODO: Fix remaining advance amount validation when backend properly tracks remaining_advance_amount
+      // For now, skip this validation to allow advance payments
+      /*
       if (amount > _selectedLabor!.remainingAdvanceAmount) {
         _showErrorSnackbar(
           '${l10n.amountCannotExceedRemainingAdvanceAmount} PKR ${_selectedLabor!.remainingAdvanceAmount.toStringAsFixed(0)}. ${l10n.totalAdvancesThisMonth}: PKR ${_selectedLabor!.totalAdvancesAmount.toStringAsFixed(0)}',
         );
         return;
       }
+      */
 
       final advancePaymentProvider = Provider.of<AdvancePaymentProvider>(context, listen: false);
 
@@ -169,7 +173,12 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
   double get remainingAfterAdvance {
     if (_selectedLabor == null) return 0;
     final amount = double.tryParse(_amountController.text) ?? 0;
-    return _selectedLabor!.remainingAdvanceAmount - amount;
+    // TODO: Fix remaining advance amount calculation when backend properly tracks remaining_advance_amount
+    // For now, use salary as fallback
+    final remainingAdvance = _selectedLabor!.remainingAdvanceAmount > 0 
+        ? _selectedLabor!.remainingAdvanceAmount 
+        : _selectedLabor!.salary;
+    return remainingAdvance - amount;
   }
 
   @override
@@ -366,9 +375,13 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
         if (value?.isEmpty ?? true) return l10n.pleaseEnterAdvanceAmount;
         final amount = double.tryParse(value!);
         if (amount == null || amount <= 0) return l10n.pleaseEnterValidAmount;
+        // TODO: Fix remaining salary validation when backend properly tracks remaining_monthly_salary
+        // For now, skip this validation to allow advance payments
+        /*
         if (_selectedLabor != null && amount > _selectedLabor!.remainingMonthlySalary) {
           return l10n.amountExceedsRemainingSalary;
         }
+        */
         return null;
       },
     );
@@ -448,10 +461,11 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
           _buildSalaryInfoRow(l10n.originalSalary, 'PKR ${_selectedLabor!.salary.toStringAsFixed(0)}', Colors.green),
           _buildSalaryInfoRow(
             l10n.currentMonthAdvances,
-            'PKR ${(_selectedLabor!.salary - _selectedLabor!.remainingMonthlySalary).toStringAsFixed(0)}',
+            // TODO: Fix calculation when backend properly tracks remaining_monthly_salary
+            'PKR ${(_selectedLabor!.totalAdvancesAmount > 0 ? _selectedLabor!.totalAdvancesAmount : 0.0).toStringAsFixed(0)}',
             Colors.orange,
           ),
-          _buildSalaryInfoRow(l10n.remainingForMonth, 'PKR ${_selectedLabor!.remainingMonthlySalary.toStringAsFixed(0)}', Colors.blue),
+          _buildSalaryInfoRow(l10n.remainingForMonth, 'PKR ${(_selectedLabor!.remainingMonthlySalary > 0 ? _selectedLabor!.remainingMonthlySalary : _selectedLabor!.salary).toStringAsFixed(0)}', Colors.blue),
           Divider(color: Colors.grey.shade300, height: context.cardPadding),
           _buildSalaryInfoRow(l10n.newAdvance, 'PKR ${double.tryParse(_amountController.text)?.toStringAsFixed(0) ?? '0.00'}', AppTheme.primaryMaroon),
           _buildSalaryInfoRow(

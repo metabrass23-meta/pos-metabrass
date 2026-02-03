@@ -121,6 +121,8 @@ class ProductService {
     required List<String> pieces,
     required int quantity,
     required String categoryId,
+    String? barcode,  // Added barcode parameter
+    String? sku,      // Added SKU parameter
   }) async {
     try {
       final request = ProductCreateRequest(
@@ -133,6 +135,8 @@ class ProductService {
         pieces: pieces,
         quantity: quantity,
         category: categoryId,
+        barcode: barcode,  // Include barcode
+        sku: sku,          // Include SKU
       );
 
       DebugHelper.printJson('Create Product Request', request.toJson());

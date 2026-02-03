@@ -5,17 +5,20 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../category/category_filter_dialog.dart';
 
 class EnhancedCategoryTable extends StatefulWidget {
   final Function(Category) onEdit;
   final Function(Category) onDelete;
   final Function(Category) onView;
+  final CategoryFilter? filter;
 
   const EnhancedCategoryTable({
     super.key,
     required this.onEdit,
     required this.onDelete,
     required this.onView,
+    this.filter,
   });
 
   @override
@@ -57,6 +60,65 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
     _contentHorizontalController.dispose();
     _verticalController.dispose();
     super.dispose();
+  }
+
+  /// Get filtered categories based on the applied filter
+  List<Category> _getFilteredCategories(List<Category> allCategories) {
+    if (widget.filter == null) {
+      return allCategories;
+    }
+
+    List<Category> filtered = List.from(allCategories);
+
+    // Filter by status
+    if (widget.filter!.status != null && widget.filter!.status!.isNotEmpty) {
+      filtered = filtered.where((category) {
+        switch (widget.filter!.status) {
+          case 'active':
+            return true; // All categories are active by default in this implementation
+          case 'inactive':
+            return false; // No inactive categories in current implementation
+          default:
+            return true;
+        }
+      }).toList();
+    }
+
+    // Filter by date range
+    if (widget.filter!.startDate != null) {
+      filtered = filtered.where((category) {
+        return category.dateCreated.isAfter(widget.filter!.startDate!.subtract(Duration(days: 1)));
+      }).toList();
+    }
+
+    if (widget.filter!.endDate != null) {
+      filtered = filtered.where((category) {
+        return category.dateCreated.isBefore(widget.filter!.endDate!.add(Duration(days: 1)));
+      }).toList();
+    }
+
+    // Sort categories
+    if (widget.filter!.sortBy != null && widget.filter!.sortBy!.isNotEmpty) {
+      switch (widget.filter!.sortBy) {
+        case 'name_asc':
+          filtered.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+          break;
+        case 'name_desc':
+          filtered.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+          break;
+        case 'created_desc':
+          filtered.sort((a, b) => b.dateCreated.compareTo(a.dateCreated));
+          break;
+        case 'created_asc':
+          filtered.sort((a, b) => a.dateCreated.compareTo(b.dateCreated));
+          break;
+        case 'updated_desc':
+          filtered.sort((a, b) => b.lastEdited.compareTo(a.lastEdited));
+          break;
+      }
+    }
+
+    return filtered;
   }
 
   @override
@@ -106,6 +168,13 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             return _buildEmptyState(context);
           }
 
+          // Get filtered categories
+          final filteredCategories = _getFilteredCategories(provider.categories);
+          
+          if (filteredCategories.isEmpty) {
+            return _buildEmptyState(context, message: "No categories match the current filter");
+          }
+
           return Column(
             children: [
               // 1. Table Header (Horizontal Scroll Only)
@@ -153,7 +222,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                           width: _getTableWidth(context),
                           // Use Column instead of ListView for better sync in nested scrolls
                           child: Column(
-                            children: provider.categories.asMap().entries.map((entry) {
+                            children: filteredCategories.asMap().entries.map((entry) {
                               return _buildTableRow(context, entry.value, entry.key);
                             }).toList(),
                           ),
@@ -454,8 +523,9 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, {String? message}) {
     final l10n = AppLocalizations.of(context)!;
+    final displayMessage = message ?? l10n.noData ?? "No categories found";
 
     return Center(
       child: Column(
@@ -492,7 +562,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
           SizedBox(height: context.mainPadding),
 
           Text(
-            '${l10n.noData} ${l10n.category}',
+            displayMessage,
             style: TextStyle(
               fontSize: context.headerFontSize * 0.8,
               fontWeight: FontWeight.w600,
@@ -545,16 +615,16 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
     } else if (difference == 1) {
       return l10n.yesterday;
     } else if (difference < 7) {
-      return '$difference ${l10n.daysAgo}';
+      return l10n.daysAgo(difference);
     } else if (difference < 30) {
       final weeks = (difference / 7).floor();
-      return weeks == 1 ? '1 ${l10n.weekAgo}' : '$weeks ${l10n.weeksAgo}';
+      return weeks == 1 ? l10n.oneWeekAgo : l10n.weeksAgo(weeks);
     } else if (difference < 365) {
       final months = (difference / 30).floor();
-      return months == 1 ? '1 ${l10n.monthAgo}' : '$months ${l10n.monthsAgo}';
+      return months == 1 ? l10n.oneMonthAgo : l10n.monthsAgo(months);
     } else {
       final years = (difference / 365).floor();
-      return years == 1 ? '1 ${l10n.yearAgo}' : '$years ${l10n.yearsAgo}';
+      return years == 1 ? l10n.oneYearAgo : l10n.yearsAgo(years);
     }
   }
 }

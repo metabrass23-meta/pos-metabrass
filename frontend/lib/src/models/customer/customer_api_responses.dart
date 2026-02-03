@@ -189,7 +189,7 @@ class CustomerCountryStats {
 class CustomerCreateRequest {
   final String name;
   final String phone;
-  final String email;
+  final String? email;
   final String? address;
   final String? city;
   final String? country;
@@ -201,7 +201,7 @@ class CustomerCreateRequest {
   CustomerCreateRequest({
     required this.name,
     required this.phone,
-    required this.email,
+    this.email,
     this.address,
     this.city,
     this.country,
@@ -215,7 +215,7 @@ class CustomerCreateRequest {
     return {
       'name': name,
       'phone': phone,
-      'email': email,
+      if (email != null) 'email': email,
       if (address != null) 'address': address,
       if (city != null) 'city': city,
       if (country != null) 'country': country,
@@ -230,7 +230,7 @@ class CustomerCreateRequest {
 class CustomerUpdateRequest {
   final String name;
   final String phone;
-  final String email;
+  final String? email;
   final String? address;
   final String? city;
   final String? country;
@@ -245,7 +245,7 @@ class CustomerUpdateRequest {
   CustomerUpdateRequest({
     required this.name,
     required this.phone,
-    required this.email,
+    this.email,
     this.address,
     this.city,
     this.country,
@@ -262,7 +262,7 @@ class CustomerUpdateRequest {
     return {
       'name': name,
       'phone': phone,
-      'email': email,
+      if (email != null) 'email': email,
       if (address != null) 'address': address,
       if (city != null) 'city': city,
       if (country != null) 'country': country,

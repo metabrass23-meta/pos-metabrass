@@ -40,7 +40,7 @@ class AnimatedTextWidget extends StatelessWidget {
                   children: [
                     // Glow background
                     Text(
-                      'Al Noor Fashion',
+                      'Al Noor',
                       style: TextStyle(
                         fontSize: context.headingFontSize * 1.2,
                         fontWeight: FontWeight.w900,
@@ -63,7 +63,7 @@ class AnimatedTextWidget extends StatelessWidget {
                         stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
                       ).createShader(bounds),
                       child: Text(
-                        'Al Noor Fashion',
+                        'Al Noor',
                         style: TextStyle(
                           fontSize: context.headingFontSize * 1.2,
                           fontWeight: FontWeight.w900,

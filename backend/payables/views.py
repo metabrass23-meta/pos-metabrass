@@ -207,15 +207,23 @@ def create_payable(request):
     """
     Create a new payable
     """
+    # Debug: Print received data
+    print(f'🔍 DEBUG: Create Payable Request Data: {request.data}')
+    
     serializer = PayableCreateSerializer(
         data=request.data,
         context={'request': request}
     )
     
+    print(f'🔍 DEBUG: Serializer is valid: {serializer.is_valid()}')
+    if not serializer.is_valid():
+        print(f'🔍 DEBUG: Serializer errors: {serializer.errors}')
+    
     if serializer.is_valid():
         try:
             with transaction.atomic():
                 payable = serializer.save()
+                print(f'🔍 DEBUG: Payable created successfully: {payable.id}')
                 
                 return Response({
                     'success': True,
@@ -224,6 +232,7 @@ def create_payable(request):
                 }, status=status.HTTP_201_CREATED)
                 
         except Exception as e:
+            print(f'🔍 DEBUG: Exception during payable creation: {str(e)}')
             return Response({
                 'success': False,
                 'message': 'Payable creation failed due to server error.',

@@ -26,7 +26,7 @@ class ExpensesProvider extends ChangeNotifier {
   DateTime? _dateTo;
 
   // Available persons for withdrawal
-  final List<String> _availablePersons = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
+  final List<String> _availablePersons = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
 
   // Getters
   List<Expense> get expenses => _filteredRecords;
@@ -319,7 +319,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Office Supplies',
         description: 'Purchased stationery and printing materials for office use',
         amount: 8500.0,
-        withdrawalBy: 'Mr. Sheikh Parveez Maqbool',
+        withdrawalBy: 'Mr. Huzaifa',
         date: DateTime.now().subtract(const Duration(days: 2)),
         time: const TimeOfDay(hour: 10, minute: 30),
         category: 'Office',
@@ -331,7 +331,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Internet Bill',
         description: 'Monthly internet service payment for office connectivity',
         amount: 12000.0,
-        withdrawalBy: 'Mr Sheikh Zain Maqbool',
+        withdrawalBy: 'Mr. Huzaifa',
         date: DateTime.now().subtract(const Duration(days: 5)),
         time: const TimeOfDay(hour: 14, minute: 15),
         category: 'Utilities',
@@ -343,7 +343,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Transportation',
         description: 'Fuel and maintenance costs for delivery vehicle',
         amount: 15000.0,
-        withdrawalBy: 'Mr. Sheikh Parveez Maqbool',
+        withdrawalBy: 'Mr. Huzaifa',
         date: DateTime.now().subtract(const Duration(days: 7)),
         time: const TimeOfDay(hour: 9, minute: 45),
         category: 'Transport',
@@ -355,7 +355,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Marketing',
         description: 'Social media advertising and promotional materials',
         amount: 25000.0,
-        withdrawalBy: 'Mr Sheikh Zain Maqbool',
+        withdrawalBy: 'Mr Huzaifa',
         date: DateTime.now().subtract(const Duration(days: 10)),
         time: const TimeOfDay(hour: 16, minute: 20),
         category: 'Marketing',

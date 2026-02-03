@@ -33,6 +33,128 @@ class ReceiptService {
     return '${ApiConfig.baseUrl}$endpoint';
   }
 
+  // Generate PDF receipt for a sale directly (same as after-sale receipt)
+  Future<ApiResponse<Map<String, dynamic>>> generateSaleReceiptPdf(String saleId) async {
+    try {
+      debugPrint(' [ReceiptService] Generating PDF receipt for sale: $saleId');
+
+      final options = await _getAuthOptions();
+      final response = await _dio.post(
+        _getUrl('/api/v1/sales/$saleId/print-receipt/'),
+        options: options,
+      );
+
+      debugPrint(' [ReceiptService] Sale receipt PDF generated successfully');
+      debugPrint(' [ReceiptService] Response data: ${response.data}');
+
+      return ApiResponse<Map<String, dynamic>>.success(
+        data: response.data,
+        message: 'Sale receipt PDF generated successfully',
+      );
+    } on DioException catch (e) {
+      debugPrint(' [ReceiptService] Dio error generating sale receipt PDF: $e');
+      debugPrint(' [ReceiptService] Response data: ${e.response?.data}');
+      debugPrint(' [ReceiptService] Status code: ${e.response?.statusCode}');
+
+      String errorMessage = 'Failed to generate sale receipt PDF';
+      
+      if (e.response?.data is Map<String, dynamic>) {
+        final data = e.response!.data as Map<String, dynamic>;
+        errorMessage = data['message'] ?? data['detail'] ?? errorMessage;
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        errorMessage = 'Connection timeout. Please check your internet connection.';
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMessage = 'No internet connection. Please check your network.';
+      }
+
+      return ApiResponse<Map<String, dynamic>>.error(
+        message: errorMessage,
+      );
+    } catch (e) {
+      debugPrint(' [ReceiptService] Unexpected error generating sale receipt PDF: $e');
+      return ApiResponse<Map<String, dynamic>>.error(
+        message: 'An unexpected error occurred: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Generate PDF for a receipt
+  Future<ApiResponse<Map<String, dynamic>>> generateReceiptPdf(String receiptId) async {
+    final url = _getUrl('/sales/receipts/$receiptId/generate-pdf/');
+    debugPrint(' [ReceiptService] POST $url (Generate PDF)');
+
+    try {
+      final response = await _dio.post(
+        url,
+        options: await _getAuthOptions(),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        debugPrint('✅ [ReceiptService] PDF generated successfully');
+        return ApiResponse.success(
+          message: data['message'] ?? 'PDF generated successfully',
+          data: data['data'] as Map<String, dynamic>,
+        );
+      } else {
+        final errorData = response.data;
+        debugPrint('❌ [ReceiptService] PDF generation failed: ${response.statusCode}');
+        return ApiResponse.error(
+          message: errorData['message'] ?? 'Failed to generate PDF',
+          errors: errorData['errors'] ?? {},
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [ReceiptService] Exception during PDF generation: $e');
+      return ApiResponse.error(
+        message: 'Failed to generate receipt PDF: ${e.toString()}',
+        errors: {'detail': e.toString()},
+      );
+    }
+  }
+
+  /// Create a simple receipt directly from sale (for sales with amount_paid > 0)
+  Future<ApiResponse<ReceiptModel>> createSimpleReceipt({
+    required String saleId,
+    String? notes,
+  }) async {
+    final url = _getUrl('/sales/receipts/create-simple/');
+    debugPrint('🚀 [ReceiptService] POST $url (Simple Receipt)');
+
+    try {
+      final response = await _dio.post(
+        url,
+        options: await _getAuthOptions(),
+        data: {
+          'sale': saleId,
+          'notes': notes ?? 'Receipt generated for paid sale',
+        },
+      );
+
+      debugPrint('✅ [ReceiptService] Simple Receipt Response: ${response.data}');
+
+      if (response.statusCode == 201 && response.data['success'] == true) {
+        final receiptData = response.data['data'];
+        final receipt = ReceiptModel.fromJson(receiptData);
+        
+        return ApiResponse.success(
+          data: receipt,
+          message: response.data['message'] ?? 'Simple receipt created successfully',
+        );
+      } else {
+        return ApiResponse.error(
+          message: response.data['message'] ?? 'Failed to create simple receipt',
+          errors: response.data['errors'],
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [ReceiptService] Simple Receipt Error: $e');
+      return ApiResponse.error(
+        message: 'Failed to create simple receipt: ${e.toString()}',
+      );
+    }
+  }
+
   /// Create a new receipt for a payment
   Future<ApiResponse<ReceiptModel>> createReceipt({
     required String saleId,
@@ -154,6 +276,7 @@ class ReceiptService {
   }) async {
     final url = _getUrl(ApiConfig.receipts);
     debugPrint('🚀 [ReceiptService] GET List $url');
+    debugPrint('🔍 [ReceiptService] Query params: saleId=$saleId, paymentId=$paymentId, status=$status');
 
     try {
       final response = await _dio.get(
@@ -170,15 +293,30 @@ class ReceiptService {
           if (pageSize != null) 'page_size': pageSize,
         },
       );
+      
+      debugPrint('🔍 [ReceiptService] Response status: ${response.statusCode}');
+      debugPrint('🔍 [ReceiptService] Response data type: ${response.data.runtimeType}');
 
       if (response.statusCode == 200) {
-        // ✅ SAFE PARSING: Handles both List [...] and Pagination {results: [...]}
+        // ✅ SAFE PARSING: Handles both {data: [...]} and {results: [...]}
         List<dynamic> listData;
-        if (response.data is Map<String, dynamic> && response.data.containsKey('results')) {
-          listData = response.data['results'];
+        if (response.data is Map<String, dynamic>) {
+          final responseData = response.data as Map<String, dynamic>;
+          if (responseData.containsKey('data')) {
+            listData = responseData['data'];
+            debugPrint('🔍 [ReceiptService] Found data field with ${listData.length} results');
+          } else if (responseData.containsKey('results')) {
+            listData = responseData['results'];
+            debugPrint('🔍 [ReceiptService] Found results field with ${listData.length} results');
+          } else {
+            debugPrint('🔍 [ReceiptService] No data or results field found in: ${responseData.keys}');
+            listData = [];
+          }
         } else if (response.data is List) {
           listData = response.data;
+          debugPrint('🔍 [ReceiptService] Found direct list with ${listData.length} items');
         } else {
+          debugPrint('🔍 [ReceiptService] Unexpected response format: ${response.data}');
           listData = [];
         }
 
@@ -229,35 +367,6 @@ class ReceiptService {
       }
     } catch (e) {
       return ApiResponse<bool>(success: false, data: false, message: 'Error: $e');
-    }
-  }
-
-  /// Generate PDF for receipt
-  Future<ApiResponse<Map<String, dynamic>>> generateReceiptPdf(String id) async {
-    final url = _getUrl(ApiConfig.generateReceiptPdf(id));
-
-    try {
-      final response = await _dio.post(
-        url,
-        options: await _getAuthOptions(),
-      );
-
-      if (response.statusCode == 200) {
-        return ApiResponse<Map<String, dynamic>>.fromJson(
-          response.data,
-              (data) => data as Map<String, dynamic>,
-        );
-      } else {
-        return ApiResponse<Map<String, dynamic>>(
-          success: false,
-          message: response.data['message'] ?? 'Failed to generate PDF',
-        );
-      }
-    } catch (e) {
-      return ApiResponse<Map<String, dynamic>>(
-        success: false,
-        message: 'Error: $e',
-      );
     }
   }
 }

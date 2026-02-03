@@ -23,6 +23,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
 
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
+  final TextEditingController _barcodeController = TextEditingController();
+  final TextEditingController _skuController = TextEditingController();
 
   String? _selectedCategoryId;
   String? _selectedColor;
@@ -46,6 +48,10 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     _selectedStockLevel = currentFilters.stockLevel;
     _selectedSortBy = currentFilters.sortBy;
     _selectedSortOrder = currentFilters.sortOrder;
+    
+    // Load barcode and sku values
+    _barcodeController.text = currentFilters.barcode ?? '';
+    _skuController.text = currentFilters.sku ?? '';
 
     if (currentFilters.minPrice != null) {
       _minPriceController.text = currentFilters.minPrice.toString();
@@ -65,6 +71,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     _animationController.dispose();
     _minPriceController.dispose();
     _maxPriceController.dispose();
+    _barcodeController.dispose();
+    _skuController.dispose();
     super.dispose();
   }
 
@@ -74,6 +82,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
 
     final minPrice = _minPriceController.text.isNotEmpty ? double.tryParse(_minPriceController.text) : null;
     final maxPrice = _maxPriceController.text.isNotEmpty ? double.tryParse(_maxPriceController.text) : null;
+    final barcode = _barcodeController.text.trim().isNotEmpty ? _barcodeController.text.trim() : null;
+    final sku = _skuController.text.trim().isNotEmpty ? _skuController.text.trim() : null;
 
     if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
       _showErrorSnackbar(l10n.minPriceCannotBeGreaterThanMax);
@@ -87,6 +97,8 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
       stockLevel: _selectedStockLevel,
       minPrice: minPrice,
       maxPrice: maxPrice,
+      barcode: barcode,  // Include barcode filter
+      sku: sku,          // Include SKU filter
       sortBy: _selectedSortBy,
       sortOrder: _selectedSortOrder,
     );
@@ -176,7 +188,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 90.w, medium: 70.w, large: 60.w, ultrawide: 50.w),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 98.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -314,7 +326,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context), fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
               ),
             ],
           ),
@@ -457,6 +469,30 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
                 controller: _maxPriceController,
                 prefixIcon: Icons.attach_money_rounded,
                 keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: context.cardPadding),
+        
+        // Barcode and SKU Fields
+        Row(
+          children: [
+            Expanded(
+              child: PremiumTextField(
+                label: 'Barcode',
+                hint: 'Enter barcode',
+                controller: _barcodeController,
+                prefixIcon: Icons.qr_code_2_outlined,
+              ),
+            ),
+            SizedBox(width: context.cardPadding),
+            Expanded(
+              child: PremiumTextField(
+                label: 'SKU',
+                hint: 'Enter SKU',
+                controller: _skuController,
+                prefixIcon: Icons.tag_outlined,
               ),
             ),
           ],

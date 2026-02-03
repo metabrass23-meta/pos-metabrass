@@ -31,6 +31,8 @@ class LaborSerializer(serializers.ModelSerializer):
     total_payments_amount = serializers.SerializerMethodField()
     last_payment_date = serializers.SerializerMethodField()
     remaining_monthly_salary = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    remaining_advance_amount = serializers.SerializerMethodField()
+    total_advances_amount = serializers.SerializerMethodField()
     
     class Meta:
         model = Labor
@@ -43,6 +45,8 @@ class LaborSerializer(serializers.ModelSerializer):
             'designation',
             'joining_date',
             'salary',
+            'current_month',
+            'current_year',
             'area',
             'city',
             'gender',
@@ -103,15 +107,27 @@ class LaborSerializer(serializers.ModelSerializer):
     
     def get_remaining_monthly_salary(self, obj):
         """Get remaining monthly salary for labor"""
-        return obj.get_remaining_monthly_salary()
+        return obj.remaining_monthly_salary
     
     def get_remaining_advance_amount(self, obj):
         """Get remaining advance amount for labor"""
-        return obj.get_remaining_advance_amount()
+        try:
+            from decimal import Decimal
+            result = obj.get_remaining_advance_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
     
     def get_total_advances_amount(self, obj):
         """Get total advances amount for current month"""
-        return obj.get_total_advances_amount()
+        try:
+            from decimal import Decimal
+            result = obj.get_total_advances_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
 
     def validate_name(self, value):
         """Clean and validate labor name"""

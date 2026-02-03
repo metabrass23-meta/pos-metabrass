@@ -124,9 +124,9 @@ class _PremiumButtonState extends State<PremiumButton>
                             widget.icon,
                             size: 12.sp,
                             color: widget.isOutlined
-                                ? (widget.textColor ??
-                                widget.backgroundColor ??
-                                AppTheme.primaryMaroon)
+                                ? (widget.textColor ?? 
+                                   widget.backgroundColor ?? 
+                                   AppTheme.primaryMaroon)
                                 : (widget.textColor ?? AppTheme.pureWhite),
                           ),
                           SizedBox(width: 1.w),
@@ -138,9 +138,9 @@ class _PremiumButtonState extends State<PremiumButton>
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                             color: widget.isOutlined
-                                ? (widget.textColor ??
-                                widget.backgroundColor ??
-                                AppTheme.primaryMaroon)
+                                ? (widget.textColor ?? 
+                                   widget.backgroundColor ?? 
+                                   AppTheme.primaryMaroon)
                                 : (widget.textColor ?? AppTheme.pureWhite),
                           ),
                         ),

@@ -9,13 +9,13 @@ class AppLocalizationsUr extends AppLocalizations {
   AppLocalizationsUr([String locale = 'ur']) : super(locale);
 
   @override
-  String get appTitle => 'النور فیشن - پریمیم POS';
+  String get appTitle => 'ال نور فیبرکس - پریمیم POS';
 
   @override
   String get welcomeBack => 'خوش آمدید';
 
   @override
-  String get brandName => 'النور فیشن';
+  String get brandName => 'ال نور فیبرکس';
 
   @override
   String get tagline => 'آپ کے قیمتی لمحات کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم برائیڈل اور گروم کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔';
@@ -27,6 +27,12 @@ class AppLocalizationsUr extends AppLocalizations {
   String get signUp => 'سائن اپ';
 
   @override
+  String get searchReturns => 'ریٹرنز تلاش کریں';
+
+  @override
+  String get serverErrorTryAgainLater => 'سرور میں خرابی ہے، براہِ کرم بعد میں دوبارہ کوشش کریں۔';
+
+  @override
   String get accessDashboard => 'اپنے پریمیم ڈیش بورڈ تک رسائی حاصل کریں';
 
   @override
@@ -34,6 +40,35 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get enterEmail => 'اپنا ای میل درج کریں';
+
+  @override
+  String get deactivatedSuccessfully => 'کامیابی سے غیر فعال ہو گیا';
+
+  @override
+  String get showing => 'دکھا رہے ہیں';
+
+  @override
+  String get pleaseConfirmAction => 'براہ کرم تصدیق کریں کہ آپ اس کارروائی کو سمجھتے ہیں';
+
+  @override
+  String get deletedPermanently => 'مستقل طور پر حذف ہو گیا';
+
+  @override
+  String get failedToDelete => 'حذف کرنے میں ناکام';
+
+  @override
+  String get pleaseConfirmConsequences => 'براہ کرم تصدیق کریں کہ آپ مستقل حذف کرنے کے نتائج کو سمجھتے ہیں';
+
+  @override
+  String pleaseTypeVendorName(Object vendorName) {
+    return 'مستقل حذف کی تصدیق کے لیے براہ کرم وینڈر کا نام بالکل ٹائپ کریں';
+  }
+
+  @override
+  String get pleaseCompleteConfirmation => 'براہ کرم تمام تصدیقی اقدامات مکمل کریں';
+
+  @override
+  String get location => 'مقام';
 
   @override
   String get password => 'پاس ورڈ';
@@ -168,9 +203,6 @@ class AppLocalizationsUr extends AppLocalizations {
   String get vendor => 'وینڈر';
 
   @override
-  String get labor => 'مزدوری';
-
-  @override
   String get zakat => 'زکٰوۃ';
 
   @override
@@ -252,6 +284,94 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get revenue => 'آمدنی';
+
+  @override
+  String get purchasesTagline => 'انوینٹری سپلائی اور خریداری کے ریکارڈز کا سراغ لگائیں اور ان کا نظم کریں';
+
+  @override
+  String get newPurchase => 'نئی خریداری';
+
+  @override
+  String get totalInvestment => 'کل سرمایہ کاری';
+
+  @override
+  String get enterInvoiceRef => 'انوائس کا حوالہ درج کریں';
+
+  @override
+  String get purchaseDate => 'خریداری کی تاریخ';
+
+  @override
+  String get purchasedProducts => 'خریدی گئی مصنوعات';
+
+  @override
+  String get addProductRow => 'پروڈکٹ کی قطار شامل کریں';
+
+  @override
+  String get unitCost => 'فی یونٹ لاگت';
+
+  @override
+  String get taxAdjustment => 'ٹیکس / ایڈجسٹمنٹ';
+
+  @override
+  String get savePurchase => 'خریداری محفوظ کریں';
+
+  @override
+  String get validationError => 'توثیق کی غلطی';
+
+  @override
+  String get enterInvoiceNumberError => 'براہ کرم انوائس نمبر درج کریں۔';
+
+  @override
+  String get selectVendorError => 'براہ کرم وینڈر منتخب کریں۔';
+
+  @override
+  String get addOneProductError => 'براہ کرم خریداری میں کم از کم ایک پروڈکٹ شامل کریں۔';
+
+  @override
+  String selectProductError(Object itemIndex) {
+    return 'آئٹم #$itemIndex: براہ کرم ایک پروڈکٹ منتخب کریں۔';
+  }
+
+  @override
+  String invalidQtyError(Object itemIndex) {
+    return 'آئٹم #$itemIndex: مقدار 0 سے زیادہ ہونی چاہیے۔';
+  }
+
+  @override
+  String get savePurchaseFailed => 'خریداری محفوظ کرنے میں ناکامی۔';
+
+  @override
+  String get purchaseDetails => 'خریداری کی تفصیلات';
+
+  @override
+  String get purchasedItems => 'خریدی گئی اشیاء';
+
+  @override
+  String get printInvoice => 'انوائس پرنٹ کریں';
+
+  @override
+  String get filterPurchases => 'خریداریوں کو فلٹر کریں';
+
+  @override
+  String get fromDate => 'اس تاریخ سے';
+
+  @override
+  String get toDate => 'اس تاریخ تک';
+
+  @override
+  String get resetAll => 'سب ری سیٹ کریں';
+
+  @override
+  String get unknownVendor => 'نامعلوم وینڈر';
+
+  @override
+  String get deletePurchaseConfirm => 'کیا آپ واقعی یہ خریداری حذف کرنا چاہتے ہیں؟';
+
+  @override
+  String get noPurchasesFound => 'کوئی خریداری نہیں ملی';
+
+  @override
+  String get noPurchasesMatchFilter => 'موجودہ فلٹر سے کوئی خریداری مماثل نہیں ہے';
 
   @override
   String get viewHistory => 'تاریخ دیکھیں';
@@ -482,6 +602,24 @@ class AppLocalizationsUr extends AppLocalizations {
   String get failedToRefreshCustomers => 'صارفین کو ریفریش کرنے میں ناکام';
 
   @override
+  String get viewLedger => 'لیجر دیکھیں';
+
+  @override
+  String get addNewCustomer => 'نیا کسٹمر شامل کریں';
+
+  @override
+  String get createNewCustomerProfile => 'ایک نیا کسٹمر پروفائل بنائیں';
+
+  @override
+  String get customerAddedSuccessfully => 'کسٹمر کامیابی سے شامل ہو گیا';
+
+  @override
+  String get failedToAddCustomer => 'کسٹمر شامل کرنے میں ناکام';
+
+  @override
+  String get lastPurchase => 'آخری خریداری';
+
+  @override
   String get logoutMessage => 'کیا آپ واقعی اپنے اکاؤنٹ سے لاگ آؤٹ کرنا چاہتے ہیں؟';
 
   @override
@@ -491,13 +629,19 @@ class AppLocalizationsUr extends AppLocalizations {
   String get brandTagline => 'پریمیم پی او ایس';
 
   @override
-  String get welcomeToPos => 'النور فیبرکس پی او ایس میں خوش آمدید';
+  String get welcomeToPos => 'ال نور فیبرکس پی او ایس میں خوش آمدید';
 
   @override
   String get welcomeTagline => 'ہر ٹانکے میں عمدگی - آپ کا پریمیم فیشن مینجمنٹ سسٹم';
 
   @override
   String get today => 'آج';
+
+  @override
+  String get totalIncome => 'کل آمدنی';
+
+  @override
+  String get totalExpenses => 'کل اخراجات';
 
   @override
   String get totalOrders => 'کل آرڈرز';
@@ -734,6 +878,18 @@ class AppLocalizationsUr extends AppLocalizations {
   String get basicInformation => 'بنیادی معلومات';
 
   @override
+  String get contactInformation => 'رابطے کی معلومات';
+
+  @override
+  String get businessInformation => 'کاروباری معلومات';
+
+  @override
+  String get additionalInformation => 'اضافی معلومات';
+
+  @override
+  String get locationInformation => 'مقام کی معلومات';
+
+  @override
   String get fullName => 'مکمل نام';
 
   @override
@@ -758,40 +914,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get pleaseEnterValid => 'براہ کرم درست درج کریں';
 
   @override
-  String get contactInformation => 'رابطہ معلومات';
-
-  @override
   String get phoneFormat => '+923001234567';
-
-  @override
-  String get locationInformation => 'مقام کی معلومات';
-
-  @override
-  String get deletedPermanently => 'مستقل طور پر حذف ہو گیا';
-
-  @override
-  String get deactivatedSuccessfully => 'کامیابی سے غیر فعال ہو گیا';
-
-  @override
-  String get failedToDelete => 'حذف کرنے میں ناکام';
-
-  @override
-  String get pleaseConfirmAction => 'براہ کرم تصدیق کریں کہ آپ اس کارروائی کو سمجھتے ہیں';
-
-  @override
-  String get pleaseConfirmConsequences => 'براہ کرم تصدیق کریں کہ آپ مستقل حذف کرنے کے نتائج کو سمجھتے ہیں';
-
-  @override
-  String get pleaseTypeVendorName => 'مستقل حذف کی تصدیق کے لیے براہ کرم وینڈر کا نام بالکل ٹائپ کریں';
-
-  @override
-  String get pleaseCompleteConfirmation => 'براہ کرم تمام تصدیقی اقدامات مکمل کریں';
-
-  @override
-  String get location => 'مقام';
-
-  @override
-  String get showing => 'دکھا رہے ہیں';
 
   @override
   String get outOf => 'میں سے';
@@ -929,9 +1052,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get costPriceInfo => 'لاگت قیمت کی ترتیب منافع کے مارجن کی گنتی اور بہتر مالیاتی تجزیہ کو فعال کرتی ہے';
 
   @override
-  String qty(int quantity) {
-    return 'مقدار';
-  }
+  String get qty => 'مقدار';
 
   @override
   String get colorName => 'رنگ کا نام';
@@ -1307,9 +1428,6 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get ofExpenses => 'اخراجات میں سے';
-
-  @override
-  String get totalExpenses => 'کل اخراجات';
 
   @override
   String get profitable => 'منافع بخش';
@@ -2102,6 +2220,36 @@ class AppLocalizationsUr extends AppLocalizations {
   String get enterFullAddress => 'مکمل پتہ درج کریں';
 
   @override
+  String get enterCustomerName => 'گاہک کا نام درج کریں';
+
+  @override
+  String get enterCustomerFullName => 'گاہک کا پورا نام درج کریں';
+
+  @override
+  String get enterCustomerPhone => 'گاہک کا فون نمبر درج کریں';
+
+  @override
+  String get enterCustomerEmail => 'گاہک کا ای میل پتہ درج کریں';
+
+  @override
+  String get enterCustomerAddress => 'گاہک کا پتہ درج کریں';
+
+  @override
+  String get enterCustomerCity => 'گاہک کا شہر درج کریں';
+
+  @override
+  String get enterCustomerCountry => 'گاہک کا ملک درج کریں';
+
+  @override
+  String get enterCustomerBusinessName => 'گاہک کا کاروباری نام درج کریں';
+
+  @override
+  String get enterCustomerTaxNumber => 'گاہک کا ٹیکس یا این ٹی این نمبر درج کریں';
+
+  @override
+  String get enterCustomerNotes => 'گاہک کے نوٹس درج کریں';
+
+  @override
   String get enterAdditionalNotes => 'اضافی نوٹس درج کریں';
 
   @override
@@ -2415,6 +2563,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get otherExpenses => 'دیگر اخراجات';
 
   @override
+  String get labor => 'مزدوری';
+
+  @override
   String get vendors => 'وینڈرز';
 
   @override
@@ -2551,9 +2702,6 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get dataInSpreadsheetFormatForAnalysis => 'تجزیہ کے لیے سپریڈشیٹ فارمیٹ میں ڈیٹا';
-
-  @override
-  String get totalIncome => 'کل آمدنی';
 
   @override
   String get profitMargin => 'منافع کا مارجن';
@@ -3875,9 +4023,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get noPhone => 'فون نہیں';
 
   @override
-  String item(int itemNumber) {
-    return 'آئٹم';
-  }
+  String get item => 'آئٹم';
 
   @override
   String get noItems => 'کوئی آئٹمز نہیں';
@@ -4043,9 +4189,6 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get isOverdue => 'وقت ختم';
-
-  @override
-  String get additionalInformation => 'اضافی معلومات';
 
   @override
   String get conversionStatus => 'تبدیلی کی حیثیت';
@@ -4327,7 +4470,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get pleaseAcceptTerms => 'براہ کرم شرائط و ضوابط کو قبول کریں';
 
   @override
-  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! النور فیشن میں خوش آمدید۔';
+  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! ال نور فیبرکس میں خوش آمدید۔';
 
   @override
   String get registrationFailedMessage => 'رجسٹریشن ناکام ہو گئی۔ براہ کرم ذیل میں تفصیلات چیک کریں۔';
@@ -5479,7 +5622,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get enableDarkThemeForApplication => 'ایپلیکیشن کے لیے ڈارک تھیم فعال کریں';
 
   @override
-  String get alNoorFashionPOS => 'النور فیشن پی او ایس';
+  String get alNoorFashionPOS => 'النور پی او ایس';
 
   @override
   String get version => 'ورژن';
@@ -6484,6 +6627,15 @@ class AppLocalizationsUr extends AppLocalizations {
   }
 
   @override
+  String get invoiceHash => 'انوائس نمبر';
+
+  @override
+  String get subTotal => 'سب ٹوٹل';
+
+  @override
+  String get action => 'عمل';
+
+  @override
   String get deletePurchase => 'خریداری ختم کریں';
 
   @override
@@ -6521,4 +6673,46 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get apply => 'لاگو کریں';
+
+  @override
+  String get scannerTitle => 'بارکوڈ اسکینر';
+
+  @override
+  String get scannerReady => 'اسکین کرنے کے لیے تیار...';
+
+  @override
+  String get scannerScanning => 'اسکین ہو رہا ہے...';
+
+  @override
+  String get scannerLabel => 'بارکوڈ';
+
+  @override
+  String get scannerHint => 'بارکوڈ ٹائپ یا اسکین کریں';
+
+  @override
+  String get scannerInvalidFormat => 'غلط بارکوڈ فارمیٹ';
+
+  @override
+  String get scannerDuplicateScan => 'ڈپلیکیٹ بارکوڈ اسکین';
+
+  @override
+  String get scannerProductNotFound => 'پروڈکٹ نہیں ملی';
+
+  @override
+  String scannerFound(String productName) {
+    return 'ملا: $productName';
+  }
+
+  @override
+  String scannerFailed(String error) {
+    return 'اسکین ناکام: $error';
+  }
+
+  @override
+  String scannerAddedToCart(String productName) {
+    return '$productName کارٹ میں شامل کر دیا گیا';
+  }
+
+  @override
+  String get scannerAddToCartFailed => 'کارٹ میں شامل کرنے میں ناکام';
 }

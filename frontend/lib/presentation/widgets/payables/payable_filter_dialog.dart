@@ -184,7 +184,7 @@ class _PayableFilterDialogState extends State<PayableFilterDialog> with SingleTi
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 90.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 99.w, small: 98.w, medium: 90.w, large: 85.w, ultrawide: 75.w),
                   maxHeight: ResponsiveBreakpoints.responsive(context, tablet: 90.h, small: 95.h, medium: 85.h, large: 80.h, ultrawide: 75.h),
                 ),
                 margin: EdgeInsets.all(context.mainPadding),

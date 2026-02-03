@@ -12,6 +12,23 @@ class AppTheme {
   static const Color lightGray = Color(0xFFF5F5F5);
   static const Color shadowColor = Color(0x1A000000);
 
+  //
+  // static const Color primaryMaroon = Color(0xFFD32F2F);
+  // static const Color secondaryMaroon = Color(0xFF5D4037);
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFFFFBF5);
+  // static const Color charcoalGray = Color(0xFF3E2723);
+  // static const Color lightGray = Color(0xFFF5F5F5);
+  // static const Color shadowColor = Color(0x1A000000);
+
+
+  //
+
+
+
+
+
   // Font Configuration
   static const String englishFontFamily = 'Inter';
   static const String urduFontFamily = 'Jameel Noori Nastaleeq';

@@ -159,7 +159,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         id: widget.vendor.id,
         name: _nameController.text.trim(),
         businessName: _businessNameController.text.trim(),
-        cnic: _cnicController.text.trim(),
+        cnic: _cnicController.text.trim().isEmpty ? null : _cnicController.text.trim(),
         phone: _phoneController.text.trim(),
         city: _cityController.text.trim(),
         area: _areaController.text.trim(),
@@ -548,18 +548,17 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
 
         // CNIC
         PremiumTextField(
-          label: '${l10n.cnic} *',
+          label: l10n.cnic,
           hint: context.shouldShowCompactLayout
-              ? '${l10n.enterEmail} ${l10n.cnic}'
-              : '${l10n.enterEmail} ${l10n.cnic} (${l10n.cnicFormat})',
+              ? '${l10n.enterCnicNumber} (${l10n.optional})'
+              : '${l10n.enterCnicNumber} (${l10n.cnicFormat}) - ${l10n.optional}',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return '${l10n.pleaseEnter} ${l10n.cnic}';
-            }
-            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
-              return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
+                return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
+              }
             }
             return null;
           },

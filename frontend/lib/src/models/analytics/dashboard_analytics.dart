@@ -29,6 +29,9 @@ class DashboardAnalyticsModel {
   final List<TopProduct> topSellingProducts;
   final List<SalesTrendData> salesTrend;
   final List<RecentTransaction> recentTransactions;
+  final List<TrendingProduct> trendingProducts;
+  final List<LatestCustomer> latestCustomers;
+  final List<SalesChartData> salesChartData;
   final DateRanges dateRanges;
 
   DashboardAnalyticsModel({
@@ -53,6 +56,9 @@ class DashboardAnalyticsModel {
     required this.topSellingProducts,
     required this.salesTrend,
     required this.recentTransactions,
+    required this.trendingProducts,
+    required this.latestCustomers,
+    required this.salesChartData,
     required this.dateRanges,
   });
 
@@ -68,24 +74,44 @@ class DashboardAnalyticsModel {
       activeVendors: json['active_vendors'] ?? 0,
       totalProducts: json['total_products'] ?? 0,
       lowStockProducts: json['low_stock_products'] ?? 0,
-      totalRevenue: (json['total_revenue'] ?? 0).toDouble(),
+      totalRevenue: (json['total_sales'] ?? 0).toDouble(),
       totalExpenses: (json['total_expenses'] ?? 0).toDouble(),
       netProfit: (json['net_profit'] ?? 0).toDouble(),
       profitMargin: (json['profit_margin'] ?? 0).toDouble(),
-      thisMonthSales: (json['this_month_sales'] ?? 0).toDouble(),
-      thisMonthSalesCount: json['this_month_sales_count'] ?? 0,
+      thisMonthSales: (json['sales_overview']['this_month'] ?? 0).toDouble(),
+      thisMonthSalesCount: json['sales_overview']['orders_count'] ?? 0,
       recentSalesCount: json['recent_sales_count'] ?? 0,
       recentOrdersCount: json['recent_orders_count'] ?? 0,
       topSellingProducts: (json['top_selling_products'] as List<dynamic>?)
               ?.map((item) => TopProduct.fromJson(item))
               .toList() ??
           [],
-      salesTrend: (json['sales_trend'] as List<dynamic>?)
-              ?.map((item) => SalesTrendData.fromJson(item))
+      salesTrend: (json['daily_orders'] as List<dynamic>?)
+              ?.map((item) => SalesTrendData.fromJson({
+                'month': item['day_name'],
+                'sales': item['order_count'].toDouble(), // Use order count as sales trend
+              }))
               .toList() ??
           [],
       recentTransactions: (json['recent_transactions'] as List<dynamic>?)
               ?.map((item) => RecentTransaction.fromJson(item))
+              .toList() ??
+          [],
+      latestCustomers: (json['latest_customers'] as List<dynamic>?)
+              ?.map((item) => LatestCustomer.fromJson(item))
+              .toList() ??
+          [],
+      trendingProducts: (json['trending_products'] as List<dynamic>?)
+              ?.map((item) => TrendingProduct.fromJson(item))
+              .toList() ??
+          [],
+      salesChartData: (json['daily_orders'] as List<dynamic>?)
+              ?.map((item) => SalesChartData.fromJson({
+                'date': item['date'],
+                'day_name': item['day_name'],
+                'sales': 0.0, // We don't have sales amount per day, just order count
+                'count': item['order_count'],
+              }))
               .toList() ??
           [],
       dateRanges: DateRanges.fromJson(json['date_ranges'] ?? {}),
@@ -236,6 +262,134 @@ class DateRanges {
       'today': today,
       'last_week': lastWeek,
       'last_month': lastMonth,
+    };
+  }
+}
+
+class TrendingProduct {
+  final String id;
+  final String name;
+  final String category;
+  final int sales;
+  final double revenue;
+  final int stock;
+  final String? image;
+
+  TrendingProduct({
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.sales,
+    required this.revenue,
+    required this.stock,
+    this.image,
+  });
+
+  factory TrendingProduct.fromJson(Map<String, dynamic> json) {
+    return TrendingProduct(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      category: json['category'] ?? '',
+      sales: json['sales'] ?? 0,
+      revenue: (json['revenue'] ?? 0).toDouble(),
+      stock: json['stock'] ?? 0,
+      image: json['image'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'category': category,
+      'sales': sales,
+      'revenue': revenue,
+      'stock': stock,
+      'image': image,
+    };
+  }
+}
+
+class LatestCustomer {
+  final String id;
+  final String name;
+  final String email;
+  final String phone;
+  final double totalSpent;
+  final int totalOrders;
+  final String? lastOrderDate;
+  final String createdAt;
+  final String avatar;
+
+  LatestCustomer({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.totalSpent,
+    required this.totalOrders,
+    this.lastOrderDate,
+    required this.createdAt,
+    required this.avatar,
+  });
+
+  factory LatestCustomer.fromJson(Map<String, dynamic> json) {
+    return LatestCustomer(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      totalSpent: (json['total_spent'] ?? 0).toDouble(),
+      totalOrders: json['total_orders'] ?? 0,
+      lastOrderDate: json['last_order_date'],
+      createdAt: json['created_at'] ?? '',
+      avatar: json['avatar'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'total_spent': totalSpent,
+      'total_orders': totalOrders,
+      'last_order_date': lastOrderDate,
+      'created_at': createdAt,
+      'avatar': avatar,
+    };
+  }
+}
+
+class SalesChartData {
+  final String date;
+  final String dayName;
+  final double sales;
+  final int count;
+
+  SalesChartData({
+    required this.date,
+    required this.dayName,
+    required this.sales,
+    required this.count,
+  });
+
+  factory SalesChartData.fromJson(Map<String, dynamic> json) {
+    return SalesChartData(
+      date: json['date'] ?? '',
+      dayName: json['day_name'] ?? '',
+      sales: (json['sales'] ?? 0).toDouble(),
+      count: json['count'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date,
+      'day_name': dayName,
+      'sales': sales,
+      'count': count,
     };
   }
 }

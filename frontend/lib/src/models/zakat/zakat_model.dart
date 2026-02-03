@@ -280,7 +280,7 @@ class Zakat {
 
 // Helper class for authorization choices
 class ZakatAuthorities {
-  static const List<String> authorities = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
+  static const List<String> authorities = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
 
   static String getDisplayName(String authority) {
     return authority;

@@ -344,6 +344,64 @@ class SalesService {
     }
   }
 
+  // ✅ ADDED: Generate Invoice PDF (Bytes)
+  Future<ApiResponse<Uint8List>> generateInvoicePdf(String invoiceId) async {
+    final url = '/sales/invoices/$invoiceId/generate-pdf/';
+    debugPrint('🚀 [SalesService] Printing Invoice: $url');
+
+    try {
+      final response = await _apiClient.post(
+        url,
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return ApiResponse<Uint8List>(
+          success: true,
+          message: 'Invoice PDF generated',
+          data: Uint8List.fromList(response.data),
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: 'Failed to generate invoice PDF',
+        );
+      }
+    } catch (e) {
+      debugPrint('🛑 [SalesService] Invoice Print Error: $e');
+      return ApiResponse(success: false, message: 'Error: $e');
+    }
+  }
+
+  // ✅ ADDED: Generate Thermal Print Data for Sale
+  Future<ApiResponse<Map<String, dynamic>>> generateSaleThermalPrint(String saleId) async {
+    final url = '/sales/$saleId/thermal-print/';
+    debugPrint('🚀 [SalesService] Generating Thermal Print: $url');
+
+    try {
+      final response = await _apiClient.post(url);
+
+      if (response.statusCode == 200) {
+        return ApiResponse<Map<String, dynamic>>(
+          success: true,
+          message: 'Thermal print data generated',
+          data: response.data as Map<String, dynamic>,
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: 'Failed to generate thermal print data',
+        );
+      }
+    } catch (e) {
+      debugPrint('🛑 [SalesService] Thermal Print Error: $e');
+      return ApiResponse(success: false, message: 'Error: $e');
+    }
+  }
+
   /// Create sale from order
   Future<ApiResponse<SaleModel>> createSaleFromOrder(CreateSaleFromOrderRequest request) async {
     try {
@@ -969,13 +1027,15 @@ class PaginationInfo {
   });
 
   factory PaginationInfo.fromJson(Map<String, dynamic> json) {
+    final currentPage = json['page'] as int? ?? json['current_page'] as int? ?? 1;
+    final totalPages = json['total_pages'] as int? ?? 1;
     return PaginationInfo(
-      currentPage: json['current_page'] as int? ?? 1,
+      currentPage: currentPage,
       pageSize: json['page_size'] as int? ?? 10,
       totalCount: json['total_count'] as int? ?? 0,
-      totalPages: json['total_pages'] as int? ?? 1,
-      hasNext: json['has_next'] as bool? ?? false,
-      hasPrevious: json['has_previous'] as bool? ?? false,
+      totalPages: totalPages,
+      hasNext: json['has_next'] as bool? ?? (currentPage < totalPages),
+      hasPrevious: json['has_previous'] as bool? ?? (currentPage > 1),
     );
   }
 }

@@ -49,9 +49,9 @@ class PrincipalAccount {
       sourceId: json['source_id'],
       description: json['description'] ?? '',
       type: json['type'] ?? '',
-      amount: (json['amount'] ?? 0.0).toDouble(),
-      balanceBefore: (json['balance_before'] ?? 0.0).toDouble(),
-      balanceAfter: (json['balance_after'] ?? 0.0).toDouble(),
+      amount: json['amount'] is String ? double.parse(json['amount'] as String) : (json['amount'] as num?)?.toDouble() ?? 0.0,
+      balanceBefore: json['balance_before'] is String ? double.parse(json['balance_before'] as String) : (json['balance_before'] as num?)?.toDouble() ?? 0.0,
+      balanceAfter: json['balance_after'] is String ? double.parse(json['balance_after'] as String) : (json['balance_after'] as num?)?.toDouble() ?? 0.0,
       handledBy: json['handled_by'],
       notes: json['notes'],
       createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
@@ -186,7 +186,7 @@ class PrincipalAccountBalance {
   factory PrincipalAccountBalance.fromJson(Map<String, dynamic> json) {
     return PrincipalAccountBalance(
       id: json['id'] ?? 0,
-      currentBalance: (json['current_balance'] ?? 0.0).toDouble(),
+      currentBalance: json['current_balance'] is String ? double.parse(json['current_balance'] as String) : (json['current_balance'] as num?)?.toDouble() ?? 0.0,
       lastUpdated: DateTime.parse(json['last_updated'] ?? DateTime.now().toIso8601String()),
       lastTransactionId: json['last_transaction_id'],
       formattedBalance: json['formatted_balance'] ?? '',
@@ -225,13 +225,13 @@ class PrincipalAccountStatistics {
 
   factory PrincipalAccountStatistics.fromJson(Map<String, dynamic> json) {
     return PrincipalAccountStatistics(
-      totalCredits: (json['total_credits'] ?? 0.0).toDouble(),
-      totalDebits: (json['total_debits'] ?? 0.0).toDouble(),
-      currentBalance: (json['current_balance'] ?? 0.0).toDouble(),
+      totalCredits: json['total_credits'] is String ? double.parse(json['total_credits'] as String) : (json['total_credits'] as num?)?.toDouble() ?? 0.0,
+      totalDebits: json['total_debits'] is String ? double.parse(json['total_debits'] as String) : (json['total_debits'] as num?)?.toDouble() ?? 0.0,
+      currentBalance: json['current_balance'] is String ? double.parse(json['current_balance'] as String) : (json['current_balance'] as num?)?.toDouble() ?? 0.0,
       transactionCount: json['transaction_count'] ?? 0,
       moduleBreakdown: json['module_breakdown'] ?? {},
       monthlyTrend: json['monthly_trend'] ?? {},
-      recentTransactions: (json['recent_transactions'] as List<dynamic>?)?.map((t) => PrincipalAccount.fromJson(t)).toList() ?? [],
+      recentTransactions: (json['recent_transactions'] as List<dynamic>?)?.map((t) => PrincipalAccount.fromJson(t as Map<String, dynamic>)).toList() ?? [],
     );
   }
 

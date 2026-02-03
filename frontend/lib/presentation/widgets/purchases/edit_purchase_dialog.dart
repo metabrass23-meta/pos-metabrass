@@ -149,14 +149,14 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
               child: Consumer<VendorProvider>(
                 builder: (context, provider, child) {
                   return PremiumDropdownField<String>(
-                    label: l10n.vendor,
+                    label: l10n.vendor ?? "Vendor",
                     value: _selectedVendorId,
                     items: provider.vendors.map((v) => DropdownItem<String>(
                         value: v.id!,
                         label: v.name
                     )).toList(),
                     onChanged: (val) => setState(() => _selectedVendorId = val),
-                    hint: "Select Vendor",
+                    hint: l10n.selectVendorError ?? "Select Vendor",
                   );
                 },
               ),
@@ -165,8 +165,8 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
             Expanded(
               child: PremiumTextField(
                 controller: _invoiceController,
-                label: "Invoice #",
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                label: l10n.invoiceNumber ?? "Invoice #",
+                validator: (val) => val!.isEmpty ? (l10n.enterInvoiceNumberError ?? "Required") : null,
               ),
             ),
           ],
@@ -190,7 +190,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                 },
                 child: IgnorePointer(
                   child: PremiumTextField(
-                    label: "Purchase Date",
+                    label: l10n.purchaseDate ?? "Purchase Date",
                     controller: TextEditingController(
                       text: "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} ${_selectedTime.format(context)}",
                     ),
@@ -224,10 +224,10 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Purchased Products",
+            Text(l10n.purchasedProducts ?? "Purchased Products",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: context.bodyFontSize)),
             PremiumButton(
-              text: "Add Product Row",
+              text: l10n.addProductRow ?? "Add Product Row",
               onPressed: _addItem,
               icon: Icons.add_rounded,
               width: 200,
@@ -254,7 +254,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   child: Consumer<ProductProvider>(
                     builder: (context, provider, child) {
                       return PremiumDropdownField<String>(
-                        label: "Product",
+                        label: l10n.purchasedProducts ?? "Product",
                         value: item.product,
                         items: provider.products.map((p) => DropdownItem<String>(
                             value: p.id!,
@@ -283,7 +283,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                 Expanded(
                   flex: 2,
                   child: PremiumTextField(
-                    label: "Cost",
+                    label: l10n.unitCost ?? "Cost",
                     keyboardType: TextInputType.number,
                     controller: TextEditingController(text: item.unitCost.toString()),
                     onChanged: (v) {
@@ -331,7 +331,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Total Tax", style: TextStyle(color: Colors.grey[600])),
+              Text(l10n.taxAdjustment ?? "Total Tax", style: TextStyle(color: Colors.grey[600])),
               SizedBox(
                   width: 150,
                   child: PremiumTextField(
@@ -343,7 +343,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
             ],
           ),
           const Divider(height: 32),
-          _summaryRow("Grand Total", _total, isTotal: true),
+          _summaryRow(l10n.grandTotal ?? "Grand Total", _total, isTotal: true),
         ],
       ),
     );
@@ -371,7 +371,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         PremiumButton(
-          text: l10n.cancel,
+          text: l10n.cancel ?? "Cancel",
           onPressed: () => Navigator.pop(context),
           isOutlined: true,
           width: 120,
@@ -381,7 +381,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
         Consumer<PurchaseProvider>(
           builder: (context, provider, child) {
             return PremiumButton(
-              text: "Update Purchase",
+              text: l10n.savePurchase ?? "Update Purchase",
               isLoading: provider.isLoading,
               onPressed: _handleUpdate,
               width: 200,
@@ -408,9 +408,6 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
       final success = await context.read<PurchaseProvider>().updatePurchase(updated);
       if (success && mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Purchase Updated Successfully"), backgroundColor: Colors.green)
-        );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(context.read<PurchaseProvider>().error ?? "Failed to update"))

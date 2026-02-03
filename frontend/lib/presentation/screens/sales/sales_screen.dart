@@ -68,6 +68,143 @@ class _SalesPageState extends State<SalesPage> {
     );
   }
 
+  void _showRecalculateDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.refresh_rounded, color: AppTheme.primaryMaroon),
+            SizedBox(width: 8),
+            Text('Recalculate Sales Totals'),
+          ],
+        ),
+        content: Text(
+          'This will recalculate totals for all sales records. This may take a few moments if you have many sales.\n\nContinue?',
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final provider = context.read<SalesProvider>();
+              await provider.bulkRecalculateTotals();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryMaroon,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Recalculate'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrintOptionsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.print_rounded, color: AppTheme.primaryMaroon),
+            SizedBox(width: 8),
+            Text('Print Options'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Choose print option:'),
+            SizedBox(height: 16),
+            ListTile(
+              leading: Icon(Icons.picture_as_pdf_rounded, color: Colors.red),
+              title: Text('PDF Receipt'),
+              subtitle: Text('Generate PDF receipt for printing'),
+              onTap: () {
+                Navigator.pop(context);
+                _showSalesSelectionDialog('pdf');
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.receipt_rounded, color: Colors.blue),
+              title: Text('Thermal Receipt'),
+              subtitle: Text('Generate thermal-style receipt for printing'),
+              onTap: () {
+                Navigator.pop(context);
+                _showSalesSelectionDialog('thermal');
+              },
+            ),
+            Divider(),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Note: Thermal receipt will be generated as a PDF with thermal printer formatting.',
+                style: TextStyle(color: Colors.blue, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSalesSelectionDialog(String printType) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Sale'),
+        content: Container(
+          width: 400,
+          height: 300,
+          child: Consumer<SalesProvider>(
+            builder: (context, provider, child) {
+              if (provider.sales.isEmpty) {
+                return Center(child: Text('No sales available'));
+              }
+              
+              return ListView.builder(
+                itemCount: provider.sales.length,
+                itemBuilder: (context, index) {
+                  final sale = provider.sales[index];
+                  return ListTile(
+                    title: Text('Invoice #${sale.invoiceNumber}'),
+                    subtitle: Text('${sale.customerName} - PKR ${sale.grandTotal.toStringAsFixed(0)}'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (printType == 'pdf') {
+                        provider.generateReceiptPdf(sale.id);
+                      } else {
+                        provider.generateSaleThermalPrint(sale.id);
+                      }
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleViewSale(SaleModel sale) {
     // Navigator.of(context).pop(); // Optional: Close history dialog first if you want
     showDialog(
@@ -220,14 +357,7 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 if (!context.isTablet) ...[
                   SizedBox(height: context.cardPadding / 4),
-                  Text(
-                    AppLocalizations.of(context)!.selectProductsManageSales,
-                    style: TextStyle(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                
                 ],
               ],
             ),
@@ -550,6 +680,27 @@ class _SalesPageState extends State<SalesPage> {
                     ),
 
                   SizedBox(width: context.smallPadding),
+                  
+                  // Recalculate Button
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _showRecalculateDialog,
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.all(context.smallPadding),
+                        child: Icon(
+                          Icons.refresh_rounded,
+                          color: AppTheme.pureWhite,
+                          size: context.iconSize('medium'),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(width: context.smallPadding),
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -690,34 +841,7 @@ class _SalesPageState extends State<SalesPage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(
-                              Icons.file_download_rounded,
-                              color: AppTheme.pureWhite,
-                            ),
-                            SizedBox(width: context.smallPadding),
-                            Text(
-                              AppLocalizations.of(context)!.exportingSalesData,
-                              style: TextStyle(
-                                color: AppTheme.pureWhite,
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: Colors.green,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius(),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                  onTap: _showPrintOptionsDialog,
                   borderRadius: BorderRadius.circular(context.borderRadius()),
                   child: Container(
                     padding: EdgeInsets.symmetric(
@@ -1015,38 +1139,7 @@ class _SalesPageState extends State<SalesPage> {
 
         SizedBox(width: context.cardPadding),
 
-        // Filter button
-        Container(
-          height: context.buttonHeight / 1.5,
-          padding: EdgeInsets.symmetric(horizontal: context.cardPadding),
-          decoration: BoxDecoration(
-            color: AppTheme.accentGold.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-            border: Border.all(
-              color: AppTheme.accentGold.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.filter_list_rounded,
-                color: AppTheme.accentGold,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                AppLocalizations.of(context)!.filter,
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.accentGold,
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Removed filter button as requested
       ],
     );
   }

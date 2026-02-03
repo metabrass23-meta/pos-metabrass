@@ -78,43 +78,35 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           return Scrollbar(
             controller: _horizontalController,
             thumbVisibility: true,
-            child: Column(
-              children: [
-                // Table Header
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _horizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
+            child: SingleChildScrollView(
+              controller: _horizontalController,
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              child: Container(
+                width: _getTableWidth(context),
+                child: Column(
+                  children: [
+                    // Table Header
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.lightGray.withOpacity(0.5),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(context.borderRadius('large')),
+                          topRight: Radius.circular(context.borderRadius('large')),
+                        ),
+                      ),
                       padding: EdgeInsets.symmetric(
                         vertical: context.cardPadding * 0.7,
                         horizontal: context.cardPadding,
                       ),
                       child: _buildTableHeader(context),
                     ),
-                  ),
-                ),
 
-                // Table Content
-                Expanded(
-                  child: Scrollbar(
-                    controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _horizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
+                    // Table Content
+                    Expanded(
+                      child: Scrollbar(
+                        controller: _verticalController,
+                        thumbVisibility: true,
                         child: ListView.builder(
                           controller: _verticalController,
                           itemCount: provider.vendors.length,
@@ -125,14 +117,14 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                // Pagination
-                if (provider.paginationInfo != null &&
-                    provider.paginationInfo!.totalPages > 1)
-                  _buildPaginationControls(context, provider),
-              ],
+                    // Pagination
+                    if (provider.paginationInfo != null &&
+                        provider.paginationInfo!.totalPages > 1)
+                      _buildPaginationControls(context, provider),
+                  ],
+                ),
+              ),
             ),
           );
         },
@@ -371,7 +363,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: 2),
                   Text(
-                    vendor.cnic,
+                    vendor.cnic ?? 'N/A',
                     style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w400,

@@ -53,16 +53,13 @@ class PrincipalAccountCreateSerializer(serializers.ModelSerializer):
         model = PrincipalAccount
         fields = [
             'date', 'time', 'source_module', 'source_id', 'description',
-            'type', 'amount', 'balance_before', 'balance_after', 'handled_by', 'notes'
+            'type', 'amount', 'handled_by', 'notes'
         ]
     
     def validate(self, data):
         """Validate transaction data"""
         if data['amount'] <= 0:
             raise serializers.ValidationError("Amount must be greater than zero.")
-        
-        if data['balance_after'] < 0:
-            raise serializers.ValidationError("Balance cannot be negative.")
         
         return data
 

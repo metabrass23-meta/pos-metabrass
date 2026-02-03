@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/customer_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 
@@ -96,11 +97,14 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
   void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<CustomerProvider>(context, listen: false);
+      final l10n = AppLocalizations.of(context)!;
 
       final success = await provider.addCustomer(
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
-        email: _emailController.text.trim(),
+        email: _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
         address: _addressController.text.trim().isEmpty
             ? null
             : _addressController.text.trim(),
@@ -127,13 +131,14 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? 'Failed to add customer');
+          _showErrorSnackbar(provider.errorMessage ?? l10n.failedToAddCustomer);
         }
       }
     }
   }
 
   void _showSuccessSnackbar() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -145,7 +150,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
             ),
             SizedBox(width: context.smallPadding),
             Text(
-              'Customer added successfully!',
+              l10n.customerAddedSuccessfully,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w500,
@@ -256,6 +261,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -287,7 +293,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? 'Add Customer' : 'Add New Customer',
+                  context.shouldShowCompactLayout ? l10n.addCustomer : l10n.addNewCustomer,
                   style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -298,7 +304,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    'Create a new customer profile',
+                    l10n.createNewCustomerProfile,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -529,19 +535,18 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
 
         // Email
         PremiumTextField(
-          label: 'Email Address *',
+          label: 'Email Address',
           hint: context.shouldShowCompactLayout
-              ? 'Enter email'
-              : 'Enter email address',
+              ? 'Enter email (optional)'
+              : 'Enter email address (optional)',
           controller: _emailController,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter email address';
-            }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-              return 'Please enter a valid email address';
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                return 'Please enter a valid email address';
+              }
             }
             return null;
           },

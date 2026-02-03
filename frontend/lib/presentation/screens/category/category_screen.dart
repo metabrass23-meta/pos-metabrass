@@ -10,6 +10,7 @@ import '../../widgets/category/category_table.dart';
 import '../../widgets/category/delete_category_dialog.dart';
 import '../../widgets/category/edit_category_dialog.dart';
 import '../../widgets/category/view_category_details_dialog.dart';
+import '../../widgets/category/category_filter_dialog.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -20,6 +21,9 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final TextEditingController _searchController = TextEditingController();
+  
+  // Local state for the current filter
+  CategoryFilter _activeFilter = CategoryFilter();
 
   @override
   void dispose() {
@@ -33,6 +37,22 @@ class _CategoryPageState extends State<CategoryPage> {
       barrierDismissible: false,
       builder: (context) => const AddCategoryDialog(),
     );
+  }
+
+  /// Opens the filter dialog and updates the local filter state
+  void _showFilterDialog() async {
+    final result = await showDialog<CategoryFilter>(
+      context: context,
+      builder: (context) => CategoryFilterDialog(initialFilter: _activeFilter),
+    );
+
+    if (result != null) {
+      setState(() {
+        _activeFilter = result;
+      });
+      // You can add logic here to trigger a filtered fetch from the provider
+      // context.read<CategoryProvider>().fetchCategories(filter: _activeFilter);
+    }
   }
 
   void _showEditCategoryDialog(Category category) {
@@ -104,6 +124,7 @@ class _CategoryPageState extends State<CategoryPage> {
             // Enhanced Categories Table with View functionality
             Expanded(
               child: EnhancedCategoryTable(
+                filter: _activeFilter,
                 onEdit: _showEditCategoryDialog,
                 onDelete: _showDeleteCategoryDialog,
                 onView: _showViewCategoryDialog,
@@ -552,37 +573,41 @@ class _CategoryPageState extends State<CategoryPage> {
   Widget _buildFilterButton() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.filter_list_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
+    return InkWell(
+      onTap: _showFilterDialog,
+      borderRadius: BorderRadius.circular(context.borderRadius()),
+      child: Container(
+        height: context.buttonHeight / 1.5,
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+        decoration: BoxDecoration(
+          color: AppTheme.lightGray,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 1,
           ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              l10n.filter,
-              style: TextStyle(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primaryMaroon,
-              ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.filter_list_rounded,
+              color: AppTheme.primaryMaroon,
+              size: context.iconSize('medium'),
             ),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                l10n.filter,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.primaryMaroon,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -651,7 +676,7 @@ class _CategoryPageState extends State<CategoryPage> {
             child: Icon(
               icon,
               color: color,
-              size: context.iconSize('medium'),
+              size: context.dashboardIconSize('medium'),
             ),
           ),
 
@@ -667,11 +692,11 @@ class _CategoryPageState extends State<CategoryPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -682,7 +707,7 @@ class _CategoryPageState extends State<CategoryPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), // Use dashboard-specific size
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
                   ),

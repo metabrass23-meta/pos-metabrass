@@ -39,14 +39,19 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
     setState(() => _isPrinting = true);
 
     try {
-      // ✅ Use SalesProvider instead of InvoiceProvider
+      // Use SalesProvider instead of InvoiceProvider
       final salesProvider = Provider.of<SalesProvider>(context, listen: false);
 
-      // ✅ Call the new function in SalesProvider
+      debugPrint(" [OrderSuccessDialog] Calling SalesProvider.generateReceiptPdf with saleId: ${widget.saleId}");
+
+      // Call the new function in SalesProvider
       final success = await salesProvider.generateReceiptPdf(widget.saleId);
+
+      debugPrint(" [OrderSuccessDialog] generateReceiptPdf result: $success");
 
       if (mounted) {
         if (success) {
+          debugPrint(" [OrderSuccessDialog] Print successful");
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -57,16 +62,50 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
                 ],
               ),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 3),
             ),
           );
         } else {
-          _showError(l10n.errorOccurred("Failed to generate PDF"));
+          debugPrint(" [OrderSuccessDialog] Print failed");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text("Failed to generate receipt"),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         }
       }
     } catch (e) {
-      if (mounted) _showError(l10n.errorOccurred(e.toString()));
+      debugPrint(" [OrderSuccessDialog] Print error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 10),
+                Text("Error: $e"),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     } finally {
-      if (mounted) setState(() => _isPrinting = false);
+      if (mounted) {
+        setState(() => _isPrinting = false);
+      }
     }
   }
 
@@ -77,7 +116,7 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
   }
 
   void _handleDone(BuildContext context) {
-    // ✅ Only pop once. The CheckoutDialog already closed itself before opening this dialog.
+    // Only pop once. The CheckoutDialog already closed itself before opening this dialog.
     Navigator.of(context).pop();
   }
 

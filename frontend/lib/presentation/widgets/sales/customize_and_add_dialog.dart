@@ -99,23 +99,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
 
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
-              SizedBox(width: context.smallPadding),
-              Expanded(
-                child: Text(l10n.customizedAddedToCart(widget.product.name), style: TextStyle(color: AppTheme.pureWhite)),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
-        ),
-      );
+      // Snackbar removed - no longer shows "customized added to cart" confirmation
     });
   }
 

@@ -24,14 +24,15 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _invoiceController = TextEditingController();
-  final TextEditingController _taxController = TextEditingController(text: '0.0');
+  final TextEditingController _taxController = TextEditingController(text: '0');
+
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   String? _selectedVendorId;
   String _status = 'draft';
 
   List<PurchaseItemModel> _items = [];
-  bool _isLocalLoading = false; // Local loading state to prevent double taps
+  bool _isLocalLoading = false;
 
   @override
   void initState() {
@@ -41,6 +42,13 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
       context.read<VendorProvider>().initialize();
       context.read<ProductProvider>().initialize();
     });
+  }
+
+  @override
+  void dispose() {
+    _invoiceController.dispose();
+    _taxController.dispose();
+    super.dispose();
   }
 
   double get _subtotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
@@ -64,6 +72,14 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
     });
   }
 
+  /// Helper to format doubles nicely (e.g. 1.0 -> "1", 1.5 -> "1.5")
+  String _formatNumber(double value) {
+    if (value == value.roundToDouble()) {
+      return value.toInt().toString();
+    }
+    return value.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -82,7 +98,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
+              // --- Header ---
               Row(
                 children: [
                   Container(
@@ -99,7 +115,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
                   ),
                   SizedBox(width: context.smallPadding),
                   Text(
-                    "New Purchase", // Hardcoded fallback if l10n fails
+                    l10n.add ?? "New Purchase",
                     style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.bold,
@@ -115,7 +131,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
               ),
               const Divider(height: 32),
 
-              // Body
+              // --- Scrollable Body ---
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -131,6 +147,8 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
               ),
 
               const Divider(height: 32),
+
+              // --- Footer Actions ---
               _buildActions(context, l10n),
             ],
           ),
@@ -148,7 +166,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
               child: Consumer<VendorProvider>(
                 builder: (context, provider, child) {
                   return PremiumDropdownField<String>(
-                    label: l10n.vendor,
+                    label: l10n.vendor ?? "Vendor",
                     value: _selectedVendorId,
                     items: provider.vendors.map((v) => DropdownItem<String>(
                       value: v.id!,
@@ -190,7 +208,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
                 },
                 child: IgnorePointer(
                   child: PremiumTextField(
-                    label: "Purchase Date",
+                    label: l10n.date ?? "Purchase Date",
                     controller: TextEditingController(
                       text: "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} ${_selectedTime.format(context)}",
                     ),
@@ -224,26 +242,41 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Purchased Products",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: context.bodyFontSize)),
+            Text(
+              "Purchased Products",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: context.bodyFontSize),
+            ),
             PremiumButton(
               text: "Add Product Row",
               onPressed: _addItem,
               icon: Icons.add_rounded,
-              width: 200,
+              width: 180,
               height: 40,
+              backgroundColor: AppTheme.secondaryMaroon,
             ),
           ],
         ),
         SizedBox(height: context.smallPadding),
+
         if (_items.isEmpty)
           Container(
             padding: EdgeInsets.all(context.mainPadding),
+            width: double.infinity,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
               borderRadius: BorderRadius.circular(context.borderRadius()),
+              color: Colors.grey.shade50,
             ),
-            child: Center(child: Text("No items added yet. Click 'Add Product Row' to begin.", style: TextStyle(color: Colors.grey[500]))),
+            child: Column(
+              children: [
+                Icon(Icons.list_alt_rounded, size: 40, color: Colors.grey[400]),
+                SizedBox(height: 8),
+                Text(
+                    "No items added yet.",
+                    style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500)
+                ),
+              ],
+            ),
           )
         else
           ListView.builder(
@@ -257,6 +290,10 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
   }
 
   Widget _buildItemRow(int index, PurchaseItemModel item) {
+    // Create controllers with current item values
+    final qtyController = TextEditingController(text: _formatNumber(item.quantity));
+    final costController = TextEditingController(text: _formatNumber(item.unitCost));
+
     return Container(
       margin: EdgeInsets.only(bottom: context.smallPadding),
       padding: EdgeInsets.all(context.smallPadding),
@@ -264,37 +301,49 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('small')),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // Align to top for error messages
         children: [
+          // Product Selection
           Expanded(
             flex: 4,
             child: Consumer<ProductProvider>(
               builder: (context, provider, child) {
                 return PremiumDropdownField<String>(
                   label: "Product",
-                  value: item.product, // Ensure this matches the ID type
+                  value: item.product,
                   items: provider.products.map((p) => DropdownItem<String>(
                     value: p.id!,
                     label: p.name,
                   )).toList(),
                   onChanged: (val) {
                     setState(() {
-                      // Update with copyWith to keep other fields
+                      // Preserve quantity/cost, update product
                       _items[index] = item.copyWith(product: val);
                     });
                   },
+                  hint: "Select Product",
                 );
               },
             ),
           ),
           SizedBox(width: context.smallPadding),
+
+          // Quantity
           Expanded(
             flex: 2,
             child: PremiumTextField(
               label: "Qty",
-              keyboardType: TextInputType.number,
-              controller: TextEditingController(text: item.quantity.toString())..selection = TextSelection.collapsed(offset: item.quantity.toString().length),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              controller: qtyController,
               onChanged: (val) {
                 final qty = double.tryParse(val) ?? 0;
                 setState(() {
@@ -302,17 +351,20 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
                     quantity: qty,
                     totalPrice: qty * item.unitCost,
                   );
+                  print('DEBUG: Updated item $index - qty: $qty, cost: ${item.unitCost}, total: ${qty * item.unitCost}');
                 });
               },
             ),
           ),
           SizedBox(width: context.smallPadding),
+
+          // Unit Cost
           Expanded(
             flex: 2,
             child: PremiumTextField(
               label: "Unit Cost",
-              keyboardType: TextInputType.number,
-              controller: TextEditingController(text: item.unitCost.toString())..selection = TextSelection.collapsed(offset: item.unitCost.toString().length),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              controller: costController,
               onChanged: (val) {
                 final cost = double.tryParse(val) ?? 0;
                 setState(() {
@@ -320,25 +372,17 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
                     unitCost: cost,
                     totalPrice: cost * item.quantity,
                   );
+                  print('DEBUG: Updated item $index - qty: ${item.quantity}, cost: $cost, total: ${cost * item.quantity}');
                 });
               },
             ),
           ),
-          SizedBox(width: context.smallPadding),
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text("Line Total", style: TextStyle(fontSize: 10, color: Colors.grey[500])),
-                Text(item.totalPrice.toStringAsFixed(2),
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryMaroon)),
-              ],
-            ),
-          ),
+
+          // Remove Button
           IconButton(
             onPressed: () => _removeItem(index),
-            icon: const Icon(Icons.delete_sweep_rounded, color: Colors.red),
+            icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+            tooltip: "Remove Item",
           ),
         ],
       ),
@@ -349,7 +393,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
     return Container(
       padding: EdgeInsets.all(context.mainPadding),
       decoration: BoxDecoration(
-        color: AppTheme.primaryMaroon.withOpacity(0.05),
+        color: AppTheme.primaryMaroon.withOpacity(0.03),
         borderRadius: BorderRadius.circular(context.borderRadius()),
         border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.1)),
       ),
@@ -360,19 +404,25 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Calculated Tax", style: TextStyle(color: Colors.grey[600])),
+              Text("Tax / Adjustment", style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500)),
               SizedBox(
                 width: 150,
                 child: PremiumTextField(
                   controller: _taxController,
-                  label: "Tax Amount",
-                  keyboardType: TextInputType.number,
-                  onChanged: (_) => setState(() {}),
+                  label: "Tax / Adjustment",
+                  hint: "0.0",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    setState(() {}); // Trigger rebuild for total calc
+                  },
                 ),
               ),
             ],
           ),
-          const Divider(height: 32),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Divider(height: 1),
+          ),
           _summaryRow("Grand Total", _total, isTotal: true),
         ],
       ),
@@ -384,14 +434,18 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: TextStyle(
-          fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
           fontSize: isTotal ? 18 : 14,
+          color: isTotal ? AppTheme.charcoalGray : Colors.grey[700],
         )),
-        Text(value.toStringAsFixed(2), style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: AppTheme.primaryMaroon,
-          fontSize: isTotal ? 18 : 14,
-        )),
+        Text(
+          value.toStringAsFixed(2),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppTheme.primaryMaroon,
+            fontSize: isTotal ? 20 : 14,
+          ),
+        ),
       ],
     );
   }
@@ -401,10 +455,11 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         PremiumButton(
-          text: l10n.cancel,
+          text: l10n.cancel ?? "Cancel",
           onPressed: () => Navigator.pop(context),
           isOutlined: true,
           width: 120,
+          height: 48,
           backgroundColor: Colors.grey,
         ),
         SizedBox(width: context.mainPadding),
@@ -415,6 +470,8 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
               isLoading: provider.isLoading || _isLocalLoading,
               onPressed: _handleSave,
               width: 200,
+              height: 48,
+              icon: Icons.check_circle_outline_rounded,
             );
           },
         ),
@@ -423,43 +480,64 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
   }
 
   void _handleSave() async {
-    // 1. Validate Form Fields (Invoice #)
+    debugPrint('🔍 [AddPurchaseDialog] Starting save process...');
+    
+    // 1. Validate General Fields
     if (!_formKey.currentState!.validate()) {
-      _showError("Please check the Invoice Number.");
+      debugPrint('❌ [AddPurchaseDialog] Form validation failed');
+      return; // TextField validators will show errors
+    }
+
+    if (_invoiceController.text.isEmpty) {
+      debugPrint('❌ [AddPurchaseDialog] Invoice number is empty');
+      _showError("Please enter an Invoice Number.");
       return;
     }
 
-    // 2. Validate Vendor
     if (_selectedVendorId == null) {
+      debugPrint('❌ [AddPurchaseDialog] No vendor selected');
       _showError("Please select a Vendor.");
       return;
     }
 
-    // 3. Validate Items Existence
+    // 2. Validate Items
     if (_items.isEmpty) {
-      _showError("Please add at least one product.");
+      debugPrint('❌ [AddPurchaseDialog] No items added');
+      _showError("Please add at least one product to the purchase.");
       return;
     }
 
-    // 4. Validate Each Item has a Product Selected
+    debugPrint('🔍 [AddPurchaseDialog] Validating ${_items.length} items...');
     for (int i = 0; i < _items.length; i++) {
+      debugPrint('🔍 [AddPurchaseDialog] Item $i: product=${_items[i].product}, quantity=${_items[i].quantity}, unitCost=${_items[i].unitCost}');
+      
       if (_items[i].product == null) {
-        _showError("Item #${i + 1} does not have a product selected.");
+        debugPrint('❌ [AddPurchaseDialog] Item #$i: No product selected');
+        _showError("Item #${i + 1}: Please select a product.");
         return;
       }
       if (_items[i].quantity <= 0) {
-        _showError("Item #${i + 1} quantity must be greater than 0.");
+        debugPrint('❌ [AddPurchaseDialog] Item #$i: Invalid quantity');
+        _showError("Item #${i + 1}: Quantity must be greater than 0.");
         return;
       }
+      // Note: Unit cost can arguably be 0 (free items), so we might not strictly enforce > 0
     }
 
+    debugPrint('✅ [AddPurchaseDialog] All validations passed');
     setState(() => _isLocalLoading = true);
 
     try {
       final purchase = PurchaseModel(
         vendor: _selectedVendorId,
         invoiceNumber: _invoiceController.text,
-        purchaseDate: _selectedDate,
+        purchaseDate: DateTime(
+          _selectedDate.year,
+          _selectedDate.month,
+          _selectedDate.day,
+          _selectedTime.hour,
+          _selectedTime.minute,
+        ),
         subtotal: _subtotal,
         tax: _taxAmount,
         total: _total,
@@ -467,24 +545,21 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
         items: _items,
       );
 
+      debugPrint('🔍 [AddPurchaseDialog] Creating purchase: ${purchase.toJson()}');
       final success = await context.read<PurchaseProvider>().addPurchase(purchase);
 
       if (!mounted) return;
 
       if (success) {
+        debugPrint('✅ [AddPurchaseDialog] Purchase created successfully');
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Purchase Added Successfully"),
-                backgroundColor: Colors.green
-            )
-        );
       } else {
-        // Show server error in dialog instead of snackbar to ensure visibility
         final error = context.read<PurchaseProvider>().error ?? "Failed to save purchase";
+        debugPrint('❌ [AddPurchaseDialog] Failed to save purchase: $error');
         _showError(error);
       }
     } catch (e) {
+      debugPrint('❌ [AddPurchaseDialog] Exception during save: $e');
       _showError("Unexpected error: $e");
     } finally {
       if (mounted) setState(() => _isLocalLoading = false);
@@ -495,12 +570,13 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text("Validation Error"),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text("Validation Error", style: TextStyle(color: Colors.red)),
           content: Text(message),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text("OK")
+                child: const Text("OK", style: TextStyle(color: AppTheme.primaryMaroon))
             )
           ],
         )

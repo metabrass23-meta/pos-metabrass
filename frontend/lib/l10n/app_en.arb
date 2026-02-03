@@ -1,14 +1,25 @@
 {
   "@@locale": "en",
-  "appTitle": "MAl Noor - Premium POS",
+  "appTitle": "Al Noor - Premium POS",
   "welcomeBack": "Welcome Back to",
-  "brandName": "Al Noor Fashion",
-  "tagline": "Crafting elegance for your most precious moments.\nExperience luxury redefined through our premium bridal and groom collections.",
+  "brandName": "Al Noor",
+  "tagline": "Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.",
   "signIn": "Sign In",
   "signUp": "Sign Up",
+  "searchReturns": "Search Returns",
+  "serverErrorTryAgainLater": "Server error. Please try again later.",
   "accessDashboard": "Access your premium dashboard",
   "emailAddress": "Email Address",
   "enterEmail": "Enter your email",
+  "deactivatedSuccessfully": "Deactivated successfully",
+  "showing": "Showing",
+  "pleaseConfirmAction": "Please confirm this action",
+  "deletedPermanently": "Deleted permanently",
+  "failedToDelete": "Failed to delete",
+  "pleaseConfirmConsequences": "This action cannot be undone. Are you sure?",
+  "pleaseTypeVendorName": "Please type '{vendorName}' to confirm",
+  "pleaseCompleteConfirmation": "Please complete the confirmation step",
+  "location": "Location",
   "password": "Password",
   "enterPassword": "Enter your password",
   "forgotPassword": "Forgot Password?",
@@ -53,7 +64,6 @@
   "notes": "Notes",
   "category": "Category",
   "vendor": "Vendor",
-  "labor": "Labor",
   "zakat": "Zakat",
   "profitLoss": "Profit & Loss",
   "advancePayment": "Advance Payment",
@@ -77,10 +87,38 @@
   "success": "Success",
   "warning": "Warning",
   "info": "Info",
-  "posSystem": "Point of Sale System",
+  "posSystem": "Sales",
   "selectProductsManageSales": "Select products and manage sales transactions",
   "todaySales": "Today Sales",
   "revenue": "Revenue",
+  "purchasesTagline": "Track and manage inventory supply and purchase records",
+  "newPurchase": "New Purchase",
+  "totalInvestment": "Total Investment",
+  "enterInvoiceRef": "Enter Invoice Reference",
+  "purchaseDate": "Purchase Date",
+  "purchasedProducts": "Purchased Products",
+  "addProductRow": "Add Product Row",
+  "unitCost": "Unit Cost",
+  "taxAdjustment": "Tax / Adjustment",
+  "savePurchase": "Save Purchase",
+  "validationError": "Validation Error",
+  "enterInvoiceNumberError": "Please enter an Invoice Number.",
+  "selectVendorError": "Please select a Vendor.",
+  "addOneProductError": "Please add at least one product to the purchase.",
+  "selectProductError": "Item #{itemIndex}: Please select a product.",
+  "invalidQtyError": "Item #{itemIndex}: Quantity must be greater than 0.",
+  "savePurchaseFailed": "Failed to save purchase",
+  "purchaseDetails": "Purchase Details",
+  "purchasedItems": "Purchased Items",
+  "printInvoice": "Print Invoice",
+  "filterPurchases": "Filter Purchases",
+  "fromDate": "From Date",
+  "toDate": "To Date",
+  "resetAll": "Reset All",
+  "unknownVendor": "Unknown Vendor",
+  "deletePurchaseConfirm": "Are you sure you want to delete this purchase?",
+  "noPurchasesFound": "No Purchases Found",
+  "noPurchasesMatchFilter": "No purchases match the current filter",
   "viewHistory": "View History",
   "currentTime": "Current Time",
   "salesHistory": "Sales Transaction History",
@@ -157,12 +195,20 @@
   "noCustomersFound": "No customers found",
   "adjustFilters": "Try adjusting your filters or adding new customers.",
   "failedToRefreshCustomers": "Failed to refresh customers",
+  "viewLedger": "View Ledger",
+  "addNewCustomer": "Add New Customer",
+  "createNewCustomerProfile": "Create a new customer profile",
+  "customerAddedSuccessfully": "Customer added successfully",
+  "failedToAddCustomer": "Failed to add customer",
+  "lastPurchase": "Last Purchase",
   "logoutMessage": "Are you sure you want to logout from your account?",
   "logoutError": "Logged out locally due to an error.",
   "brandTagline": "Premium POS",
-  "welcomeToPos": "Welcome to Al Noor Fabrics POS",
-  "welcomeTagline": "Crafting Excellence in Every Stitch - Your Premium Fashion Management System",
+  "welcomeToPos": "Welcome to Al Noor POS",
+  "welcomeTagline": "Quality Spare Parts Management - Your Complete Automotive Solution",
   "today": "Today",
+  "totalIncome": "Total Income",
+  "totalExpenses": "Total Expenses",
   "totalOrders": "Total Orders",
   "activeCustomers": "Active Customers",
   "activeVendors": "Active Vendors",
@@ -241,6 +287,10 @@
   "pleaseFixErrors": "Please fix the following errors",
   "profile": "Profile",
   "basicInformation": "Basic Information",
+  "contactInformation": "Contact Information",
+  "businessInformation": "Business Information",
+  "additionalInformation": "Additional Information",
+  "locationInformation": "Location Information",
   "fullName": "Full Name",
   "pleaseEnter": "Please enter",
   "mustBeAtLeast": "must be at least",
@@ -249,18 +299,7 @@
   "cnic": "CNIC",
   "cnicFormat": "XXXXX-XXXXXXX-X",
   "pleaseEnterValid": "Please enter a valid",
-  "contactInformation": "Contact Information",
   "phoneFormat": "+923001234567",
-  "locationInformation": "Location Information",
-  "deletedPermanently": "deleted permanently",
-  "deactivatedSuccessfully": "deactivated successfully",
-  "failedToDelete": "Failed to delete",
-  "pleaseConfirmAction": "Please confirm that you understand this action",
-  "pleaseConfirmConsequences": "Please confirm that you understand the consequences of permanent deletion",
-  "pleaseTypeVendorName": "Please type the vendor name exactly to confirm permanent deletion",
-  "pleaseCompleteConfirmation": "Please complete all confirmation steps",
-  "location": "Location",
-  "showing": "Showing",
   "outOf": "of",
   "refineVendorList": "Refine your vendor list with filters",
   "showInactiveVendorsOnly": "Show inactive vendors only",
@@ -709,6 +748,16 @@
   "enterCnicNumber": "Enter CNIC number",
   "enterPhoneWithCode": "Enter phone (+92XXXXXXXXXX)",
   "enterFullAddress": "Enter full address",
+  "enterCustomerName": "Enter customer name",
+  "enterCustomerFullName": "Enter customer's full name",
+  "enterCustomerPhone": "Enter customer phone number",
+  "enterCustomerEmail": "Enter customer email address",
+  "enterCustomerAddress": "Enter customer address",
+  "enterCustomerCity": "Enter customer city",
+  "enterCustomerCountry": "Enter customer country",
+  "enterCustomerBusinessName": "Enter customer business name",
+  "enterCustomerTaxNumber": "Enter customer tax or NTN number",
+  "enterCustomerNotes": "Enter customer notes",
   "enterAdditionalNotes": "Enter additional notes",
   "addZakat": "Add Zakat",
   "addNewZakatRecord": "Add New Zakat Record",
@@ -1580,7 +1629,7 @@
   "updateExpense": "Update Expense",
   "expenseUpdatedSuccessfully": "Expense updated successfully!",
   "pleaseAcceptTerms": "Please accept the terms and conditions",
-  "accountCreatedSuccessfully": "Account created successfully! Welcome to Al Noor Fashion.",
+  "accountCreatedSuccessfully": "Account created successfully! Welcome to Al Noor.",
   "registrationFailedMessage": "Registration failed. Please check the details below.",
   "joinOur": "Join Our",
   "premiumFamily": "Premium Family",
@@ -1975,7 +2024,7 @@
   "aboutApp": "About App",
   "darkMode": "Dark Mode",
   "enableDarkThemeForApplication": "Enable dark theme for the application",
-  "alNoorFashionPOS": "Al Noor Fashion POS",
+  "alNoorFashionPOS": "Al Noor POS",
   "version": "Version",
   "aPremiumPointOfSaleSolution": "A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.",
   "createNewReturn": "Create New Return",
@@ -2000,13 +2049,6 @@
   "returnItems": "Return Items",
   "noItemsAdded": "No return items added",
   "clickAddItem": "Click \"Add Item\" to add items to return",
-  "@item": {
-    "placeholders": {
-      "itemNumber": {
-        "type": "int"
-      }
-    }
-  },
   "removeItem": "Remove Item",
   "saleItemId": "Sale Item ID",
   "enterSaleItemId": "Enter sale item ID",
@@ -2486,13 +2528,6 @@
   "saleItems": "Sale Items",
   "noSaleItemsAdded": "No Sale Items Added",
   "addItemsToSale": "Add items to this sale",
-  "@qty": {
-    "placeholders": {
-      "quantity": {
-        "type": "int"
-      }
-    }
-  },
   "taxConfiguration": "Tax Configuration",
   "totalTax": "Total Tax",
   "createSale": "Create Sale",
@@ -2548,6 +2583,9 @@
       }
     }
   },
+  "invoiceHash": "Invoice #",
+  "subTotal": "Subtotal",
+  "action": "Actions",
   "deletePurchase": "Delete Purchase",
   "loadingData": "Loading data...",
   "pendingOrders": "Pending orders",
@@ -2560,6 +2598,38 @@
   "confirmDelete": "Are you sure you want to delete this purchase?",
   "deleteSuccess": "Purchase deleted successfully",
   "editPurchase": "Edit Purchase",
-  "apply": "Apply"
-
+  "apply": "Apply",
+  "scannerTitle": "Barcode Scanner",
+  "scannerReady": "Ready to scan...",
+  "scannerScanning": "Scanning...",
+  "scannerLabel": "Barcode",
+  "scannerHint": "Type or scan barcode",
+  "scannerInvalidFormat": "Invalid barcode format",
+  "scannerDuplicateScan": "Duplicate barcode scan",
+  "scannerProductNotFound": "Product not found",
+  "scannerFound": "Found: {productName}",
+  "@scannerFound": {
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      }
+    }
+  },
+  "scannerFailed": "Scan failed: {error}",
+  "@scannerFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scannerAddedToCart": "Added {productName} to cart",
+  "@scannerAddedToCart": {
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      }
+    }
+  },
+  "scannerAddToCartFailed": "Failed to add product to cart"
 }

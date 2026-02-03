@@ -33,6 +33,7 @@ class CustomerModel {
 
   // Sales-related fields from backend
   final int totalSalesCount;
+  final double totalSalesAmount;  // Add total sales amount
   final bool hasRecentSales;
 
   // Display fields from backend
@@ -70,6 +71,7 @@ class CustomerModel {
     this.phoneCountryCode,
     required this.formattedCountryPhone,
     required this.totalSalesCount,
+    required this.totalSalesAmount,  // Add total sales amount
     required this.hasRecentSales,
     required this.customerTypeDisplay,
     required this.statusDisplay,
@@ -107,6 +109,7 @@ class CustomerModel {
       phoneCountryCode: json['phone_country_code'] as String?,
       formattedCountryPhone: json['formatted_country_phone'] as String? ?? '',
       totalSalesCount: json['total_sales_count'] as int? ?? 0,
+      totalSalesAmount: (json['total_sales_amount'] as num?)?.toDouble() ?? 0.0,  // Add total sales amount
       hasRecentSales: json['has_recent_sales'] as bool? ?? false,
       customerTypeDisplay: json['customer_type_display'] as String? ?? json['customer_type'] as String,
       statusDisplay: json['status_display'] as String? ?? json['status'] as String,
@@ -145,6 +148,7 @@ class CustomerModel {
       'phone_country_code': phoneCountryCode,
       'formatted_country_phone': formattedCountryPhone,
       'total_sales_count': totalSalesCount,
+      'total_sales_amount': totalSalesAmount,  // Add total sales amount
       'has_recent_sales': hasRecentSales,
       'customer_type_display': customerTypeDisplay,
       'status_display': statusDisplay,
@@ -182,6 +186,7 @@ class CustomerModel {
     String? phoneCountryCode,
     String? formattedCountryPhone,
     int? totalSalesCount,
+    double? totalSalesAmount,  // Add total sales amount
     bool? hasRecentSales,
     String? customerTypeDisplay,
     String? statusDisplay,
@@ -217,6 +222,7 @@ class CustomerModel {
       phoneCountryCode: phoneCountryCode ?? this.phoneCountryCode,
       formattedCountryPhone: formattedCountryPhone ?? this.formattedCountryPhone,
       totalSalesCount: totalSalesCount ?? this.totalSalesCount,
+      totalSalesAmount: totalSalesAmount ?? this.totalSalesAmount,  // Add total sales amount
       hasRecentSales: hasRecentSales ?? this.hasRecentSales,
       customerTypeDisplay: customerTypeDisplay ?? this.customerTypeDisplay,
       statusDisplay: statusDisplay ?? this.statusDisplay,
@@ -240,6 +246,17 @@ class CustomerModel {
   String get formattedLastContactDate {
     if (lastContactDate == null) return 'Never';
     return '${lastContactDate!.day.toString().padLeft(2, '0')}/${lastContactDate!.month.toString().padLeft(2, '0')}/${lastContactDate!.year}';
+  }
+
+  // Sales-related getters for customer table
+  double? get lastPurchase {
+    // Return the total sales amount if customer has sales
+    return totalSalesAmount > 0 ? totalSalesAmount : null;
+  }
+
+  DateTime? get lastPurchaseDate {
+    // Use lastOrderDate as the purchase date
+    return lastOrderDate;
   }
 
   // Relative dates

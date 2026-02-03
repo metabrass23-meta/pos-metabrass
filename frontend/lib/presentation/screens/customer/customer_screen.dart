@@ -80,7 +80,7 @@ class _CustomerPageState extends State<CustomerPage> {
     final provider = context.read<CustomerProvider>();
     await provider.refreshCustomers();
 
-    if (provider.hasError) {
+    if (provider.hasError && mounted) {
       _showErrorSnackbar(
         provider.errorMessage ??
             AppLocalizations.of(context)!.failedToRefreshCustomers,
@@ -121,71 +121,14 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  void _handleExport() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    try {
-      final provider = context.read<CustomerProvider>();
-      await provider.exportData();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.check_circle_rounded,
-                color: AppTheme.pureWhite,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                l10n.customerDataExported,
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-        ),
-      );
-    } catch (e) {
-      _showErrorSnackbar('${l10n.failedToExportData}: ${e.toString()}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (!context.isMinimumSupported) {
-      return _buildUnsupportedScreen();
-    }
-
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       body: Consumer<CustomerProvider>(
         builder: (context, provider, child) {
-          if (provider.hasError) {
-            return _buildErrorState(
-              provider.errorMessage ??
-                  AppLocalizations.of(context)!.failedToRefreshCustomers,
-            );
-          }
-
-          if (provider.isLoading && provider.customers.isEmpty) {
-            return _buildLoadingState();
-          }
-
-          if (!provider.isLoading && provider.customers.isEmpty) {
-            return _buildEmptyState();
-          }
-
+          // This structure ensures Headers are ALWAYS visible.
+          // The content (Table/Loading/Empty) changes inside the Expanded widget.
           return _buildNormalContent(provider);
         },
       ),
@@ -235,9 +178,75 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
+  Widget _buildNormalContent(CustomerProvider provider) {
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      color: AppTheme.primaryMaroon,
+      child: Padding(
+        padding: EdgeInsets.all(context.mainPadding / 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ResponsiveBreakpoints.responsive(
+              context,
+              tablet: _buildTabletHeader(),
+              small: _buildMobileHeader(),
+              medium: _buildDesktopHeader(),
+              large: _buildDesktopHeader(),
+              ultrawide: _buildDesktopHeader(),
+            ),
+
+            SizedBox(height: context.mainPadding),
+
+            context.statsCardColumns == 2
+                ? _buildMobileStatsGrid(provider)
+                : _buildDesktopStatsRow(provider),
+
+            SizedBox(height: context.cardPadding * 0.5),
+
+            _buildSearchSection(provider),
+
+            SizedBox(height: context.cardPadding * 0.5),
+
+            _buildActiveFilters(provider),
+
+            // ✅ Logic handled HERE inside the column so headers stay visible
+            Expanded(
+              child: _buildMainContent(provider),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent(CustomerProvider provider) {
+    if (provider.isLoading && provider.customers.isEmpty) {
+      return _buildLoadingWidget();
+    }
+
+    if (provider.customers.isEmpty) {
+      // Logic: If error exists, show error, else show empty
+      if (provider.hasError) {
+        return _buildErrorStateWidget(
+            provider.errorMessage ?? AppLocalizations.of(context)!.failedToRefreshCustomers
+        );
+      }
+      return _buildEmptyStateWidget();
+    }
+
+    // ✅ If we are here, we have customers. Show the table.
+    return EnhancedCustomerTable(
+      onEdit: _showEditCustomerDialog,
+      onDelete: _showDeleteCustomerDialog,
+      onView: _showViewCustomerDialog,
+    );
+  }
+
+  // --- Header Widgets ---
+
   Widget _buildDesktopHeader() {
     final l10n = AppLocalizations.of(context)!;
-
     return Row(
       children: [
         Expanded(
@@ -265,7 +274,6 @@ class _CustomerPageState extends State<CustomerPage> {
             ],
           ),
         ),
-
         _buildAddButton(),
       ],
     );
@@ -273,7 +281,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildTabletHeader() {
     final l10n = AppLocalizations.of(context)!;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -296,7 +303,6 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
@@ -304,7 +310,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildMobileHeader() {
     final l10n = AppLocalizations.of(context)!;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -327,7 +332,6 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-
         SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
@@ -335,7 +339,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
-
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -382,7 +385,6 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildDesktopStatsRow(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
     final stats = provider.customerStats;
-
     return Row(
       children: [
         Expanded(
@@ -427,7 +429,6 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildMobileStatsGrid(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
     final stats = provider.customerStats;
-
     return Column(
       children: [
         Row(
@@ -505,19 +506,12 @@ class _CustomerPageState extends State<CustomerPage> {
   Widget _buildDesktopSearchLayout(CustomerProvider provider) {
     return Row(
       children: [
-        Expanded(flex: 3, child: _buildSearchBar(provider)),
-
+        Expanded(flex: 1, child: _buildSearchBar(provider)),
         SizedBox(width: context.cardPadding),
-
         Expanded(flex: 1, child: _buildShowInactiveToggle(provider)),
-
         SizedBox(width: context.smallPadding),
-
         Expanded(flex: 1, child: _buildFilterButton(provider)),
-
         SizedBox(width: context.smallPadding),
-
-        Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
   }
@@ -532,8 +526,6 @@ class _CustomerPageState extends State<CustomerPage> {
             Expanded(child: _buildShowInactiveToggle(provider)),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildFilterButton(provider)),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -551,7 +543,6 @@ class _CustomerPageState extends State<CustomerPage> {
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildFilterButton(provider)),
             SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -560,7 +551,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildSearchBar(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
-
     return SizedBox(
       height: context.buttonHeight / 1.5,
       child: TextField(
@@ -608,7 +598,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildShowInactiveToggle(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
-
     return Container(
       height: context.buttonHeight / 1.5,
       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
@@ -644,7 +633,7 @@ class _CustomerPageState extends State<CustomerPage> {
                     ? l10n.hideInactive
                     : l10n.showInactive,
                 style: TextStyle(
-                  fontSize: context.bodyFontSize,
+                  fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive
                       ? AppTheme.primaryMaroon
@@ -660,7 +649,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   Widget _buildFilterButton(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
-
     final hasActiveFilters =
         provider.selectedStatus != null ||
             provider.selectedType != null ||
@@ -717,47 +705,7 @@ class _CustomerPageState extends State<CustomerPage> {
     );
   }
 
-  Widget _buildExportButton() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: InkWell(
-        onTap: _handleExport,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.download_rounded,
-              color: AppTheme.accentGold,
-              size: context.iconSize('medium'),
-            ),
-            if (!context.isTablet) ...[
-              SizedBox(width: context.smallPadding),
-              Text(
-                l10n.export,
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.accentGold,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+  // Export button method removed
 
   Widget _buildActiveFilters(CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
@@ -829,7 +777,6 @@ class _CustomerPageState extends State<CustomerPage> {
               ),
             ),
           ),
-
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.smallPadding,
@@ -861,7 +808,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   void _clearSpecificFilter(String filterText, CustomerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
-
     if (filterText.startsWith('${l10n.status}:')) {
       provider.setStatusFilter(null);
     } else if (filterText.startsWith('${l10n.type}:')) {
@@ -885,12 +831,7 @@ class _CustomerPageState extends State<CustomerPage> {
     return count;
   }
 
-  Widget _buildStatsCard(
-      String title,
-      String value,
-      IconData icon,
-      Color color,
-      ) {
+  Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
     return Container(
       height: context.statsCardHeight / 1.5,
       padding: EdgeInsets.all(context.cardPadding / 2),
@@ -911,15 +852,11 @@ class _CustomerPageState extends State<CustomerPage> {
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                context.borderRadius('small'),
-              ),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
-
           SizedBox(width: context.cardPadding),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -930,11 +867,11 @@ class _CustomerPageState extends State<CustomerPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -945,7 +882,7 @@ class _CustomerPageState extends State<CustomerPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), // Use dashboard-specific size
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
                   ),
@@ -965,148 +902,89 @@ class _CustomerPageState extends State<CustomerPage> {
     return totalSales != null ? totalSales.toString() : '0';
   }
 
-  Widget _buildErrorState(String message) {
+  // ✅ WIDGET: Local Error State (not Scaffold)
+  Widget _buildErrorStateWidget(String message) {
     final l10n = AppLocalizations.of(context)!;
-
-    return Scaffold(
-      backgroundColor: AppTheme.creamWhite,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 10.w, color: Colors.red[400]),
-            SizedBox(height: 2.h),
-            Text(
-              '${l10n.error}: $message',
-              style: TextStyle(
-                fontSize: 4.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.red[700],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 1.h),
-            Text(
-              l10n.pleaseTryAgainOrContactSupport,
-              style: TextStyle(
-                fontSize: 3.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 5.h),
+          Icon(Icons.error_outline, size: 10.w, color: Colors.red[400]),
+          SizedBox(height: 2.h),
+          Text(
+            '${l10n.error}: $message',
+            style: TextStyle(fontSize: 4.sp, fontWeight: FontWeight.w500, color: Colors.red[700]),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 1.h),
+          Text(
+            l10n.pleaseTryAgainOrContactSupport,
+            style: TextStyle(fontSize: 3.sp, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildLoadingState() {
+  // ✅ WIDGET: Local Empty State (not Scaffold)
+  Widget _buildEmptyStateWidget() {
     final l10n = AppLocalizations.of(context)!;
-
-    return Scaffold(
-      backgroundColor: AppTheme.creamWhite,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: AppTheme.primaryMaroon,
-              strokeWidth: 2.w,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 5.h),
+          Icon(Icons.search_off_rounded, size: 10.w, color: Colors.grey[400]),
+          SizedBox(height: 2.h),
+          Text(
+            l10n.noCustomersFound,
+            style: TextStyle(
+              fontSize: 4.sp,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
             ),
-            SizedBox(height: 2.h),
-            Text(
-              l10n.loadingCustomers,
-              style: TextStyle(
-                fontSize: 4.sp,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoalGray,
-              ),
-              textAlign: TextAlign.center,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 1.h),
+          Text(
+            l10n.adjustFilters,
+            style: TextStyle(
+              fontSize: 3.sp,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[600],
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  // ✅ WIDGET: Local Loading State (not Scaffold)
+  Widget _buildLoadingWidget() {
     final l10n = AppLocalizations.of(context)!;
-
-    return Scaffold(
-      backgroundColor: AppTheme.creamWhite,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off_rounded, size: 10.w, color: Colors.grey[400]),
-            SizedBox(height: 2.h),
-            Text(
-              l10n.noCustomersFound,
-              style: TextStyle(
-                fontSize: 4.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 5.h),
+          CircularProgressIndicator(
+            color: AppTheme.primaryMaroon,
+            strokeWidth: 2.w,
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            l10n.loadingCustomers,
+            style: TextStyle(
+              fontSize: 4.sp,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoalGray,
             ),
-            SizedBox(height: 1.h),
-            Text(
-              l10n.adjustFilters,
-              style: TextStyle(
-                fontSize: 3.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNormalContent(CustomerProvider provider) {
-    return RefreshIndicator(
-      onRefresh: _handleRefresh,
-      color: AppTheme.primaryMaroon,
-      child: Padding(
-        padding: EdgeInsets.all(context.mainPadding / 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-
-            SizedBox(height: context.mainPadding),
-
-            context.statsCardColumns == 2
-                ? _buildMobileStatsGrid(provider)
-                : _buildDesktopStatsRow(provider),
-
-            SizedBox(height: context.cardPadding * 0.5),
-
-            _buildSearchSection(provider),
-
-            SizedBox(height: context.cardPadding * 0.5),
-
-            _buildActiveFilters(provider),
-
-            Expanded(
-              child: EnhancedCustomerTable(
-                onEdit: _showEditCustomerDialog,
-                onDelete: _showDeleteCustomerDialog,
-                onView: _showViewCustomerDialog,
-              ),
-            ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/receipt_provider.dart';
+import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
-import 'create_receipt_dialog.dart';
+import '../../../src/services/receipt_service.dart';
+import 'create_simple_receipt_dialog.dart';
+import 'view_receipt_dialog.dart';
 import 'edit_receipt_dialog.dart';
 
 class ReceiptManagementWidget extends StatefulWidget {
@@ -21,7 +24,9 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Load both receipts and sales
       context.read<ReceiptProvider>().initialize();
+      context.read<SalesProvider>().loadAllSales();
     });
   }
 
@@ -46,7 +51,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateReceiptDialog(context),
+        onPressed: () => _showCreateSimpleReceiptDialog(context),
         tooltip: l10n.createReceipt,
         child: const Icon(Icons.add),
       ),
@@ -74,7 +79,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       labelText: l10n.search,
-                      hintText: l10n.searchByReceiptCustomerPayment,
+                      hintText: 'Search by invoice number or customer...',
                       prefixIcon: const Icon(Icons.search),
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -138,23 +143,23 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   Widget _buildReceiptsList() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Consumer<ReceiptProvider>(
-      builder: (context, provider, child) {
-        if (provider.isLoading) {
+    return Consumer2<SalesProvider, ReceiptProvider>(
+      builder: (context, salesProvider, receiptProvider, child) {
+        if (salesProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (provider.error != null) {
+        if (salesProvider.errorMessage != null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
-                Text(l10n.error(provider.error!)),
+                Text(l10n.error(salesProvider.errorMessage!)),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => provider.refresh(),
+                  onPressed: () => salesProvider.loadSales(refresh: true),
                   child: Text(l10n.retry),
                 ),
               ],
@@ -162,35 +167,214 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           );
         }
 
-        final receipts = provider.filteredReceipts;
+        // Filter sales based on search
+        List<SaleModel> filteredSales = salesProvider.sales.where((sale) {
+          if (_searchController.text.isNotEmpty) {
+            final searchLower = _searchController.text.toLowerCase();
+            return sale.invoiceNumber.toLowerCase().contains(searchLower) ||
+                   sale.customerName.toLowerCase().contains(searchLower);
+          }
+          return true;
+        }).toList();
 
-        if (receipts.isEmpty) {
+        if (filteredSales.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.receipt, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text(l10n.noReceiptsFound, style: Theme.of(context).textTheme.titleMedium),
+                Text('No Sales Found', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                Text(l10n.createNewReceiptUsingButton, style: Theme.of(context).textTheme.bodyMedium),
+                Text('No sales found in the system', style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           );
         }
 
         return RefreshIndicator(
-          onRefresh: () => provider.refresh(),
+          onRefresh: () => salesProvider.loadSales(refresh: true),
           child: ListView.builder(
             padding: const EdgeInsets.only(bottom: 80),
-            itemCount: receipts.length,
+            itemCount: filteredSales.length,
             itemBuilder: (context, index) {
-              final receipt = receipts[index];
-              return _buildReceiptCard(receipt, provider);
+              final sale = filteredSales[index];
+              final hasReceipt = receiptProvider.receipts.any((receipt) => receipt.saleId == sale.id);
+              
+              return _buildSaleCard(sale, hasReceipt, receiptProvider);
             },
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSaleCard(SaleModel sale, bool hasReceipt, ReceiptProvider receiptProvider) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
+          backgroundColor: hasReceipt ? Colors.green : Colors.blue,
+          child: Icon(
+            hasReceipt ? Icons.receipt : Icons.receipt_long,
+            color: Colors.white,
+          ),
+        ),
+        title: Text(
+          sale.invoiceNumber,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(sale.customerName),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  '${l10n.date}: ${sale.dateOfSale.toString().split('T')[0]}',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  '${l10n.total}: PKR ${sale.grandTotal.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Status indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: hasReceipt ? Colors.green : Colors.orange,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                hasReceipt ? 'Receipt' : 'Invoice',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Actions
+            PopupMenuButton<String>(
+              onSelected: (value) => _handleSaleAction(value, sale, receiptProvider),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'view',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.visibility, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.view),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'print',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.print, size: 16),
+                      const SizedBox(width: 8),
+                      Text('Print'),
+                    ],
+                  ),
+                ),
+                if (!hasReceipt)
+                  PopupMenuItem(
+                    value: 'create_receipt',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.receipt_long, size: 16),
+                        const SizedBox(width: 8),
+                        Text(l10n.createReceipt),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleSaleAction(String action, SaleModel sale, ReceiptProvider receiptProvider) {
+    switch (action) {
+      case 'view':
+        _viewSaleReceipt(sale);
+        break;
+      case 'print':
+        _printSaleReceipt(sale);
+        break;
+      case 'create_receipt':
+        _createReceiptForSale(sale);
+        break;
+    }
+  }
+
+  void _viewSaleReceipt(SaleModel sale) {
+    // Show receipt details in a dialog
+    showDialog(
+      context: context,
+      builder: (context) => ViewReceiptDialog(sale: sale),
+    );
+  }
+
+  void _printSaleReceipt(SaleModel sale) async {
+    try {
+      // Show loading state
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Generating receipt for printing...')),
+        );
+      }
+
+      // Use SalesProvider to generate and print the receipt (same as ViewReceiptDialog)
+      final salesProvider = context.read<SalesProvider>();
+      final success = await salesProvider.generateReceiptPdf(sale.id);
+      
+      if (success) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Receipt sent to printer successfully!')),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to print receipt')),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error printing receipt: $e')),
+        );
+      }
+    }
+  }
+
+  void _createReceiptForSale(SaleModel sale) {
+    // Show create receipt dialog with pre-selected sale
+    showDialog(
+      context: context,
+      builder: (context) => CreateSimpleReceiptDialog(
+        initialSaleId: sale.id,
+        isViewOnly: false,
+      ),
     );
   }
 
@@ -263,6 +447,11 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         value: 'view',
         child: Row(children: [const Icon(Icons.visibility, color: Colors.blue), const SizedBox(width: 8), Text(l10n.view)]),
       ),
+      if (receipt.pdfFile != null)
+        PopupMenuItem(
+          value: 'download_pdf',
+          child: Row(children: [const Icon(Icons.picture_as_pdf, color: Colors.green), const SizedBox(width: 8), Text('Download PDF')]),
+        ),
       PopupMenuItem(
         value: 'edit',
         child: Row(children: [const Icon(Icons.edit, color: Colors.orange), const SizedBox(width: 8), Text(l10n.edit)]),
@@ -280,6 +469,9 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
       case 'view':
         _showReceiptDetails(receipt, provider);
         break;
+      case 'download_pdf':
+        _downloadReceiptPdf(receipt);
+        break;
       case 'edit':
         _showEditReceiptDialog(receipt, provider);
         break;
@@ -289,8 +481,55 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     }
   }
 
-  void _showCreateReceiptDialog(BuildContext context) {
-    showDialog(context: context, builder: (context) => const CreateReceiptDialog());
+  void _showCreateSimpleReceiptDialog(BuildContext context) {
+    showDialog(context: context, builder: (context) => const CreateSimpleReceiptDialog());
+  }
+
+  void _downloadReceiptPdf(ReceiptModel receipt) {
+    if (receipt.pdfFile != null) {
+      // Show dialog with PDF URL
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: Icon(Icons.picture_as_pdf, color: Colors.green, size: 48),
+          title: const Text('Receipt PDF'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('PDF generated successfully!'),
+              const SizedBox(height: 8),
+              Text('Available at:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                receipt.pdfFile!,
+                style: TextStyle(fontSize: 12, color: Colors.blue),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: Icon(Icons.info_outline, color: Colors.orange, size: 48),
+          title: const Text('PDF Not Available'),
+          content: const Text('PDF not available for this receipt. Please generate the PDF first.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _showReceiptDetails(ReceiptModel receipt, ReceiptProvider provider) {
@@ -369,15 +608,27 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
               Navigator.of(context).pop();
               final success = await provider.deleteReceipt(receipt.id);
               if (success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.receiptDeletedSuccessfully),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                _showSuccessDialog(l10n.receiptDeletedSuccessfully);
               }
             },
             child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(Icons.check_circle, color: Colors.green, size: 48),
+        title: const Text('Success'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
           ),
         ],
       ),

@@ -320,6 +320,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'fabric',
             'pieces',  # Added
             'quantity',
+            'barcode',  # Added barcode field
+            'sku',      # Added SKU field
             'category_name',
             'stock_status',
             'stock_status_display',
@@ -359,6 +361,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'fabric',
             'pieces',
             'quantity',
+            'barcode',  # Added barcode field
+            'sku',      # Added SKU field
             'category',
             'stock_status',
             'stock_status_display',

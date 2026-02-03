@@ -86,12 +86,12 @@ def customer_ledger(request, customer_id):
                 'reference_number': sale.invoice_number,
                 'reference_id': str(sale.id),
                 'source_module': 'SALES',
-                'payment_status': sale.payment_status,
+                'payment_status': 'PAID' if sale.is_fully_paid else 'PENDING',
                 'details': {
                     'invoice_number': sale.invoice_number,
-                    'total_amount': float(sale.total_amount),
+                    'total_amount': float(sale.grand_total),
                     'tax_amount': float(sale.tax_amount),
-                    'discount': float(sale.discount),
+                    'discount': float(sale.overall_discount),
                     'grand_total': float(sale.grand_total),
                     'items_count': sale.sale_items.count() if hasattr(sale, 'sale_items') else 0
                 }

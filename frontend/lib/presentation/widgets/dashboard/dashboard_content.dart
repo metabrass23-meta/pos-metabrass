@@ -31,7 +31,7 @@ import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
 
 // Dashboard Widgets
-// import 'quick_actions_card.dart'; // REMOVED: 4 colored boxes
+import 'sales_overview_chart.dart';
 import 'recent_orders_card.dart';
 import 'sales_chart_card.dart';
 import 'stats_card.dart';
@@ -49,44 +49,40 @@ class DashboardContent extends StatelessWidget {
       case 1:
         return const SalesPage();
       case 2:
-        return const OrderPage();
-      case 3:
         return const PurchasesScreen();
-      case 4:
+      case 3:
         return const ProductPage();
-      case 5:
+      case 4:
         return const CategoryPage();
-      case 6:
+      case 5:
         return const CustomerPage();
-      case 7:
+      case 6:
         return const VendorPage();
-      case 8:
+      case 7:
         return const LaborPage();
-      case 9:
+      case 8:
         return const ReceivablesPage();
-      case 10:
+      case 9:
         return const PayablesPage();
-      case 11:
+      case 10:
         return const AdvancePaymentPage();
-      case 12:
+      case 11:
         return const PaymentPage();
-      case 13:
+      case 12:
         return const ExpensesPage();
-      case 14:
+      case 13:
         return const PrincipalAccountPage();
-      case 15:
+      case 14:
         return const ZakatPage();
-      case 16:
+      case 15:
         return const ProfitLossPage();
-      case 17:
-        return const TaxManagementScreen();
-      case 18:
+      case 16:
         return const ReturnManagementScreen();
-      case 19:
+      case 17:
         return const InvoiceManagementScreen();
-      case 20:
+      case 18:
         return const ReceiptManagementScreen();
-      case 21:
+      case 19:
         return const SettingsScreen();
       default:
         return _buildPlaceholderContent(context);
@@ -164,12 +160,23 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: AppLocalizations.of(context)!.totalOrders,
-                            value: stats['totalOrders']['value'],
-                            change: stats['totalOrders']['change'],
-                            isPositive: stats['totalOrders']['isPositive'],
-                            icon: Icons.shopping_bag_rounded,
-                            color: Colors.blue,
+                            title: AppLocalizations.of(context)!.totalIncome,
+                            value: stats['totalIncome']['value'],
+                            change: stats['totalIncome']['change'],
+                            isPositive: stats['totalIncome']['isPositive'],
+                            icon: Icons.attach_money_rounded,
+                            color: Colors.green,
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: StatsCard(
+                            title: AppLocalizations.of(context)!.totalExpenses,
+                            value: stats['totalExpenses']['value'],
+                            change: stats['totalExpenses']['change'],
+                            isPositive: stats['totalExpenses']['isPositive'],
+                            icon: Icons.money_off_rounded,
+                            color: Colors.red,
                           ),
                         ),
                         SizedBox(
@@ -194,17 +201,6 @@ class DashboardContent extends StatelessWidget {
                             color: Colors.teal,
                           ),
                         ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: StatsCard(
-                            title: AppLocalizations.of(context)!.pendingOrders,
-                            value: stats['pendingOrders']?['value'] ?? '0',
-                            change: stats['pendingOrders']?['change'] ?? '0',
-                            isPositive: stats['pendingOrders']?['isPositive'] ?? false,
-                            icon: Icons.pending_actions_rounded,
-                            color: Colors.orange,
-                          ),
-                        ),
                       ],
                     );
                   },
@@ -212,52 +208,43 @@ class DashboardContent extends StatelessWidget {
 
                 SizedBox(height: context.formFieldSpacing * 3),
 
-                // --- Main Content Row (Charts & Recent Orders) ---
-                // Removed QuickActionsCard (the 4 colored boxes)
+                // --- Main Content Row (Charts & Analytics) ---
                 LayoutBuilder(
                   builder: (context, constraints) {
                     // Responsive layout
-                    if (constraints.maxWidth < 900) {
+                    if (constraints.maxWidth < 1200) {
                       return Column(
                         children: [
-                          // Sales Chart (Restored)
-                          // const SizedBox(
-                          //   height: 400,
-                          //   child: SalesChartCard(),
-                          // ),
-
-                          SizedBox(height: context.formFieldSpacing * 2),
-
-                          // // Recent Orders (Restored)
-                          // const RecentOrdersCard(),
+                          // Top Row - Charts
+                          Row(
+                            children: [
+                              // Sales Overview Chart
+                              Expanded(
+                                child: SalesOverviewChart(
+                                  analytics: provider.analytics?.toJson() ?? {},
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       );
                     }
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // Desktop Layout
+                    return Column(
                       children: [
-                        // Left Column (Sales Chart Only)
-                        Expanded(
-                          flex: context.tableColumnFlexes[0],
-                          child: Column(
-                            children: [
-                              // Sales Chart (Restored)
-                              // SizedBox(
-                              //   height: context.chartHeight,
-                              //   child: const SalesChartCard(),
-                              // ),
-                            ],
-                          ),
+                        // Top Row - Charts
+                        Row(
+                          children: [
+                            // Sales Overview Chart
+                            Expanded(
+                              flex: 2,
+                              child: SalesOverviewChart(
+                                analytics: provider.analytics?.toJson() ?? {},
+                              ),
+                            ),
+                          ],
                         ),
-
-                        SizedBox(width: context.cardPadding),
-
-                        // Right Column (Recent Orders Restored)
-                        // Expanded(
-                        //   flex: context.tableColumnFlexes[1],
-                        //   child: const RecentOrdersCard(),
-                        // ),
                       ],
                     );
                   },

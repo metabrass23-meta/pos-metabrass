@@ -111,7 +111,9 @@ class PaymentService {
       DebugHelper.printApiResponse('GET Payments', response.data);
 
       if (response.statusCode == 200) {
+        debugPrint('🌐 API Response [GET Payments]: ${response.data}');
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
+        debugPrint('📊 Parsed ${paymentsResponse.payments.length} payments');
 
         final apiResponse = ApiResponse<PaymentListResponse>(success: true, message: 'Payments loaded successfully', data: paymentsResponse);
 

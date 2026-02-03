@@ -11,6 +11,7 @@ import '../../widgets/prinicipal acc/delete_principal_acc_dialog.dart';
 import '../../widgets/prinicipal acc/edit_principal_acc_dialog.dart';
 import '../../widgets/prinicipal acc/principal_acc_table.dart';
 import '../../widgets/prinicipal acc/view_principal_acc_dialog.dart';
+import '../../widgets/principal_acc/principal_account_filter_dialog.dart';
 
 class PrincipalAccountPage extends StatefulWidget {
   const PrincipalAccountPage({super.key});
@@ -21,6 +22,9 @@ class PrincipalAccountPage extends StatefulWidget {
 
 class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
   final TextEditingController _searchController = TextEditingController();
+  
+  // Local state for the current filter
+  PrincipalAccountFilter _activeFilter = PrincipalAccountFilter();
 
   @override
   void dispose() {
@@ -30,6 +34,22 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
 
   void _showAddPrincipalAccountDialog() {
     showDialog(context: context, barrierDismissible: false, builder: (context) => const AddPrincipalAccountDialog());
+  }
+
+  /// Opens the filter dialog and updates the local filter state
+  void _showFilterDialog() async {
+    final result = await showDialog<PrincipalAccountFilter>(
+      context: context,
+      builder: (context) => PrincipalAccountFilterDialog(initialFilter: _activeFilter),
+    );
+
+    if (result != null) {
+      setState(() {
+        _activeFilter = result;
+      });
+      // You can add logic here to trigger a filtered fetch from the provider
+      // context.read<PrincipalAccountProvider>().fetchPrincipalAccounts(filter: _activeFilter);
+    }
   }
 
   void _showEditPrincipalAccountDialog(PrincipalAccount account) {
@@ -64,36 +84,45 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: Padding(
-        padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-            SizedBox(height: context.mainPadding),
-            Consumer<PrincipalAccountProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
-              },
-            ),
-            SizedBox(height: context.cardPadding * 0.5),
-            _buildSearchSection(),
-            SizedBox(height: context.cardPadding * 0.5),
-            Expanded(
-              child: PrincipalAccountTable(
-                onEdit: _showEditPrincipalAccountDialog,
-                onDelete: _showDeletePrincipalAccountDialog,
-                onView: _showViewPrincipalAccountDialog,
+      body: SingleChildScrollView( // Make entire screen scrollable
+        child: Padding(
+          padding: EdgeInsets.all(context.mainPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // Use minimum size
+            children: [
+              ResponsiveBreakpoints.responsive(
+                context,
+                tablet: _buildTabletHeader(),
+                small: _buildMobileHeader(),
+                medium: _buildDesktopHeader(),
+                large: _buildDesktopHeader(),
+                ultrawide: _buildDesktopHeader(),
               ),
-            ),
-          ],
+              SizedBox(height: context.mainPadding),
+              Consumer<PrincipalAccountProvider>(
+                builder: (context, provider, child) {
+                  return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
+                },
+              ),
+              SizedBox(height: context.cardPadding * 0.5),
+              _buildSearchSection(),
+              SizedBox(height: context.cardPadding * 0.5),
+              // Remove Expanded and add height constraint to table
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6, // Max 60% of screen height
+                ),
+                child: PrincipalAccountTable(
+                  onEdit: _showEditPrincipalAccountDialog,
+                  onDelete: _showDeletePrincipalAccountDialog,
+                  onView: _showViewPrincipalAccountDialog,
+                ),
+              ),
+              // Add bottom padding for scroll space
+              SizedBox(height: context.mainPadding),
+            ],
+          ),
         ),
       ),
     );
@@ -384,8 +413,6 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         Expanded(flex: 3, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
         Expanded(flex: 1, child: _buildFilterButton()),
-        SizedBox(width: context.smallPadding),
-        Expanded(flex: 1, child: _buildExportButton()),
       ],
     );
   }
@@ -398,8 +425,6 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -414,8 +439,6 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -458,26 +481,30 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
   Widget _buildFilterButton() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.lightGray,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.filter_list_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              l10n.filter,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
-            ),
+    return InkWell(
+      onTap: _showFilterDialog,
+      borderRadius: BorderRadius.circular(context.borderRadius()),
+      child: Container(
+        height: context.buttonHeight / 1.5,
+        padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
+        decoration: BoxDecoration(
+          color: AppTheme.lightGray,
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.filter_list_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+            if (!context.isTablet) ...[
+              SizedBox(width: context.smallPadding),
+              Text(
+                l10n.filter,
+                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -523,7 +550,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -536,11 +563,11 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -550,7 +577,7 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
                 ),
                 Text(
                   title,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

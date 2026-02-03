@@ -462,7 +462,7 @@ class _ViewVendorDetailsDialogState extends State<ViewVendorDetailsDialog>
         children: [
           _buildInfoRow(l10n.phone, widget.vendor.formattedPhone, Icons.phone),
           SizedBox(height: context.smallPadding),
-          _buildInfoRow(l10n.cnic, widget.vendor.cnic, Icons.credit_card),
+          _buildInfoRow(l10n.cnic, widget.vendor.cnic ?? 'N/A', Icons.credit_card),
         ],
       ),
     );

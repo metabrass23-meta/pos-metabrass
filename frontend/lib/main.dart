@@ -26,6 +26,7 @@ import 'package:frontend/src/providers/receivables_provider.dart';
 import 'package:frontend/src/providers/sales_provider.dart';
 import 'package:frontend/src/providers/tax_rates_provider.dart';
 import 'package:frontend/src/providers/vendor_ledger_provider.dart';
+import 'package:frontend/src/providers/customer_ledger_provider.dart';
 import 'package:frontend/src/providers/vendor_provider.dart';
 import 'package:frontend/src/providers/zakat_provider.dart';
 import 'package:frontend/src/providers/return_provider.dart';
@@ -46,23 +47,23 @@ void main() async {
   await StorageService().init();
   ApiClient().init();
 
-  runApp(const AlNoorFabricApp());
+  runApp(const AlNoorApp());
 
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
       appWindow
-        ..minSize = const Size(1400, 770)
+        ..minSize = const Size(1200, 700)  // Reduced from 1400x770 to support 1366x768 screens
         ..maxSize = const Size(1920, 1080)
-        ..size = const Size(1400, 770)
+        ..size = const Size(1366, 768)     // Default size for HP EliteBook compatibility
         ..alignment = Alignment.center
-        ..title = "Al Noor Fashion"
+        ..title = "Al Noor"
         ..show();
     });
   }
 }
 
-class AlNoorFabricApp extends StatelessWidget {
-  const AlNoorFabricApp({super.key});
+class AlNoorApp extends StatelessWidget {
+  const AlNoorApp({super.key});
 
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -88,6 +89,7 @@ class AlNoorFabricApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PayablesProvider()),
         ChangeNotifierProvider(create: (_) => ExpensesProvider()),
         ChangeNotifierProvider(create: (_) => VendorLedgerProvider()),
+        ChangeNotifierProvider(create: (_) => CustomerLedgerProvider()),
         ChangeNotifierProvider(create: (_) => ZakatProvider()),
         ChangeNotifierProvider(create: (_) => PurchaseProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
@@ -124,7 +126,7 @@ class AlNoorFabricApp extends StatelessWidget {
           return Sizer(
             builder: (context, orientation, deviceType) {
               return MaterialApp(
-                title: 'Al Noor Fashion - Premium POS',
+                title: 'Al Noor - Premium POS',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,

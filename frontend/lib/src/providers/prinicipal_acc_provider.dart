@@ -46,7 +46,7 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   final List<String> _availableTransactionTypes = ['CREDIT', 'DEBIT'];
 
-  final List<String> _availableHandlers = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
+  final List<String> _availableHandlers = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
 
   List<String> get availableSourceModules => _availableSourceModules;
   List<String> get availableTransactionTypes => _availableTransactionTypes;

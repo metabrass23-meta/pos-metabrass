@@ -12,8 +12,9 @@ import '../globals/text_field.dart';
 
 class EnhancedAddToCartDialog extends StatefulWidget {
   final ProductModel product;
+  final VoidCallback? onItemAdded;
 
-  const EnhancedAddToCartDialog({super.key, required this.product});
+  const EnhancedAddToCartDialog({super.key, required this.product, this.onItemAdded});
 
   @override
   State<EnhancedAddToCartDialog> createState() => _EnhancedAddToCartDialogState();
@@ -59,14 +60,27 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
   }
 
   void _handleAddToCart() {
+    print('🔍 Add to cart button tapped');
+    print('🔍 Product: ${widget.product.name}');
+    print('🔍 Current price: $_currentPrice');
+    print('🔍 Quantity: $_quantity');
+    print('🔍 Item discount: $_itemDiscount');
+    print('🔍 Line total: $_lineTotal');
+    print('🔍 Notes: ${_notesController.text}');
+    
     if (_formKey.currentState?.validate() ?? false) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
+      print('🔍 Form validated, getting provider...');
 
       final customPrice = _isCustomPrice ? double.tryParse(_customPriceController.text) ?? widget.product.price : widget.product.price;
-      final notes = _hasNotes && _notesController.text.isNotEmpty ? _notesController.text : null;
+      final notes = _hasNotes ? _notesController.text : null;
+      
+      print('🔍 Custom price: $customPrice');
+      print('🔍 Notes: $notes');
 
       final productToAdd = _isCustomPrice ? widget.product.copyWith(price: customPrice) : widget.product;
 
+      print('🔍 Calling provider.addToCartWithCustomization...');
       provider.addToCartWithCustomization(
         productId: productToAdd.id,
         productName: productToAdd.name,
@@ -75,8 +89,18 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
         itemDiscount: _itemDiscount,
         customizationNotes: notes,
       );
-
-      _handleSuccess();
+      
+      print('✅ Add to cart completed');
+      
+      if (widget.onItemAdded != null) {
+        print('🔍 Calling onItemAdded callback...');
+        widget.onItemAdded!();
+      }
+      
+      Navigator.of(context).pop();
+      print('🔍 Dialog closed');
+    } else {
+      print('❌ Form validation failed');
     }
   }
 
@@ -85,24 +109,9 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
 
     _animationController.reverse().then((_) {
       Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite),
-              SizedBox(width: context.smallPadding),
-              Expanded(
-                child: Text('${widget.product.name} ${l10n.addedToCart}', style: TextStyle(color: AppTheme.pureWhite)),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
-        ),
-      );
+      // Call the callback if provided (for checkout button functionality)
+      widget.onItemAdded?.call();
+      // Snackbar removed - no longer shows "added to cart" confirmation
     });
   }
 
@@ -525,8 +534,24 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
+                        print('🔍 Item discount button tapped');
+                        print('🔍 Percentage: $percentage%');
+                        print('🔍 Current price: $_currentPrice');
+                        print('🔍 Quantity: $_quantity');
+                        print('🔍 Calculated discount amount: $discountAmount');
+                        
                         setState(() {
-                          _itemDiscount = discountAmount;
+                          // Ensure discount doesn't exceed the total price
+                          final maxDiscount = _currentPrice * _quantity;
+                          print('🔍 Maximum allowed discount: $maxDiscount');
+                          
+                          if (discountAmount <= maxDiscount) {
+                            _itemDiscount = discountAmount;
+                            print('✅ Set item discount to: $_itemDiscount');
+                          } else {
+                            _itemDiscount = maxDiscount;
+                            print('⚠️ Discount exceeded max, set to: $_itemDiscount');
+                          }
                         });
                       },
                       borderRadius: BorderRadius.circular(context.borderRadius('small')),

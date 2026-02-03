@@ -272,6 +272,16 @@ class ApiError {
     String type = 'unknown_error';
     String message = 'An unknown error occurred';
 
+    String? serverMessage;
+    final data = e.response?.data;
+    if (data is Map) {
+      final map = Map<String, dynamic>.from(data as Map);
+      final dynamic raw = map['message'] ?? map['detail'] ?? map['error'];
+      if (raw is String && raw.trim().isNotEmpty) {
+        serverMessage = raw.trim();
+      }
+    }
+
     if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout || e.type == DioExceptionType.sendTimeout) {
       type = 'timeout_error';
       message = 'Request timed out. Please try again.';
@@ -282,7 +292,7 @@ class ApiError {
       final statusCode = e.response!.statusCode;
       if (statusCode == 400) {
         type = 'bad_request';
-        message = 'Invalid request. Please check your input.';
+        message = serverMessage ?? 'Invalid request. Please check your input.';
       } else if (statusCode == 401) {
         type = 'unauthorized';
         message = 'Unauthorized access. Please log in again.';
@@ -291,13 +301,13 @@ class ApiError {
         message = 'Access forbidden. You don\'t have permission for this action.';
       } else if (statusCode == 404) {
         type = 'not_found';
-        message = 'Resource not found.';
+        message = serverMessage ?? 'Resource not found.';
       } else if (statusCode == 500) {
         type = 'server_error';
-        message = 'Server error. Please try again later.';
+        message = serverMessage ?? 'Server error. Please try again later.';
       } else {
         type = 'http_error';
-        message = 'HTTP error $statusCode. Please try again.';
+        message = serverMessage ?? 'HTTP error $statusCode. Please try again.';
       }
     }
 

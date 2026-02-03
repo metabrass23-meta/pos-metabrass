@@ -126,6 +126,8 @@ class ApiConfig {
   static String deleteInvoice(String id) => '/sales/invoices/$id/delete/';
   static String generateInvoicePdf(String id) =>
       '/sales/invoices/$id/generate-pdf/';
+  static String generateInvoiceThermalPrint(String id) =>
+      '/sales/invoices/$id/thermal-print/';
 
   // Receipt Management API endpoints
   static const String receipts = '/sales/receipts/';
@@ -495,6 +497,7 @@ class ApiConfig {
   static String deletePrincipalAccount(String id) => '/principal-account/$id/';
 
   static String vendorLedger(String id) => '$baseUrl/vendors/$id/ledger/';
+  static String customerLedger(String id) => '$baseUrl/customers/$id/ledger/';
 
   static const String principalAccountBalance = '/principal-account/balance/';
   static const String principalAccountStatistics =

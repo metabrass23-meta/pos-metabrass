@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/models/purchase_model.dart';
+import '../../../src/providers/vendor_provider.dart';
+import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
-import '../globals/text_button.dart'; // Import for PremiumButton
+import '../globals/text_button.dart';
 import 'purchase_table_helpers.dart';
 
 class ViewPurchaseDetailsDialog extends StatelessWidget {
@@ -13,8 +16,62 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
 
   const ViewPurchaseDetailsDialog({super.key, required this.purchase});
 
+  /// Helper to robustly get the Vendor Name with Localization
+  String _getVendorName(BuildContext context, AppLocalizations l10n) {
+    // 1. Try direct name field (from model)
+    if (purchase.vendorName != null && purchase.vendorName!.isNotEmpty) {
+      return purchase.vendorName!;
+    }
+
+    // 2. Try nested object
+    if (purchase.vendorDetail?.name != null) {
+      return purchase.vendorDetail!.name;
+    }
+
+    // 3. Last resort: Lookup in Provider using ID
+    if (purchase.vendor != null) {
+      try {
+        final vendorProvider = context.read<VendorProvider>();
+        final foundVendor = vendorProvider.vendors.firstWhere(
+              (v) => v.id == purchase.vendor,
+        );
+        // If found, return its name
+        return foundVendor.name;
+      } catch (e) {
+        // Not found in the list (e.g. pagination or not loaded)
+      }
+    }
+
+    return l10n.unknownVendor ?? "Unknown Vendor";
+  }
+
+  /// Helper to get Product Name robustly with Localization
+  String _getProductName(BuildContext context, PurchaseItemModel item, AppLocalizations l10n) {
+    // 1. Try nested detail
+    if (item.productDetail?.name != null) {
+      return item.productDetail!.name;
+    }
+
+    // 2. Try Lookup in Provider
+    if (item.product != null) {
+      try {
+        final productProvider = context.read<ProductProvider>();
+        final foundProduct = productProvider.products.firstWhere(
+              (p) => p.id == item.product,
+        );
+        return foundProduct.name;
+      } catch (e) {
+        // Not found
+      }
+    }
+
+    // 3. Fallback to ID or generic text
+    return item.product ?? (l10n.unknownProduct ?? "Unknown Product");
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Ensure l10n is not null
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
@@ -80,7 +137,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Purchase Details",
+                l10n.purchaseDetails ?? "Purchase Details",
                 style: TextStyle(
                   fontSize: context.headerFontSize,
                   fontWeight: FontWeight.bold,
@@ -88,7 +145,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
                 ),
               ),
               Text(
-                "Invoice: ${purchase.invoiceNumber}",
+                "${l10n.invoiceNumber ?? 'Invoice'}: ${purchase.invoiceNumber}",
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],
@@ -116,12 +173,17 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _infoColumn(l10n.vendor, purchase.vendorDetail?.name ?? "N/A"),
-          _infoColumn(l10n.date, PurchaseTableHelpers.formatDate(purchase.purchaseDate)),
+          // Vendor Name (Safe Lookup)
+          _infoColumn(l10n.vendor ?? "Vendor", _getVendorName(context, l10n)),
+
+          // Date
+          _infoColumn(l10n.date ?? "Date", PurchaseTableHelpers.formatDate(purchase.purchaseDate)),
+
+          // Status
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text("Status", style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)),
+              Text(l10n.status ?? "Status", style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)),
               SizedBox(height: context.smallPadding / 4),
               PurchaseTableHelpers.buildStatusBadge(context, purchase.status),
             ],
@@ -137,7 +199,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       children: [
         Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500], fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text(value, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        Text(value, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.charcoalGray)),
       ],
     );
   }
@@ -149,60 +211,77 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(vertical: context.smallPadding),
           child: Text(
-            "Purchased Items",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            l10n.purchasedItems ?? "Purchased Items",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
         ),
-        Table(
-          columnWidths: const {
-            0: FlexColumnWidth(3),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(1.5),
-            3: FlexColumnWidth(1.5),
-          },
-          border: TableBorder(
-            horizontalInside: BorderSide(color: Colors.grey.shade100, width: 1),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade200),
+            borderRadius: BorderRadius.circular(8),
           ),
-          children: [
-            TableRow(
-              decoration: BoxDecoration(color: AppTheme.primaryMaroon.withOpacity(0.05)),
-              children: [
-                _tableHeader("Item"),
-                _tableHeader("Qty"),
-                _tableHeader("Cost"),
-                _tableHeader("Total"),
-              ],
-            ),
-            ...purchase.items.map((item) => TableRow(
-              children: [
-                _tableCell(item.productDetail?.name ?? "Unknown Product"),
-                _tableCell(item.quantity.toStringAsFixed(0)),
-                _tableCell(item.unitCost.toStringAsFixed(2)),
-                _tableCell(item.totalPrice.toStringAsFixed(2), isBold: true),
-              ],
-            )),
-          ],
+          child: Table(
+            columnWidths: const {
+              0: FlexColumnWidth(3),
+              1: FlexColumnWidth(1),
+              2: FlexColumnWidth(1.5),
+              3: FlexColumnWidth(1.5),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: [
+              TableRow(
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.05),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                ),
+                children: [
+                  _tableHeader(l10n.product),
+                  _tableHeader(l10n.quantity, align: TextAlign.center),
+                  _tableHeader(l10n.unitCost, align: TextAlign.right),
+                  _tableHeader(l10n.total, align: TextAlign.right),
+                ],
+              ),
+              ...purchase.items.map((item) => TableRow(
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                ),
+                children: [
+                  // Product Name (Safe Lookup)
+                  _tableCell(_getProductName(context, item, l10n)),
+                  _tableCell(item.quantity.toStringAsFixed(0), align: TextAlign.center),
+                  _tableCell(item.unitCost.toStringAsFixed(2), align: TextAlign.right),
+                  _tableCell(item.totalPrice.toStringAsFixed(2), isBold: true, align: TextAlign.right),
+                ],
+              )),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _tableHeader(String text) {
+  Widget _tableHeader(String text, {TextAlign align = TextAlign.left}) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+      child: Text(
+        text.toUpperCase(),
+        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey),
+        textAlign: align,
+      ),
     );
   }
 
-  Widget _tableCell(String text, {bool isBold = false}) {
+  Widget _tableCell(String text, {bool isBold = false, TextAlign align = TextAlign.left}) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          color: isBold ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
         ),
+        textAlign: align,
       ),
     );
   }
@@ -210,11 +289,14 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
   Widget _buildTotalsSection(BuildContext context, AppLocalizations l10n) {
     return Column(
       children: [
-        _totalRow("Subtotal", purchase.subtotal),
+        _totalRow(l10n.subtotal ?? "Subtotal", purchase.subtotal),
         SizedBox(height: context.smallPadding / 2),
-        _totalRow("Tax", purchase.tax),
-        const Divider(height: 24),
-        _totalRow("Grand Total", purchase.total, isMain: true),
+        _totalRow(l10n.taxAdjustment ?? "Tax", purchase.tax),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Divider(height: 1),
+        ),
+        _totalRow(l10n.grandTotal ?? "Grand Total", purchase.total, isMain: true),
       ],
     );
   }
@@ -227,7 +309,8 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
           label,
           style: TextStyle(
             fontWeight: isMain ? FontWeight.bold : FontWeight.normal,
-            fontSize: isMain ? 18 : 14,
+            fontSize: isMain ? 16 : 14,
+            color: isMain ? AppTheme.charcoalGray : Colors.grey[600],
           ),
         ),
         Text(
@@ -235,7 +318,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isMain ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
-            fontSize: isMain ? 20 : 14,
+            fontSize: isMain ? 18 : 14,
           ),
         ),
       ],
@@ -247,20 +330,20 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         PremiumButton(
-          text: "Print Invoice",
+          text: l10n.printInvoice ?? "Print Invoice",
           onPressed: () {
             // Print logic implementation
           },
           icon: Icons.print_rounded,
           isOutlined: true,
-          width: 200,
+          width: 160,
           height: 45,
         ),
         SizedBox(width: context.mainPadding),
         PremiumButton(
-          text: l10n.cancel,
+          text: l10n.close ?? "Close",
           onPressed: () => Navigator.pop(context),
-          width: 150,
+          width: 120,
           height: 45,
           backgroundColor: AppTheme.primaryMaroon,
         ),

@@ -631,7 +631,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
                 child: Text(
                   value ? l10n.active : l10n.inactive,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
                     fontWeight: FontWeight.w600,
                     color: value ? Colors.green[700] : Colors.red[700],
                   ),

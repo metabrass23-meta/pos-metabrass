@@ -130,21 +130,53 @@ class PaymentModel {
       laborName: json['labor_name'] as String?,
       laborPhone: json['labor_phone'] as String?,
       laborRole: json['labor_role'] as String?,
-      amountPaid: (json['amount_paid'] as num).toDouble(),
-      bonus: (json['bonus'] as num?)?.toDouble() ?? 0.0,
-      deduction: (json['deduction'] as num?)?.toDouble() ?? 0.0,
+      amountPaid: json['amount_paid'] is String ? double.parse(json['amount_paid'] as String) : (json['amount_paid'] as num?)?.toDouble() ?? 0.0,
+      bonus: json['bonus'] is String ? double.parse(json['bonus'] as String) : (json['bonus'] as num?)?.toDouble() ?? 0.0,
+      deduction: json['deduction'] is String ? double.parse(json['deduction'] as String) : (json['deduction'] as num?)?.toDouble() ?? 0.0,
       paymentMonth: DateTime.parse(json['payment_month'] as String),
       isFinalPayment: json['is_final_payment'] as bool? ?? false,
-      paymentMethod: json['payment_method'] as String,
+      paymentMethod: json['payment_method'] as String? ?? 'CASH',
       description: json['description'] as String?,
       date: DateTime.parse(json['date'] as String),
-      time: DateTime.parse(json['time'] as String),
+      time: _parseTime(json['time'] as String? ?? '00:00:00'),
       receiptImagePath: json['receipt_image_path'] as String?,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['created_at'] as String),
       createdBy: json['created_by'] as String?,
     );
+  }
+
+  // Helper method to parse time in different formats
+  static DateTime _parseTime(String? timeString) {
+    if (timeString == null || timeString.isEmpty) {
+      return DateTime.now();
+    }
+    
+    try {
+      // Try parsing as full ISO datetime first (for backward compatibility)
+      if (timeString.contains('T') || timeString.contains('-')) {
+        return DateTime.parse(timeString);
+      }
+      
+      // Parse as time-only format (HH:mm:ss)
+      final parts = timeString.split(':');
+      if (parts.length >= 2) {
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        final second = parts.length > 2 ? int.parse(parts[2]) : 0;
+        
+        // Create DateTime with today's date and the parsed time
+        final now = DateTime.now();
+        return DateTime(now.year, now.month, now.day, hour, minute, second);
+      }
+      
+      // Fallback to current time if parsing fails
+      return DateTime.now();
+    } catch (e) {
+      // Fallback to current time if any error occurs
+      return DateTime.now();
+    }
   }
 
   // Convert to JSON

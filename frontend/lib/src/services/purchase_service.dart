@@ -9,9 +9,7 @@ import 'api_client.dart';
 
 class PurchaseService {
   static final PurchaseService _instance = PurchaseService._internal();
-
   factory PurchaseService() => _instance;
-
   PurchaseService._internal();
 
   final ApiClient _apiClient = ApiClient();
@@ -19,35 +17,46 @@ class PurchaseService {
 
   Future<ApiResponse<List<PurchaseModel>>> getPurchases() async {
     try {
+      debugPrint('🚀 [PurchaseService] GET ${ApiConfig.purchases}');
       final response = await _apiClient.get(ApiConfig.purchases);
 
       DebugHelper.printApiResponse('GET Purchases', response.data);
 
       if (response.statusCode == 200) {
-        final responseData = response.data;
-        List<dynamic> recordsData;
+        final responseBody = response.data;
+        List<dynamic> listData = [];
 
-        if (responseData is Map && responseData.containsKey('results')) {
-          recordsData = responseData['results'] as List<dynamic>;
-        } else if (responseData is List) {
-          recordsData = responseData;
-        } else {
-          recordsData = [responseData];
+        // 1. Unwrap the "data" field if present
+        dynamic targetData = responseBody;
+        if (responseBody is Map<String, dynamic> && responseBody.containsKey('data')) {
+          targetData = responseBody['data'];
         }
 
-        final purchases = recordsData
-            .map((json) {
+        // 2. Determine if it's a List or a Map (Pagination)
+        if (targetData is List) {
+          listData = targetData;
+        } else if (targetData is Map<String, dynamic>) {
+          // Check for common list keys inside the data object
+          if (targetData.containsKey('purchases')) {
+            listData = targetData['purchases'];
+          } else if (targetData.containsKey('results')) {
+            listData = targetData['results'];
+          } else {
+            debugPrint('⚠️ [PurchaseService] Could not find list in data map keys: ${targetData.keys}');
+          }
+        }
+
+        // 3. Parse List
+        final purchases = listData.map((json) {
           try {
             return PurchaseModel.fromJson(json);
           } catch (e) {
             DebugHelper.printError('Error parsing purchase record', e);
             return null;
           }
-        })
-            .where((p) => p != null)
-            .cast<PurchaseModel>()
-            .toList();
+        }).whereType<PurchaseModel>().toList();
 
+        debugPrint('✅ [PurchaseService] Parsed ${purchases.length} purchases');
         await _cachePurchases(purchases);
 
         return ApiResponse<List<PurchaseModel>>(
@@ -101,8 +110,13 @@ class PurchaseService {
       DebugHelper.printApiResponse('POST Create Purchase', response.data);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final responseData = response.data as Map<String, dynamic>;
-        final newPurchase = PurchaseModel.fromJson(responseData);
+        // Unwrap data if wrapped
+        dynamic responseData = response.data;
+        if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+          responseData = responseData['data'];
+        }
+
+        final newPurchase = PurchaseModel.fromJson(responseData as Map<String, dynamic>);
 
         return ApiResponse<PurchaseModel>(
           success: true,
@@ -138,14 +152,18 @@ class PurchaseService {
     try {
       DebugHelper.printJson('Update Purchase Request', purchase.toJson());
 
-      // Uses ApiConfig helper to generate the detail URL (e.g., /purchases/123/)
       final response = await _apiClient.put(ApiConfig.getPurchaseById(id), data: purchase.toJson());
 
       DebugHelper.printApiResponse('PUT Update Purchase', response.data);
 
       if (response.statusCode == 200) {
-        final responseData = response.data as Map<String, dynamic>;
-        final updatedPurchase = PurchaseModel.fromJson(responseData);
+        // Unwrap data if wrapped
+        dynamic responseData = response.data;
+        if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+          responseData = responseData['data'];
+        }
+
+        final updatedPurchase = PurchaseModel.fromJson(responseData as Map<String, dynamic>);
 
         return ApiResponse<PurchaseModel>(
           success: true,

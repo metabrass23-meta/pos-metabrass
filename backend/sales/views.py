@@ -739,9 +739,9 @@ def create_invoice(request):
             with transaction.atomic():
                 invoice = serializer.save()
 
-                # Update sale status to INVOICED if it's not already
+                # Update sale status to INVOICED if it's not already invoiced
                 sale = invoice.sale
-                if sale.status == 'CONFIRMED':
+                if sale.status not in ['INVOICED', 'CANCELLED']:
                     sale.status = 'INVOICED'
                     sale.save(update_fields=['status', 'updated_at'])
 
@@ -915,7 +915,7 @@ def generate_invoice_pdf(request, invoice_id):
 
         # Company and customer info
         company_info = [
-            ['Company: Al Noor', f'Invoice Date: {invoice.issue_date.strftime("%B %d, %Y")}'],
+            ['Company: Al Noor Fabrics', f'Invoice Date: {invoice.issue_date.strftime("%B %d, %Y")}'],
             ['Address: Your Company Address', f'Due Date: {invoice.due_date.strftime("%B %d, %Y")}'],
             ['Phone: +92-XXX-XXXXXXX', f'Status: {invoice.status}'],
         ]
@@ -983,9 +983,9 @@ def generate_invoice_pdf(request, invoice_id):
         # Totals
         totals_data = [
             ['Subtotal:', f"PKR {invoice.sale.subtotal:.2f}" if invoice.sale else 'PKR 0.00'],
-            ['Tax:', f"PKR {invoice.sale.taxAmount:.2f}" if invoice.sale else 'PKR 0.00'],
-            ['Discount:', f"PKR {invoice.sale.discountAmount:.2f}" if invoice.sale else 'PKR 0.00'],
-            ['Total:', f"PKR {invoice.sale.grandTotal:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Tax:', f"PKR {invoice.sale.tax_amount:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Discount:', f"PKR {invoice.sale.overall_discount:.2f}" if invoice.sale else 'PKR 0.00'],
+            ['Total:', f"PKR {invoice.sale.grand_total:.2f}" if invoice.sale else 'PKR 0.00'],
         ]
 
         totals_table = Table(totals_data, colWidths=[1*inch, 1*inch])
@@ -1042,7 +1042,168 @@ def generate_invoice_pdf(request, invoice_id):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_invoice(request, invoice_id):
+    """Delete an invoice"""
+    try:
+        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        
+        # Soft delete by setting is_active to False
+        invoice.is_active = False
+        invoice.save(update_fields=['is_active', 'updated_at'])
+        
+        logger.info(f"Invoice {invoice.invoice_number} deleted by user {request.user}")
+        
+        return Response({
+            'success': True,
+            'message': 'Invoice deleted successfully'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Error deleting invoice {invoice_id}: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'Failed to delete invoice',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_invoice_thermal_print(request, invoice_id):
+    """Generate thermal print data for invoice"""
+    try:
+        from django.conf import settings
+        import json
+
+        invoice = get_object_or_404(Invoice, id=invoice_id, is_active=True)
+        
+        # Create thermal print data structure
+        thermal_data = {
+            'type': 'thermal_print',
+            'invoice': {
+                'invoice_number': invoice.invoice_number,
+                'issue_date': invoice.issue_date.strftime("%Y-%m-%d %H:%M"),
+                'due_date': invoice.due_date.strftime("%Y-%m-%d") if invoice.due_date else None,
+                'status': invoice.status,
+                'customer_name': invoice.sale.customer_name if invoice.sale else 'Walk-in Customer',
+                'customer_phone': invoice.sale.customer_phone if invoice.sale else '',
+            },
+            'company': {
+                'name': 'Al Noor Fabrics',
+                'address': 'Your Company Address',
+                'phone': '+92-XXX-XXXXXXX',
+            },
+            'items': [],
+            'totals': {
+                'subtotal': float(invoice.sale.subtotal) if invoice.sale else 0.0,
+                'tax': float(invoice.sale.tax_amount) if invoice.sale else 0.0,
+                'discount': float(invoice.sale.overall_discount) if invoice.sale else 0.0,
+                'total': float(invoice.sale.grand_total) if invoice.sale else 0.0,
+            }
+        }
+        
+        # Add items
+        if invoice.sale and invoice.sale.sale_items.exists():
+            for item in invoice.sale.sale_items.all():
+                thermal_data['items'].append({
+                    'name': item.product.name if item.product else 'N/A',
+                    'quantity': int(item.quantity),
+                    'unit_price': float(item.unit_price),
+                    'total': float(item.quantity * item.unit_price),
+                })
+        
+        logger.info(f"Thermal print data generated for invoice {invoice.invoice_number}")
+        
+        return Response({
+            'success': True,
+            'message': 'Thermal print data generated successfully',
+            'data': thermal_data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Error generating thermal print data for invoice {invoice_id}: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'Failed to generate thermal print data',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # ===== RECEIPT MANAGEMENT =====
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_simple_receipt(request):
+    """Create a simple receipt directly from sale (no separate payment record needed)"""
+    from decimal import Decimal
+    import uuid
+    
+    sale_id = request.data.get('sale')
+    notes = request.data.get('notes', 'Receipt generated for paid sale')
+    
+    if not sale_id:
+        return Response({
+            'success': False,
+            'message': 'Sale ID is required',
+            'errors': {'sale': ['This field is required.']}
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Get sale
+        sale = Sales.objects.get(id=sale_id, is_active=True)
+        
+        # Check if sale has payment
+        if sale.amount_paid <= 0:
+            return Response({
+                'success': False,
+                'message': 'Cannot create receipt for unpaid sale',
+                'errors': {'sale': ['This sale has no payment recorded.']}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if receipt already exists
+        existing_receipt = Receipt.objects.filter(sale=sale, is_active=True).first()
+        if existing_receipt:
+            return Response({
+                'success': False,
+                'message': 'Receipt already exists for this sale',
+                'errors': {'sale': ['Receipt already generated for this sale.']}
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create a mock payment for receipt compatibility
+        mock_payment_id = str(uuid.uuid4())
+        
+        # Create receipt
+        receipt = Receipt.objects.create(
+            id=uuid.uuid4(),
+            sale=sale,
+            payment=None,  # No payment required for simple receipts
+            receipt_number=f"REC-{timezone.now().strftime('%Y-%m')}-{str(uuid.uuid4())[:8].upper()}",
+            generated_at=timezone.now(),
+            status='GENERATED',
+            notes=notes
+        )
+        
+        return Response({
+            'success': True,
+            'message': 'Simple receipt created successfully',
+            'data': ReceiptSerializer(receipt).data
+        }, status=status.HTTP_201_CREATED)
+        
+    except Sales.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Sale not found',
+            'errors': {'sale': ['Invalid sale ID.']}
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Failed to create simple receipt',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -1188,12 +1349,12 @@ def list_receipts(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def generate_receipt_pdf(request, receipt_id):
-    """Generate PDF for receipt"""
+    """Generate PDF for receipt in thermal receipt format (80mm width)"""
     try:
-        from reportlab.lib.pagesizes import letter, A4
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.units import mm
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib.units import inch
         from reportlab.lib import colors
         from reportlab.pdfgen import canvas
         from django.conf import settings
@@ -1201,137 +1362,282 @@ def generate_receipt_pdf(request, receipt_id):
         from io import BytesIO
 
         receipt = get_object_or_404(Receipt, id=receipt_id, is_active=True)
-
+        
         # Create PDF buffer
         buffer = BytesIO()
-
-        # Create PDF document
-        doc = SimpleDocTemplate(buffer, pagesize=A4)
+        
+        # Custom page size for thermal receipt (80mm width, 300mm height)
+        page_width = 80 * mm
+        page_height = 300 * mm
+        
+        # Create PDF document with custom page size
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=(page_width, page_height),
+            leftMargin=3*mm,
+            rightMargin=3*mm,
+            topMargin=5*mm,
+            bottomMargin=5*mm
+        )
         story = []
-
+        
         # Get styles
         styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=18,
-            spaceAfter=30,
+        
+        # Shop header styles
+        shop_name_style = ParagraphStyle(
+            'ShopName',
+            parent=styles['Normal'],
+            fontSize=16,
+            fontName='Helvetica-Bold',
             alignment=1,  # Center alignment
+            spaceAfter=2*mm,
+            textColor=colors.black
         )
-
-        # Add title
-        story.append(Paragraph(f"RECEIPT #{receipt.receipt_number}", title_style))
-        story.append(Spacer(1, 20))
-
-        # Company and receipt info
-        company_info = [
-            ['Company: Maqbool Fabric', f'Receipt Date: {receipt.generated_at.strftime("%B %d, %Y")}'],
-            ['Address: Your Company Address', f'Time: {receipt.generated_at.strftime("%I:%M %p")}'],
-            ['Phone: +92-XXX-XXXXXXX', f'Status: {receipt.status}'],
-        ]
-
-        company_table = Table(company_info, colWidths=[3*inch, 3*inch])
-        company_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', 10),
-            ('BOTTOMPADDING', 6, 6, 6),
+        
+        shop_tagline_style = ParagraphStyle(
+            'ShopTagline',
+            parent=styles['Normal'],
+            fontSize=9,
+            fontName='Helvetica',
+            alignment=1,
+            spaceAfter=3*mm,
+            textColor=colors.grey
+        )
+        
+        normal_center_style = ParagraphStyle(
+            'NormalCenter',
+            parent=styles['Normal'],
+            fontSize=8,
+            fontName='Helvetica',
+            alignment=1,
+            spaceAfter=1*mm
+        )
+        
+        normal_left_style = ParagraphStyle(
+            'NormalLeft',
+            parent=styles['Normal'],
+            fontSize=8,
+            fontName='Helvetica',
+            alignment=0,  # Left alignment
+            spaceAfter=1*mm
+        )
+        
+        # Add shop header
+        story.append(Paragraph("★★ AL NOOR FABRICS ★★", shop_name_style))
+        story.append(Paragraph("Quality Fabrics & Textiles", shop_tagline_style))
+        story.append(Paragraph("Karachi, Pakistan", normal_center_style))
+        story.append(Paragraph("Phone: +92-XXX-XXXXXXX", normal_center_style))
+        
+        # Separator
+        story.append(Spacer(1, 2*mm))
+        separator_data = [['=' * 30]]
+        separator_table = Table(separator_data, colWidths=[page_width - 6*mm])
+        separator_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ]))
-        story.append(company_table)
-        story.append(Spacer(1, 20))
-
-        # Payment details
-        if receipt.payment:
-            payment = receipt.payment
-            payment_info = [
-                ['Payment Information:'],
-                ['Payment ID:', payment.id],
-                ['Payment Method:', payment.payment_method],
-                ['Amount:', f"PKR {payment.amount:.2f}"],
-                ['Status:', payment.status],
-            ]
-
-            payment_table = Table(payment_info, colWidths=[1.5*inch, 4.5*inch])
-            payment_table.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', 10),
-                ('BOTTOMPADDING', 6, 6, 6),
-                ('BACKGROUND', (0, 0), (0, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
-            ]))
-            story.append(payment_table)
-            story.append(Spacer(1, 20))
-
-        # Sale details
+        story.append(separator_table)
+        story.append(Spacer(1, 2*mm))
+        
+        # Receipt info
+        current_time = receipt.generated_at
+        story.append(Paragraph(f"Receipt #: {receipt.receipt_number}", normal_center_style))
+        story.append(Paragraph(f"Date: {current_time.strftime('%d-%b-%Y')}", normal_center_style))
+        story.append(Paragraph(f"Time: {current_time.strftime('%I:%M %p')}", normal_center_style))
+        story.append(Paragraph(f"Invoice: {receipt.sale.invoice_number if receipt.sale else 'N/A'}", normal_center_style))
+        
+        # Customer info
+        if receipt.sale and receipt.sale.customer:
+            customer = receipt.sale.customer
+            story.append(Spacer(1, 2*mm))
+            story.append(Paragraph(f"Customer: {customer.name}", normal_left_style))
+            if customer.phone:
+                story.append(Paragraph(f"Phone: {customer.phone}", normal_left_style))
+        
+        # Separator
+        story.append(Spacer(1, 2*mm))
+        separator_data = [['-' * 30]]
+        separator_table = Table(separator_data, colWidths=[page_width - 6*mm])
+        separator_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 6),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ]))
+        story.append(separator_table)
+        
+        # Table header
+        story.append(Spacer(1, 2*mm))
+        header_data = [
+            ['Item', 'Qty', 'Price', 'Total'],
+        ]
+        
+        header_table = Table(header_data, colWidths=[30*mm, 8*mm, 14*mm, 14*mm])
+        header_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ]))
+        story.append(header_table)
+        
+        # Add sale items
         if receipt.sale:
             sale = receipt.sale
-            if sale.customer:
-                customer = sale.customer
-                customer_info = [
-                    ['Customer Information:'],
-                    ['Name:', customer.name],
-                    ['Phone:', customer.phone or 'N/A'],
-                    ['Email:', customer.email or 'N/A'],
-                ]
-
-                customer_table = Table(customer_info, colWidths=[1.5*inch, 4.5*inch])
-                customer_table.setStyle(TableStyle([
+            sale_items = sale.sale_items.all() if hasattr(sale, 'sale_items') else []
+            
+            items_data = []
+            total_quantity = 0
+            total_amount = 0.0
+            
+            for item in sale_items:
+                product_name = item.product.name if item.product else 'Unknown Product'
+                quantity = float(item.quantity) if item.quantity else 0
+                unit_price = float(item.unit_price) if item.unit_price else 0
+                item_total = quantity * unit_price
+                
+                # Truncate long product names
+                display_name = product_name[:25] + "..." if len(product_name) > 25 else product_name
+                
+                items_data.append([
+                    display_name,
+                    f"{quantity:.0f}",
+                    f"{unit_price:.0f}",
+                    f"{item_total:.0f}"
+                ])
+                
+                total_quantity += quantity
+                total_amount += item_total
+            
+            # Items table
+            if items_data:
+                items_table = Table(items_data, colWidths=[30*mm, 8*mm, 14*mm, 14*mm])
+                items_table.setStyle(TableStyle([
                     ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                    ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+                    ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
                     ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                    ('FONTSIZE', 10),
-                    ('BOTTOMPADDING', 6, 6, 6),
-                    ('BACKGROUND', (0, 0), (0, 0), colors.grey),
-                    ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+                    ('FONTSIZE', (0, 0), (-1, -1), 7),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                    ('TOPPADDING', (0, 0), (-1, -1), 1),
                 ]))
-                story.append(customer_table)
-                story.append(Spacer(1, 20))
-
-        # Receipt summary
+                story.append(items_table)
+        
+        # Separator
+        story.append(Spacer(1, 2*mm))
+        separator_data = [['-' * 30]]
+        separator_table = Table(separator_data, colWidths=[page_width - 6*mm])
+        separator_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 6),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ]))
+        story.append(separator_table)
+        
+        # Totals section
+        story.append(Spacer(1, 2*mm))
+        
+        # Calculate totals
+        grand_total = float(receipt.sale.grand_total) if receipt.sale and receipt.sale.grand_total else 0.0
+        amount_paid = float(receipt.sale.amount_paid) if receipt.sale and receipt.sale.amount_paid else 0.0
+        
+        # For receipt, show the actual amount that should be paid (grand_total after discount)
+        # not the original amount_paid which might include overpayment
+        receipt_amount = grand_total
+        balance = amount_paid - grand_total  # Positive means overpaid, negative means underpaid
+        
+        # Summary table
         summary_data = [
-            ['Receipt Summary:'],
-            ['Total Amount:', f"PKR {receipt.amount:.2f}"],
-            ['Payment Method:', receipt.payment.payment_method if receipt.payment else 'N/A'],
-            ['Transaction Date:', receipt.generated_at.strftime("%B %d, %Y at %I:%M %p")],
+            ['Subtotal:', f"PKR {total_amount:.2f}"],
+            ['Tax (0%):', 'PKR 0.00'],
+            ['Grand Total:', f"PKR {grand_total:.2f}"],
+            ['Amount Paid:', f"PKR {receipt_amount:.2f}"],
+            ['Balance:', f"PKR {balance:.2f}"],
         ]
-
-        summary_table = Table(summary_data, colWidths=[1.5*inch, 4.5*inch])
+        
+        summary_table = Table(summary_data, colWidths=[30*mm, 30*mm])
         summary_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', 10),
-            ('BOTTOMPADDING', 6, 6, 6),
-            ('BACKGROUND', (0, 0), (0, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (0, 0), colors.whitesmoke),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
         ]))
         story.append(summary_table)
-
+        
+        # Payment method
+        if receipt.sale:
+            payment_method = receipt.sale.payment_method_display if hasattr(receipt.sale, 'payment_method_display') else receipt.sale.payment_method
+            story.append(Spacer(1, 2*mm))
+            payment_data = [['Payment Method:', payment_method]]
+            payment_table = Table(payment_data, colWidths=[30*mm, 30*mm])
+            payment_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                ('TOPPADDING', (0, 0), (-1, -1), 1),
+            ]))
+            story.append(payment_table)
+        
+        # Separator
+        story.append(Spacer(1, 3*mm))
+        separator_data = [['=' * 30]]
+        separator_table = Table(separator_data, colWidths=[page_width - 6*mm])
+        separator_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ]))
+        story.append(separator_table)
+        
+        # Footer
+        story.append(Spacer(1, 3*mm))
+        footer_style = ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=7,
+            fontName='Helvetica',
+            alignment=1,
+            spaceAfter=1*mm
+        )
+        story.append(Paragraph("Thank You!", footer_style))
+        story.append(Paragraph("Please Visit Again", footer_style))
+        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("Software: POS System", footer_style))
+        story.append(Paragraph(f"Printed: {current_time.strftime('%d/%m/%Y %I:%M %p')}", footer_style))
+        
         # Build PDF
         doc.build(story)
-
+        
         # Get PDF content
         pdf_content = buffer.getvalue()
         buffer.close()
-
+        
         # Save PDF to file
         filename = f"receipt_{receipt.receipt_number}_{receipt.generated_at.strftime('%Y%m%d_%H%M')}.pdf"
         filepath = os.path.join(settings.MEDIA_ROOT, 'receipts', filename)
-
+        
         # Ensure directory exists
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
+        
         with open(filepath, 'wb') as f:
             f.write(pdf_content)
-
+        
         # Update receipt with PDF file
         from django.core.files.base import ContentFile
         receipt.pdf_file.save(filename, ContentFile(pdf_content), save=True)
         receipt.status = 'GENERATED'
         receipt.save(update_fields=['status', 'updated_at', 'pdf_file'])
-
+        
         return Response({
             'success': True,
             'message': 'Receipt PDF generated successfully',
@@ -1342,7 +1648,7 @@ def generate_receipt_pdf(request, receipt_id):
                 'filename': filename
             }
         }, status=status.HTTP_200_OK)
-
+        
     except Exception as e:
         return Response({
             'success': False,
@@ -1389,33 +1695,45 @@ def generate_sale_receipt_pdf(request, sale_id):
         # 2. Custom Styles for POS
         style_center = ParagraphStyle(name='Center', parent=styles['Normal'], alignment=TA_CENTER, fontSize=8, leading=10)
         style_left = ParagraphStyle(name='Left', parent=styles['Normal'], alignment=TA_LEFT, fontSize=8, leading=10)
+        style_bold_left = ParagraphStyle(name='BoldLeft', parent=styles['Normal'], alignment=TA_LEFT, fontSize=8, leading=10, fontName='Helvetica-Bold')
         style_bold_center = ParagraphStyle(name='BoldCenter', parent=styles['Normal'], alignment=TA_CENTER, fontSize=9, leading=11, fontName='Helvetica-Bold')
         style_title = ParagraphStyle(name='Title', parent=styles['Normal'], alignment=TA_CENTER, fontSize=12, leading=14, fontName='Helvetica-Bold')
 
-        # 3. Header Section
-        story.append(Paragraph("Al Noor Fabric", style_title))
-        story.append(Paragraph("123 Market Street, City Name", style_center))
-        story.append(Paragraph("Phone: +92 300 1234567", style_center))
-        story.append(Spacer(1, 4*mm))
+        # 3. Enhanced Header Section
+        story.append(Paragraph("🏪 AL NOOR FABRICS", style_title))
+        story.append(Paragraph("📍 123 Market Street, City Name", style_center))
+        story.append(Paragraph("📞 +92 300 1234567", style_center))
+        story.append(Paragraph("🌐 www.alnoorfabrics.com", style_center))
+        story.append(Spacer(1, 3*mm))
 
         # Separator Line
-        story.append(Paragraph("-" * 48, style_center)) # Dashed line simulation
+        story.append(Paragraph("=" * 48, style_center))
 
         # 4. Receipt Info Section
-        story.append(Paragraph(f"Invoice #: {sale.invoice_number}", style_left))
-        story.append(Paragraph(f"Date: {sale.date_of_sale.strftime('%d-%m-%Y %H:%M')}", style_left))
+        story.append(Paragraph(f"🧾 INVOICE #: {sale.invoice_number}", style_bold_left))
+        story.append(Paragraph(f"📅 Date: {sale.date_of_sale.strftime('%d-%m-%Y %H:%M')}", style_left))
         if sale.customer:
-            story.append(Paragraph(f"Customer: {sale.customer.name}", style_left))
+            story.append(Paragraph(f"👤 Customer: {sale.customer.name}", style_left))
+        else:
+            story.append(Paragraph("👤 Customer: Walk-in Customer", style_left))
+        
+        # Payment method
+        payment_method_display = sale.get_payment_method_display()
+        story.append(Paragraph(f"💳 Payment: {payment_method_display}", style_left))
 
-        story.append(Paragraph("-" * 48, style_center))
+        story.append(Paragraph("=" * 48, style_center))
+        story.append(Spacer(1, 2*mm))
 
-        # 5. Items Table Section
+        # 5. Enhanced Items Table Section
+        story.append(Paragraph("📋 ORDER DETAILS", style_bold_center))
+        story.append(Spacer(1, 1*mm))
+        
         # Columns: Item (Name wraps), Qty, Price, Total
         # Widths: Total ~76mm (80mm - 4mm margins)
         # Item: 35mm, Qty: 8mm, Price: 15mm, Total: 18mm
         col_widths = [35*mm, 8*mm, 15*mm, 18*mm]
 
-        headers = ["Item", "Qty", "Rate", "Total"]
+        headers = ["🛍️ Item", "Qty", "Rate", "Total"]
         data = [headers]
 
         total_qty = 0
@@ -1441,36 +1759,40 @@ def generate_sale_receipt_pdf(request, sale_id):
             ('ALIGN', (0,0), (0,-1), 'LEFT'),   # Item Name Left Aligned
             ('VALIGN', (0,0), (-1,-1), 'TOP'),
             ('LINEBELOW', (0,0), (-1,0), 0.5, colors.black), # Line below header
+            ('LINEABOVE', (0,0), (-1,0), 0.5, colors.black), # Line above header
             ('BOTTOMPADDING', (0,0), (-1,0), 3),
             ('TOPPADDING', (0,0), (-1,-1), 2),
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey), # Header background
         ]))
         story.append(t)
 
-        story.append(Paragraph("-" * 48, style_center))
+        story.append(Paragraph("=" * 48, style_center))
+        story.append(Spacer(1, 2*mm))
 
-        # 6. Totals Section
-        # We use a 2-column table for alignment: Label (Left), Value (Right)
+        # 6. Enhanced Totals Section
+        story.append(Paragraph("💰 PAYMENT SUMMARY", style_bold_center))
+        story.append(Spacer(1, 1*mm))
 
         # Calculate change/remaining based on model fields
         # Assuming change_amount exists, else 0
         change = getattr(sale, 'change_amount', 0)
 
         t_totals_data = [
-            ["Total Qty:", f"{total_qty}"],
-            ["Subtotal:", f"{int(sale.subtotal)}"],
+            ["📦 Total Items:", f"{total_qty}"],
+            ["💵 Subtotal:", f"PKR {int(sale.subtotal)}"],
         ]
 
         if sale.overall_discount > 0:
-            t_totals_data.append(["Discount:", f"-{int(sale.overall_discount)}"])
+            t_totals_data.append(["🎉 Discount:", f"-PKR {int(sale.overall_discount)}"])
 
         if sale.tax_amount > 0:
-            t_totals_data.append(["Tax:", f"{int(sale.tax_amount)}"])
+            t_totals_data.append(["📈 Tax:", f"PKR {int(sale.tax_amount)}"])
 
-        t_totals_data.append(["GRAND TOTAL:", f"{int(sale.grand_total)}"])
-        t_totals_data.append(["Paid:", f"{int(sale.amount_paid)}"])
+        t_totals_data.append(["💎 GRAND TOTAL:", f"PKR {int(sale.grand_total)}"])
+        t_totals_data.append(["💸 Amount Paid:", f"PKR {int(sale.grand_total)}"])  # Show grand_total instead of amount_paid
 
         if change > 0:
-            t_totals_data.append(["Change:", f"{int(change)}"])
+            t_totals_data.append(["🔄 Change:", f"PKR {int(change)}"])
 
         t_totals = Table(t_totals_data, colWidths=[45*mm, 30*mm])
 
@@ -1480,14 +1802,7 @@ def generate_sale_receipt_pdf(request, sale_id):
             ('FONTSIZE', (0,0), (-1,-1), 8),
             ('ALIGN', (0,0), (0,-1), 'LEFT'),
             ('ALIGN', (1,0), (1,-1), 'RIGHT'),
-
-            # Make "GRAND TOTAL" bold and larger
-            ('FONTNAME', (0,-3), (-1,-3), 'Helvetica-Bold'), # Row index depends on rows added above.
-            # Safer way: Find the row index for GRAND TOTAL if dynamic.
-            # But here we assume simple structure. Let's just bold everything for now in totals for clarity or just Grand Total.
-            # Since rows are dynamic (discount/tax/change), fixed indices are risky.
-            # Let's just set the font size for the whole table to 8 and maybe manually bold Grand Total row if needed.
-            # For simplicity in this "paste-ready" code, we keep it uniform or use simple bolding.
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ]))
 
         # Find index of GRAND TOTAL to bold it specifically
@@ -1502,18 +1817,24 @@ def generate_sale_receipt_pdf(request, sale_id):
                 ('FONTNAME', (0, grand_total_idx), (-1, grand_total_idx), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, grand_total_idx), (-1, grand_total_idx), 10),
                 ('LINEABOVE', (0, grand_total_idx), (-1, grand_total_idx), 0.5, colors.black),
+                ('LINEBELOW', (0, grand_total_idx), (-1, grand_total_idx), 0.5, colors.black),
+                ('BACKGROUND', (0, grand_total_idx), (-1, grand_total_idx), colors.lightgrey),
             ]))
 
         story.append(t_totals)
 
-        story.append(Paragraph("-" * 48, style_center))
-        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("=" * 48, style_center))
+        story.append(Spacer(1, 3*mm))
 
-        # 7. Footer Section
-        story.append(Paragraph("No Return / Exchange without receipt", style_center))
-        story.append(Paragraph("Thank you for shopping!", style_bold_center))
+        # 7. Enhanced Footer Section
+        story.append(Paragraph("⚠️  No Return / Exchange without receipt", style_center))
+        story.append(Paragraph("🙏 Thank you for shopping at Al Noor Fabrics!", style_bold_center))
         story.append(Spacer(1, 2*mm))
-        story.append(Paragraph("Software by: HH Tech Hub", style_center))
+        story.append(Paragraph("📱 Visit us again!", style_center))
+        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("💻 Powered by: HH Tech Hub", style_center))
+        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("🌟 Quality Fabric, Trusted Service", style_center))
 
         doc.build(story)
         pdf_content = buffer.getvalue()
@@ -1528,5 +1849,69 @@ def generate_sale_receipt_pdf(request, sale_id):
         return Response({
             'success': False,
             'message': 'Failed to generate receipt',
+            'errors': {'detail': str(e)}
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_sale_thermal_print(request, sale_id):
+    """Generate thermal print data for sale"""
+    try:
+        from django.conf import settings
+        import json
+
+        sale = get_object_or_404(Sales, id=sale_id, is_active=True)
+        
+        # Create thermal print data structure
+        thermal_data = {
+            'type': 'thermal_print',
+            'sale': {
+                'invoice_number': sale.invoice_number,
+                'date_of_sale': sale.date_of_sale.strftime("%Y-%m-%d %H:%M"),
+                'customer_name': sale.customer_name,
+                'customer_phone': sale.customer_phone,
+                'subtotal': float(sale.subtotal),
+                'overall_discount': float(sale.overall_discount),
+                'tax_amount': float(sale.tax_amount),
+                'grand_total': float(sale.grand_total),
+                'amount_paid': float(sale.amount_paid),
+                'remaining_amount': float(sale.remaining_amount),
+                'payment_method': sale.payment_method,
+                'status': sale.status,
+            },
+            'items': [],
+            'company': {
+                'name': getattr(settings, 'COMPANY_NAME', 'Al Noor Fabrics'),
+                'address': getattr(settings, 'COMPANY_ADDRESS', 'Your Address'),
+                'phone': getattr(settings, 'COMPANY_PHONE', 'Your Phone'),
+                'email': getattr(settings, 'COMPANY_EMAIL', 'your@email.com'),
+            }
+        }
+        
+        # Add items
+        if sale.sale_items.exists():
+            for item in sale.sale_items.all():
+                thermal_data['items'].append({
+                    'name': item.product.name if item.product else 'N/A',
+                    'quantity': int(item.quantity),
+                    'unit_price': float(item.unit_price),
+                    'item_discount': float(item.item_discount),
+                    'total': float(item.line_total),
+                })
+        
+        logger.info(f"Thermal print data generated for sale {sale.invoice_number}")
+        
+        return Response({
+            'success': True,
+            'message': 'Thermal print data generated successfully',
+            'data': thermal_data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Error generating thermal print data for sale {sale_id}: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'Failed to generate thermal print data',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

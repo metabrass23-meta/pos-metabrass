@@ -55,7 +55,7 @@ class _PurchaseFilterDialogState extends State<PurchaseFilterDialog> {
       ),
       backgroundColor: AppTheme.creamWhite,
       child: Container(
-        width: 40.w, // Optimized width for Desktop
+        width: 50.w, // Increased width for larger fonts
         padding: EdgeInsets.all(context.cardPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,

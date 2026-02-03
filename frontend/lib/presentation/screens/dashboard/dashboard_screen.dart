@@ -20,7 +20,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<DashboardProvider>().initialize();
+        final dashboardProvider = context.read<DashboardProvider>();
+        dashboardProvider.setInstance(); // Set global instance
+        dashboardProvider.initialize();
       }
     });
   }

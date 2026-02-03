@@ -250,7 +250,17 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: SingleChildScrollView(
                   padding: context.pagePadding,
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: context.maxContentWidth * 0.5),
+                    constraints: BoxConstraints(
+                      maxWidth: ResponsiveBreakpoints.responsive(
+                        context,
+                        tablet: context.maxContentWidth * 0.9,
+                        small: context.maxContentWidth * 0.7,
+                        medium: context.maxContentWidth * 0.6,
+                        large: context.maxContentWidth * 0.5,
+                        ultrawide: context.maxContentWidth * 0.4,
+                      ),
+                      minWidth: 300, // Ensure minimum width in pixels
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(

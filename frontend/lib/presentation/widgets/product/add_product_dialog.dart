@@ -24,7 +24,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   final _costPriceController = TextEditingController();
   final _quantityController = TextEditingController();
   final _colorController = TextEditingController();
-  final _fabricController = TextEditingController();
+  final _typeController = TextEditingController();
+  final _barcodeController = TextEditingController();
+  final _skuController = TextEditingController();
 
   String? _selectedCategoryId;
   List<String> _selectedPieces = [];
@@ -54,7 +56,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     _costPriceController.dispose();
     _quantityController.dispose();
     _colorController.dispose();
-    _fabricController.dispose();
+    _typeController.dispose();
+    _barcodeController.dispose();
+    _skuController.dispose();
     super.dispose();
   }
 
@@ -66,8 +70,8 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         _showErrorSnackbar('${l10n.pleaseEnter} ${l10n.color}');
         return;
       }
-      if (_fabricController.text.trim().isEmpty) {
-        _showErrorSnackbar('${l10n.pleaseEnter} ${l10n.fabric}');
+      if (_typeController.text.trim().isEmpty) {
+        _showErrorSnackbar('${l10n.pleaseEnter} ${l10n.type}');
         return;
       }
       if (_selectedCategoryId == null) {
@@ -89,10 +93,12 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             ? double.parse(_costPriceController.text.trim())
             : null,
         color: _colorController.text.trim(),
-        fabric: _fabricController.text.trim(),
+        fabric: _typeController.text.trim(),
         pieces: _selectedPieces,
         quantity: int.parse(_quantityController.text.trim()),
         categoryId: _selectedCategoryId!,
+        barcode: _barcodeController.text.trim().isNotEmpty ? _barcodeController.text.trim() : null,
+        sku: _skuController.text.trim().isNotEmpty ? _skuController.text.trim() : null,
       );
 
       if (mounted) {
@@ -470,21 +476,53 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             ),
             SizedBox(height: context.cardPadding),
 
-            // Fabric Input Field
+            // Type Input Field
             PremiumTextField(
-              label: l10n.fabric,
-              hint: isCompact ? '${l10n.enterEmail} ${l10n.fabric}' : '${l10n.enterEmail} ${l10n.fabricType}',
-              controller: _fabricController,
-              prefixIcon: Icons.texture_outlined,
+              label: l10n.type,
+              hint: isCompact ? '${l10n.enterEmail} ${l10n.type}' : '${l10n.enterEmail} ${l10n.product} ${l10n.type}',
+              controller: _typeController,
+              prefixIcon: Icons.category_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return '${l10n.pleaseEnter} ${l10n.fabric}';
+                  return '${l10n.pleaseEnter} ${l10n.type}';
                 }
                 if (value!.length < 2) {
-                  return '${l10n.fabricName} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
+                  return '${l10n.type} ${l10n.mustBeAtLeast} 2 ${l10n.characters}';
                 }
                 return null;
               },
+            ),
+            SizedBox(height: context.cardPadding),
+
+            // Barcode and SKU Fields
+            Row(
+              children: [
+                Expanded(
+                  child: PremiumTextField(
+                    label: 'Barcode',
+                    hint: 'Enter barcode (optional)',
+                    controller: _barcodeController,
+                    prefixIcon: Icons.qr_code_2_outlined,
+                    validator: (value) {
+                      // Barcode is optional, no validation required
+                      return null;
+                    },
+                  ),
+                ),
+                SizedBox(width: context.cardPadding),
+                Expanded(
+                  child: PremiumTextField(
+                    label: 'SKU',
+                    hint: 'Enter SKU (optional)',
+                    controller: _skuController,
+                    prefixIcon: Icons.tag_outlined,
+                    validator: (value) {
+                      // SKU is optional, no validation required
+                      return null;
+                    },
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: context.cardPadding),
 

@@ -13,7 +13,7 @@ class ReceiptManagementScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
       appBar: AppBar(
-        title: Text(l10n.receiptManagement),
+        title: Text('Invoices & Receipts'),
         backgroundColor: AppTheme.primaryMaroon,
         foregroundColor: AppTheme.pureWhite,
         elevation: 0,

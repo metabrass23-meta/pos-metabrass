@@ -95,6 +95,80 @@ def update_inventory_on_sale_confirmation(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Sales)
+def update_inventory_on_sale_creation(sender, instance, created, **kwargs):
+    """Update inventory immediately when sale is created (for cash sales)"""
+    try:
+        if created:
+            logger.info(f"🚀 Sale created: {instance.invoice_number}, Payment: {instance.payment_method}, Status: {instance.status}")
+            
+            # For cash sales, reduce inventory immediately
+            if instance.payment_method in ['CASH', 'CARD', 'BANK_TRANSFER', 'MOBILE_PAYMENT']:
+                logger.info(f"💰 Processing stock reduction for cash sale: {instance.invoice_number}")
+                
+                # Use a small delay to ensure sale items are created
+                from django.db.models import Q
+                from .models import SaleItem
+                
+                # Wait a moment for sale items to be created, then process
+                import time
+                time.sleep(0.1)  # Small delay
+                
+                with transaction.atomic():
+                    # Refresh sale items
+                    sale_items = SaleItem.objects.filter(sale=instance)
+                    logger.info(f"📦 Found {len(sale_items)} sale items")
+                    
+                    for sale_item in sale_items:
+                        logger.info(f"📦 Processing item: {sale_item.product_name} x{sale_item.quantity}")
+                        
+                        if sale_item.product:
+                            old_quantity = sale_item.product.quantity
+                            logger.info(f"📊 Before: {sale_item.product.name} quantity = {old_quantity}")
+                            
+                            # Directly update product quantity without using reduce_stock_for_sale
+                            new_quantity = old_quantity - sale_item.quantity
+                            if new_quantity >= 0:
+                                sale_item.product.quantity = new_quantity
+                                sale_item.product.save(update_fields=['quantity'])
+                                logger.info(f"📊 After: {sale_item.product.name} quantity = {new_quantity} (reduced by {sale_item.quantity})")
+                            else:
+                                logger.error(f"❌ Insufficient stock for {sale_item.product.name}")
+                        else:
+                            logger.error(f"❌ Sale item {sale_item.id} has no product")
+                    
+                    logger.info(f"✅ Stock reduction completed for sale: {instance.invoice_number}")
+            else:
+                logger.info(f"⏭️ Skipping stock reduction for {instance.payment_method} sale")
+                    
+    except Exception as e:
+        logger.error(f"❌ Failed to update inventory on sale creation: {str(e)}", exc_info=True)
+
+
+@receiver(post_save, sender=SaleItem)
+def update_inventory_on_sale_item_creation(sender, instance, created, **kwargs):
+    """Update inventory when sale item is created (backup method)"""
+    try:
+        if created and instance.product:
+            # Check if this is part of a cash sale
+            if hasattr(instance, 'sale') and instance.sale:
+                if instance.sale.payment_method in ['CASH', 'CARD', 'BANK_TRANSFER', 'MOBILE_PAYMENT']:
+                    logger.info(f"🔄 SaleItem signal: Reducing stock for {instance.product_name} x{instance.quantity}")
+                    
+                    old_quantity = instance.product.quantity
+                    new_quantity = old_quantity - instance.quantity
+                    
+                    if new_quantity >= 0:
+                        instance.product.quantity = new_quantity
+                        instance.product.save(update_fields=['quantity'])
+                        logger.info(f"🔄 Stock reduced: {instance.product.name} {old_quantity} → {new_quantity}")
+                    else:
+                        logger.error(f"❌ Insufficient stock for {instance.product.name}")
+                        
+    except Exception as e:
+        logger.error(f"❌ Failed to update inventory on sale item creation: {str(e)}", exc_info=True)
+
+
+@receiver(post_save, sender=Sales)
 def update_payment_status_on_amount_change(sender, instance, created, **kwargs):
     """Update payment status when amount paid changes"""
     try:

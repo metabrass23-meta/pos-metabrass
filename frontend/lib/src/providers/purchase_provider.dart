@@ -57,10 +57,12 @@ class PurchaseProvider with ChangeNotifier {
         return true;
       } else {
         _error = response.message;
+        notifyListeners();
         return false;
       }
     } catch (e) {
       _error = e.toString();
+      notifyListeners();
       return false;
     } finally {
       _setLoading(false);
@@ -68,7 +70,6 @@ class PurchaseProvider with ChangeNotifier {
   }
 
   /// Update an existing purchase
-  /// This method is required by EditPurchaseDialog
   Future<bool> updatePurchase(PurchaseModel purchase) async {
     _setLoading(true);
     _error = null;
@@ -76,29 +77,28 @@ class PurchaseProvider with ChangeNotifier {
     try {
       if (purchase.id == null) {
         _error = "Update failed: Missing purchase ID";
+        notifyListeners();
         return false;
       }
 
       final response = await _purchaseService.updatePurchase(purchase.id!, purchase);
 
       if (response.success && response.data != null) {
-        // Find the index of the old purchase in the local list
         final index = _purchases.indexWhere((p) => p.id == purchase.id);
-
         if (index != -1) {
-          // Replace the old record with the updated record from server
           _purchases[index] = response.data!;
         }
-
         notifyListeners();
         return true;
       } else {
         _error = response.message;
+        notifyListeners();
         return false;
       }
     } catch (e) {
       _error = e.toString();
       DebugHelper.printError('PurchaseProvider update error', e);
+      notifyListeners();
       return false;
     } finally {
       _setLoading(false);
@@ -114,29 +114,28 @@ class PurchaseProvider with ChangeNotifier {
       final response = await _purchaseService.deletePurchase(id);
 
       if (response.success) {
-        // Remove locally to refresh UI immediately
         _purchases.removeWhere((p) => p.id == id);
         notifyListeners();
         return true;
       } else {
         _error = response.message;
+        notifyListeners();
         return false;
       }
     } catch (e) {
       _error = e.toString();
+      notifyListeners();
       return false;
     } finally {
       _setLoading(false);
     }
   }
 
-  /// Clear any existing error
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  /// Internal helper to manage loading state
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();

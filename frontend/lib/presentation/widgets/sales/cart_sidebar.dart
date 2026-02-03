@@ -7,6 +7,8 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../sales/order_success_dialog.dart';
+import '../barcode/barcode_scanner_widget.dart';
 
 class CartSidebar extends StatefulWidget {
   final VoidCallback onCheckout;
@@ -42,9 +44,10 @@ class _CartSidebarState extends State<CartSidebar> {
         children: [
           _buildCartHeader(),
           _buildCustomerSelection(),
+          _buildBarcodeScanner(),
           Expanded(child: _buildCartItems()),
           _buildCartSummary(),
-          _buildCheckoutButton(),
+          _buildCheckoutButtons(),
         ],
       ),
     );
@@ -280,6 +283,20 @@ class _CartSidebarState extends State<CartSidebar> {
               ],
             ],
           );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBarcodeScanner() {
+    return Container(
+      margin: EdgeInsets.all(context.cardPadding / 2),
+      child: BarcodeScannerWidget(
+        autoAddToCart: true,
+        showFeedback: true,
+        onBarcodeScanned: (barcode) {
+          // Optional: Handle barcode scan events
+          print('Barcode scanned: $barcode');
         },
       ),
     );
@@ -608,7 +625,7 @@ class _CartSidebarState extends State<CartSidebar> {
         }
 
         return Container(
-          padding: EdgeInsets.all(context.cardPadding),
+          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
           decoration: BoxDecoration(
             color: AppTheme.lightGray.withOpacity(0.3),
             border: Border(
@@ -638,7 +655,7 @@ class _CartSidebarState extends State<CartSidebar> {
                 ],
               ),
 
-              SizedBox(height: context.smallPadding / 2),
+              SizedBox(height: context.smallPadding / 3),
 
               if (provider.overallDiscount > 0) ...[
                 Row(
@@ -648,20 +665,44 @@ class _CartSidebarState extends State<CartSidebar> {
                       l10n.discount,
                       style: TextStyle(
                         fontSize: context.bodyFontSize,
-                        color: Colors.orange[700],
+                        color: AppTheme.charcoalGray,
                       ),
                     ),
                     Text(
-                      '- PKR ${provider.overallDiscount.toStringAsFixed(0)}',
+                      '-PKR ${provider.overallDiscount.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.orange[700],
+                        color: Colors.red,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: context.smallPadding / 2),
+                SizedBox(height: context.smallPadding / 3),
+              ],
+
+              if (provider.cartTaxAmount > 0) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.tax,
+                      style: TextStyle(
+                        fontSize: context.bodyFontSize,
+                        color: AppTheme.charcoalGray,
+                      ),
+                    ),
+                    Text(
+                      'PKR ${provider.cartTaxAmount.toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.charcoalGray,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.smallPadding / 3),
               ],
 
               if (provider.gstPercentage > 0) ...[
@@ -685,36 +726,12 @@ class _CartSidebarState extends State<CartSidebar> {
                     ),
                   ],
                 ),
-                SizedBox(height: context.smallPadding / 2),
-              ],
-
-              if (provider.taxPercentage > 0) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${l10n.tax} (${provider.taxPercentage}%)',
-                      style: TextStyle(
-                        fontSize: context.bodyFontSize,
-                        color: AppTheme.charcoalGray,
-                      ),
-                    ),
-                    Text(
-                      'PKR ${provider.cartTaxAmount.toStringAsFixed(0)}',
-                      style: TextStyle(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.smallPadding / 2),
+                SizedBox(height: context.smallPadding / 3),
               ],
 
               Divider(color: Colors.grey.shade300, thickness: 1),
 
-              SizedBox(height: context.smallPadding / 2),
+              SizedBox(height: context.smallPadding / 3),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -744,7 +761,7 @@ class _CartSidebarState extends State<CartSidebar> {
     );
   }
 
-  Widget _buildCheckoutButton() {
+  Widget _buildCheckoutButtons() {
     final l10n = AppLocalizations.of(context)!;
 
     return Consumer<SalesProvider>(
@@ -753,69 +770,181 @@ class _CartSidebarState extends State<CartSidebar> {
 
         return Container(
           padding: EdgeInsets.all(context.cardPadding / 2),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: isDisabled
-                  ? LinearGradient(
-                colors: [Colors.grey.shade400, Colors.grey.shade500],
-              )
-                  : const LinearGradient(
-                colors: [
-                  AppTheme.primaryMaroon,
-                  AppTheme.secondaryMaroon,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: isDisabled ? null : widget.onCheckout,
-                borderRadius: BorderRadius.circular(context.borderRadius()),
+          child: Row(
+            children: [
+              // Proceed to Checkout Button
+              Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: context.cardPadding / 2,
-                  ),
-                  child: provider.isLoading
-                      ? Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: AppTheme.pureWhite,
-                        strokeWidth: 2,
-                      ),
+                  decoration: BoxDecoration(
+                    gradient: isDisabled
+                        ? LinearGradient(
+                      colors: [Colors.grey.shade400, Colors.grey.shade500],
+                    )
+                        : const LinearGradient(
+                      colors: [
+                        AppTheme.primaryMaroon,
+                        AppTheme.secondaryMaroon,
+                      ],
                     ),
-                  )
-                      : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.payment_rounded,
-                        color: AppTheme.pureWhite,
-                        size: context.iconSize('medium'),
-                      ),
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        context.shouldShowCompactLayout
-                            ? l10n.checkout
-                            : l10n.proceedToCheckout,
-                        style: TextStyle(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.pureWhite,
-                          letterSpacing: 0.5,
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: isDisabled ? null : widget.onCheckout,
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.cardPadding / 2,
+                        ),
+                        child: provider.isLoading
+                            ? Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: AppTheme.pureWhite,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        )
+                            : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.payment_rounded,
+                              color: AppTheme.pureWhite,
+                              size: context.iconSize('small'),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              context.shouldShowCompactLayout
+                                  ? l10n.checkout
+                                  : l10n.proceedToCheckout,
+                              style: TextStyle(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.pureWhite,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+              SizedBox(width: context.smallPadding / 2),
+              // Complete Sale Button
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: isDisabled
+                        ? LinearGradient(
+                      colors: [Colors.grey.shade400, Colors.grey.shade500],
+                    )
+                        : LinearGradient(
+                      colors: [Colors.green.shade600, Colors.green.shade700],
+                    ),
+                    borderRadius: BorderRadius.circular(context.borderRadius()),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: isDisabled ? null : () => _handleCompleteSale(context, provider),
+                      borderRadius: BorderRadius.circular(context.borderRadius()),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.cardPadding / 2,
+                        ),
+                        child: provider.isLoading
+                            ? Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: AppTheme.pureWhite,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        )
+                            : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_rounded,
+                              color: AppTheme.pureWhite,
+                              size: context.iconSize('small'),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Complete Sale',
+                              style: TextStyle(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.pureWhite,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
+    );
+  }
+
+  void _handleCompleteSale(BuildContext context, SalesProvider provider) {
+    // Store the cart total before clearing
+    final cartTotal = provider.cartGrandTotal;
+    
+    // Process the sale directly with default payment method and get sale ID
+    provider.createSaleFromCartWithId(
+      paymentMethod: 'CASH', // Default payment method
+      amountPaid: cartTotal, // Pay full amount
+      notes: 'Quick sale',
+    ).then((saleId) {
+      if (saleId != null) {
+        // Get the sale details from provider (it's inserted at index 0)
+        final newSale = provider.sales.first;
+        // Show Order Success Dialog with all required parameters
+        _showOrderSuccessDialog(
+          context,
+          saleId: newSale.id,
+          invoiceNumber: newSale.invoiceNumber,
+          totalPrice: newSale.grandTotal, // Use actual sale total
+          advanceAmount: newSale.amountPaid, // Use actual amount paid
+          deliveryDate: DateTime.now(),
+        );
+      }
+    });
+  }
+
+  void _showOrderSuccessDialog(
+    BuildContext context, {
+    required String saleId,
+    required String invoiceNumber,
+    required double totalPrice,
+    required double advanceAmount,
+    required DateTime deliveryDate,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => OrderSuccessDialog(
+        saleId: saleId,
+        invoiceNumber: invoiceNumber,
+        totalPrice: totalPrice,
+        advanceAmount: advanceAmount,
+        deliveryDate: deliveryDate,
+      ),
     );
   }
 

@@ -733,7 +733,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.borderRadius('small')),
             ),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -744,7 +744,14 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: context.bodyFontSize,
+                    fontSize: ResponsiveBreakpoints.responsive(
+                      context,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
+                    ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
                   ),
@@ -754,7 +761,7 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
                   ),

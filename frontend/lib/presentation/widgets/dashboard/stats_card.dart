@@ -103,7 +103,7 @@ class _StatsCardState extends State<StatsCard>
                             child: Icon(
                               widget.icon,
                               color: widget.color,
-                              size: context.iconSize('medium'),
+                              size: context.dashboardIconSize('medium'),
                             ),
                           ),
 
@@ -126,13 +126,13 @@ class _StatsCardState extends State<StatsCard>
                                       ? Icons.trending_up_rounded
                                       : Icons.trending_down_rounded,
                                   color: widget.isPositive ? Colors.green : Colors.red,
-                                  size: context.iconSize('small'),
+                                  size: context.dashboardIconSize('small'),
                                 ),
                                 SizedBox(width: context.smallPadding * 0.5),
                                 Text(
                                   widget.change,
                                   style: TextStyle(
-                                    fontSize: context.captionFontSize,
+                                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
                                     fontWeight: FontWeight.w600,
                                     color: widget.isPositive ? Colors.green : Colors.red,
                                   ),
@@ -148,7 +148,7 @@ class _StatsCardState extends State<StatsCard>
                       Text(
                         widget.value,
                         style: TextStyle(
-                          fontSize: context.headingFontSize,
+                          fontSize: ResponsiveBreakpoints.getDashboardHeaderFontSize(context),
                           fontWeight: FontWeight.w700,
                           color: AppTheme.charcoalGray,
                           letterSpacing: -0.5,
@@ -160,7 +160,7 @@ class _StatsCardState extends State<StatsCard>
                       Text(
                         widget.title,
                         style: TextStyle(
-                          fontSize: context.subtitleFontSize,
+                          fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context),
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
                           letterSpacing: 0.2,

@@ -227,32 +227,30 @@ def list_customers(request):
         if show_inactive:
             customers = Customer.objects.all()
         else:
-            customers = Customer.active_customers()
+            customers = Customer.objects.filter(is_active=True)
         
-        # Apply search filter
+        # Apply search
         if search:
-            customers = customers.search(search)
+            customers = customers.filter(
+                Q(name__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone__icontains=search) |
+                Q(business_name__icontains=search)
+            )
         
-        # Apply customer type filter
-        if customer_type and customer_type.upper() in dict(Customer.TYPE_CHOICES):
-            customers = customers.filter(customer_type=customer_type.upper())
+        # Apply filters
+        if customer_type:
+            customers = customers.filter(customer_type=customer_type)
         
-        # Apply status filter
-        if status_filter and status_filter.upper() in dict(Customer.STATUS_CHOICES):
-            customers = customers.filter(status=status_filter.upper())
+        if status_filter:
+            customers = customers.filter(status=status_filter)
         
-        # Apply city filter
         if city:
-            customers = customers.filter(city__iexact=city)
+            customers = customers.filter(city__icontains=city)
         
         if country:
-            customers = customers.filter(country__iexact=country)
+            customers = customers.filter(country__icontains=country)
         
-        # Apply country filter
-        if country:
-            customers = customers.filter(country__iexact=country)
-        
-        # Apply verification filter
         if verification_filter:
             if verification_filter == 'phone':
                 customers = customers.filter(phone_verified=True)
@@ -260,29 +258,13 @@ def list_customers(request):
                 customers = customers.filter(email_verified=True)
             elif verification_filter == 'both':
                 customers = customers.filter(phone_verified=True, email_verified=True)
-            elif verification_filter == 'none':
-                customers = customers.filter(phone_verified=False, email_verified=False)
         
-        # Apply date range filters
+        # Apply date filters
         if created_after:
-            try:
-                customers = customers.filter(created_at__date__gte=created_after)
-            except ValueError:
-                return Response({
-                    'success': False,
-                    'message': 'Invalid created_after date format. Use YYYY-MM-DD.',
-                    'errors': {'created_after': 'Invalid date format'}
-                }, status=status.HTTP_400_BAD_REQUEST)
+            customers = customers.filter(created_at__gte=created_after)
         
         if created_before:
-            try:
-                customers = customers.filter(created_at__date__lte=created_before)
-            except ValueError:
-                return Response({
-                    'success': False,
-                    'message': 'Invalid created_before date format. Use YYYY-MM-DD.',
-                    'errors': {'created_before': 'Invalid date format'}
-                }, status=status.HTTP_400_BAD_REQUEST)
+            customers = customers.filter(created_at__lte=created_before)
         
         # Apply sorting
         sort_fields = {

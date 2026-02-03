@@ -28,12 +28,22 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
   bool _isPermanentDelete = true; // Toggle between permanent and soft delete
   bool _confirmationChecked = false; // Requires user to check confirmation
   String _confirmationText = ''; // User must type confirmation text
+  bool _hasSalesRecords = false; // Track if customer has sales records
 
   final TextEditingController _confirmationController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    
+    // Check if customer has sales records
+    _hasSalesRecords = widget.customer.totalSalesCount > 0;
+    
+    // If customer has sales records, default to soft delete
+    if (_hasSalesRecords) {
+      _isPermanentDelete = false;
+    }
+    
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -84,6 +94,14 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
     bool success;
     if (_isPermanentDelete) {
       success = await provider.deleteCustomer(widget.customer.id);
+      
+      // If permanent delete failed due to PROTECT constraint, suggest soft delete
+      if (!success && provider.errorMessage?.contains('protected foreign keys') == true) {
+        if (mounted) {
+          _showProtectedKeysError();
+        }
+        return;
+      }
     } else {
       success = await provider.softDeleteCustomer(widget.customer.id);
     }
@@ -111,6 +129,56 @@ class _EnhancedDeleteCustomerDialogState extends State<EnhancedDeleteCustomerDia
       // For soft deletion, just require checkbox
       return true;
     }
+  }
+
+  void _showProtectedKeysError() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+            SizedBox(width: 8),
+            Text('Cannot Delete Customer'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This customer has sales records and cannot be permanently deleted.',
+              style: TextStyle(fontSize: 14),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Would you like to soft delete this customer instead? (They will be marked as inactive but their data will be preserved)',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _isPermanentDelete = false;
+              });
+              _handleDelete();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryMaroon,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Soft Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showValidationError() {

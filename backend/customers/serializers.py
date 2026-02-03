@@ -408,6 +408,7 @@ class CustomerListSerializer(serializers.ModelSerializer):
     
     # Fix: Add proper source for computed fields
     total_sales_count = serializers.IntegerField(read_only=True)
+    total_sales_amount = serializers.ReadOnlyField()  # Add total sales amount
     has_recent_sales = serializers.SerializerMethodField()
     
     class Meta:
@@ -433,6 +434,7 @@ class CustomerListSerializer(serializers.ModelSerializer):
             'created_at',
             'created_by_email',
             'total_sales_count',
+            'total_sales_amount',
             'has_recent_sales'
         )
     

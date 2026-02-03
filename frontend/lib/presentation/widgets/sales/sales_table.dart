@@ -69,6 +69,10 @@ class _SalesTableState extends State<SalesTable> {
           )
         ],
       ),
+      // Add height constraint to prevent overflow
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7, // Max 70% of screen height
+      ),
       child: Consumer<SalesProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -86,6 +90,7 @@ class _SalesTableState extends State<SalesTable> {
           }
 
           return Column(
+            mainAxisSize: MainAxisSize.min, // Use minimum size
             children: [
               // 1. Table Header (Horizontal Scroll)
               Container(
@@ -109,7 +114,7 @@ class _SalesTableState extends State<SalesTable> {
               ),
 
               // 2. Table Content (Vertical + Horizontal Scroll)
-              Expanded(
+              Flexible( // Use Flexible instead of Expanded
                 child: Scrollbar(
                   controller: _verticalScrollController,
                   thumbVisibility: true,
@@ -129,6 +134,7 @@ class _SalesTableState extends State<SalesTable> {
                           width: _getTableWidth(context),
                           // Use Column instead of ListView inside SingleChildScrollView to avoid conflicts
                           child: Column(
+                            mainAxisSize: MainAxisSize.min, // Use minimum size
                             children: provider.sales.asMap().entries.map((entry) {
                               return _buildTableRow(context, entry.value, entry.key);
                             }).toList(),

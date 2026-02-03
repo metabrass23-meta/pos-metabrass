@@ -93,7 +93,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
     _validationErrors = provider.validateVendorData(
       name: _nameController.text,
       businessName: _businessNameController.text,
-      cnic: _cnicController.text,
+      cnic: _cnicController.text.trim().isEmpty ? null : _cnicController.text,
       phone: _phoneController.text,
       city: _cityController.text,
       area: _areaController.text,
@@ -117,7 +117,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       final success = await provider.addVendor(
         name: _nameController.text.trim(),
         businessName: _businessNameController.text.trim(),
-        cnic: _cnicController.text.trim(),
+        cnic: _cnicController.text.trim().isEmpty
+            ? null
+            : _cnicController.text.trim(),
         phone: _phoneController.text.trim(),
         city: _cityController.text.trim(),
         area: _areaController.text.trim(),
@@ -392,8 +394,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         PremiumTextField(
           label: '${l10n.vendor} ${l10n.name} *',
           hint: context.shouldShowCompactLayout
-              ? '${l10n.enterEmail} ${l10n.name}'
-              : '${l10n.enterEmail} ${l10n.vendor} ${l10n.fullName}',
+              ? l10n.enterVendorName
+              : '${l10n.enterVendorName} ${l10n.fullName}',
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           validator: (value) {
@@ -415,8 +417,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         PremiumTextField(
           label: '${l10n.businessName} *',
           hint: context.shouldShowCompactLayout
-              ? '${l10n.enterEmail} ${l10n.businessName}'
-              : '${l10n.enterEmail} ${l10n.businessName}',
+              ? l10n.enterBusinessName
+              : l10n.enterBusinessName,
           controller: _businessNameController,
           prefixIcon: Icons.business_outlined,
           validator: (value) {
@@ -436,18 +438,17 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
 
         // CNIC
         PremiumTextField(
-          label: '${l10n.cnic} *',
+          label: l10n.cnic,
           hint: context.shouldShowCompactLayout
-              ? '${l10n.enterEmail} ${l10n.cnic}'
-              : '${l10n.enterEmail} ${l10n.cnic} (${l10n.cnicFormat})',
+              ? '${l10n.enterCnicNumber} (${l10n.optional})'
+              : '${l10n.enterCnicNumber} (${l10n.cnicFormat}) - ${l10n.optional}',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return '${l10n.pleaseEnter} ${l10n.cnic}';
-            }
-            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
-              return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
+                return '${l10n.pleaseEnterValid} ${l10n.cnic} (${l10n.cnicFormat})';
+              }
             }
             return null;
           },
@@ -575,8 +576,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         PremiumTextField(
           label: '${l10n.phone} *',
           hint: context.shouldShowCompactLayout
-              ? '${l10n.enterEmail} ${l10n.phone}'
-              : '${l10n.enterEmail} ${l10n.phone} (${l10n.phoneFormat})',
+              ? l10n.enterPhoneWithCode
+              : '${l10n.enterPhoneWithCode} (${l10n.phoneFormat})',
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
@@ -644,7 +645,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       children: [
         PremiumTextField(
           label: '${l10n.city} *',
-          hint: '${l10n.enterEmail} ${l10n.city}',
+          hint: l10n.enterCity,
           controller: _cityController,
           prefixIcon: Icons.location_city_outlined,
           validator: (value) {
@@ -680,7 +681,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       children: [
         PremiumTextField(
           label: '${l10n.area} *',
-          hint: '${l10n.enterEmail} ${l10n.area}',
+          hint: l10n.enterArea,
           controller: _areaController,
           prefixIcon: Icons.map_outlined,
           validator: (value) {

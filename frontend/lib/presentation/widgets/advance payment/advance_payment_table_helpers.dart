@@ -313,11 +313,17 @@ class AdvancePaymentTableHelpers {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, color: Colors.grey, size: context.iconSize('small')),
+            Flexible(
+              child: Icon(Icons.receipt_long_outlined, color: Colors.grey, size: context.iconSize('small')),
+            ),
             SizedBox(width: context.smallPadding / 2),
-            Text(
-              l10n.missing,
-              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
+            Flexible(
+              child: Text(
+                l10n.missing,
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
           ],
         ),

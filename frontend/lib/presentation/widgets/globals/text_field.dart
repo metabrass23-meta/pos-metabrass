@@ -14,6 +14,7 @@ class PremiumTextField extends StatefulWidget {
   final int maxLines;
   final bool enabled;
   final ValueChanged<String>? onChanged; // Added onChanged parameter
+  final ValueChanged<String>? onSubmitted; // Added onSubmitted parameter
 
   const PremiumTextField({
     super.key,
@@ -28,6 +29,7 @@ class PremiumTextField extends StatefulWidget {
     this.maxLines = 1,
     this.enabled = true,
     this.onChanged, // Added to constructor
+    this.onSubmitted, // Added to constructor
   });
 
   @override
@@ -86,6 +88,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
           maxLines: widget.maxLines,
           enabled: widget.enabled,
           onChanged: widget.onChanged, // Pass onChanged to TextFormField
+          onFieldSubmitted: widget.onSubmitted, // Pass onSubmitted to TextFormField
           style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w400,
@@ -103,7 +106,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
                   : const Color(0xFF9E9E9E),
             )
                 : null,
-            suffixIcon: widget.suffixIcon,
+            suffixIcon: widget.suffixIcon != null
+                ? Padding(
+                    padding: EdgeInsets.only(right: 1.w),
+                    child: widget.suffixIcon,
+                  )
+                : null,
             filled: true,
             fillColor: widget.enabled ? AppTheme.pureWhite : Colors.grey.shade50,
             border: OutlineInputBorder(
@@ -143,7 +151,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 2.h,
-              horizontal: 2.w,
+              horizontal: widget.suffixIcon != null ? 3.w : 2.w, // More padding when suffix icon exists
             ),
             labelStyle: TextStyle(
               color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),

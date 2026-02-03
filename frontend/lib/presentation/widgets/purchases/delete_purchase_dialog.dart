@@ -153,23 +153,6 @@ class DeletePurchaseDialog extends StatelessWidget {
     if (!context.mounted) return;
 
     Navigator.pop(context); // Close dialog first
-
-    // Show feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? "✅ Purchase deleted successfully"
-              : "❌ ${provider.error ?? "Failed to delete purchase"}",
-        ),
-        backgroundColor: success ? Colors.green : Colors.red,
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
   }
 
   Widget _infoRow(String label, String value) {

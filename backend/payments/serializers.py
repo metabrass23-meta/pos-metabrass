@@ -175,6 +175,9 @@ class PaymentCreateSerializer(PaymentSerializer):
         help_text="Optional: Specify which payable to reduce. If not specified, will auto-link to most recent pending payable for vendor."
     )
     
+    # Override time field to make it writable for creation
+    time = serializers.TimeField(required=True, help_text="Time of payment")
+    
     class Meta(PaymentSerializer.Meta):
         fields = (
             'labor', 'vendor', 'order', 'sale',

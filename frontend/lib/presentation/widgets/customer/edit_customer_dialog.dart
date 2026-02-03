@@ -204,7 +204,7 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
         id: widget.customer.id,
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
-        email: _emailController.text.trim(),
+        email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
         city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
         country: _countryController.text.trim().isEmpty ? null : _countryController.text.trim(),
@@ -722,17 +722,16 @@ class _EditCustomerDialogState extends State<EditCustomerDialog> with SingleTick
 
         // Email
         PremiumTextField(
-          label: 'Email Address *',
-          hint: context.shouldShowCompactLayout ? 'Enter email' : 'Enter email address',
+          label: 'Email Address',
+          hint: context.shouldShowCompactLayout ? 'Enter email (optional)' : 'Enter email address (optional)',
           controller: _emailController,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter email address';
-            }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-              return 'Please enter a valid email address';
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                return 'Please enter a valid email address';
+              }
             }
             return null;
           },

@@ -121,81 +121,6 @@ class _VendorPageState extends State<VendorPage> {
     );
   }
 
-  void _handleExport() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    try {
-      final provider = context.read<VendorProvider>();
-
-      // Show loading state
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pureWhite),
-                ),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                '${l10n.export}...',
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.blue,
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-        ),
-      );
-
-      // Simulate export process - replace with actual export logic when available
-      await Future.delayed(const Duration(seconds: 1));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                Icons.check_circle_rounded,
-                color: AppTheme.pureWhite,
-                size: context.iconSize('medium'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                '${l10n.vendor} ${l10n.exportCompleted}',
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.borderRadius()),
-          ),
-        ),
-      );
-    } catch (e) {
-      _showErrorSnackbar('${l10n.error} ${l10n.export}: ${e.toString()}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (!context.isMinimumSupported) {
@@ -585,7 +510,7 @@ class _VendorPageState extends State<VendorPage> {
       children: [
         // Search Bar
         Expanded(
-          flex: 3,
+          flex: 1,
           child: _buildSearchBar(provider),
         ),
 
@@ -607,11 +532,7 @@ class _VendorPageState extends State<VendorPage> {
 
         SizedBox(width: context.smallPadding),
 
-        // Export Button
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
+        // Export Button removed
       ],
     );
   }
@@ -626,8 +547,6 @@ class _VendorPageState extends State<VendorPage> {
             Expanded(child: _buildShowInactiveToggle(provider)),
             SizedBox(width: context.cardPadding),
             Expanded(child: _buildFilterButton(provider)),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -644,8 +563,6 @@ class _VendorPageState extends State<VendorPage> {
             Expanded(child: _buildShowInactiveToggle(provider)),
             SizedBox(width: context.smallPadding),
             Expanded(child: _buildFilterButton(provider)),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -737,7 +654,7 @@ class _VendorPageState extends State<VendorPage> {
               Text(
                 provider.showInactive ? l10n.hideInactive : l10n.showInactive,
                 style: TextStyle(
-                  fontSize: context.bodyFontSize,
+                  fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
                   fontWeight: FontWeight.w500,
                   color: provider.showInactive ? AppTheme.primaryMaroon : Colors.grey[600],
                 ),
@@ -793,48 +710,6 @@ class _VendorPageState extends State<VendorPage> {
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w500,
                   color: hasActiveFilters ? AppTheme.accentGold : AppTheme.primaryMaroon,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExportButton() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: InkWell(
-        onTap: _handleExport,
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.download_rounded,
-              color: AppTheme.accentGold,
-              size: context.iconSize('medium'),
-            ),
-            if (!context.isTablet) ...[
-              SizedBox(width: context.smallPadding),
-              Text(
-                l10n.export,
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.accentGold,
                 ),
               ),
             ],
@@ -975,7 +850,7 @@ class _VendorPageState extends State<VendorPage> {
             child: Icon(
               icon,
               color: color,
-              size: context.iconSize('medium'),
+              size: context.dashboardIconSize('medium'),
             ),
           ),
 
@@ -991,11 +866,11 @@ class _VendorPageState extends State<VendorPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -1006,7 +881,7 @@ class _VendorPageState extends State<VendorPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.captionFontSize,
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), // Use dashboard-specific size
                     fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
                   ),

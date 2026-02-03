@@ -1,10 +1,5 @@
 """
-CORRECTED Dashboard Analytics View
-File: backend/analytics/views.py
-
-IMPORTANT: This version uses the correct model names:
-- Sales (not Sale)
-- SaleItem (not SaleItem) - this one was correct
+Simplified Dashboard Analytics View - Daily Order Count Only
 """
 
 from rest_framework import status
@@ -12,301 +7,215 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from django.db.models import Sum, Count, Avg, Q, F
-from datetime import datetime, timedelta
-from decimal import Decimal
+from django.db.models import Sum, Count
+from datetime import timedelta
+import logging
 
-# Import your models - CORRECTED IMPORTS
-from sales.models import Sales, SaleItem  # ← Changed from 'Sale' to 'Sales'
-from orders.models import Order
-from customers.models import Customer
-from products.models import Product
-from vendors.models import Vendor
-from expenses.models import Expense
-from payments.models import Payment
-from rest_framework.throttling import UserRateThrottle
+# Import models
+from sales.models import Sales
 
-class DashboardRateThrottle(UserRateThrottle):
-    scope = 'dashboard'
+# Set up logger
+logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dashboard_analytics(request):
     """
-    Get comprehensive dashboard analytics with ALL required metrics
+    Simplified Dashboard Analytics - Daily Order Count Only
     """
     try:
-        # Get current date and calculate date ranges
+        logger.info("=== DASHBOARD ANALYTICS API CALLED ===")
+        
+        # Date ranges
         today = timezone.now().date()
-        last_week = today - timedelta(days=7)
-        last_month = today - timedelta(days=30)
         current_month_start = today.replace(day=1)
         
+        logger.info(f"DEBUG: Date ranges - today: {today}, current_month_start: {current_month_start}")
+        
         # =====================================================
-        # SALES METRICS
+        # SALES METRICS - SIMPLIFIED
         # =====================================================
         
-        # Total sales (all time) - Using 'Sales' model
-        total_sales_data = Sales.objects.filter(is_active=True).aggregate(
-            total=Sum('grand_total'),
-            count=Count('id')
-        )
-        total_sales = total_sales_data['total'] or Decimal('0.00')
-        total_sales_count = total_sales_data['count'] or 0
+        # Debug: Check total sales in database
+        all_sales_count = Sales.objects.filter(is_active=True).count()
+        logger.info(f"DEBUG: Total sales in database: {all_sales_count}")
         
-        # This month's sales
-        this_month_sales_data = Sales.objects.filter(
+        # Debug: Check sales this month
+        this_month_sales = Sales.objects.filter(
             is_active=True,
             date_of_sale__gte=current_month_start
-        ).aggregate(
-            total=Sum('grand_total'),
-            count=Count('id')
         )
-        this_month_sales = this_month_sales_data['total'] or Decimal('0.00')
-        this_month_sales_count = this_month_sales_data['count'] or 0
+        this_month_count = this_month_sales.count()
+        logger.info(f"DEBUG: Sales this month: {this_month_count}")
         
-        # Recent sales (last 7 days)
-        recent_sales_count = Sales.objects.filter(
+        # Debug: Show some sample sales
+        sample_sales = Sales.objects.filter(is_active=True)[:3]
+        for sale in sample_sales:
+            logger.info(f"DEBUG: Sample sale - ID: {sale.id}, date: {sale.date_of_sale}, total: {sale.grand_total}, active: {sale.is_active}")
+        
+        # Total sales (current month)
+        total_sales_result = Sales.objects.filter(
             is_active=True,
-            date_of_sale__gte=last_week
-        ).count()
+            date_of_sale__gte=current_month_start
+        ).aggregate(total=Sum('grand_total'))
+        total_sales = total_sales_result['total'] or 0
+        logger.info(f"DEBUG: total_sales_result: {total_sales_result}")
+        logger.info(f"DEBUG: total_sales: {total_sales}")
         
-        # =====================================================
-        # ORDER METRICS ⭐ NEW
-        # =====================================================
-        
-        # Total orders (all active orders)
-        total_orders = Order.objects.filter(is_active=True).count()
-        
-        # Pending orders
-        pending_orders = Order.objects.filter(
+        # Total orders (current month)
+        total_orders = Sales.objects.filter(
             is_active=True,
-            status='PENDING'
+            date_of_sale__gte=current_month_start
         ).count()
+        logger.info(f"DEBUG: total_orders: {total_orders}")
         
-        # Recent orders (last 7 days)
-        recent_orders_count = Order.objects.filter(
-            is_active=True,
-            created_at__gte=last_week
-        ).count()
+        # Daily order count for the last 7 days
+        daily_orders = []
+        for i in range(7):
+            date = today - timedelta(days=6-i)  # Start from 6 days ago
+            day_orders = Sales.objects.filter(
+                is_active=True,
+                date_of_sale__date=date
+            ).count()
+            
+            daily_orders.append({
+                'date': date.isoformat(),
+                'day_name': date.strftime('%a'),
+                'order_count': day_orders,
+            })
+            logger.info(f"DEBUG: {date} - {day_orders} orders")
+        
+        logger.info(f"DEBUG: daily_orders calculated: {len(daily_orders)} days")
         
         # =====================================================
-        # CUSTOMER METRICS ⭐ NEW
+        # ADDITIONAL METRICS
         # =====================================================
         
-        # Total active customers
+        # Customer metrics
+        from customers.models import Customer
         total_customers = Customer.objects.filter(is_active=True).count()
+        active_customers = Customer.objects.filter(is_active=True).count()
         
-        # Active customers (customers who made purchases in last 30 days)
-        active_customers = Customer.objects.filter(
-            is_active=True,
-            sales__date_of_sale__gte=last_month,
-            sales__is_active=True
-        ).distinct().count()
+        # Latest customers (recent 5)
+        latest_customers = Customer.objects.filter(is_active=True).order_by('-created_at')[:5]
+        latest_customers_data = []
+        for customer in latest_customers:
+            latest_customers_data.append({
+                'id': str(customer.id),
+                'name': customer.name,
+                'email': customer.email or '',
+                'phone': customer.phone or '',
+                'total_spent': float(customer.total_sales_amount),  # Calculate from customer's sales
+                'total_orders': customer.total_sales_count,  # Get from customer's sales count
+                'created_at': customer.created_at.isoformat(),
+                'avatar': '',
+            })
         
-        # =====================================================
-        # VENDOR METRICS ⭐ NEW
-        # =====================================================
-        
-        # Total active vendors
+        # Vendor metrics  
+        from vendors.models import Vendor
         total_vendors = Vendor.objects.filter(is_active=True).count()
+        active_vendors = Vendor.objects.filter(is_active=True).count()
         
-        # Active vendors (vendors with payments in last 30 days)
-        # Note: Adjust the related_name based on your Payment model's ForeignKey to Vendor
-        try:
-            active_vendors = Vendor.objects.filter(
-                is_active=True,
-                payments__created_at__gte=last_month  # May need to adjust related_name
-            ).distinct().count()
-        except:
-            # Fallback: count vendors updated recently
-            active_vendors = Vendor.objects.filter(
-                is_active=True,
-                updated_at__gte=last_month
-            ).count()
-        
-        # =====================================================
-        # PRODUCT METRICS ⭐ NEW
-        # =====================================================
-        
-        # Total active products
+        # Product metrics
+        from products.models import Product
         total_products = Product.objects.filter(is_active=True).count()
+        low_stock_products = Product.objects.filter(is_active=True, quantity__lte=5).count()
         
-        # Low stock products
-        # Try using reorder_point if it exists, otherwise use threshold of 10
-        try:
-            low_stock_products = Product.objects.filter(
-                is_active=True,
-                quantity__lt=F('reorder_point')
-            ).count()
-        except Exception as e:
-            # Fallback: use arbitrary threshold (quantity < 10)
-            low_stock_products = Product.objects.filter(
-                is_active=True,
-                quantity__lt=10
-            ).count()
-        
-        # =====================================================
-        # FINANCIAL METRICS
-        # =====================================================
-        
-        # Calculate total revenue (same as total sales for now)
-        total_revenue = total_sales
-        
-        # Calculate total expenses
-        # Sum from expenses table
-        expenses_total = Expense.objects.filter(
-            is_active=True
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-        
-        # Add labor payments
-        labor_payments = Payment.objects.filter(
-            payer_type='LABOR'
-        ).aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
-        
-        # Add vendor payments
-        vendor_payments = Payment.objects.filter(
-            payer_type='VENDOR'
-        ).aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
-        
-        # Total expenses
-        total_expenses = expenses_total + labor_payments + vendor_payments
-        
-        # Net profit = Revenue - Expenses
-        net_profit = total_revenue - total_expenses
-        
-        # Profit margin = (Net profit / Revenue) * 100
-        profit_margin = (net_profit / total_revenue * 100) if total_revenue > 0 else 0
-        
-        # =====================================================
-        # TOP SELLING PRODUCTS
-        # =====================================================
-        
-        top_products = SaleItem.objects.filter(
+        # Trending products (top 5 by sales)
+        from sales.models import SaleItem
+        trending_products = SaleItem.objects.filter(
             sale__is_active=True,
-            sale__date_of_sale__gte=last_month
-        ).values('product__name').annotate(
+            sale__date_of_sale__gte=current_month_start
+        ).values('product__name', 'product__id').annotate(
             total_quantity=Sum('quantity'),
-            total_revenue=Sum('line_total')
-        ).order_by('-total_revenue')[:10]
+            total_revenue=Sum('line_total')  # Fixed: use line_total instead of total_price
+        ).order_by('-total_quantity')[:5]
         
-        # Format top products for response
-        top_selling_products = [
-            {
+        trending_products_data = []
+        for product in trending_products:
+            trending_products_data.append({
+                'id': str(product['product__id']),
                 'name': product['product__name'],
-                'quantity': product['total_quantity'],
-                'revenue': float(product['total_revenue'] or 0)
-            }
-            for product in top_products
-        ]
+                'sales': int(product['total_quantity']),
+                'revenue': float(product['total_revenue']),
+                'stock': 0,  # Would need to get from Product model
+                'category': '',
+                'image': None,
+            })
         
-        # =====================================================
-        # SALES TREND (Last 6 months)
-        # =====================================================
-        
-        # Get sales grouped by month for last 6 months
-        six_months_ago = today - timedelta(days=180)
-        
-        # Use PostgreSQL-specific date formatting
-        monthly_sales = Sales.objects.filter(
+        # Expense metrics (simplified)
+        from expenses.models import Expense
+        total_expenses = Expense.objects.filter(
             is_active=True,
-            date_of_sale__gte=six_months_ago
-        ).extra(
-            select={'month': "TO_CHAR(date_of_sale, 'Mon')"}
-        ).values('month').annotate(
-            sales=Sum('grand_total')
-        ).order_by('date_of_sale')
+            date__gte=current_month_start
+        ).aggregate(total=Sum('amount'))['total'] or 0
         
-        # Format sales trend
-        sales_trend = [
-            {
-                'month': item['month'],
-                'sales': float(item['sales'] or 0)
-            }
-            for item in monthly_sales
-        ]
+        # Profit & Loss calculations
+        net_profit = float(total_sales) - float(total_expenses)
+        profit_margin = (net_profit / float(total_sales) * 100) if float(total_sales) > 0 else 0
         
-        # =====================================================
-        # RECENT TRANSACTIONS (Last 10)
-        # =====================================================
+        # Sales overview breakdown
+        sales_overview = {
+            'this_month': float(total_sales),
+            'orders_count': total_orders,
+            'average_order_value': float(total_sales) / total_orders if total_orders > 0 else 0,
+            'daily_average': float(total_sales) / 30,  # Assuming 30 days
+        }
         
-        recent_sales = Sales.objects.filter(
-            is_active=True
-        ).select_related('customer').order_by('-date_of_sale')[:10]
-        
-        recent_transactions = [
-            {
-                'id': str(sale.id),
-                'type': 'Sale',
-                'customer': sale.customer_name or 'Walk-in Customer',
-                'amount': float(sale.grand_total),
-                'date': sale.date_of_sale.isoformat(),
-                'status': sale.status
-            }
-            for sale in recent_sales
-        ]
+        logger.info(f"DEBUG: Additional metrics - customers: {total_customers}, vendors: {total_vendors}, products: {total_products}, expenses: {total_expenses}")
+        logger.info(f"DEBUG: Latest customers: {len(latest_customers_data)}, Trending products: {len(trending_products_data)}")
         
         # =====================================================
-        # ASSEMBLE RESPONSE
+        # RESPONSE DATA - ENHANCED
         # =====================================================
         
-        analytics_data = {
+        response_data = {
             # Sales metrics
             'total_sales': float(total_sales),
-            'total_sales_count': total_sales_count,
-            
-            # Order metrics ⭐ NEW
             'total_orders': total_orders,
-            'pending_orders': pending_orders,
             
-            # Customer metrics ⭐ NEW
+            # Daily order analytics
+            'daily_orders': daily_orders,
+            
+            # Customer metrics
             'total_customers': total_customers,
             'active_customers': active_customers,
+            'latest_customers': latest_customers_data,
             
-            # Vendor metrics ⭐ NEW
+            # Vendor metrics
             'total_vendors': total_vendors,
             'active_vendors': active_vendors,
             
-            # Product metrics ⭐ NEW
+            # Product metrics
             'total_products': total_products,
             'low_stock_products': low_stock_products,
+            'trending_products': trending_products_data,
             
             # Financial metrics
-            'total_revenue': float(total_revenue),
             'total_expenses': float(total_expenses),
-            'net_profit': float(net_profit),
-            'profit_margin': float(profit_margin),
+            'total_revenue': float(total_sales),  # Alias for compatibility
+            'net_profit': net_profit,
+            'profit_margin': profit_margin,
             
-            # This month metrics
-            'this_month_sales': float(this_month_sales),
-            'this_month_sales_count': this_month_sales_count,
+            # Sales overview
+            'sales_overview': sales_overview,
             
-            # Recent activity
-            'recent_sales_count': recent_sales_count,
-            'recent_orders_count': recent_orders_count,
-            
-            # Collections
-            'top_selling_products': top_selling_products,
-            'sales_trend': sales_trend,
-            'recent_transactions': recent_transactions,
-            
-            # Date ranges
-            'date_ranges': {
-                'today': today.isoformat(),
-                'last_week': last_week.isoformat(),
-                'last_month': last_month.isoformat(),
-            }
+            # Basic info
+            'current_month': current_month_start.isoformat(),
+            'today': today.isoformat(),
         }
         
+        logger.info("=== DASHBOARD ANALYTICS API SUCCESS ===")
         return Response({
             'success': True,
-            'data': analytics_data
-        }, status=status.HTTP_200_OK)
+            'data': response_data
+        })
         
     except Exception as e:
+        logger.error(f"Dashboard analytics error: {e}")
+        logger.error(f"Exception type: {type(e)}")
         import traceback
-        print(f"Dashboard analytics error: {str(e)}")
-        print(traceback.format_exc())
+        logger.error(f"Traceback: {traceback.format_exc()}")
         
         return Response({
             'success': False,

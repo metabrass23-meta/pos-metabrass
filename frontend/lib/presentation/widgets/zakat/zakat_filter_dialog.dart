@@ -31,7 +31,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   final TextEditingController _beneficiaryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _authorityOptions = ['Mr. Sheikh Parveez Maqbool', 'Mr Sheikh Zain Maqbool'];
+  final List<String> _authorityOptions = ['Mr. Shahzain Baloch', 'Mr Sheikh Huzaifa'];
 
   final List<String> _commonBeneficiaries = ['Esha', 'Faatima', 'sadfg', 'Family', 'Orphanage', 'Mosque', 'School', 'Hospital'];
 
@@ -173,7 +173,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 85.w, small: 90.w, medium: 70.w, large: 60.w, ultrawide: 50.w),
+                width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 98.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
@@ -377,7 +377,7 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           },
           title: Text(
             l10n.showInactiveRecordsOnly,
-            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context), fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
           ),
           activeColor: AppTheme.primaryMaroon,
           dense: true,

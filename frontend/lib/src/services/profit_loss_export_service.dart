@@ -12,10 +12,10 @@ import '../models/profit_loss/profit_loss_models.dart';
 import '../theme/app_theme.dart';
 
 class ProfitLossExportService {
-  static const String _companyName = 'Al Noor Fabric';
+  static const String _companyName = 'Al Noor';
   static const String _companyAddress = 'Your Company Address';
   static const String _companyPhone = '+92 XXX XXXXXXX';
-  static const String _companyEmail = 'info@maqboolfabric.com';
+  static const String _companyEmail = 'info@alnoor.com';
 
   /// Export Profit & Loss report to PDF
   static Future<String?> exportToPDF({

@@ -28,7 +28,8 @@ class _PaymentPageState extends State<PaymentPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<PaymentProvider>();
-      provider.loadPayments();
+      // Force refresh on startup to ensure latest data is loaded
+      provider.loadPayments(refresh: true);
       provider.loadStatistics();
     });
   }
@@ -429,7 +430,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _buildDesktopSearchLayout() {
     return Row(
       children: [
-        Expanded(flex: 3, child: _buildSearchBar()),
+        Expanded(flex: 1, child: _buildSearchBar()),
         SizedBox(width: context.cardPadding),
         Expanded(flex: 1, child: _buildFilterButton()),
       ],
@@ -514,7 +515,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.filter,
-                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+                      style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context), fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
                     ),
                   ],
                 ],
@@ -571,7 +572,7 @@ class _PaymentPageState extends State<PaymentPage> {
           Container(
             padding: EdgeInsets.all(context.smallPadding),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-            child: Icon(icon, color: color, size: context.iconSize('medium')),
+            child: Icon(icon, color: color, size: context.dashboardIconSize('medium')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -584,11 +585,11 @@ class _PaymentPageState extends State<PaymentPage> {
                   style: TextStyle(
                     fontSize: ResponsiveBreakpoints.responsive(
                       context,
-                      tablet: 10.8.sp,
-                      small: 11.2.sp,
-                      medium: 11.5.sp,
-                      large: 11.8.sp,
-                      ultrawide: 12.2.sp,
+                      tablet: 10.8.sp, // Original size
+                      small: 11.2.sp, // Original size
+                      medium: 11.5.sp, // Original size
+                      large: 11.8.sp, // Original size
+                      ultrawide: 12.2.sp, // Original size
                     ),
                     fontWeight: FontWeight.w700,
                     color: AppTheme.charcoalGray,
@@ -598,7 +599,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
                 Text(
                   title,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context), fontWeight: FontWeight.w400, color: Colors.grey[600]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

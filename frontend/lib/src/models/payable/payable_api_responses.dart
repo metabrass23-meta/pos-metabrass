@@ -370,7 +370,7 @@ class PayableCreateRequest {
       'date_borrowed': dateBorrowed.toIso8601String().split('T')[0],
       'expected_repayment_date': expectedRepaymentDate.toIso8601String().split('T')[0],
       'priority': priority,
-      'notes': notes,
+      'notes': notes ?? '', // Send empty string instead of null
     };
   }
 }

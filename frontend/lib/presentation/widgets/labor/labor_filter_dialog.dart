@@ -140,11 +140,11 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
               child: Container(
                 width: ResponsiveBreakpoints.responsive(
                   context,
-                  tablet: 85.w,
-                  small: 90.w,
-                  medium: 70.w,
-                  large: 60.w,
-                  ultrawide: 50.w,
+                  tablet: 95.w,
+                  small: 98.w,
+                  medium: 80.w,
+                  large: 70.w,
+                  ultrawide: 60.w,
                 ),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
@@ -386,7 +386,7 @@ class _EnhancedLaborFilterDialogState extends State<EnhancedLaborFilterDialog>
           title: Text(
             l10n.showInactiveLaborsOnly,
             style: TextStyle(
-              fontSize: context.subtitleFontSize,
+              fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context),
               fontWeight: FontWeight.w500,
               color: AppTheme.charcoalGray,
             ),

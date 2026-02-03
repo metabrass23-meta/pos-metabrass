@@ -1,11 +1,11 @@
 {
-    "name": "frontend",
-    "short_name": "frontend",
+    "name": "Al Noor Fabrics POS",
+    "short_name": "Al Noor Fabrics",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Al Noor Fabrics Premium Point of Sale System",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

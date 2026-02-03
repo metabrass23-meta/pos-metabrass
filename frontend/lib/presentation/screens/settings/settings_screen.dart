@@ -37,11 +37,6 @@ class SettingsScreen extends StatelessWidget {
 
                 SizedBox(height: context.formFieldSpacing * 3),
 
-                _buildSectionHeader(context, l10n.appearance),
-                _buildThemeCard(context, appProvider, l10n),
-
-                SizedBox(height: context.formFieldSpacing * 3),
-
                 _buildSectionHeader(context, l10n.aboutApp),
                 _buildAboutCard(context, l10n),
               ],
@@ -186,75 +181,6 @@ class SettingsScreen extends StatelessWidget {
               color: Colors.grey[400],
               size: context.iconSize('medium'),
             ),
-    );
-  }
-
-  Widget _buildThemeCard(
-      BuildContext context, AppProvider appProvider, AppLocalizations l10n) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-      ),
-      child: SwitchListTile(
-        value: appProvider.isDarkMode,
-        onChanged: (value) {
-          appProvider.toggleTheme();
-          debugPrint('🎨 Theme toggled to: ${value ? "Dark" : "Light"}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(
-                    value ? Icons.dark_mode : Icons.light_mode,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    value ? 'Dark mode enabled' : 'Light mode enabled',
-                  ),
-                ],
-              ),
-              duration: Duration(seconds: 2),
-              backgroundColor: AppTheme.primaryMaroon,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
-        },
-        title: Text(
-          l10n.darkMode,
-          style: TextStyle(
-            fontSize: context.subtitleFontSize,
-            fontWeight: FontWeight.w500,
-            color: AppTheme.charcoalGray,
-          ),
-        ),
-        subtitle: Text(
-          l10n.enableDarkThemeForApplication,
-          style: TextStyle(
-            fontSize: context.captionFontSize,
-            color: Colors.grey[600],
-          ),
-        ),
-        secondary: Container(
-          padding: EdgeInsets.all(context.smallPadding / 2),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryMaroon.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          ),
-          child: Icon(
-            appProvider.isDarkMode
-                ? Icons.dark_mode_rounded
-                : Icons.light_mode_rounded,
-            color: AppTheme.primaryMaroon,
-            size: context.iconSize('medium'),
-          ),
-        ),
-        activeColor: AppTheme.primaryMaroon,
-      ),
     );
   }
 

@@ -360,19 +360,18 @@ def principal_account_statistics(request):
         
         # Prepare statistics data
         stats_data = {
-            'total_credits': total_credits,
-            'total_debits': total_debits,
-            'current_balance': current_balance,
+            'total_credits': float(total_credits),
+            'total_debits': float(total_debits),
+            'current_balance': float(current_balance),
             'transaction_count': transaction_count,
             'module_breakdown': module_breakdown,
             'monthly_trend': monthly_trend,
             'recent_transactions': recent_serializer.data
         }
         
-        serializer = PrincipalAccountStatisticsSerializer(stats_data)
         return Response({
             'success': True,
-            'data': serializer.data
+            'data': stats_data
         }, status=status.HTTP_200_OK)
         
     except Exception as e:

@@ -17,8 +17,18 @@ def increase_stock_on_purchase_item(sender, instance, created, **kwargs):
         return
 
     product = instance.product
-    product.stock += instance.quantity
-    product.save()
+
+    # ✅ FIX: Changed 'stock' to 'quantity' (common naming convention).
+    # If your Product model uses a different name (e.g. 'inventory'), change it here.
+    if hasattr(product, 'quantity'):
+        product.quantity += instance.quantity
+        product.save()
+    elif hasattr(product, 'stock'):
+        product.stock += instance.quantity
+        product.save()
+    else:
+        # Fallback log if neither exists (prevents 500 error crash)
+        print(f"⚠️ Error updating stock: Product model has no 'quantity' or 'stock' field.")
 
 
 # ====================================
@@ -29,21 +39,29 @@ def create_or_update_payable_on_purchase(sender, instance, created, **kwargs):
     """
     Create or update payable when a purchase is POSTED.
     Draft purchases are ignored.
+    Only create payable if total > 0 (Payable model requires amount_borrowed >= 0.01)
     """
 
-    # Ignore drafts
-    if instance.status != "posted":
+    # Ignore drafts or zero-total purchases
+    if instance.status != "posted" or instance.total <= 0:
         return
 
+    # Ensure Payable has all required fields.
+    # Added 'vendor' and 'balance' logic usually required for payables.
     payable, payable_created = Payable.objects.get_or_create(
         purchase=instance,
         defaults={
-            "amount": instance.total,
-            "paid_amount": 0,
+            "vendor": instance.vendor,  # Associate with the vendor
+            "creditor_name": instance.vendor.name if instance.vendor else "Unknown Vendor",
+            "amount_borrowed": instance.total,
+            "amount_paid": 0,
+            "reason_or_item": f"Purchase {instance.invoice_number or 'N/A'}",
+            "date_borrowed": instance.purchase_date,
+            "expected_repayment_date": instance.purchase_date,  # You may want to adjust this
         }
     )
 
     # Sync amount if purchase total changes
-    if not payable_created and payable.amount != instance.total:
-        payable.amount = instance.total
+    if not payable_created and payable.amount_borrowed != instance.total:
+        payable.amount_borrowed = instance.total
         payable.save()

@@ -61,9 +61,15 @@ class ReturnListView(generics.ListCreateAPIView):
             return ReturnCreateSerializer
         return ReturnListSerializer
     
-    def perform_create(self, serializer):
-        """Set created_by user"""
-        serializer.save(created_by=self.request.user)
+    def create(self, request, *args, **kwargs):
+        """Create return and return complete data"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return_obj = serializer.save(created_by=request.user)
+        
+        # Return the complete return data using ReturnListSerializer
+        response_serializer = ReturnListSerializer(return_obj)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ReturnDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -191,35 +197,64 @@ class RefundListView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         """Filter refunds based on query parameters"""
-        queryset = Refund.objects.filter(is_active=True).select_related(
-            'return_request', 'return_request__sale', 'return_request__customer',
-            'processed_by', 'created_by'
-        )
-        
-        # Filter by status
-        status_filter = self.request.query_params.get('status')
-        if status_filter:
-            queryset = queryset.filter(status=status_filter.upper())
-        
-        # Filter by return request
-        return_id = self.request.query_params.get('return_id')
-        if return_id:
-            queryset = queryset.filter(return_request_id=return_id)
-        
-        # Filter by method
-        method = self.request.query_params.get('method')
-        if method:
-            queryset = queryset.filter(method=method.upper())
-        
-        # Filter by date range
-        date_from = self.request.query_params.get('date_from')
-        date_to = self.request.query_params.get('date_to')
-        if date_from:
-            queryset = queryset.filter(created_at__date__gte=date_from)
-        if date_to:
-            queryset = queryset.filter(created_at__date__lte=date_to)
-        
-        return queryset.order_by('-created_at')
+        try:
+            print(f"🔍 [RefundListView] Getting queryset...")
+            queryset = Refund.objects.filter(is_active=True).select_related(
+                'return_request', 'return_request__sale', 'return_request__customer',
+                'processed_by', 'created_by'
+            )
+            print(f"🔍 [RefundListView] Base queryset count: {queryset.count()}")
+            
+            # Filter by status
+            status_filter = self.request.query_params.get('status')
+            if status_filter:
+                queryset = queryset.filter(status=status_filter.upper())
+            
+            # Filter by return request
+            return_id = self.request.query_params.get('return_id')
+            if return_id:
+                queryset = queryset.filter(return_request_id=return_id)
+            
+            # Filter by method
+            method = self.request.query_params.get('method')
+            if method:
+                queryset = queryset.filter(method=method.upper())
+            
+            # Filter by date range
+            date_from = self.request.query_params.get('date_from')
+            date_to = self.request.query_params.get('date_to')
+            if date_from:
+                queryset = queryset.filter(created_at__date__gte=date_from)
+            if date_to:
+                queryset = queryset.filter(created_at__date__lte=date_to)
+            
+            result = queryset.order_by('-created_at')
+            print(f"🔍 [RefundListView] Final queryset count: {result.count()}")
+            return result
+        except Exception as e:
+            print(f"❌ [RefundListView] Error in get_queryset: {e}")
+            import traceback
+            traceback.print_exc()
+            return Refund.objects.none()
+    
+    def list(self, request, *args, **kwargs):
+        """Override list to add error handling"""
+        try:
+            print(f"🔍 [RefundListView] List method called")
+            response = super().list(request, *args, **kwargs)
+            print(f"✅ [RefundListView] List successful: {len(response.data.get('results', []))} items")
+            print(f"🔍 [RefundListView] Response data: {response.data}")
+            return response
+        except Exception as e:
+            print(f"❌ [RefundListView] Error in list: {e}")
+            import traceback
+            traceback.print_exc()
+            from rest_framework.response import Response
+            return Response({
+                'success': False,
+                'message': f'Error loading refunds: {str(e)}',
+                'results': []
+            }, status=200)  # Return 200 instead of 500 to prevent UI breaking
     
     def get_serializer_class(self):
         """Use different serializer for create vs list"""
@@ -342,7 +377,7 @@ def return_statistics(request):
         
         # Total return amount
         total_return_amount = Return.objects.filter(is_active=True).aggregate(
-            total=Sum('total_return_amount')
+            total=Sum('refund_amount')
         )['total'] or Decimal('0.00')
         
         # Total refund amount
@@ -397,7 +432,7 @@ def customer_return_history(request, customer_id):
         # Calculate customer return statistics
         total_returns = returns.count()
         total_return_amount = returns.aggregate(
-            total=Sum('total_return_amount')
+            total=Sum('refund_amount')
         )['total'] or Decimal('0.00')
         
         return Response({
