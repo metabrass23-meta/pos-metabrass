@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
 import 'package:provider/provider.dart';
 import '../../../src/services/barcode_scanner_service.dart';
@@ -30,7 +29,6 @@ class BarcodeScannerWidget extends StatefulWidget {
 class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
   final TextEditingController _barcodeController = TextEditingController();
   final BarcodeScannerService _scannerService = BarcodeScannerService();
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   bool _isScanning = false;
   String _lastScannedBarcode = '';
@@ -58,7 +56,6 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
   @override
   void dispose() {
     _barcodeController.dispose();
-    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -69,23 +66,9 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
     });
   }
 
-  Future<void> _playSuccessSound() async {
-    if (!widget.showFeedback) return;
-    try {
-      await _audioPlayer.play(AssetSource('sounds/success_beep.mp3'));
-    } catch (e) {
-      debugPrint('Audio not supported: $e');
-    }
-  }
 
-  Future<void> _playErrorSound() async {
-    if (!widget.showFeedback) return;
-    try {
-      await _audioPlayer.play(AssetSource('sounds/error_beep.mp3'));
-    } catch (e) {
-      debugPrint('Audio not supported: $e');
-    }
-  }
+
+
 
   Future<void> _vibrate() async {
     if (!widget.showFeedback) return;
@@ -135,7 +118,6 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
           _isError = false;
         });
 
-        await _playSuccessSound();
         await _vibrate();
 
         if (widget.autoAddToCart) {
@@ -229,7 +211,6 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
       _isSuccess = false;
     });
 
-    _playErrorSound();
     _vibrate();
 
     Future.delayed(const Duration(seconds: 2), () {

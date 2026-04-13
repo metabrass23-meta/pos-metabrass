@@ -28,7 +28,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
 
   String? _selectedCategoryId;
   String? _selectedColor;
-  String? _selectedFabric;
+  String? _selectedMaterial;
   String? _selectedStockLevel;
   String _selectedSortBy = 'name';
   String _selectedSortOrder = 'asc';
@@ -44,7 +44,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     final currentFilters = context.read<ProductProvider>().currentFilters;
     _selectedCategoryId = currentFilters.categoryId;
     _selectedColor = currentFilters.color;
-    _selectedFabric = currentFilters.fabric;
+    _selectedMaterial = currentFilters.material;
     _selectedStockLevel = currentFilters.stockLevel;
     _selectedSortBy = currentFilters.sortBy;
     _selectedSortOrder = currentFilters.sortOrder;
@@ -93,7 +93,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     final filters = ProductFilters(
       categoryId: _selectedCategoryId,
       color: _selectedColor,
-      fabric: _selectedFabric,
+      material: _selectedMaterial,
       stockLevel: _selectedStockLevel,
       minPrice: minPrice,
       maxPrice: maxPrice,
@@ -114,7 +114,7 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
     setState(() {
       _selectedCategoryId = null;
       _selectedColor = null;
-      _selectedFabric = null;
+      _selectedMaterial = null;
       _selectedStockLevel = null;
       _selectedSortBy = 'name';
       _selectedSortOrder = 'asc';
@@ -391,18 +391,26 @@ class _FilterProductsDialogState extends State<FilterProductsDialog> with Single
             ),
             SizedBox(height: context.cardPadding),
             Text(
-              l10n.fabric,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              l10n.material,
+              style: TextStyle(
+                fontSize: context.shouldShowCompactLayout ? 13 : 15,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.charcoalGray,
+              ),
             ),
-            SizedBox(height: context.smallPadding),
+            const SizedBox(height: 12),
             Wrap(
-              spacing: context.smallPadding,
-              runSpacing: context.smallPadding / 2,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                _buildFilterChip(label: l10n.allFabrics, isSelected: _selectedFabric == null, onTap: () => setState(() => _selectedFabric = null)),
-                ...provider.availableFabrics.map(
-                      (fabric) =>
-                      _buildFilterChip(label: fabric, isSelected: _selectedFabric == fabric, onTap: () => setState(() => _selectedFabric = fabric)),
+                _buildFilterChip(
+                  label: '${l10n.all} ${l10n.material}',
+                  isSelected: _selectedMaterial == null,
+                  onTap: () => setState(() => _selectedMaterial = null),
+                ),
+                ...provider.availableMaterials.map(
+                      (material) =>
+                      _buildFilterChip(label: material, isSelected: _selectedMaterial == material, onTap: () => setState(() => _selectedMaterial = material)),
                 ),
               ],
             ),

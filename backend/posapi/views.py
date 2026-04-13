@@ -47,6 +47,7 @@ def register_user(request):
                 'errors': {'detail': str(e)}
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+    print(f"DEBUG: Registration validation errors: {serializer.errors}")
     return Response({
         'success': False,
         'message': 'Registration failed.',

@@ -138,6 +138,17 @@ class ApiConfig {
   static String generateReceiptPdf(String id) =>
       '/sales/receipts/$id/generate-pdf/';
 
+  // Receivables API endpoints
+  static const String receivables = '/receivables/';
+  static const String createReceivable = '/receivables/create/';
+  static String getReceivableById(String id) => '/receivables/$id/';
+  static String updateReceivable(String id) => '/receivables/$id/update/';
+  static String deleteReceivable(String id) => '/receivables/$id/delete/';
+  static String recordReceivablePayment(String id) =>
+      '/receivables/$id/record-payment/';
+  static const String receivableSummary = '/receivables/summary/';
+  static const String searchReceivablesData = '/receivables/search/';
+
   // Returns & Refunds API endpoints
   static const String returns = '/sales/returns/';
   static const String returnsEndpoint = '/sales/returns/';
@@ -366,6 +377,16 @@ class ApiConfig {
       '/order-items/order/$orderId/';
   static String orderItemsByProduct(String productId) =>
       '/order-items/product/$productId/';
+
+  // Quotations API endpoints
+  static const String quotations = '/quotations/';
+  static const String createQuotation = '/quotations/';
+  static String getQuotationById(String id) => '/quotations/$id/';
+  static String updateQuotation(String id) => '/quotations/$id/';
+  static String deleteQuotation(String id) => '/quotations/$id/';
+  static String convertQuotationToSale(String id) => '/quotations/$id/convert_to_sale/';
+  static String generateQuotationPdf(String id) => '/quotations/$id/generate_pdf/';
+  static const String quotationsCacheKey = 'cached_quotations';
 
   // Purchases API endpoints
   static const String purchases = '/purchases/';

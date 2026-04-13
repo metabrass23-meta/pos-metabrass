@@ -57,9 +57,9 @@ class _CheckoutDialogState extends State<CheckoutDialog>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<SalesProvider>(context, listen: false);
-      _amountPaidController.text = provider.cartGrandTotal.toStringAsFixed(0);
-      _overallDiscountController.text =
-          provider.overallDiscount.toStringAsFixed(0);
+      _amountPaidController.text = ''; // Empty initially
+      _overallDiscountController.text = provider.overallDiscount
+          .toStringAsFixed(0);
       _gstController.text = provider.gstPercentage.toStringAsFixed(0);
       _taxController.text = provider.taxPercentage.toStringAsFixed(0);
       _notesController.text = '';
@@ -97,8 +97,11 @@ class _CheckoutDialogState extends State<CheckoutDialog>
 
     // ✅ CAPTURE VALUES BEFORE CLEARING CART
     final double capturedTotalAmount = provider.cartGrandTotal;
-    final double amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
-    final String paymentMethod = _translatePaymentMethod(_selectedPaymentMethod);
+    final double amountPaid =
+        double.tryParse(_amountPaidController.text) ?? 0.0;
+    final String paymentMethod = _translatePaymentMethod(
+      _selectedPaymentMethod,
+    );
 
     if (amountPaid < 0) {
       _showErrorDialog('Invalid Amount', 'Amount paid cannot be negative.');
@@ -110,7 +113,8 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     if (_isSplitPayment) {
       final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
       final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
-      final bankAmount = double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+      final bankAmount =
+          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
 
       splitPaymentDetails = {
         'cash': cashAmount,
@@ -146,7 +150,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
           context: context,
           barrierDismissible: false,
           builder: (context) => OrderSuccessDialog(
-            saleId: newSale.id,                   // ✅ Fix: Pass Sale ID
+            saleId: newSale.id, // ✅ Fix: Pass Sale ID
             invoiceNumber: newSale.invoiceNumber, // ✅ Fix: Pass Invoice Number
             totalPrice: capturedTotalAmount,
             advanceAmount: amountPaid,
@@ -162,10 +166,7 @@ class _CheckoutDialogState extends State<CheckoutDialog>
       }
     } catch (e) {
       if (!mounted) return;
-      _showErrorDialog(
-        'Error',
-        e.toString().replaceAll('Exception: ', ''),
-      );
+      _showErrorDialog('Error', e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -218,7 +219,8 @@ class _CheckoutDialogState extends State<CheckoutDialog>
     if (_isSplitPayment) {
       final cashAmount = double.tryParse(_cashAmountController.text) ?? 0.0;
       final cardAmount = double.tryParse(_cardAmountController.text) ?? 0.0;
-      final bankAmount = double.tryParse(_bankTransferAmountController.text) ?? 0.0;
+      final bankAmount =
+          double.tryParse(_bankTransferAmountController.text) ?? 0.0;
       final totalAmount = cashAmount + cardAmount + bankAmount;
 
       setState(() {
@@ -713,39 +715,40 @@ class _CheckoutDialogState extends State<CheckoutDialog>
                     _isSplitPayment = value == 'Split';
                   });
                 },
-                items: [
-                  l10n.cash,
-                  l10n.card,
-                  l10n.bankTransfer,
-                  l10n.credit,
-                  l10n.split,
-                ].map((method) {
-                  return DropdownMenuItem<String>(
-                    value: method,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.cardPadding / 2,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _getPaymentMethodIcon(method),
-                            color: AppTheme.primaryMaroon,
-                            size: context.iconSize('medium'),
+                items:
+                    [
+                      l10n.cash,
+                      l10n.card,
+                      l10n.bankTransfer,
+                      l10n.credit,
+                      l10n.split,
+                    ].map((method) {
+                      return DropdownMenuItem<String>(
+                        value: method,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.cardPadding / 2,
                           ),
-                          SizedBox(width: context.smallPadding),
-                          Text(
-                            method,
-                            style: TextStyle(
-                              fontSize: context.bodyFontSize,
-                              color: AppTheme.charcoalGray,
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _getPaymentMethodIcon(method),
+                                color: AppTheme.primaryMaroon,
+                                size: context.iconSize('medium'),
+                              ),
+                              SizedBox(width: context.smallPadding),
+                              Text(
+                                method,
+                                style: TextStyle(
+                                  fontSize: context.bodyFontSize,
+                                  color: AppTheme.charcoalGray,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
           ),
@@ -934,24 +937,29 @@ class _CheckoutDialogState extends State<CheckoutDialog>
             onChanged: (value) {
               print('🔍 Overall discount field changed');
               print('🔍 Input value: $value');
-              
+
               final discount = double.tryParse(value) ?? 0.0;
               print('🔍 Parsed discount: $discount');
-              
-              final provider = Provider.of<SalesProvider>(context, listen: false);
+
+              final provider = Provider.of<SalesProvider>(
+                context,
+                listen: false,
+              );
               print('🔍 Cart subtotal: ${provider.cartSubtotal}');
-              
+
               // Ensure discount doesn't exceed cart subtotal
               final maxDiscount = provider.cartSubtotal;
               print('🔍 Maximum allowed discount: $maxDiscount');
-              
+
               if (discount >= 0 && discount <= maxDiscount) {
                 provider.setOverallDiscount(discount);
                 print('✅ Set overall discount to: $discount');
               } else if (discount > maxDiscount) {
                 // Set to maximum allowed discount
                 provider.setOverallDiscount(maxDiscount);
-                _overallDiscountController.text = maxDiscount.toStringAsFixed(0);
+                _overallDiscountController.text = maxDiscount.toStringAsFixed(
+                  0,
+                );
                 print('⚠️ Discount exceeded max, set to: $maxDiscount');
               } else {
                 // Reset to 0 for negative values

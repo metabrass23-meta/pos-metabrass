@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 import '../../widgets/dashboard/dashboard_content.dart';
 import '../../widgets/globals/sidebar.dart';
 
@@ -30,56 +30,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppTheme.creamWhite,
-        body: Consumer<DashboardProvider>(
-          builder: (context, dashboardProvider, child) {
-            return Row(
-              children: [
-                // Sidebar
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  width: dashboardProvider.isSidebarExpanded ? 28.w : 8.w,
-                  child: PremiumSidebar(
-                    isExpanded: dashboardProvider.isSidebarExpanded,
-                    selectedIndex: dashboardProvider.selectedMenuIndex,
-                    onMenuSelected: (index) {
-                      dashboardProvider.selectMenu(index);
-                    },
-                    onToggle: () {
-                      dashboardProvider.toggleSidebar();
-                    },
-                  ),
+      backgroundColor: AppTheme.creamWhite,
+      body: Consumer<DashboardProvider>(
+        builder: (context, dashboardProvider, child) {
+          return Row(
+            children: [
+              // Sidebar
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: dashboardProvider.isSidebarExpanded
+                    ? ResponsiveBreakpoints.getSidebarExpandedWidth(context)
+                    : ResponsiveBreakpoints.getSidebarCollapsedWidth(context),
+                child: PremiumSidebar(
+                  isExpanded: dashboardProvider.isSidebarExpanded,
+                  selectedIndex: dashboardProvider.selectedMenuIndex,
+                  onMenuSelected: (index) {
+                    dashboardProvider.selectMenu(index);
+                  },
+                  onToggle: () {
+                    dashboardProvider.toggleSidebar();
+                  },
                 ),
+              ),
 
-                // Main Content
-                Expanded(
-                  child: Column(
-                    children: [
-                      // Header
-                      // DashboardHeader(
-                      //   title: dashboardProvider.currentPageTitle,
-                      //   onNotificationTap: () {
-                      //     // Handle notifications
-                      //   },
-                      //   onProfileTap: () {
-                      //     // Handle profile
-                      //   },
-                      // ),
+              // Main Content
+              Expanded(
+                child: Column(
+                  children: [
+                    // Header
+                    // DashboardHeader(
+                    //   title: dashboardProvider.currentPageTitle,
+                    //   onNotificationTap: () {
+                    //     // Handle notifications
+                    //   },
+                    //   onProfileTap: () {
+                    //     // Handle profile
+                    //   },
+                    // ),
 
-                      // Content
-                      Expanded(
-                        child: DashboardContent(
-                          selectedIndex: dashboardProvider.selectedMenuIndex,
-                        ),
+                    // Content
+                    Expanded(
+                      child: DashboardContent(
+                        selectedIndex: dashboardProvider.selectedMenuIndex,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          },
-        ),
-      );
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }

@@ -419,7 +419,7 @@ class _AddPayableDialogState extends State<AddPayableDialog> with SingleTickerPr
             keyboardType: TextInputType.phone,
             validator: (value) {
               if (value?.isEmpty ?? true) return l10n.pleaseEnterPhoneNumber;
-              if (!RegExp(r'^\+?[1-9]\d{1,14}$').hasMatch(value!)) return l10n.pleaseEnterAValidPhoneNumber;
+              if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value!)) return l10n.pleaseEnterAValidPhoneNumber;
               return null;
             },
           ),

@@ -332,35 +332,34 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
 
           isCompact
               ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInvoiceField(l10n, l10n.name, widget.sale.customerName),
-              SizedBox(height: context.smallPadding),
-              _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone),
-              SizedBox(height: context.smallPadding),
-              _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId!),
-            ],
-          )
-              : Row(
-            children: [
-              Expanded(
-                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildInvoiceField(l10n, l10n.name, widget.sale.customerName),
                     SizedBox(height: context.smallPadding),
                     _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone),
+                    SizedBox(height: context.smallPadding),
+                    _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId ?? '-'),
+                    SizedBox(height: context.smallPadding),
+                    _buildInvoiceField(l10n, 'Notes', widget.sale.notes ?? '-'),
+                  ],
+                )
+              : Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: _buildInvoiceField(l10n, l10n.name, widget.sale.customerName)),
+                        Expanded(child: _buildInvoiceField(l10n, l10n.phone, widget.sale.customerPhone)),
+                      ],
+                    ),
+                    SizedBox(height: context.smallPadding),
+                    Row(
+                      children: [
+                        Expanded(child: _buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId ?? '-')),
+                        Expanded(child: _buildInvoiceField(l10n, 'Notes', widget.sale.notes ?? '-')),
+                      ],
+                    ),
                   ],
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_buildInvoiceField(l10n, l10n.customerId, widget.sale.customerId!)],
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -430,7 +429,7 @@ class _ViewSaleDialogState extends State<ViewSaleDialog> with SingleTickerProvid
                   SizedBox(width: context.smallPadding),
                   Expanded(
                     child: Text(
-                      item.productName,
+                      item.productName ?? 'Unknown Product',
                       style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

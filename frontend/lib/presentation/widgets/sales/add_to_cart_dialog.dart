@@ -32,7 +32,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
 
   bool _isCustomPrice = false;
   bool _hasNotes = false;
-  int _quantity = 1;
+  double _quantity = 1.0;
   double _itemDiscount = 0.0;
 
   @override
@@ -259,7 +259,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
             width: 60,
             height: 60,
             decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.checkroom_outlined, color: Colors.grey[500], size: context.iconSize('large')),
+            child: Icon(Icons.category_outlined, color: Colors.grey[500], size: context.iconSize('large')),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -284,7 +284,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     ),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      '${widget.product.color} • ${widget.product.fabric}',
+                      '${widget.product.color} • ${widget.product.material}',
                       style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     ),
                   ],
@@ -297,7 +297,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                   ),
                   child: Text(
-                    '${l10n.stockAvailable}: ${widget.product.quantity}',
+                    l10n.stockAvailable(widget.product.quantity),
                     style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: widget.product.stockStatusColor),
                   ),
                 ),
@@ -349,23 +349,23 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                     ),
                   ),
                   Container(
-                    width: 60,
+                    width: 70,
                     padding: EdgeInsets.symmetric(vertical: context.smallPadding),
                     child: TextFormField(
                       controller: _quantityController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
                       onChanged: (value) {
-                        final qty = int.tryParse(value) ?? 1;
+                        final qty = double.tryParse(value) ?? 1.0;
                         setState(() {
-                          _quantity = qty.clamp(1, widget.product.quantity);
+                          _quantity = qty.clamp(0.01, widget.product.quantity);
                         });
                       },
                       validator: (value) {
-                        final qty = int.tryParse(value ?? '') ?? 0;
-                        if (qty < 1) return '${l10n.min} 1';
+                        final qty = double.tryParse(value ?? '') ?? 0.0;
+                        if (qty <= 0) return '${l10n.min} 0.01';
                         if (qty > widget.product.quantity) return '${l10n.max} ${widget.product.quantity}';
                         return null;
                       },
@@ -405,10 +405,9 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      setState(() {
-                        _quantity = qty;
-                        _quantityController.text = qty.toString();
-                      });
+                      _quantity = qty.toDouble();
+                      _quantityController.text = _quantity.toString();
+                      setState(() {});
                     },
                     borderRadius: BorderRadius.circular(context.borderRadius('small')),
                     child: Container(
@@ -598,7 +597,7 @@ class _EnhancedAddToCartDialogState extends State<EnhancedAddToCartDialog> with 
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                   child: Text(
-                    l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
+                    l10n.clearDiscount,
                     style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
                   ),
 

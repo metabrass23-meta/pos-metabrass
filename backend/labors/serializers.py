@@ -24,6 +24,9 @@ class LaborSerializer(serializers.ModelSerializer):
     full_address = serializers.CharField(read_only=True)
     gender_display = serializers.CharField(read_only=True)
     
+    cnic = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    caste = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
     # Payment-related fields (placeholders for future integration)
     advance_payments_count = serializers.SerializerMethodField()
     total_advance_amount = serializers.SerializerMethodField()
@@ -143,7 +146,7 @@ class LaborSerializer(serializers.ModelSerializer):
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
         if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+            return None
         
         cnic = value.strip()
         
@@ -168,7 +171,7 @@ class LaborSerializer(serializers.ModelSerializer):
     def validate_caste(self, value):
         """Clean caste field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Caste is required.")
+            return None
         return value.strip().title()
 
     def validate_designation(self, value):
@@ -213,6 +216,9 @@ class LaborSerializer(serializers.ModelSerializer):
 class LaborCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating labors"""
     
+    cnic = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    caste = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
     class Meta:
         model = Labor
         fields = (
@@ -243,7 +249,7 @@ class LaborCreateSerializer(serializers.ModelSerializer):
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
         if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+            return None
         
         cnic = value.strip()
         
@@ -264,7 +270,7 @@ class LaborCreateSerializer(serializers.ModelSerializer):
     def validate_caste(self, value):
         """Clean caste field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Caste is required.")
+            return None
         return value.strip().title()
 
     def validate_designation(self, value):
@@ -315,6 +321,9 @@ class LaborCreateSerializer(serializers.ModelSerializer):
 class LaborUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating labors"""
     
+    cnic = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    caste = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
     class Meta:
         model = Labor
         fields = (
@@ -345,7 +354,7 @@ class LaborUpdateSerializer(serializers.ModelSerializer):
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
         if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+            return None
         
         cnic = value.strip()
         
@@ -370,7 +379,7 @@ class LaborUpdateSerializer(serializers.ModelSerializer):
     def validate_caste(self, value):
         """Clean caste field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Caste is required.")
+            return None
         return value.strip().title()
 
     def validate_designation(self, value):
@@ -424,6 +433,11 @@ class LaborListSerializer(serializers.ModelSerializer):
     work_experience_years = serializers.FloatField(read_only=True)
     advance_payments_count = serializers.SerializerMethodField()
     total_advance_amount = serializers.SerializerMethodField()
+    remaining_advance_amount = serializers.SerializerMethodField()
+    total_advances_amount = serializers.SerializerMethodField()
+    
+    cnic = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    caste = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     
     class Meta:
         model = Labor
@@ -448,6 +462,9 @@ class LaborListSerializer(serializers.ModelSerializer):
             'work_experience_years',
             'advance_payments_count',
             'total_advance_amount',
+            'remaining_monthly_salary',
+            'remaining_advance_amount',
+            'total_advances_amount',
             'is_active',
             'created_at',
             'created_by_email'
@@ -460,6 +477,26 @@ class LaborListSerializer(serializers.ModelSerializer):
     def get_total_advance_amount(self, obj):
         """Get total advance amount for labor"""
         return obj.get_total_advance_amount()
+
+    def get_remaining_advance_amount(self, obj):
+        """Get remaining advance amount for labor"""
+        try:
+            from decimal import Decimal
+            result = obj.get_remaining_advance_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
+    
+    def get_total_advances_amount(self, obj):
+        """Get total advances amount for current month"""
+        try:
+            from decimal import Decimal
+            result = obj.get_total_advances_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
 
 
 class LaborDetailSerializer(serializers.ModelSerializer):
@@ -476,6 +513,14 @@ class LaborDetailSerializer(serializers.ModelSerializer):
     formatted_phone = serializers.CharField(read_only=True)
     full_address = serializers.CharField(read_only=True)
     gender_display = serializers.CharField(read_only=True)
+    
+    cnic = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    caste = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
+    advance_payments_count = serializers.SerializerMethodField()
+    total_advance_amount = serializers.SerializerMethodField()
+    remaining_advance_amount = serializers.SerializerMethodField()
+    total_advances_amount = serializers.SerializerMethodField()
     
     class Meta:
         model = Labor
@@ -502,11 +547,44 @@ class LaborDetailSerializer(serializers.ModelSerializer):
             'phone_country_code',
             'formatted_phone',
             'full_address',
+            'advance_payments_count',
+            'total_advance_amount',
+            'remaining_monthly_salary',
+            'remaining_advance_amount',
+            'total_advances_amount',
             'is_active',
             'created_at',
             'updated_at',
             'created_by'
         )
+        
+    def get_advance_payments_count(self, obj):
+        """Get total advance payments count for labor"""
+        return obj.get_advance_payments_count()
+    
+    def get_total_advance_amount(self, obj):
+        """Get total advance amount for labor"""
+        return obj.get_total_advance_amount()
+
+    def get_remaining_advance_amount(self, obj):
+        """Get remaining advance amount for labor"""
+        try:
+            from decimal import Decimal
+            result = obj.get_remaining_advance_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
+    
+    def get_total_advances_amount(self, obj):
+        """Get total advances amount for current month"""
+        try:
+            from decimal import Decimal
+            result = obj.get_total_advances_amount()
+            return Decimal(str(result)) if result is not None else Decimal('0.00')
+        except Exception:
+            from decimal import Decimal
+            return Decimal('0.00')
 
 
 class LaborStatsSerializer(serializers.Serializer):
@@ -704,7 +782,9 @@ class LaborDuplicateSerializer(serializers.Serializer):
     )
     cnic = serializers.CharField(
         max_length=15,
-        required=True,
+        required=False,
+        allow_blank=True,
+        allow_null=True,
         help_text="CNIC for the new labor"
     )
     age = serializers.IntegerField(
@@ -726,7 +806,7 @@ class LaborDuplicateSerializer(serializers.Serializer):
     def validate_cnic(self, value):
         """Clean CNIC and check uniqueness"""
         if not value or not value.strip():
-            raise serializers.ValidationError("CNIC is required.")
+            return None
         
         cnic = value.strip()
         

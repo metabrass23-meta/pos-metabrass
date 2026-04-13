@@ -12,10 +12,11 @@ import '../models/profit_loss/profit_loss_models.dart';
 import '../theme/app_theme.dart';
 
 class ProfitLossExportService {
-  static const String _companyName = 'Al Noor';
-  static const String _companyAddress = 'Your Company Address';
-  static const String _companyPhone = '+92 XXX XXXXXXX';
-  static const String _companyEmail = 'info@alnoor.com';
+  static const String _companyName = 'MetaBrass';
+  static const String _companyAddress =
+      'Kacha Eminabadroad Siddique Colony Gujranwala';
+  static const String _companyPhone = '055-8174471';
+  static const String _companyEmail = 'info@metabras.com';
 
   /// Export Profit & Loss report to PDF
   static Future<String?> exportToPDF({
@@ -42,7 +43,8 @@ class ProfitLossExportService {
 
       // Save PDF
       final output = await getTemporaryDirectory();
-      final fileName = 'profit_loss_report_${_getFormattedDate(DateTime.now())}.pdf';
+      final fileName =
+          'profit_loss_report_${_getFormattedDate(DateTime.now())}.pdf';
       final file = File(path.join(output.path, fileName));
       await file.writeAsBytes(await pdf.save());
 
@@ -81,7 +83,8 @@ class ProfitLossExportService {
 
       // Save Excel file
       final output = await getTemporaryDirectory();
-      final fileName = 'profit_loss_report_${_getFormattedDate(DateTime.now())}.xlsx';
+      final fileName =
+          'profit_loss_report_${_getFormattedDate(DateTime.now())}.xlsx';
       final file = File(path.join(output.path, fileName));
       await file.writeAsBytes(excel.encode()!);
 
@@ -93,7 +96,10 @@ class ProfitLossExportService {
   }
 
   /// Build PDF Summary Page
-  static pw.Page _buildSummaryPage(ProfitLossRecord profitLoss, String? customPeriod) {
+  static pw.Page _buildSummaryPage(
+    ProfitLossRecord profitLoss,
+    String? customPeriod,
+  ) {
     return pw.Page(
       pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
@@ -114,7 +120,9 @@ class ProfitLossExportService {
   }
 
   /// Build PDF Product Analysis Page
-  static pw.Page _buildProductAnalysisPage(List<ProductProfitability> products) {
+  static pw.Page _buildProductAnalysisPage(
+    List<ProductProfitability> products,
+  ) {
     return pw.Page(
       pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
@@ -125,7 +133,11 @@ class ProfitLossExportService {
             pw.SizedBox(height: 20),
             pw.Text(
               'Product Profitability Analysis',
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue900,
+              ),
             ),
             pw.SizedBox(height: 15),
             _buildProductTable(products),
@@ -147,7 +159,11 @@ class ProfitLossExportService {
             pw.SizedBox(height: 20),
             pw.Text(
               'Business Dashboard',
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue900,
+              ),
             ),
             pw.SizedBox(height: 15),
             _buildDashboardMetrics(dashboard),
@@ -169,7 +185,11 @@ class ProfitLossExportService {
             pw.SizedBox(height: 20),
             pw.Text(
               'Detailed Breakdown',
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue900,
+              ),
             ),
             pw.SizedBox(height: 15),
             _buildDetailedBreakdown(profitLoss),
@@ -195,10 +215,20 @@ class ProfitLossExportService {
             children: [
               pw.Text(
                 _companyName,
-                style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+                style: pw.TextStyle(
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.blue900,
+                ),
               ),
-              pw.Text(_companyAddress, style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
-              pw.Text('Phone: $_companyPhone | Email: $_companyEmail', style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
+              pw.Text(
+                _companyAddress,
+                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+              ),
+              pw.Text(
+                'Phone: $_companyPhone | Email: $_companyEmail',
+                style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+              ),
             ],
           ),
           pw.Column(
@@ -206,9 +236,16 @@ class ProfitLossExportService {
             children: [
               pw.Text(
                 'Profit & Loss Report',
-                style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.red800),
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.red800,
+                ),
               ),
-              pw.Text('Generated: ${_getFormattedDateTime(DateTime.now())}', style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600)),
+              pw.Text(
+                'Generated: ${_getFormattedDateTime(DateTime.now())}',
+                style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+              ),
             ],
           ),
         ],
@@ -217,7 +254,10 @@ class ProfitLossExportService {
   }
 
   /// Build Summary Section
-  static pw.Widget _buildSummarySection(ProfitLossRecord profitLoss, String? customPeriod) {
+  static pw.Widget _buildSummarySection(
+    ProfitLossRecord profitLoss,
+    String? customPeriod,
+  ) {
     return pw.Container(
       padding: pw.EdgeInsets.all(15),
       decoration: pw.BoxDecoration(
@@ -230,14 +270,26 @@ class ProfitLossExportService {
         children: [
           pw.Text(
             'Period Summary',
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
           ),
           pw.SizedBox(height: 10),
           pw.Row(
             children: [
-              pw.Expanded(child: pw.Text('Period Type: ${customPeriod ?? profitLoss.periodTypeDisplay}')),
-              pw.Expanded(child: pw.Text('From: ${_formatDate(profitLoss.startDate)}')),
-              pw.Expanded(child: pw.Text('To: ${_formatDate(profitLoss.endDate)}')),
+              pw.Expanded(
+                child: pw.Text(
+                  'Period Type: ${customPeriod ?? profitLoss.periodTypeDisplay}',
+                ),
+              ),
+              pw.Expanded(
+                child: pw.Text('From: ${_formatDate(profitLoss.startDate)}'),
+              ),
+              pw.Expanded(
+                child: pw.Text('To: ${_formatDate(profitLoss.endDate)}'),
+              ),
             ],
           ),
         ],
@@ -259,22 +311,42 @@ class ProfitLossExportService {
         children: [
           pw.Text(
             'Key Financial Metrics',
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
           ),
           pw.SizedBox(height: 15),
           pw.Row(
             children: [
-              _buildMetricCard('Total Income', profitLoss.formattedTotalIncome, PdfColors.green),
+              _buildMetricCard(
+                'Total Income',
+                profitLoss.formattedTotalIncome,
+                PdfColors.green,
+              ),
               pw.SizedBox(width: 10),
-              _buildMetricCard('Total Expenses', profitLoss.formattedTotalExpenses, PdfColors.red),
+              _buildMetricCard(
+                'Total Expenses',
+                profitLoss.formattedTotalExpenses,
+                PdfColors.red,
+              ),
             ],
           ),
           pw.SizedBox(height: 10),
           pw.Row(
             children: [
-              _buildMetricCard('Gross Profit', profitLoss.formattedGrossProfit, PdfColors.blue),
+              _buildMetricCard(
+                'Gross Profit',
+                profitLoss.formattedGrossProfit,
+                PdfColors.blue,
+              ),
               pw.SizedBox(width: 10),
-              _buildMetricCard('Net Profit', profitLoss.formattedNetProfit, profitLoss.isProfitable ? PdfColors.green : PdfColors.red),
+              _buildMetricCard(
+                'Net Profit',
+                profitLoss.formattedNetProfit,
+                profitLoss.isProfitable ? PdfColors.green : PdfColors.red,
+              ),
             ],
           ),
         ],
@@ -283,7 +355,11 @@ class ProfitLossExportService {
   }
 
   /// Build Metric Card
-  static pw.Widget _buildMetricCard(String title, String value, PdfColor color) {
+  static pw.Widget _buildMetricCard(
+    String title,
+    String value,
+    PdfColor color,
+  ) {
     return pw.Expanded(
       child: pw.Container(
         padding: pw.EdgeInsets.all(10),
@@ -296,12 +372,20 @@ class ProfitLossExportService {
           children: [
             pw.Text(
               title,
-              style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700),
+              style: pw.TextStyle(
+                fontSize: 12,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.grey700,
+              ),
             ),
             pw.SizedBox(height: 5),
             pw.Text(
               value,
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: color),
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+                color: color,
+              ),
             ),
           ],
         ),
@@ -323,22 +407,40 @@ class ProfitLossExportService {
         children: [
           pw.Text(
             'Profitability Indicators',
-            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
           ),
           pw.SizedBox(height: 15),
           pw.Row(
             children: [
-              pw.Expanded(child: pw.Text('Gross Profit Margin: ${profitLoss.formattedGrossProfitMargin}')),
-              pw.Expanded(child: pw.Text('Net Profit Margin: ${profitLoss.formattedProfitMargin}')),
+              pw.Expanded(
+                child: pw.Text(
+                  'Gross Profit Margin: ${profitLoss.formattedGrossProfitMargin}',
+                ),
+              ),
+              pw.Expanded(
+                child: pw.Text(
+                  'Net Profit Margin: ${profitLoss.formattedProfitMargin}',
+                ),
+              ),
             ],
           ),
           pw.SizedBox(height: 10),
           pw.Row(
             children: [
               pw.Expanded(
-                child: pw.Text('Expense Ratio: ${(profitLoss.totalExpensesCalculated / profitLoss.totalSalesIncome * 100).toStringAsFixed(1)}%'),
+                child: pw.Text(
+                  'Expense Ratio: ${(profitLoss.totalExpensesCalculated / profitLoss.totalSalesIncome * 100).toStringAsFixed(1)}%',
+                ),
               ),
-              pw.Expanded(child: pw.Text('Status: ${profitLoss.isProfitable ? "Profitable" : "Loss"}')),
+              pw.Expanded(
+                child: pw.Text(
+                  'Status: ${profitLoss.isProfitable ? "Profitable" : "Loss"}',
+                ),
+              ),
             ],
           ),
         ],
@@ -348,7 +450,16 @@ class ProfitLossExportService {
 
   /// Build Product Table
   static pw.Widget _buildProductTable(List<ProductProfitability> products) {
-    final headers = ['Rank', 'Product', 'Category', 'Units Sold', 'Revenue', 'Cost', 'Profit', 'Margin %'];
+    final headers = [
+      'Rank',
+      'Product',
+      'Category',
+      'Units Sold',
+      'Revenue',
+      'Cost',
+      'Profit',
+      'Margin %',
+    ];
 
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey400),
@@ -370,7 +481,10 @@ class ProfitLossExportService {
               .map(
                 (header) => pw.Padding(
                   padding: pw.EdgeInsets.all(5),
-                  child: pw.Text(header, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  child: pw.Text(
+                    header,
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
                 ),
               )
               .toList(),
@@ -381,19 +495,53 @@ class ProfitLossExportService {
             .map(
               (product) => pw.TableRow(
                 children: [
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text('#${product.profitabilityRank}')),
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text(product.productName, maxLines: 2)),
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text(product.productCategory)),
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text(product.unitsSold.toString())),
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text(product.formattedTotalRevenue)),
-                  pw.Padding(padding: pw.EdgeInsets.all(5), child: pw.Text('PKR ${product.totalCost.toStringAsFixed(0)}')),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5),
-                    child: pw.Text(product.formattedGrossProfit, style: pw.TextStyle(color: product.isProfitable ? PdfColors.green : PdfColors.red)),
+                    child: pw.Text('#${product.profitabilityRank}'),
                   ),
                   pw.Padding(
                     padding: pw.EdgeInsets.all(5),
-                    child: pw.Text(product.formattedProfitMargin, style: pw.TextStyle(color: product.isProfitable ? PdfColors.green : PdfColors.red)),
+                    child: pw.Text(product.productName, maxLines: 2),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(product.productCategory),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(product.unitsSold.toString()),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(product.formattedTotalRevenue),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(
+                      'PKR ${product.totalCost.toStringAsFixed(0)}',
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(
+                      product.formattedGrossProfit,
+                      style: pw.TextStyle(
+                        color: product.isProfitable
+                            ? PdfColors.green
+                            : PdfColors.red,
+                      ),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.all(5),
+                    child: pw.Text(
+                      product.formattedProfitMargin,
+                      style: pw.TextStyle(
+                        color: product.isProfitable
+                            ? PdfColors.green
+                            : PdfColors.red,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -413,7 +561,10 @@ class ProfitLossExportService {
           'Profit Growth: ${dashboard.growthMetrics.profitGrowth.toStringAsFixed(1)}%',
         ]),
         pw.SizedBox(height: 15),
-        _buildDashboardCard('Business Trends', ['Sales Trend: ${dashboard.trends.salesTrend}', 'Profit Trend: ${dashboard.trends.profitTrend}']),
+        _buildDashboardCard('Business Trends', [
+          'Sales Trend: ${dashboard.trends.salesTrend}',
+          'Profit Trend: ${dashboard.trends.profitTrend}',
+        ]),
         pw.SizedBox(height: 15),
         _buildDashboardCard('Expense Breakdown', [
           'Labor: PKR ${dashboard.expenseBreakdown.laborPayments.toStringAsFixed(0)}',
@@ -439,7 +590,11 @@ class ProfitLossExportService {
         children: [
           pw.Text(
             title,
-            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
           ),
           pw.SizedBox(height: 10),
           ...items
@@ -459,7 +614,10 @@ class ProfitLossExportService {
   static pw.Widget _buildDetailedBreakdown(ProfitLossRecord profitLoss) {
     return pw.Column(
       children: [
-        _buildBreakdownCard('Income Sources', ['Sales Income: ${profitLoss.formattedTotalIncome}', 'Products Sold: ${profitLoss.totalProductsSold}']),
+        _buildBreakdownCard('Income Sources', [
+          'Sales Income: ${profitLoss.formattedTotalIncome}',
+          'Products Sold: ${profitLoss.totalProductsSold}',
+        ]),
         pw.SizedBox(height: 15),
         _buildBreakdownCard('Expense Categories', [
           'Labor Payments: PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)}',
@@ -491,7 +649,11 @@ class ProfitLossExportService {
         children: [
           pw.Text(
             title,
-            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.blue900,
+            ),
           ),
           pw.SizedBox(height: 10),
           ...items
@@ -508,52 +670,96 @@ class ProfitLossExportService {
   }
 
   /// Add Summary Sheet to Excel
-  static void _addSummarySheet(Excel excel, ProfitLossRecord profitLoss, String? customPeriod) {
+  static void _addSummarySheet(
+    Excel excel,
+    ProfitLossRecord profitLoss,
+    String? customPeriod,
+  ) {
     final sheet = excel['Summary'];
 
     // Header
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value = 'Profit & Loss Summary';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value = 'Generated: ${_getFormattedDateTime(DateTime.now())}';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value =
+        'Profit & Loss Summary';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value =
+        'Generated: ${_getFormattedDateTime(DateTime.now())}';
 
     // Period Information
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value = 'Period Information';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value = 'Period Type';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value = customPeriod ?? profitLoss.periodTypeDisplay;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value = 'Start Date';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 5)).value = _formatDate(profitLoss.startDate);
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value = 'End Date';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value = _formatDate(profitLoss.endDate);
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value =
+        'Period Information';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value =
+        'Period Type';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value =
+        customPeriod ?? profitLoss.periodTypeDisplay;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value =
+        'Start Date';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 5)).value =
+        _formatDate(profitLoss.startDate);
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value =
+        'End Date';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value =
+        _formatDate(profitLoss.endDate);
 
     // Financial Summary
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 8)).value = 'Financial Summary';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value = 'Total Income';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 9)).value = profitLoss.totalSalesIncome;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value = 'Total Expenses';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value = profitLoss.totalExpenses;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value = 'Gross Profit';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 11)).value = profitLoss.grossProfit;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 12)).value = 'Net Profit';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 12)).value = profitLoss.netProfit;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 8)).value =
+        'Financial Summary';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value =
+        'Total Income';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 9)).value =
+        profitLoss.totalSalesIncome;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value =
+        'Total Expenses';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value =
+        profitLoss.totalExpenses;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value =
+        'Gross Profit';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 11)).value =
+        profitLoss.grossProfit;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 12)).value =
+        'Net Profit';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 12)).value =
+        profitLoss.netProfit;
 
     // Profitability Metrics
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 14)).value = 'Profitability Metrics';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 15)).value = 'Gross Profit Margin';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 15)).value = '${profitLoss.grossProfitMarginPercentage.toStringAsFixed(2)}%';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 16)).value = 'Net Profit Margin';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 16)).value = '${profitLoss.profitMarginPercentage.toStringAsFixed(2)}%';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 17)).value = 'Expense Ratio';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 14)).value =
+        'Profitability Metrics';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 15)).value =
+        'Gross Profit Margin';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 15)).value =
+        '${profitLoss.grossProfitMarginPercentage.toStringAsFixed(2)}%';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 16)).value =
+        'Net Profit Margin';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 16)).value =
+        '${profitLoss.profitMarginPercentage.toStringAsFixed(2)}%';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 17)).value =
+        'Expense Ratio';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 17)).value =
         '${(profitLoss.totalExpensesCalculated / profitLoss.totalSalesIncome * 100).toStringAsFixed(2)}%';
   }
 
   /// Add Product Analysis Sheet to Excel
-  static void _addProductAnalysisSheet(Excel excel, List<ProductProfitability> products) {
+  static void _addProductAnalysisSheet(
+    Excel excel,
+    List<ProductProfitability> products,
+  ) {
     final sheet = excel['Product Analysis'];
 
     // Headers
-    final headers = ['Rank', 'Product Name', 'Category', 'Units Sold', 'Revenue', 'Cost', 'Profit', 'Margin %', 'Status'];
+    final headers = [
+      'Rank',
+      'Product Name',
+      'Category',
+      'Units Sold',
+      'Revenue',
+      'Cost',
+      'Profit',
+      'Margin %',
+      'Status',
+    ];
     for (int i = 0; i < headers.length; i++) {
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0)).value = headers[i];
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
+              .value =
+          headers[i];
     }
 
     // Data
@@ -561,15 +767,43 @@ class ProfitLossExportService {
       final product = products[i];
       final row = i + 1;
 
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row)).value = product.profitabilityRank;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row)).value = product.productName;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row)).value = product.productCategory;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row)).value = product.unitsSold;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row)).value = product.totalRevenue;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row)).value = product.totalCost;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row)).value = product.grossProfit;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row)).value = product.profitMargin;
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row)).value = product.isProfitable ? 'Profitable' : 'Loss';
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
+              .value =
+          product.profitabilityRank;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
+              .value =
+          product.productName;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
+              .value =
+          product.productCategory;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
+              .value =
+          product.unitsSold;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
+              .value =
+          product.totalRevenue;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
+              .value =
+          product.totalCost;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
+              .value =
+          product.grossProfit;
+      sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
+              .value =
+          product.profitMargin;
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
+          .value = product.isProfitable
+          ? 'Profitable'
+          : 'Loss';
     }
   }
 
@@ -578,60 +812,100 @@ class ProfitLossExportService {
     final sheet = excel['Dashboard'];
 
     // Growth Metrics
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value = 'Growth Metrics';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value = 'Sales Growth';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 1)).value = '${dashboard.growthMetrics.salesGrowth.toStringAsFixed(1)}%';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 2)).value = 'Expense Growth';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 2)).value = '${dashboard.growthMetrics.expenseGrowth.toStringAsFixed(1)}%';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value = 'Profit Growth';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 3)).value = '${dashboard.growthMetrics.profitGrowth.toStringAsFixed(1)}%';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value =
+        'Growth Metrics';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value =
+        'Sales Growth';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 1)).value =
+        '${dashboard.growthMetrics.salesGrowth.toStringAsFixed(1)}%';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 2)).value =
+        'Expense Growth';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 2)).value =
+        '${dashboard.growthMetrics.expenseGrowth.toStringAsFixed(1)}%';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value =
+        'Profit Growth';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 3)).value =
+        '${dashboard.growthMetrics.profitGrowth.toStringAsFixed(1)}%';
 
     // Trends
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value = 'Business Trends';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value = 'Sales Trend';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value = dashboard.trends.salesTrend;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 7)).value = 'Profit Trend';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 7)).value = dashboard.trends.profitTrend;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value =
+        'Business Trends';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value =
+        'Sales Trend';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value =
+        dashboard.trends.salesTrend;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 7)).value =
+        'Profit Trend';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 7)).value =
+        dashboard.trends.profitTrend;
 
     // Expense Breakdown
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value = 'Expense Breakdown';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value = 'Labor Payments';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value = dashboard.expenseBreakdown.laborPayments;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value = 'Vendor Payments';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 11)).value = dashboard.expenseBreakdown.vendorPayments;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 12)).value = 'Other Expenses';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 12)).value = dashboard.expenseBreakdown.otherExpenses;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 13)).value = 'Zakat';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 13)).value = dashboard.expenseBreakdown.zakat;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value =
+        'Expense Breakdown';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value =
+        'Labor Payments';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value =
+        dashboard.expenseBreakdown.laborPayments;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value =
+        'Vendor Payments';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 11)).value =
+        dashboard.expenseBreakdown.vendorPayments;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 12)).value =
+        'Other Expenses';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 12)).value =
+        dashboard.expenseBreakdown.otherExpenses;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 13)).value =
+        'Zakat';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 13)).value =
+        dashboard.expenseBreakdown.zakat;
   }
 
   /// Add Detailed Breakdown Sheet to Excel
-  static void _addDetailedBreakdownSheet(Excel excel, ProfitLossRecord profitLoss) {
+  static void _addDetailedBreakdownSheet(
+    Excel excel,
+    ProfitLossRecord profitLoss,
+  ) {
     final sheet = excel['Detailed Breakdown'];
 
     // Source Records
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value = 'Source Records';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value = 'Sales Records';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 1)).value = profitLoss.totalProductsSold;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 1)).value = profitLoss.totalSalesIncome;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value =
+        'Source Records';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value =
+        'Sales Records';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 1)).value =
+        profitLoss.totalProductsSold;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 1)).value =
+        profitLoss.totalSalesIncome;
 
     // Expense Details
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value = 'Expense Details';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value = 'Labor Payments';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value = profitLoss.totalLaborPayments;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value = 'Vendor Payments';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 5)).value = profitLoss.totalVendorPayments;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value = 'Other Expenses';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value = profitLoss.totalExpenses;
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 7)).value = 'Zakat';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 7)).value = profitLoss.totalZakat;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value =
+        'Expense Details';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value =
+        'Labor Payments';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value =
+        profitLoss.totalLaborPayments;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value =
+        'Vendor Payments';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 5)).value =
+        profitLoss.totalVendorPayments;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 6)).value =
+        'Other Expenses';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 6)).value =
+        profitLoss.totalExpenses;
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 7)).value =
+        'Zakat';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 7)).value =
+        profitLoss.totalZakat;
 
     // Calculation Formula
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value = 'Calculation Formula';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value = 'Gross Profit = Income - COGS';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value =
+        'Calculation Formula';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value =
+        'Gross Profit = Income - COGS';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value =
         '${profitLoss.totalSalesIncome} - ${profitLoss.totalCostOfGoodsSold} = ${profitLoss.grossProfit}';
-    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value = 'Net Profit = Gross Profit - Total Expenses';
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value =
+        'Net Profit = Gross Profit - Total Expenses';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 11)).value =
         '${profitLoss.grossProfit} - ${profitLoss.totalExpenses} = ${profitLoss.netProfit}';
   }

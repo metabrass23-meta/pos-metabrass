@@ -9,16 +9,16 @@ class AppLocalizationsUr extends AppLocalizations {
   AppLocalizationsUr([String locale = 'ur']) : super(locale);
 
   @override
-  String get appTitle => 'ال نور فیبرکس - پریمیم POS';
+  String get appTitle => 'میٹا براس - پریمیم POS';
 
   @override
   String get welcomeBack => 'خوش آمدید';
 
   @override
-  String get brandName => 'ال نور فیبرکس';
+  String get brandName => 'میٹا براس';
 
   @override
-  String get tagline => 'آپ کے قیمتی لمحات کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم برائیڈل اور گروم کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔';
+  String get tagline => 'آپ کے جدید گھر کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم باتھ روم اور سینیٹری کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔';
 
   @override
   String get signIn => 'سائن ان';
@@ -401,7 +401,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get searchProducts => 'مصنوعات تلاش کریں...';
 
   @override
-  String get searchProductsExpanded => 'نام، رنگ، کپڑا سے مصنوعات تلاش کریں...';
+  String get searchProductsExpanded => 'نام، برانڈ، میٹریل سے مصنوعات تلاش کریں...';
 
   @override
   String get filter => 'فلٹر';
@@ -626,13 +626,13 @@ class AppLocalizationsUr extends AppLocalizations {
   String get logoutError => 'غلطی کی وجہ سے مقامی طور پر لاگ آؤٹ ہو گئے۔';
 
   @override
-  String get brandTagline => 'پریمیم پی او ایس';
+  String get brandTagline => 'پریمیم سینیٹری POS';
 
   @override
-  String get welcomeToPos => 'ال نور فیبرکس پی او ایس میں خوش آمدید';
+  String get welcomeToPos => 'میٹا براس POS میں خوش آمدید';
 
   @override
-  String get welcomeTagline => 'ہر ٹانکے میں عمدگی - آپ کا پریمیم فیشن مینجمنٹ سسٹم';
+  String get welcomeTagline => 'پریمیم سینیٹری مینجمنٹ - ڈیزائن اور معیار میں عمدگی';
 
   @override
   String get today => 'آج';
@@ -1055,13 +1055,13 @@ class AppLocalizationsUr extends AppLocalizations {
   String get qty => 'مقدار';
 
   @override
-  String get colorName => 'رنگ کا نام';
+  String get colorName => 'فنش/رنگ';
 
   @override
-  String get fabricType => 'کپڑے کی قسم';
+  String get fabricType => 'مٹیریل کی قسم';
 
   @override
-  String get fabricName => 'کپڑے کا نام';
+  String get fabricName => 'مٹیریل کا نام';
 
   @override
   String get pleaseSelectAtLeastOnePiece => 'براہ کرم کم از کم ایک ٹکڑا منتخب کریں';
@@ -2367,12 +2367,12 @@ class AppLocalizationsUr extends AppLocalizations {
   String get noNotes => 'کوئی نوٹس نہیں';
 
   @override
-  String showingZakatRecords(int start, int end, int total) {
+  String showingZakatRecords(num start, num end, num total) {
     return '$start-$end دکھایا جا رہا ہے کل $total زکوٰۃ ریکارڈز میں سے';
   }
 
   @override
-  String pageOfPages(int current, int total) {
+  String pageOfPages(num current, num total) {
     return '$current از $total';
   }
 
@@ -2731,12 +2731,12 @@ class AppLocalizationsUr extends AppLocalizations {
   String get productProfitabilityAnalysis => 'مصنوعات کی منافع بخشی کا تجزیہ';
 
   @override
-  String analyzingProductsAcrossDifferentCategories(int count) {
+  String analyzingProductsAcrossDifferentCategories(num count) {
     return 'مختلف زمروں میں $count مصنوعات کا تجزیہ';
   }
 
   @override
-  String productsCount(int count) {
+  String productsCount(num count) {
     return '$count مصنوعات';
   }
 
@@ -2903,7 +2903,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get selectExpectedRepaymentDate => 'متوقع واپسی کی تاریخ منتخب کریں';
 
   @override
-  String borrowingPeriodDays(int days) {
+  String borrowingPeriodDays(num days) {
     return 'قرض کی مدت: $days دن';
   }
 
@@ -2941,7 +2941,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get expectedRepayment => 'متوقع واپسی';
 
   @override
-  String daysCount(int count) {
+  String daysCount(num count) {
     return '$count دن';
   }
 
@@ -3006,7 +3006,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get creditor => 'قرض دہندہ';
 
   @override
-  String showingPayableRecords(int start, int end, int total) {
+  String showingPayableRecords(num start, num end, num total) {
     return '$start-$end دکھایا جا رہا ہے، کل $total واجب الادا ریکارڈز';
   }
 
@@ -3073,7 +3073,7 @@ class AppLocalizationsUr extends AppLocalizations {
   }
 
   @override
-  String daysOverdueCount(int count) {
+  String daysOverdueCount(num count) {
     return '$count دن تاخیر';
   }
 
@@ -3129,10 +3129,10 @@ class AppLocalizationsUr extends AppLocalizations {
   String get costPrice => 'لاگت قیمت';
 
   @override
-  String get color => 'رنگ';
+  String get color => 'فنش';
 
   @override
-  String get fabric => 'کپڑا';
+  String get fabric => 'مٹیریل';
 
   @override
   String get stockStatus => 'اسٹاک کی حیثیت';
@@ -3162,7 +3162,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get yesterday => 'کل';
 
   @override
-  String daysAgo(int count) {
+  String daysAgo(num count) {
     return 'دن پہلے';
   }
 
@@ -3170,7 +3170,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get oneWeekAgo => '1 ہفتہ پہلے';
 
   @override
-  String weeksAgo(int count) {
+  String weeksAgo(num count) {
     return '$count ہفتے پہلے';
   }
 
@@ -3178,7 +3178,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get oneMonthAgo => '1 ماہ پہلے';
 
   @override
-  String monthsAgo(int count) {
+  String monthsAgo(num count) {
     return '$count ماہ پہلے';
   }
 
@@ -3186,7 +3186,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get oneYearAgo => '1 سال پہلے';
 
   @override
-  String yearsAgo(int count) {
+  String yearsAgo(num count) {
     return '$count سال پہلے';
   }
 
@@ -3206,7 +3206,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get setCostPriceToCalculateProfitMargin => 'منافع کا مارجن معلوم کرنے کے لیے لاگت قیمت مقرر کریں';
 
   @override
-  String unitsCount(int count) {
+  String unitsCount(num count) {
     return '$count یونٹس';
   }
 
@@ -4470,7 +4470,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get pleaseAcceptTerms => 'براہ کرم شرائط و ضوابط کو قبول کریں';
 
   @override
-  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! ال نور فیبرکس میں خوش آمدید۔';
+  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! میٹا براس میں خوش آمدید۔';
 
   @override
   String get registrationFailedMessage => 'رجسٹریشن ناکام ہو گئی۔ براہ کرم ذیل میں تفصیلات چیک کریں۔';
@@ -4898,7 +4898,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get inventoryImpact => 'انوینٹری اثر';
 
   @override
-  String quantityWillBeAffected(int quantity) {
+  String quantityWillBeAffected(num quantity) {
     return 'مقدار $quantity متاثر ہوگی';
   }
 
@@ -5002,8 +5002,8 @@ class AppLocalizationsUr extends AppLocalizations {
   String get minimumQuantity => 'کم سے کم مقدار';
 
   @override
-  String maxQuantity(int max) {
-    return 'زیادہ سے زیادہ مقدار';
+  String maxQuantity(num quantity) {
+    return 'زیادہ سے زیادہ مقدار $quantity';
   }
 
   @override
@@ -5130,8 +5130,8 @@ class AppLocalizationsUr extends AppLocalizations {
   String get addedToCart => 'کارٹ میں شامل کیا گیا';
 
   @override
-  String stockAvailable(int quantity) {
-    return 'اسٹاک';
+  String stockAvailable(num quantity) {
+    return 'اسٹاک $quantity';
   }
 
   @override
@@ -5147,9 +5147,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get itemDiscountOptional => 'آئٹم ڈسکاؤنٹ (اختیاری)';
 
   @override
-  String clearDiscount(String amount) {
-    return 'ڈسکاؤنٹ صاف کریں';
-  }
+  String get clearDiscount => 'ڈسکاؤنٹ صاف کریں';
 
   @override
   String get specialInstructions => 'خصوصی ہدایات';
@@ -5622,7 +5620,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get enableDarkThemeForApplication => 'ایپلیکیشن کے لیے ڈارک تھیم فعال کریں';
 
   @override
-  String get alNoorFashionPOS => 'النور پی او ایس';
+  String get alNoorFashionPOS => 'میٹا براس پی او ایس';
 
   @override
   String get version => 'ورژن';
@@ -5851,7 +5849,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get additionalRequirementsHint => 'کوئی خاص ضروریات، پیمائش، ڈیزائن ترجیحات، یا ترسیل کی ہدایات...';
 
   @override
-  String basePriceQuantity(int quantity) {
+  String basePriceQuantity(num quantity) {
     return 'بنیادی قیمت × $quantity:';
   }
 
@@ -5961,7 +5959,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get saleSummaryReadOnly => 'فروخت کا خلاصہ (صرف پڑھنے کے لیے)';
 
   @override
-  String itemsCount(int count) {
+  String itemsCount(num count) {
     return '$count اشیاء';
   }
 
@@ -6169,12 +6167,12 @@ class AppLocalizationsUr extends AppLocalizations {
   String get recentWorkflowActivities => 'حالیہ کام کی سرگرمیاں';
 
   @override
-  String minutesAgo(int minutes) {
+  String minutesAgo(num minutes) {
     return '$minutes منٹ پہلے';
   }
 
   @override
-  String hoursAgo(int hours) {
+  String hoursAgo(num hours) {
     return '$hours گھنٹے پہلے';
   }
 

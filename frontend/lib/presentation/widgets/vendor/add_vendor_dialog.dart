@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:frontend/src/utils/cnic_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
@@ -12,7 +13,8 @@ class EnhancedAddVendorDialog extends StatefulWidget {
   const EnhancedAddVendorDialog({super.key});
 
   @override
-  State<EnhancedAddVendorDialog> createState() => _EnhancedAddVendorDialogState();
+  State<EnhancedAddVendorDialog> createState() =>
+      _EnhancedAddVendorDialogState();
 }
 
 class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
@@ -22,7 +24,8 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   // Controllers
   final _nameController = TextEditingController();
   final _businessNameController = TextEditingController();
-  final _cnicController = TextEditingController();
+  final _cnicController = TextEditingController(); // Optional - leave empty
+
   final _phoneController = TextEditingController();
   final _cityController = TextEditingController();
   final _areaController = TextEditingController();
@@ -60,17 +63,18 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     _animationController.forward();
   }
@@ -144,7 +148,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -161,7 +169,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 5),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -173,7 +183,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.vendor} ${l10n.success}!',
@@ -188,7 +202,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -198,7 +214,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -215,7 +235,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -252,7 +274,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -282,7 +306,9 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -296,7 +322,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(Icons.store_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            child: Icon(
+              Icons.store_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -335,7 +365,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -444,6 +478,7 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               : '${l10n.enterCnicNumber} (${l10n.cnicFormat}) - ${l10n.optional}',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
+          inputFormatters: [CnicInputFormatter()],
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
@@ -460,7 +495,11 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+        Icon(
+          icon,
+          color: AppTheme.primaryMaroon,
+          size: context.iconSize('medium'),
+        ),
         SizedBox(width: context.smallPadding),
         Text(
           title,
@@ -474,16 +513,25 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.accentGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.accentGold.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
@@ -569,7 +617,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
+        _buildSectionTitle(
+          l10n.contactInformation,
+          Icons.contact_phone_outlined,
+        ),
         SizedBox(height: context.cardPadding),
 
         // Phone Number
@@ -601,7 +652,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
+        _buildSectionTitle(
+          l10n.locationInformation,
+          Icons.location_on_outlined,
+        ),
         SizedBox(height: context.cardPadding),
 
         // City and Area Row/Column
@@ -663,10 +717,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-              label: city,
-              onTap: () => setState(() => _cityController.text = city),
-            ),
-          )
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -699,10 +753,10 @@ class _EnhancedAddVendorDialogState extends State<EnhancedAddVendorDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-              label: area,
-              onTap: () => setState(() => _areaController.text = area),
-            ),
-          )
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
               .toList(),
         ),
       ],

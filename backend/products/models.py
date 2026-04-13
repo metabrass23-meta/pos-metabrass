@@ -6,9 +6,55 @@ from decimal import Decimal
 import json
 
 
+class ProductQuerySet(models.QuerySet):
+    """Custom QuerySet for Product model"""
+    
+    def active(self):
+        return self.filter(is_active=True)
+    
+    def by_category(self, category_id):
+        return self.filter(category_id=category_id)
+    
+    def search(self, query):
+        """Search products by name, detail, color, material, or category name"""
+        if not query:
+            return self
+            
+        return self.filter(
+            models.Q(name__icontains=query) |
+            models.Q(detail__icontains=query) |
+            models.Q(color__icontains=query) |
+            models.Q(material__icontains=query) |
+            models.Q(category__name__icontains=query)
+        )
+    
+    def price_range(self, min_price=None, max_price=None):
+        """Filter products by price range"""
+        queryset = self
+        if min_price is not None:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price is not None:
+            queryset = queryset.filter(price__lte=max_price)
+        return queryset
+    
+    def stock_level(self, level):
+        """Filter by stock level"""
+        if level == 'OUT_OF_STOCK':
+            return self.filter(quantity=0)
+        elif level == 'LOW_STOCK':
+            return self.filter(quantity__gt=0, quantity__lte=5)
+        elif level == 'MEDIUM_STOCK':
+            return self.filter(quantity__gt=5, quantity__lte=20)
+        elif level == 'HIGH_STOCK':
+            return self.filter(quantity__gt=20)
+        return self
+
+
 class Product(models.Model):
     """Product model for inventory management"""
     
+    objects = models.Manager.from_queryset(ProductQuerySet)()
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -37,40 +83,53 @@ class Product(models.Model):
         max_length=50,
         help_text="Product color"
     )
-    fabric = models.CharField(
+    material = models.CharField(
         max_length=100,
-        help_text="Fabric type/material"
+        help_text="Material type"
     )
     pieces = models.JSONField(
         default=list,
-        help_text="Array of product pieces (e.g., ['Blouse', 'Lehenga', 'Dupatta'])"
+        blank=True,
+        help_text="Array of product pieces (e.g., ['Handle', 'Tap', 'Valve'])"
     )
-    quantity = models.PositiveIntegerField(
+    quantity = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=0,
         help_text="Available quantity in stock"
     )
     # New field for available quantity (excluding reserved stock)
-    quantity_available = models.PositiveIntegerField(
+    quantity_available = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=0,
         help_text="Available quantity excluding reserved stock"
     )
     # New field for reserved quantity
-    quantity_reserved = models.PositiveIntegerField(
+    quantity_reserved = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=0,
         help_text="Quantity currently reserved for pending sales"
     )
     # New field for minimum stock threshold
-    min_stock_threshold = models.PositiveIntegerField(
+    min_stock_threshold = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=5,
         help_text="Minimum stock level before low stock warning"
     )
     # New field for reorder point
-    reorder_point = models.PositiveIntegerField(
+    reorder_point = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=10,
         help_text="Stock level at which to reorder"
     )
     # New field for maximum stock level
-    max_stock_level = models.PositiveIntegerField(
+    max_stock_level = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         default=100,
         help_text="Maximum stock level to maintain"
     )
@@ -125,7 +184,7 @@ class Product(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} - {self.color} ({self.fabric})"
+        return f"{self.name} - {self.color} ({self.material})"
 
     def clean(self):
         """Validate model data"""
@@ -589,49 +648,7 @@ class Product(models.Model):
         }
 
 
-class ProductQuerySet(models.QuerySet):
-    """Custom QuerySet for Product model"""
-    
-    def active(self):
-        return self.filter(is_active=True)
-    
-    def by_category(self, category_id):
-        return self.filter(category_id=category_id)
-    
-    def search(self, query):
-        """Search products by name, color, fabric, or category name"""
-        return self.filter(
-            models.Q(name__icontains=query) |
-            models.Q(color__icontains=query) |
-            models.Q(fabric__icontains=query) |
-            models.Q(category__name__icontains=query)
-        )
-    
-    def price_range(self, min_price=None, max_price=None):
-        """Filter products by price range"""
-        queryset = self
-        if min_price is not None:
-            queryset = queryset.filter(price__gte=min_price)
-        if max_price is not None:
-            queryset = queryset.filter(price__lte=max_price)
-        return queryset
-    
-    def stock_level(self, level):
-        """Filter by stock level"""
-        if level == 'OUT_OF_STOCK':
-            return self.filter(quantity=0)
-        elif level == 'LOW_STOCK':
-            return self.filter(quantity__gt=0, quantity__lte=5)
-        elif level == 'MEDIUM_STOCK':
-            return self.filter(quantity__gt=5, quantity__lte=20)
-        elif level == 'HIGH_STOCK':
-            return self.filter(quantity__gt=20)
-        return self
 
-
-# Add the custom manager to the Product model
-Product.add_to_class('objects', models.Manager.from_queryset(ProductQuerySet)())
-    
 class StockReservation(models.Model):
     """Model for tracking stock reservations during sales process"""
     
@@ -649,7 +666,9 @@ class StockReservation(models.Model):
         max_length=100,
         help_text="ID of the sale this reservation is for"
     )
-    quantity_reserved = models.PositiveIntegerField(
+    quantity_reserved = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         help_text="Quantity reserved for this sale"
     )
     reserved_until = models.DateTimeField(
@@ -735,10 +754,14 @@ class StockChangeLog(models.Model):
         on_delete=models.CASCADE,
         related_name='stock_changes'
     )
-    old_quantity = models.PositiveIntegerField(
+    old_quantity = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         help_text="Quantity before change"
     )
-    new_quantity = models.PositiveIntegerField(
+    new_quantity = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
         help_text="Quantity after change"
     )
     change_type = models.CharField(

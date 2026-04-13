@@ -195,10 +195,10 @@ class OrderItemStatisticsResponse {
   final int inactiveOrderItems;
   final int itemsWithCustomization;
   final double totalValue;
-  final int totalQuantity;
+  final double totalQuantity;
   final Map<String, int> itemsByStatus;
   final Map<String, double> valueByProduct;
-  final Map<String, int> quantityByProduct;
+  final Map<String, double> quantityByProduct;
 
   const OrderItemStatisticsResponse({
     required this.totalOrderItems,
@@ -219,12 +219,14 @@ class OrderItemStatisticsResponse {
       inactiveOrderItems: json['inactive_order_items'] as int? ?? 0,
       itemsWithCustomization: json['items_with_customization'] as int? ?? 0,
       totalValue: (json['total_value'] as num?)?.toDouble() ?? 0.0,
-      totalQuantity: json['total_quantity'] as int? ?? 0,
+      totalQuantity: (json['total_quantity'] as num?)?.toDouble() ?? 0.0,
       itemsByStatus: Map<String, int>.from(json['items_by_status'] as Map? ?? {}),
       valueByProduct: Map<String, double>.from(
         (json['value_by_product'] as Map?)?.map((key, value) => MapEntry(key, (value as num).toDouble())) ?? {},
       ),
-      quantityByProduct: Map<String, int>.from(json['quantity_by_product'] as Map? ?? {}),
+      quantityByProduct: Map<String, double>.from(
+        (json['quantity_by_product'] as Map?)?.map((key, value) => MapEntry(key, (value as num).toDouble())) ?? {},
+      ),
     );
   }
 
@@ -296,7 +298,7 @@ class OrderUpdateRequest {
 class OrderItemCreateRequest {
   final String order;
   final String product;
-  final int quantity;
+  final double quantity;
   final double unitPrice;
   final String customizationNotes;
 
@@ -325,7 +327,7 @@ class OrderItemCreateRequest {
 
 // Order Item Update Request
 class OrderItemUpdateRequest {
-  final int quantity;
+  final double quantity;
   final double unitPrice;
   final String customizationNotes;
 
@@ -451,8 +453,8 @@ class OrderItemListParams {
   final String? orderId;
   final String? productId;
   final bool? hasCustomization;
-  final int? minQuantity;
-  final int? maxQuantity;
+  final double? minQuantity;
+  final double? maxQuantity;
   final double? minPrice;
   final double? maxPrice;
 

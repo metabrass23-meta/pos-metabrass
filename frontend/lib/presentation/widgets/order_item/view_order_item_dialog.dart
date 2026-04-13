@@ -342,8 +342,8 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
             _buildInfoRow(l10n.color, widget.orderItem.productColor!, Icons.palette_outlined),
             SizedBox(height: context.smallPadding),
           ],
-          if (widget.orderItem.productFabric != null && widget.orderItem.productFabric!.isNotEmpty) ...[
-            _buildInfoRow(l10n.fabric, widget.orderItem.productFabric!, Icons.texture_outlined),
+          if (widget.orderItem.productMaterial != null && widget.orderItem.productMaterial!.isNotEmpty) ...[
+            _buildInfoRow(l10n.material, widget.orderItem.productMaterial!, Icons.category_outlined),
             SizedBox(height: context.smallPadding),
           ],
           if (widget.orderItem.currentStock != null) ...[
@@ -355,7 +355,7 @@ class _ViewOrderItemDialogState extends State<ViewOrderItemDialog> with SingleTi
             SizedBox(height: context.smallPadding),
           ],
           if ((widget.orderItem.productColor == null || widget.orderItem.productColor!.isEmpty) &&
-              (widget.orderItem.productFabric == null || widget.orderItem.productFabric!.isEmpty) &&
+              (widget.orderItem.productMaterial == null || widget.orderItem.productMaterial!.isEmpty) &&
               widget.orderItem.currentStock == null &&
               (widget.orderItem.productDisplayInfo == null || widget.orderItem.productDisplayInfo!.isEmpty)) ...[
             Container(

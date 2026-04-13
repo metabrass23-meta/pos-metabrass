@@ -227,7 +227,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
         return item.productName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             item.customizationNotes.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             item.productColor?.toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
-            item.productFabric?.toLowerCase().contains(_searchQuery.toLowerCase()) == true;
+            item.productMaterial?.toLowerCase().contains(_searchQuery.toLowerCase()) == true;
       }).toList();
 
       setState(() {
@@ -471,7 +471,7 @@ class _OrderItemsManagementDialogState extends State<OrderItemsManagementDialog>
   Widget _buildStatsSection() {
     final l10n = AppLocalizations.of(context)!;
     final totalItems = _orderItems.length;
-    final totalQuantity = _orderItems.fold<int>(0, (sum, item) => sum + item.quantity);
+    final totalQuantity = _orderItems.fold<double>(0.0, (sum, item) => sum + item.quantity);
     final totalValue = _orderItems.fold<double>(0.0, (sum, item) => sum + item.lineTotal);
     final activeCount = _orderItems.where((item) => item.isActive).length;
 

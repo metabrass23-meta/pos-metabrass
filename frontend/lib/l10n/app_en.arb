@@ -1,9 +1,9 @@
 {
   "@@locale": "en",
-  "appTitle": "Al Noor - Premium POS",
+  "appTitle": "MetaBrass - Premium POS",
   "welcomeBack": "Welcome Back to",
-  "brandName": "Al Noor",
-  "tagline": "Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.",
+  "brandName": "MetaBrass",
+  "tagline": "Elegant designs for your modern home.\nExperience luxury with our premium bathroom and sanitary collections.",
   "signIn": "Sign In",
   "signUp": "Sign Up",
   "searchReturns": "Search Returns",
@@ -128,7 +128,7 @@
   "export": "Export",
   "exportingSalesData": "Exporting sales data...",
   "searchProducts": "Search products...",
-  "searchProductsExpanded": "Search products by name, color, fabric...",
+  "searchProductsExpanded": "Search products by name, brand, material...",
   "filter": "Filter",
   "screenTooSmall": "Screen Too Small",
   "screenTooSmallMessage": "This application requires a minimum screen width of 750px for optimal experience. Please use a larger screen or rotate your device.",
@@ -173,7 +173,7 @@
   "inStock": "In Stock",
   "totalValue": "Total Value",
   "value": "Value",
-  "searchProductsHint": "Search products by ID, name, color, fabric, or pieces...",
+  "searchProductsHint": "Search products by ID, name, color, material, or pieces...",
   "customerManagement": "Customer Management",
   "customerManagementDescription": "Organize and manage your customer relationships with comprehensive tools",
   "customerManagementShortDescription": "Manage customer relationships",
@@ -203,9 +203,9 @@
   "lastPurchase": "Last Purchase",
   "logoutMessage": "Are you sure you want to logout from your account?",
   "logoutError": "Logged out locally due to an error.",
-  "brandTagline": "Premium POS",
-  "welcomeToPos": "Welcome to Al Noor POS",
-  "welcomeTagline": "Quality Spare Parts Management - Your Complete Automotive Solution",
+  "brandTagline": "Premium Sanitary POS",
+  "welcomeToPos": "Welcome to MetaBrass POS",
+  "welcomeTagline": "Premium Sanitary Management - Elegant Designs & Quality Fittings",
   "today": "Today",
   "totalIncome": "Total Income",
   "totalExpenses": "Total Expenses",
@@ -346,9 +346,9 @@
   "costPriceCannotExceedSellingPrice": "Cost price cannot exceed selling price",
   "costPriceInfo": "Setting cost price enables profit margin calculations and better financial analysis",
   "qty": "Qty",
-  "colorName": "Color Name",
-  "fabricType": "Fabric Type",
-  "fabricName": "Fabric Name",
+  "colorName": "Finish/Color",
+  "materialType": "Material Type",
+  "materialName": "Material Name",
   "pleaseSelectAtLeastOnePiece": "Please select at least one piece",
   "failedToAdd": "Failed to add",
   "addedSuccessfully": "added successfully",
@@ -720,7 +720,7 @@
   "sortOptions": "Sort Options",
   "allCategories": "All Categories",
   "allColors": "All Colors",
-  "allFabrics": "All Fabrics",
+  "allMaterials": "All Materials",
   "allStockLevels": "All Stock Levels",
   "inStockHigh": "In Stock (High)",
   "mediumStock": "Medium Stock",
@@ -741,7 +741,7 @@
   "enterPrice": "Enter price",
   "enterQuantity": "Enter quantity",
   "enterColor": "Enter color",
-  "enterFabric": "Enter fabric",
+  "enterMaterial": "Enter material",
   "enterMinPrice": "Enter minimum price",
   "enterVendorName": "Enter vendor name",
   "enterBusinessName": "Enter business name",
@@ -801,13 +801,13 @@
   "@showingZakatRecords": {
     "placeholders": {
       "start": {
-        "type": "int"
+        "type": "num"
       },
       "end": {
-        "type": "int"
+        "type": "num"
       },
       "total": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -815,10 +815,10 @@
   "@pageOfPages": {
     "placeholders": {
       "current": {
-        "type": "int"
+        "type": "num"
       },
       "total": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -945,7 +945,7 @@
   "@analyzingProductsAcrossDifferentCategories": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -953,7 +953,7 @@
   "@productsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1015,7 +1015,7 @@
   "@borrowingPeriodDays": {
     "placeholders": {
       "days": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1034,7 +1034,7 @@
   "@daysCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1062,13 +1062,13 @@
   "@showingPayableRecords": {
     "placeholders": {
       "start": {
-        "type": "int"
+        "type": "num"
       },
       "end": {
-        "type": "int"
+        "type": "num"
       },
       "total": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1103,7 +1103,7 @@
   "@daysOverdueCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1124,8 +1124,8 @@
   "notUpdated": "Not updated",
   "productName": "Product Name",
   "costPrice": "Cost Price",
-  "color": "Color",
-  "fabric": "Fabric",
+  "color": "Finish",
+  "material": "Material",
   "stockStatus": "Stock Status",
   "pieces": "Pieces",
   "createdDate": "Created Date",
@@ -1139,7 +1139,7 @@
   "@daysAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1148,7 +1148,7 @@
   "@weeksAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1157,7 +1157,7 @@
   "@monthsAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1166,7 +1166,7 @@
   "@yearsAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1179,7 +1179,7 @@
   "@unitsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1215,9 +1215,10 @@
   "enterColorName": "Enter color name (e.g., Red, Blue, Turquoise)",
   "pleaseEnterColor": "Please enter a color",
   "colorNameMustBeAtLeast2Characters": "Color name must be at least 2 characters",
-  "enterFabricType": "Enter fabric type (e.g., Cotton, Silk, Chiffon)",
-  "pleaseEnterFabric": "Please enter a fabric",
-  "fabricNameMustBeAtLeast2Characters": "Fabric name must be at least 2 characters",
+  "enterMaterial": "Enter material",
+  "enterMaterialType": "Enter material type (e.g., Brass, Steel, Chrome)",
+  "pleaseEnterMaterial": "Please enter a material",
+  "materialNameMustBeAtLeast2Characters": "Material name must be at least 2 characters",
   "productNameMustBeAtLeast2Characters": "Product name must be at least 2 characters",
   "pleaseEnterProductName": "Please enter a product name",
   "updateProduct": "Update Product",
@@ -1515,7 +1516,7 @@
   "chooseProductToAddToOrder": "Choose a product to add to the order",
   "pleaseSelectProduct": "Please select a product",
   "searchProductsShort": "Search products",
-  "searchProductsByNameFabricOrColor": "Search products by name, fabric, or color...",
+  "searchProductsByNameMaterialOrColor": "Search products by name, material, or color...",
   "availableProducts": "Available Products",
   "tryAdjustingYourSearchTerms": "Try adjusting your search terms",
   "selectedProductDetails": "Selected Product Details",
@@ -1629,7 +1630,7 @@
   "updateExpense": "Update Expense",
   "expenseUpdatedSuccessfully": "Expense updated successfully!",
   "pleaseAcceptTerms": "Please accept the terms and conditions",
-  "accountCreatedSuccessfully": "Account created successfully! Welcome to Al Noor.",
+  "accountCreatedSuccessfully": "Account created successfully! Welcome to MetaBrass.",
   "registrationFailedMessage": "Registration failed. Please check the details below.",
   "joinOur": "Join Our",
   "premiumFamily": "Premium Family",
@@ -1783,7 +1784,7 @@
   "@quantityWillBeAffected": {
     "placeholders": {
       "quantity": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1820,7 +1821,7 @@
   "numericRangeFilters": "Numeric Range Filters",
   "minQuantity": "Min Quantity",
   "minimumQuantity": "Minimum quantity",
-  "maxQuantity": "Max Quantity",
+  "maxQuantity": "Max Quantity {quantity}",
   "maximumQuantity": "Maximum quantity",
   "minPricePKR": "Min Price (PKR)",
   "minimumUnitPrice": "Minimum unit price",
@@ -1858,11 +1859,14 @@
   "noCustomizationNotesAvailable": "No customization notes available",
   "brand": "Brand",
   "material": "Material",
-  "style": "Style",
+  "materialName": "Material Name",
+  "materialType": "Material Type",
+  "enterMaterial": "Enter Material",
+  "allMaterials": "All Materials",
   "noAdditionalDetails": "No additional details",
   "additionalProductInformationAvailable": "Additional product information available",
   "addedToCart": "added to cart",
-  "stockAvailable": "Stock",
+  "stockAvailable": "Stock {quantity}",
   "min": "Min",
   "customPrice": "Custom Price",
   "customPricePkr": "Custom Price (PKR)",
@@ -2024,7 +2028,7 @@
   "aboutApp": "About App",
   "darkMode": "Dark Mode",
   "enableDarkThemeForApplication": "Enable dark theme for the application",
-  "alNoorFashionPOS": "Al Noor POS",
+  "alNoorFashionPOS": "MetaBrass POS",
   "version": "Version",
   "aPremiumPointOfSaleSolution": "A premium point of sale solution designed for fashion retail businesses. Manage your inventory, customers, and sales with elegance.",
   "createNewReturn": "Create New Return",
@@ -2088,7 +2092,7 @@
   "@stockAvailable": {
     "placeholders": {
       "quantity": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -2104,26 +2108,20 @@
   "quantityAndPricing": "Quantity & Pricing",
   "@maxQuantity": {
     "placeholders": {
-      "max": {
-        "type": "int"
+      "quantity": {
+        "type": "num"
       }
     }
   },
   "enterValidPrice": "Please enter a valid price",
-  "@clearDiscount": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
+  "@clearDiscount": {},
   "sizeAndFitting": "Size & Fitting",
   "fitting": "Fitting",
   "fittingStyle": "Fitting Style",
   "customizationOptions": "Customization Options",
   "embroideryWork": "Embroidery Work",
   "embroidery": "Embroidery",
-  "fabricQuality": "Fabric Quality",
+  "materialQuality": "Material Quality",
   "accentColor": "Accent Color",
   "additionalServices": "Additional Services",
   "expressDelivery": "Express Delivery",
@@ -2138,7 +2136,7 @@
   "@basePriceQuantity": {
     "placeholders": {
       "quantity": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -2200,7 +2198,7 @@
   "@itemsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -2304,7 +2302,7 @@
   "@minutesAgo": {
     "placeholders": {
       "minutes": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -2312,7 +2310,7 @@
   "@hoursAgo": {
     "placeholders": {
       "hours": {
-        "type": "int"
+        "type": "num"
       }
     }
   },

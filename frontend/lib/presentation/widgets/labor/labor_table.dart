@@ -97,51 +97,40 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             return _helpers.buildEmptyState(context);
           }
 
-          return Column(
-            children: [
-              // 1. Table Header (Horizontal Scroll Only)
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGray.withOpacity(0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  controller: _headerHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  child: Container(
-                    width: _getTableWidth(context),
-                    padding: EdgeInsets.symmetric(
-                        vertical: context.cardPadding * 0.85,
-                        horizontal: context.cardPadding / 2),
-                    child: _buildTableHeader(context),
-                  ),
-                ),
-              ),
+          return Scrollbar(
+            thumbVisibility: true,
+            controller: _headerHorizontalController, // Reusing controller for horizontal scrollbar
+            child: SingleChildScrollView(
+              controller: _headerHorizontalController,
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                width: _getTableWidth(context),
+                child: Column(
+                  children: [
+                    // 1. Table Header
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.lightGray.withOpacity(0.5),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(context.borderRadius('large')),
+                          topRight: Radius.circular(context.borderRadius('large')),
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                          vertical: context.cardPadding * 0.85,
+                          horizontal: context.cardPadding / 2),
+                      child: _buildTableHeader(context),
+                    ),
 
-              // 2. Table Content (Vertical + Horizontal Scroll)
-              Expanded(
-                child: Scrollbar(
-                  controller: _verticalController,
-                  thumbVisibility: true,
-                  trackVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _verticalController,
-                    scrollDirection: Axis.vertical,
-                    child: Scrollbar(
-                      controller: _contentHorizontalController,
-                      thumbVisibility: true,
-                      notificationPredicate: (notification) => notification.depth == 1,
-                      child: SingleChildScrollView(
-                        controller: _contentHorizontalController,
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        child: Container(
-                          width: _getTableWidth(context),
-                          // Use Column instead of ListView for smoother nested scrolling
+                    // 2. Table Content
+                    Expanded(
+                      child: Scrollbar(
+                        controller: _verticalController,
+                        thumbVisibility: true,
+                        trackVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _verticalController,
+                          scrollDirection: Axis.vertical,
                           child: Column(
                             children: provider.labors.asMap().entries.map((entry) {
                               return _buildTableRow(context, entry.value, entry.key);
@@ -150,14 +139,14 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
                         ),
                       ),
                     ),
-                  ),
+
+                    if (provider.paginationInfo != null &&
+                        provider.paginationInfo!.totalPages > 1)
+                      _buildPaginationControls(context, provider),
+                  ],
                 ),
               ),
-
-              if (provider.paginationInfo != null &&
-                  provider.paginationInfo!.totalPages > 1)
-                _buildPaginationControls(context, provider),
-            ],
+            ),
           );
         },
       ),
@@ -423,7 +412,7 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
-              labor.cnic,
+              labor.cnic ?? '-',
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,

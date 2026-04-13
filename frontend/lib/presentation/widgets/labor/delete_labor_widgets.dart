@@ -456,7 +456,7 @@ class DeleteLaborContent extends StatelessWidget {
                     if (!context.isTablet) ...[
                       SizedBox(height: context.smallPadding / 2),
                       Text(
-                        labor.cnic,
+                        labor.cnic ?? '-',
                         style: TextStyle(
                           fontSize: context.subtitleFontSize,
                           fontWeight: FontWeight.w400,

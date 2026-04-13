@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/theme/app_theme.dart';
 
@@ -15,6 +16,8 @@ class PremiumTextField extends StatefulWidget {
   final bool enabled;
   final ValueChanged<String>? onChanged; // Added onChanged parameter
   final ValueChanged<String>? onSubmitted; // Added onSubmitted parameter
+  final List<TextInputFormatter>?
+  inputFormatters; // Added inputFormatters parameter
 
   const PremiumTextField({
     super.key,
@@ -30,6 +33,7 @@ class PremiumTextField extends StatefulWidget {
     this.enabled = true,
     this.onChanged, // Added to constructor
     this.onSubmitted, // Added to constructor
+    this.inputFormatters, // Added to constructor
   });
 
   @override
@@ -88,7 +92,10 @@ class _PremiumTextFieldState extends State<PremiumTextField>
           maxLines: widget.maxLines,
           enabled: widget.enabled,
           onChanged: widget.onChanged, // Pass onChanged to TextFormField
-          onFieldSubmitted: widget.onSubmitted, // Pass onSubmitted to TextFormField
+          onFieldSubmitted:
+              widget.onSubmitted, // Pass onSubmitted to TextFormField
+          inputFormatters:
+              widget.inputFormatters, // Pass inputFormatters to TextFormField
           style: TextStyle(
             fontSize: 10.sp,
             fontWeight: FontWeight.w400,
@@ -99,12 +106,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
-              widget.prefixIcon,
-              size: 12.sp,
-              color: _isFocused
-                  ? AppTheme.primaryMaroon
-                  : const Color(0xFF9E9E9E),
-            )
+                    widget.prefixIcon,
+                    size: 12.sp,
+                    color: _isFocused
+                        ? AppTheme.primaryMaroon
+                        : const Color(0xFF9E9E9E),
+                  )
                 : null,
             suffixIcon: widget.suffixIcon != null
                 ? Padding(
@@ -113,7 +120,9 @@ class _PremiumTextFieldState extends State<PremiumTextField>
                   )
                 : null,
             filled: true,
-            fillColor: widget.enabled ? AppTheme.pureWhite : Colors.grey.shade50,
+            fillColor: widget.enabled
+                ? AppTheme.pureWhite
+                : Colors.grey.shade50,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.w),
               borderSide: BorderSide(
@@ -137,24 +146,22 @@ class _PremiumTextFieldState extends State<PremiumTextField>
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.w),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 0.1.w,
-              ),
+              borderSide: BorderSide(color: Colors.red, width: 0.1.w),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.w),
-              borderSide: BorderSide(
-                color: Colors.red,
-                width: 0.2.w,
-              ),
+              borderSide: BorderSide(color: Colors.red, width: 0.2.w),
             ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 2.h,
-              horizontal: widget.suffixIcon != null ? 3.w : 2.w, // More padding when suffix icon exists
+              horizontal: widget.suffixIcon != null
+                  ? 3.w
+                  : 2.w, // More padding when suffix icon exists
             ),
             labelStyle: TextStyle(
-              color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
+              color: _isFocused
+                  ? AppTheme.primaryMaroon
+                  : const Color(0xFF9E9E9E),
               fontSize: 10.sp,
               fontWeight: FontWeight.w500,
             ),

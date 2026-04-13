@@ -44,6 +44,7 @@ class ProductProvider extends ChangeNotifier {
   int get totalCount => _totalCount;
   bool get hasMore => _hasMore;
   ProductFilters get currentFilters => _currentFilters;
+  double get totalInventoryValue => _products.fold<double>(0.0, (sum, p) => sum + p.totalValue);
 
   // Available options for dropdowns
   final List<String> availableColors = [
@@ -65,42 +66,20 @@ class ProductProvider extends ChangeNotifier {
     'Beige',
   ];
 
-  final List<String> availableFabrics = [
-    'Cotton',
-    'Silk',
-    'Chiffon',
-    'Georgette',
-    'Net',
-    'Velvet',
-    'Satin',
-    'Organza',
-    'Crepe',
-    'Linen',
-    'Jacquard',
-    'Brocade',
-    'Lawn',
-    'Khaddar',
+  final List<String> availableMaterials = [
+    'Brass',
+    'Stainless Steel',
+    'Ceramic',
+    'PVC',
+    'Plastic',
+    'Chrome',
+    'Nickel',
+    'Bronze',
+    'Iron',
+    'Aluminum',
   ];
 
-  final List<String> availablePieces = [
-
-
-
-
-    'Blouse',
-    'Lehenga',
-    'Dupatta',
-    'Shirt',
-    'Trouser',
-    'Kurta',
-    'Palazzo',
-    'Scarf',
-    'Veil',
-    'Jacket',
-    'Waistcoat',
-    'Sharara',
-    'Gharara',
-  ];
+  final List<String> availablePieces = [];
 
   final List<String> stockLevels = ['HIGH_STOCK', 'MEDIUM_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK'];
 
@@ -108,6 +87,12 @@ class ProductProvider extends ChangeNotifier {
 
   /// Initialize provider - load data
   Future<void> initialize() async {
+    _searchQuery = '';
+    _currentFilters = const ProductFilters();
+    _products = [];
+    _filteredProducts = [];
+    _errorMessage = null;
+    
     await loadCategories();
     await loadProducts();
     await loadStatistics();
@@ -239,7 +224,7 @@ class ProductProvider extends ChangeNotifier {
         if (!product.name.toLowerCase().contains(query) &&
             !product.detail.toLowerCase().contains(query) &&
             !product.color.toLowerCase().contains(query) &&
-            !product.fabric.toLowerCase().contains(query) &&
+            !product.material.toLowerCase().contains(query) &&
             !product.piecesText.toLowerCase().contains(query)) {
           return false;
         }
@@ -258,9 +243,9 @@ class ProductProvider extends ChangeNotifier {
     required double price,
     double? costPrice, // Added cost price parameter
     required String color,
-    required String fabric,
+    required String material,
     required List<String> pieces,
-    required int quantity,
+    required double quantity,
     required String categoryId,
     String? barcode,  // Added barcode parameter
     String? sku,      // Added SKU parameter
@@ -276,7 +261,7 @@ class ProductProvider extends ChangeNotifier {
         price: price,
         costPrice: costPrice, // Include cost price
         color: color,
-        fabric: fabric,
+        material: material,
         pieces: pieces,
         quantity: quantity,
         categoryId: categoryId,
@@ -312,9 +297,9 @@ class ProductProvider extends ChangeNotifier {
     double? price,
     double? costPrice, // Added cost price parameter
     String? color,
-    String? fabric,
+    String? material,
     List<String>? pieces,
-    int? quantity,
+    double? quantity,
     String? categoryId,
   }) async {
     _isLoading = true;
@@ -329,7 +314,7 @@ class ProductProvider extends ChangeNotifier {
         price: price,
         costPrice: costPrice, // Include cost price
         color: color,
-        fabric: fabric,
+        material: material,
         pieces: pieces,
         quantity: quantity,
         categoryId: categoryId,
@@ -468,7 +453,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Update product quantity - ENHANCED VERSION
-  Future<bool> updateProductQuantity(String id, int newQuantity) async {
+  Future<bool> updateProductQuantity(String id, double newQuantity) async {
     _errorMessage = null;
 
     try {
@@ -513,7 +498,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   /// Get low stock products
-  Future<List<ProductModel>> getLowStockProducts({int threshold = 5}) async {
+  Future<List<ProductModel>> getLowStockProducts({double threshold = 5.0}) async {
     try {
       final response = await _productService.getLowStockProducts(threshold: threshold);
       if (response.success && response.data != null) {
@@ -577,7 +562,7 @@ class ProductProvider extends ChangeNotifier {
             'Profit Margin': product.formattedProfitMargin, // Added profit margin
             'Profit Amount': product.formattedProfitAmount, // Added profit amount
             'Color': product.color,
-            'Fabric': product.fabric,
+            'Material': product.material,
             'Pieces': product.piecesText,
             'Quantity': product.quantity.toString(),
             'Stock Status': product.stockStatusText,
@@ -598,7 +583,7 @@ class ProductProvider extends ChangeNotifier {
   /// Get inventory summary
   Map<String, dynamic> get inventorySummary {
     final totalProducts = _products.length;
-    final totalQuantity = _products.fold<int>(0, (sum, product) => sum + product.quantity);
+    final totalQuantity = _products.fold<double>(0.0, (sum, product) => sum + product.quantity);
     final totalValue = _products.fold<double>(0, (sum, product) => sum + product.totalValue);
     final averageValue = totalProducts > 0 ? totalValue / totalProducts : 0.0;
     final inStockProducts = _products.where((p) => !p.isOutOfStock).length;
@@ -615,38 +600,38 @@ class ProductProvider extends ChangeNotifier {
   /// Get product statistics by category
   Map<String, dynamic> getProductStatsByCategory() {
     final Map<String, int> colorStats = {};
-    final Map<String, int> fabricStats = {};
+    final Map<String, int> materialStats = {};
     final Map<String, double> colorValue = {};
-    final Map<String, double> fabricValue = {};
+    final Map<String, double> materialValue = {};
 
     for (final product in _products) {
       // Color statistics
       colorStats[product.color] = (colorStats[product.color] ?? 0) + 1;
       colorValue[product.color] = (colorValue[product.color] ?? 0) + product.totalValue;
 
-      // Fabric statistics
-      fabricStats[product.fabric] = (fabricStats[product.fabric] ?? 0) + 1;
-      fabricValue[product.fabric] = (fabricValue[product.fabric] ?? 0) + product.totalValue;
+      // Material statistics
+      materialStats[product.material] = (materialStats[product.material] ?? 0) + 1;
+      materialValue[product.material] = (materialValue[product.material] ?? 0) + product.totalValue;
     }
 
-    return {'colorStats': colorStats, 'fabricStats': fabricStats, 'colorValue': colorValue, 'fabricValue': fabricValue};
+    return {'colorStats': colorStats, 'materialStats': materialStats, 'colorValue': colorValue, 'materialValue': materialValue};
   }
 
   /// Filter products locally
   List<ProductModel> filterProducts({
     String? color,
-    String? fabric,
+    String? material,
     double? minPrice,
     double? maxPrice,
-    int? minQuantity,
-    int? maxQuantity,
+    double? minQuantity,
+    double? maxQuantity,
     bool? isLowStock,
     bool? isOutOfStock,
     String? categoryId,
   }) {
     return _products.where((product) {
       if (color != null && product.color != color) return false;
-      if (fabric != null && product.fabric != fabric) return false;
+      if (material != null && product.material != material) return false;
       if (minPrice != null && product.price < minPrice) return false;
       if (maxPrice != null && product.price > maxPrice) return false;
       if (minQuantity != null && product.quantity < minQuantity) return false;
@@ -715,8 +700,8 @@ class ProductProvider extends ChangeNotifier {
 
   /// Get product analytics
   Map<String, dynamic> get productAnalytics {
-    final totalInventoryValue = _products.fold<double>(0, (sum, product) => sum + product.totalValue);
-    final averageQuantity = _products.isNotEmpty ? _products.fold<int>(0, (sum, product) => sum + product.quantity) / _products.length : 0.0;
+    final totalQuantity = _products.fold<double>(0.0, (sum, product) => sum + product.quantity);
+    final averageQuantity = _products.isNotEmpty ? totalQuantity / _products.length : 0.0;
 
     final inStockProducts = _products.where((p) => !p.isOutOfStock).toList();
     final stockTurnoverRate = _products.isNotEmpty ? (inStockProducts.length / _products.length * 100) : 0.0;

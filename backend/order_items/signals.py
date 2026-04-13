@@ -92,7 +92,7 @@ def order_item_post_save(sender, instance, created, **kwargs):
             
             logger.info(
                 f"Order item quantity updated: {instance.product_name} (ID: {instance.id}) "
-                f"from {old_qty} to {new_qty} (difference: {difference:+d}) "
+                f"from {old_qty} to {new_qty} (difference: {difference:+.2f}) "
                 f"New total: PKR {instance.line_total}"
             )
             delattr(instance, '_old_quantity')

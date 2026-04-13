@@ -22,7 +22,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 INSTALLED_APPS = [
-    'daphne',  # ASGI server
+    # 'daphne',  # ASGI server (Disabled for dev stability)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'principal_account',
     'analytics',
     'purchases',
+    'quotations',
 ]
 
 MIDDLEWARE = [
@@ -104,9 +105,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='POS_DB'),
+            'NAME': config('DB_NAME', default='metabrass'),
             'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default='Shah112233@'),
+            'PASSWORD': config('DB_PASSWORD', default='1234'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
         }
@@ -134,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Karachi'
 USE_I18N = True
 USE_TZ = True
 

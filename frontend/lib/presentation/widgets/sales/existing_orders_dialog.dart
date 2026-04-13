@@ -430,7 +430,7 @@ class _ExistingOrdersDialogState extends State<ExistingOrdersDialog> {
         'orderDate': '15 Jul 2024',
         'deliveryDate': '15 Aug 2024',
         'amount': '85000',
-        'notes': 'Bridal dress with heavy embroidery work - custom measurements required',
+        'notes': 'Kitchen mixer tap with matte black finish - premium packaging required',
       },
       {
         'id': 'ORD004',

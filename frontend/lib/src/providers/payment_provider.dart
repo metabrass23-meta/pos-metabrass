@@ -759,11 +759,9 @@ class PaymentProvider extends ChangeNotifier {
         _labors = response.data!.labors;
 
         _laborers = _labors.map((labor) {
-          // Use remainingMonthlySalary if available and > 0
-          // Otherwise, use full salary (assuming no payments yet or new month)
-          final displayAmount = (labor.remainingMonthlySalary != null && labor.remainingMonthlySalary > 0)
-              ? labor.remainingMonthlySalary
-              : labor.salary;
+          // Use remainingMonthlySalary if available. It CAN be 0 (if all salary was advanced).
+          // Fallback to salary only if it somehow evaluates to completely null (which shouldn't happen with our robust LaborModel fallback)
+          final displayAmount = labor.remainingAdvanceAmount;
 
           return PaymentLabor(
             id: labor.id,

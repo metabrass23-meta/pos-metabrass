@@ -46,7 +46,7 @@ class CreateSaleItemRequest {
   final String? orderItemId;
   final String productId;
   final double unitPrice;
-  final int quantity;
+  final double quantity;
   final double itemDiscount;
   final String? customizationNotes;
 
@@ -64,7 +64,7 @@ class CreateSaleItemRequest {
       'order_item': orderItemId,
       'product': productId,
       'unit_price': unitPrice.toString(),
-      'quantity': quantity,
+      'quantity': quantity.toString(),
       'item_discount': itemDiscount.toString(),
       'customization_notes': customizationNotes,
     };
@@ -79,8 +79,17 @@ class UpdateSaleRequest {
   final Map<String, dynamic>? splitPaymentDetails;
   final String? notes;
   final String? status;
+  final double? amountPaid; // ✅ Added this
 
-  UpdateSaleRequest({this.overallDiscount, this.taxConfiguration, this.paymentMethod, this.splitPaymentDetails, this.notes, this.status});
+  UpdateSaleRequest({
+    this.overallDiscount,
+    this.taxConfiguration,
+    this.paymentMethod,
+    this.splitPaymentDetails,
+    this.notes,
+    this.status,
+    this.amountPaid, // ✅ Added this
+  });
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
@@ -90,6 +99,7 @@ class UpdateSaleRequest {
     if (splitPaymentDetails != null) data['split_payment_details'] = splitPaymentDetails;
     if (notes != null) data['notes'] = notes;
     if (status != null) data['status'] = status;
+    if (amountPaid != null) data['amount_paid'] = amountPaid.toString(); // ✅ Added this
     return data;
   }
 }
@@ -130,7 +140,7 @@ class CreateSaleFromOrderRequest {
 /// Request model for updating a sale item
 class UpdateSaleItemRequest {
   final double? unitPrice;
-  final int? quantity;
+  final double? quantity;
   final double? itemDiscount;
   final String? customizationNotes;
 
@@ -139,7 +149,7 @@ class UpdateSaleItemRequest {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
     if (unitPrice != null) data['unit_price'] = unitPrice.toString();
-    if (quantity != null) data['quantity'] = quantity;
+    if (quantity != null) data['quantity'] = quantity!.toString();
     if (itemDiscount != null) data['item_discount'] = itemDiscount.toString();
     if (customizationNotes != null) data['customization_notes'] = customizationNotes;
     return data;

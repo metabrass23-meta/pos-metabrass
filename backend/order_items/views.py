@@ -470,7 +470,7 @@ def search_order_items(request):
             Q(customization_notes__icontains=query) |
             Q(product__name__icontains=query) |
             Q(product__color__icontains=query) |
-            Q(product__fabric__icontains=query)
+            Q(product__material__icontains=query)
         )
         order_items = order_items.select_related('order', 'product')
         

@@ -383,7 +383,7 @@ class _EditPayableDialogState extends State<EditPayableDialog> with SingleTicker
               keyboardType: TextInputType.phone,
               validator: (value) {
                 if (value?.isEmpty ?? true) return l10n.pleaseEnterPhoneNumber;
-                if (value!.length < 10) return l10n.pleaseEnterAValidPhoneNumber;
+                if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value!)) return l10n.pleaseEnterAValidPhoneNumber;
                 return null;
               },
             ),

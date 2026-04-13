@@ -47,25 +47,31 @@ void main() async {
   await StorageService().init();
   ApiClient().init();
 
-  runApp(const AlNoorApp());
+  runApp(const MetaBrassApp());
 
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     doWhenWindowReady(() {
+      // Use a more conservative size that fits well on HP laptop screens
+      // Account for Windows taskbar and system UI
       appWindow
-        ..minSize = const Size(1200, 700)  // Reduced from 1400x770 to support 1366x768 screens
-        ..maxSize = const Size(1920, 1080)
-        ..size = const Size(1366, 768)     // Default size for HP EliteBook compatibility
+        ..minSize =
+            const Size(1000, 550) // Reduced minimum height
+        ..maxSize =
+            const Size(2560, 1400) // Reduced max height for taskbar space
+        ..size =
+            const Size(1200, 680) // Reduced height to avoid taskbar cutoff
         ..alignment = Alignment.center
-        ..title = "Al Noor"
+        ..title = "MetaBrass"
         ..show();
     });
   }
 }
 
-class AlNoorApp extends StatelessWidget {
-  const AlNoorApp({super.key});
+class MetaBrassApp extends StatelessWidget {
+  const MetaBrassApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,103 +106,107 @@ class AlNoorApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
       child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
-        builder: (context, authProvider, profitLossProvider, appProvider, child) {
+        builder:
+            (context, authProvider, profitLossProvider, appProvider, child) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!appProvider.isInitialized) {
+                  appProvider.initialize();
+                }
+              });
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!appProvider.isInitialized) {
-              appProvider.initialize();
-            }
-          });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (authProvider.state == AuthState.initial) {
+                  authProvider.initialize();
+                }
+              });
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (authProvider.state == AuthState.initial) {
-              authProvider.initialize();
-            }
-          });
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (authProvider.state == AuthState.authenticated) {
-              if (profitLossProvider.profitLossHistory.isEmpty &&
-                  !profitLossProvider.isLoading) {
-                profitLossProvider.initialize();
-              }
-            }
-          });
-
-          return Sizer(
-            builder: (context, orientation, deviceType) {
-              return MaterialApp(
-                title: 'Al Noor - Premium POS',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: ThemeMode.light,
-                navigatorKey: navigatorKey,
-
-                locale: appProvider.locale,
-
-                supportedLocales: const [
-                  Locale('ur'),
-                  Locale('en'),
-                ],
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                initialRoute: '/',
-                onGenerateRoute: (settings) {
-                  if (settings.name == '/dashboard') {
-                    if (authProvider.state != AuthState.authenticated) {
-                      return MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                        settings: settings,
-                      );
-                    }
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (authProvider.state == AuthState.authenticated) {
+                  if (profitLossProvider.profitLossHistory.isEmpty &&
+                      !profitLossProvider.isLoading) {
+                    profitLossProvider.initialize();
                   }
+                }
+              });
 
-                  if (settings.name == '/login' || settings.name == '/signup') {
-                    if (authProvider.state == AuthState.authenticated) {
-                      return MaterialPageRoute(
-                        builder: (_) => const DashboardScreen(),
-                        settings: settings,
-                      );
-                    }
-                  }
+              return Sizer(
+                builder: (context, orientation, deviceType) {
+                  return MaterialApp(
+                    title: 'MetaBrass - Premium POS',
+                    debugShowCheckedModeBanner: false,
+                    theme: AppTheme.lightTheme,
+                    darkTheme: AppTheme.darkTheme,
+                    themeMode: ThemeMode.light,
+                    navigatorKey: navigatorKey,
 
-                  switch (settings.name) {
-                    case '/':
-                      return MaterialPageRoute(
-                        builder: (_) => const SplashScreen(),
-                        settings: settings,
-                      );
-                    case '/login':
-                      return MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                        settings: settings,
-                      );
-                    case '/signup':
-                      return MaterialPageRoute(
-                        builder: (_) => const SignupScreen(),
-                        settings: settings,
-                      );
-                    case '/dashboard':
-                      return MaterialPageRoute(
-                        builder: (_) => const DashboardScreen(),
-                        settings: settings,
-                      );
-                    default:
-                      return MaterialPageRoute(
-                        builder: (_) => const SplashScreen(),
-                        settings: settings,
-                      );
-                  }
+                    locale: appProvider.locale,
+
+                    supportedLocales: const [Locale('ur'), Locale('en')],
+                    localizationsDelegates: const [
+                      AppLocalizations.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                    ],
+
+                    // Add scroll behavior to prevent overflow
+                    scrollBehavior: const MaterialScrollBehavior().copyWith(
+                      overscroll: false,
+                    ),
+
+                    initialRoute: '/',
+                    onGenerateRoute: (settings) {
+                      if (settings.name == '/dashboard') {
+                        if (authProvider.state != AuthState.authenticated) {
+                          return MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                            settings: settings,
+                          );
+                        }
+                      }
+
+                      if (settings.name == '/login' ||
+                          settings.name == '/signup') {
+                        if (authProvider.state == AuthState.authenticated) {
+                          return MaterialPageRoute(
+                            builder: (_) => const DashboardScreen(),
+                            settings: settings,
+                          );
+                        }
+                      }
+
+                      switch (settings.name) {
+                        case '/':
+                          return MaterialPageRoute(
+                            builder: (_) => const SplashScreen(),
+                            settings: settings,
+                          );
+                        case '/login':
+                          return MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                            settings: settings,
+                          );
+                        case '/signup':
+                          return MaterialPageRoute(
+                            builder: (_) => const SignupScreen(),
+                            settings: settings,
+                          );
+                        case '/dashboard':
+                          return MaterialPageRoute(
+                            builder: (_) => const DashboardScreen(),
+                            settings: settings,
+                          );
+                        default:
+                          return MaterialPageRoute(
+                            builder: (_) => const SplashScreen(),
+                            settings: settings,
+                          );
+                      }
+                    },
+                  );
                 },
               );
             },
-          );
-        },
       ),
     );
   }

@@ -198,12 +198,10 @@ class RefundListView(generics.ListCreateAPIView):
     def get_queryset(self):
         """Filter refunds based on query parameters"""
         try:
-            print(f"🔍 [RefundListView] Getting queryset...")
             queryset = Refund.objects.filter(is_active=True).select_related(
                 'return_request', 'return_request__sale', 'return_request__customer',
                 'processed_by', 'created_by'
             )
-            print(f"🔍 [RefundListView] Base queryset count: {queryset.count()}")
             
             # Filter by status
             status_filter = self.request.query_params.get('status')
@@ -228,11 +226,8 @@ class RefundListView(generics.ListCreateAPIView):
             if date_to:
                 queryset = queryset.filter(created_at__date__lte=date_to)
             
-            result = queryset.order_by('-created_at')
-            print(f"🔍 [RefundListView] Final queryset count: {result.count()}")
-            return result
+            return queryset.order_by('-created_at')
         except Exception as e:
-            print(f"❌ [RefundListView] Error in get_queryset: {e}")
             import traceback
             traceback.print_exc()
             return Refund.objects.none()
@@ -240,13 +235,9 @@ class RefundListView(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         """Override list to add error handling"""
         try:
-            print(f"🔍 [RefundListView] List method called")
             response = super().list(request, *args, **kwargs)
-            print(f"✅ [RefundListView] List successful: {len(response.data.get('results', []))} items")
-            print(f"🔍 [RefundListView] Response data: {response.data}")
             return response
         except Exception as e:
-            print(f"❌ [RefundListView] Error in list: {e}")
             import traceback
             traceback.print_exc()
             from rest_framework.response import Response
@@ -254,7 +245,7 @@ class RefundListView(generics.ListCreateAPIView):
                 'success': False,
                 'message': f'Error loading refunds: {str(e)}',
                 'results': []
-            }, status=200)  # Return 200 instead of 500 to prevent UI breaking
+            }, status=200)
     
     def get_serializer_class(self):
         """Use different serializer for create vs list"""

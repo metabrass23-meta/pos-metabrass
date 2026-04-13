@@ -3,6 +3,7 @@ import 'package:frontend/src/utils/responsive_breakpoints.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/receivables_provider.dart';
+import '../../../src/providers/sales_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../widgets/receivables/add_receivable_dialog.dart';
@@ -11,6 +12,10 @@ import '../../widgets/receivables/edit_receivable_dialog.dart';
 import '../../widgets/receivables/receivable_table.dart';
 import '../../widgets/receivables/view_receviable_details.dart';
 import '../../widgets/receivables/receivables_filter_dialog.dart';
+import '../../widgets/sales/edit_sale_dialog.dart';
+import '../../widgets/sales/delete_sales_dialog.dart';
+import '../../widgets/sales/view_sales_dialog.dart';
+import '../../../src/models/sales/sale_model.dart';
 
 class ReceivablesPage extends StatefulWidget {
   const ReceivablesPage({super.key});
@@ -24,6 +29,14 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   
   // Local state for the current filter
   ReceivablesFilter _activeFilter = ReceivablesFilter();
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReceivablesProvider>().fetchReceivables();
+    });
+  }
 
   @override
   void dispose() {
@@ -55,28 +68,118 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
     }
   }
 
-  void _showEditReceivableDialog(Receivable receivable) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => EditReceivableDialog(receivable: receivable),
-    );
+  void _showEditReceivableDialog(Receivable receivable) async {
+    if (receivable.isFromSale) {
+      final salesProvider = Provider.of<SalesProvider>(context, listen: false);
+      
+      // Try local find first
+      SaleModel? sale;
+      try {
+        sale = salesProvider.sales.firstWhere((s) => s.id == receivable.relatedSaleId || s.id == receivable.id);
+      } catch (e) {
+        // Not in local list
+      }
+
+      if (sale == null) {
+        // Fetch from backend
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fetching sale details...'), duration: Duration(seconds: 1)),
+        );
+        sale = await salesProvider.getSaleById(receivable.relatedSaleId ?? receivable.id);
+      }
+
+      if (sale != null) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => EditSaleDialog(sale: sale!),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not find original sale record to edit.')),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => EditReceivableDialog(receivable: receivable),
+      );
+    }
   }
 
-  void _showDeleteReceivableDialog(Receivable receivable) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => DeleteReceivableDialog(receivable: receivable),
-    );
+  void _showDeleteReceivableDialog(Receivable receivable) async {
+    if (receivable.isFromSale) {
+      final salesProvider = Provider.of<SalesProvider>(context, listen: false);
+      SaleModel? sale;
+      try {
+        sale = salesProvider.sales.firstWhere((s) => s.id == receivable.relatedSaleId || s.id == receivable.id);
+      } catch (e) {}
+
+      if (sale == null) {
+        sale = await salesProvider.getSaleById(receivable.relatedSaleId ?? receivable.id);
+      }
+
+      if (sale != null) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => DeleteSaleDialog(sale: sale!),
+        );
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => DeleteReceivableDialog(receivable: receivable),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => DeleteReceivableDialog(receivable: receivable),
+      );
+    }
   }
 
-  void _showViewDetailsDialog(Receivable receivable) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => ViewReceivableDetailsDialog(receivable: receivable),
-    );
+  void _showViewDetailsDialog(Receivable receivable) async {
+    if (receivable.isFromSale) {
+      final salesProvider = Provider.of<SalesProvider>(context, listen: false);
+      SaleModel? sale;
+      try {
+        sale = salesProvider.sales.firstWhere((s) => s.id == receivable.relatedSaleId || s.id == receivable.id);
+      } catch (e) {}
+
+      if (sale == null) {
+        sale = await salesProvider.getSaleById(receivable.relatedSaleId ?? receivable.id);
+      }
+
+      if (sale != null) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) => ViewSaleDialog(sale: sale!),
+        );
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) => ViewReceivableDetailsDialog(receivable: receivable),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => ViewReceivableDetailsDialog(receivable: receivable),
+      );
+    }
   }
 
   @override

@@ -1,9 +1,9 @@
 class LaborModel {
   final String id;
   final String name;
-  final String cnic;
+  final String? cnic;
   final String phoneNumber;
-  final String caste;
+  final String? caste;
   final String designation;
   final DateTime joiningDate;
   final double salary;
@@ -38,9 +38,9 @@ class LaborModel {
   const LaborModel({
     required this.id,
     required this.name,
-    required this.cnic,
+    this.cnic,
     required this.phoneNumber,
-    required this.caste,
+    this.caste,
     required this.designation,
     required this.joiningDate,
     required this.salary,
@@ -77,9 +77,9 @@ class LaborModel {
     return LaborModel(
       id: json['id'] as String,
       name: json['name'] as String,
-      cnic: json['cnic'] as String,
+      cnic: json['cnic'] as String?,
       phoneNumber: json['phone_number'] as String,
-      caste: json['caste'] as String,
+      caste: json['caste'] as String?,
       designation: json['designation'] as String,
       joiningDate: DateTime.parse(json['joining_date'] as String),
       salary: json['salary'] is String ? double.parse(json['salary'] as String) : (json['salary'] as num?)?.toDouble() ?? 0.0,
@@ -108,15 +108,31 @@ class LaborModel {
           ? double.parse(json['total_payments_amount'] as String)
           : (json['total_payments_amount'] as num?)?.toDouble() ?? 0.0,
       lastPaymentDate: json['last_payment_date'] != null ? DateTime.parse(json['last_payment_date'] as String) : null,
-      remainingMonthlySalary: json['remaining_monthly_salary'] is String
-          ? double.parse(json['remaining_monthly_salary'] as String)
-          : (json['remaining_monthly_salary'] as num?)?.toDouble() ?? 0.0,
-      remainingAdvanceAmount: json['remaining_advance_amount'] is String
-          ? double.parse(json['remaining_advance_amount'] as String)
-          : (json['remaining_advance_amount'] as num?)?.toDouble() ?? 0.0,
-      totalAdvancesAmount: json['total_advances_amount'] is String
+      remainingMonthlySalary: (json['remaining_monthly_salary'] is String
+          ? double.tryParse(json['remaining_monthly_salary'] as String) ?? 0.0
+          : (json['remaining_monthly_salary'] as num?)?.toDouble() ?? 0.0) != 0.0 
+          ? (json['remaining_monthly_salary'] is String
+            ? double.tryParse(json['remaining_monthly_salary'] as String) ?? 0.0
+            : (json['remaining_monthly_salary'] as num?)?.toDouble() ?? 0.0) 
+          : ((json['salary'] is String ? double.tryParse(json['salary'] as String) ?? 0.0 : (json['salary'] as num?)?.toDouble() ?? 0.0) 
+            - (json['total_advances_amount'] is String
+              ? double.tryParse(json['total_advances_amount'] as String) ?? 0.0
+              : (json['total_advances_amount'] as num?)?.toDouble() ?? 0.0)),
+      remainingAdvanceAmount: (json['remaining_advance_amount'] is String
+          ? double.tryParse(json['remaining_advance_amount'] as String) ?? 0.0
+          : (json['remaining_advance_amount'] as num?)?.toDouble() ?? 0.0) != 0.0 
+          ? (json['remaining_advance_amount'] is String
+            ? double.tryParse(json['remaining_advance_amount'] as String) ?? 0.0
+            : (json['remaining_advance_amount'] as num?)?.toDouble() ?? 0.0) 
+          : ((json['salary'] is String ? double.tryParse(json['salary'] as String) ?? 0.0 : (json['salary'] as num?)?.toDouble() ?? 0.0) 
+            - (json['total_advances_amount'] is String
+              ? double.tryParse(json['total_advances_amount'] as String) ?? 0.0
+              : (json['total_advances_amount'] as num?)?.toDouble() ?? 0.0)),
+      totalAdvancesAmount: json['total_advances_amount'] != null ? (json['total_advances_amount'] is String
           ? double.parse(json['total_advances_amount'] as String)
-          : (json['total_advances_amount'] as num?)?.toDouble() ?? 0.0,
+          : (json['total_advances_amount'] as num?)?.toDouble() ?? 0.0) : (json['total_advance_amount'] is String
+          ? double.parse(json['total_advance_amount'] as String)
+          : (json['total_advance_amount'] as num?)?.toDouble() ?? 0.0),
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String? ?? json['created_at'] as String),

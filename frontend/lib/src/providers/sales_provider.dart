@@ -3,7 +3,7 @@ import 'dart:io'; // ✅ REQUIRED for File operations
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:printing/printing.dart'; // ✅ REQUIRED
-import 'package:pdf/pdf.dart';           // ✅ REQUIRED
+import 'package:pdf/pdf.dart'; // ✅ REQUIRED
 import 'package:path_provider/path_provider.dart'; // ✅ REQUIRED for file operations
 import '../models/sales/sale_model.dart';
 import '../models/sales/request_models.dart';
@@ -24,7 +24,7 @@ class CartItem {
   final String productId;
   final String productName;
   final double unitPrice;
-  final int quantity;
+  final double quantity;
   final double itemDiscount;
   final String? customizationNotes;
   final double lineTotal;
@@ -44,7 +44,7 @@ class CartItem {
     String? productId,
     String? productName,
     double? unitPrice,
-    int? quantity,
+    double? quantity,
     double? itemDiscount,
     String? customizationNotes,
   }) {
@@ -134,8 +134,10 @@ class SalesProvider extends ChangeNotifier {
 
   // Cart getters
   List<CartItem> get currentCart => _cartItems;
-  int get cartTotalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
-  double get cartSubtotal => _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+  double get cartTotalItems =>
+      _cartItems.fold(0.0, (sum, item) => sum + item.quantity);
+  double get cartSubtotal =>
+      _cartItems.fold(0.0, (sum, item) => sum + item.lineTotal);
   double get overallDiscount => _overallDiscount;
   double get cartGstAmount => _taxConfiguration.totalTaxAmount;
   double get cartTaxAmount => _taxConfiguration.totalTaxAmount;
@@ -154,8 +156,10 @@ class SalesProvider extends ChangeNotifier {
   // Computed getters
   bool get hasSales => _sales.isNotEmpty;
   int get salesCount => _sales.length;
-  double get totalRevenue => _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
-  double get totalTaxCollected => _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
+  double get totalRevenue =>
+      _sales.fold(0.0, (sum, sale) => sum + sale.grandTotal);
+  double get totalTaxCollected =>
+      _sales.fold(0.0, (sum, sale) => sum + sale.taxAmount);
 
   /// Load sales with current filters and pagination
   Future<void> loadSales({bool refresh = false}) async {
@@ -188,17 +192,23 @@ class SalesProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         if (refresh) {
           _sales = response.data!.sales;
-          debugPrint('🔍 [SalesProvider] Refresh: Set sales to ${_sales.length} items');
+          debugPrint(
+            '🔍 [SalesProvider] Refresh: Set sales to ${_sales.length} items',
+          );
         } else {
           _sales.addAll(response.data!.sales);
-          debugPrint('🔍 [SalesProvider] Append: Added ${response.data!.sales.length} items, total now ${_sales.length}');
+          debugPrint(
+            '🔍 [SalesProvider] Append: Added ${response.data!.sales.length} items, total now ${_sales.length}',
+          );
         }
 
         _totalCount = response.data!.pagination.totalCount;
         _totalPages = response.data!.pagination.totalPages;
         _hasNext = response.data!.pagination.hasNext;
         _hasPrevious = response.data!.pagination.hasPrevious;
-        debugPrint('🔍 [SalesProvider] Pagination updated: page=$_currentPage, totalPages=$_totalPages, hasNext=$_hasNext');
+        debugPrint(
+          '🔍 [SalesProvider] Pagination updated: page=$_currentPage, totalPages=$_totalPages, hasNext=$_hasNext',
+        );
       } else {
         _setError(response.message);
       }
@@ -214,20 +224,26 @@ class SalesProvider extends ChangeNotifier {
     debugPrint('🔍 [SalesProvider] Starting loadAllSales...');
     _sales.clear();
     _currentPage = 1;
-    
+
     // Load first page to get pagination info
     debugPrint('🔍 [SalesProvider] Loading first page...');
     await loadSales(refresh: true);
-    debugPrint('🔍 [SalesProvider] After first load: hasNext=$_hasNext, totalPages=$_totalPages, salesCount=${_sales.length}');
-    
+    debugPrint(
+      '🔍 [SalesProvider] After first load: hasNext=$_hasNext, totalPages=$_totalPages, salesCount=${_sales.length}',
+    );
+
     // Load remaining pages
     while (_hasNext && _currentPage < _totalPages) {
       _currentPage++;
       debugPrint('🔍 [SalesProvider] Loading page $_currentPage...');
       await loadSales(refresh: false);
-      debugPrint('🔍 [SalesProvider] After page $_currentPage: hasNext=$_hasNext, salesCount=${_sales.length}');
+      debugPrint(
+        '🔍 [SalesProvider] After page $_currentPage: hasNext=$_hasNext, salesCount=${_sales.length}',
+      );
     }
-    debugPrint('🔍 [SalesProvider] Finished loading all ${_sales.length} sales');
+    debugPrint(
+      '🔍 [SalesProvider] Finished loading all ${_sales.length} sales',
+    );
   }
 
   /// Load sales statistics
@@ -283,12 +299,12 @@ class SalesProvider extends ChangeNotifier {
     required String productId,
     required String productName,
     required double unitPrice,
-    required int quantity,
+    required double quantity,
     double itemDiscount = 0.0,
     String? customizationNotes,
   }) {
     final existingItemIndex = _cartItems.indexWhere(
-          (item) => item.productId == productId,
+      (item) => item.productId == productId,
     );
 
     if (existingItemIndex != -1) {
@@ -321,7 +337,7 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCartItemQuantity(String itemId, int newQuantity) {
+  void updateCartItemQuantity(String itemId, double newQuantity) {
     final itemIndex = _cartItems.indexWhere((item) => item.id == itemId);
     if (itemIndex != -1) {
       if (newQuantity <= 0) {
@@ -394,20 +410,20 @@ class SalesProvider extends ChangeNotifier {
     print('🔍 setOverallDiscount called');
     print('🔍 Input discount: $discount');
     print('🔍 Cart subtotal: $cartSubtotal');
-    
+
     // Validate discount
     if (discount < 0) {
       print('❌ Discount is negative');
       _setError('Discount cannot be negative');
       return;
     }
-    
+
     if (discount > cartSubtotal) {
       print('❌ Discount $discount exceeds subtotal $cartSubtotal');
       _setError('Discount cannot exceed subtotal');
       return;
     }
-    
+
     _overallDiscount = discount;
     print('✅ Overall discount set to: $_overallDiscount');
     notifyListeners();
@@ -431,13 +447,13 @@ class SalesProvider extends ChangeNotifier {
       final saleItems = _cartItems
           .map(
             (item) => CreateSaleItemRequest(
-          productId: item.productId,
-          unitPrice: item.unitPrice,
-          quantity: item.quantity,
-          itemDiscount: item.itemDiscount,
-          customizationNotes: item.customizationNotes,
-        ),
-      )
+              productId: item.productId,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              itemDiscount: item.itemDiscount,
+              customizationNotes: item.customizationNotes,
+            ),
+          )
           .toList();
 
       final request = CreateSaleRequest(
@@ -458,17 +474,17 @@ class SalesProvider extends ChangeNotifier {
         final saleId = response.data!.id;
         _sales.insert(0, response.data!);
         _setSuccess('Sale created successfully');
-        
+
         // Clear cart after successful sale
         clearCart();
         setSelectedCustomer(null);
-        
+
         // Refresh products to update stock quantities
         await loadProducts();
-        
+
         // Refresh dashboard to update real-time counts
         DashboardProvider.refreshDashboard();
-        
+
         return saleId;
       } else {
         _setError(response.message);
@@ -480,6 +496,7 @@ class SalesProvider extends ChangeNotifier {
       return null;
     }
   }
+
   Future<bool> createSaleFromCart({
     required String paymentMethod,
     required double amountPaid,
@@ -494,13 +511,13 @@ class SalesProvider extends ChangeNotifier {
       final saleItems = _cartItems
           .map(
             (item) => CreateSaleItemRequest(
-          productId: item.productId,
-          unitPrice: item.unitPrice,
-          quantity: item.quantity,
-          itemDiscount: item.itemDiscount,
-          customizationNotes: item.customizationNotes,
-        ),
-      )
+              productId: item.productId,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              itemDiscount: item.itemDiscount,
+              customizationNotes: item.customizationNotes,
+            ),
+          )
           .toList();
 
       final request = CreateSaleRequest(
@@ -523,10 +540,10 @@ class SalesProvider extends ChangeNotifier {
       if (success) {
         clearCart();
         setSelectedCustomer(null);
-        
+
         // Refresh products to update stock quantities
         await loadProducts();
-        
+
         // Refresh dashboard to update real-time counts
         DashboardProvider.refreshDashboard();
       }
@@ -565,13 +582,13 @@ class SalesProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         _sales.insert(0, response.data!);
         _setSuccess('Sale created successfully');
-        
+
         // Refresh products to update stock quantities
         await loadProducts();
-        
+
         // Refresh dashboard to update real-time counts
         DashboardProvider.refreshDashboard();
-        
+
         return true;
       } else {
         _setError(response.message);
@@ -745,7 +762,7 @@ class SalesProvider extends ChangeNotifier {
       // 1. Calculate Subtotal
       final double subtotal = sale.saleItems.fold(
         0.0,
-            (sum, item) => sum + item.lineTotal,
+        (sum, item) => sum + item.lineTotal,
       );
 
       // 2. Recalculate Taxes
@@ -796,13 +813,13 @@ class SalesProvider extends ChangeNotifier {
 
   /// Create sale from order
   Future<bool> createSaleFromOrder(
-      String orderId, {
-        required String paymentMethod,
-        required double amountPaid,
-        double overallDiscount = 0.0,
-        TaxConfiguration? taxConfiguration,
-        String? notes,
-      }) async {
+    String orderId, {
+    required String paymentMethod,
+    required double amountPaid,
+    double overallDiscount = 0.0,
+    TaxConfiguration? taxConfiguration,
+    String? notes,
+  }) async {
     try {
       final request = CreateSaleFromOrderRequest(
         orderId: orderId,
@@ -849,19 +866,24 @@ class SalesProvider extends ChangeNotifier {
     try {
       // Get all sales IDs
       final allSalesIds = _sales.map((sale) => sale.id).toList();
-      
+
       if (allSalesIds.isEmpty) {
         _setError('No sales found to recalculate');
         return false;
       }
 
       _setLoading(false); // Stop loading for info message
-      
-      final response = await _salesService.bulkActionSales(allSalesIds, 'recalculate');
+
+      final response = await _salesService.bulkActionSales(
+        allSalesIds,
+        'recalculate',
+      );
 
       if (response.success) {
         await loadSales(refresh: true);
-        _setSuccess('Totals recalculated successfully for ${allSalesIds.length} sales');
+        _setSuccess(
+          'Totals recalculated successfully for ${allSalesIds.length} sales',
+        );
         return true;
       } else {
         _setError(response.message);
@@ -1029,11 +1051,11 @@ class SalesProvider extends ChangeNotifier {
 
   /// Add payment to sale
   Future<bool> addPayment(
-      String saleId,
-      double amount,
-      String method, {
-        Map<String, dynamic>? splitDetails,
-      }) async {
+    String saleId,
+    double amount,
+    String method, {
+    Map<String, dynamic>? splitDetails,
+  }) async {
     try {
       final response = await _salesService.addSalePayment(
         saleId,
@@ -1077,7 +1099,7 @@ class SalesProvider extends ChangeNotifier {
 
       if (response.success) {
         await loadSales(refresh: true);
-        _setSuccess('Payment processed with workflow successfully');
+        _setSuccess('Payment of PKR ${amount.toStringAsFixed(0)} processed successfully');
         return true;
       } else {
         _setError(response.message);
@@ -1158,10 +1180,10 @@ class SalesProvider extends ChangeNotifier {
 
   /// Update sale status with payment tracking
   Future<bool> updateSaleStatusWithPayment(
-      String saleId,
-      String newStatus, {
-        String? notes,
-      }) async {
+    String saleId,
+    String newStatus, {
+    String? notes,
+  }) async {
     try {
       final response = await _salesService.updateSaleStatus(saleId, newStatus);
       if (response.success) {
@@ -1180,9 +1202,9 @@ class SalesProvider extends ChangeNotifier {
 
   /// Handle split payments
   Future<bool> handleSplitPayments(
-      String saleId,
-      Map<String, dynamic> splitDetails,
-      ) async {
+    String saleId,
+    Map<String, dynamic> splitDetails,
+  ) async {
     try {
       final response = await _salesService.addPayment(saleId, 0.0, 'SPLIT');
       if (response.success) {
@@ -1243,13 +1265,13 @@ class SalesProvider extends ChangeNotifier {
 
   /// Get payment workflow actions for a sale
   List<String> getAvailablePaymentActions(
-      Map<String, dynamic> workflowSummary,
-      ) {
+    Map<String, dynamic> workflowSummary,
+  ) {
     final actions = <String>[];
 
     if (workflowSummary['workflow_actions'] != null) {
       final workflowActions =
-      workflowSummary['workflow_actions'] as Map<String, dynamic>;
+          workflowSummary['workflow_actions'] as Map<String, dynamic>;
 
       if (workflowActions['can_add_payment'] == true) {
         actions.add('add_payment');
@@ -1290,7 +1312,7 @@ class SalesProvider extends ChangeNotifier {
   double getPaymentWorkflowProgress(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
       final paymentSummary =
-      workflowSummary['payment_summary'] as Map<String, dynamic>;
+          workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['payment_percentage'] as double? ?? 0.0;
     }
     return 0.0;
@@ -1300,7 +1322,7 @@ class SalesProvider extends ChangeNotifier {
   bool isPaymentWorkflowComplete(Map<String, dynamic> workflowSummary) {
     if (workflowSummary['payment_summary'] != null) {
       final paymentSummary =
-      workflowSummary['payment_summary'] as Map<String, dynamic>;
+          workflowSummary['payment_summary'] as Map<String, dynamic>;
       return paymentSummary['is_fully_paid'] as bool? ?? false;
     }
     return false;
@@ -1439,9 +1461,9 @@ class SalesProvider extends ChangeNotifier {
 
   /// Create sale item (Note: Sale items are typically created as part of sale creation)
   Future<bool> createSaleItem(
-      CreateSaleItemRequest request,
-      String saleId,
-      ) async {
+    CreateSaleItemRequest request,
+    String saleId,
+  ) async {
     try {
       final response = await _saleItemService.createSaleItem(request);
       if (response.success && response.data != null) {
@@ -1465,17 +1487,16 @@ class SalesProvider extends ChangeNotifier {
     }
   }
 
-
   Future<bool> updateSaleItem(
-      String itemId,
-      UpdateSaleItemRequest request,
-      ) async {
+    String itemId,
+    UpdateSaleItemRequest request,
+  ) async {
     try {
       final response = await _saleItemService.updateSaleItem(itemId, request);
       if (response.success && response.data != null) {
         for (int i = 0; i < _sales.length; i++) {
           final itemIndex = _sales[i].saleItems.indexWhere(
-                (item) => item.id == itemId,
+            (item) => item.id == itemId,
           );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
@@ -1505,7 +1526,7 @@ class SalesProvider extends ChangeNotifier {
         // Remove the item from the sale
         for (int i = 0; i < _sales.length; i++) {
           final itemIndex = _sales[i].saleItems.indexWhere(
-                (item) => item.id == itemId,
+            (item) => item.id == itemId,
           );
           if (itemIndex != -1) {
             final updatedItems = List<SaleItemModel>.from(_sales[i].saleItems);
@@ -1555,21 +1576,25 @@ class SalesProvider extends ChangeNotifier {
         try {
           // ✅ Save PDF to temporary file
           final directory = await getTemporaryDirectory();
-          final fileName = 'Receipt_$saleId.pdf';
+          final fileName = 'Receipt_${saleId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
           final filePath = '${directory.path}/$fileName';
-          
+
           final file = File(filePath);
           await file.writeAsBytes(response.data!);
-          
+
           debugPrint("✅ PDF saved to: $filePath");
-          
+
           // ✅ Open PDF in system viewer
-          if (Platform.isMacOS || Platform.isWindows) {
+          if (Platform.isWindows) {
+            // Windows: Use 'start' command and fix path format
+            final windowsPath = filePath.replaceAll('/', '\\');
+            await Process.run('explorer.exe', [windowsPath]);
+          } else if (Platform.isMacOS) {
             await Process.run('open', [filePath]);
           } else if (Platform.isLinux) {
             await Process.run('xdg-open', [filePath]);
           }
-          
+
           _setSuccess('Receipt opened for printing');
           return true;
         } catch (openError) {
@@ -1604,21 +1629,25 @@ class SalesProvider extends ChangeNotifier {
         try {
           // ✅ Save PDF to temporary file
           final directory = await getTemporaryDirectory();
-          final fileName = 'Invoice_$invoiceId.pdf';
+          final fileName = 'Invoice_${invoiceId}_${DateTime.now().millisecondsSinceEpoch}.pdf';
           final filePath = '${directory.path}/$fileName';
-          
+
           final file = File(filePath);
           await file.writeAsBytes(response.data!);
-          
+
           debugPrint("✅ Invoice PDF saved to: $filePath");
-          
+
           // ✅ Open PDF in system viewer
-          if (Platform.isMacOS || Platform.isWindows) {
+          if (Platform.isWindows) {
+            // Windows: Use 'start' command and fix path format
+            final windowsPath = filePath.replaceAll('/', '\\');
+            await Process.run('explorer.exe', [windowsPath]);
+          } else if (Platform.isMacOS) {
             await Process.run('open', [filePath]);
-          } else {
+          } else if (Platform.isLinux) {
             await Process.run('xdg-open', [filePath]);
           }
-          
+
           _setSuccess('Invoice opened for printing');
           return true;
         } catch (openError) {
@@ -1639,7 +1668,7 @@ class SalesProvider extends ChangeNotifier {
     }
   }
 
-// ✅ NEW: Generate Thermal Print for Sale
+  // ✅ NEW: Generate Thermal Print for Sale
   Future<bool> generateSaleThermalPrint(String saleId) async {
     _setLoading(true);
     debugPrint("🖨️ [SalesProvider] Starting Thermal Print Generation...");
@@ -1649,32 +1678,36 @@ class SalesProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         debugPrint("✅ Thermal print data received");
-        
+
         // Backend returns thermal data as JSON, not PDF bytes
         // For now, show the thermal data in a dialog or save as text file
         final thermalData = response.data as Map<String, dynamic>;
-        
+
         try {
           // Create a simple text receipt from thermal data
           final receiptText = _generateThermalTextReceipt(thermalData);
-          
+
           // Save as text file
           final directory = await getTemporaryDirectory();
           final fileName = 'Thermal_Receipt_$saleId.txt';
           final filePath = '${directory.path}/$fileName';
-          
+
           final file = File(filePath);
           await file.writeAsString(receiptText);
-          
+
           debugPrint("✅ Thermal receipt saved to: $filePath");
-          
+
           // Open text file in system viewer
-          if (Platform.isMacOS || Platform.isWindows) {
+          if (Platform.isWindows) {
+            // Windows: Use 'start' command and fix path format
+            final windowsPath = filePath.replaceAll('/', '\\');
+            await Process.run('cmd', ['/c', 'start', '', windowsPath]);
+          } else if (Platform.isMacOS) {
             await Process.run('open', [filePath]);
           } else if (Platform.isLinux) {
             await Process.run('xdg-open', [filePath]);
           }
-          
+
           _setSuccess('Thermal receipt opened for printing');
           return true;
         } catch (openError) {
@@ -1697,42 +1730,51 @@ class SalesProvider extends ChangeNotifier {
 
   // ✅ Generate thermal-style text receipt
   String _generateThermalTextReceipt(Map<String, dynamic> thermalData) {
-    final receipt = thermalData['sale'];
-    final items = thermalData['items'] as List;
-    final company = thermalData['company'];
-    
+    final receipt = thermalData['sale'] ?? {};
+    final items = thermalData['items'] as List<dynamic>? ?? [];
+    final company = thermalData['company'] ?? {};
+
     final buffer = StringBuffer();
-    
+
     // Company header
-    buffer.writeln(company['name'] ?? 'Al Noor');
-    buffer.writeln(company['address'] ?? '');
-    buffer.writeln(company['phone'] ?? '');
+    buffer.writeln(company['name'] ?? 'Maqbool Fashion');
+    buffer.writeln(
+      company['address'] ?? 'Kacha Eminabadroad Siddique Colony Gujranwala',
+    );
+    buffer.writeln(company['phone'] ?? '055-8174471');
     buffer.writeln('' + '=' * 40);
-    
+
     // Receipt details
-    buffer.writeln('Invoice: ${receipt['invoice_number']}');
-    buffer.writeln('Date: ${receipt['date_of_sale']}');
-    buffer.writeln('Customer: ${receipt['customer_name']}');
-    if (receipt['customer_phone'] != null && receipt['customer_phone'].isNotEmpty) {
+    buffer.writeln('Invoice: ${receipt['invoice_number'] ?? 'N/A'}');
+    buffer.writeln('Date: ${receipt['date_of_sale'] ?? 'N/A'}');
+    buffer.writeln(
+      'Customer: ${receipt['customer_name'] ?? 'Walk-in Customer'}',
+    );
+    if (receipt['customer_phone'] != null &&
+        receipt['customer_phone'].isNotEmpty) {
       buffer.writeln('Phone: ${receipt['customer_phone']}');
     }
     buffer.writeln('' + '-' * 40);
-    
+
     // Table header
     buffer.writeln('Item        Qty  Price   Total');
     buffer.writeln('' + '-' * 40);
-    
+
     // Items
     for (var item in items) {
-      final itemName = item['name'] as String;
-      final quantity = item['quantity'] as int;
-      final unitPrice = item['unit_price'] as double;
-      final total = item['total'] as double;
-      
+      final itemName = (item['name'] as String? ?? 'Unknown Item');
+      final quantity = (item['quantity'] as int? ?? 0);
+      final unitPrice = (item['unit_price'] as num? ?? 0).toDouble();
+      final total = (item['total'] as num? ?? 0).toDouble();
+
       // Item name (truncate if too long)
-      String displayName = itemName.length > 10 ? itemName.substring(0, 10) : itemName;
-      buffer.writeln('$displayName${' ' * (10 - displayName.length)}${quantity.toString().padLeft(3)}  ${unitPrice.toStringAsFixed(0).padLeft(5)}  ${total.toStringAsFixed(0).padLeft(5)}');
-      
+      String displayName = itemName.length > 10
+          ? itemName.substring(0, 10)
+          : itemName;
+      buffer.writeln(
+        '$displayName${' ' * (10 - displayName.length)}${quantity.toString().padLeft(3)}  ${unitPrice.toStringAsFixed(0).padLeft(5)}  ${total.toStringAsFixed(0).padLeft(5)}',
+      );
+
       // If item name was truncated, show the rest on next line
       if (itemName.length > 10) {
         String remainingName = itemName.substring(10);
@@ -1742,44 +1784,68 @@ class SalesProvider extends ChangeNotifier {
         buffer.writeln(remainingName);
       }
     }
-    
+
     buffer.writeln('' + '-' * 40);
-    
+
     // Totals
-    buffer.writeln('Subtotal:'.padRight(17) + receipt['subtotal'].toStringAsFixed(0).padLeft(6));
-    
-    if (receipt['overall_discount'] > 0) {
-      buffer.writeln('Discount:'.padRight(17) + '-${receipt['overall_discount'].toStringAsFixed(0)}'.padLeft(6));
+    final subtotal = (receipt['subtotal'] as num? ?? 0).toDouble();
+    final overallDiscount = (receipt['overall_discount'] as num? ?? 0)
+        .toDouble();
+    final taxAmount = (receipt['tax_amount'] as num? ?? 0).toDouble();
+    final grandTotal = (receipt['grand_total'] as num? ?? 0).toDouble();
+
+    buffer.writeln(
+      'Subtotal:'.padRight(17) + subtotal.toStringAsFixed(0).padLeft(6),
+    );
+
+    if (overallDiscount > 0) {
+      buffer.writeln(
+        'Discount:'.padRight(17) +
+            '-${overallDiscount.toStringAsFixed(0)}'.padLeft(6),
+      );
     }
-    
-    if (receipt['tax_amount'] > 0) {
-      buffer.writeln('Tax:'.padRight(17) + receipt['tax_amount'].toStringAsFixed(0).padLeft(6));
+
+    if (taxAmount > 0) {
+      buffer.writeln(
+        'Tax:'.padRight(17) + taxAmount.toStringAsFixed(0).padLeft(6),
+      );
     }
-    
+
     // Double line for total
     buffer.writeln('' + '=' * 40);
-    
+
     // Grand Total (larger font simulation)
-    buffer.writeln('TOTAL:'.padRight(17) + receipt['grand_total'].toStringAsFixed(0).padLeft(6));
-    
+    buffer.writeln(
+      'TOTAL:'.padRight(17) + grandTotal.toStringAsFixed(0).padLeft(6),
+    );
+
     // Double line for total
     buffer.writeln('' + '=' * 40);
-    
+
     // Payment info
-    buffer.writeln('Payment: ${receipt['payment_method']}');
-    buffer.writeln('Paid:'.padRight(17) + receipt['amount_paid'].toStringAsFixed(0).padLeft(6));
-    
-    if (receipt['remaining_amount'] > 0) {
-      buffer.writeln('Due:'.padRight(17) + receipt['remaining_amount'].toStringAsFixed(0).padLeft(6));
+    final paymentMethod = receipt['payment_method'] as String? ?? 'CASH';
+    final amountPaid = (receipt['amount_paid'] as num? ?? 0).toDouble();
+    final remainingAmount = (receipt['remaining_amount'] as num? ?? 0)
+        .toDouble();
+
+    buffer.writeln('Payment: $paymentMethod');
+    buffer.writeln(
+      'Paid:'.padRight(17) + amountPaid.toStringAsFixed(0).padLeft(6),
+    );
+
+    if (remainingAmount > 0) {
+      buffer.writeln(
+        'Due:'.padRight(17) + remainingAmount.toStringAsFixed(0).padLeft(6),
+      );
     }
-    
+
     buffer.writeln('' + '-' * 40);
-    
+
     // Footer
     buffer.writeln('Thank you for shopping!');
     buffer.writeln('No Return / Exchange without receipt');
     buffer.writeln('Visit us again!');
-    
+
     return buffer.toString();
   }
 

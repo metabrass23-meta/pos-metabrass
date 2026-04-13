@@ -89,7 +89,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
           .where(
             (product) =>
         product.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            product.fabric.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            product.material.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             product.color.toLowerCase().contains(_searchQuery.toLowerCase()),
       )
           .toList();
@@ -454,7 +454,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                                 ),
                                 SizedBox(height: context.smallPadding / 2),
                                 Text(
-                                  '${product.fabric} • ${product.color}',
+                                  '${product.material} • ${product.color}',
                                   style: TextStyle(
                                     fontSize: context.bodyFontSize,
                                     color: Colors.grey[700],
@@ -586,7 +586,7 @@ class _ProductSelectionDialogState extends State<ProductSelectionDialog> with Si
                     ),
                     SizedBox(height: context.smallPadding / 2),
                     Text(
-                      '${_selectedProduct!.fabric} • ${_selectedProduct!.color}',
+                      '${_selectedProduct!.material} • ${_selectedProduct!.color}',
                       style: TextStyle(
                         fontSize: context.bodyFontSize,
                         fontWeight: FontWeight.w400,

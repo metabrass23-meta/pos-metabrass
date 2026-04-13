@@ -29,6 +29,7 @@ import '../../screens/settings/settings_screen.dart';
 import '../../screens/tax_management_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
+import '../../screens/quotation/quotation_list_screen.dart';
 
 // Dashboard Widgets
 import 'sales_overview_chart.dart';
@@ -55,34 +56,36 @@ class DashboardContent extends StatelessWidget {
       case 4:
         return const CategoryPage();
       case 5:
-        return const CustomerPage();
+        return const QuotationListScreen();
       case 6:
-        return const VendorPage();
+        return const CustomerPage();
       case 7:
-        return const LaborPage();
+        return const VendorPage();
       case 8:
-        return const ReceivablesPage();
+        return const LaborPage();
       case 9:
-        return const PayablesPage();
+        return const ReceivablesPage();
       case 10:
-        return const AdvancePaymentPage();
+        return const PayablesPage();
       case 11:
-        return const PaymentPage();
+        return const AdvancePaymentPage();
       case 12:
-        return const ExpensesPage();
+        return const PaymentPage();
       case 13:
-        return const PrincipalAccountPage();
+        return const ExpensesPage();
       case 14:
-        return const ZakatPage();
+        return const PrincipalAccountPage();
       case 15:
-        return const ProfitLossPage();
+        return const ZakatPage();
       case 16:
-        return const ReturnManagementScreen();
+        return const ProfitLossPage();
       case 17:
-        return const InvoiceManagementScreen();
+        return const ReturnManagementScreen();
       case 18:
-        return const ReceiptManagementScreen();
+        return const InvoiceManagementScreen();
       case 19:
+        return const ReceiptManagementScreen();
+      case 20:
         return const SettingsScreen();
       default:
         return _buildPlaceholderContent(context);
@@ -92,7 +95,6 @@ class DashboardContent extends StatelessWidget {
   Widget _buildDashboard(BuildContext context) {
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
-
         // 1. Initial Loading State
         if (provider.isLoading && provider.analytics == null) {
           return const Center(child: CircularProgressIndicator());
@@ -137,11 +139,13 @@ class DashboardContent extends StatelessWidget {
                 // --- STATS CARDS (RESTORED & ACTIVE) ---
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final cardCount = context.statsCardColumns.clamp(2, 4);
+                    final cardCount = context.statsCardColumns;
+                    final availableWidth = constraints.maxWidth;
+                    final cardPadding = context.cardPadding;
+                    final totalPadding = cardPadding * (cardCount - 1);
                     final cardWidth =
-                        (constraints.maxWidth -
-                            context.cardPadding * (cardCount - 1)) /
-                            cardCount;
+                        (availableWidth - totalPadding) / cardCount;
+
                     return Wrap(
                       spacing: context.cardPadding,
                       runSpacing: context.formFieldSpacing,
@@ -182,7 +186,9 @@ class DashboardContent extends StatelessWidget {
                         SizedBox(
                           width: cardWidth,
                           child: StatsCard(
-                            title: AppLocalizations.of(context)!.activeCustomers,
+                            title: AppLocalizations.of(
+                              context,
+                            )!.activeCustomers,
                             value: stats['activeCustomers']['value'],
                             change: stats['activeCustomers']['change'],
                             isPositive: stats['activeCustomers']['isPositive'],
@@ -327,7 +333,7 @@ class DashboardContent extends StatelessWidget {
               color: AppTheme.pureWhite.withOpacity(0.1),
               borderRadius: BorderRadius.circular(context.cardPadding),
             ),
-            child: Image.asset('assets/images/logo.png'),
+            child: Image.asset('assets/images/metabras.png'),
           ),
         ],
       ),
@@ -357,6 +363,7 @@ class DashboardContent extends StatelessWidget {
       AppLocalizations.of(context)!.returns,
       AppLocalizations.of(context)!.invoices,
       AppLocalizations.of(context)!.receipts,
+      'Quotations',
       AppLocalizations.of(context)!.settings,
     ];
 

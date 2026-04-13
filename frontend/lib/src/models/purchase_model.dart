@@ -66,7 +66,7 @@ class PurchaseModel {
       if (id != null) 'id': id,
       'vendor': vendor,
       'invoice_number': invoiceNumber,
-      'purchase_date': purchaseDate.toIso8601String(),
+      'purchase_date': "${purchaseDate.year.toString().padLeft(4, '0')}-${purchaseDate.month.toString().padLeft(2, '0')}-${purchaseDate.day.toString().padLeft(2, '0')}",
       // Send numbers as Strings to ensure Backend DecimalFields accept them strictly
       'subtotal': subtotal.toStringAsFixed(2),
       'tax': tax.toStringAsFixed(2),

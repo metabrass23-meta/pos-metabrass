@@ -14,7 +14,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     # Product details
     product_id = serializers.UUIDField(source='product.id', read_only=True)
     product_color = serializers.CharField(source='product.color', read_only=True)
-    product_fabric = serializers.CharField(source='product.fabric', read_only=True)
+    product_material = serializers.CharField(source='product.material', read_only=True)
     current_stock = serializers.IntegerField(source='product.quantity', read_only=True)
     
     # Computed fields
@@ -29,7 +29,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'product_id',
             'product_name',
             'product_color',
-            'product_fabric',
+            'product_material',
             'current_stock',
             'quantity',
             'unit_price',
@@ -43,7 +43,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id', 'order_id', 'product_id', 'product_name', 'product_color',
-            'product_fabric', 'current_stock', 'line_total', 'total_value',
+            'product_material', 'current_stock', 'line_total', 'total_value',
             'product_display_info', 'created_at', 'updated_at'
         )
 
@@ -212,7 +212,7 @@ class OrderItemListSerializer(serializers.ModelSerializer):
     order_id = serializers.UUIDField(source='order.id', read_only=True)
     product_id = serializers.UUIDField(source='product.id', read_only=True)
     product_color = serializers.CharField(source='product.color', read_only=True)
-    product_fabric = serializers.CharField(source='product.fabric', read_only=True)
+    product_material = serializers.CharField(source='product.material', read_only=True)
     remaining_to_sell = serializers.IntegerField(source='remaining_quantity_to_sell', read_only=True)
     has_been_sold = serializers.BooleanField(read_only=True)
     
@@ -230,7 +230,7 @@ class OrderItemListSerializer(serializers.ModelSerializer):
             'product_id',
             'product_name',
             'product_color',
-            'product_fabric',
+            'product_material',
             'quantity',
             'unit_price',
             'customization_notes',
@@ -304,7 +304,7 @@ class OrderItemDetailSerializer(serializers.ModelSerializer):
                 'id': str(obj.product.id),
                 'name': obj.product.name,
                 'color': obj.product.color,
-                'fabric': obj.product.fabric,
+                'material': obj.product.material,
                 'current_price': obj.product.price,
                 'current_stock': obj.product.quantity
             }

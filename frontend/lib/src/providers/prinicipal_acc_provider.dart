@@ -46,7 +46,7 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   final List<String> _availableTransactionTypes = ['CREDIT', 'DEBIT'];
 
-  final List<String> _availableHandlers = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
+  final List<String> _availableHandlers = ['MetaBrass Admin'];
 
   List<String> get availableSourceModules => _availableSourceModules;
   List<String> get availableTransactionTypes => _availableTransactionTypes;
@@ -141,7 +141,10 @@ class PrincipalAccountProvider extends ChangeNotifier {
   }
 
   /// Update transaction
-  Future<bool> updateTransaction(String id, PrincipalAccountUpdateRequest request) async {
+  Future<bool> updateTransaction(
+    String id,
+    PrincipalAccountUpdateRequest request,
+  ) async {
     try {
       _setLoading(true);
       _clearError();
@@ -202,13 +205,19 @@ class PrincipalAccountProvider extends ChangeNotifier {
   }
 
   /// Create transaction from other modules
-  Future<bool> createTransactionFromModule(PrincipalAccountCreateRequest request) async {
+  Future<bool> createTransactionFromModule(
+    PrincipalAccountCreateRequest request,
+  ) async {
     try {
       final response = await _service.createTransactionFromModule(request);
 
       if (response.success && response.data != null) {
         // Reload data to reflect the new transaction
-        await Future.wait([loadTransactions(), loadBalance(), loadStatistics()]);
+        await Future.wait([
+          loadTransactions(),
+          loadBalance(),
+          loadStatistics(),
+        ]);
 
         return true;
       } else {
@@ -243,25 +252,39 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   /// Filter transactions by source module
   Future<void> filterBySourceModule(String? sourceModule) async {
-    final params = PrincipalAccountListParams(sourceModule: sourceModule, page: 1);
+    final params = PrincipalAccountListParams(
+      sourceModule: sourceModule,
+      page: 1,
+    );
     await loadTransactions(params: params);
   }
 
   /// Filter transactions by type
   Future<void> filterByTransactionType(String? transactionType) async {
-    final params = PrincipalAccountListParams(transactionType: transactionType, page: 1);
+    final params = PrincipalAccountListParams(
+      transactionType: transactionType,
+      page: 1,
+    );
     await loadTransactions(params: params);
   }
 
   /// Filter transactions by date range
   Future<void> filterByDateRange(DateTime? dateFrom, DateTime? dateTo) async {
-    final params = PrincipalAccountListParams(dateFrom: dateFrom, dateTo: dateTo, page: 1);
+    final params = PrincipalAccountListParams(
+      dateFrom: dateFrom,
+      dateTo: dateTo,
+      page: 1,
+    );
     await loadTransactions(params: params);
   }
 
   /// Filter transactions by amount range
   Future<void> filterByAmountRange(double? minAmount, double? maxAmount) async {
-    final params = PrincipalAccountListParams(minAmount: minAmount, maxAmount: maxAmount, page: 1);
+    final params = PrincipalAccountListParams(
+      minAmount: minAmount,
+      maxAmount: maxAmount,
+      page: 1,
+    );
     await loadTransactions(params: params);
   }
 
@@ -298,11 +321,15 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   // Computed properties
   double get totalCredits {
-    return _accounts.where((account) => account.type == 'CREDIT').fold(0.0, (sum, account) => sum + account.amount);
+    return _accounts
+        .where((account) => account.type == 'CREDIT')
+        .fold(0.0, (sum, account) => sum + account.amount);
   }
 
   double get totalDebits {
-    return _accounts.where((account) => account.type == 'DEBIT').fold(0.0, (sum, account) => sum + account.amount);
+    return _accounts
+        .where((account) => account.type == 'DEBIT')
+        .fold(0.0, (sum, account) => sum + account.amount);
   }
 
   double get netBalance {
@@ -315,7 +342,9 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   // Get transactions by source module
   List<PrincipalAccount> getTransactionsByModule(String sourceModule) {
-    return _accounts.where((account) => account.sourceModule == sourceModule).toList();
+    return _accounts
+        .where((account) => account.sourceModule == sourceModule)
+        .toList();
   }
 
   // Get transactions by type
@@ -331,25 +360,48 @@ class PrincipalAccountProvider extends ChangeNotifier {
   }
 
   // Get transactions by date range
-  List<PrincipalAccount> getTransactionsByDateRange(DateTime startDate, DateTime endDate) {
+  List<PrincipalAccount> getTransactionsByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     return _accounts.where((account) {
-      return account.date.isAfter(startDate.subtract(const Duration(days: 1))) && account.date.isBefore(endDate.add(const Duration(days: 1)));
+      return account.date.isAfter(
+            startDate.subtract(const Duration(days: 1)),
+          ) &&
+          account.date.isBefore(endDate.add(const Duration(days: 1)));
     }).toList();
   }
 
   // Get monthly summary
   Map<String, double> getMonthlySummary(int year) {
     final monthlyData = <String, double>{};
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     for (int i = 1; i <= 12; i++) {
       final monthTransactions = _accounts.where((account) {
         return account.date.year == year && account.date.month == i;
       });
 
-      final monthCredits = monthTransactions.where((account) => account.type == 'CREDIT').fold(0.0, (sum, account) => sum + account.amount);
+      final monthCredits = monthTransactions
+          .where((account) => account.type == 'CREDIT')
+          .fold(0.0, (sum, account) => sum + account.amount);
 
-      final monthDebits = monthTransactions.where((account) => account.type == 'DEBIT').fold(0.0, (sum, account) => sum + account.amount);
+      final monthDebits = monthTransactions
+          .where((account) => account.type == 'DEBIT')
+          .fold(0.0, (sum, account) => sum + account.amount);
 
       monthlyData[months[i - 1]] = monthCredits - monthDebits;
     }
@@ -367,9 +419,13 @@ class PrincipalAccountProvider extends ChangeNotifier {
       }
 
       if (account.type == 'CREDIT') {
-        breakdown[account.sourceModule]!['credits'] = (breakdown[account.sourceModule]!['credits'] ?? 0.0) + account.amount;
+        breakdown[account.sourceModule]!['credits'] =
+            (breakdown[account.sourceModule]!['credits'] ?? 0.0) +
+            account.amount;
       } else {
-        breakdown[account.sourceModule]!['debits'] = (breakdown[account.sourceModule]!['debits'] ?? 0.0) + account.amount;
+        breakdown[account.sourceModule]!['debits'] =
+            (breakdown[account.sourceModule]!['debits'] ?? 0.0) +
+            account.amount;
       }
     }
 
@@ -377,12 +433,17 @@ class PrincipalAccountProvider extends ChangeNotifier {
   }
 
   // Add missing method for addPrincipalAccount (alias for createTransaction)
-  Future<bool> addPrincipalAccount(PrincipalAccountCreateRequest request) async {
+  Future<bool> addPrincipalAccount(
+    PrincipalAccountCreateRequest request,
+  ) async {
     return await createTransaction(request);
   }
 
   // Add missing method for updatePrincipalAccount (alias for alias for updateTransaction)
-  Future<bool> updatePrincipalAccount(String id, PrincipalAccountUpdateRequest request) async {
+  Future<bool> updatePrincipalAccount(
+    String id,
+    PrincipalAccountUpdateRequest request,
+  ) async {
     return await updateTransaction(id, request);
   }
 

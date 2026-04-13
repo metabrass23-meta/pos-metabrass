@@ -67,8 +67,8 @@ class OrderItemService {
     int page = 1,
     String? search,
     int pageSize = 20,
-    int? minQuantity,
-    int? maxQuantity,
+    double? minQuantity,
+    double? maxQuantity,
     double? minPrice,
     double? maxPrice,
     bool? hasCustomization,
@@ -183,7 +183,7 @@ class OrderItemService {
   Future<ApiResponse<OrderItemModel>> createOrderItem({
     required String orderId,
     required String productId,
-    required int quantity,
+    required double quantity,
     required double unitPrice,
     String? customizationNotes,
   }) async {
@@ -223,7 +223,7 @@ class OrderItemService {
   }
 
   /// Update an existing order item
-  Future<ApiResponse<OrderItemModel>> updateOrderItem({required String id, int? quantity, double? unitPrice, String? customizationNotes}) async {
+  Future<ApiResponse<OrderItemModel>> updateOrderItem({required String id, double? quantity, double? unitPrice, String? customizationNotes}) async {
     try {
       final Map<String, dynamic> requestData = {};
 

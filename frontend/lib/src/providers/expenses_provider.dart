@@ -26,7 +26,7 @@ class ExpensesProvider extends ChangeNotifier {
   DateTime? _dateTo;
 
   // Available persons for withdrawal
-  final List<String> _availablePersons = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
+  final List<String> _availablePersons = ['MetaBrass Admin'];
 
   // Getters
   List<Expense> get expenses => _filteredRecords;
@@ -62,7 +62,11 @@ class ExpensesProvider extends ChangeNotifier {
   }
 
   /// Load expense records from API
-  Future<void> loadExpenseRecords({int page = 1, int pageSize = 20, bool showLoading = true}) async {
+  Future<void> loadExpenseRecords({
+    int page = 1,
+    int pageSize = 20,
+    bool showLoading = true,
+  }) async {
     if (showLoading) {
       _setLoading(true);
     }
@@ -132,7 +136,8 @@ class ExpensesProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       final response = await _expenseService.createExpense(
         expense: expense,
@@ -178,7 +183,8 @@ class ExpensesProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       final response = await _expenseService.updateExpense(
         id: id,
@@ -295,7 +301,9 @@ class ExpensesProvider extends ChangeNotifier {
       // Return default stats if statistics not loaded
       return {
         'total': _expenseRecords.length,
-        'totalAmount': _expenseRecords.fold<double>(0.0, (sum, expense) => sum + expense.amount).toStringAsFixed(0),
+        'totalAmount': _expenseRecords
+            .fold<double>(0.0, (sum, expense) => sum + expense.amount)
+            .toStringAsFixed(0),
         'thisYear': _getThisYearCount(),
         'thisMonth': _getThisMonthCount(),
         'thisWeek': _getThisWeekCount(),
@@ -317,9 +325,10 @@ class ExpensesProvider extends ChangeNotifier {
       Expense(
         id: 'EXP001',
         expense: 'Office Supplies',
-        description: 'Purchased stationery and printing materials for office use',
+        description:
+            'Purchased stationery and printing materials for office use',
         amount: 8500.0,
-        withdrawalBy: 'Mr. Huzaifa',
+        withdrawalBy: 'MetaBrass Admin',
         date: DateTime.now().subtract(const Duration(days: 2)),
         time: const TimeOfDay(hour: 10, minute: 30),
         category: 'Office',
@@ -331,7 +340,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Internet Bill',
         description: 'Monthly internet service payment for office connectivity',
         amount: 12000.0,
-        withdrawalBy: 'Mr. Huzaifa',
+        withdrawalBy: 'MetaBrass Admin',
         date: DateTime.now().subtract(const Duration(days: 5)),
         time: const TimeOfDay(hour: 14, minute: 15),
         category: 'Utilities',
@@ -343,7 +352,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Transportation',
         description: 'Fuel and maintenance costs for delivery vehicle',
         amount: 15000.0,
-        withdrawalBy: 'Mr. Huzaifa',
+        withdrawalBy: 'MetaBrass Admin',
         date: DateTime.now().subtract(const Duration(days: 7)),
         time: const TimeOfDay(hour: 9, minute: 45),
         category: 'Transport',
@@ -355,7 +364,7 @@ class ExpensesProvider extends ChangeNotifier {
         expense: 'Marketing',
         description: 'Social media advertising and promotional materials',
         amount: 25000.0,
-        withdrawalBy: 'Mr Huzaifa',
+        withdrawalBy: 'MetaBrass Admin',
         date: DateTime.now().subtract(const Duration(days: 10)),
         time: const TimeOfDay(hour: 16, minute: 20),
         category: 'Marketing',
@@ -369,12 +378,16 @@ class ExpensesProvider extends ChangeNotifier {
 
   /// Get total amount by person
   double getTotalAmountByPerson(String person) {
-    return _expenseRecords.where((expense) => expense.withdrawalBy == person).fold<double>(0.0, (sum, expense) => sum + expense.amount);
+    return _expenseRecords
+        .where((expense) => expense.withdrawalBy == person)
+        .fold<double>(0.0, (sum, expense) => sum + expense.amount);
   }
 
   /// Get expenses by person
   List<Expense> getExpensesByPerson(String person) {
-    return _expenseRecords.where((expense) => expense.withdrawalBy == person).toList();
+    return _expenseRecords
+        .where((expense) => expense.withdrawalBy == person)
+        .toList();
   }
 
   /// Get expense categories with counts
@@ -382,7 +395,8 @@ class ExpensesProvider extends ChangeNotifier {
     final categories = <String, int>{};
     for (final expense in _expenseRecords) {
       if (expense.category != null && expense.category!.isNotEmpty) {
-        categories[expense.category!] = (categories[expense.category!] ?? 0) + 1;
+        categories[expense.category!] =
+            (categories[expense.category!] ?? 0) + 1;
       }
     }
     return categories;
@@ -391,13 +405,29 @@ class ExpensesProvider extends ChangeNotifier {
   /// Get monthly expense trend
   Map<String, double> getMonthlyExpenseTrend(int year) {
     final monthlyTotals = <String, double>{};
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     for (int i = 1; i <= 12; i++) {
       final monthExpenses = _expenseRecords.where((expense) {
         return expense.date.year == year && expense.date.month == i;
       });
-      final total = monthExpenses.fold<double>(0.0, (sum, expense) => sum + expense.amount);
+      final total = monthExpenses.fold<double>(
+        0.0,
+        (sum, expense) => sum + expense.amount,
+      );
       monthlyTotals[months[i - 1]] = total;
     }
 
@@ -433,19 +463,28 @@ class ExpensesProvider extends ChangeNotifier {
 
   int _getThisYearCount() {
     final currentYear = DateTime.now().year;
-    return _expenseRecords.where((expense) => expense.date.year == currentYear).length;
+    return _expenseRecords
+        .where((expense) => expense.date.year == currentYear)
+        .length;
   }
 
   int _getThisMonthCount() {
     final now = DateTime.now();
-    return _expenseRecords.where((expense) => expense.date.year == now.year && expense.date.month == now.month).length;
+    return _expenseRecords
+        .where(
+          (expense) =>
+              expense.date.year == now.year && expense.date.month == now.month,
+        )
+        .length;
   }
 
   int _getThisWeekCount() {
     final now = DateTime.now();
     final currentWeekStart = now.subtract(Duration(days: now.weekday - 1));
     return _expenseRecords.where((expense) {
-      return expense.date.isAfter(currentWeekStart.subtract(const Duration(days: 1)));
+      return expense.date.isAfter(
+        currentWeekStart.subtract(const Duration(days: 1)),
+      );
     }).length;
   }
 

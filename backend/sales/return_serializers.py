@@ -111,8 +111,6 @@ class ReturnCreateSerializer(ReturnSerializer):
             original_unit_price = sale_item.unit_price
             calculated_return_amount = original_unit_price * quantity_returned
             
-            print(f"🔍 [ReturnSerializer] Item: {sale_item.product.name}, Qty: {quantity_returned}, Unit Price: {original_unit_price}, Calculated: {calculated_return_amount}")
-            
             # Use provided return_amount if available, otherwise use calculated amount
             return_amount = Decimal(str(item_data.get('return_amount', calculated_return_amount)))
             
@@ -126,12 +124,10 @@ class ReturnCreateSerializer(ReturnSerializer):
             )
             
             total_return_amount += return_amount
-            print(f"✅ [ReturnSerializer] Created return item with amount {return_amount}, running total: {total_return_amount}")
         
         # Update total return amount
         return_request.refund_amount = total_return_amount
         return_request.save()
-        print(f"💰 [ReturnSerializer] Final refund_amount set to: {total_return_amount}")
         
         return return_request
 
@@ -307,8 +303,6 @@ class RefundListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Override to add error handling and safe field access"""
         try:
-            print(f"🔍 [RefundListSerializer] Serializing refund: {instance.id} - {instance.refund_number}")
-            
             # Basic refund data
             data = {
                 'id': str(instance.id),
@@ -337,13 +331,11 @@ class RefundListSerializer(serializers.ModelSerializer):
                     else:
                         data['sale_invoice_number'] = ''
                 else:
-                    print(f"⚠️ [RefundListSerializer] No return_request found for refund {instance.id}")
                     data['return_number'] = ''
                     data['return_request_id'] = ''
                     data['customer_name'] = 'Walk-in Customer'
                     data['sale_invoice_number'] = ''
-            except Exception as e:
-                print(f"⚠️ [RefundListSerializer] Error accessing return request: {e}")
+            except Exception:
                 data['return_number'] = ''
                 data['return_request_id'] = ''
                 data['customer_name'] = 'Walk-in Customer'
@@ -357,8 +349,7 @@ class RefundListSerializer(serializers.ModelSerializer):
                 else:
                     data['processed_by'] = ''
                     data['processed_by_name'] = ''
-            except Exception as e:
-                print(f"⚠️ [RefundListSerializer] Error accessing processed_by: {e}")
+            except Exception:
                 data['processed_by'] = ''
                 data['processed_by_name'] = ''
             
@@ -369,16 +360,13 @@ class RefundListSerializer(serializers.ModelSerializer):
                 else:
                     data['created_by'] = ''
                     data['created_by_name'] = ''
-            except Exception as e:
-                print(f"⚠️ [RefundListSerializer] Error accessing created_by: {e}")
+            except Exception:
                 data['created_by'] = ''
                 data['created_by_name'] = ''
             
-            print(f"✅ [RefundListSerializer] Final data: {data}")
             return data
             
         except Exception as e:
-            print(f"❌ [RefundListSerializer] Critical error: {e}")
             import traceback
             traceback.print_exc()
             return {

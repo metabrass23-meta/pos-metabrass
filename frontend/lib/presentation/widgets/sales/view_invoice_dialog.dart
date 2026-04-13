@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sizer/sizer.dart';
-import 'package:open_file/open_file.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/services/pdf_invoice_service.dart';
-import '../../../src/theme/app_theme.dart';
-import '../../../src/utils/responsive_breakpoints.dart';
 import '../../widgets/globals/text_button.dart';
-import '../../../src/providers/invoice_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +18,58 @@ class ViewInvoiceDialog extends StatefulWidget {
 
 class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
   bool _isPrinting = false;
-  bool _isGeneratingPdf = false;
+  SaleModel? _relatedSale;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRelatedSale();
+  }
+
+  Future<void> _loadRelatedSale() async {
+    try {
+      final salesProvider = context.read<SalesProvider>();
+      final sale = salesProvider.sales.firstWhere(
+        (sale) => sale.id == widget.invoice.saleId,
+        orElse: () => SaleModel(
+          id: '',
+          invoiceNumber: '',
+          dateOfSale: widget.invoice.issueDate,
+          customerName: widget.invoice.customerName,
+          customerPhone: '',
+          subtotal: widget.invoice.grandTotal,
+          overallDiscount: 0.0,
+          taxConfiguration: TaxConfiguration(),
+          gstPercentage: 0.0,
+          taxAmount: 0.0,
+          grandTotal: widget.invoice.grandTotal,
+          amountPaid: widget.invoice.status == 'PAID'
+              ? widget.invoice.grandTotal
+              : 0.0,
+          remainingAmount: widget.invoice.status == 'PAID'
+              ? 0.0
+              : widget.invoice.grandTotal,
+          isFullyPaid: widget.invoice.status == 'PAID',
+          paymentMethod: 'CASH',
+          status: widget.invoice.status,
+          notes: widget.invoice.notes,
+          isActive: widget.invoice.isActive,
+          createdAt: widget.invoice.createdAt,
+          updatedAt: widget.invoice.updatedAt,
+          createdBy: widget.invoice.createdBy,
+          saleItems: [],
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          _relatedSale = sale;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ [ViewInvoiceDialog] Error loading related sale: $e');
+    }
+  }
 
   Future<void> _printInvoice() async {
     setState(() {
@@ -31,18 +77,24 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
     });
 
     try {
-      debugPrint('🖨️ [ViewInvoiceDialog] Print Invoice requested for ${widget.invoice.invoiceNumber}');
-      
+      debugPrint(
+        '🖨️ [ViewInvoiceDialog] Print Invoice requested for ${widget.invoice.invoiceNumber}',
+      );
+
       // Use SalesProvider with the working receipt generation (but will show invoice data)
       final salesProvider = Provider.of<SalesProvider>(context, listen: false);
-      
-      debugPrint('🔍 [ViewInvoiceDialog] Calling SalesProvider.generateReceiptPdf with saleId: ${widget.invoice.saleId}');
-      
+
+      debugPrint(
+        '🔍 [ViewInvoiceDialog] Calling SalesProvider.generateReceiptPdf with saleId: ${widget.invoice.saleId}',
+      );
+
       // Use the working receipt generation - it will show the sale data which includes invoice info
-      final success = await salesProvider.generateReceiptPdf(widget.invoice.saleId);
-      
+      final success = await salesProvider.generateReceiptPdf(
+        widget.invoice.saleId,
+      );
+
       debugPrint('🔍 [ViewInvoiceDialog] generateReceiptPdf result: $success');
-      
+
       if (mounted) {
         if (success) {
           debugPrint('✅ [ViewInvoiceDialog] Invoice print successful');
@@ -105,95 +157,34 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
     }
   }
 
-  Future<void> _generatePdfInvoice() async {
-    setState(() {
-      _isGeneratingPdf = true;
-    });
-
-    try {
-      debugPrint('📄 [ViewInvoiceDialog] Generating PDF for invoice: ${widget.invoice.invoiceNumber}');
-      
-      // Convert InvoiceModel to SaleModel with proper field mapping
-      final sale = SaleModel(
-        id: widget.invoice.saleId,
-        invoiceNumber: widget.invoice.saleInvoiceNumber,
-        dateOfSale: widget.invoice.issueDate,
-        customerName: widget.invoice.customerName,
-        customerPhone: '', // InvoiceModel doesn't have phone field, using empty string
-        subtotal: widget.invoice.grandTotal, // Using grandTotal as subtotal since InvoiceModel doesn't have subtotal
-        overallDiscount: 0.0, // InvoiceModel doesn't have discount field
-        taxConfiguration: TaxConfiguration(), // Empty tax configuration
-        gstPercentage: 0.0, // InvoiceModel doesn't have GST field
-        taxAmount: 0.0, // InvoiceModel doesn't have tax field
-        grandTotal: widget.invoice.grandTotal,
-        amountPaid: widget.invoice.status == 'PAID' ? widget.invoice.grandTotal : 0.0, // Assume paid if status is PAID
-        remainingAmount: widget.invoice.status == 'PAID' ? 0.0 : widget.invoice.grandTotal, // Assume full balance if not paid
-        isFullyPaid: widget.invoice.status == 'PAID', // Check if status is PAID
-        paymentMethod: 'CASH', // Default payment method
-        status: widget.invoice.status,
-        notes: widget.invoice.notes,
-        isActive: widget.invoice.isActive,
-        createdAt: widget.invoice.createdAt,
-        updatedAt: widget.invoice.updatedAt,
-        createdBy: widget.invoice.createdBy,
-        saleItems: [], // InvoiceModel doesn't have items, so using empty list
-      );
-
-      // Generate PDF
-      final filePath = await PdfInvoiceService.generateInvoicePdf(sale);
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("PDF generated successfully!"),
-            backgroundColor: Colors.green,
-            action: SnackBarAction(
-              label: "Open",
-              textColor: Colors.white,
-              onPressed: () async {
-                await OpenFile.open(filePath);
-              },
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error generating PDF: $e"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isGeneratingPdf = false;
-        });
-      }
-    }
-  }
-
   Future<void> _printPdfInvoice() async {
     try {
-      debugPrint('🖨️ [ViewInvoiceDialog] Printing PDF for invoice: ${widget.invoice.invoiceNumber}');
-      
+      debugPrint(
+        '🖨️ [ViewInvoiceDialog] Printing PDF for invoice: ${widget.invoice.invoiceNumber}',
+      );
+
       // Convert InvoiceModel to SaleModel with proper field mapping
       final sale = SaleModel(
         id: widget.invoice.saleId,
         invoiceNumber: widget.invoice.saleInvoiceNumber,
         dateOfSale: widget.invoice.issueDate,
         customerName: widget.invoice.customerName,
-        customerPhone: '', // InvoiceModel doesn't have phone field, using empty string
-        subtotal: widget.invoice.grandTotal, // Using grandTotal as subtotal since InvoiceModel doesn't have subtotal
+        customerPhone:
+            '', // InvoiceModel doesn't have phone field, using empty string
+        subtotal: widget
+            .invoice
+            .grandTotal, // Using grandTotal as subtotal since InvoiceModel doesn't have subtotal
         overallDiscount: 0.0, // InvoiceModel doesn't have discount field
         taxConfiguration: TaxConfiguration(), // Empty tax configuration
         gstPercentage: 0.0, // InvoiceModel doesn't have GST field
         taxAmount: 0.0, // InvoiceModel doesn't have tax field
         grandTotal: widget.invoice.grandTotal,
-        amountPaid: widget.invoice.status == 'PAID' ? widget.invoice.grandTotal : 0.0, // Assume paid if status is PAID
-        remainingAmount: widget.invoice.status == 'PAID' ? 0.0 : widget.invoice.grandTotal, // Assume full balance if not paid
+        amountPaid: widget.invoice.status == 'PAID'
+            ? widget.invoice.grandTotal
+            : 0.0, // Assume paid if status is PAID
+        remainingAmount: widget.invoice.status == 'PAID'
+            ? 0.0
+            : widget.invoice.grandTotal, // Assume full balance if not paid
         isFullyPaid: widget.invoice.status == 'PAID', // Check if status is PAID
         paymentMethod: 'CASH', // Default payment method
         status: widget.invoice.status,
@@ -207,7 +198,7 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
 
       // Show print preview
       await PdfInvoiceService.previewAndPrintInvoice(sale);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -260,23 +251,75 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
                   // --- Thermal Receipt Header ---
                   _buildThermalHeader(),
                   const SizedBox(height: 20),
-                  
+
                   // --- Invoice Details ---
                   _buildThermalDivider(),
                   _buildThermalSectionTitle('INVOICE'),
                   _buildThermalDivider(),
                   const SizedBox(height: 10),
-                  
+
                   _buildThermalRow('Invoice #', widget.invoice.invoiceNumber),
-                  _buildThermalRow('Sale Ref #', widget.invoice.saleInvoiceNumber),
+                  _buildThermalRow(
+                    'Sale Ref #',
+                    widget.invoice.saleInvoiceNumber,
+                  ),
                   _buildThermalRow('Customer', widget.invoice.customerName),
                   _buildThermalRow('Date', widget.invoice.formattedIssueDate),
-                  if (widget.invoice.dueDate != null) _buildThermalRow('Due Date', widget.invoice.formattedDueDate),
-                  _buildThermalRow('Amount', 'PKR ${widget.invoice.grandTotal.toStringAsFixed(2)}'),
+                  if (widget.invoice.dueDate != null)
+                    _buildThermalRow(
+                      'Due Date',
+                      widget.invoice.formattedDueDate,
+                    ),
+                  _buildThermalRow(
+                    'Amount',
+                    'PKR ${widget.invoice.grandTotal.toStringAsFixed(2)}',
+                  ),
                   _buildThermalRow('Status', widget.invoice.statusDisplay),
                   _buildThermalDivider(),
+                  const SizedBox(height: 10),
+
+                  // --- Payment Details ---
+                  _buildThermalSectionTitle('PAYMENT DETAILS'),
+                  _buildThermalDivider(),
+                  const SizedBox(height: 10),
+
+                  _buildThermalRow(
+                    'Total Amount:',
+                    'PKR ${widget.invoice.grandTotal.toStringAsFixed(2)}',
+                  ),
+                  _buildThermalRow(
+                    'Payment Status:',
+                    widget.invoice.statusDisplay,
+                  ),
+                  if (_relatedSale != null) ...[
+                    _buildThermalRow(
+                      'Paid Amount:',
+                      'PKR ${_relatedSale!.amountPaid.toStringAsFixed(2)}',
+                    ),
+                    _buildThermalRow(
+                      'Remaining Amount:',
+                      'PKR ${_relatedSale!.remainingAmount.toStringAsFixed(2)}',
+                    ),
+                  ] else ...[
+                    // Fallback if sale data not loaded
+                    if (widget.invoice.status == 'PAID')
+                      _buildThermalRow(
+                        'Paid Amount:',
+                        'PKR ${widget.invoice.grandTotal.toStringAsFixed(2)}',
+                      )
+                    else
+                      _buildThermalRow('Paid Amount:', 'PKR 0.00'),
+                    if (widget.invoice.status == 'PAID')
+                      _buildThermalRow('Remaining Amount:', 'PKR 0.00')
+                    else
+                      _buildThermalRow(
+                        'Remaining Amount:',
+                        'PKR ${widget.invoice.grandTotal.toStringAsFixed(2)}',
+                      ),
+                  ],
+                  _buildThermalDivider(),
                   const SizedBox(height: 20),
-                  
+
                   // --- Notes Section ---
                   if (widget.invoice.notes?.isNotEmpty == true) ...[
                     _buildThermalSectionTitle('NOTES'),
@@ -299,18 +342,27 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
                     _buildThermalDivider(),
                     const SizedBox(height: 20),
                   ],
-                  
+
                   // --- Footer ---
                   _buildThermalFooter(),
                   const SizedBox(height: 20),
-                  
+
                   // --- Status Badge ---
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(widget.invoice.status).withOpacity(0.1),
+                      color: _getStatusColor(
+                        widget.invoice.status,
+                      ).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _getStatusColor(widget.invoice.status).withOpacity(0.3)),
+                      border: Border.all(
+                        color: _getStatusColor(
+                          widget.invoice.status,
+                        ).withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
                       widget.invoice.statusDisplay,
@@ -322,35 +374,19 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // --- Action Buttons ---
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Generate PDF Button
-                      PremiumButton(
-                        text: _isGeneratingPdf ? "Generating..." : "PDF",
-                        onPressed: _isGeneratingPdf ? null : _generatePdfInvoice,
-                        backgroundColor: Colors.red,
-                        width: 80,
-                      ),
-                      
-                      // Print PDF Button
-                      PremiumButton(
-                        text: "Print PDF",
-                        onPressed: _printPdfInvoice,
-                        backgroundColor: Colors.green,
-                        width: 80,
-                      ),
-                      
                       // Original Print Button
-                      PremiumButton(
-                        text: _isPrinting ? "Printing..." : "Print",
-                        onPressed: _isPrinting ? null : _printInvoice,
-                        backgroundColor: Colors.purple,
-                        width: 80,
-                      ),
-                      
+                      // PremiumButton(
+                      //   text: _isPrinting ? "Printing..." : "Print",
+                      //   onPressed: _isPrinting ? null : _printInvoice,
+                      //   backgroundColor: Colors.purple,
+                      //   width: 80,
+                      // ),
+
                       // Close Button
                       PremiumButton(
                         text: l10n.close ?? "Close",
@@ -384,25 +420,10 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Al Noor',
+          'Maqbool Fashion',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black54,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'DG Khan',
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.black54,
-          ),
-        ),
-        Text(
-          'Phone: +92-3029383942',
-          style: TextStyle(
-            fontSize: 10,
             color: Colors.black54,
           ),
         ),
@@ -490,10 +511,7 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
         const SizedBox(height: 4),
         Text(
           'This is a computer-generated invoice',
-          style: TextStyle(
-            fontSize: 8,
-            color: Colors.black38,
-          ),
+          style: TextStyle(fontSize: 8, color: Colors.black38),
         ),
         const SizedBox(height: 10),
       ],

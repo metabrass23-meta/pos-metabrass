@@ -11,7 +11,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'color',
-        'fabric',
+        'material',
         'formatted_price',
         'quantity',
         'stock_status_badge',
@@ -25,7 +25,7 @@ class ProductAdmin(admin.ModelAdmin):
         'is_active',
         'category',
         'color',
-        'fabric',
+        'material',
         'created_at',
         'updated_at',
     )
@@ -34,7 +34,7 @@ class ProductAdmin(admin.ModelAdmin):
         'name',
         'detail',
         'color',
-        'fabric',
+        'material',
         'category__name',
         'pieces',
     )
@@ -54,7 +54,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('id', 'name', 'detail', 'category')
         }),
         ('Product Details', {
-            'fields': ('color', 'fabric', 'pieces', 'price')
+            'fields': ('color', 'material', 'pieces', 'price')
         }),
         ('Inventory', {
             'fields': ('quantity', 'stock_status', 'stock_status_display', 'total_value')

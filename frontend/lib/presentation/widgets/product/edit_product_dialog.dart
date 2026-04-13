@@ -27,7 +27,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
   late TextEditingController _costPriceController;
   late TextEditingController _quantityController;
   late TextEditingController _colorController;
-  late TextEditingController _fabricController;
+  late TextEditingController _materialController;
+  late TextEditingController _manualPieceController;
 
   late String? _selectedCategoryId;
   late List<String> _selectedPieces;
@@ -45,7 +46,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     _costPriceController = TextEditingController(text: widget.product.costPrice?.toString() ?? '');
     _quantityController = TextEditingController(text: widget.product.quantity.toString());
     _colorController = TextEditingController(text: widget.product.color);
-    _fabricController = TextEditingController(text: widget.product.fabric);
+    _materialController = TextEditingController(text: widget.product.material);
+    _manualPieceController = TextEditingController();
 
     _selectedCategoryId = widget.product.categoryId;
     _selectedPieces = List.from(widget.product.pieces);
@@ -134,7 +136,8 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     _costPriceController.dispose();
     _quantityController.dispose();
     _colorController.dispose();
-    _fabricController.dispose();
+    _materialController.dispose();
+    _manualPieceController.dispose();
     super.dispose();
   }
 
@@ -142,10 +145,12 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
     final l10n = AppLocalizations.of(context)!;
 
     if (_formKey.currentState?.validate() ?? false) {
+      /*
       if (_selectedPieces.isEmpty) {
         _showErrorSnackbar(l10n.pleaseSelectAtLeastOnePiece);
         return;
       }
+      */
 
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
@@ -158,9 +163,9 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             ? double.parse(_costPriceController.text.trim())
             : null,
         color: _colorController.text.trim(),
-        fabric: _fabricController.text.trim(),
+        material: _materialController.text.trim(),
         pieces: _selectedPieces,
-        quantity: int.parse(_quantityController.text.trim()),
+        quantity: double.parse(_quantityController.text.trim()),
         categoryId: _selectedCategoryId,
       );
 
@@ -465,7 +470,7 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                       if (value?.isEmpty ?? true) {
                         return l10n.pleaseEnterQuantity;
                       }
-                      final quantity = int.tryParse(value!);
+                      final quantity = double.tryParse(value!);
                       if (quantity == null || quantity < 0) {
                         return l10n.pleaseEnterValidQuantity;
                       }
@@ -586,16 +591,16 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
             SizedBox(height: context.cardPadding),
 
             PremiumTextField(
-              label: l10n.fabric,
-              hint: context.shouldShowCompactLayout ? l10n.enterFabric : l10n.enterFabricType,
-              controller: _fabricController,
-              prefixIcon: Icons.texture_outlined,
+              label: l10n.material,
+              hint: context.shouldShowCompactLayout ? '${l10n.enter} ${l10n.material}' : l10n.material,
+              controller: _materialController,
+              prefixIcon: Icons.category_outlined,
               validator: (value) {
                 if (value?.isEmpty ?? true) {
-                  return l10n.pleaseEnterFabric;
+                  return '${l10n.enter} ${l10n.material}';
                 }
                 if (value!.length < 2) {
-                  return l10n.fabricNameMustBeAtLeast2Characters;
+                  return '${l10n.material} must be at least 2 characters';
                 }
                 return null;
               },
@@ -607,11 +612,51 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      l10n.pieces,
-                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.pieces,
+                          style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                        ),
+                        Text(
+                          '(${l10n.optional})',
+                          style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[500]),
+                        ),
+                      ],
                     ),
                     SizedBox(height: context.smallPadding),
+                    
+                    // Manual Piece Input
+                    Row(
+                      children: [
+                        Expanded(
+                          child: PremiumTextField(
+                            label: 'Add Custom Piece',
+                            hint: 'Enter piece name (e.g. Handle, Tap)',
+                            controller: _manualPieceController,
+                            prefixIcon: Icons.add_box_outlined,
+                          ),
+                        ),
+                        SizedBox(width: context.smallPadding),
+                        PremiumButton(
+                          text: l10n.add,
+                          width: 80,
+                          height: 50,
+                          onPressed: () {
+                            final piece = _manualPieceController.text.trim();
+                            if (piece.isNotEmpty && !_selectedPieces.contains(piece)) {
+                              setState(() {
+                                _selectedPieces.add(piece);
+                                _manualPieceController.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: context.cardPadding),
+
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(context.cardPadding),
@@ -619,44 +664,51 @@ class _EditProductDialogState extends State<EditProductDialog> with SingleTicker
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                       ),
-                      child: Wrap(
-                        spacing: context.smallPadding,
-                        runSpacing: context.smallPadding,
-                        children: provider.availablePieces.map((piece) {
-                          final isSelected = _selectedPieces.contains(piece);
-                          return FilterChip(
-                            label: Text(
-                              piece,
-                              style: TextStyle(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_selectedPieces.isEmpty)
+                            Center(
+                              child: Text(
+                                'No pieces added yet',
+                                style: TextStyle(
+                                  fontSize: context.captionFontSize,
+                                  color: Colors.grey[500],
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                             ),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedPieces.add(piece);
-                                } else {
-                                  _selectedPieces.remove(piece);
-                                }
-                              });
-                            },
-                            selectedColor: Colors.blue,
-                            checkmarkColor: AppTheme.pureWhite,
-                            backgroundColor: AppTheme.lightGray,
-                          );
-                        }).toList(),
+                          Wrap(
+                            spacing: context.smallPadding,
+                            runSpacing: context.smallPadding,
+                            children: [
+                              ..._selectedPieces.map((piece) {
+                                final bool isPredefined = provider.availablePieces.contains(piece);
+                                return InputChip(
+                                  label: Text(
+                                    piece,
+                                    style: TextStyle(
+                                      fontSize: context.captionFontSize,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppTheme.pureWhite,
+                                    ),
+                                  ),
+                                  selected: true,
+                                  onDeleted: () {
+                                    setState(() {
+                                      _selectedPieces.remove(piece);
+                                    });
+                                  },
+                                  selectedColor: isPredefined ? Colors.blue : Colors.blueAccent,
+                                  checkmarkColor: AppTheme.pureWhite,
+                                  deleteIconColor: AppTheme.pureWhite,
+                                );
+                              }),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    if (_selectedPieces.isEmpty) ...[
-                      SizedBox(height: context.smallPadding / 2),
-                      Text(
-                        l10n.pleaseSelectAtLeastOnePiece,
-                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
-                      ),
-                    ],
                   ],
                 );
               },

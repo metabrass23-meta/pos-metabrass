@@ -3,7 +3,7 @@ import '../utils/storage_service.dart';
 
 class AppProvider extends ChangeNotifier {
   bool _isDarkMode = false;
-  String _currentLanguage = 'ur'; // Default to Urdu per requirement
+  String _currentLanguage = 'en'; // Default to English
   bool _isInitialized = false;
 
   bool get isDarkMode => _isDarkMode;

@@ -38,7 +38,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
 
   CustomerModel? _selectedCustomer;
   DateTime _selectedDeliveryDate = DateTime.now().add(const Duration(days: 30));
-  int _quantity = 1;
+  double _quantity = 1.0;
   double _totalAmount = 0.0;
   double _advanceAmount = 0.0;
   bool _isLoading = false;
@@ -430,7 +430,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         ),
                         SizedBox(width: context.smallPadding / 2),
                         Text(
-                          '${widget.product.color} • ${widget.product.fabric}',
+                          '${widget.product.color} • ${widget.product.material}',
                           style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                       ],
@@ -642,13 +642,13 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                         style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                         decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
                         onChanged: (value) {
-                          final qty = int.tryParse(value) ?? 1;
-                          setState(() => _quantity = qty.clamp(1, 100));
+                          final qty = double.tryParse(value) ?? 1.0;
+                          setState(() => _quantity = qty.clamp(1.0, 100.0));
                           _updateTotalAmount();
                         },
                         validator: (value) {
-                          final qty = int.tryParse(value ?? '') ?? 0;
-                          if (qty < 1) return 'Min 1';
+                          final qty = double.tryParse(value ?? '') ?? 0.0;
+                          if (qty < 0.1) return 'Min 0.1';
                           return null;
                         },
                       ),
@@ -769,7 +769,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
             controller: _notesController,
             prefixIcon: Icons.note_outlined,
             maxLines: 3,
-            hint: 'Any special requirements, fabric preferences, design changes...',
+            hint: 'Any special requirements, material specifications, design changes...',
           ),
 
           SizedBox(height: context.cardPadding),
@@ -1141,7 +1141,7 @@ class _CreateCustomOrderDialogState extends State<CreateCustomOrderDialog> with 
                       label: 'Option Name',
                       controller: labelController,
                       prefixIcon: Icons.label_rounded,
-                      hint: 'e.g., Embroidery Style, Button Type',
+                      hint: 'e.g., Finish Type, Fitting Style',
                     ),
                     SizedBox(height: context.smallPadding),
                     PremiumTextField(

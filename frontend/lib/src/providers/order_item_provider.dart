@@ -56,7 +56,7 @@ class OrderItemProvider extends ChangeNotifier {
 
   // Computed properties
   double get totalValue => _orderItems.fold(0.0, (sum, item) => sum + item.lineTotal);
-  int get totalQuantity => _orderItems.fold(0, (sum, item) => sum + item.quantity);
+  double get totalQuantity => _orderItems.fold(0.0, (sum, item) => sum + item.quantity);
 
   Map<String, int> get orderItemStats {
     final total = _orderItems.length;
@@ -142,8 +142,8 @@ class OrderItemProvider extends ChangeNotifier {
     String? productId,
     bool refresh = false,
     String? search,
-    int? minQuantity,
-    int? maxQuantity,
+    double? minQuantity,
+    double? maxQuantity,
     double? minPrice,
     double? maxPrice,
     bool? hasCustomization,
@@ -230,7 +230,7 @@ class OrderItemProvider extends ChangeNotifier {
   Future<bool> createOrderItem({
     required String orderId,
     required String productId,
-    required int quantity,
+    required double quantity,
     required double unitPrice,
     String? customizationNotes,
   }) async {
@@ -268,7 +268,7 @@ class OrderItemProvider extends ChangeNotifier {
   }
 
   /// Update an existing order item
-  Future<bool> updateOrderItem({required String id, int? quantity, double? unitPrice, String? customizationNotes}) async {
+  Future<bool> updateOrderItem({required String id, double? quantity, double? unitPrice, String? customizationNotes}) async {
     _setLoading(true);
     _clearError();
 

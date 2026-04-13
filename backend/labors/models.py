@@ -80,6 +80,8 @@ class LaborQuerySet(models.QuerySet):
 
 def validate_pakistani_cnic(value):
     """Validate Pakistani CNIC format: 42101-1234567-8"""
+    if not value:
+        return
     pattern = r'^\d{5}-\d{7}-\d{1}$'
     if not re.match(pattern, value):
         raise ValidationError(
@@ -121,6 +123,8 @@ class Labor(models.Model):
     cnic = models.CharField(
         max_length=15,
         unique=True,
+        null=True,
+        blank=True,
         validators=[validate_pakistani_cnic],
         help_text="Pakistani CNIC in format: 12345-1234567-1"
     )
@@ -131,6 +135,8 @@ class Labor(models.Model):
     )
     caste = models.CharField(
         max_length=100,
+        null=True,
+        blank=True,
         help_text="Caste/community of the labor"
     )
     designation = models.CharField(
@@ -239,10 +245,18 @@ class Labor(models.Model):
         # Clean other fields
         if self.caste:
             self.caste = self.caste.strip().title()
+            if not self.caste:
+                self.caste = None
+        else:
+            self.caste = None
         if self.designation:
             self.designation = self.designation.strip().title()
         if self.cnic:
             self.cnic = self.cnic.strip()
+            if not self.cnic:
+                self.cnic = None
+        else:
+            self.cnic = None
         if self.city:
             self.city = self.city.strip().title()
         if self.area:

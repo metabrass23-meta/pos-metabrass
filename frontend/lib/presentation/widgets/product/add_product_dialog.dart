@@ -16,7 +16,8 @@ class AddProductDialog extends StatefulWidget {
   State<AddProductDialog> createState() => _AddProductDialogState();
 }
 
-class _AddProductDialogState extends State<AddProductDialog> with SingleTickerProviderStateMixin {
+class _AddProductDialogState extends State<AddProductDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _detailController = TextEditingController();
@@ -27,6 +28,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   final _typeController = TextEditingController();
   final _barcodeController = TextEditingController();
   final _skuController = TextEditingController();
+  final _manualPieceController = TextEditingController();
 
   String? _selectedCategoryId;
   List<String> _selectedPieces = [];
@@ -38,11 +40,18 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     _animationController.forward();
   }
@@ -59,6 +68,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     _typeController.dispose();
     _barcodeController.dispose();
     _skuController.dispose();
+    _manualPieceController.dispose();
     super.dispose();
   }
 
@@ -78,12 +88,18 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         _showErrorSnackbar('${l10n.pleaseSelect} ${l10n.category}');
         return;
       }
+      // Pieces are now optional as per user request
+      /*
       if (_selectedPieces.isEmpty) {
         _showErrorSnackbar(l10n.pleaseSelectAtLeastOnePiece);
         return;
       }
+      */
 
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      );
 
       final success = await productProvider.addProduct(
         name: _nameController.text.trim(),
@@ -93,12 +109,16 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             ? double.parse(_costPriceController.text.trim())
             : null,
         color: _colorController.text.trim(),
-        fabric: _typeController.text.trim(),
+        material: _typeController.text.trim(),
         pieces: _selectedPieces,
-        quantity: int.parse(_quantityController.text.trim()),
+        quantity: double.parse(_quantityController.text.trim()),
         categoryId: _selectedCategoryId!,
-        barcode: _barcodeController.text.trim().isNotEmpty ? _barcodeController.text.trim() : null,
-        sku: _skuController.text.trim().isNotEmpty ? _skuController.text.trim() : null,
+        barcode: _barcodeController.text.trim().isNotEmpty
+            ? _barcodeController.text.trim()
+            : null,
+        sku: _skuController.text.trim().isNotEmpty
+            ? _skuController.text.trim()
+            : null,
       );
 
       if (mounted) {
@@ -106,7 +126,10 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(productProvider.errorMessage ?? '${l10n.failedToAdd} ${l10n.product}');
+          _showErrorSnackbar(
+            productProvider.errorMessage ??
+                '${l10n.failedToAdd} ${l10n.product}',
+          );
         }
       }
     }
@@ -119,18 +142,28 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.product} ${l10n.addedSuccessfully}!',
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -140,12 +173,20 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.pureWhite,
+                ),
               ),
             ),
           ],
@@ -153,7 +194,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -170,22 +213,37 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
       animation: _animationController,
       builder: (context, child) {
         return Scaffold(
-          backgroundColor: Colors.black.withOpacity(0.5 * (_fadeAnimation.value.clamp(0.0, 1.0))),
+          backgroundColor: Colors.black.withOpacity(
+            0.5 * (_fadeAnimation.value.clamp(0.0, 1.0)),
+          ),
           body: Center(
             child: Transform.scale(
               scale: _scaleAnimation.value.clamp(0.1, 2.0),
               child: Container(
                 width: context.dialogWidth ?? 600,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 90.w,
+                    small: 85.w,
+                    medium: 75.w,
+                    large: 65.w,
+                    ultrawide: 55.w,
+                  ),
                   maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -206,19 +264,28 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
+      ),
     );
   }
 
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
+      ),
     );
   }
 
   Widget _buildDesktopLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: false)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: false)],
+      ),
     );
   }
 
@@ -228,7 +295,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -238,8 +307,15 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.inventory_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.inventory_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -278,7 +354,11 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -299,7 +379,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
           children: [
             PremiumTextField(
               label: '${l10n.product} ${l10n.name}',
-              hint: isCompact ? '${l10n.enterEmail} ${l10n.name}' : '${l10n.enterEmail} ${l10n.product} ${l10n.name}',
+              hint: isCompact
+                  ? '${l10n.enter} ${l10n.name}'
+                  : '${l10n.enter} ${l10n.product} ${l10n.name}',
               controller: _nameController,
               prefixIcon: Icons.label_outlined,
               validator: (value) {
@@ -316,7 +398,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
             PremiumTextField(
               label: '${l10n.product} ${l10n.detail}',
-              hint: isCompact ? '${l10n.enterEmail} ${l10n.details}' : '${l10n.enterEmail} ${l10n.product} ${l10n.description}',
+              hint: isCompact
+                  ? '${l10n.enter} ${l10n.details}'
+                  : '${l10n.enter} ${l10n.product} ${l10n.description}',
               controller: _detailController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
@@ -337,7 +421,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 Expanded(
                   child: PremiumTextField(
                     label: l10n.price,
-                    hint: isCompact ? '${l10n.enterEmail} ${l10n.price}' : '${l10n.enterEmail} ${l10n.price} (PKR)',
+                    hint: isCompact
+                        ? '${l10n.enter} ${l10n.price}'
+                        : '${l10n.enter} ${l10n.price} (PKR)',
                     controller: _priceController,
                     prefixIcon: Icons.attach_money_rounded,
                     keyboardType: TextInputType.number,
@@ -357,7 +443,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 Expanded(
                   child: PremiumTextField(
                     label: l10n.costPrice,
-                    hint: isCompact ? '${l10n.enterEmail} ${l10n.cost}' : '${l10n.enterEmail} ${l10n.costPrice} (PKR) - ${l10n.optional}',
+                    hint: isCompact
+                        ? '${l10n.enter} ${l10n.cost}'
+                        : '${l10n.enter} ${l10n.costPrice} (PKR) - ${l10n.optional}',
                     controller: _costPriceController,
                     prefixIcon: Icons.shopping_cart_outlined,
                     keyboardType: TextInputType.number,
@@ -381,21 +469,34 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             SizedBox(height: context.smallPadding / 2),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding,
+                vertical: context.smallPadding / 3,
+              ),
               decoration: BoxDecoration(
                 color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
                 border: Border.all(color: Colors.blue.withOpacity(0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.info_outline, size: context.iconSize('small'), color: Colors.blue[700]),
+                  Icon(
+                    Icons.info_outline,
+                    size: context.iconSize('small'),
+                    color: Colors.blue[700],
+                  ),
                   SizedBox(width: context.smallPadding / 2),
                   Flexible(
                     child: Text(
                       l10n.costPriceInfo,
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue[700]),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.blue[700],
+                      ),
                     ),
                   ),
                 ],
@@ -408,7 +509,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 Expanded(
                   child: PremiumTextField(
                     label: l10n.quantity,
-                    hint: isCompact ? '${l10n.enterEmail} ${l10n.qty}' : '${l10n.enterEmail} ${l10n.quantity}',
+                    hint: isCompact
+                        ? '${l10n.enter} ${l10n.qty}'
+                        : '${l10n.enter} ${l10n.quantity}',
                     controller: _quantityController,
                     prefixIcon: Icons.inventory_2_outlined,
                     keyboardType: TextInputType.number,
@@ -416,7 +519,7 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                       if (value?.isEmpty ?? true) {
                         return '${l10n.pleaseEnter} ${l10n.quantity}';
                       }
-                      final quantity = int.tryParse(value!);
+                      final quantity = double.tryParse(value!);
                       if (quantity == null || quantity < 0) {
                         return '${l10n.pleaseEnterValid} ${l10n.quantity}';
                       }
@@ -435,11 +538,18 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
               builder: (context, provider, child) {
                 return PremiumDropdownField<String>(
                   label: l10n.category,
-                  hint: isCompact ? '${l10n.select} ${l10n.category}' : '${l10n.select} ${l10n.product} ${l10n.category}',
+                  hint: isCompact
+                      ? '${l10n.select} ${l10n.category}'
+                      : '${l10n.select} ${l10n.product} ${l10n.category}',
                   prefixIcon: Icons.category_outlined,
                   items: provider.categories
                       .where((category) => category.isActive)
-                      .map((category) => DropdownItem<String>(value: category.id, label: category.name))
+                      .map(
+                        (category) => DropdownItem<String>(
+                          value: category.id,
+                          label: category.name,
+                        ),
+                      )
                       .toList(),
                   value: _selectedCategoryId,
                   onChanged: (value) {
@@ -461,7 +571,9 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
             // Color Input Field
             PremiumTextField(
               label: l10n.color,
-              hint: isCompact ? '${l10n.enterEmail} ${l10n.color}' : '${l10n.enterEmail} ${l10n.colorName}',
+              hint: isCompact
+                  ? '${l10n.enter} ${l10n.color}'
+                  : '${l10n.enter} ${l10n.colorName}',
               controller: _colorController,
               prefixIcon: Icons.color_lens_outlined,
               validator: (value) {
@@ -478,8 +590,10 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
 
             // Type Input Field
             PremiumTextField(
-              label: l10n.type,
-              hint: isCompact ? '${l10n.enterEmail} ${l10n.type}' : '${l10n.enterEmail} ${l10n.product} ${l10n.type}',
+              label: l10n.material,
+              hint: isCompact
+                  ? '${l10n.enter} ${l10n.material}'
+                  : '${l10n.enter} ${l10n.product} ${l10n.material}',
               controller: _typeController,
               prefixIcon: Icons.category_outlined,
               validator: (value) {
@@ -532,11 +646,58 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      l10n.pieces,
-                      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.pieces,
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.charcoalGray,
+                          ),
+                        ),
+                        Text(
+                          '(${l10n.optional})',
+                          style: TextStyle(
+                            fontSize: context.captionFontSize,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: context.smallPadding),
+                    
+                    // Manual Piece Input
+                    Row(
+                      children: [
+                        Expanded(
+                          child: PremiumTextField(
+                            label: 'Add Custom Piece',
+                            hint: 'Enter piece name (e.g. Handle, Tap)',
+                            controller: _manualPieceController,
+                            prefixIcon: Icons.add_box_outlined,
+                          ),
+                        ),
+                        SizedBox(width: context.smallPadding),
+                        PremiumButton(
+                          text: l10n.add,
+                          width: 80,
+                          height: 50,
+                          onPressed: () {
+                            final piece = _manualPieceController.text.trim();
+                            if (piece.isNotEmpty && !_selectedPieces.contains(piece)) {
+                              setState(() {
+                                _selectedPieces.add(piece);
+                                _manualPieceController.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: context.cardPadding),
+
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(context.cardPadding),
@@ -544,44 +705,51 @@ class _AddProductDialogState extends State<AddProductDialog> with SingleTickerPr
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(context.borderRadius()),
                       ),
-                      child: Wrap(
-                        spacing: context.smallPadding,
-                        runSpacing: context.smallPadding,
-                        children: provider.availablePieces.map((piece) {
-                          final isSelected = _selectedPieces.contains(piece);
-                          return FilterChip(
-                            label: Text(
-                              piece,
-                              style: TextStyle(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: isSelected ? AppTheme.pureWhite : AppTheme.charcoalGray,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_selectedPieces.isEmpty)
+                            Center(
+                              child: Text(
+                                'No pieces added yet',
+                                style: TextStyle(
+                                  fontSize: context.captionFontSize,
+                                  color: Colors.grey[500],
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                             ),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedPieces.add(piece);
-                                } else {
-                                  _selectedPieces.remove(piece);
-                                }
-                              });
-                            },
-                            selectedColor: AppTheme.primaryMaroon,
-                            checkmarkColor: AppTheme.pureWhite,
-                            backgroundColor: AppTheme.lightGray,
-                          );
-                        }).toList(),
+                          Wrap(
+                            spacing: context.smallPadding,
+                            runSpacing: context.smallPadding,
+                            children: [
+                              ..._selectedPieces.map((piece) {
+                                final bool isPredefined = provider.availablePieces.contains(piece);
+                                return InputChip(
+                                  label: Text(
+                                    piece,
+                                    style: TextStyle(
+                                      fontSize: context.captionFontSize,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppTheme.pureWhite,
+                                    ),
+                                  ),
+                                  selected: true,
+                                  onDeleted: () {
+                                    setState(() {
+                                      _selectedPieces.remove(piece);
+                                    });
+                                  },
+                                  selectedColor: isPredefined ? AppTheme.primaryMaroon : Colors.blueAccent,
+                                  checkmarkColor: AppTheme.pureWhite,
+                                  deleteIconColor: AppTheme.pureWhite,
+                                );
+                              }),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    if (_selectedPieces.isEmpty) ...[
-                      SizedBox(height: context.smallPadding / 2),
-                      Text(
-                        l10n.pleaseSelectAtLeastOnePiece,
-                        style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
-                      ),
-                    ],
                   ],
                 );
               },

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:frontend/src/utils/cnic_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
-import '../../../src/models/labor/labor_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/models/labor/labor_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
@@ -17,7 +18,8 @@ class EnhancedEditLaborDialog extends StatefulWidget {
   const EnhancedEditLaborDialog({super.key, required this.labor});
 
   @override
-  State<EnhancedEditLaborDialog> createState() => _EnhancedEditLaborDialogState();
+  State<EnhancedEditLaborDialog> createState() =>
+      _EnhancedEditLaborDialogState();
 }
 
 class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
@@ -66,28 +68,33 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.labor.name);
-    _cnicController = TextEditingController(text: widget.labor.cnic);
+    _cnicController = TextEditingController(text: widget.labor.cnic ?? '');
     _phoneController = TextEditingController(text: widget.labor.phoneNumber);
-    _casteController = TextEditingController(text: widget.labor.caste);
-    _designationController = TextEditingController(text: widget.labor.designation);
-    _salaryController = TextEditingController(text: widget.labor.salary.toString());
+    _casteController = TextEditingController(text: widget.labor.caste ?? '');
+    _designationController = TextEditingController(
+      text: widget.labor.designation,
+    );
+    _salaryController = TextEditingController(
+      text: widget.labor.salary.toString(),
+    );
     _areaController = TextEditingController(text: widget.labor.area);
     _cityController = TextEditingController(text: widget.labor.city);
     _ageController = TextEditingController(text: widget.labor.age.toString());
     _selectedGender = widget.labor.gender;
     _selectedJoiningDate = widget.labor.joiningDate;
 
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     _animationController.forward();
   }
@@ -140,7 +147,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
             _showSuccessSnackbar(l10n.laborUpdatedSuccessfully);
             Navigator.of(context).pop();
           } else {
-            _showErrorSnackbar(provider.errorMessage ?? l10n.failedToUpdateLabor);
+            _showErrorSnackbar(
+              provider.errorMessage ?? l10n.failedToUpdateLabor,
+            );
           }
         }
       } catch (e) {
@@ -162,7 +171,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               message,
@@ -177,7 +190,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -187,7 +202,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -204,7 +223,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -240,7 +261,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+        Icon(
+          icon,
+          color: AppTheme.primaryMaroon,
+          size: context.iconSize('medium'),
+        ),
         SizedBox(width: context.smallPadding),
         Text(
           title,
@@ -254,16 +279,25 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.accentGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.accentGold.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
@@ -303,7 +337,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -333,7 +369,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -347,7 +385,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               color: AppTheme.pureWhite.withOpacity(0.2),
               borderRadius: BorderRadius.circular(context.borderRadius()),
             ),
-            child: Icon(Icons.edit_outlined, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            child: Icon(
+              Icons.edit_outlined,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -355,7 +397,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.editLabor : l10n.editLaborDetails,
+                  context.shouldShowCompactLayout
+                      ? l10n.editLabor
+                      : l10n.editLaborDetails,
                   style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -384,7 +428,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
             ),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
             ),
             child: Text(
               widget.labor.id,
@@ -403,7 +449,11 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -454,7 +504,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: '${l10n.fullName} *',
-          hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterWorkerFullName,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterName
+              : l10n.enterWorkerFullName,
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           enabled: !_isUpdating,
@@ -473,25 +525,29 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: '${l10n.cnic} *',
-          hint: context.shouldShowCompactLayout ? l10n.enterCNIC : l10n.enterCNICFormat,
+          label: '${l10n.cnic} (${l10n.optional})',
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterCNIC
+              : l10n.enterCNICFormat,
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           enabled: !_isUpdating,
+          inputFormatters: [CnicInputFormatter()],
           validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return l10n.pleaseEnterCNIC;
-            }
-            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
-              return l10n.pleaseEnterValidCNIC;
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
+                return l10n.pleaseEnterValidCNIC;
+              }
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: l10n.caste,
-          hint: context.shouldShowCompactLayout ? l10n.enterCaste : l10n.enterCasteOptional,
+          label: '${l10n.caste} (${l10n.optional})',
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterCaste
+              : l10n.enterCasteOptional,
           controller: _casteController,
           prefixIcon: Icons.group_outlined,
           enabled: !_isUpdating,
@@ -506,11 +562,16 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
+        _buildSectionTitle(
+          l10n.contactInformation,
+          Icons.contact_phone_outlined,
+        ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: '${l10n.phoneNumber} *',
-          hint: context.shouldShowCompactLayout ? l10n.enterPhone : l10n.enterPhoneNumberFormat,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterPhone
+              : l10n.enterPhoneNumberFormat,
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
@@ -535,7 +596,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
+        _buildSectionTitle(
+          l10n.locationInformation,
+          Icons.location_on_outlined,
+        ),
         SizedBox(height: context.cardPadding),
         ResponsiveBreakpoints.responsive(
           context,
@@ -581,7 +645,7 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               hint: l10n.selectJoiningDate,
               controller: TextEditingController(
                 text:
-                '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
+                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
               ),
               prefixIcon: Icons.calendar_today,
               enabled: !_isUpdating,
@@ -591,7 +655,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: '${l10n.monthlySalary} *',
-          hint: context.shouldShowCompactLayout ? l10n.enterSalary : l10n.enterMonthlySalaryInPKR,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterSalary
+              : l10n.enterMonthlySalaryInPKR,
           controller: _salaryController,
           prefixIcon: Icons.account_balance_wallet_outlined,
           keyboardType: TextInputType.number,
@@ -609,7 +675,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         SizedBox(height: context.cardPadding),
         PremiumDropdownField<String>(
           label: '${l10n.gender} *',
-          hint: context.shouldShowCompactLayout ? l10n.selectGender : l10n.selectGender,
+          hint: context.shouldShowCompactLayout
+              ? l10n.selectGender
+              : l10n.selectGender,
           prefixIcon: Icons.person_pin_rounded,
           items: [
             DropdownItem<String>(value: 'M', label: l10n.male),
@@ -620,10 +688,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
           onChanged: _isUpdating
               ? null
               : (value) {
-            setState(() {
-              _selectedGender = value!;
-            });
-          },
+                  setState(() {
+                    _selectedGender = value!;
+                  });
+                },
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.pleaseSelectGender;
@@ -634,7 +702,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: '${l10n.age} *',
-          hint: context.shouldShowCompactLayout ? l10n.enterAge : l10n.enterAgeMinimum18Years,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterAge
+              : l10n.enterAgeMinimum18Years,
           controller: _ageController,
           prefixIcon: Icons.cake_outlined,
           keyboardType: TextInputType.number,
@@ -703,10 +773,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-              label: city,
-              onTap: () => setState(() => _cityController.text = city),
-            ),
-          )
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -740,10 +810,10 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-              label: area,
-              onTap: () => setState(() => _areaController.text = area),
-            ),
-          )
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -760,7 +830,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
           builder: (context, provider, child) {
             return PremiumButton(
               text: l10n.updateLabor,
-              onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
+              onPressed: (_isUpdating || provider.isLoading)
+                  ? null
+                  : _handleUpdate,
               isLoading: _isUpdating || provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.save_rounded,
@@ -803,7 +875,9 @@ class _EnhancedEditLaborDialogState extends State<EnhancedEditLaborDialog>
             builder: (context, provider, child) {
               return PremiumButton(
                 text: l10n.updateLabor,
-                onPressed: (_isUpdating || provider.isLoading) ? null : _handleUpdate,
+                onPressed: (_isUpdating || provider.isLoading)
+                    ? null
+                    : _handleUpdate,
                 isLoading: _isUpdating || provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.save_rounded,

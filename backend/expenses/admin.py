@@ -251,7 +251,7 @@ class ExpenseAdmin(admin.ModelAdmin):
             }
         
         # Recent expenses (last 30 days)
-        thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
+        thirty_days_ago = timezone.localdate() - timezone.timedelta(days=30)
         recent_expenses = active_expenses.filter(date__gte=thirty_days_ago)
         recent_total = recent_expenses.aggregate(total=Sum('amount'))['total'] or 0
         recent_count = recent_expenses.count()

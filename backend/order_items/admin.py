@@ -34,7 +34,7 @@ class OrderItemAdmin(admin.ModelAdmin):
         'order__customer_name',
         'product__name',
         'product__color',
-        'product__fabric',
+        'product__material',
     )
     
     readonly_fields = (
@@ -98,7 +98,7 @@ class OrderItemAdmin(admin.ModelAdmin):
                 product_url,
                 obj.product_name,
                 obj.product.color if obj.product else 'N/A',
-                obj.product.fabric if obj.product else 'N/A'
+                obj.product.material if obj.product else 'N/A'
             )
         return format_html('<strong>{}</strong><br><small style="color: #dc3545;">Product not found</small>', obj.product_name)
     product_name_formatted.short_description = 'Product'
@@ -186,13 +186,13 @@ class OrderItemAdmin(admin.ModelAdmin):
             '<strong>Current Product Info:</strong><br>'
             'Name: {}<br>'
             'Color: {}<br>'
-            'Fabric: {}<br>'
+            'Material: {}<br>'
             'Current Price: PKR {}<br>'
             'Current Stock: {} units<br>'
             'Category: {}',
             obj.product.name,
             obj.product.color,
-            obj.product.fabric,
+            obj.product.material,
             obj.product.price,
             obj.product.quantity,
             obj.product.category.name if obj.product.category else 'N/A'

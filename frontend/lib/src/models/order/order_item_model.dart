@@ -3,7 +3,7 @@ class OrderItemModel {
   final String orderId;
   final String productId;
   final String productName;
-  final int quantity;
+  final double quantity;
   final double unitPrice;
   final String customizationNotes;
   final double lineTotal;
@@ -13,11 +13,11 @@ class OrderItemModel {
 
   // Product details
   final String? productColor;
-  final String? productFabric;
-  final int? currentStock;
+  final String? productMaterial;
+  final double? currentStock;
 
   // Sales tracking
-  final int? remainingToSell;
+  final double? remainingToSell;
   final bool? hasBeenSold;
 
   // Computed fields
@@ -37,7 +37,7 @@ class OrderItemModel {
     required this.createdAt,
     this.updatedAt,
     this.productColor,
-    this.productFabric,
+    this.productMaterial,
     this.currentStock,
     this.remainingToSell,
     this.hasBeenSold,
@@ -51,7 +51,7 @@ class OrderItemModel {
       orderId: json['order_id']?.toString() ?? '',
       productId: json['product_id']?.toString() ?? '',
       productName: json['product_name']?.toString() ?? '',
-      quantity: json['quantity'] as int? ?? 0,
+      quantity: _parseDouble(json['quantity']),
       unitPrice: _parseDouble(json['unit_price']),
       customizationNotes:
           json['customization_notes']?.toString() ??
@@ -65,9 +65,9 @@ class OrderItemModel {
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at']?.toString() ?? '') : null,
       productColor: json['product_color']?.toString(),
-      productFabric: json['product_fabric']?.toString(),
-      currentStock: json['current_stock'] as int?,
-      remainingToSell: json['remaining_to_sell'] as int?,
+      productMaterial: json['product_material']?.toString(),
+      currentStock: json['current_stock'] != null ? _parseDouble(json['current_stock']) : null,
+      remainingToSell: json['remaining_to_sell'] != null ? _parseDouble(json['remaining_to_sell']) : null,
       hasBeenSold: json['has_been_sold'] as bool?,
       totalValue: _parseDouble(json['total_value'] ?? json['line_total']),
       productDisplayInfo: json['product_display_info'] as Map<String, dynamic>? ?? {},
@@ -92,7 +92,7 @@ class OrderItemModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'product_color': productColor,
-      'product_fabric': productFabric,
+      'product_material': productMaterial,
       'current_stock': currentStock,
       'remaining_to_sell': remainingToSell,
       'has_been_sold': hasBeenSold,
@@ -118,7 +118,7 @@ class OrderItemModel {
     String? orderId,
     String? productId,
     String? productName,
-    int? quantity,
+    double? quantity,
     double? unitPrice,
     String? customizationNotes,
     double? lineTotal,
@@ -126,9 +126,9 @@ class OrderItemModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? productColor,
-    String? productFabric,
-    int? currentStock,
-    int? remainingToSell,
+    String? productMaterial,
+    double? currentStock,
+    double? remainingToSell,
     bool? hasBeenSold,
     double? totalValue,
     Map<String, dynamic>? productDisplayInfo,
@@ -146,7 +146,7 @@ class OrderItemModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       productColor: productColor ?? this.productColor,
-      productFabric: productFabric ?? this.productFabric,
+      productMaterial: productMaterial ?? this.productMaterial,
       currentStock: currentStock ?? this.currentStock,
       remainingToSell: remainingToSell ?? this.remainingToSell,
       hasBeenSold: hasBeenSold ?? this.hasBeenSold,

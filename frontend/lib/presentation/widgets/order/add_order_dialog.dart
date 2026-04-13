@@ -1530,9 +1530,9 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           orderId: '',
           productId: product.id,
           productName: product.name,
-          productFabric: product.fabric,
+          productMaterial: product.material,
           productColor: product.color,
-          quantity: quantity,
+          quantity: quantity.toDouble(),
           unitPrice: product.price,
           customizationNotes: customizationNotes ?? '',
           lineTotal: quantity * product.price,
@@ -1543,7 +1543,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> with SingleTickerProvid
           totalValue: quantity * product.price,
           productDisplayInfo: {
             'name': product.name,
-            'fabric': product.fabric,
+            'material': product.material,
             'color': product.color,
             'price': product.price
           },

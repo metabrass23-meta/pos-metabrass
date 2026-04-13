@@ -29,6 +29,10 @@ class PrincipalAccount(models.Model):
         ('ADJUSTMENT', 'Adjustment'),
         ('TRANSFER', 'Transfer'),
     ]
+
+    HANDLED_BY_CHOICES = [
+        ('MetaBrass Admin', 'MetaBrass Admin'),
+    ]
     
     id = models.UUIDField(
         primary_key=True,
@@ -89,6 +93,7 @@ class PrincipalAccount(models.Model):
     # Additional information
     handled_by = models.CharField(
         max_length=100,
+        choices=HANDLED_BY_CHOICES,
         blank=True,
         null=True,
         help_text="Person who handled this transaction"

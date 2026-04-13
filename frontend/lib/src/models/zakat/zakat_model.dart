@@ -42,6 +42,38 @@ class Zakat {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
+  // Factory constructor with default authorizer
+  factory Zakat.withDefaults({
+    required String id,
+    required String name,
+    required String description,
+    required DateTime date,
+    required TimeOfDay time,
+    required double amount,
+    required String beneficiaryName,
+    String? beneficiaryContact,
+    String? notes,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    String? createdByEmail,
+  }) {
+    return Zakat(
+      id: id,
+      name: name,
+      description: description,
+      date: date,
+      time: time,
+      amount: amount,
+      beneficiaryName: beneficiaryName,
+      beneficiaryContact: beneficiaryContact,
+      notes: notes,
+      authorizedBy: 'MetaBrass Admin', // Default authorizer
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      createdByEmail: createdByEmail,
+    );
+  }
+
   // Formatted time for display
   String get formattedTime {
     final hour = time.hour.toString().padLeft(2, '0');
@@ -101,10 +133,13 @@ class Zakat {
         continue;
       }
       if (part.isNotEmpty) {
-        initials += part[0].toUpperCase(); // FIXED: changed .upper() → .toUpperCase()
+        initials += part[0]
+            .toUpperCase(); // FIXED: changed .upper() → .toUpperCase()
       }
     }
-    return initials.isNotEmpty ? initials : authorizedBy.substring(0, 2).toUpperCase();
+    return initials.isNotEmpty
+        ? initials
+        : authorizedBy.substring(0, 2).toUpperCase();
   }
 
   // Zakat summary for display
@@ -172,7 +207,8 @@ class Zakat {
       'name': name,
       'description': description,
       'date': date.toIso8601String().split('T')[0], // YYYY-MM-DD format
-      'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+      'time':
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
       'amount': amount,
       'beneficiary_name': beneficiaryName,
       'beneficiary_contact': beneficiaryContact,
@@ -194,7 +230,8 @@ class Zakat {
       try {
         if (timeStr.isEmpty) return TimeOfDay(hour: 0, minute: 0);
         final parts = timeStr.split(':');
-        if (parts.length < 2 || parts.length > 3) return TimeOfDay(hour: 0, minute: 0);
+        if (parts.length < 2 || parts.length > 3)
+          return TimeOfDay(hour: 0, minute: 0);
         final hour = int.tryParse(parts[0]) ?? 0;
         final minute = int.tryParse(parts[1]) ?? 0;
         return TimeOfDay(hour: hour, minute: minute);
@@ -223,7 +260,9 @@ class Zakat {
     double extractAmountFromFormatted(String formattedAmount) {
       try {
         // Remove "PKR " prefix and commas, then parse
-        final cleanAmount = formattedAmount.replaceAll('PKR ', '').replaceAll(',', '');
+        final cleanAmount = formattedAmount
+            .replaceAll('PKR ', '')
+            .replaceAll(',', '');
         return double.tryParse(cleanAmount) ?? 0.0;
       } catch (e) {
         return 0.0;
@@ -249,17 +288,27 @@ class Zakat {
       description: safeString(json['description'] ?? ''),
       date: safeDateTime(json['date']),
       time: parseTime(safeString(json['time'] ?? '00:00')),
-      amount: safeDouble(json['amount']) ?? extractAmountFromFormatted(safeString(json['formatted_amount'] ?? '')),
+      amount:
+          safeDouble(json['amount']) ??
+          extractAmountFromFormatted(
+            safeString(json['formatted_amount'] ?? ''),
+          ),
       beneficiaryName: safeString(json['beneficiary_name'] ?? ''),
-      beneficiaryContact: json['beneficiary_contact'] != null ? safeString(json['beneficiary_contact']) : null,
+      beneficiaryContact: json['beneficiary_contact'] != null
+          ? safeString(json['beneficiary_contact'])
+          : null,
       notes: json['notes'] != null ? safeString(json['notes']) : null,
       authorizedBy: safeString(json['authorized_by'] ?? ''),
       createdAt: safeDateTime(json['created_at']),
       updatedAt: safeDateTime(json['updated_at'] ?? json['created_at']),
-      createdByEmail: json['created_by_name'] != null ? safeString(json['created_by_name']) : null,
+      createdByEmail: json['created_by_name'] != null
+          ? safeString(json['created_by_name'])
+          : null,
       isActive: json['is_active'] as bool? ?? true,
-      isVerified: false, // Default to false since this field doesn't exist in backend
-      isArchived: false, // Default to false since this field doesn't exist in backend
+      isVerified:
+          false, // Default to false since this field doesn't exist in backend
+      isArchived:
+          false, // Default to false since this field doesn't exist in backend
     );
   }
 
@@ -280,7 +329,7 @@ class Zakat {
 
 // Helper class for authorization choices
 class ZakatAuthorities {
-  static const List<String> authorities = ['Mr. Shahzain Baloch', 'Mr Huzaifa'];
+  static const List<String> authorities = ['MetaBrass Admin'];
 
   static String getDisplayName(String authority) {
     return authority;
@@ -297,6 +346,8 @@ class ZakatAuthorities {
         initials += part[0].toUpperCase();
       }
     }
-    return initials.isNotEmpty ? initials : authority.substring(0, 2).toUpperCase();
+    return initials.isNotEmpty
+        ? initials
+        : authority.substring(0, 2).toUpperCase();
   }
 }

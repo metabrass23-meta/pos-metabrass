@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
 import '../../../src/providers/auth_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
@@ -69,7 +68,10 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
 
-                final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -88,9 +90,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                         SizedBox(width: context.smallPadding),
                         Text(
                           AppLocalizations.of(context)!.loggingOut,
-                          style: TextStyle(
-                            fontSize: context.captionFontSize,
-                          ),
+                          style: TextStyle(fontSize: context.captionFontSize),
                         ),
                       ],
                     ),
@@ -111,21 +111,18 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
 
                   await Future.delayed(const Duration(milliseconds: 300));
 
-                  AlNoorApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                    '/login',
-                        (route) => false,
-                  );
+                  MaqboolFashionApp.navigatorKey.currentState
+                      ?.pushNamedAndRemoveUntil('/login', (route) => false);
 
                   Future.delayed(const Duration(milliseconds: 500), () {
-                    final currentContext = AlNoorApp.navigatorKey.currentContext;
+                    final currentContext =
+                        MaqboolFashionApp.navigatorKey.currentContext;
                     if (currentContext != null) {
                       ScaffoldMessenger.of(currentContext).showSnackBar(
                         SnackBar(
                           content: Text(
                             AppLocalizations.of(currentContext)!.logoutSuccess,
-                            style: TextStyle(
-                              fontSize: context.captionFontSize,
-                            ),
+                            style: TextStyle(fontSize: context.captionFontSize),
                           ),
                           backgroundColor: Colors.green,
                           behavior: SnackBarBehavior.floating,
@@ -140,21 +137,18 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                     }
                   });
                 } catch (e) {
-                  AlNoorApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                    '/login',
-                        (route) => false,
-                  );
+                  MaqboolFashionApp.navigatorKey.currentState
+                      ?.pushNamedAndRemoveUntil('/login', (route) => false);
 
                   Future.delayed(const Duration(milliseconds: 500), () {
-                    final currentContext = AlNoorApp.navigatorKey.currentContext;
+                    final currentContext =
+                        MaqboolFashionApp.navigatorKey.currentContext;
                     if (currentContext != null) {
                       ScaffoldMessenger.of(currentContext).showSnackBar(
                         SnackBar(
                           content: Text(
                             AppLocalizations.of(currentContext)!.logoutError,
-                            style: TextStyle(
-                              fontSize: context.captionFontSize,
-                            ),
+                            style: TextStyle(fontSize: context.captionFontSize),
                           ),
                           backgroundColor: Colors.orange,
                           behavior: SnackBarBehavior.floating,
@@ -174,9 +168,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                 backgroundColor: AppTheme.primaryMaroon,
                 foregroundColor: AppTheme.pureWhite,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    context.borderRadius(),
-                  ),
+                  borderRadius: BorderRadius.circular(context.borderRadius()),
                 ),
                 elevation: 2,
               ),
@@ -214,28 +206,28 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
           ),
           child: widget.isExpanded
               ? Row(
-            children: [
-              Icon(
-                Icons.logout_rounded,
-                color: Colors.red.shade300,
-                size: context.iconSize('small'),
-              ),
-              SizedBox(width: context.smallPadding),
-              Text(
-                AppLocalizations.of(context)!.logout,
-                style: TextStyle(
-                  fontSize: context.bodyFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.pureWhite,
-                ),
-              ),
-            ],
-          )
+                  children: [
+                    Icon(
+                      Icons.logout_rounded,
+                      color: Colors.red.shade300,
+                      size: context.iconSize('small'),
+                    ),
+                    SizedBox(width: context.smallPadding),
+                    Text(
+                      AppLocalizations.of(context)!.logout,
+                      style: TextStyle(
+                        fontSize: context.bodyFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.pureWhite,
+                      ),
+                    ),
+                  ],
+                )
               : Icon(
-            Icons.logout_rounded,
-            color: Colors.red.shade300,
-            size: context.iconSize('medium'),
-          ),
+                  Icons.logout_rounded,
+                  color: Colors.red.shade300,
+                  size: context.iconSize('medium'),
+                ),
         ),
       ),
     );

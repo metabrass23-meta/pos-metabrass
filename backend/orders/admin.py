@@ -504,7 +504,7 @@ class OrderItemInline(admin.TabularInline):
     def product_display_info(self, obj):
         """Display product information"""
         if obj.product:
-            return f"{obj.product.color} - {obj.product.fabric}"
+            return f"{obj.product.color} - {obj.product.material}"
         return "Product not available"
     product_display_info.short_description = 'Product Info'
 

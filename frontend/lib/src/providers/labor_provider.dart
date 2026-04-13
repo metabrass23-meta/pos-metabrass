@@ -750,12 +750,12 @@ class LaborProvider extends ChangeNotifier {
     }
 
     // CNIC validation
-    if (cnic.trim().isEmpty) {
-      errors['cnic'] = 'CNIC is required';
-    } else if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
-      errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
-    } else if (_labors.any((labor) => labor.cnic == cnic.trim())) {
-      errors['cnic'] = 'A labor with this CNIC already exists';
+    if (cnic.trim().isNotEmpty) {
+      if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
+        errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
+      } else if (_labors.any((labor) => labor.cnic == cnic.trim())) {
+        errors['cnic'] = 'A labor with this CNIC already exists';
+      }
     }
 
     // Phone validation
@@ -768,8 +768,8 @@ class LaborProvider extends ChangeNotifier {
     }
 
     // Caste validation
-    if (caste.trim().isEmpty) {
-      errors['caste'] = 'Caste is required';
+    if (caste.trim().isNotEmpty) {
+      // Caste is now optional, but we can do extra formatting here if needed.
     }
 
     // Designation validation
@@ -887,7 +887,13 @@ class LaborProvider extends ChangeNotifier {
   }
 
   List<String> get availableCastes {
-    return _labors.map((labor) => labor.caste).where((caste) => caste.isNotEmpty).toSet().toList()..sort();
+    return _labors
+        .map((labor) => labor.caste)
+        .where((caste) => caste != null && caste.isNotEmpty)
+        .cast<String>()
+        .toSet()
+        .toList()
+      ..sort();
   }
 
   @override

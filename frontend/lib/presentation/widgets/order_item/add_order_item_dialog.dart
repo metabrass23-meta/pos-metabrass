@@ -156,7 +156,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
                         if (value == null || value.isEmpty) {
                           return l10n.quantityIsRequired;
                         }
-                        if (int.tryParse(value) == null) {
+                        if (double.tryParse(value) == null) {
                           return l10n.pleaseEnterValidNumber;
                         }
                         return null;
@@ -276,7 +276,7 @@ class _AddOrderItemDialogState extends State<AddOrderItemDialog> {
         return;
       }
 
-      final quantity = int.parse(_quantityController.text);
+      final quantity = double.parse(_quantityController.text);
       final unitPrice = double.parse(_unitPriceController.text);
 
       context

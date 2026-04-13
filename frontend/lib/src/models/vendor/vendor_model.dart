@@ -34,7 +34,7 @@ class VendorModel {
     required this.totalPaymentsAmount,
     required this.isActive,
     required this.createdAt,
-    this.createdByEmail,
+    this.createdByEmail = 'Mr Sheikh Parwaiz Maqbool', // Default authorizer
   });
 
   factory VendorModel.fromJson(Map<String, dynamic> json) {
@@ -42,19 +42,26 @@ class VendorModel {
       id: json['id'] as String,
       name: json['name'] as String,
       businessName: json['business_name'] as String,
-      displayName: json['display_name'] as String? ?? '${json['business_name']} (${json['name']})',
-      initials: json['initials'] as String? ?? _generateInitials(json['name'] as String),
+      displayName:
+          json['display_name'] as String? ??
+          '${json['business_name']} (${json['name']})',
+      initials:
+          json['initials'] as String? ??
+          _generateInitials(json['name'] as String),
       cnic: json['cnic'] as String?, // Handle null CNIC
       phone: json['phone'] as String,
       city: json['city'] as String,
       area: json['area'] as String,
-      fullAddress: json['full_address'] as String? ?? '${json['area']}, ${json['city']}',
+      fullAddress:
+          json['full_address'] as String? ?? '${json['area']}, ${json['city']}',
       isNewVendor: json['is_new_vendor'] as bool? ?? false,
       paymentsCount: json['payments_count'] as int? ?? 0,
-      totalPaymentsAmount: (json['total_payments_amount'] as num?)?.toDouble() ?? 0.0,
+      totalPaymentsAmount:
+          (json['total_payments_amount'] as num?)?.toDouble() ?? 0.0,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
-      createdByEmail: json['created_by_email'] as String? ?? json['created_by'] as String?,
+      createdByEmail:
+          json['created_by_email'] as String? ?? json['created_by'] as String?,
     );
   }
 
@@ -175,6 +182,7 @@ class VendorModel {
     final words = name.trim().split(' ');
     if (words.isEmpty) return 'V';
     if (words.length == 1) return words[0].substring(0, 1).toUpperCase();
-    return '${words[0].substring(0, 1)}${words[1].substring(0, 1)}'.toUpperCase();
+    return '${words[0].substring(0, 1)}${words[1].substring(0, 1)}'
+        .toUpperCase();
   }
 }

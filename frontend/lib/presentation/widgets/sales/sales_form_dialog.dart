@@ -80,7 +80,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius('medium'))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(context.borderRadius('medium')),
+      ),
       child: Container(
         width: 90.w,
         height: 90.h,
@@ -109,17 +111,29 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       ),
       child: Row(
         children: [
-          Icon(Icons.point_of_sale_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+          Icon(
+            Icons.point_of_sale_rounded,
+            color: AppTheme.pureWhite,
+            size: context.iconSize('large'),
+          ),
           SizedBox(width: context.cardPadding),
           Expanded(
             child: Text(
               widget.sale == null ? l10n.createNewSale : l10n.editSale,
-              style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.headerFontSize,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            icon: Icon(
+              Icons.close_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
           ),
         ],
       ),
@@ -157,14 +171,24 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-        boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadowColor,
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.basicInformation,
-            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(
+              fontSize: context.headingFontSize,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
+            ),
           ),
           SizedBox(height: context.cardPadding),
           Row(
@@ -174,7 +198,11 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   controller: _invoiceNumberController,
                   decoration: InputDecoration(
                     labelText: l10n.invoiceNumber,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
@@ -188,11 +216,20 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
               Expanded(
                 child: TextFormField(
                   readOnly: true,
-                  initialValue: _saleDate?.toString().split(' ')[0] ?? DateTime.now().toString().split(' ')[0],
+                  initialValue:
+                      _saleDate?.toString().split(' ')[0] ??
+                      DateTime.now().toString().split(' ')[0],
                   decoration: InputDecoration(
                     labelText: l10n.saleDate,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-                    suffixIcon: IconButton(onPressed: () => _selectDate(context), icon: const Icon(Icons.calendar_today_rounded)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () => _selectDate(context),
+                      icon: const Icon(Icons.calendar_today_rounded),
+                    ),
                   ),
                 ),
               ),
@@ -206,7 +243,11 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   controller: _customerNameController,
                   decoration: InputDecoration(
                     labelText: l10n.customerName,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
@@ -222,7 +263,11 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   controller: _customerPhoneController,
                   decoration: InputDecoration(
                     labelText: l10n.customerPhone,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value?.isEmpty ?? true) {
@@ -242,13 +287,23 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   value: _selectedPaymentMethod,
                   decoration: InputDecoration(
                     labelText: l10n.paymentMethod,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
                   ),
                   items: [
                     DropdownMenuItem(value: 'CASH', child: Text(l10n.cash)),
                     DropdownMenuItem(value: 'CARD', child: Text(l10n.card)),
-                    DropdownMenuItem(value: 'BANK_TRANSFER', child: Text(l10n.bankTransfer)),
-                    DropdownMenuItem(value: 'MOBILE_PAYMENT', child: Text(l10n.mobilePayment)),
+                    DropdownMenuItem(
+                      value: 'BANK_TRANSFER',
+                      child: Text(l10n.bankTransfer),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MOBILE_PAYMENT',
+                      child: Text(l10n.mobilePayment),
+                    ),
                     DropdownMenuItem(value: 'CREDIT', child: Text(l10n.credit)),
                   ],
                   onChanged: (value) {
@@ -270,11 +325,49 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                   initialValue: _overallDiscount.toString(),
                   decoration: InputDecoration(
                     labelText: l10n.overallDiscountRs,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     _overallDiscount = double.tryParse(value) ?? 0.0;
+                  },
+                ),
+              ),
+              SizedBox(width: context.cardPadding),
+              Expanded(
+                child: TextFormField(
+                  initialValue: _amountPaid.toString(),
+                  decoration: InputDecoration(
+                    labelText: 'Amount Paid (Rs)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    _amountPaid = double.tryParse(value) ?? 0.0;
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter amount paid';
+                    }
+                    final amount = double.tryParse(value);
+                    if (amount == null) {
+                      return 'Please enter a valid amount';
+                    }
+                    final subtotal = _calculateSubtotal();
+                    final totalTax = _taxConfiguration.totalTaxAmount;
+                    final grandTotal = subtotal + totalTax - _overallDiscount;
+                    if (amount > grandTotal) {
+                      return 'Amount paid cannot exceed total amount';
+                    }
+                    return null;
                   },
                 ),
               ),
@@ -285,7 +378,11 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             controller: _notesController,
             decoration: InputDecoration(
               labelText: l10n.notes,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
             ),
             maxLines: 3,
           ),
@@ -294,7 +391,11 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             value: _selectedStatus,
             decoration: InputDecoration(
               labelText: l10n.status,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
             ),
             items: [
               DropdownMenuItem(value: 'DRAFT', child: Text(l10n.draft)),
@@ -330,7 +431,13 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-        boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadowColor,
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,21 +446,35 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             children: [
               Text(
                 l10n.saleItems,
-                style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.headingFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () => _showAddSaleItemDialog(),
-                icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
+                icon: Icon(
+                  Icons.add_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('small'),
+                ),
                 label: Text(
                   l10n.addItem,
-                  style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: AppTheme.pureWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
           ),
           SizedBox(height: context.cardPadding),
-          if (_saleItems.isEmpty) _buildEmptySaleItemsState() else _buildSaleItemsList(),
+          if (_saleItems.isEmpty)
+            _buildEmptySaleItemsState()
+          else
+            _buildSaleItemsList(),
         ],
       ),
     );
@@ -367,16 +488,27 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.shopping_cart_outlined, color: AppTheme.lightGray, size: 8.w),
+            Icon(
+              Icons.shopping_cart_outlined,
+              color: AppTheme.lightGray,
+              size: 8.w,
+            ),
             SizedBox(height: context.cardPadding),
             Text(
               l10n.noSaleItemsAdded,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.lightGray),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.lightGray,
+              ),
             ),
             SizedBox(height: context.smallPadding),
             Text(
               l10n.addItemsToSale,
-              style: TextStyle(fontSize: context.captionFontSize, color: AppTheme.lightGray.withOpacity(0.7)),
+              style: TextStyle(
+                fontSize: context.captionFontSize,
+                color: AppTheme.lightGray.withOpacity(0.7),
+              ),
             ),
           ],
         ),
@@ -397,7 +529,10 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           decoration: BoxDecoration(
             color: AppTheme.creamWhite,
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            border: Border.all(color: AppTheme.lightGray.withOpacity(0.5), width: 1),
+            border: Border.all(
+              color: AppTheme.lightGray.withOpacity(0.5),
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -405,30 +540,48 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
                 flex: 2,
                 child: Text(
                   item.productName,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ),
               Expanded(
                 child: Text(
                   l10n.qty(item.quantity),
-                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ),
               Expanded(
                 child: Text(
                   'Rs. ${item.unitPrice.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ),
               Expanded(
                 child: Text(
                   'Rs. ${item.lineTotal.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryMaroon,
+                  ),
                 ),
               ),
               IconButton(
                 onPressed: () => _removeSaleItem(index),
-                icon: Icon(Icons.delete_rounded, color: Colors.red, size: context.iconSize('small')),
+                icon: Icon(
+                  Icons.delete_rounded,
+                  color: Colors.red,
+                  size: context.iconSize('small'),
+                ),
               ),
             ],
           ),
@@ -445,14 +598,24 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-        boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadowColor,
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.taxConfiguration,
-            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(
+              fontSize: context.headingFontSize,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
+            ),
           ),
           SizedBox(height: context.cardPadding),
           TaxConfigurationWidget(
@@ -480,14 +643,24 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('medium')),
-        boxShadow: [BoxShadow(color: AppTheme.shadowColor, blurRadius: context.shadowBlur('light'), offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadowColor,
+            blurRadius: context.shadowBlur('light'),
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.summary,
-            style: TextStyle(fontSize: context.headingFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(
+              fontSize: context.headingFontSize,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
+            ),
           ),
           SizedBox(height: context.cardPadding),
           _buildSummaryRow(l10n.subtotal, subtotal),
@@ -509,7 +682,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           Text(
             label,
             style: TextStyle(
-              fontSize: isTotal ? context.headingFontSize : context.bodyFontSize,
+              fontSize: isTotal
+                  ? context.headingFontSize
+                  : context.bodyFontSize,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
               color: AppTheme.charcoalGray,
             ),
@@ -517,7 +692,9 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           Text(
             'Rs. ${amount.toStringAsFixed(2)}',
             style: TextStyle(
-              fontSize: isTotal ? context.headingFontSize : context.bodyFontSize,
+              fontSize: isTotal
+                  ? context.headingFontSize
+                  : context.bodyFontSize,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
               color: isTotal ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
             ),
@@ -546,7 +723,10 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               l10n.cancel,
-              style: TextStyle(color: AppTheme.charcoalGray, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: AppTheme.charcoalGray,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           SizedBox(width: context.cardPadding),
@@ -554,14 +734,20 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
             onPressed: _isLoading ? null : _saveSale,
             child: _isLoading
                 ? SizedBox(
-              width: 4.w,
-              height: 4.w,
-              child: const CircularProgressIndicator(color: AppTheme.pureWhite, strokeWidth: 2),
-            )
+                    width: 4.w,
+                    height: 4.w,
+                    child: const CircularProgressIndicator(
+                      color: AppTheme.pureWhite,
+                      strokeWidth: 2,
+                    ),
+                  )
                 : Text(
-              widget.sale == null ? l10n.createSale : l10n.updateSale,
-              style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
-            ),
+                    widget.sale == null ? l10n.createSale : l10n.updateSale,
+                    style: TextStyle(
+                      color: AppTheme.pureWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -611,7 +797,10 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
 
     if (_saleItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.pleaseAddAtLeastOneSaleItem), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(l10n.pleaseAddAtLeastOneSaleItem),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -630,13 +819,13 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
         final saleItems = _saleItems
             .map(
               (item) => CreateSaleItemRequest(
-            productId: item.productId,
-            unitPrice: item.unitPrice,
-            quantity: item.quantity,
-            itemDiscount: item.itemDiscount,
-            customizationNotes: item.customizationNotes,
-          ),
-        )
+                productId: item.productId,
+                unitPrice: item.unitPrice,
+                quantity: item.quantity,
+                itemDiscount: item.itemDiscount,
+                customizationNotes: item.customizationNotes,
+              ),
+            )
             .toList();
 
         final request = CreateSaleRequest(
@@ -645,7 +834,8 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
           taxConfiguration: _taxConfiguration,
           paymentMethod: _selectedPaymentMethod,
           notes: _notesController.text.trim(),
-          saleItems: saleItems, amountPaid: _amountPaid,
+          saleItems: saleItems,
+          amountPaid: _amountPaid,
         );
 
         final success = await provider.createSale(request);
@@ -668,7 +858,10 @@ class _SalesFormDialogState extends State<SalesFormDialog> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.errorSavingSale(e.toString())), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(l10n.errorSavingSale(e.toString())),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {

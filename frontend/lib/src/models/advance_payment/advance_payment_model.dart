@@ -87,7 +87,15 @@ class AdvancePayment {
         date: DateTime.parse(json['date']),
         time: json['time'] ?? '00:00',
         receiptImagePath: json['receipt_image_path'],
-        remainingSalary: (json['remaining_salary'] is String) ? double.parse(json['remaining_salary']) : (json['remaining_salary'] ?? 0.0),
+        remainingSalary: (() {
+          double rem = (json['remaining_salary'] is String) ? double.tryParse(json['remaining_salary']) ?? 0.0 : ((json['remaining_salary'] as num?)?.toDouble() ?? 0.0);
+          if (rem == 0.0) {
+            double total = (json['total_salary'] is String) ? double.tryParse(json['total_salary']) ?? 0.0 : ((json['total_salary'] as num?)?.toDouble() ?? 0.0);
+            double amt = (json['amount'] is String) ? double.tryParse(json['amount']) ?? 0.0 : ((json['amount'] as num?)?.toDouble() ?? 0.0);
+            if (total > 0) return total - amt;
+          }
+          return rem;
+        })(),
         totalSalary: (json['total_salary'] is String) ? double.parse(json['total_salary']) : (json['total_salary'] ?? 0.0),
         isActive: json['is_active'] ?? true,
         createdAt: DateTime.parse(json['created_at']),

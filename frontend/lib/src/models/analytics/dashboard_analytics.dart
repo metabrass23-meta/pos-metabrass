@@ -148,7 +148,7 @@ class DashboardAnalyticsModel {
 
 class TopProduct {
   final String name;
-  final int quantity;
+  final double quantity;
   final double revenue;
 
   TopProduct({
@@ -160,7 +160,7 @@ class TopProduct {
   factory TopProduct.fromJson(Map<String, dynamic> json) {
     return TopProduct(
       name: json['name'] ?? '',
-      quantity: json['quantity'] ?? 0,
+      quantity: (json['quantity'] ?? 0).toDouble(),
       revenue: (json['revenue'] ?? 0).toDouble(),
     );
   }
@@ -270,9 +270,9 @@ class TrendingProduct {
   final String id;
   final String name;
   final String category;
-  final int sales;
+  final double sales;
   final double revenue;
-  final int stock;
+  final double stock;
   final String? image;
 
   TrendingProduct({
@@ -290,9 +290,9 @@ class TrendingProduct {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       category: json['category'] ?? '',
-      sales: json['sales'] ?? 0,
+      sales: (json['sales'] ?? 0).toDouble(),
       revenue: (json['revenue'] ?? 0).toDouble(),
-      stock: json['stock'] ?? 0,
+      stock: (json['stock'] ?? 0).toDouble(),
       image: json['image'],
     );
   }

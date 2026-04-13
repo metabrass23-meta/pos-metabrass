@@ -6,7 +6,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from decimal import Decimal, InvalidOperation
-from .models import Product
+from django.utils import timezone
+from .models import Product, StockReservation, StockChangeLog
 from .serializers import (
     ProductSerializer,
     ProductCreateSerializer,
@@ -36,7 +37,7 @@ def list_products(request):
         search = request.GET.get('search', '').strip()
         category_id = request.GET.get('category_id', '').strip()
         color = request.GET.get('color', '').strip()
-        fabric = request.GET.get('fabric', '').strip()
+        material = request.GET.get('material', '').strip()
         stock_level = request.GET.get('stock_level', '').strip()
         
         # Price range
@@ -65,9 +66,9 @@ def list_products(request):
         if color:
             products = products.filter(color__icontains=color)
         
-        # Apply fabric filter
-        if fabric:
-            products = products.filter(fabric__icontains=fabric)
+        # Apply material filter
+        if material:
+            products = products.filter(material__icontains=material)
         
         # Apply price range filter
         try:
@@ -129,7 +130,7 @@ def list_products(request):
                     'search': search,
                     'category_id': category_id,
                     'color': color,
-                    'fabric': fabric,
+                    'material': material,
                     'stock_level': stock_level,
                     'min_price': min_price,
                     'max_price': max_price,
@@ -392,7 +393,7 @@ def restore_product(request, product_id):
 @permission_classes([IsAuthenticated])
 def search_products(request):
     """
-    Search products by name, color, fabric, or category
+    Search products by name, color, material, or category
     """
     try:
         query = request.GET.get('q', '').strip()
@@ -715,7 +716,7 @@ def duplicate_product(request, product_id):
                 'detail': original_product.detail,
                 'price': original_product.price,
                 'color': original_product.color,
-                'fabric': original_product.fabric,
+                'material': original_product.material,
                 'pieces': original_product.pieces.copy(),
                 'quantity': 0,  # Start with 0 quantity for duplicate
                 'category': original_product.category,

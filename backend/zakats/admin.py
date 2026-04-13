@@ -265,7 +265,7 @@ class ZakatAdmin(admin.ModelAdmin):
             }
         
         # Recent Zakat entries (last 30 days)
-        thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
+        thirty_days_ago = timezone.localdate() - timezone.timedelta(days=30)
         recent_zakat = active_zakat.filter(date__gte=thirty_days_ago)
         recent_total = recent_zakat.aggregate(total=Sum('amount'))['total'] or 0
         recent_count = recent_zakat.count()

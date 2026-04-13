@@ -9,6 +9,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     created_by = serializers.StringRelatedField(read_only=True)
     created_by_id = serializers.IntegerField(read_only=True, source='created_by.id')
+    pieces = serializers.JSONField(required=False, default=list)
     
     # Category details
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -28,7 +29,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'price',
             'cost_price',
             'color',
-            'fabric',
+            'material',
             'pieces',
             'quantity',
             'barcode',
@@ -57,8 +58,8 @@ class ProductSerializer(serializers.ModelSerializer):
         # Remove empty strings and strip whitespace
         cleaned_pieces = [piece.strip() for piece in value if piece.strip()]
         
-        if not cleaned_pieces:
-            raise serializers.ValidationError("At least one piece is required.")
+        # if not cleaned_pieces:
+        #     raise serializers.ValidationError("At least one piece is required.")
         
         # Check for duplicates (case-insensitive)
         lower_pieces = [piece.lower() for piece in cleaned_pieces]
@@ -93,10 +94,10 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Color is required.")
         return value.strip().title()
 
-    def validate_fabric(self, value):
-        """Clean fabric field"""
+    def validate_material(self, value):
+        """Clean material field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Fabric is required.")
+            raise serializers.ValidationError("Material is required.")
         return value.strip().title()
 
     def validate_detail(self, value):
@@ -110,6 +111,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating products"""
     
     category = serializers.UUIDField(write_only=True, help_text="Category UUID")
+    pieces = serializers.JSONField(required=False, default=list)
     
     class Meta:
         model = Product
@@ -119,7 +121,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             'price',
             'cost_price',
             'color',
-            'fabric',
+            'material',
             'pieces',
             'quantity',
             'barcode',
@@ -134,8 +136,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         
         cleaned_pieces = [piece.strip() for piece in value if piece.strip()]
         
-        if not cleaned_pieces:
-            raise serializers.ValidationError("At least one piece is required.")
+        # if not cleaned_pieces:
+        #     raise serializers.ValidationError("At least one piece is required.")
         
         # Check for duplicates (case-insensitive)
         lower_pieces = [piece.lower() for piece in cleaned_pieces]
@@ -178,10 +180,10 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Color is required.")
         return value.strip().title()
 
-    def validate_fabric(self, value):
-        """Clean fabric field"""
+    def validate_material(self, value):
+        """Clean material field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Fabric is required.")
+            raise serializers.ValidationError("Material is required.")
         return value.strip().title()
 
     def validate_detail(self, value):
@@ -210,6 +212,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating products"""
     
     category = serializers.UUIDField(write_only=True, help_text="Category UUID", required=False)
+    pieces = serializers.JSONField(required=False, default=list)
     
     class Meta:
         model = Product
@@ -219,7 +222,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             'price',
             'cost_price',
             'color',
-            'fabric',
+            'material',
             'pieces',
             'quantity',
             'category'
@@ -232,8 +235,8 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
         
         cleaned_pieces = [piece.strip() for piece in value if piece.strip()]
         
-        if not cleaned_pieces:
-            raise serializers.ValidationError("At least one piece is required.")
+        # if not cleaned_pieces:
+        #     raise serializers.ValidationError("At least one piece is required.")
         
         # Check for duplicates (case-insensitive)
         lower_pieces = [piece.lower() for piece in cleaned_pieces]
@@ -276,10 +279,10 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Color is required.")
         return value.strip().title()
 
-    def validate_fabric(self, value):
-        """Clean fabric field"""
+    def validate_material(self, value):
+        """Clean material field"""
         if not value or not value.strip():
-            raise serializers.ValidationError("Fabric is required.")
+            raise serializers.ValidationError("Material is required.")
         return value.strip().title()
 
     def validate_detail(self, value):
@@ -317,7 +320,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             'price',
             'cost_price',
             'color',
-            'fabric',
+            'material',
             'pieces',  # Added
             'quantity',
             'barcode',  # Added barcode field
@@ -358,7 +361,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'price',
             'cost_price',
             'color',
-            'fabric',
+            'material',
             'pieces',
             'quantity',
             'barcode',  # Added barcode field

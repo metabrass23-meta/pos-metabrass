@@ -25,8 +25,10 @@ class SalesPage extends StatefulWidget {
 
 class _SalesPageState extends State<SalesPage> {
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _customerSearchController = TextEditingController();
+  final TextEditingController _customerSearchController =
+      TextEditingController();
   String _selectedCategory = 'All';
+  String _selectedStatus = 'All Status';
 
   @override
   void initState() {
@@ -173,14 +175,16 @@ class _SalesPageState extends State<SalesPage> {
               if (provider.sales.isEmpty) {
                 return Center(child: Text('No sales available'));
               }
-              
+
               return ListView.builder(
                 itemCount: provider.sales.length,
                 itemBuilder: (context, index) {
                   final sale = provider.sales[index];
                   return ListTile(
                     title: Text('Invoice #${sale.invoiceNumber}'),
-                    subtitle: Text('${sale.customerName} - PKR ${sale.grandTotal.toStringAsFixed(0)}'),
+                    subtitle: Text(
+                      '${sale.customerName} - PKR ${sale.grandTotal.toStringAsFixed(0)}',
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       if (printType == 'pdf') {
@@ -260,11 +264,11 @@ class _SalesPageState extends State<SalesPage> {
           Container(
             width: ResponsiveBreakpoints.responsive(
               context,
-              tablet: 25.w,
-              small: 40.w,
-              medium: 25.w,
-              large: 30.w,
-              ultrawide: 25.w,
+              tablet: 18.w,
+              small: 30.w,
+              medium: 18.w,
+              large: 22.w,
+              ultrawide: 18.w,
             ),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
@@ -357,7 +361,6 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 if (!context.isTablet) ...[
                   SizedBox(height: context.cardPadding / 4),
-                
                 ],
               ],
             ),
@@ -509,11 +512,11 @@ class _SalesPageState extends State<SalesPage> {
   }
 
   Widget _buildQuickStat(
-      String title,
-      String value,
-      IconData icon,
-      Color color,
-      ) {
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(context.smallPadding),
       decoration: BoxDecoration(
@@ -680,7 +683,7 @@ class _SalesPageState extends State<SalesPage> {
                     ),
 
                   SizedBox(width: context.smallPadding),
-                  
+
                   // Recalculate Button
                   Material(
                     color: Colors.transparent,
@@ -755,7 +758,7 @@ class _SalesPageState extends State<SalesPage> {
             Expanded(
               flex: 2,
               child: Container(
-                height: context.buttonHeight / 1.5,
+                height: context.buttonHeight / 1.2,
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
                   borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -785,9 +788,10 @@ class _SalesPageState extends State<SalesPage> {
                       size: context.iconSize('medium'),
                     ),
                     border: InputBorder.none,
+                    isDense: true,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: context.cardPadding / 2,
-                      vertical: context.cardPadding / 2,
+                      vertical: context.cardPadding / 4,
                     ),
                   ),
                 ),
@@ -797,43 +801,49 @@ class _SalesPageState extends State<SalesPage> {
             SizedBox(width: context.cardPadding),
 
             // Status Filter
-            if (!context.isTablet)
-              Container(
-                height: context.buttonHeight / 1.5,
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: 'All Status',
-                    hint: Text(AppLocalizations.of(context)!.status),
-                    onChanged: (value) {
-                      // Implement status filtering
-                    },
-                    items: ['All Status', 'Paid', 'Partial', 'Unpaid'].map((
+            Container(
+              height: context.buttonHeight / 1.5,
+              padding: EdgeInsets.symmetric(
+                horizontal: context.cardPadding / 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.pureWhite,
+                borderRadius: BorderRadius.circular(context.borderRadius()),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedStatus,
+                  hint: Text(AppLocalizations.of(context)?.status ?? 'Status'),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedStatus = value;
+                      });
+                      
+                      final statusFilter = value == 'All Status' ? null : value.toUpperCase();
+                      context.read<SalesProvider>().filterByStatus(statusFilter);
+                    }
+                  },
+                  items: ['All Status', 'Paid', 'Partial', 'Unpaid'].map((
+                    status,
+                  ) {
+                    return DropdownMenuItem(
+                      value: status,
+                      child: Text(
                         status,
-                        ) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(
-                          status,
-                          style: TextStyle(
-                            fontSize: context.bodyFontSize,
-                            color: AppTheme.charcoalGray,
-                          ),
+                        style: TextStyle(
+                          fontSize: context.bodyFontSize,
+                          color: AppTheme.charcoalGray,
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
+            ),
 
-            if (!context.isTablet) SizedBox(width: context.cardPadding),
+            SizedBox(width: context.cardPadding),
 
             // Export Button
             Container(
@@ -866,17 +876,15 @@ class _SalesPageState extends State<SalesPage> {
                           color: Colors.green,
                           size: context.iconSize('medium'),
                         ),
-                        if (!context.isTablet) ...[
-                          SizedBox(width: context.smallPadding),
-                          Text(
-                            AppLocalizations.of(context)!.export,
-                            style: TextStyle(
-                              fontSize: context.bodyFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.green,
-                            ),
+                        SizedBox(width: context.smallPadding),
+                        Text(
+                          AppLocalizations.of(context)?.export ?? 'Export',
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.green,
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -909,7 +917,7 @@ class _SalesPageState extends State<SalesPage> {
       children: [
         // Search bar
         Container(
-          height: context.buttonHeight / 1.5,
+          height: context.buttonHeight / 1.2,
           decoration: BoxDecoration(
             color: AppTheme.pureWhite,
             borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -941,21 +949,22 @@ class _SalesPageState extends State<SalesPage> {
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Colors.grey[500],
-                  size: context.iconSize('small'),
-                ),
-              )
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: Colors.grey[500],
+                        size: context.iconSize('small'),
+                      ),
+                    )
                   : null,
               border: InputBorder.none,
+              isDense: true,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: context.cardPadding / 2,
-                vertical: context.cardPadding / 2,
+                vertical: context.cardPadding / 4,
               ),
             ),
           ),
@@ -965,12 +974,13 @@ class _SalesPageState extends State<SalesPage> {
 
         // Category filters
         SizedBox(
-          height: context.buttonHeight / 1.8,
+          height:
+              context.buttonHeight / 1.2, // Increased height from 1.8 to 1.2
           child: Consumer<SalesProvider>(
             builder: (context, provider, child) {
               final categories = [
                 'All',
-                ...provider.products.map((p) => p.fabric).toSet().toList(),
+                ...provider.products.map((p) => p.material).toSet().toList(),
               ];
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -990,9 +1000,15 @@ class _SalesPageState extends State<SalesPage> {
                           context.borderRadius(),
                         ),
                         child: Container(
+                          constraints: BoxConstraints(
+                            minWidth: 60.0, // Minimum width
+                            maxWidth:
+                                120.0, // Maximum width to prevent overflow
+                          ),
                           padding: EdgeInsets.symmetric(
-                            horizontal: context.cardPadding,
-                            vertical: context.smallPadding,
+                            horizontal:
+                                context.cardPadding, // Increased padding
+                            vertical: context.smallPadding, // Increased padding
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
@@ -1008,14 +1024,19 @@ class _SalesPageState extends State<SalesPage> {
                               width: 1,
                             ),
                           ),
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected
-                                  ? AppTheme.pureWhite
-                                  : AppTheme.charcoalGray,
+                          child: Center(
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                fontSize: context.captionFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: isSelected
+                                    ? AppTheme.pureWhite
+                                    : AppTheme.charcoalGray,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
@@ -1038,7 +1059,7 @@ class _SalesPageState extends State<SalesPage> {
         Expanded(
           flex: 2,
           child: Container(
-            height: context.buttonHeight / 1.5,
+            height: context.buttonHeight / 1.2,
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
               borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -1070,21 +1091,22 @@ class _SalesPageState extends State<SalesPage> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    Icons.clear_rounded,
-                    color: Colors.grey[500],
-                    size: context.iconSize('small'),
-                  ),
-                )
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          Icons.clear_rounded,
+                          color: Colors.grey[500],
+                          size: context.iconSize('small'),
+                        ),
+                      )
                     : null,
                 border: InputBorder.none,
+                isDense: true,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: context.cardPadding / 2,
-                  vertical: context.cardPadding / 2,
+                  vertical: context.cardPadding / 4,
                 ),
               ),
             ),
@@ -1097,7 +1119,7 @@ class _SalesPageState extends State<SalesPage> {
         Expanded(
           flex: 1,
           child: Container(
-            height: context.buttonHeight / 1.5,
+            height: context.buttonHeight / 1.2,
             padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
@@ -1108,7 +1130,7 @@ class _SalesPageState extends State<SalesPage> {
               builder: (context, provider, child) {
                 final categories = [
                   'All',
-                  ...provider.products.map((p) => p.fabric).toSet().toList(),
+                  ...provider.products.map((p) => p.material).toSet().toList(),
                 ];
                 return DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
@@ -1119,16 +1141,16 @@ class _SalesPageState extends State<SalesPage> {
                     items: categories
                         .map(
                           (category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                            fontSize: context.bodyFontSize,
-                            color: AppTheme.charcoalGray,
+                            value: category,
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                fontSize: context.bodyFontSize,
+                                color: AppTheme.charcoalGray,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )
+                        )
                         .toList(),
                   ),
                 );

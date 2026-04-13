@@ -406,9 +406,13 @@ class Payment(models.Model):
             self.payer_id = self.order.customer.id
         
         # Set payer type for sale
-        elif self.sale and hasattr(self.sale, 'customer'):
+        elif self.sale:
             self.payer_type = 'CUSTOMER'
-            self.payer_id = self.sale.customer.id
+            # Safe access to customer for walk-in sales
+            if hasattr(self.sale, 'customer') and self.sale.customer:
+                self.payer_id = self.sale.customer.id
+            else:
+                self.payer_id = None
         
         self.full_clean()
         super().save(*args, **kwargs)

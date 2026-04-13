@@ -222,7 +222,7 @@ def expense_statistics(request):
     try:
         # Get date range parameters
         days = int(request.GET.get('days', 30))
-        end_date = date.today()
+        end_date = timezone.localdate()
         start_date = end_date - timedelta(days=days)
         
         # Get expenses in date range
@@ -311,8 +311,8 @@ def expense_statistics(request):
 def expense_monthly_summary(request):
     """Get monthly expense summary"""
     try:
-        year = int(request.GET.get('year', datetime.now().year))
-        month = int(request.GET.get('month', datetime.now().month))
+        year = int(request.GET.get('year', timezone.localdate().year))
+        month = int(request.GET.get('month', timezone.localdate().month))
         
         # Get expenses for specific month
         start_date = date(year, month, 1)
@@ -679,7 +679,7 @@ def expenses_by_date_range(request):
 def recent_expenses(request):
     """Get recent expenses (last 30 days)"""
     try:
-        thirty_days_ago = timezone.now().date() - timedelta(days=30)
+        thirty_days_ago = timezone.localdate() - timedelta(days=30)
         expenses = Expense.objects.active().filter(date__gte=thirty_days_ago)
         
         # Apply pagination

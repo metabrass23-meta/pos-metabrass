@@ -22,7 +22,9 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
   // Controllers
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _emailController = TextEditingController(
+    text: 'customer@gmail.com',
+  ); // Default email
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _countryController = TextEditingController(text: 'Pakistan');
@@ -42,11 +44,23 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
   // Options
   final List<String> _customerTypes = ['INDIVIDUAL', 'BUSINESS'];
   final List<String> _commonCities = [
-    'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad',
-    'Multan', 'Peshawar', 'Quetta'
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
   ];
   final List<String> _commonCountries = [
-    'Pakistan', 'UAE', 'Saudi Arabia', 'UK', 'USA', 'Canada', 'Australia'
+    'Pakistan',
+    'UAE',
+    'Saudi Arabia',
+    'UK',
+    'USA',
+    'Canada',
+    'Australia',
   ];
 
   @override
@@ -115,10 +129,13 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
             ? null
             : _countryController.text.trim(),
         customerType: _selectedCustomerType,
-        businessName: _showBusinessFields && _businessNameController.text.trim().isNotEmpty
+        businessName:
+            _showBusinessFields &&
+                _businessNameController.text.trim().isNotEmpty
             ? _businessNameController.text.trim()
             : null,
-        taxNumber: _showBusinessFields && _taxNumberController.text.trim().isNotEmpty
+        taxNumber:
+            _showBusinessFields && _taxNumberController.text.trim().isNotEmpty
             ? _taxNumberController.text.trim()
             : null,
         notes: _notesController.text.trim().isEmpty
@@ -234,7 +251,9 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -247,9 +266,7 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildHeader(),
-                    Flexible(
-                      child: _buildFormContent(),
-                    ),
+                    Flexible(child: _buildFormContent()),
                   ],
                 ),
               ),
@@ -293,7 +310,9 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.addCustomer : l10n.addNewCustomer,
+                  context.shouldShowCompactLayout
+                      ? l10n.addCustomer
+                      : l10n.addNewCustomer,
                   style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -420,55 +439,67 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
           ),
           SizedBox(height: context.cardPadding),
           Row(
-            children: _customerTypes.map((type) => Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: type == _customerTypes.last ? 0 : context.smallPadding,
-                ),
-                child: InkWell(
-                  onTap: () => _handleCustomerTypeChange(type),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  child: Container(
-                    padding: EdgeInsets.all(context.cardPadding / 1.5),
-                    decoration: BoxDecoration(
-                      color: _selectedCustomerType == type
-                          ? AppTheme.primaryMaroon.withOpacity(0.1)
-                          : Colors.grey.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(context.borderRadius()),
-                      border: Border.all(
-                        color: _selectedCustomerType == type
-                            ? AppTheme.primaryMaroon
-                            : Colors.grey.shade300,
-                        width: _selectedCustomerType == type ? 2 : 1,
+            children: _customerTypes
+                .map(
+                  (type) => Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: type == _customerTypes.last
+                            ? 0
+                            : context.smallPadding,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          type == 'BUSINESS' ? Icons.business : Icons.person,
-                          color: _selectedCustomerType == type
-                              ? AppTheme.primaryMaroon
-                              : Colors.grey[600],
-                          size: context.iconSize('small'),
+                      child: InkWell(
+                        onTap: () => _handleCustomerTypeChange(type),
+                        borderRadius: BorderRadius.circular(
+                          context.borderRadius(),
                         ),
-                        SizedBox(width: context.smallPadding / 2),
-                        Text(
-                          type == 'BUSINESS' ? 'Business' : 'Individual',
-                          style: TextStyle(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w600,
+                        child: Container(
+                          padding: EdgeInsets.all(context.cardPadding / 1.5),
+                          decoration: BoxDecoration(
                             color: _selectedCustomerType == type
-                                ? AppTheme.primaryMaroon
-                                : Colors.grey[600],
+                                ? AppTheme.primaryMaroon.withOpacity(0.1)
+                                : Colors.grey.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius(),
+                            ),
+                            border: Border.all(
+                              color: _selectedCustomerType == type
+                                  ? AppTheme.primaryMaroon
+                                  : Colors.grey.shade300,
+                              width: _selectedCustomerType == type ? 2 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                type == 'BUSINESS'
+                                    ? Icons.business
+                                    : Icons.person,
+                                color: _selectedCustomerType == type
+                                    ? AppTheme.primaryMaroon
+                                    : Colors.grey[600],
+                                size: context.iconSize('small'),
+                              ),
+                              SizedBox(width: context.smallPadding / 2),
+                              Text(
+                                type == 'BUSINESS' ? 'Business' : 'Individual',
+                                style: TextStyle(
+                                  fontSize: context.subtitleFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: _selectedCustomerType == type
+                                      ? AppTheme.primaryMaroon
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            )).toList(),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -544,7 +575,9 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
             if (value != null && value.isNotEmpty) {
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(
+                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+              ).hasMatch(value)) {
                 return 'Please enter a valid email address';
               }
             }
@@ -581,13 +614,9 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
   Widget _buildLocationFieldsRow() {
     return Row(
       children: [
-        Expanded(
-          child: _buildCityField(),
-        ),
+        Expanded(child: _buildCityField()),
         SizedBox(width: context.cardPadding),
-        Expanded(
-          child: _buildCountryField(),
-        ),
+        Expanded(child: _buildCountryField()),
       ],
     );
   }
@@ -616,10 +645,15 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
         Wrap(
           spacing: context.smallPadding / 2,
           runSpacing: context.smallPadding / 4,
-          children: _commonCities.take(4).map((city) => _buildQuickSelectChip(
-            label: city,
-            onTap: () => setState(() => _cityController.text = city),
-          )).toList(),
+          children: _commonCities
+              .take(4)
+              .map(
+                (city) => _buildQuickSelectChip(
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -639,10 +673,16 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
         Wrap(
           spacing: context.smallPadding / 2,
           runSpacing: context.smallPadding / 4,
-          children: _commonCountries.take(4).map((country) => _buildQuickSelectChip(
-            label: country,
-            onTap: () => setState(() => _countryController.text = country),
-          )).toList(),
+          children: _commonCountries
+              .take(4)
+              .map(
+                (country) => _buildQuickSelectChip(
+                  label: country,
+                  onTap: () =>
+                      setState(() => _countryController.text = country),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -665,15 +705,17 @@ class _AddCustomerDialogState extends State<AddCustomerDialog>
                 : 'Enter registered business name',
             controller: _businessNameController,
             prefixIcon: Icons.business_center_outlined,
-            validator: _showBusinessFields ? (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Business name is required for business customers';
-              }
-              if (value!.length > 200) {
-                return 'Business name must be less than 200 characters';
-              }
-              return null;
-            } : null,
+            validator: _showBusinessFields
+                ? (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Business name is required for business customers';
+                    }
+                    if (value!.length > 200) {
+                      return 'Business name must be less than 200 characters';
+                    }
+                    return null;
+                  }
+                : null,
           ),
           SizedBox(height: context.cardPadding),
 

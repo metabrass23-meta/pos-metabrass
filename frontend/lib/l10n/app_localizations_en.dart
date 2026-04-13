@@ -9,16 +9,16 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Al Noor - Premium POS';
+  String get appTitle => 'MetaBrass - Premium POS';
 
   @override
   String get welcomeBack => 'Welcome Back to';
 
   @override
-  String get brandName => 'Al Noor';
+  String get brandName => 'MetaBrass';
 
   @override
-  String get tagline => 'Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.';
+  String get tagline => 'Elegant designs for your modern home.\nExperience luxury with our premium bathroom and sanitary collections.';
 
   @override
   String get signIn => 'Sign In';
@@ -401,7 +401,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchProducts => 'Search products...';
 
   @override
-  String get searchProductsExpanded => 'Search products by name, color, fabric...';
+  String get searchProductsExpanded => 'Search products by name, brand, material...';
 
   @override
   String get filter => 'Filter';
@@ -626,13 +626,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logoutError => 'Logged out locally due to an error.';
 
   @override
-  String get brandTagline => 'Premium POS';
+  String get brandTagline => 'Premium Sanitary POS';
 
   @override
-  String get welcomeToPos => 'Welcome to Al Noor POS';
+  String get welcomeToPos => 'Welcome to MetaBrass POS';
 
   @override
-  String get welcomeTagline => 'Quality Spare Parts Management - Your Complete Automotive Solution';
+  String get welcomeTagline => 'Premium Sanitary Management - Elegant Designs & Quality Fittings';
 
   @override
   String get today => 'Today';
@@ -1055,13 +1055,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qty => 'Qty';
 
   @override
-  String get colorName => 'Color Name';
+  String get colorName => 'Finish/Color';
 
   @override
-  String get fabricType => 'Fabric Type';
+  String get fabricType => 'Material Type';
 
   @override
-  String get fabricName => 'Fabric Name';
+  String get fabricName => 'Material Name';
 
   @override
   String get pleaseSelectAtLeastOnePiece => 'Please select at least one piece';
@@ -2367,12 +2367,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNotes => 'No notes';
 
   @override
-  String showingZakatRecords(int start, int end, int total) {
+  String showingZakatRecords(num start, num end, num total) {
     return 'Showing $start-$end of $total zakat records';
   }
 
   @override
-  String pageOfPages(int current, int total) {
+  String pageOfPages(num current, num total) {
     return '$current of $total';
   }
 
@@ -2731,12 +2731,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get productProfitabilityAnalysis => 'Product Profitability Analysis';
 
   @override
-  String analyzingProductsAcrossDifferentCategories(int count) {
+  String analyzingProductsAcrossDifferentCategories(num count) {
     return 'Analyzing $count products across different categories';
   }
 
   @override
-  String productsCount(int count) {
+  String productsCount(num count) {
     return '$count Products';
   }
 
@@ -2903,7 +2903,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectExpectedRepaymentDate => 'Select Expected Repayment Date';
 
   @override
-  String borrowingPeriodDays(int days) {
+  String borrowingPeriodDays(num days) {
     return 'Borrowing period: $days days';
   }
 
@@ -2941,7 +2941,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expectedRepayment => 'Expected Repayment';
 
   @override
-  String daysCount(int count) {
+  String daysCount(num count) {
     return '$count days';
   }
 
@@ -3006,7 +3006,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creditor => 'Creditor';
 
   @override
-  String showingPayableRecords(int start, int end, int total) {
+  String showingPayableRecords(num start, num end, num total) {
     return 'Showing $start-$end of $total payable records';
   }
 
@@ -3073,7 +3073,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String daysOverdueCount(int count) {
+  String daysOverdueCount(num count) {
     return '$count days overdue';
   }
 
@@ -3129,10 +3129,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get costPrice => 'Cost Price';
 
   @override
-  String get color => 'Color';
+  String get color => 'Finish';
 
   @override
-  String get fabric => 'Fabric';
+  String get fabric => 'Material';
 
   @override
   String get stockStatus => 'Stock Status';
@@ -3162,7 +3162,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yesterday => 'Yesterday';
 
   @override
-  String daysAgo(int count) {
+  String daysAgo(num count) {
     return '$count days ago';
   }
 
@@ -3170,7 +3170,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get oneWeekAgo => '1 week ago';
 
   @override
-  String weeksAgo(int count) {
+  String weeksAgo(num count) {
     return '$count weeks ago';
   }
 
@@ -3178,7 +3178,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get oneMonthAgo => '1 month ago';
 
   @override
-  String monthsAgo(int count) {
+  String monthsAgo(num count) {
     return '$count months ago';
   }
 
@@ -3186,7 +3186,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get oneYearAgo => '1 year ago';
 
   @override
-  String yearsAgo(int count) {
+  String yearsAgo(num count) {
     return '$count years ago';
   }
 
@@ -3206,7 +3206,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setCostPriceToCalculateProfitMargin => 'Set cost price to calculate profit margin';
 
   @override
-  String unitsCount(int count) {
+  String unitsCount(num count) {
     return '$count units';
   }
 
@@ -4470,7 +4470,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseAcceptTerms => 'Please accept the terms and conditions';
 
   @override
-  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to Al Noor.';
+  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to MetaBrass.';
 
   @override
   String get registrationFailedMessage => 'Registration failed. Please check the details below.';
@@ -4898,7 +4898,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inventoryImpact => 'Inventory Impact';
 
   @override
-  String quantityWillBeAffected(int quantity) {
+  String quantityWillBeAffected(num quantity) {
     return 'Quantity $quantity will be affected';
   }
 
@@ -5002,8 +5002,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get minimumQuantity => 'Minimum quantity';
 
   @override
-  String maxQuantity(int max) {
-    return 'Max Quantity';
+  String maxQuantity(num quantity) {
+    return 'Max Quantity $quantity';
   }
 
   @override
@@ -5130,8 +5130,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addedToCart => 'added to cart';
 
   @override
-  String stockAvailable(int quantity) {
-    return 'Stock';
+  String stockAvailable(num quantity) {
+    return 'Stock $quantity';
   }
 
   @override
@@ -5147,9 +5147,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itemDiscountOptional => 'Item Discount (Optional)';
 
   @override
-  String clearDiscount(String amount) {
-    return 'Clear Discount';
-  }
+  String get clearDiscount => 'Clear Discount';
 
   @override
   String get specialInstructions => 'Special Instructions';
@@ -5622,7 +5620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableDarkThemeForApplication => 'Enable dark theme for the application';
 
   @override
-  String get alNoorFashionPOS => 'Al Noor POS';
+  String get alNoorFashionPOS => 'MetaBrass POS';
 
   @override
   String get version => 'Version';
@@ -5851,7 +5849,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get additionalRequirementsHint => 'Any special requirements, measurements, design preferences, or delivery instructions...';
 
   @override
-  String basePriceQuantity(int quantity) {
+  String basePriceQuantity(num quantity) {
     return 'Base Price × $quantity:';
   }
 
@@ -5961,7 +5959,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saleSummaryReadOnly => 'Sale Summary (Read-Only)';
 
   @override
-  String itemsCount(int count) {
+  String itemsCount(num count) {
     return '$count items';
   }
 
@@ -6169,12 +6167,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentWorkflowActivities => 'Recent Workflow Activities';
 
   @override
-  String minutesAgo(int minutes) {
+  String minutesAgo(num minutes) {
     return '${minutes}m ago';
   }
 
   @override
-  String hoursAgo(int hours) {
+  String hoursAgo(num hours) {
     return '${hours}h ago';
   }
 

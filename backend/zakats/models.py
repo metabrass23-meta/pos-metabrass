@@ -35,8 +35,7 @@ class Zakat(models.Model):
     """Zakat model for tracking Islamic charitable giving"""
     
     AUTHORIZATION_CHOICES = [
-        ('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'),
-        ('Mr Huzaifa', 'Mr Huzaifa'),
+            ('MetaBrass Admin', 'MetaBrass Admin'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -104,7 +103,7 @@ class Zakat(models.Model):
         """Days since Zakat transaction was recorded"""
         if not self.date:
             return 0
-        return (timezone.now().date() - self.date).days
+        return (timezone.localdate() - self.date).days
     
     @property
     def formatted_amount(self):
@@ -148,7 +147,7 @@ class Zakat(models.Model):
         from django.core.exceptions import ValidationError
         
         # Date cannot be in the future
-        if self.date > timezone.now().date():
+        if self.date > timezone.localdate():
             raise ValidationError({'date': 'Date cannot be in the future.'})
         
         # Amount must be positive

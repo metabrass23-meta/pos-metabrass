@@ -16,7 +16,8 @@ class ZakatFilterDialog extends StatefulWidget {
   State<ZakatFilterDialog> createState() => _ZakatFilterDialogState();
 }
 
-class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTickerProviderStateMixin {
+class _ZakatFilterDialogState extends State<ZakatFilterDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -31,18 +32,37 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   final TextEditingController _beneficiaryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _authorityOptions = ['Mr. Shahzain Baloch', 'Mr Sheikh Huzaifa'];
+  final List<String> _authorityOptions = [
+    'Mr Sheikh Parwaiz Maqbool',
+    'Mr Sheikh Zain Maqbool',
+  ];
 
-  final List<String> _commonBeneficiaries = ['Esha', 'Faatima', 'sadfg', 'Family', 'Orphanage', 'Mosque', 'School', 'Hospital'];
+  final List<String> _commonBeneficiaries = [
+    'Esha',
+    'Faatima',
+    'sadfg',
+    'Family',
+    'Orphanage',
+    'Mosque',
+    'School',
+    'Hospital',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     final provider = context.read<ZakatProvider>();
     _selectedBeneficiary = provider.selectedBeneficiary;
@@ -69,7 +89,9 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
   void _handleApplyFilters() async {
     final provider = context.read<ZakatProvider>();
 
-    final beneficiary = _beneficiaryController.text.trim().isEmpty ? null : _beneficiaryController.text.trim();
+    final beneficiary = _beneficiaryController.text.trim().isEmpty
+        ? null
+        : _beneficiaryController.text.trim();
     final search = _searchController.text.trim();
 
     if (beneficiary != provider.selectedBeneficiary) {
@@ -173,14 +195,27 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 98.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 95.w,
+                  small: 98.w,
+                  medium: 80.w,
+                  large: 70.w,
+                  ultrawide: 60.w,
+                ),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -204,7 +239,9 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -214,8 +251,15 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.filter_alt_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.filter_alt_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
 
           SizedBox(width: context.cardPadding),
@@ -255,7 +299,11 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -273,23 +321,43 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildFilterSection(title: l10n.searchZakatRecords, icon: Icons.search_outlined, child: _buildSearchFilter()),
+            _buildFilterSection(
+              title: l10n.searchZakatRecords,
+              icon: Icons.search_outlined,
+              child: _buildSearchFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.recordStatus, icon: Icons.flag_outlined, child: _buildStatusFilter()),
+            _buildFilterSection(
+              title: l10n.recordStatus,
+              icon: Icons.flag_outlined,
+              child: _buildStatusFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.beneficiary, icon: Icons.person_outline, child: _buildBeneficiaryFilter()),
+            _buildFilterSection(
+              title: l10n.beneficiary,
+              icon: Icons.person_outline,
+              child: _buildBeneficiaryFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.authorizationAuthority, icon: Icons.verified_user_outlined, child: _buildAuthorityFilter()),
+            _buildFilterSection(
+              title: l10n.authorizationAuthority,
+              icon: Icons.verified_user_outlined,
+              child: _buildAuthorityFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.dateRange, icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
+            _buildFilterSection(
+              title: l10n.dateRange,
+              icon: Icons.date_range_outlined,
+              child: _buildDateRangeFilter(),
+            ),
 
             SizedBox(height: context.mainPadding),
 
@@ -307,7 +375,11 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
     );
   }
 
-  Widget _buildFilterSection({required String title, required IconData icon, required Widget child}) {
+  Widget _buildFilterSection({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -320,11 +392,19 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         children: [
           Row(
             children: [
-              Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(
+                icon,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -340,11 +420,21 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
 
     return TextFormField(
       controller: _searchController,
-      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      style: TextStyle(
+        fontSize: context.bodyFontSize,
+        color: AppTheme.charcoalGray,
+      ),
       decoration: InputDecoration(
         hintText: l10n.searchByNameDescriptionBeneficiaryOrNotes,
-        hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
-        prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
+        hintStyle: TextStyle(
+          fontSize: context.bodyFontSize,
+          color: Colors.grey[500],
+        ),
+        prefixIcon: Icon(
+          Icons.search,
+          color: Colors.grey[500],
+          size: context.iconSize('medium'),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -353,7 +443,10 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           borderRadius: BorderRadius.circular(context.borderRadius()),
           borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: context.cardPadding,
+          vertical: context.cardPadding / 2,
+        ),
       ),
       onChanged: (value) {
         setState(() {
@@ -377,7 +470,13 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           },
           title: Text(
             l10n.showInactiveRecordsOnly,
-            style: TextStyle(fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(context), fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+            style: TextStyle(
+              fontSize: ResponsiveBreakpoints.getDashboardSubtitleFontSize(
+                context,
+              ),
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoalGray,
+            ),
           ),
           activeColor: AppTheme.primaryMaroon,
           dense: true,
@@ -386,15 +485,27 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
         if (_showInactiveOnly)
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
+            ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.orange, size: context.iconSize('small')),
+                Icon(
+                  Icons.info_outline,
+                  color: Colors.orange,
+                  size: context.iconSize('small'),
+                ),
                 SizedBox(width: context.smallPadding),
                 Expanded(
                   child: Text(
                     l10n.onlyDeactivatedZakatRecordsWillBeShown,
-                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.orange[700]),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      color: Colors.orange[700],
+                    ),
                   ),
                 ),
               ],
@@ -411,20 +522,36 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
       children: [
         TextFormField(
           controller: _beneficiaryController,
-          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+          style: TextStyle(
+            fontSize: context.bodyFontSize,
+            color: AppTheme.charcoalGray,
+          ),
           decoration: InputDecoration(
             hintText: l10n.enterBeneficiaryName,
-            hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
-            prefixIcon: Icon(Icons.person_outline, color: Colors.grey[500], size: context.iconSize('medium')),
+            hintStyle: TextStyle(
+              fontSize: context.bodyFontSize,
+              color: Colors.grey[500],
+            ),
+            prefixIcon: Icon(
+              Icons.person_outline,
+              color: Colors.grey[500],
+              size: context.iconSize('medium'),
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryMaroon,
+                width: 2,
+              ),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: context.cardPadding,
+              vertical: context.cardPadding / 2,
+            ),
           ),
           onChanged: (value) {
             setState(() {
@@ -437,7 +564,13 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
           spacing: context.smallPadding / 2,
           runSpacing: context.smallPadding / 4,
           children: _commonBeneficiaries
-              .map((beneficiary) => _buildQuickSelectChip(label: beneficiary, onTap: () => setState(() => _beneficiaryController.text = beneficiary)))
+              .map(
+                (beneficiary) => _buildQuickSelectChip(
+                  label: beneficiary,
+                  onTap: () =>
+                      setState(() => _beneficiaryController.text = beneficiary),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -451,11 +584,15 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
       children: [
         Text(
           l10n.selectAuthorizationAuthority,
-          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(
+            fontSize: context.subtitleFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.charcoalGray,
+          ),
         ),
         SizedBox(height: context.smallPadding),
         ...(_authorityOptions.map(
-              (authority) => RadioListTile<String>(
+          (authority) => RadioListTile<String>(
             value: authority,
             groupValue: _selectedAuthority,
             onChanged: (value) {
@@ -465,7 +602,11 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
             },
             title: Text(
               authority,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
             ),
             activeColor: AppTheme.primaryMaroon,
             dense: true,
@@ -477,10 +618,17 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
               _selectedAuthority = null;
             });
           },
-          icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
+          icon: Icon(
+            Icons.clear,
+            color: Colors.grey[600],
+            size: context.iconSize('small'),
+          ),
           label: Text(
             l10n.clearAuthorityFilter,
-            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: context.captionFontSize,
+              color: Colors.grey[600],
+            ),
           ),
         ),
       ],
@@ -509,11 +657,19 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                          Icon(
+                            Icons.date_range_rounded,
+                            color: AppTheme.primaryMaroon,
+                            size: context.iconSize('medium'),
+                          ),
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.selectDateRange,
-                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                            style: TextStyle(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primaryMaroon,
+                            ),
                           ),
                         ],
                       ),
@@ -524,7 +680,9 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                             : l10n.noDateRangeSelected,
                         style: TextStyle(
                           fontSize: context.captionFontSize,
-                          color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
+                          color: _dateFrom != null && _dateTo != null
+                              ? AppTheme.charcoalGray
+                              : Colors.grey[500],
                         ),
                       ),
                     ],
@@ -546,10 +704,17 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
                       _dateTo = null;
                     });
                   },
-                  icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
+                  icon: Icon(
+                    Icons.clear,
+                    color: Colors.red[600],
+                    size: context.iconSize('small'),
+                  ),
                   label: Text(
                     l10n.clearDateRange,
-                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red[600]),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      color: Colors.red[600],
+                    ),
                   ),
                 ),
               ),
@@ -560,20 +725,33 @@ class _ZakatFilterDialogState extends State<ZakatFilterDialog> with SingleTicker
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.primaryMaroon.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.primaryMaroon.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+          style: TextStyle(
+            fontSize: context.captionFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.primaryMaroon,
+          ),
         ),
       ),
     );

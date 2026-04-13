@@ -134,20 +134,11 @@ class SalesCreateSerializer(serializers.ModelSerializer):
             
             # Convert floats to Decimals to avoid type errors
             if 'overall_discount' in validated_data:
-                print(f"🔍 Converting overall_discount: {validated_data['overall_discount']}")
                 validated_data['overall_discount'] = Decimal(str(validated_data['overall_discount']))
-                print(f"✅ Converted overall_discount: {validated_data['overall_discount']}")
             if 'amount_paid' in validated_data:
-                print(f"🔍 Converting amount_paid: {validated_data['amount_paid']}")
                 validated_data['amount_paid'] = Decimal(str(validated_data['amount_paid']))
-                print(f"✅ Converted amount_paid: {validated_data['amount_paid']}")
             
-            # Debug the final validated_data
-            print(f"🔍 Final validated_data keys: {list(validated_data.keys())}")
-            if 'overall_discount' in validated_data:
-                print(f"🔍 Final overall_discount: {validated_data['overall_discount']}")
-            if 'sale_items' in validated_data:
-                print(f"🔍 Final sale_items count: {len(validated_data['sale_items'])}")
+            logger.info(f"📋 Final validated_data keys: {list(validated_data.keys())}")
             
             with transaction.atomic():
                 # Add created_by if available
@@ -158,6 +149,25 @@ class SalesCreateSerializer(serializers.ModelSerializer):
                         logger.info(f"✅ Added created_by to validated_data")
                     except Exception as e:
                         logger.warning(f"⚠️  Sales model doesn't have created_by field: {e}")
+                
+                # 🔥 CRITICAL FIX: Handle customer_email for selected customers
+                customer = validated_data.get('customer')
+                if customer:
+                    # If a customer is selected, populate customer fields
+                    if not validated_data.get('customer_name'):
+                        validated_data['customer_name'] = customer.name or ''
+                    if not validated_data.get('customer_phone'):
+                        validated_data['customer_phone'] = customer.phone or ''
+                    # Always set customer_email, even if it's None/empty
+                    validated_data['customer_email'] = customer.email or ''
+                    logger.info(f"👤 Set customer fields for {customer.name}: email={customer.email}")
+                else:
+                    # Walk-in customer - set empty strings instead of null
+                    if not validated_data.get('customer_name'):
+                        validated_data['customer_name'] = 'Walk-in Customer'
+                    validated_data['customer_phone'] = ''
+                    validated_data['customer_email'] = ''
+                    logger.info(f"🚶 Set walk-in customer fields")
                 
                 # Create Sale
                 logger.info(f"🏗️  Creating Sales object with fields: {list(validated_data.keys())}")
@@ -187,12 +197,7 @@ class SalesCreateSerializer(serializers.ModelSerializer):
                             item_discount = Decimal(str(item_data.get('item_discount', 0)))
                             line_total = (quantity * unit_price) - item_discount
                             
-                            print(f"🔍 Creating sale item {idx+1}:")
-                            print(f"  📦 Product: {product.name}")
-                            print(f"  💰 Unit Price: {unit_price}")
-                            print(f"  🔢 Quantity: {quantity}")
-                            print(f"  🎉 Item Discount: {item_discount}")
-                            print(f"  💵 Line Total: {line_total}")
+                            logger.info(f"  Creating sale item {idx+1}: {product.name} x{quantity} @ {unit_price}")
                             
                             sale_item = SaleItem.objects.create(
                                 sale=sale,
@@ -206,7 +211,7 @@ class SalesCreateSerializer(serializers.ModelSerializer):
                                 customization_notes=item_data.get('customization_notes', '') or ''
                             )
                             
-                            print(f"✅ Sale item {idx+1} created successfully")
+                            logger.info(f"  Item {idx+1} created successfully")
                             
                             logger.info(f"  ✅ Item {idx+1}: {product.name} x{quantity} = PKR {line_total}")
                             
@@ -279,16 +284,12 @@ class SaleItemCreateSerializer(serializers.Serializer):
     
     def validate_item_discount(self, value):
         """Validate item discount"""
-        print(f"🔍 Validating item_discount: {value}")
         if value < 0:
-            print("❌ Item discount is negative")
             raise serializers.ValidationError("Item discount cannot be negative.")
         # Ensure discount doesn't exceed unit price
         if hasattr(self, 'parent_instance') and hasattr(self.parent_instance, 'unit_price'):
             if value > self.parent_instance.unit_price:
-                print(f"❌ Item discount {value} exceeds unit price {self.parent_instance.unit_price}")
                 raise serializers.ValidationError("Item discount cannot exceed unit price.")
-        print(f"✅ Item discount validation passed: {value}")
         return value
 
 
@@ -395,33 +396,19 @@ class SalesSerializer(serializers.ModelSerializer):
     
     def validate_overall_discount(self, value):
         """Validate overall discount"""
-        print(f"🔍 Validating overall_discount: {value}")
         if value < 0:
-            print("❌ Overall discount is negative")
             raise serializers.ValidationError("Overall discount cannot be negative.")
         # Get subtotal to validate discount doesn't exceed it
         if hasattr(self, 'initial_data') and 'sale_items' in self.initial_data:
             subtotal = Decimal('0.00')
-            print(f"🔍 Calculating subtotal from {len(self.initial_data['sale_items'])} items")
-            for idx, item in enumerate(self.initial_data['sale_items']):
+            for item in self.initial_data['sale_items']:
                 unit_price = Decimal(str(item.get('unit_price', 0)))
                 quantity = int(item.get('quantity', 0))
                 item_discount = Decimal(str(item.get('item_discount', 0)))
-                item_total = (quantity * unit_price) - item_discount
-                subtotal += item_total
-                print(f"  📦 Item {idx+1}: {unit_price} x {quantity} - {item_discount} = {item_total}")
+                subtotal += (quantity * unit_price) - item_discount
             
-            print(f"💰 Calculated subtotal: {subtotal}")
-            print(f"🎉 Overall discount: {value}")
-            print(f"🔍 Is discount valid? {value <= subtotal}")
-            
-            # Remove the strict validation for now - let the sale proceed
-            # The business logic should handle this at the model level
             if value > subtotal:
-                print(f"⚠️ Overall discount {value} exceeds subtotal {subtotal}, but allowing for now")
-                # Don't raise error, just log it
-                # raise serializers.ValidationError("Overall discount cannot exceed subtotal.")
-        print(f"✅ Overall discount validation passed: {value}")
+                logger.warning(f"Overall discount {value} exceeds subtotal {subtotal}")
         return value
     
     def validate_amount_paid(self, value):
@@ -437,7 +424,7 @@ class SalesUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sales
         fields = (
-            'overall_discount', 'payment_method',
+            'overall_discount', 'payment_method', 'amount_paid',
             'split_payment_details', 'notes', 'status'
         )
     
@@ -455,30 +442,30 @@ class SalesListSerializer(serializers.ModelSerializer):
     payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     tax_summary_display = serializers.CharField(read_only=True)
+    total_items = serializers.IntegerField(read_only=True)  # Explicitly include the property
     
     class Meta:
         model = Sales
         fields = (
             'id', 'invoice_number', 'customer_name', 'status', 'status_display',
-            'grand_total', 'amount_paid', 'payment_method', 'payment_method_display',
+            'subtotal', 'overall_discount', 'grand_total', 'amount_paid', 'remaining_amount',
+            'payment_method', 'payment_method_display',
             'date_of_sale', 'total_items', 'tax_summary_display', 'is_active'
         )
 
 
-class SalesPaymentSerializer(serializers.ModelSerializer):
-    """Serializer for updating payment information"""
+class SalesPaymentSerializer(serializers.Serializer):
+    """Serializer for recording a single payment against a sale"""
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=True)
+    payment_method = serializers.ChoiceField(choices=Sales.PAYMENT_METHOD_CHOICES, required=True)
+    split_payment_details = serializers.JSONField(required=False, default=dict)
+    notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    is_partial_payment = serializers.BooleanField(required=False, default=False)
     
-    class Meta:
-        model = Sales
-        fields = ('amount_paid', 'payment_method', 'split_payment_details')
-    
-    def validate_amount_paid(self, value):
-        """Validate amount paid"""
-        if value < 0:
-            raise serializers.ValidationError("Amount paid cannot be negative.")
-        
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
         return value
-
 
 class SalesStatusUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating sale status"""

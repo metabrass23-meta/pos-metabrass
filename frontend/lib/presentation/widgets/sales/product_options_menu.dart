@@ -144,7 +144,7 @@ class ProductOptionsMenu extends StatelessWidget {
                   context,
                   icon: Icons.tune_rounded,
                   title: l10n.customizeAndAdd,
-                  subtitle: l10n.setSizeQualityEmbroidery,
+                  subtitle: 'Set Size, Quality & Finish',
                   color: Colors.blue,
                   onTap: () {
                     Navigator.of(context).pop();

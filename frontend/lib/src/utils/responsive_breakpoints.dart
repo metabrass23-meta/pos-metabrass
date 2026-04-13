@@ -3,27 +3,33 @@ import 'package:sizer/sizer.dart';
 
 class ResponsiveBreakpoints {
   // Desktop breakpoints for POS system (600px minimum for better compatibility)
-  static const double tablet = 600;  // Reduced from 750 for better small screen support
+  static const double tablet =
+      600; // Reduced from 750 for better small screen support
   static const double smallDesktop = 1024; // Small desktop
-  static const double mediumDesktop = 1366; // Medium desktop (HP EliteBook 840 G5)
+  static const double mediumDesktop =
+      1366; // Medium desktop (HP EliteBook 840 G5)
   static const double largeDesktop = 1920; // Large desktop
   static const double ultrawide = 2560; // Ultrawide monitors
 
   // Screen type detection
   static bool isTablet(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 1024;
+    return MediaQuery.of(context).size.width >= 600 &&
+        MediaQuery.of(context).size.width < 1024;
   }
 
   static bool isSmallDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 1024 && MediaQuery.of(context).size.width < 1366;
+    return MediaQuery.of(context).size.width >= 1024 &&
+        MediaQuery.of(context).size.width < 1366;
   }
 
   static bool isMediumDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 1366 && MediaQuery.of(context).size.width < 1920;
+    return MediaQuery.of(context).size.width >= 1366 &&
+        MediaQuery.of(context).size.width < 1920;
   }
 
   static bool isLargeDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 1920 && MediaQuery.of(context).size.width < 2560;
+    return MediaQuery.of(context).size.width >= 1920 &&
+        MediaQuery.of(context).size.width < 2560;
   }
 
   static bool isUltrawide(BuildContext context) {
@@ -64,28 +70,26 @@ class ResponsiveBreakpoints {
 
   // Sizer-based responsive widths with tablet support
   static double getSidebarExpandedWidth(BuildContext context) {
-    final baseWidth = responsive(
-      context,
-      tablet: 20.w, // Reduced from 25.w
-      small: 20.w, // Reduced from 25.w
-      medium: 12.w, // Reduced from 15.w
-      large: 16.w, // Reduced from 20.w
-      ultrawide: 14.w, // Reduced from 18.w
-    );
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // More aggressive sidebar sizing for small screens
+    if (screenWidth < 800) return 230.0; // Fixed width for very small screens
+    if (screenWidth < 1024) return 220.0; // Smaller for tablets
+    if (screenWidth < 1366) return 240.0; // Small desktop
+    if (screenWidth < 1920) return 250.0; // Medium desktop
+    return 280.0; // Large desktop
 
     // Ensure minimum and maximum constraints
-    return baseWidth.clamp(200.0, 350.0); // Reduced max from 400.0
+    return (screenWidth * 0.15).clamp(180.0, 300.0);
   }
 
   static double getSidebarCollapsedWidth(BuildContext context) {
-    return responsive(
-      context,
-      tablet: 6.w, // Reduced from 7.w
-      small: 4.w, // Reduced from 5.w
-      medium: 4.w, // Reduced from 4.5.w
-      large: 3.5.w, // Reduced from 4.w
-      ultrawide: 3.w, // Reduced from 3.5.w
-    ).clamp(50.0, 80.0); // Reduced max from 100.0
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Fixed collapsed width for better space utilization
+    if (screenWidth < 800) return 50.0; // Very small screens
+    if (screenWidth < 1024) return 55.0; // Tablets
+    return 60.0; // All larger screens
   }
 
   static double getHeadingFontSize(BuildContext context) {
@@ -248,35 +252,138 @@ class ResponsiveBreakpoints {
 
   // Enhanced grid and layout with tablet support
   static int getStatsCardColumns(BuildContext context) {
-    return responsive(
-      context,
-      tablet: 2, // 2x2 grid for tablets
-      small: 2, // 2x2 grid for small screens
-      medium: 4, // 1x4 row for medium screens
-      large: 4, // 1x4 row for large screens
-      ultrawide: 4, // 1x4 row for ultrawide
-    );
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // More aggressive responsive logic for smaller screens
+    if (screenWidth < 800) return 1; // Very small screens - single column
+    if (screenWidth < 1024) return 2; // Tablets - 2 columns
+    if (screenWidth < 1200) return 3; // Small desktop - 3 columns
+    return 4; // Medium to large screens - 4 columns
   }
 
   static List<int> getTableColumnFlexes(BuildContext context) {
     return responsive(
       context,
-      tablet: [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Very compressed for tablets
-      small: [1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Compressed for small screens
-      medium: [1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Balanced for medium screens
+      tablet: [
+        1,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Very compressed for tablets
+      small: [
+        1,
+        2,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Compressed for small screens
+      medium: [
+        1,
+        2,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Balanced for medium screens
       large: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1], // More space for description
-      ultrawide: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Extra space for ultrawide
+      ultrawide: [
+        1,
+        2,
+        4,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Extra space for ultrawide
     );
   }
 
   static List<int> getLaborTableColumnFlexes(BuildContext context) {
     return responsive(
       context,
-      tablet: [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Very compressed for tablets
-      small: [1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Compressed for small screens
-      medium: [1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Balanced for medium screens
+      tablet: [
+        1,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Very compressed for tablets
+      small: [
+        1,
+        2,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Compressed for small screens
+      medium: [
+        1,
+        2,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Balanced for medium screens
       large: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1], // More space for description
-      ultrawide: [1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Extra space for ultrawide
+      ultrawide: [
+        1,
+        2,
+        4,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+      ], // Extra space for ultrawide
     );
   }
 
@@ -285,10 +392,42 @@ class ResponsiveBreakpoints {
     return responsive(
       context,
       tablet: [1, 2, 1, 1, 1, 1, 2], // Actions column gets 2x space on tablets
-      small: [1, 2, 2, 1, 1, 1, 2], // Actions column gets 2x space on small screens
-      medium: [1, 2, 3, 1, 1, 1, 2], // Actions column gets 2x space on medium screens
-      large: [1, 2, 4, 1, 1, 1, 2], // Actions column gets 2x space on large screens
-      ultrawide: [1, 2, 4, 1, 1, 1, 2], // Actions column gets 2x space on ultrawide
+      small: [
+        1,
+        2,
+        2,
+        1,
+        1,
+        1,
+        2,
+      ], // Actions column gets 2x space on small screens
+      medium: [
+        1,
+        2,
+        3,
+        1,
+        1,
+        1,
+        2,
+      ], // Actions column gets 2x space on medium screens
+      large: [
+        1,
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+      ], // Actions column gets 2x space on large screens
+      ultrawide: [
+        1,
+        2,
+        4,
+        1,
+        1,
+        1,
+        2,
+      ], // Actions column gets 2x space on ultrawide
     );
   }
 
@@ -318,35 +457,122 @@ class ResponsiveBreakpoints {
   static double getIconSize(BuildContext context, {required String type}) {
     switch (type) {
       case 'small':
-        return responsive(context, tablet: 14.sp, small: 14.sp, medium: 14.sp, large: 14.sp, ultrawide: 14.sp); // Increased from 12.sp
+        return responsive(
+          context,
+          tablet: 14.sp,
+          small: 14.sp,
+          medium: 14.sp,
+          large: 14.sp,
+          ultrawide: 14.sp,
+        ); // Increased from 12.sp
       case 'medium':
-        return responsive(context, tablet: 16.sp, small: 16.sp, medium: 16.sp, large: 16.sp, ultrawide: 16.sp); // Increased from 12.sp
+        return responsive(
+          context,
+          tablet: 16.sp,
+          small: 16.sp,
+          medium: 16.sp,
+          large: 16.sp,
+          ultrawide: 16.sp,
+        ); // Increased from 12.sp
       case 'large':
-        return responsive(context, tablet: 18.sp, small: 18.sp, medium: 18.sp, large: 18.sp, ultrawide: 18.sp); // Increased from 12.sp
+        return responsive(
+          context,
+          tablet: 18.sp,
+          small: 18.sp,
+          medium: 18.sp,
+          large: 18.sp,
+          ultrawide: 18.sp,
+        ); // Increased from 12.sp
       case 'xl':
-        return responsive(context, tablet: 20.sp, small: 20.sp, medium: 20.sp, large: 20.sp, ultrawide: 20.sp); // Increased from 12.sp
+        return responsive(
+          context,
+          tablet: 20.sp,
+          small: 20.sp,
+          medium: 20.sp,
+          large: 20.sp,
+          ultrawide: 20.sp,
+        ); // Increased from 12.sp
       case 'special':
-        return responsive(context, tablet: 34.sp, small: 34.sp, medium: 34.sp, large: 34.sp, ultrawide: 34.sp); // Increased from 30.sp
+        return responsive(
+          context,
+          tablet: 34.sp,
+          small: 34.sp,
+          medium: 34.sp,
+          large: 34.sp,
+          ultrawide: 34.sp,
+        ); // Increased from 30.sp
       default:
-        return responsive(context, tablet: 14.sp, small: 14.sp, medium: 14.sp, large: 14.sp, ultrawide: 14.sp); // Increased from 12.sp
+        return responsive(
+          context,
+          tablet: 14.sp,
+          small: 14.sp,
+          medium: 14.sp,
+          large: 14.sp,
+          ultrawide: 14.sp,
+        ); // Increased from 12.sp
     }
   }
 
   // Dashboard-specific icon sizes (ORIGINAL SIZES TO PREVENT OVERFLOW)
-  static double getDashboardIconSize(BuildContext context, {required String type}) {
+  static double getDashboardIconSize(
+    BuildContext context, {
+    required String type,
+  }) {
     switch (type) {
       case 'small':
-        return responsive(context, tablet: 12.sp, small: 12.sp, medium: 12.sp, large: 12.sp, ultrawide: 12.sp); // Original size
+        return responsive(
+          context,
+          tablet: 12.sp,
+          small: 12.sp,
+          medium: 12.sp,
+          large: 12.sp,
+          ultrawide: 12.sp,
+        ); // Original size
       case 'medium':
-        return responsive(context, tablet: 12.sp, small: 12.sp, medium: 12.sp, large: 12.sp, ultrawide: 12.sp); // Original size
+        return responsive(
+          context,
+          tablet: 12.sp,
+          small: 12.sp,
+          medium: 12.sp,
+          large: 12.sp,
+          ultrawide: 12.sp,
+        ); // Original size
       case 'large':
-        return responsive(context, tablet: 12.sp, small: 12.sp, medium: 12.sp, large: 12.sp, ultrawide: 12.sp); // Original size
+        return responsive(
+          context,
+          tablet: 12.sp,
+          small: 12.sp,
+          medium: 12.sp,
+          large: 12.sp,
+          ultrawide: 12.sp,
+        ); // Original size
       case 'xl':
-        return responsive(context, tablet: 12.sp, small: 12.sp, medium: 12.sp, large: 12.sp, ultrawide: 12.sp); // Original size
+        return responsive(
+          context,
+          tablet: 12.sp,
+          small: 12.sp,
+          medium: 12.sp,
+          large: 12.sp,
+          ultrawide: 12.sp,
+        ); // Original size
       case 'special':
-        return responsive(context, tablet: 30.sp, small: 30.sp, medium: 30.sp, large: 30.sp, ultrawide: 30.sp); // Original size
+        return responsive(
+          context,
+          tablet: 30.sp,
+          small: 30.sp,
+          medium: 30.sp,
+          large: 30.sp,
+          ultrawide: 30.sp,
+        ); // Original size
       default:
-        return responsive(context, tablet: 12.sp, small: 12.sp, medium: 12.sp, large: 12.sp, ultrawide: 12.sp); // Original size
+        return responsive(
+          context,
+          tablet: 12.sp,
+          small: 12.sp,
+          medium: 12.sp,
+          large: 12.sp,
+          ultrawide: 12.sp,
+        ); // Original size
     }
   }
 
@@ -374,7 +600,10 @@ class ResponsiveBreakpoints {
   }
 
   // Enhanced border radius with tablet support
-  static double getBorderRadius(BuildContext context, {String size = 'medium'}) {
+  static double getBorderRadius(
+    BuildContext context, {
+    String size = 'medium',
+  }) {
     final baseRadius = responsive(
       context,
       tablet: 0.8.w, // Smaller radius for tablets
@@ -397,7 +626,10 @@ class ResponsiveBreakpoints {
   }
 
   // Enhanced shadow blur with tablet support
-  static double getShadowBlur(BuildContext context, {String intensity = 'medium'}) {
+  static double getShadowBlur(
+    BuildContext context, {
+    String intensity = 'medium',
+  }) {
     final baseBlur = responsive(
       context,
       tablet: 0.6.w, // Lighter shadows for tablets
@@ -436,11 +668,25 @@ class ResponsiveBreakpoints {
 
   // Additional responsive helpers
   static double getAppBarHeight(BuildContext context) {
-    return responsive(context, tablet: 6.h, small: 7.h, medium: 8.h, large: 9.h, ultrawide: 10.h).clamp(56.0, 100.0);
+    return responsive(
+      context,
+      tablet: 6.h,
+      small: 7.h,
+      medium: 8.h,
+      large: 9.h,
+      ultrawide: 10.h,
+    ).clamp(56.0, 100.0);
   }
 
   static double getDrawerWidth(BuildContext context) {
-    return responsive(context, tablet: 70.w, small: 60.w, medium: 50.w, large: 40.w, ultrawide: 30.w).clamp(250.0, 400.0);
+    return responsive(
+      context,
+      tablet: 70.w,
+      small: 60.w,
+      medium: 50.w,
+      large: 40.w,
+      ultrawide: 30.w,
+    ).clamp(250.0, 400.0);
   }
 
   static EdgeInsets getPagePadding(BuildContext context) {
@@ -460,20 +706,48 @@ class ResponsiveBreakpoints {
 
   // Form field responsive properties
   static double getFormFieldHeight(BuildContext context) {
-    return responsive(context, tablet: 5.h, small: 5.5.h, medium: 6.h, large: 6.5.h, ultrawide: 7.h).clamp(48.0, 72.0);
+    return responsive(
+      context,
+      tablet: 5.h,
+      small: 5.5.h,
+      medium: 6.h,
+      large: 6.5.h,
+      ultrawide: 7.h,
+    ).clamp(48.0, 72.0);
   }
 
   static double getFormFieldSpacing(BuildContext context) {
-    return responsive(context, tablet: 1.h, small: 1.5.h, medium: 2.h, large: 2.5.h, ultrawide: 3.h).clamp(8.0, 24.0);
+    return responsive(
+      context,
+      tablet: 1.h,
+      small: 1.5.h,
+      medium: 2.h,
+      large: 2.5.h,
+      ultrawide: 3.h,
+    ).clamp(8.0, 24.0);
   }
 
   // Navigation responsive properties
   static double getBottomNavHeight(BuildContext context) {
-    return responsive(context, tablet: 7.h, small: 8.h, medium: 9.h, large: 10.h, ultrawide: 11.h).clamp(60.0, 100.0);
+    return responsive(
+      context,
+      tablet: 7.h,
+      small: 8.h,
+      medium: 9.h,
+      large: 10.h,
+      ultrawide: 11.h,
+    ).clamp(60.0, 100.0);
   }
 
   static double getTabHeight(BuildContext context) {
-    return responsive(context, tablet: 5.h, small: 5.5.h, medium: 6.h, large: 6.5.h, ultrawide: 7.h).clamp(48.0, 72.0);
+    return responsive(
+      context,
+      tablet: 5.h,
+      small: 5.5.h,
+      medium: 6.h,
+      large: 6.5.h,
+      ultrawide: 7.h,
+    ).clamp(48.0, 72.0);
   }
 
   // Content responsive properties
@@ -489,11 +763,25 @@ class ResponsiveBreakpoints {
   }
 
   static int getGridCrossAxisCount(BuildContext context) {
-    return responsive(context, tablet: 2, small: 3, medium: 4, large: 5, ultrawide: 6);
+    return responsive(
+      context,
+      tablet: 2,
+      small: 3,
+      medium: 4,
+      large: 5,
+      ultrawide: 6,
+    );
   }
 
   static double getListTileHeight(BuildContext context) {
-    return responsive(context, tablet: 6.h, small: 7.h, medium: 8.h, large: 9.h, ultrawide: 10.h).clamp(56.0, 100.0);
+    return responsive(
+      context,
+      tablet: 6.h,
+      small: 7.h,
+      medium: 8.h,
+      large: 9.h,
+      ultrawide: 10.h,
+    ).clamp(56.0, 100.0);
   }
 }
 
@@ -509,27 +797,38 @@ extension ResponsiveContext on BuildContext {
   String get screenType => ResponsiveBreakpoints.getScreenType(this);
 
   // Layout helpers
-  bool get shouldShowCompactLayout => ResponsiveBreakpoints.shouldShowCompactLayout(this);
-  bool get shouldShowFullLayout => ResponsiveBreakpoints.shouldShowFullLayout(this);
-  bool get shouldUseDropdownActions => ResponsiveBreakpoints.shouldUseDropdownActions(this);
-  bool get shouldUseLabeledButtons => ResponsiveBreakpoints.shouldUseLabeledButtons(this);
+  bool get shouldShowCompactLayout =>
+      ResponsiveBreakpoints.shouldShowCompactLayout(this);
+  bool get shouldShowFullLayout =>
+      ResponsiveBreakpoints.shouldShowFullLayout(this);
+  bool get shouldUseDropdownActions =>
+      ResponsiveBreakpoints.shouldUseDropdownActions(this);
+  bool get shouldUseLabeledButtons =>
+      ResponsiveBreakpoints.shouldUseLabeledButtons(this);
 
   // Dimensions with Sizer + Breakpoints
-  double get sidebarExpandedWidth => ResponsiveBreakpoints.getSidebarExpandedWidth(this);
-  double get sidebarCollapsedWidth => ResponsiveBreakpoints.getSidebarCollapsedWidth(this);
+  double get sidebarExpandedWidth =>
+      ResponsiveBreakpoints.getSidebarExpandedWidth(this);
+  double get sidebarCollapsedWidth =>
+      ResponsiveBreakpoints.getSidebarCollapsedWidth(this);
 
   // Typography with Sizer scaling
   double get headerFontSize => ResponsiveBreakpoints.getHeaderFontSize(this);
   double get headingFontSize => ResponsiveBreakpoints.getHeadingFontSize(this);
   double get bodyFontSize => ResponsiveBreakpoints.getBodyFontSize(this);
-  double get subtitleFontSize => ResponsiveBreakpoints.getSubtitleFontSize(this);
+  double get subtitleFontSize =>
+      ResponsiveBreakpoints.getSubtitleFontSize(this);
   double get captionFontSize => ResponsiveBreakpoints.getCaptionFontSize(this);
 
   // Dashboard-specific typography (ORIGINAL SIZES)
-  double get dashboardHeaderFontSize => ResponsiveBreakpoints.getDashboardHeaderFontSize(this);
-  double get dashboardBodyFontSize => ResponsiveBreakpoints.getDashboardBodyFontSize(this);
-  double get dashboardSubtitleFontSize => ResponsiveBreakpoints.getDashboardSubtitleFontSize(this);
-  double get dashboardCaptionFontSize => ResponsiveBreakpoints.getDashboardCaptionFontSize(this);
+  double get dashboardHeaderFontSize =>
+      ResponsiveBreakpoints.getDashboardHeaderFontSize(this);
+  double get dashboardBodyFontSize =>
+      ResponsiveBreakpoints.getDashboardBodyFontSize(this);
+  double get dashboardSubtitleFontSize =>
+      ResponsiveBreakpoints.getDashboardSubtitleFontSize(this);
+  double get dashboardCaptionFontSize =>
+      ResponsiveBreakpoints.getDashboardCaptionFontSize(this);
 
   // Spacing with Sizer scaling
   double get mainPadding => ResponsiveBreakpoints.getMainPadding(this);
@@ -545,7 +844,8 @@ extension ResponsiveContext on BuildContext {
   double get appBarHeight => ResponsiveBreakpoints.getAppBarHeight(this);
   double get drawerWidth => ResponsiveBreakpoints.getDrawerWidth(this);
   double get formFieldHeight => ResponsiveBreakpoints.getFormFieldHeight(this);
-  double get formFieldSpacing => ResponsiveBreakpoints.getFormFieldSpacing(this);
+  double get formFieldSpacing =>
+      ResponsiveBreakpoints.getFormFieldSpacing(this);
   double get bottomNavHeight => ResponsiveBreakpoints.getBottomNavHeight(this);
   double get tabHeight => ResponsiveBreakpoints.getTabHeight(this);
   double get maxContentWidth => ResponsiveBreakpoints.getMaxContentWidth(this);
@@ -553,19 +853,28 @@ extension ResponsiveContext on BuildContext {
 
   // Layout helpers
   int get statsCardColumns => ResponsiveBreakpoints.getStatsCardColumns(this);
-  List<int> get tableColumnFlexes => ResponsiveBreakpoints.getTableColumnFlexes(this);
-  List<int> get laborTableColumnFlexes => ResponsiveBreakpoints.getLaborTableColumnFlexes(this);
-  List<int> get orderTableColumnFlexes => ResponsiveBreakpoints.getOrderTableColumnFlexes(this);
-  int get gridCrossAxisCount => ResponsiveBreakpoints.getGridCrossAxisCount(this);
+  List<int> get tableColumnFlexes =>
+      ResponsiveBreakpoints.getTableColumnFlexes(this);
+  List<int> get laborTableColumnFlexes =>
+      ResponsiveBreakpoints.getLaborTableColumnFlexes(this);
+  List<int> get orderTableColumnFlexes =>
+      ResponsiveBreakpoints.getOrderTableColumnFlexes(this);
+  int get gridCrossAxisCount =>
+      ResponsiveBreakpoints.getGridCrossAxisCount(this);
 
   // Edge insets helpers
   EdgeInsets get pagePadding => ResponsiveBreakpoints.getPagePadding(this);
   EdgeInsets get cardMargin => ResponsiveBreakpoints.getCardMargin(this);
-  EdgeInsets get sectionPadding => ResponsiveBreakpoints.getSectionPadding(this);
+  EdgeInsets get sectionPadding =>
+      ResponsiveBreakpoints.getSectionPadding(this);
 
   // Style helpers
-  double borderRadius([String size = 'medium']) => ResponsiveBreakpoints.getBorderRadius(this, size: size);
-  double shadowBlur([String intensity = 'medium']) => ResponsiveBreakpoints.getShadowBlur(this, intensity: intensity);
-  double iconSize(String type) => ResponsiveBreakpoints.getIconSize(this, type: type);
-  double dashboardIconSize(String type) => ResponsiveBreakpoints.getDashboardIconSize(this, type: type);
+  double borderRadius([String size = 'medium']) =>
+      ResponsiveBreakpoints.getBorderRadius(this, size: size);
+  double shadowBlur([String intensity = 'medium']) =>
+      ResponsiveBreakpoints.getShadowBlur(this, intensity: intensity);
+  double iconSize(String type) =>
+      ResponsiveBreakpoints.getIconSize(this, type: type);
+  double dashboardIconSize(String type) =>
+      ResponsiveBreakpoints.getDashboardIconSize(this, type: type);
 }

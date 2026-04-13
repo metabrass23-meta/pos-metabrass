@@ -41,7 +41,6 @@ dependencies:
   printing: ^5.14.2
   
   # Barcode Scanner Support
-  audioplayers: ^5.2.1
   vibration: ^1.8.4
 
 dev_dependencies:

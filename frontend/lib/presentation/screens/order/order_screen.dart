@@ -449,7 +449,7 @@ class _OrderPageState extends State<OrderPage> {
 
   Widget _buildSearchBar(OrderProvider provider) {
     return SizedBox(
-      height: context.buttonHeight / 1.5,
+      height: context.buttonHeight / 1.2,
       child: TextField(
         controller: _searchController,
         onChanged: provider.searchOrders,
@@ -468,7 +468,8 @@ class _OrderPageState extends State<OrderPage> {
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 2),
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2, vertical: context.cardPadding / 4),
         ),
       ),
     );

@@ -37,8 +37,8 @@ class ProductService {
 
         final apiResponse = ApiResponse<ProductsListResponse>(success: true, message: 'Products loaded successfully', data: productsResponse);
 
-        // Cache products if successful
-        if (apiResponse.data != null) {
+        // Cache products if successful and no filters are applied
+        if (apiResponse.data != null && (filters == null || (filters.search == null && filters.categoryId == null))) {
           await _cacheProducts(apiResponse.data!.products);
         }
 
@@ -117,9 +117,9 @@ class ProductService {
     required double price,
     double? costPrice, // Added cost price parameter
     required String color,
-    required String fabric,
+    required String material,
     required List<String> pieces,
-    required int quantity,
+    required double quantity,
     required String categoryId,
     String? barcode,  // Added barcode parameter
     String? sku,      // Added SKU parameter
@@ -131,7 +131,7 @@ class ProductService {
         price: price,
         costPrice: costPrice, // Include cost price
         color: color,
-        fabric: fabric,
+        material: material,
         pieces: pieces,
         quantity: quantity,
         category: categoryId,
@@ -182,9 +182,9 @@ class ProductService {
     double? price,
     double? costPrice, // Added cost price parameter
     String? color,
-    String? fabric,
+    String? material,
     List<String>? pieces,
-    int? quantity,
+    double? quantity,
     String? categoryId,
   }) async {
     try {
@@ -194,7 +194,7 @@ class ProductService {
         price: price,
         costPrice: costPrice, // Include cost price
         color: color,
-        fabric: fabric,
+        material: material,
         pieces: pieces,
         quantity: quantity,
         category: categoryId,
@@ -378,7 +378,7 @@ class ProductService {
   }
 
   /// Get low stock products - FIXED
-  Future<ApiResponse<ProductsListResponse>> getLowStockProducts({int threshold = 5, int page = 1, int pageSize = 20}) async {
+  Future<ApiResponse<ProductsListResponse>> getLowStockProducts({double threshold = 5.0, int page = 1, int pageSize = 20}) async {
     try {
       final queryParams = {'threshold': threshold.toString(), 'page': page.toString(), 'page_size': pageSize.toString()};
 
@@ -450,7 +450,7 @@ class ProductService {
   }
 
   /// Update product quantity
-  Future<ApiResponse<Map<String, dynamic>>> updateProductQuantity({required String productId, required int newQuantity}) async {
+  Future<ApiResponse<Map<String, dynamic>>> updateProductQuantity({required String productId, required double newQuantity}) async {
     try {
       final data = {'quantity': newQuantity};
 
@@ -537,7 +537,7 @@ class ProductService {
     }
   }
 
-  Future<void> _updateProductQuantityInCache(String productId, int newQuantity) async {
+  Future<void> _updateProductQuantityInCache(String productId, double newQuantity) async {
     try {
       final cachedProducts = await _getCachedProducts();
       final index = cachedProducts.indexWhere((product) => product.id == productId);

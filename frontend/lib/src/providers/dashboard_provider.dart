@@ -39,6 +39,7 @@ class DashboardProvider extends ChangeNotifier {
     'Purchases',
     'Products',
     'Categories',
+    'Quotations',
     'Customers',
     'Vendors',
     'Labor',

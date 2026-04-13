@@ -786,10 +786,10 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
         SizedBox(height: context.cardPadding),
         Row(
           children: [
-            Icon(Icons.texture_outlined, size: 16, color: Colors.grey[600]),
+            Icon(Icons.category_outlined, size: 16, color: Colors.grey[600]),
             SizedBox(width: context.smallPadding),
             Text(
-              '${l10n.fabric}:',
+              '${l10n.material}:',
               style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[700]),
             ),
             SizedBox(width: context.smallPadding),
@@ -798,7 +798,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
                 padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
                 decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
                 child: Text(
-                  widget.product.fabric ?? l10n.notAvailable,
+                  widget.product.material ?? l10n.notAvailable,
                   style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                 ),
               ),
@@ -847,7 +847,7 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${l10n.fabric}:',
+                '${l10n.material}:',
                 style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
               ),
               SizedBox(height: context.smallPadding / 2),
@@ -857,10 +857,10 @@ class _ViewProductDetailsDialogState extends State<ViewProductDetailsDialog> wit
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.texture_outlined, size: 12, color: Colors.grey[600]),
+                    Icon(Icons.category_outlined, size: 12, color: Colors.grey[600]),
                     SizedBox(width: context.smallPadding / 2),
                     Text(
-                      widget.product.fabric ?? l10n.notAvailable,
+                      widget.product.material ?? l10n.notAvailable,
                       style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.grey[700]),
                     ),
                   ],

@@ -32,7 +32,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
     
     def validate_date(self, value):
         """Validate date is not in the future"""
-        if value > timezone.now().date():
+        if value > timezone.localdate():
             raise serializers.ValidationError("Date cannot be in the future.")
         return value
     
@@ -77,7 +77,7 @@ class ExpenseUpdateSerializer(serializers.ModelSerializer):
     
     def validate_date(self, value):
         """Validate date is not in the future"""
-        if value > timezone.now().date():
+        if value > timezone.localdate():
             raise serializers.ValidationError("Date cannot be in the future.")
         return value
 
@@ -159,7 +159,7 @@ class ExpenseStatisticsSerializer(serializers.Serializer):
         
         monthly_trend = []
         for i in range(6):
-            month_start = (timezone.now().date().replace(day=1) - timedelta(days=i*30))
+            month_start = (timezone.localdate().replace(day=1) - timedelta(days=i*30))
             month_end = month_start.replace(day=28) + timedelta(days=4)
             month_end = month_end - timedelta(days=month_end.day)
             

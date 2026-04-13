@@ -24,10 +24,7 @@ class AnimatedTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([
-        textController,
-        shimmerController,
-      ]),
+      animation: Listenable.merge([textController, shimmerController]),
       builder: (context, child) {
         return SlideTransition(
           position: textSlideAnimation,
@@ -40,7 +37,7 @@ class AnimatedTextWidget extends StatelessWidget {
                   children: [
                     // Glow background
                     Text(
-                      'Al Noor',
+                      'MetaBrass',
                       style: TextStyle(
                         fontSize: context.headingFontSize * 1.2,
                         fontWeight: FontWeight.w900,
@@ -63,7 +60,7 @@ class AnimatedTextWidget extends StatelessWidget {
                         stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
                       ).createShader(bounds),
                       child: Text(
-                        'Al Noor',
+                        'MetaBrass',
                         style: TextStyle(
                           fontSize: context.headingFontSize * 1.2,
                           fontWeight: FontWeight.w900,
@@ -139,7 +136,7 @@ class AnimatedTextWidget extends StatelessWidget {
                     ],
                   ).createShader(bounds),
                   child: Text(
-                    'Premium Bridal & Groom Collections',
+                    'Premium Fabrics & Dress Materials',
                     style: TextStyle(
                       fontSize: context.headerFontSize,
                       fontWeight: FontWeight.w400,

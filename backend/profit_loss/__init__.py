@@ -1,2 +1,2 @@
-# Profit and Loss app for Maqbool Fabric
+# Profit and Loss app for MetaBrass
 

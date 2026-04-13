@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from .models import Purchase, PurchaseItem
 from products.models import Product
 
@@ -30,15 +31,25 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
+        
+        # Extract purchase_date if present, otherwise it uses the model default (timezone.now)
+        purchase_date = validated_data.pop('purchase_date', None)
 
         # Initialize total=0 to satisfy DB constraint
-        purchase = Purchase.objects.create(total=0, subtotal=0, **validated_data)
+        purchase = Purchase.objects.create(
+            total=0, 
+            subtotal=0, 
+            purchase_date=purchase_date if purchase_date else timezone.now().date(),
+            **validated_data
+        )
 
         subtotal = 0
         for item in items_data:
             product = item['product']
             quantity = item['quantity']
             unit_cost = item['unit_cost']
+            # product.quantity will be updated via signal in signals.py
+            
             total_cost = quantity * unit_cost
 
             PurchaseItem.objects.create(

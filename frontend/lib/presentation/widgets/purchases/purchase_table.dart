@@ -34,14 +34,16 @@ class _PurchaseTableState extends State<PurchaseTable> {
     // 2. Link the header and content scrolling (Two-way sync)
     _headerHorizontalController.addListener(() {
       if (_contentHorizontalController.hasClients &&
-          _headerHorizontalController.offset != _contentHorizontalController.offset) {
+          _headerHorizontalController.offset !=
+              _contentHorizontalController.offset) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
       }
     });
 
     _contentHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients &&
-          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+          _contentHorizontalController.offset !=
+              _headerHorizontalController.offset) {
         _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
       }
     });
@@ -64,25 +66,38 @@ class _PurchaseTableState extends State<PurchaseTable> {
     List<PurchaseModel> filtered = List.from(allPurchases);
 
     // Filter by vendor
-    if (widget.filter!.vendorId != null && widget.filter!.vendorId!.isNotEmpty) {
-      filtered = filtered.where((purchase) => purchase.vendor == widget.filter!.vendorId).toList();
+    if (widget.filter!.vendorId != null &&
+        widget.filter!.vendorId!.isNotEmpty) {
+      filtered = filtered
+          .where((purchase) => purchase.vendor == widget.filter!.vendorId)
+          .toList();
     }
 
     // Filter by status
     if (widget.filter!.status != null && widget.filter!.status!.isNotEmpty) {
-      filtered = filtered.where((purchase) => purchase.status.toLowerCase() == widget.filter!.status!.toLowerCase()).toList();
+      filtered = filtered
+          .where(
+            (purchase) =>
+                purchase.status.toLowerCase() ==
+                widget.filter!.status!.toLowerCase(),
+          )
+          .toList();
     }
 
     // Filter by date range
     if (widget.filter!.startDate != null) {
       filtered = filtered.where((purchase) {
-        return purchase.purchaseDate.isAfter(widget.filter!.startDate!.subtract(Duration(days: 1)));
+        return purchase.purchaseDate.isAfter(
+          widget.filter!.startDate!.subtract(Duration(days: 1)),
+        );
       }).toList();
     }
 
     if (widget.filter!.endDate != null) {
       filtered = filtered.where((purchase) {
-        return purchase.purchaseDate.isBefore(widget.filter!.endDate!.add(Duration(days: 1)));
+        return purchase.purchaseDate.isBefore(
+          widget.filter!.endDate!.add(Duration(days: 1)),
+        );
       }).toList();
     }
 
@@ -124,9 +139,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
                   padding: EdgeInsets.symmetric(
                     vertical: context.cardPadding * 0.75,
                   ),
-                  child: Row(
-                    children: _buildHeaderCells(context),
-                  ),
+                  child: Row(children: _buildHeaderCells(context)),
                 ),
               ),
             ),
@@ -138,7 +151,9 @@ class _PurchaseTableState extends State<PurchaseTable> {
                   // 1. Loading
                   if (provider.isLoading && provider.purchases.isEmpty) {
                     return Center(
-                      child: CircularProgressIndicator(color: AppTheme.primaryMaroon),
+                      child: CircularProgressIndicator(
+                        color: AppTheme.primaryMaroon,
+                      ),
                     );
                   }
 
@@ -148,10 +163,15 @@ class _PurchaseTableState extends State<PurchaseTable> {
                   }
 
                   // Get filtered purchases
-                  final filteredPurchases = _getFilteredPurchases(provider.purchases);
+                  final filteredPurchases = _getFilteredPurchases(
+                    provider.purchases,
+                  );
 
                   if (filteredPurchases.isEmpty) {
-                    return _buildEmptyState(context, message: l10n.noPurchasesMatchFilter);
+                    return _buildEmptyState(
+                      context,
+                      message: l10n.noPurchasesMatchFilter,
+                    );
                   }
 
                   // 3. Data
@@ -165,7 +185,8 @@ class _PurchaseTableState extends State<PurchaseTable> {
                       child: Scrollbar(
                         controller: _contentHorizontalController,
                         thumbVisibility: true,
-                        notificationPredicate: (notification) => notification.depth == 1,
+                        notificationPredicate: (notification) =>
+                            notification.depth == 1,
                         child: SingleChildScrollView(
                           controller: _contentHorizontalController,
                           scrollDirection: Axis.horizontal,
@@ -173,8 +194,14 @@ class _PurchaseTableState extends State<PurchaseTable> {
                           child: Container(
                             width: _calculateTotalWidth(),
                             child: Column(
-                              children: filteredPurchases.asMap().entries.map((entry) {
-                                return _buildTableRow(context, entry.value, entry.key);
+                              children: filteredPurchases.asMap().entries.map((
+                                entry,
+                              ) {
+                                return _buildTableRow(
+                                  context,
+                                  entry.value,
+                                  entry.key,
+                                );
                               }).toList(),
                             ),
                           ),
@@ -200,7 +227,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
     100.0, // 4. Tax
     120.0, // 5. Total
     110.0, // 6. Status
-    140.0, // 7. Actions
+    // 140.0, // 7. Actions - Commented out
   ];
 
   double _calculateTotalWidth() => _colWidths.reduce((a, b) => a + b);
@@ -217,7 +244,6 @@ class _PurchaseTableState extends State<PurchaseTable> {
       l10n.tax,
       l10n.total,
       l10n.status,
-      l10n.action // or l10n.actions
     ];
 
     return List.generate(headers.length, (index) {
@@ -240,38 +266,64 @@ class _PurchaseTableState extends State<PurchaseTable> {
     });
   }
 
-  Widget _buildTableRow(BuildContext context, PurchaseModel purchase, int index) {
+  Widget _buildTableRow(
+    BuildContext context,
+    PurchaseModel purchase,
+    int index,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.3),
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
+        color: index.isEven
+            ? AppTheme.pureWhite
+            : AppTheme.lightGray.withOpacity(0.3),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 0.5),
+        ),
       ),
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2.5),
       child: Row(
         children: [
           // 0. Date
-          _textCell(DateFormat('dd-MM-yyyy').format(purchase.purchaseDate), 0, context),
+          _textCell(
+            DateFormat('dd-MM-yyyy').format(purchase.purchaseDate),
+            0,
+            context,
+          ),
 
           // 1. Invoice #
           _textCell(purchase.invoiceNumber, 1, context, isBold: true),
 
           // 2. Vendor
-          _textCell(purchase.vendorName ?? purchase.vendor ?? 'Unknown', 2, context),
+          _textCell(
+            purchase.vendorName ?? purchase.vendor ?? 'Unknown',
+            2,
+            context,
+          ),
 
           // 3. Subtotal (Right Aligned)
-          _textCell(purchase.subtotal.toStringAsFixed(2), 3, context, isNumeric: true),
+          _textCell(
+            purchase.subtotal.toStringAsFixed(2),
+            3,
+            context,
+            isNumeric: true,
+          ),
 
           // 4. Tax (Right Aligned)
-          _textCell(purchase.tax.toStringAsFixed(2), 4, context, isNumeric: true),
+          _textCell(
+            purchase.tax.toStringAsFixed(2),
+            4,
+            context,
+            isNumeric: true,
+          ),
 
           // 5. Total (Right Aligned, Bold)
           _textCell(
-              purchase.total.toStringAsFixed(2),
-              5,
-              context,
-              isNumeric: true,
-              isBold: true,
-              color: AppTheme.primaryMaroon
+            purchase.total.toStringAsFixed(2),
+            5,
+            context,
+            isNumeric: true,
+            isBold: true,
+            color: AppTheme.primaryMaroon,
           ),
 
           // 6. Status
@@ -279,17 +331,23 @@ class _PurchaseTableState extends State<PurchaseTable> {
             width: _colWidths[6],
             padding: const EdgeInsets.symmetric(horizontal: 8),
             alignment: Alignment.centerLeft,
-            child: PurchaseTableHelpers.buildStatusBadge(context, purchase.status),
+            child: PurchaseTableHelpers.buildStatusBadge(
+              context,
+              purchase.status,
+            ),
           ),
 
-          // 7. Actions
-          _actionCell(context, purchase, 7),
+          // 7. Actions - Commented out
+          // _actionCell(context, purchase, 7),
         ],
       ),
     );
   }
 
-  Widget _textCell(String text, int index, BuildContext context, {
+  Widget _textCell(
+    String text,
+    int index,
+    BuildContext context, {
     bool isBold = false,
     Color? color,
     bool isNumeric = false,
@@ -318,15 +376,24 @@ class _PurchaseTableState extends State<PurchaseTable> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _iconButton(Icons.visibility_outlined, Colors.blue, () {
-            showDialog(context: context, builder: (_) => ViewPurchaseDetailsDialog(purchase: purchase));
+            showDialog(
+              context: context,
+              builder: (_) => ViewPurchaseDetailsDialog(purchase: purchase),
+            );
           }),
           const SizedBox(width: 8),
           _iconButton(Icons.edit_outlined, Colors.orange, () {
-            showDialog(context: context, builder: (_) => EditPurchaseDialog(purchase: purchase));
+            showDialog(
+              context: context,
+              builder: (_) => EditPurchaseDialog(purchase: purchase),
+            );
           }),
           const SizedBox(width: 8),
           _iconButton(Icons.delete_outline, Colors.red, () {
-            showDialog(context: context, builder: (_) => DeletePurchaseDialog(purchase: purchase));
+            showDialog(
+              context: context,
+              builder: (_) => DeletePurchaseDialog(purchase: purchase),
+            );
           }),
         ],
       ),

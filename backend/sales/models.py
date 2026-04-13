@@ -301,10 +301,11 @@ class Return(models.Model):
         
         # Auto-create a pending refund with the actual refund amount
         refund_amount = self.refund_amount or self.total_return_amount
-        print(f"🔍 [Return] Approving return {self.return_number}, refund_amount={refund_amount}, total_return_amount={self.total_return_amount}")
         
         if refund_amount > 0:
             try:
+                import logging
+                logger = logging.getLogger(__name__)
                 refund = Refund.objects.create(
                     return_request=self,
                     amount=refund_amount,
@@ -313,11 +314,13 @@ class Return(models.Model):
                     created_by=approved_by_user,
                     notes=f"Auto-created refund for approved return {self.return_number}"
                 )
-                print(f"✅ [Return] Created refund {refund.refund_number} for amount {refund_amount}")
+                logger.info(f"Created refund {refund.refund_number} for amount {refund_amount}")
             except Exception as e:
-                print(f"❌ [Return] Error creating refund: {e}")
+                import logging
+                logging.getLogger(__name__).error(f"Error creating refund: {e}")
         else:
-            print(f"⚠️ [Return] No refund created - amount is 0 or less")
+            import logging
+            logging.getLogger(__name__).warning(f"No refund created - amount is 0 or less")
 
     def reject(self, rejected_by_user, reason):
         """Reject the return request"""
@@ -1227,13 +1230,13 @@ class Sales(models.Model):
         # Cache customer information if not set
         if self.customer:
             if not self.customer_name or self.customer_name == 'Walk-in Customer':
-                self.customer_name = self.customer.name
+                self.customer_name = self.customer.name or "Walk-in Customer"
 
             if not self.customer_phone:
-                self.customer_phone = self.customer.phone
+                self.customer_phone = self.customer.phone or ""
 
             if not self.customer_email:
-                self.customer_email = self.customer.email
+                self.customer_email = self.customer.email or ""
 
         # Calculate tax amount
         if self.subtotal and self.overall_discount is not None and self.gst_percentage:
@@ -1348,7 +1351,13 @@ class Sales(models.Model):
         if self.grand_total > 0:
             self.is_fully_paid = self.amount_paid >= self.grand_total
             self.remaining_amount = max(0, self.grand_total - self.amount_paid)
-            self.save(update_fields=['is_fully_paid', 'remaining_amount'])
+            
+            # Automatically push status to PAID if fully settled
+            if self.is_fully_paid and self.status not in ['DELIVERED', 'RETURNED']:
+                self.status = 'PAID'
+                self.save(update_fields=['is_fully_paid', 'remaining_amount', 'status'])
+            else:
+                self.save(update_fields=['is_fully_paid', 'remaining_amount'])
 
     def recalculate_totals(self):
         """Safely recalculate sale totals"""

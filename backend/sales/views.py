@@ -25,6 +25,7 @@ from .serializers import (
     ReceiptCreateSerializer, ReceiptSerializer, ReceiptUpdateSerializer, ReceiptListSerializer
 )
 from django.utils import timezone
+from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -52,16 +53,24 @@ def list_sales(request):
 
         # Base queryset
         if show_inactive:
-            sales = Sales.objects.all()
+            sales = Sales.objects.all().prefetch_related('sale_items')
         else:
-            sales = Sales.objects.active()
+            sales = Sales.objects.active().prefetch_related('sale_items')
 
         # Apply filters
         if search:
             sales = sales.search(search)
 
         if status_filter:
-            sales = sales.by_status(status_filter)
+            status_upper = status_filter.upper()
+            if status_upper == 'PAID':
+                sales = sales.filter(is_fully_paid=True)
+            elif status_upper == 'UNPAID':
+                sales = sales.filter(is_fully_paid=False, amount_paid=0)
+            elif status_upper == 'PARTIAL':
+                sales = sales.filter(is_fully_paid=False, amount_paid__gt=0)
+            else:
+                sales = sales.by_status(status_filter)
 
         if customer_id:
             sales = sales.by_customer(customer_id)
@@ -251,28 +260,46 @@ def add_payment(request, sale_id):
             method = payment_data['payment_method']
 
             with transaction.atomic():
+                logger.info(f"🔹 Processing sale {sale.id} payment update...")
                 # Update payment details on Sales
                 sale.payment_method = method
                 if amount:
                     sale.amount_paid += amount
+                
+                logger.info(f"🔹 New amount_paid: {sale.amount_paid}")
 
                 if method == 'SPLIT':
                     sale.split_payment_details = payment_data.get('split_payment_details', {})
 
-                sale.update_payment_status()
+                # ✅ Recalculate and update status before saving
+                if hasattr(sale, 'recalculate_totals'):
+                    logger.info("🔹 Calling recalculate_totals...")
+                    sale.recalculate_totals()
+                else:
+                    logger.info("🔹 Calling update_payment_status...")
+                    sale.update_payment_status()
+                
+                logger.info("🔹 Saving sale...")
                 sale.save()
+                logger.info("✅ Sale saved successfully")
 
                 # ✅ CREATE PAYMENT RECORD
                 if amount:
-                    Payment.objects.create(
-                        entity_id=str(sale.id),
-                        entity_type='sale',
-                        amount=amount,
+                    now = timezone.now()
+                    logger.info(f"🔹 Creating Payment record for {amount}...")
+                    p = Payment.objects.create(
+                        sale=sale,
+                        payer_type='CUSTOMER',
+                        payer_id=sale.customer.id if sale.customer else None,
+                        amount_paid=amount,
                         payment_method=method,
                         created_by=request.user,
-                        status='COMPLETED',
-                        transaction_date=timezone.now()
+                        date=now.date(),
+                        time=now.time(),
+                        payment_month=now.date().replace(day=1),
+                        description=f"Initial payment for sale {sale.invoice_number}" if sale.amount_paid == amount else f"Partial payment for sale {sale.invoice_number}"
                     )
+                    logger.info(f"✅ Payment record created: {p.id}")
 
                 return Response({
                     'success': True,
@@ -292,10 +319,23 @@ def add_payment(request, sale_id):
             'message': 'Sale not found.'
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        import traceback
+        from django.conf import settings
+        error_msg = str(e)
+        stack_trace = traceback.format_exc()
+        logger.error(f"❌ Error adding payment: {error_msg}")
+        logger.error(stack_trace)
+        
+        # Determine if we should show debug info
+        show_debug = getattr(settings, 'DEBUG', False)
+        
         return Response({
             'success': False,
-            'message': 'Failed to record payment.',
-            'errors': {'detail': str(e)}
+            'message': f'Failed to record payment: {error_msg}',
+            'errors': {
+                'detail': error_msg,
+                'trace': stack_trace if show_debug else None
+            }
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -913,11 +953,9 @@ def generate_invoice_pdf(request, invoice_id):
         story.append(Paragraph(f"INVOICE #{invoice.invoice_number}", title_style))
         story.append(Spacer(1, 20))
 
-        # Company and customer info
         company_info = [
-            ['Company: Al Noor Fabrics', f'Invoice Date: {invoice.issue_date.strftime("%B %d, %Y")}'],
-            ['Address: Your Company Address', f'Due Date: {invoice.due_date.strftime("%B %d, %Y")}'],
-            ['Phone: +92-XXX-XXXXXXX', f'Status: {invoice.status}'],
+            ['Company: METABRASS', f'Invoice Date: {invoice.issue_date.strftime("%B %d, %Y")}'],
+            [f'Status: {invoice.status}', f'Due Date: {invoice.due_date.strftime("%B %d, %Y")}'],
         ]
 
         company_table = Table(company_info, colWidths=[3*inch, 3*inch])
@@ -936,9 +974,7 @@ def generate_invoice_pdf(request, invoice_id):
             customer_info = [
                 ['Customer Information:'],
                 ['Name:', customer.name],
-                ['Phone:', customer.phone or 'N/A'],
                 ['Email:', customer.email or 'N/A'],
-                ['Address:', customer.address or 'N/A'],
             ]
 
             customer_table = Table(customer_info, colWidths=[1.5*inch, 4.5*inch])
@@ -1091,9 +1127,7 @@ def generate_invoice_thermal_print(request, invoice_id):
                 'customer_phone': invoice.sale.customer_phone if invoice.sale else '',
             },
             'company': {
-                'name': 'Al Noor Fabrics',
-                'address': 'Your Company Address',
-                'phone': '+92-XXX-XXXXXXX',
+                'name': 'METABRASS',
             },
             'items': [],
             'totals': {
@@ -1424,12 +1458,8 @@ def generate_receipt_pdf(request, receipt_id):
         )
         
         # Add shop header
-        story.append(Paragraph("★★ AL NOOR FABRICS ★★", shop_name_style))
-        story.append(Paragraph("Quality Fabrics & Textiles", shop_tagline_style))
-        story.append(Paragraph("Karachi, Pakistan", normal_center_style))
-        story.append(Paragraph("Phone: +92-XXX-XXXXXXX", normal_center_style))
-        
-        # Separator
+        story.append(Paragraph("★★ METABRASS ★★", shop_name_style))
+        story.append(Paragraph("Premium Fashion & Dress Materials", shop_tagline_style))
         story.append(Spacer(1, 2*mm))
         separator_data = [['=' * 30]]
         separator_table = Table(separator_data, colWidths=[page_width - 6*mm])
@@ -1700,10 +1730,7 @@ def generate_sale_receipt_pdf(request, sale_id):
         style_title = ParagraphStyle(name='Title', parent=styles['Normal'], alignment=TA_CENTER, fontSize=12, leading=14, fontName='Helvetica-Bold')
 
         # 3. Enhanced Header Section
-        story.append(Paragraph("🏪 AL NOOR FABRICS", style_title))
-        story.append(Paragraph("📍 123 Market Street, City Name", style_center))
-        story.append(Paragraph("📞 +92 300 1234567", style_center))
-        story.append(Paragraph("🌐 www.alnoorfabrics.com", style_center))
+        story.append(Paragraph("🏪 METABRASS", style_title))
         story.append(Spacer(1, 3*mm))
 
         # Separator Line
@@ -1789,7 +1816,12 @@ def generate_sale_receipt_pdf(request, sale_id):
             t_totals_data.append(["📈 Tax:", f"PKR {int(sale.tax_amount)}"])
 
         t_totals_data.append(["💎 GRAND TOTAL:", f"PKR {int(sale.grand_total)}"])
-        t_totals_data.append(["💸 Amount Paid:", f"PKR {int(sale.grand_total)}"])  # Show grand_total instead of amount_paid
+        t_totals_data.append(["💸 Amount Paid:", f"PKR {int(sale.amount_paid)}"])  
+
+        # Add remaining balance if not fully paid
+        remaining_balance = sale.grand_total - sale.amount_paid
+        if remaining_balance > 0:
+            t_totals_data.append(["📋 Balance Due:", f"PKR {int(remaining_balance)}"])
 
         if change > 0:
             t_totals_data.append(["🔄 Change:", f"PKR {int(change)}"])
@@ -1828,13 +1860,13 @@ def generate_sale_receipt_pdf(request, sale_id):
 
         # 7. Enhanced Footer Section
         story.append(Paragraph("⚠️  No Return / Exchange without receipt", style_center))
-        story.append(Paragraph("🙏 Thank you for shopping at Al Noor Fabrics!", style_bold_center))
+        story.append(Paragraph("🙏 Thank you for shopping at MetaBrass!", style_bold_center))
         story.append(Spacer(1, 2*mm))
-        story.append(Paragraph("📱 Visit us again!", style_center))
+        story.append(Paragraph("📱 Visit us again at MetaBrass", style_center))
         story.append(Spacer(1, 2*mm))
         story.append(Paragraph("💻 Powered by: HH Tech Hub", style_center))
         story.append(Spacer(1, 2*mm))
-        story.append(Paragraph("🌟 Quality Fabric, Trusted Service", style_center))
+        story.append(Paragraph("🌟 Quality Fashion, Trusted Service", style_center))
 
         doc.build(story)
         pdf_content = buffer.getvalue()
@@ -1882,10 +1914,7 @@ def generate_sale_thermal_print(request, sale_id):
             },
             'items': [],
             'company': {
-                'name': getattr(settings, 'COMPANY_NAME', 'Al Noor Fabrics'),
-                'address': getattr(settings, 'COMPANY_ADDRESS', 'Your Address'),
-                'phone': getattr(settings, 'COMPANY_PHONE', 'Your Phone'),
-                'email': getattr(settings, 'COMPANY_EMAIL', 'your@email.com'),
+                'name': getattr(settings, 'COMPANY_NAME', 'METABRASS'),
             }
         }
         

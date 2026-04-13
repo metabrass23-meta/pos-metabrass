@@ -281,6 +281,7 @@ class PremiumSidebar extends StatelessWidget {
       {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount},
       {'icon': Icons.inventory_2_rounded, 'title': l10n.products, 'badge': productsCount},
       {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount},
+      {'icon': Icons.description_rounded, 'title': 'Quotations', 'badge': null},
       {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': customersCount},
       {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': vendorsCount},
       {'icon': Icons.engineering_rounded, 'title': l10n.labor, 'badge': laborsCount},
@@ -349,7 +350,7 @@ class PremiumSidebar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Image.asset('assets/images/logo.png'),
+                  child: Image.asset('assets/images/metabras.png'),
                 ),
 
                 if (isExpanded) ...[
@@ -360,8 +361,10 @@ class PremiumSidebar extends StatelessWidget {
                       children: [
                         Text(
                           AppLocalizations.of(context)!.brandName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: context.headerFontSize * 1.1, // ✅ Increased
+                            fontSize: context.headerFontSize * 1.1,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.pureWhite,
                             letterSpacing: 0.5,
@@ -369,8 +372,10 @@ class PremiumSidebar extends StatelessWidget {
                         ),
                         Text(
                           AppLocalizations.of(context)!.brandTagline,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: context.captionFontSize * 1.1, // ✅ Increased
+                            fontSize: context.captionFontSize * 1.1,
                             fontWeight: FontWeight.w300,
                             color: AppTheme.pureWhite.withOpacity(0.8),
                           ),
@@ -379,24 +384,6 @@ class PremiumSidebar extends StatelessWidget {
                     ),
                   ),
                 ],
-
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: onToggle,
-                    borderRadius: BorderRadius.circular(context.borderRadius()),
-                    child: Container(
-                      padding: EdgeInsets.all(context.smallPadding / 2),
-                      child: Icon(
-                        isExpanded
-                            ? Icons.chevron_left_rounded
-                            : Icons.chevron_right_rounded,
-                        color: AppTheme.pureWhite.withOpacity(0.9),
-                        size: context.iconSize('medium'),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -445,11 +432,9 @@ class PremiumSidebar extends StatelessWidget {
                               ),
                               border: isSelected
                                   ? Border.all(
-                                color: AppTheme.pureWhite.withOpacity(
-                                  0.3,
-                                ),
-                                width: 0.05.w,
-                              )
+                                      color: AppTheme.pureWhite.withOpacity(0.3),
+                                      width: 0.05.w,
+                                    )
                                   : null,
                             ),
                             child: Row(
@@ -478,24 +463,26 @@ class PremiumSidebar extends StatelessWidget {
                                   SizedBox(width: context.smallPadding),
 
                                   Expanded(
-                                    child: Text(
-                                      item['title'],
-                                      style: TextStyle(
-                                        fontSize: context.subtitleFontSize * 1.4, // ✅ Increased
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                        color: isSelected
-                                            ? AppTheme.pureWhite
-                                            : AppTheme.pureWhite.withOpacity(
-                                          0.85,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        item['title'],
+                                        style: TextStyle(
+                                          fontSize: context.subtitleFontSize,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.w400,
+                                          color: isSelected
+                                              ? AppTheme.pureWhite
+                                              : AppTheme.pureWhite.withOpacity(0.85),
+                                          letterSpacing: 0.2,
                                         ),
-                                        letterSpacing: 0.2,
                                       ),
                                     ),
                                   ),
-
                                   if (item['badge'] != null) ...[
+                                    SizedBox(width: context.smallPadding / 1.5),
                                     Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: context.smallPadding,
@@ -571,7 +558,7 @@ class PremiumSidebar extends StatelessWidget {
                                 Text(
                                   user?.fullName ?? 'User',
                                   style: TextStyle(
-                                    fontSize: context.bodyFontSize * 1.1, // ✅ Increased
+                                    fontSize: context.bodyFontSize * 1.1,
                                     fontWeight: FontWeight.w500,
                                     color: AppTheme.pureWhite,
                                   ),
@@ -580,7 +567,7 @@ class PremiumSidebar extends StatelessWidget {
                                 Text(
                                   user?.email ?? 'user@email.com',
                                   style: TextStyle(
-                                    fontSize: context.captionFontSize * 1.1, // ✅ Increased
+                                    fontSize: context.captionFontSize * 1.1,
                                     fontWeight: FontWeight.w300,
                                     color: AppTheme.pureWhite.withOpacity(0.7),
                                   ),

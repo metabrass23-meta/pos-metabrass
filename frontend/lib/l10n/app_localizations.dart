@@ -98,7 +98,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Al Noor - Premium POS'**
+  /// **'MetaBrass - Premium POS'**
   String get appTitle;
 
   /// No description provided for @welcomeBack.
@@ -110,13 +110,13 @@ abstract class AppLocalizations {
   /// No description provided for @brandName.
   ///
   /// In en, this message translates to:
-  /// **'Al Noor'**
+  /// **'MetaBrass'**
   String get brandName;
 
   /// No description provided for @tagline.
   ///
   /// In en, this message translates to:
-  /// **'Your trusted partner for quality spare parts.\nFind everything you need for vehicle maintenance and repairs.'**
+  /// **'Elegant designs for your modern home.\nExperience luxury with our premium bathroom and sanitary collections.'**
   String get tagline;
 
   /// No description provided for @signIn.
@@ -866,7 +866,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchProductsExpanded.
   ///
   /// In en, this message translates to:
-  /// **'Search products by name, color, fabric...'**
+  /// **'Search products by name, brand, material...'**
   String get searchProductsExpanded;
 
   /// No description provided for @filter.
@@ -1316,19 +1316,19 @@ abstract class AppLocalizations {
   /// No description provided for @brandTagline.
   ///
   /// In en, this message translates to:
-  /// **'Premium POS'**
+  /// **'Premium Sanitary POS'**
   String get brandTagline;
 
   /// No description provided for @welcomeToPos.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Al Noor POS'**
+  /// **'Welcome to MetaBrass POS'**
   String get welcomeToPos;
 
   /// No description provided for @welcomeTagline.
   ///
   /// In en, this message translates to:
-  /// **'Quality Spare Parts Management - Your Complete Automotive Solution'**
+  /// **'Premium Sanitary Management - Elegant Designs & Quality Fittings'**
   String get welcomeTagline;
 
   /// No description provided for @today.
@@ -2174,19 +2174,19 @@ abstract class AppLocalizations {
   /// No description provided for @colorName.
   ///
   /// In en, this message translates to:
-  /// **'Color Name'**
+  /// **'Finish/Color'**
   String get colorName;
 
   /// No description provided for @fabricType.
   ///
   /// In en, this message translates to:
-  /// **'Fabric Type'**
+  /// **'Material Type'**
   String get fabricType;
 
   /// No description provided for @fabricName.
   ///
   /// In en, this message translates to:
-  /// **'Fabric Name'**
+  /// **'Material Name'**
   String get fabricName;
 
   /// No description provided for @pleaseSelectAtLeastOnePiece.
@@ -4791,13 +4791,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Showing {start}-{end} of {total} zakat records'**
-  String showingZakatRecords(int start, int end, int total);
+  String showingZakatRecords(num start, num end, num total);
 
   /// No description provided for @pageOfPages.
   ///
   /// In en, this message translates to:
   /// **'{current} of {total}'**
-  String pageOfPages(int current, int total);
+  String pageOfPages(num current, num total);
 
   /// No description provided for @filterZakatRecords.
   ///
@@ -5511,13 +5511,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Analyzing {count} products across different categories'**
-  String analyzingProductsAcrossDifferentCategories(int count);
+  String analyzingProductsAcrossDifferentCategories(num count);
 
   /// No description provided for @productsCount.
   ///
   /// In en, this message translates to:
   /// **'{count} Products'**
-  String productsCount(int count);
+  String productsCount(num count);
 
   /// No description provided for @rank.
   ///
@@ -5847,7 +5847,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Borrowing period: {days} days'**
-  String borrowingPeriodDays(int days);
+  String borrowingPeriodDays(num days);
 
   /// No description provided for @pleaseSelectAValidRepaymentDate.
   ///
@@ -5919,7 +5919,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} days'**
-  String daysCount(int count);
+  String daysCount(num count);
 
   /// No description provided for @thisWillPermanentlyDeleteThePayableRecord.
   ///
@@ -6045,7 +6045,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Showing {start}-{end} of {total} payable records'**
-  String showingPayableRecords(int start, int end, int total);
+  String showingPayableRecords(num start, num end, num total);
 
   /// No description provided for @priority.
   ///
@@ -6171,7 +6171,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} days overdue'**
-  String daysOverdueCount(int count);
+  String daysOverdueCount(num count);
 
   /// No description provided for @noPayablesFound.
   ///
@@ -6278,13 +6278,13 @@ abstract class AppLocalizations {
   /// No description provided for @color.
   ///
   /// In en, this message translates to:
-  /// **'Color'**
+  /// **'Finish'**
   String get color;
 
   /// No description provided for @fabric.
   ///
   /// In en, this message translates to:
-  /// **'Fabric'**
+  /// **'Material'**
   String get fabric;
 
   /// No description provided for @stockStatus.
@@ -6345,7 +6345,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} days ago'**
-  String daysAgo(int count);
+  String daysAgo(num count);
 
   /// No description provided for @oneWeekAgo.
   ///
@@ -6357,7 +6357,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} weeks ago'**
-  String weeksAgo(int count);
+  String weeksAgo(num count);
 
   /// No description provided for @oneMonthAgo.
   ///
@@ -6369,7 +6369,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} months ago'**
-  String monthsAgo(int count);
+  String monthsAgo(num count);
 
   /// No description provided for @oneYearAgo.
   ///
@@ -6381,7 +6381,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} years ago'**
-  String yearsAgo(int count);
+  String yearsAgo(num count);
 
   /// No description provided for @productDetails.
   ///
@@ -6417,7 +6417,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} units'**
-  String unitsCount(int count);
+  String unitsCount(num count);
 
   /// No description provided for @unknown.
   ///
@@ -8924,7 +8924,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountCreatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Account created successfully! Welcome to Al Noor.'**
+  /// **'Account created successfully! Welcome to MetaBrass.'**
   String get accountCreatedSuccessfully;
 
   /// No description provided for @registrationFailedMessage.
@@ -9777,7 +9777,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Quantity {quantity} will be affected'**
-  String quantityWillBeAffected(int quantity);
+  String quantityWillBeAffected(num quantity);
 
   /// No description provided for @salesImpact.
   ///
@@ -9980,8 +9980,8 @@ abstract class AppLocalizations {
   /// No description provided for @maxQuantity.
   ///
   /// In en, this message translates to:
-  /// **'Max Quantity'**
-  String maxQuantity(int max);
+  /// **'Max Quantity {quantity}'**
+  String maxQuantity(num quantity);
 
   /// No description provided for @maximumQuantity.
   ///
@@ -10232,8 +10232,8 @@ abstract class AppLocalizations {
   /// No description provided for @stockAvailable.
   ///
   /// In en, this message translates to:
-  /// **'Stock'**
-  String stockAvailable(int quantity);
+  /// **'Stock {quantity}'**
+  String stockAvailable(num quantity);
 
   /// No description provided for @min.
   ///
@@ -10263,7 +10263,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Clear Discount'**
-  String clearDiscount(String amount);
+  String get clearDiscount;
 
   /// No description provided for @specialInstructions.
   ///
@@ -11204,7 +11204,7 @@ abstract class AppLocalizations {
   /// No description provided for @alNoorFashionPOS.
   ///
   /// In en, this message translates to:
-  /// **'Al Noor POS'**
+  /// **'MetaBrass POS'**
   String get alNoorFashionPOS;
 
   /// No description provided for @version.
@@ -11655,7 +11655,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Base Price × {quantity}:'**
-  String basePriceQuantity(int quantity);
+  String basePriceQuantity(num quantity);
 
   /// No description provided for @customSizeLabel.
   ///
@@ -11859,7 +11859,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{count} items'**
-  String itemsCount(int count);
+  String itemsCount(num count);
 
   /// No description provided for @gst.
   ///
@@ -12255,13 +12255,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{minutes}m ago'**
-  String minutesAgo(int minutes);
+  String minutesAgo(num minutes);
 
   /// No description provided for @hoursAgo.
   ///
   /// In en, this message translates to:
   /// **'{hours}h ago'**
-  String hoursAgo(int hours);
+  String hoursAgo(num hours);
 
   /// No description provided for @collected.
   ///

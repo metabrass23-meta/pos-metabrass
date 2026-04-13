@@ -5,15 +5,22 @@ import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
+import '../../../src/providers/receivables_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../globals/text_button.dart';
 
 class SalesTable extends StatefulWidget {
   final Function(SaleModel) onEdit;
   final Function(SaleModel) onDelete;
   final Function(SaleModel) onView;
 
-  const SalesTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
+  const SalesTable({
+    super.key,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onView,
+  });
 
   @override
   State<SalesTable> createState() => _SalesTableState();
@@ -34,15 +41,21 @@ class _SalesTableState extends State<SalesTable> {
     // Link the header and content horizontal scrolling
     _headerScrollController.addListener(() {
       if (_contentHorizontalScrollController.hasClients &&
-          _headerScrollController.offset != _contentHorizontalScrollController.offset) {
-        _contentHorizontalScrollController.jumpTo(_headerScrollController.offset);
+          _headerScrollController.offset !=
+              _contentHorizontalScrollController.offset) {
+        _contentHorizontalScrollController.jumpTo(
+          _headerScrollController.offset,
+        );
       }
     });
 
     _contentHorizontalScrollController.addListener(() {
       if (_headerScrollController.hasClients &&
-          _contentHorizontalScrollController.offset != _headerScrollController.offset) {
-        _headerScrollController.jumpTo(_contentHorizontalScrollController.offset);
+          _contentHorizontalScrollController.offset !=
+              _headerScrollController.offset) {
+        _headerScrollController.jumpTo(
+          _contentHorizontalScrollController.offset,
+        );
       }
     });
   }
@@ -63,24 +76,43 @@ class _SalesTableState extends State<SalesTable> {
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: context.shadowBlur(),
-              offset: Offset(0, context.smallPadding)
-          )
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(0, context.smallPadding),
+          ),
         ],
       ),
       // Add height constraint to prevent overflow
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7, // Max 70% of screen height
+        maxHeight:
+            MediaQuery.of(context).size.height *
+            0.7, // Max 70% of screen height
       ),
       child: Consumer<SalesProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
             return Center(
               child: SizedBox(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
-                height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
-                child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 8.w,
+                  small: 6.w,
+                  medium: 5.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                height: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 8.w,
+                  small: 6.w,
+                  medium: 5.w,
+                  large: 4.w,
+                  ultrawide: 3.w,
+                ),
+                child: const CircularProgressIndicator(
+                  color: AppTheme.primaryMaroon,
+                  strokeWidth: 3,
+                ),
               ),
             );
           }
@@ -89,63 +121,51 @@ class _SalesTableState extends State<SalesTable> {
             return _buildEmptyState(context);
           }
 
-          return Column(
-            mainAxisSize: MainAxisSize.min, // Use minimum size
-            children: [
-              // 1. Table Header (Horizontal Scroll)
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGray.withOpacity(0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  controller: _headerScrollController, // Controlled by header controller
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  child: Container(
-                      width: _getTableWidth(context),
+          return Scrollbar(
+            thumbVisibility: true,
+            controller: _headerScrollController, // Reusing controller for scrollbar
+            child: SingleChildScrollView(
+              controller: _headerScrollController,
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                width: _getTableWidth(context),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 1. Table Header
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.lightGray.withOpacity(0.5),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(context.borderRadius('large')),
+                          topRight: Radius.circular(context.borderRadius('large')),
+                        ),
+                      ),
                       padding: EdgeInsets.all(context.cardPadding),
-                      child: _buildTableHeader(context)
-                  ),
-                ),
-              ),
+                      child: _buildTableHeader(context),
+                    ),
 
-              // 2. Table Content (Vertical + Horizontal Scroll)
-              Flexible( // Use Flexible instead of Expanded
-                child: Scrollbar(
-                  controller: _verticalScrollController,
-                  thumbVisibility: true,
-                  trackVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _verticalScrollController, // Vertical Scrolling
-                    scrollDirection: Axis.vertical,
-                    child: Scrollbar(
-                      controller: _contentHorizontalScrollController,
-                      thumbVisibility: true,
-                      notificationPredicate: (notification) => notification.depth == 1,
+                    // 2. Table Content
+                    Flexible(
                       child: SingleChildScrollView(
-                        controller: _contentHorizontalScrollController, // Controlled by content horizontal controller
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        child: Container(
-                          width: _getTableWidth(context),
-                          // Use Column instead of ListView inside SingleChildScrollView to avoid conflicts
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min, // Use minimum size
-                            children: provider.sales.asMap().entries.map((entry) {
-                              return _buildTableRow(context, entry.value, entry.key);
-                            }).toList(),
-                          ),
+                        controller: _verticalScrollController,
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: provider.sales.asMap().entries.map((entry) {
+                            return _buildTableRow(
+                              context,
+                              entry.value,
+                              entry.key,
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           );
         },
       ),
@@ -153,7 +173,14 @@ class _SalesTableState extends State<SalesTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1400.0, small: 1600.0, medium: 1800.0, large: 2000.0, ultrawide: 2200.0);
+    return ResponsiveBreakpoints.responsive(
+      context,
+      tablet: 1800.0, // Increased from 1400.0
+      small: 2000.0, // Increased from 1600.0
+      medium: 2200.0, // Increased from 1800.0
+      large: 2400.0, // Increased from 2000.0
+      ultrawide: 2600.0, // Increased from 2200.0
+    );
   }
 
   Widget _buildTableHeader(BuildContext context) {
@@ -162,20 +189,63 @@ class _SalesTableState extends State<SalesTable> {
 
     return Row(
       children: [
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.saleId)),
-        Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.invoiceNumber)),
-        Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.customer)),
-        Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.items)),
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.subtotal)),
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.discount)),
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.gst)),
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.grandTotal)),
-        Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.paid)),
-        Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.remaining)),
-        Container(width: columnWidths[10], child: _buildHeaderCell(context, l10n.payment)),
-        Container(width: columnWidths[11], child: _buildHeaderCell(context, l10n.date)),
-        Container(width: columnWidths[12], child: _buildHeaderCell(context, l10n.status)),
-        Container(width: columnWidths[13], child: _buildHeaderCell(context, l10n.actions)),
+        Container(
+          width: columnWidths[0],
+          child: _buildHeaderCell(context, l10n.saleId),
+        ),
+        Container(
+          width: columnWidths[1],
+          child: _buildHeaderCell(context, l10n.invoiceNumber),
+        ),
+        Container(
+          width: columnWidths[2],
+          child: _buildHeaderCell(context, l10n.customer),
+        ),
+        // Commented out Items column header
+        // Container(
+        //   width: columnWidths[3],
+        //   child: _buildHeaderCell(context, l10n.items),
+        // ),
+        Container(
+          width: columnWidths[4],
+          child: _buildHeaderCell(context, l10n.subtotal),
+        ),
+        Container(
+          width: columnWidths[5],
+          child: _buildHeaderCell(context, l10n.discount),
+        ),
+        Container(
+          width: columnWidths[6],
+          child: _buildHeaderCell(context, l10n.gst),
+        ),
+        Container(
+          width: columnWidths[7],
+          child: _buildHeaderCell(context, l10n.grandTotal),
+        ),
+        Container(
+          width: columnWidths[8],
+          child: _buildHeaderCell(context, l10n.paid),
+        ),
+        Container(
+          width: columnWidths[9],
+          child: _buildHeaderCell(context, l10n.remaining),
+        ),
+        Container(
+          width: columnWidths[10],
+          child: _buildHeaderCell(context, l10n.payment),
+        ),
+        Container(
+          width: columnWidths[11],
+          child: _buildHeaderCell(context, l10n.date),
+        ),
+        Container(
+          width: columnWidths[12],
+          child: _buildHeaderCell(context, l10n.status),
+        ),
+        Container(
+          width: columnWidths[13],
+          child: _buildHeaderCell(context, l10n.actions),
+        ),
       ],
     );
   }
@@ -195,14 +265,19 @@ class _SalesTableState extends State<SalesTable> {
       120.0, // Payment Method
       120.0, // Date
       100.0, // Status
-      220.0, // Actions
+      280.0, // Actions
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
-      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      style: TextStyle(
+        fontSize: context.bodyFontSize,
+        fontWeight: FontWeight.w600,
+        color: AppTheme.charcoalGray,
+        letterSpacing: 0.2,
+      ),
     );
   }
 
@@ -212,8 +287,12 @@ class _SalesTableState extends State<SalesTable> {
 
     return Container(
       decoration: BoxDecoration(
-        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
+        color: index.isEven
+            ? AppTheme.pureWhite
+            : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 0.5),
+        ),
       ),
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       child: Row(
@@ -223,14 +302,23 @@ class _SalesTableState extends State<SalesTable> {
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
               ),
               child: Text(
                 sale.id,
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                style: TextStyle(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primaryMaroon,
+                ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -244,7 +332,11 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.formattedInvoiceNumber,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
             ),
           ),
 
@@ -252,39 +344,44 @@ class _SalesTableState extends State<SalesTable> {
           Container(
             width: columnWidths[2],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  sale.customerName,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  sale.customerPhone,
-                  style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+            child: Text(
+              sale.customerName,
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 
-          // Items Count
-          Container(
-            width: columnWidths[3],
-            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Text(
-                sale.totalItems.toString(),
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.blue),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+          // Commented out Items Count column body
+          // Container(
+          //   width: columnWidths[3],
+          //   padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(
+          //       horizontal: context.smallPadding / 2,
+          //       vertical: context.smallPadding / 4,
+          //     ),
+          //     decoration: BoxDecoration(
+          //       color: Colors.blue.withOpacity(0.1),
+          //       borderRadius: BorderRadius.circular(
+          //         context.borderRadius('small'),
+          //       ),
+          //     ),
+          //     child: Text(
+          //       sale.totalItems.toString(),
+          //       style: TextStyle(
+          //         fontSize: context.subtitleFontSize,
+          //         fontWeight: FontWeight.w600,
+          //         color: Colors.blue,
+          //       ),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
 
           // Subtotal
           Container(
@@ -292,7 +389,11 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.subtotal.toStringAsFixed(0)}',
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
             ),
           ),
 
@@ -302,21 +403,33 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: sale.overallDiscount > 0
                 ? Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                'PKR ${sale.overallDiscount.toStringAsFixed(0)}',
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
-              ),
-            )
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.smallPadding / 2,
+                      vertical: context.smallPadding / 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
+                    child: Text(
+                      'PKR ${sale.overallDiscount.toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  )
                 : Text(
-              '-',
-              style: TextStyle(fontSize: context.subtitleFontSize, color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
+                    '-',
+                    style: TextStyle(
+                      fontSize: context.subtitleFontSize,
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
           ),
 
           // GST
@@ -325,7 +438,11 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${sale.gstPercentage}%',
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
             ),
           ),
 
@@ -334,14 +451,23 @@ class _SalesTableState extends State<SalesTable> {
             width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
               decoration: BoxDecoration(
                 color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
               ),
               child: Text(
                 'PKR ${sale.grandTotal.toStringAsFixed(0)}',
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: AppTheme.primaryMaroon),
+                style: TextStyle(
+                  fontSize: context.subtitleFontSize,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.primaryMaroon,
+                ),
               ),
             ),
           ),
@@ -352,7 +478,11 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.amountPaid.toStringAsFixed(0)}',
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.green),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.green,
+              ),
             ),
           ),
 
@@ -362,24 +492,45 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: sale.remainingAmount > 0
                 ? Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Text(
-                'PKR ${sale.remainingAmount.toStringAsFixed(0)}',
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
-              ),
-            )
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.smallPadding / 2,
+                      vertical: context.smallPadding / 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
+                    child: Text(
+                      'PKR ${sale.remainingAmount.toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    ),
+                  )
                 : Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                l10n.paid,
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green),
-              ),
-            ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.smallPadding / 2,
+                      vertical: context.smallPadding / 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.paid,
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
           ),
 
           // Payment Method
@@ -387,15 +538,26 @@ class _SalesTableState extends State<SalesTable> {
             width: columnWidths[10],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
               decoration: BoxDecoration(
-                color: _getPaymentMethodColor(sale.paymentMethod).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                color: _getPaymentMethodColor(
+                  sale.paymentMethod,
+                ).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(_getPaymentMethodIcon(sale.paymentMethod), color: _getPaymentMethodColor(sale.paymentMethod), size: context.iconSize('small')),
+                  Icon(
+                    _getPaymentMethodIcon(sale.paymentMethod),
+                    color: _getPaymentMethodColor(sale.paymentMethod),
+                    size: context.iconSize('small'),
+                  ),
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
@@ -420,7 +582,11 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.dateTimeText,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
             ),
           ),
 
@@ -429,21 +595,36 @@ class _SalesTableState extends State<SalesTable> {
             width: columnWidths[12],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(color: sale.statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.smallPadding / 2,
+                vertical: context.smallPadding / 4,
+              ),
+              decoration: BoxDecoration(
+                color: sale.statusColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: BoxDecoration(color: sale.statusColor, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: sale.statusColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   SizedBox(width: context.smallPadding / 2),
                   Expanded(
                     child: Text(
                       _getLocalizedStatus(l10n, sale.status),
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: sale.statusColor),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: sale.statusColor,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -519,53 +700,79 @@ class _SalesTableState extends State<SalesTable> {
             onTap: () => widget.onView(sale),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.visibility_outlined, color: Colors.blue, size: context.iconSize('small')),
+              padding: EdgeInsets.all(4.0),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(Icons.visibility_outlined, color: Colors.blue, size: 16),
             ),
           ),
         ),
-
-        SizedBox(width: context.smallPadding / 2),
-
-        // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(sale),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.edit_outlined, color: Colors.orange, size: context.iconSize('small')),
-            ),
-          ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
+        SizedBox(width: 4),
 
         // Print Button
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.printReceiptFor(sale.formattedInvoiceNumber)),
-                  backgroundColor: Colors.green,
-                ),
+            onTap: () async {
+              final salesProvider = context.read<SalesProvider>();
+              final success = await salesProvider.generateReceiptPdf(
+                sale.id,
               );
+
+              if (!success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      salesProvider.errorMessage ??
+                          'Failed to generate thermal receipt',
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.print_outlined, color: Colors.green, size: context.iconSize('small')),
+              padding: EdgeInsets.all(4.0),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(Icons.print_outlined, color: Colors.green, size: 16),
             ),
           ),
         ),
+        SizedBox(width: 4),
 
-        SizedBox(width: context.smallPadding / 2),
+        // Add Payment Button (If Unpaid/Partial)
+        if (sale.remainingAmount > 0)
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showAddPaymentDialog(context, sale),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
+                  ),
+                  child: Icon(Icons.payment_outlined, color: Colors.orange, size: 16),
+                ),
+              ),
+            ),
+          ),
+
 
         // Delete Button
         Material(
@@ -574,13 +781,161 @@ class _SalesTableState extends State<SalesTable> {
             onTap: () => widget.onDelete(sale),
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+              padding: EdgeInsets.all(4.0),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(Icons.delete_outline, color: Colors.red, size: 16),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _showAddPaymentDialog(BuildContext context, SaleModel sale) {
+    if (!mounted) return;
+    
+    final l10n = AppLocalizations.of(context);
+    final isUrdu = l10n?.localeName == 'ur';
+    final salesProvider = context.read<SalesProvider>();
+    
+    final amountController = TextEditingController(text: sale.remainingAmount.toStringAsFixed(0));
+    String selectedMethod = 'CASH';
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (builderContext, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppTheme.pureWhite,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title: Text(isUrdu ? 'ادائیگی شامل کریں' : 'Add Payment', style: TextStyle(color: AppTheme.primaryMaroon, fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text(
+                     isUrdu ? 'باقی رقم: PKR ${sale.remainingAmount.toStringAsFixed(0)}' : 'Remaining: PKR ${sale.remainingAmount.toStringAsFixed(0)}',
+                     style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                   ),
+                   SizedBox(height: 16),
+                   TextField(
+                     controller: amountController,
+                     keyboardType: TextInputType.number,
+                     style: const TextStyle(color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
+                     decoration: InputDecoration(
+                       labelText: isUrdu ? 'رقم' : 'Amount',
+                       hintText: '0.00',
+                       prefixIcon: const Icon(Icons.money_rounded, color: AppTheme.primaryMaroon),
+                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2.0)),
+                     ),
+                   ),
+                   const SizedBox(height: 16),
+                   DropdownButtonFormField<String>(
+                      value: selectedMethod,
+                      decoration: InputDecoration(
+                        labelText: isUrdu ? 'طریقہ کار' : 'Payment Method',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppTheme.primaryMaroon)),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'CASH', child: Text('Cash')),
+                        DropdownMenuItem(value: 'CARD', child: Text('Card')),
+                        DropdownMenuItem(value: 'BANK_TRANSFER', child: Text('Bank Transfer')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedMethod = val);
+                        }
+                      },
+                   ),
+                ],
+              ),
+              actions: [
+                PremiumButton(
+                  text: isUrdu ? 'منسوخ کریں' : 'Cancel',
+                  width: 120,
+                  height: 45,
+                  isOutlined: true,
+                  textColor: Colors.grey[700],
+                  backgroundColor: Colors.grey[700]!,
+                  onPressed: () => Navigator.pop(dialogContext),
+                ),
+                PremiumButton(
+                  text: isUrdu ? 'محفوظ کریں' : 'Save',
+                  width: 120,
+                  height: 45,
+                  backgroundColor: AppTheme.primaryMaroon,
+                  onPressed: () async {
+                    final amountText = amountController.text.trim();
+                    final amount = double.tryParse(amountText) ?? 0.0;
+                    
+                    if (amount <= 0) {
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(content: Text(isUrdu ? 'براہ کرم درست رقم درج کریں' : 'Please enter a valid amount')),
+                      );
+                      return;
+                    }
+                    
+                    if (amount > sale.remainingAmount) {
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(content: Text(isUrdu ? 'رقم باقی رقم سے زیادہ نہیں ہو سکتی' : 'Amount cannot exceed remaining balance')),
+                      );
+                      return;
+                    }
+                    
+                    setDialogState(() {}); // Show loading animation
+                    
+                    bool success = await salesProvider.addPaymentWithWorkflow(
+                       saleId: sale.id,
+                       amount: amount,
+                       method: selectedMethod,
+                    );
+                    
+                    if (!mounted) return;
+                    
+                    if (success) {
+                      // 🔥 Sync Receivables after successful payment
+                      try {
+                        final recProvider = Provider.of<ReceivablesProvider>(context, listen: false);
+                        await recProvider.fetchReceivables();
+                      } catch (e) {
+                        debugPrint('ReceivablesProvider not found in context: $e');
+                      }
+                      
+                      if (context.mounted) {
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isUrdu ? 'ادائیگی کامیابی سے شامل ہو گئی' : 'Payment added successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } else {
+                      setDialogState(() {}); // Stop loading animation
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(salesProvider.errorMessage ?? (isUrdu ? 'ادائیگی میں غلطی' : 'Payment error')),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
+            );
+          }
+        );
+      }
     );
   }
 
@@ -592,28 +947,64 @@ class _SalesTableState extends State<SalesTable> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: ResponsiveBreakpoints.responsive(context, tablet: 5.w, small: 5.w, medium: 5.w, large: 5.w, ultrawide: 5.w),
-            height: ResponsiveBreakpoints.responsive(context, tablet: 5.w, small: 5.w, medium: 5.w, large: 5.w, ultrawide: 5.w),
-            decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
-            child: Icon(Icons.receipt_long_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
+            width: ResponsiveBreakpoints.responsive(
+              context,
+              tablet: 5.w,
+              small: 5.w,
+              medium: 5.w,
+              large: 5.w,
+              ultrawide: 5.w,
+            ),
+            height: ResponsiveBreakpoints.responsive(
+              context,
+              tablet: 5.w,
+              small: 5.w,
+              medium: 5.w,
+              large: 5.w,
+              ultrawide: 5.w,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.lightGray,
+              borderRadius: BorderRadius.circular(context.borderRadius('xl')),
+            ),
+            child: Icon(
+              Icons.receipt_long_outlined,
+              size: context.iconSize('xl'),
+              color: Colors.grey[400],
+            ),
           ),
 
           SizedBox(height: context.mainPadding),
 
           Text(
             l10n.noSalesRecordsFound,
-            style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+            style: TextStyle(
+              fontSize: context.headerFontSize * 0.8,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoalGray,
+            ),
           ),
 
           SizedBox(height: context.smallPadding),
 
           Container(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
+              maxWidth: ResponsiveBreakpoints.responsive(
+                context,
+                tablet: 80.w,
+                small: 70.w,
+                medium: 60.w,
+                large: 50.w,
+                ultrawide: 40.w,
+              ),
             ),
             child: Text(
               l10n.completeFirstSaleMessage,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
           ),

@@ -35,8 +35,7 @@ class Expense(models.Model):
     """Expense model for tracking company expenses and withdrawals"""
     
     WITHDRAWAL_CHOICES = [
-        ('Mr. Shahzain Baloch', 'Mr. Shahzain Baloch'),
-        ('Mr Huzaifa', 'Mr Huzaifa'),
+            ('MetaBrass Admin', 'MetaBrass Admin'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -100,7 +99,7 @@ class Expense(models.Model):
         """Days since expense was recorded"""
         if not self.date:
             return 0
-        return (timezone.now().date() - self.date).days
+        return (timezone.localdate() - self.date).days
     
     @property
     def formatted_amount(self):
@@ -137,7 +136,7 @@ class Expense(models.Model):
         from django.core.exceptions import ValidationError
         
         # Date cannot be more than 1 year in the future (allow planned expenses)
-        max_future_date = timezone.now().date() + timezone.timedelta(days=365)
+        max_future_date = timezone.localdate() + timezone.timedelta(days=365)
         if self.date > max_future_date:
             raise ValidationError({'date': 'Date cannot be more than 1 year in the future.'})
         

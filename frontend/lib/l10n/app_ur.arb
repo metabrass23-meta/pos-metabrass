@@ -1,9 +1,9 @@
 {
   "@@locale": "ur",
-  "appTitle": "ال نور فیبرکس - پریمیم POS",
+  "appTitle": "میٹا براس - پریمیم POS",
   "welcomeBack": "خوش آمدید",
-  "brandName": "ال نور فیبرکس",
-  "tagline": "آپ کے قیمتی لمحات کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم برائیڈل اور گروم کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔",
+  "brandName": "میٹا براس",
+  "tagline": "آپ کے جدید گھر کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم باتھ روم اور سینیٹری کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔",
   "signIn": "سائن ان",
   "signUp": "سائن اپ",
   "searchReturns": "ریٹرنز تلاش کریں",
@@ -144,7 +144,7 @@
   "export": "ایکسپورٹ",
   "exportingSalesData": "فروخت کا ڈیٹا ایکسپورٹ ہو رہا ہے...",
   "searchProducts": "مصنوعات تلاش کریں...",
-  "searchProductsExpanded": "نام، رنگ، کپڑا سے مصنوعات تلاش کریں...",
+  "searchProductsExpanded": "نام، برانڈ، میٹریل سے مصنوعات تلاش کریں...",
   "filter": "فلٹر",
   "screenTooSmall": "اسکرین بہت چھوٹی ہے",
   "screenTooSmallMessage": "اس ایپلیکیشن کو بہترین تجربے کے لیے کم از کم 750px اسکرین کی چوڑائی درکار ہے۔ براہ کرم بڑی اسکرین استعمال کریں یا اپنے ڈیوائس کو گھمائیں۔",
@@ -189,7 +189,7 @@
   "inStock": "اسٹاک میں موجود",
   "totalValue": "کل مالیت",
   "value": "مالیت",
-  "searchProductsHint": "آئی ڈی، نام، رنگ، فیبرک، یا ٹکڑوں کے ذریعے مصنوعات تلاش کریں...",
+  "searchProductsHint": "آئی ڈی، نام، فنش، میٹریل، یا اجزاء کے ذریعے مصنوعات تلاش کریں...",
   "customerManagement": "کسٹمر مینجمنٹ",
   "customerManagementDescription": "جامع ٹولز کے ساتھ اپنے کسٹمر تعلقات کو منظم اور منظم کریں",
   "customerManagementShortDescription": "کسٹمر تعلقات کو منظم کریں",
@@ -219,9 +219,9 @@
   "lastPurchase": "آخری خریداری",
   "logoutMessage": "کیا آپ واقعی اپنے اکاؤنٹ سے لاگ آؤٹ کرنا چاہتے ہیں؟",
   "logoutError": "غلطی کی وجہ سے مقامی طور پر لاگ آؤٹ ہو گئے۔",
-  "brandTagline": "پریمیم پی او ایس",
-  "welcomeToPos": "ال نور فیبرکس پی او ایس میں خوش آمدید",
-  "welcomeTagline": "ہر ٹانکے میں عمدگی - آپ کا پریمیم فیشن مینجمنٹ سسٹم",
+  "brandTagline": "پریمیم سینیٹری POS",
+  "welcomeToPos": "میٹا براس POS میں خوش آمدید",
+  "welcomeTagline": "پریمیم سینیٹری مینجمنٹ - ڈیزائن اور معیار میں عمدگی",
   "today": "آج",
   "totalIncome": "کل آمدنی",
   "totalExpenses": "کل اخراجات",
@@ -374,17 +374,17 @@
   "costPriceCannotExceedSellingPrice": "لاگت قیمت فروخت قیمت سے زیادہ نہیں ہو سکتی",
   "costPriceInfo": "لاگت قیمت کی ترتیب منافع کے مارجن کی گنتی اور بہتر مالیاتی تجزیہ کو فعال کرتی ہے",
   "qty": "مقدار",
-  "colorName": "رنگ کا نام",
-  "fabricType": "کپڑے کی قسم",
-  "fabricName": "کپڑے کا نام",
+  "colorName": "فنش/رنگ",
+  "materialType": "میٹریل کی قسم",
+  "materialName": "میٹریل کا نام",
   "pieces": "ٹکڑے",
   "pleaseSelectAtLeastOnePiece": "براہ کرم کم از کم ایک ٹکڑا منتخب کریں",
   "failedToAdd": "شامل کرنے میں ناکام",
   "addedSuccessfully": "کامیابی سے شامل ہو گیا",
   "select": "منتخب کریں",
   "pleaseSelect": "براہ کرم منتخب کریں",
-  "color": "رنگ",
-  "fabric": "کپڑا",
+  "color": "فنش",
+  "material": "میٹریل",
   "labors": "مزدور",
   "laborManagement": "مزدوروں کا انتظام",
   "laborManagementDescription": "جامع ٹولز کے ساتھ اپنی لیبر ورک فورس کو منظم اور منیجکریں",
@@ -753,7 +753,7 @@
   "sortOptions": "ترتیب کے اختیارات",
   "allCategories": "تمام اقسام",
   "allColors": "تمام رنگ",
-  "allFabrics": "تمام کپڑے",
+  "allMaterials": "تمام میٹریل",
   "allStockLevels": "اسٹاک کی تمام سطحیں",
   "inStockHigh": "اسٹاک میں (زیادہ)",
   "mediumStock": "درمیانی اسٹاک",
@@ -774,7 +774,7 @@
   "enterPrice": "قیمت درج کریں",
   "enterQuantity": "مقدار درج کریں",
   "enterColor": "رنگ درج کریں",
-  "enterFabric": "کپڑا درج کریں",
+  "enterMaterial": "میٹریل درج کریں",
   "enterMinPrice": "کم از کم قیمت درج کریں",
   "enterVendorName": "وینڈر کا نام درج کریں",
   "enterBusinessName": "کاروبار کا نام درج کریں",
@@ -833,16 +833,16 @@
   "showingZakatRecords": "{start}-{end} دکھایا جا رہا ہے کل {total} زکوٰۃ ریکارڈز میں سے",
   "@showingZakatRecords": {
     "placeholders": {
-      "start": {"type": "int"},
-      "end": {"type": "int"},
-      "total": {"type": "int"}
+      "start": {"type": "num"},
+      "end": {"type": "num"},
+      "total": {"type": "num"}
     }
   },
   "pageOfPages": "{current} از {total}",
   "@pageOfPages": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"}
+      "current": {"type": "num"},
+      "total": {"type": "num"}
     }
   },
   "filterZakatRecords": "زکوٰۃ ریکارڈز فلٹر کریں",
@@ -1101,7 +1101,7 @@
   "@daysOverdueCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1110,7 +1110,7 @@
   "@weeksAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1119,7 +1119,7 @@
   "@monthsAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1128,7 +1128,7 @@
   "@yearsAgo": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "num"
       }
     }
   },
@@ -1170,9 +1170,9 @@
   "enterColorName": "رنگ کا نام درج کریں (مثلاً: سرخ، نیلا، فیروزی)",
   "pleaseEnterColor": "براہ کرم رنگ درج کریں",
   "colorNameMustBeAtLeast2Characters": "رنگ کا نام کم از کم 2 حروف کا ہونا چاہیے",
-  "enterFabricType": "کپڑے کی قسم درج کریں (مثلاً: کاٹن، ریشم، شیفون)",
-  "pleaseEnterFabric": "براہ کرم کپڑا درج کریں",
-  "fabricNameMustBeAtLeast2Characters": "کپڑے کا نام کم از کم 2 حروف کا ہونا چاہیے",
+  "enterMaterialType": "میٹریل کی قسم درج کریں (مثلاً: پیتل، سٹیل، کروم)",
+  "pleaseEnterMaterial": "براہ کرم میٹریل درج کریں",
+  "materialNameMustBeAtLeast2Characters": "میٹریل کا نام کم از کم 2 حروف کا ہونا چاہیے",
   "productNameMustBeAtLeast2Characters": "مصنوعات کا نام کم از کم 2 حروف کا ہونا چاہیے",
   "pleaseEnterProductName": "براہ کرم مصنوعات کا نام درج کریں",
   "updateProduct": "مصنوعات اپ ڈیٹ کریں",
@@ -1441,7 +1441,7 @@
   "chooseProductToAddToOrder": "آرڈر میں شامل کرنے کے لیے پروڈکٹ منتخب کریں",
   "pleaseSelectProduct": "براہ کرم ایک پروڈکٹ منتخب کریں",
   "searchProductsShort": "پروڈکٹس تلاش کریں",
-  "searchProductsByNameFabricOrColor": "نام، کپڑے یا رنگ کے ذریعے پروڈکٹس تلاش کریں...",
+  "searchProductsByNameMaterialOrColor": "نام، میٹریل یا رنگ کے ذریعے پروڈکٹس تلاش کریں...",
   "availableProducts": "دستیاب پروڈکٹس",
   "tryAdjustingYourSearchTerms": "اپنی تلاش کی شرائط کو ایڈجسٹ کرنے کی کوشش کریں",
   "selectedProductDetails": "منتخب پروڈکٹ کی تفصیلات",
@@ -1555,7 +1555,7 @@
   "updateExpense": "اخراجات اپ ڈیٹ کریں",
   "expenseUpdatedSuccessfully": "اخراجات کامیابی سے اپ ڈیٹ ہو گیا!",
   "pleaseAcceptTerms": "براہ کرم شرائط و ضوابط کو قبول کریں",
-  "accountCreatedSuccessfully": "اکاؤنٹ کامیابی سے بن گیا! ال نور فیبرکس میں خوش آمدید۔",
+  "accountCreatedSuccessfully": "اکاؤنٹ کامیابی سے بن گیا! میٹا براس میں خوش آمدید۔",
   "registrationFailedMessage": "رجسٹریشن ناکام ہو گئی۔ براہ کرم ذیل میں تفصیلات چیک کریں۔",
   "joinOur": "ہمارے ساتھ شامل ہوں",
   "premiumFamily": "پریمیم فیملی",
@@ -1732,7 +1732,7 @@
   "numericRangeFilters": "عددی حد فلٹرز",
   "minQuantity": "کم سے کم مقدار",
   "minimumQuantity": "کم سے کم مقدار",
-  "maxQuantity": "زیادہ سے زیادہ مقدار",
+  "maxQuantity": "زیادہ سے زیادہ مقدار {quantity}",
   "maximumQuantity": "زیادہ سے زیادہ مقدار",
   "minPricePKR": "کم سے کم قیمت (PKR)",
   "minimumUnitPrice": "کم سے کم یونٹ قیمت",
@@ -1777,7 +1777,7 @@
   "style": "انداز",
   "noAdditionalDetails": "کوئی اضافی تفصیلات نہیں",
   "addedToCart": "کارٹ میں شامل کیا گیا",
-  "stockAvailable": "اسٹاک",
+  "stockAvailable": "اسٹاک {quantity}",
   "min": "کم از کم",
   "customPrice": "حسب ضرورت قیمت",
   "customPricePkr": "حسب ضرورت قیمت (PKR)",
@@ -1951,7 +1951,7 @@
   "aboutApp": "ایپ کے بارے میں",
   "darkMode": "ڈارک موڈ",
   "enableDarkThemeForApplication": "ایپلیکیشن کے لیے ڈارک تھیم فعال کریں",
-  "alNoorFashionPOS": "النور پی او ایس",
+  "alNoorFashionPOS": "میٹا براس پی او ایس",
   "version": "ورژن",
   "aPremiumPointOfSaleSolution": "فیشن ریٹیل کاروبار کے لیے ایک پریمیم پوائنٹ آف سیل حل۔ اپنی انوینٹری، گاہکوں اور فروخت کو خوبصورتی سے منظم کریں۔",
   "createNewReturn": "نیا واپسی بنائیں",
@@ -2008,7 +2008,7 @@
   "customizationOptions": "تخصیص کے اختیارات",
   "embroideryWork": "کڑھائی کا کام",
   "embroidery": "کڑھائی",
-  "fabricQuality": "کپڑے کا معیار",
+  "materialQuality": "میٹریل کا معیار",
   "accentColor": "لہجے کا رنگ",
   "additionalServices": "اضافی خدمات",
   "expressDelivery": "فوری ترسیل",
@@ -2026,6 +2026,21 @@
   "subtotalWithCustomizations": "تخصیص کے ساتھ ذیلی کل:",
   "itemDiscount": "شے کی رعایت:",
   "youSave": "آپ PKR {amount} بچاتے ہیں",
+  "@maxQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "num"
+      }
+    }
+  },
+  "@clearDiscount": {},
+  "@basePriceQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "num"
+      }
+    }
+  },
   "none": "کوئی نہیں",
   "red": "سرخ",
   "blue": "نیلا",

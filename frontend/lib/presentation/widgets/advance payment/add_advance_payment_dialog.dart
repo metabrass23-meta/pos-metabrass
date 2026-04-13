@@ -103,6 +103,8 @@ class _AddAdvancePaymentDialogState extends State<AddAdvancePaymentDialog> with 
         if (mounted) {
           if (success) {
             _showSuccessSnackbar();
+            // Refresh labor data to update balances across the app
+            Provider.of<LaborProvider>(context, listen: false).refreshLabors();
             Navigator.of(context).pop();
           } else {
             _showErrorSnackbar(advancePaymentProvider.errorMessage ?? l10n.failedToAddAdvancePayment);

@@ -55,7 +55,7 @@ def product_post_save(sender, instance, created, **kwargs):
         
         logger.info(
             f"Product quantity updated: {instance.name} (ID: {instance.id}) "
-            f"from {old_qty} to {new_qty} (difference: {difference:+d})"
+            f"from {old_qty} to {new_qty} (difference: {difference:+.2f})"
         )
         
         # Check for low stock alert

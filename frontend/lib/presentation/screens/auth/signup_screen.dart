@@ -188,7 +188,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ],
                       ),
-                      child: Image.asset('assets/images/logo.png'),
+                      child: Image.asset('assets/images/metabras.png'),
                     ),
 
                     SizedBox(height: context.mainPadding),

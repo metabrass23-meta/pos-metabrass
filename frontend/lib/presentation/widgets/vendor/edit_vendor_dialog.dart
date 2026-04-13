@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:frontend/src/utils/cnic_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/vendor_provider.dart';
@@ -15,7 +16,8 @@ class EnhancedEditVendorDialog extends StatefulWidget {
   const EnhancedEditVendorDialog({super.key, required this.vendor});
 
   @override
-  State<EnhancedEditVendorDialog> createState() => _EnhancedEditVendorDialogState();
+  State<EnhancedEditVendorDialog> createState() =>
+      _EnhancedEditVendorDialogState();
 }
 
 class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
@@ -67,7 +69,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
 
     // Initialize controllers with existing vendor data
     _nameController = TextEditingController(text: widget.vendor.name);
-    _businessNameController = TextEditingController(text: widget.vendor.businessName);
+    _businessNameController = TextEditingController(
+      text: widget.vendor.businessName,
+    );
     _cnicController = TextEditingController(text: widget.vendor.cnic);
     _phoneController = TextEditingController(text: widget.vendor.phone);
     _cityController = TextEditingController(text: widget.vendor.city);
@@ -92,17 +96,18 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     _areaController.addListener(_checkForChanges);
 
     // Initialize animations
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     _animationController.forward();
   }
@@ -159,7 +164,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         id: widget.vendor.id,
         name: _nameController.text.trim(),
         businessName: _businessNameController.text.trim(),
-        cnic: _cnicController.text.trim().isEmpty ? null : _cnicController.text.trim(),
+        cnic: _cnicController.text.trim().isEmpty
+            ? null
+            : _cnicController.text.trim(),
         phone: _phoneController.text.trim(),
         city: _cityController.text.trim(),
         area: _areaController.text.trim(),
@@ -170,7 +177,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           _showSuccessSnackbar();
           Navigator.of(context).pop();
         } else {
-          _showErrorSnackbar(provider.errorMessage ?? '${l10n.failedToUpdate} ${l10n.vendor}');
+          _showErrorSnackbar(
+            provider.errorMessage ?? '${l10n.failedToUpdate} ${l10n.vendor}',
+          );
         }
       }
     }
@@ -183,7 +192,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               '${l10n.vendor} ${l10n.updatedSuccessfully}!',
@@ -198,7 +211,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -208,7 +223,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Expanded(
               child: Text(
@@ -225,7 +244,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -235,7 +256,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.info_outline, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.info_outline,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               message,
@@ -250,7 +275,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
         backgroundColor: Colors.blue,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -265,7 +292,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           title: Text(l10n.discardChanges),
           content: Text(l10n.discardChangesMessage),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.continueEditing)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.continueEditing),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close confirmation dialog
@@ -311,7 +341,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -342,7 +374,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: _hasChanges ? [Colors.orange, Colors.orangeAccent] : [Colors.blue, Colors.blueAccent],
+          colors: _hasChanges
+              ? [Colors.orange, Colors.orangeAccent]
+              : [Colors.blue, Colors.blueAccent],
         ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
@@ -382,7 +416,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
                 if (!context.isTablet) ...[
                   SizedBox(height: context.smallPadding / 2),
                   Text(
-                    _hasChanges ? l10n.unsavedChanges : '${l10n.update} ${l10n.vendor} ${l10n.information}',
+                    _hasChanges
+                        ? l10n.unsavedChanges
+                        : '${l10n.update} ${l10n.vendor} ${l10n.information}',
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w400,
@@ -401,7 +437,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               ),
               decoration: BoxDecoration(
                 color: AppTheme.pureWhite.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -426,10 +464,14 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             ),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
             ),
             child: Text(
-              widget.vendor.id.length > 8 ? '${widget.vendor.id.substring(0, 8)}...' : widget.vendor.id,
+              widget.vendor.id.length > 8
+                  ? '${widget.vendor.id.substring(0, 8)}...'
+                  : widget.vendor.id,
               style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
@@ -445,7 +487,11 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -554,6 +600,7 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               : '${l10n.enterCnicNumber} (${l10n.cnicFormat}) - ${l10n.optional}',
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
+          inputFormatters: [CnicInputFormatter()],
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
@@ -573,7 +620,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
+        _buildSectionTitle(
+          l10n.contactInformation,
+          Icons.contact_phone_outlined,
+        ),
         SizedBox(height: context.cardPadding),
 
         // Phone Number
@@ -605,7 +655,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
+        _buildSectionTitle(
+          l10n.locationInformation,
+          Icons.location_on_outlined,
+        ),
         SizedBox(height: context.cardPadding),
 
         // City and Area Row/Column
@@ -667,10 +720,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-              label: city,
-              onTap: () => setState(() => _cityController.text = city),
-            ),
-          )
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -703,10 +756,10 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-              label: area,
-              onTap: () => setState(() => _areaController.text = area),
-            ),
-          )
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -730,16 +783,25 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.accentGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.accentGold.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
@@ -763,7 +825,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
           builder: (context, provider, child) {
             return PremiumButton(
               text: '${l10n.update} ${l10n.vendor}',
-              onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
+              onPressed: (!_hasChanges || provider.isLoading)
+                  ? null
+                  : _handleUpdate,
               isLoading: provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.save_rounded,
@@ -806,7 +870,9 @@ class _EnhancedEditVendorDialogState extends State<EnhancedEditVendorDialog>
             builder: (context, provider, child) {
               return PremiumButton(
                 text: '${l10n.update} ${l10n.vendor}',
-                onPressed: (!_hasChanges || provider.isLoading) ? null : _handleUpdate,
+                onPressed: (!_hasChanges || provider.isLoading)
+                    ? null
+                    : _handleUpdate,
                 isLoading: provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.save_rounded,

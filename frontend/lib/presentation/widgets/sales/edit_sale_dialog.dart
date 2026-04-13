@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart';
+import '../../../src/providers/receivables_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/models/sales/request_models.dart';
 import '../../../src/theme/app_theme.dart';
@@ -26,8 +27,8 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
   final _notesController = TextEditingController();
   final _scrollController = ScrollController();
 
-  String _selectedPaymentMethod = 'Cash';
-  String _selectedStatus = 'Paid';
+  String _selectedPaymentMethod = 'CASH';
+  String _selectedStatus = 'PAID';
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -62,10 +63,26 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
       final provider = Provider.of<SalesProvider>(context, listen: false);
       final amountPaid = double.tryParse(_amountPaidController.text) ?? 0.0;
 
+      // Update the sale details including amountPaid
       await provider.updateSale(
         widget.sale.id,
-        UpdateSaleRequest(paymentMethod: _selectedPaymentMethod, status: _selectedStatus, notes: _notesController.text),
+        UpdateSaleRequest(
+          paymentMethod: _selectedPaymentMethod,
+          status: _selectedStatus,
+          notes: _notesController.text,
+          amountPaid: amountPaid, // ✅ Correctly passing amountPaid now
+        ),
       );
+
+      // Refresh receivables data to reflect the update
+      try {
+        if (mounted) {
+          final recProvider = Provider.of<ReceivablesProvider>(context, listen: false);
+          recProvider.fetchReceivables();
+        }
+      } catch (e) {
+        // ReceivablesProvider might not be available in all contexts
+      }
 
       if (mounted) {
         _showSuccessSnackbar();
@@ -447,18 +464,24 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               child: DropdownButton<String>(
                 value: _selectedPaymentMethod,
                 isExpanded: true,
-                onChanged: (value) => setState(() => _selectedPaymentMethod = value ?? 'Cash'),
-                items: ['Cash', 'Card', 'Bank Transfer', 'Credit', 'Split'].map((method) {
+                onChanged: (value) => setState(() => _selectedPaymentMethod = value ?? 'CASH'),
+                items: [
+                  {'value': 'CASH', 'label': 'Cash'},
+                  {'value': 'CARD', 'label': 'Card'},
+                  {'value': 'BANK_TRANSFER', 'label': 'Bank Transfer'},
+                  {'value': 'CREDIT', 'label': 'Credit Sale'},
+                  {'value': 'SPLIT', 'label': 'Split Payment'},
+                ].map((method) {
                   return DropdownMenuItem<String>(
-                    value: method,
+                    value: method['value'] as String,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Row(
                         children: [
-                          Icon(_getPaymentMethodIcon(method), color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                          Icon(_getPaymentMethodIcon(method['value'] as String), color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
                           SizedBox(width: context.smallPadding),
                           Text(
-                            method,
+                            method['label'] as String,
                             style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                           ),
                         ],
@@ -498,11 +521,12 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
               child: DropdownButton<String>(
                 value: _selectedStatus,
                 isExpanded: true,
-                onChanged: (value) => setState(() => _selectedStatus = value ?? 'Paid'),
+                onChanged: (value) => setState(() => _selectedStatus = value ?? 'PAID'),
                 items: [
-                  DropdownMenuItem(value: 'Paid', child: _buildStatusItem(l10n.paidStatus, _getStatusColor('Paid'), context)),
-                  DropdownMenuItem(value: 'Partial', child: _buildStatusItem(l10n.partialStatus, _getStatusColor('Partial'), context)),
-                  DropdownMenuItem(value: 'Unpaid', child: _buildStatusItem(l10n.unpaidStatus, _getStatusColor('Unpaid'), context)),
+                  DropdownMenuItem(value: 'PAID', child: _buildStatusItem(l10n.paidStatus, _getStatusColor('PAID'), context)),
+                  DropdownMenuItem(value: 'PARTIAL', child: _buildStatusItem(l10n.partialStatus, _getStatusColor('PARTIAL'), context)),
+                  DropdownMenuItem(value: 'UNPAID', child: _buildStatusItem(l10n.unpaidStatus, _getStatusColor('UNPAID'), context)),
+                  DropdownMenuItem(value: 'DRAFT', child: _buildStatusItem('Draft', _getStatusColor('DRAFT'), context)),
                 ],
               ),
             ),
@@ -711,16 +735,16 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
   }
 
   IconData _getPaymentMethodIcon(String method) {
-    switch (method) {
-      case 'Cash':
+    switch (method.toUpperCase()) {
+      case 'CASH':
         return Icons.money_rounded;
-      case 'Card':
+      case 'CARD':
         return Icons.credit_card_rounded;
-      case 'Bank Transfer':
+      case 'BANK_TRANSFER':
         return Icons.account_balance_rounded;
-      case 'Credit':
+      case 'CREDIT':
         return Icons.account_balance_wallet_rounded;
-      case 'Split':
+      case 'SPLIT':
         return Icons.call_split_rounded;
       default:
         return Icons.payment_rounded;
@@ -728,13 +752,15 @@ class _EditSaleDialogState extends State<EditSaleDialog> with SingleTickerProvid
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Paid':
+    switch (status.toUpperCase()) {
+      case 'PAID':
         return Colors.green;
-      case 'Partial':
+      case 'PARTIAL':
         return Colors.orange;
-      case 'Unpaid':
+      case 'UNPAID':
         return Colors.red;
+      case 'DRAFT':
+        return Colors.grey;
       default:
         return Colors.grey;
     }

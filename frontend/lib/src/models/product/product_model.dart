@@ -7,9 +7,9 @@ class ProductModel {
   final double price;
   final double? costPrice; // Added cost price field
   final String color;
-  final String fabric;
+  final String material;
   final List<String> pieces;
-  final int quantity;
+  final double quantity;
   final String? categoryId;
   final String? categoryName;
   final String stockStatus;
@@ -31,7 +31,7 @@ class ProductModel {
     required this.price,
     this.costPrice, // Added cost price parameter
     required this.color,
-    required this.fabric,
+    required this.material,
     required this.pieces,
     required this.quantity,
     this.categoryId,
@@ -58,9 +58,9 @@ class ProductModel {
       price: _parseDouble(json['price']),
       costPrice: json['cost_price'] != null ? _parseDouble(json['cost_price']) : null, // Parse cost price
       color: json['color'] as String,
-      fabric: json['fabric'] as String,
+      material: json['material'] as String? ?? '',
       pieces: _parsePieces(json['pieces']),
-      quantity: json['quantity'] as int? ?? 0,
+      quantity: _parseDouble(json['quantity']),
       categoryId: json['category_id'] as String?,
       categoryName: json['category_name'] as String?,
       stockStatus: json['stock_status'] as String? ?? 'UNKNOWN',
@@ -111,7 +111,7 @@ class ProductModel {
       'price': price,
       'cost_price': costPrice, // Include cost price in JSON
       'color': color,
-      'fabric': fabric,
+      'material': material,
       'pieces': pieces,
       'quantity': quantity,
       'category_id': categoryId,
@@ -198,9 +198,9 @@ class ProductModel {
     double? price,
     double? costPrice, // Added cost price parameter
     String? color,
-    String? fabric,
+    String? material,
     List<String>? pieces,
-    int? quantity,
+    double? quantity,
     String? categoryId,
     String? categoryName,
     String? stockStatus,
@@ -222,7 +222,7 @@ class ProductModel {
       price: price ?? this.price,
       costPrice: costPrice ?? this.costPrice, // Include cost price
       color: color ?? this.color,
-      fabric: fabric ?? this.fabric,
+      material: material ?? this.material,
       pieces: pieces ?? this.pieces,
       quantity: quantity ?? this.quantity,
       categoryId: categoryId ?? this.categoryId,
@@ -318,9 +318,9 @@ class ProductCreateRequest {
   final double price;
   final double? costPrice; // Added cost price field
   final String color;
-  final String fabric;
+  final String material;
   final List<String> pieces;
-  final int quantity;
+  final double quantity;
   final String category; // Category UUID
   final String? barcode; // Added barcode field
   final String? sku;     // Added SKU field
@@ -331,7 +331,7 @@ class ProductCreateRequest {
     required this.price,
     this.costPrice, // Made optional
     required this.color,
-    required this.fabric,
+    required this.material,
     required this.pieces,
     required this.quantity,
     required this.category,
@@ -345,7 +345,7 @@ class ProductCreateRequest {
       'detail': detail,
       'price': price,
       'color': color,
-      'fabric': fabric,
+      'material': material,
       'pieces': pieces,
       'quantity': quantity,
       'category': category,
@@ -376,9 +376,9 @@ class ProductUpdateRequest {
   final double? price;
   final double? costPrice; // Added cost price field
   final String? color;
-  final String? fabric;
+  final String? material;
   final List<String>? pieces;
-  final int? quantity;
+  final double? quantity;
   final String? category; // Category UUID
 
   ProductUpdateRequest({
@@ -387,7 +387,7 @@ class ProductUpdateRequest {
     this.price,
     this.costPrice, // Added cost price parameter
     this.color,
-    this.fabric,
+    this.material,
     this.pieces,
     this.quantity,
     this.category,
@@ -400,7 +400,7 @@ class ProductUpdateRequest {
     if (price != null) data['price'] = price;
     if (costPrice != null) data['cost_price'] = costPrice; // Include cost price
     if (color != null) data['color'] = color;
-    if (fabric != null) data['fabric'] = fabric;
+    if (material != null) data['material'] = material;
     if (pieces != null) data['pieces'] = pieces;
     if (quantity != null) data['quantity'] = quantity;
     if (category != null) data['category'] = category;
@@ -412,7 +412,7 @@ class ProductFilters {
   final String? search;
   final String? categoryId;
   final String? color;
-  final String? fabric;
+  final String? material;
   final String? stockLevel;
   final double? minPrice;
   final double? maxPrice;
@@ -425,7 +425,7 @@ class ProductFilters {
     this.search,
     this.categoryId,
     this.color,
-    this.fabric,
+    this.material,
     this.stockLevel,
     this.minPrice,
     this.maxPrice,
@@ -441,7 +441,7 @@ class ProductFilters {
     if (search != null && search!.isNotEmpty) params['search'] = search!;
     if (categoryId != null && categoryId!.isNotEmpty) params['category_id'] = categoryId!;
     if (color != null && color!.isNotEmpty) params['color'] = color!;
-    if (fabric != null && fabric!.isNotEmpty) params['fabric'] = fabric!;
+    if (material != null && material!.isNotEmpty) params['material'] = material!;
     if (stockLevel != null && stockLevel!.isNotEmpty) params['stock_level'] = stockLevel!;
     if (minPrice != null) params['min_price'] = minPrice.toString();
     if (maxPrice != null) params['max_price'] = maxPrice.toString();
@@ -457,7 +457,7 @@ class ProductFilters {
     String? search,
     String? categoryId,
     String? color,
-    String? fabric,
+    String? material,
     String? stockLevel,
     double? minPrice,
     double? maxPrice,
@@ -470,7 +470,7 @@ class ProductFilters {
       search: search ?? this.search,
       categoryId: categoryId ?? this.categoryId,
       color: color ?? this.color,
-      fabric: fabric ?? this.fabric,
+      material: material ?? this.material,
       stockLevel: stockLevel ?? this.stockLevel,
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
@@ -525,7 +525,7 @@ class ProductStatistics {
 class CategoryStats {
   final String categoryName;
   final int count;
-  final int totalQuantity;
+  final double totalQuantity;
   final double? totalValue;
 
   const CategoryStats({required this.categoryName, required this.count, required this.totalQuantity, this.totalValue});
@@ -534,7 +534,7 @@ class CategoryStats {
     return CategoryStats(
       categoryName: json['category__name'] as String? ?? '',
       count: json['count'] as int? ?? 0,
-      totalQuantity: json['total_quantity'] as int? ?? 0,
+      totalQuantity: ProductModel._parseDouble(json['total_quantity']),
       totalValue: ProductModel._parseDouble(json['total_value']),
     );
   }

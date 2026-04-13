@@ -268,7 +268,7 @@ class SaleItemModel {
   final String productId;
   final String productName;
   final double unitPrice;
-  final int quantity;
+  final double quantity;
   final double itemDiscount;
   final double lineTotal;
   final String? customizationNotes;
@@ -279,8 +279,9 @@ class SaleItemModel {
   // Computed properties
   double get totalBeforeDiscount => unitPrice * quantity;
   double get discountAmount => totalBeforeDiscount - lineTotal;
-  double get discountPercentage =>
-      totalBeforeDiscount > 0 ? (discountAmount / totalBeforeDiscount) * 100 : 0;
+  double get discountPercentage => totalBeforeDiscount > 0
+      ? (discountAmount / totalBeforeDiscount) * 100
+      : 0;
   double get discountedUnitPrice =>
       quantity > 0 ? lineTotal / quantity : unitPrice;
 
@@ -308,7 +309,7 @@ class SaleItemModel {
       productId: json['product'] as String? ?? '',
       productName: json['product_name'] as String? ?? 'Unknown Product',
       unitPrice: _parseDouble(json['unit_price']),
-      quantity: _parseInt(json['quantity']),
+      quantity: _parseDouble(json['quantity']),
       itemDiscount: _parseDouble(json['item_discount']),
       lineTotal: _parseDouble(json['line_total']),
       customizationNotes: json['customization_notes'] as String?,
@@ -347,7 +348,7 @@ class SaleItemModel {
     String? productId,
     String? productName,
     double? unitPrice,
-    int? quantity,
+    double? quantity,
     double? itemDiscount,
     double? lineTotal,
     String? customizationNotes,
@@ -409,7 +410,7 @@ class SaleModel {
   String get formattedInvoiceNumber => '#$invoiceNumber';
   String get dateTimeText =>
       '${dateOfSale.day}/${dateOfSale.month}/${dateOfSale.year}';
-  int get totalItems => saleItems.fold(0, (sum, item) => sum + item.quantity);
+  double get totalItems => saleItems.fold(0.0, (sum, item) => sum + item.quantity);
   double get paymentPercentage =>
       grandTotal > 0 ? (amountPaid / grandTotal) * 100 : 0;
   int get salesAgeDays => DateTime.now().difference(dateOfSale).inDays;
@@ -522,7 +523,7 @@ class SaleModel {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
-    this.createdBy,
+    this.createdBy = 'Mr Sheikh Parwaiz Maqbool', // Default authorizer
     required this.saleItems,
   });
 
@@ -541,7 +542,8 @@ class SaleModel {
       subtotal: _parseDouble(json['subtotal']),
       overallDiscount: _parseDouble(json['overall_discount']),
       taxConfiguration: TaxConfiguration.fromJson(
-          json['tax_configuration'] as Map<String, dynamic>? ?? {}),
+        json['tax_configuration'] as Map<String, dynamic>? ?? {},
+      ),
       gstPercentage: _parseDouble(json['gst_percentage']),
       taxAmount: _parseDouble(json['tax_amount']),
       grandTotal: _parseDouble(json['grand_total']),
@@ -550,11 +552,13 @@ class SaleModel {
       // Calculate remaining amount if missing (List View doesn't send it)
       remainingAmount: json['remaining_amount'] != null
           ? _parseDouble(json['remaining_amount'])
-          : _parseDouble(json['grand_total']) - _parseDouble(json['amount_paid']),
+          : _parseDouble(json['grand_total']) -
+                _parseDouble(json['amount_paid']),
 
       isFullyPaid: json['is_fully_paid'] as bool? ?? false,
       paymentMethod: json['payment_method'] as String? ?? 'CASH',
-      splitPaymentDetails: json['split_payment_details'] as Map<String, dynamic>?,
+      splitPaymentDetails:
+          json['split_payment_details'] as Map<String, dynamic>?,
 
       // Date of Sale
       dateOfSale: json['date_of_sale'] != null
@@ -569,8 +573,8 @@ class SaleModel {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : (json['date_of_sale'] != null
-          ? DateTime.parse(json['date_of_sale'] as String)
-          : DateTime.now()),
+                ? DateTime.parse(json['date_of_sale'] as String)
+                : DateTime.now()),
 
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
@@ -579,9 +583,12 @@ class SaleModel {
       createdBy: json['created_by'] as String?,
 
       // --- FIX: Handle Missing Items List ---
-      saleItems: (json['sale_items'] as List<dynamic>?)
-          ?.map((item) => SaleItemModel.fromJson(item as Map<String, dynamic>))
-          .toList() ??
+      saleItems:
+          (json['sale_items'] as List<dynamic>?)
+              ?.map(
+                (item) => SaleItemModel.fromJson(item as Map<String, dynamic>),
+              )
+              .toList() ??
           [],
     );
   }
@@ -714,9 +721,9 @@ class InvoiceModel {
 
   bool get isOverdue =>
       dueDate != null &&
-          status != 'PAID' &&
-          status != 'CANCELLED' &&
-          DateTime.now().isAfter(dueDate!);
+      status != 'PAID' &&
+      status != 'CANCELLED' &&
+      DateTime.now().isAfter(dueDate!);
 
   Color get statusColor {
     switch (status) {
@@ -782,7 +789,7 @@ class InvoiceModel {
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     try {
       debugPrint('🔍 [InvoiceModel] Parsing JSON: $json');
-      
+
       // Helper function to handle both int and string types
       String? _parseString(dynamic value) {
         if (value == null) return null;
@@ -791,7 +798,7 @@ class InvoiceModel {
         if (value is double) return value.toString();
         return value.toString();
       }
-      
+
       final invoice = InvoiceModel(
         id: json['id'] as String? ?? '',
         saleId: json['sale'] as String? ?? '',
@@ -825,8 +832,10 @@ class InvoiceModel {
             : DateTime.now(),
         createdBy: _parseString(json['created_by']),
       );
-      
-      debugPrint('✅ [InvoiceModel] Successfully parsed invoice: ${invoice.invoiceNumber}');
+
+      debugPrint(
+        '✅ [InvoiceModel] Successfully parsed invoice: ${invoice.invoiceNumber}',
+      );
       return invoice;
     } catch (e) {
       debugPrint('❌ [InvoiceModel] Error parsing JSON: $e');
@@ -994,7 +1003,9 @@ class ReceiptModel {
       saleInvoiceNumber: json['sale_invoice_number'] as String? ?? '',
       customerName: json['customer_name'] as String? ?? '',
       paymentId: json['payment'] as String? ?? '',
-      paymentAmount: _parseDouble(json['payment_amount'] ?? json['sale_amount'] ?? '0.0'),
+      paymentAmount: _parseDouble(
+        json['payment_amount'] ?? json['sale_amount'] ?? '0.0',
+      ),
       paymentMethod: json['payment_method'] as String? ?? 'CASH',
       receiptNumber: json['receipt_number'] as String? ?? '',
       generatedAt: json['generated_at'] != null

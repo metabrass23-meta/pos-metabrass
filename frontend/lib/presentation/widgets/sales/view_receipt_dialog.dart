@@ -9,6 +9,7 @@ import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/services/receipt_service.dart';
+import '../../../src/services/pdf_receipt_service.dart';
 import '../../widgets/globals/text_button.dart';
 
 class ViewReceiptDialog extends StatefulWidget {
@@ -34,7 +35,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
   Future<void> _loadReceipt() async {
     try {
       final receiptProvider = context.read<ReceiptProvider>();
-      
+
       // Find receipt for this sale
       final receipts = receiptProvider.receipts;
       final receipt = receipts.firstWhere(
@@ -139,7 +140,10 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
                     ),
                     child: const Text(
                       'Close',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
@@ -155,9 +159,19 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      'Print',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.picture_as_pdf, size: 16),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'Print PDF',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -181,11 +195,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.receipt_long,
-            size: 48,
-            color: AppTheme.primaryMaroon,
-          ),
+          Icon(Icons.receipt_long, size: 48, color: AppTheme.primaryMaroon),
           const SizedBox(height: 16),
           Text(
             'Receipt Details',
@@ -206,22 +216,35 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
           ),
           Text(
             'Customer: ${widget.sale.customerName}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),
           const SizedBox(height: 8),
           const Divider(color: Colors.grey),
           const SizedBox(height: 8),
-          
+
           // Show correct financial details - calculate from sale items if needed
-          _buildReceiptRow('Subtotal:', _formatCurrency(_calculateSubtotal().toString())),
-          _buildReceiptRow('Discount:', _formatCurrency(_calculateDiscount().toString())),
-          _buildReceiptRow('Grand Total:', _formatCurrency(_calculateGrandTotal().toString()), isBold: true),
-          _buildReceiptRow('Amount Paid:', _formatCurrency(widget.sale.amountPaid.toString())),
-          _buildReceiptRow('Balance:', _formatCurrency(_calculateBalance().toString())),
-          
+          _buildReceiptRow(
+            'Subtotal:',
+            _formatCurrency(_calculateSubtotal().toString()),
+          ),
+          _buildReceiptRow(
+            'Discount:',
+            _formatCurrency(_calculateDiscount().toString()),
+          ),
+          _buildReceiptRow(
+            'Grand Total:',
+            _formatCurrency(_calculateGrandTotal().toString()),
+            isBold: true,
+          ),
+          _buildReceiptRow(
+            'Amount Paid:',
+            _formatCurrency(widget.sale.amountPaid.toString()),
+          ),
+          _buildReceiptRow(
+            'Balance:',
+            _formatCurrency(_calculateBalance().toString()),
+          ),
+
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
@@ -232,19 +255,12 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
             ),
             child: Column(
               children: [
-                Icon(
-                  Icons.info_outline,
-                  color: Colors.blue.shade700,
-                  size: 20,
-                ),
+                Icon(Icons.info_outline, color: Colors.blue.shade700, size: 20),
                 const SizedBox(height: 4),
                 Text(
-                  'Click "Print" to generate receipt',
+                  'Click "Print PDF" to generate receipt',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.blue.shade700,
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
                 ),
               ],
             ),
@@ -253,7 +269,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
       ),
     );
   }
-  
+
   Widget _buildReceiptRow(String label, String value, {bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -280,37 +296,66 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
       ),
     );
   }
-  
+
   // Calculate correct values from sale items
   double _calculateSubtotal() {
-    debugPrint('🔍 [ViewReceiptDialog] Calculating subtotal from ${widget.sale.saleItems.length} sale items');
-    double subtotal = 0.0;
-    for (var item in widget.sale.saleItems) {
-      debugPrint('🔍 [ViewReceiptDialog] Item: ${item.productName}, Qty: ${item.quantity}, Price: ${item.unitPrice}');
-      subtotal += (item.unitPrice * item.quantity);
+    debugPrint(
+      '🔍 [ViewReceiptDialog] Calculating subtotal from ${widget.sale.saleItems.length} sale items',
+    );
+
+    // If sale items exist, calculate from items
+    if (widget.sale.saleItems.isNotEmpty) {
+      double subtotal = 0.0;
+      for (var item in widget.sale.saleItems) {
+        debugPrint(
+          '🔍 [ViewReceiptDialog] Item: ${item.productName}, Qty: ${item.quantity}, Price: ${item.unitPrice}',
+        );
+        subtotal += (item.unitPrice * item.quantity);
+      }
+      debugPrint(
+        '🔍 [ViewReceiptDialog] Calculated subtotal from items: $subtotal',
+      );
+      return subtotal;
     }
-    debugPrint('🔍 [ViewReceiptDialog] Calculated subtotal: $subtotal');
-    debugPrint('🔍 [ViewReceiptDialog] Original sale.subtotal: ${widget.sale.subtotal}');
-    return subtotal;
+
+    // Fallback to sale's stored subtotal if items are empty
+    debugPrint(
+      '🔍 [ViewReceiptDialog] Using stored subtotal: ${widget.sale.subtotal}',
+    );
+    return widget.sale.subtotal;
   }
-  
+
   double _calculateDiscount() {
-    debugPrint('🔍 [ViewReceiptDialog] Overall discount: ${widget.sale.overallDiscount}');
+    debugPrint(
+      '🔍 [ViewReceiptDialog] Overall discount: ${widget.sale.overallDiscount}',
+    );
     return widget.sale.overallDiscount;
   }
-  
+
   double _calculateGrandTotal() {
-    double grandTotal = _calculateSubtotal() - _calculateDiscount();
-    debugPrint('🔍 [ViewReceiptDialog] Calculated grand total: $grandTotal');
-    debugPrint('🔍 [ViewReceiptDialog] Original sale.grandTotal: ${widget.sale.grandTotal}');
-    return grandTotal;
+    // If sale items exist, calculate from items
+    if (widget.sale.saleItems.isNotEmpty) {
+      double grandTotal = _calculateSubtotal() - _calculateDiscount();
+      debugPrint(
+        '🔍 [ViewReceiptDialog] Calculated grand total from items: $grandTotal',
+      );
+      return grandTotal;
+    }
+
+    // Fallback to sale's stored grand total if items are empty
+    debugPrint(
+      '🔍 [ViewReceiptDialog] Using stored grand total: ${widget.sale.grandTotal}',
+    );
+    return widget.sale.grandTotal;
   }
-  
+
   double _calculateBalance() {
     double balance = _calculateGrandTotal() - widget.sale.amountPaid;
     debugPrint('🔍 [ViewReceiptDialog] Amount paid: ${widget.sale.amountPaid}');
     debugPrint('🔍 [ViewReceiptDialog] Calculated balance: $balance');
-    debugPrint('🔍 [ViewReceiptDialog] Original sale.remainingAmount: ${widget.sale.remainingAmount}');
+    debugPrint(
+      '🔍 [ViewReceiptDialog] Original sale.remainingAmount: ${widget.sale.remainingAmount}',
+    );
     return balance;
   }
 
@@ -336,19 +381,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
     return Column(
       children: [
         Text(
-          'AL NOOR POS',
+          'Maqbool Fashion POS',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Cell: 0300-1234567',
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.black54,
           ),
         ),
         const SizedBox(height: 8),
@@ -378,10 +415,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
         ),
         Text(
           _formatDate(widget.sale.dateOfSale.toIso8601String()),
-          style: const TextStyle(
-            fontSize: 9,
-            color: Colors.black54,
-          ),
+          style: const TextStyle(fontSize: 9, color: Colors.black54),
         ),
       ],
     );
@@ -401,14 +435,6 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
               color: Colors.black,
             ),
           ),
-          if (widget.sale.customerPhone.isNotEmpty)
-            Text(
-              'Phone: ${widget.sale.customerPhone}',
-              style: const TextStyle(
-                fontSize: 9,
-                color: Colors.black54,
-              ),
-            ),
         ],
       ),
     );
@@ -438,10 +464,10 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
 
   Widget _buildThermalItem(SaleItemModel item) {
     final itemTotal = (item.quantity * item.unitPrice) - item.itemDiscount;
-    final itemName = item.productName.length > 25 
+    final itemName = item.productName.length > 25
         ? '${item.productName.substring(0, 25)}...'
         : item.productName;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1),
       child: Column(
@@ -449,27 +475,18 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
         children: [
           Text(
             itemName,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 9, color: Colors.black),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 '${item.quantity} x ${_formatCurrency(item.unitPrice.toString())}',
-                style: const TextStyle(
-                  fontSize: 9,
-                  color: Colors.black54,
-                ),
+                style: const TextStyle(fontSize: 9, color: Colors.black54),
               ),
               Text(
                 _formatCurrency(itemTotal.toString()),
-                style: const TextStyle(
-                  fontSize: 9,
-                  color: Colors.black54,
-                ),
+                style: const TextStyle(fontSize: 9, color: Colors.black54),
               ),
             ],
           ),
@@ -479,17 +496,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
               children: [
                 Text(
                   '  Discount:',
-                  style: const TextStyle(
-                    fontSize: 8,
-                    color: Colors.red,
-                  ),
+                  style: const TextStyle(fontSize: 8, color: Colors.red),
                 ),
                 Text(
                   '-${_formatCurrency(item.itemDiscount.toString())}',
-                  style: const TextStyle(
-                    fontSize: 8,
-                    color: Colors.red,
-                  ),
+                  style: const TextStyle(fontSize: 8, color: Colors.red),
                 ),
               ],
             ),
@@ -503,11 +514,20 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: [
-          _buildSummaryRow('Subtotal:', _formatCurrency(widget.sale.subtotal.toString())),
+          _buildSummaryRow(
+            'Subtotal:',
+            _formatCurrency(widget.sale.subtotal.toString()),
+          ),
           if (widget.sale.overallDiscount > 0)
-            _buildSummaryRow('Discount:', _formatCurrency(widget.sale.overallDiscount.toString())),
+            _buildSummaryRow(
+              'Discount:',
+              _formatCurrency(widget.sale.overallDiscount.toString()),
+            ),
           if (widget.sale.taxAmount > 0)
-            _buildSummaryRow('Tax:', _formatCurrency(widget.sale.taxAmount.toString())),
+            _buildSummaryRow(
+              'Tax:',
+              _formatCurrency(widget.sale.taxAmount.toString()),
+            ),
           _buildDottedLine(),
           _buildSummaryRow(
             'Total:',
@@ -521,12 +541,11 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
           if (widget.sale.grandTotal != widget.sale.amountPaid)
             _buildSummaryRow(
               'Balance:',
-              _formatCurrency((widget.sale.amountPaid - widget.sale.grandTotal).toString()),
+              _formatCurrency(
+                (widget.sale.grandTotal - widget.sale.amountPaid).toString(),
+              ),
             ),
-          _buildSummaryRow(
-            'Payment:',
-            widget.sale.paymentMethod,
-          ),
+          _buildSummaryRow('Payment:', widget.sale.paymentMethod),
         ],
       ),
     );
@@ -548,10 +567,7 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
           const SizedBox(height: 4),
           Text(
             'Please visit again',
-            style: const TextStyle(
-              fontSize: 9,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 9, color: Colors.black54),
           ),
         ],
       ),
@@ -606,35 +622,56 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
   void _printReceipt() async {
     try {
       final l10n = AppLocalizations.of(context)!;
-      
+
       // Show loading state
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Generating receipt for printing...')),
+          const SnackBar(content: Text('Loading sale details...')),
         );
       }
 
-      // Use SalesProvider to generate and print the receipt
+      // Get full sale details with items from SalesProvider
       final salesProvider = context.read<SalesProvider>();
-      final success = await salesProvider.generateReceiptPdf(widget.sale.id);
-      
-      if (success) {
+      final fullSale = await salesProvider.getSaleById(widget.sale.id);
+
+      if (fullSale == null) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Receipt sent to printer successfully!')),
+            const SnackBar(
+              content: Text('Failed to load sale details'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to print receipt')),
-          );
-        }
+        return;
       }
-    } catch (e) {
+
+      debugPrint(
+        '🔍 [ViewReceiptDialog] Full sale items count: ${fullSale.saleItems.length}',
+      );
+      for (var item in fullSale.saleItems) {
+        debugPrint(
+          '🔍 [ViewReceiptDialog] Item: ${item.productName}, Qty: ${item.quantity}',
+        );
+      }
+
+      // Use the new PDF receipt service with full sale data
+      await PdfReceiptService.previewAndPrintReceipt(fullSale);
+
+      // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error printing receipt: $e')),
+          const SnackBar(
+            content: Text('PDF receipt opened successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error generating PDF receipt: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating PDF receipt: $e')),
         );
       }
     }

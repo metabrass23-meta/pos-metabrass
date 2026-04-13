@@ -13,10 +13,13 @@ class ViewPrincipalAccountDetailsDialog extends StatefulWidget {
   const ViewPrincipalAccountDetailsDialog({super.key, required this.account});
 
   @override
-  State<ViewPrincipalAccountDetailsDialog> createState() => _ViewPrincipalAccountDetailsDialogState();
+  State<ViewPrincipalAccountDetailsDialog> createState() =>
+      _ViewPrincipalAccountDetailsDialogState();
 }
 
-class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccountDetailsDialog> with SingleTickerProviderStateMixin {
+class _ViewPrincipalAccountDetailsDialogState
+    extends State<ViewPrincipalAccountDetailsDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -24,9 +27,16 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
     _animationController.forward();
   }
 
@@ -55,15 +65,28 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 90.w,
+                    small: 85.w,
+                    medium: 75.w,
+                    large: 65.w,
+                    ultrawide: 55.w,
+                  ),
                   maxHeight: 85.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -87,7 +110,9 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
+        Flexible(
+          child: SingleChildScrollView(child: _buildContent(isCompact: true)),
+        ),
       ],
     );
   }
@@ -97,7 +122,9 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: true))),
+        Flexible(
+          child: SingleChildScrollView(child: _buildContent(isCompact: true)),
+        ),
       ],
     );
   }
@@ -107,7 +134,9 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeader(),
-        Flexible(child: SingleChildScrollView(child: _buildContent(isCompact: false))),
+        Flexible(
+          child: SingleChildScrollView(child: _buildContent(isCompact: false)),
+        ),
       ],
     );
   }
@@ -118,7 +147,12 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [widget.account.typeColor, widget.account.typeColor.withOpacity(0.8)]),
+        gradient: LinearGradient(
+          colors: [
+            widget.account.typeColor,
+            widget.account.typeColor.withOpacity(0.8),
+          ],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -128,8 +162,15 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -160,11 +201,23 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.cardPadding,
+              vertical: context.cardPadding / 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
+            ),
             child: Text(
               widget.account.id,
-              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.captionFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ),
           SizedBox(width: context.smallPadding),
@@ -175,7 +228,11 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -198,11 +255,15 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
           SizedBox(height: context.cardPadding),
           _buildBalanceInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
-          if (widget.account.handledBy != null) ...[_buildHandlerInfoCard(isCompact), SizedBox(height: context.cardPadding)],
+          if (widget.account.handledBy != null) ...[
+            _buildHandlerInfoCard(isCompact),
+            SizedBox(height: context.cardPadding),
+          ],
           _buildDateTimeInfoCard(isCompact),
           SizedBox(height: context.cardPadding),
           _buildDescriptionCard(isCompact),
-          if (widget.account.notes != null && widget.account.notes!.isNotEmpty) ...[
+          if (widget.account.notes != null &&
+              widget.account.notes!.isNotEmpty) ...[
             SizedBox(height: context.cardPadding),
             _buildNotesCard(isCompact),
           ],
@@ -231,17 +292,28 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       decoration: BoxDecoration(
         color: widget.account.typeColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: widget.account.typeColor.withOpacity(0.2), width: 1),
+        border: Border.all(
+          color: widget.account.typeColor.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(widget.account.typeIcon, color: widget.account.typeColor, size: context.iconSize('medium')),
+              Icon(
+                widget.account.typeIcon,
+                color: widget.account.typeColor,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDetails,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -253,23 +325,37 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   padding: EdgeInsets.all(context.cardPadding),
                   decoration: BoxDecoration(
                     color: widget.account.typeColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
                   ),
                   child: Column(
                     children: [
                       Text(
                         l10n.type,
-                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(
+                          fontSize: context.subtitleFontSize,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(widget.account.typeIcon, color: widget.account.typeColor, size: context.iconSize('small')),
+                          Icon(
+                            widget.account.typeIcon,
+                            color: widget.account.typeColor,
+                            size: context.iconSize('small'),
+                          ),
                           SizedBox(width: context.smallPadding / 2),
                           Text(
                             widget.account.type.toUpperCase(),
-                            style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: widget.account.typeColor),
+                            style: TextStyle(
+                              fontSize: context.bodyFontSize,
+                              fontWeight: FontWeight.w700,
+                              color: widget.account.typeColor,
+                            ),
                           ),
                         ],
                       ),
@@ -284,13 +370,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   padding: EdgeInsets.all(context.cardPadding),
                   decoration: BoxDecoration(
                     color: widget.account.typeColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
                   ),
                   child: Column(
                     children: [
                       Text(
                         l10n.amount,
-                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(
+                          fontSize: context.subtitleFontSize,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Text(
@@ -320,18 +412,29 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       decoration: BoxDecoration(
         color: widget.account.sourceModuleColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: widget.account.sourceModuleColor.withOpacity(0.2), width: 1),
+        border: Border.all(
+          color: widget.account.sourceModuleColor.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(_getSourceModuleIcon(widget.account.sourceModule), color: widget.account.sourceModuleColor, size: context.iconSize('medium')),
+              Icon(
+                _getSourceModuleIcon(widget.account.sourceModule),
+                color: widget.account.sourceModuleColor,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.sourceModuleInformation,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -343,14 +446,20 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   padding: EdgeInsets.all(context.cardPadding),
                   decoration: BoxDecoration(
                     color: widget.account.sourceModuleColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         l10n.module,
-                        style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                        style: TextStyle(
+                          fontSize: context.subtitleFontSize,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
                       ),
                       SizedBox(height: context.smallPadding / 2),
                       Row(
@@ -362,7 +471,9 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                           ),
                           SizedBox(width: context.smallPadding / 2),
                           Text(
-                            widget.account.sourceModule.replaceAll('_', ' ').toUpperCase(),
+                            widget.account.sourceModule
+                                .replaceAll('_', ' ')
+                                .toUpperCase(),
                             style: TextStyle(
                               fontSize: context.bodyFontSize,
                               fontWeight: FontWeight.w700,
@@ -382,21 +493,32 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                     padding: EdgeInsets.all(context.cardPadding),
                     decoration: BoxDecoration(
                       color: widget.account.sourceModuleColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius('small'),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           l10n.sourceID,
-                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                          style: TextStyle(
+                            fontSize: context.subtitleFontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
+                          ),
                         ),
                         SizedBox(height: context.smallPadding / 2),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.smallPadding / 2,
+                            vertical: context.smallPadding / 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                            borderRadius: BorderRadius.circular(
+                              context.borderRadius('small'),
+                            ),
                           ),
                           child: Text(
                             widget.account.sourceId!,
@@ -433,11 +555,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         children: [
           Row(
             children: [
-              Icon(Icons.account_balance_wallet_outlined, color: Colors.blue, size: context.iconSize('medium')),
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                color: Colors.blue,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.balanceInformation,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: Colors.blue[700]),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blue[700],
+                ),
               ),
             ],
           ),
@@ -445,17 +575,28 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.mainPadding),
-            decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
             child: Column(
               children: [
                 Text(
                   l10n.balanceAfterTransaction,
-                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                  style: TextStyle(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
                 ),
                 SizedBox(height: context.smallPadding),
                 Text(
                   'PKR ${widget.account.balanceAfter.toStringAsFixed(0)}',
-                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w800, color: Colors.blue[700]),
+                  style: TextStyle(
+                    fontSize: context.headerFontSize,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.blue[700],
+                  ),
                 ),
               ],
             ),
@@ -473,18 +614,29 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
       decoration: BoxDecoration(
         color: _getPersonColor(widget.account.handledBy!).withOpacity(0.05),
         borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(color: _getPersonColor(widget.account.handledBy!).withOpacity(0.2), width: 1),
+        border: Border.all(
+          color: _getPersonColor(widget.account.handledBy!).withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.person_outline, color: _getPersonColor(widget.account.handledBy!), size: context.iconSize('medium')),
+              Icon(
+                Icons.person_outline,
+                color: _getPersonColor(widget.account.handledBy!),
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.handlerInformation,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -493,8 +645,12 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             width: double.infinity,
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
-              color: _getPersonColor(widget.account.handledBy!).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              color: _getPersonColor(
+                widget.account.handledBy!,
+              ).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -502,8 +658,15 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(color: _getPersonColor(widget.account.handledBy!), shape: BoxShape.circle),
-                  child: Icon(Icons.person, color: AppTheme.pureWhite, size: context.iconSize('small')),
+                  decoration: BoxDecoration(
+                    color: _getPersonColor(widget.account.handledBy!),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: AppTheme.pureWhite,
+                    size: context.iconSize('small'),
+                  ),
                 ),
                 SizedBox(width: context.cardPadding),
                 Text(
@@ -541,29 +704,48 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+          decoration: BoxDecoration(
+            color: Colors.purple.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
+                  Icon(
+                    Icons.calendar_today,
+                    size: context.iconSize('small'),
+                    color: Colors.purple,
+                  ),
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.date,
-                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.formattedDate,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.relativeDate,
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: context.captionFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
               ),
             ],
           ),
@@ -572,24 +754,39 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.cardPadding),
-          decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+          decoration: BoxDecoration(
+            color: Colors.orange.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(context.borderRadius()),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.orange),
+                  Icon(
+                    Icons.access_time,
+                    size: context.iconSize('small'),
+                    color: Colors.orange,
+                  ),
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.time,
-                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
               SizedBox(height: context.smallPadding / 2),
               Text(
                 widget.account.formattedTime,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -606,29 +803,48 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         Expanded(
           child: Container(
             padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            decoration: BoxDecoration(
+              color: Colors.purple.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: context.iconSize('small'), color: Colors.purple),
+                    Icon(
+                      Icons.calendar_today,
+                      size: context.iconSize('small'),
+                      color: Colors.purple,
+                    ),
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.date,
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.formattedDate,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.relativeDate,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -638,24 +854,39 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         Expanded(
           child: Container(
             padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: context.iconSize('small'), color: Colors.orange),
+                    Icon(
+                      Icons.access_time,
+                      size: context.iconSize('small'),
+                      color: Colors.orange,
+                    ),
                     SizedBox(width: context.smallPadding),
                     Text(
                       l10n.time,
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: context.smallPadding / 2),
                 Text(
                   widget.account.formattedTime,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ],
             ),
@@ -670,17 +901,28 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
-      decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius())),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.description_outlined, color: Colors.grey[700], size: context.iconSize('medium')),
+              Icon(
+                Icons.description_outlined,
+                color: Colors.grey[700],
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.transactionDescription,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -690,12 +932,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
               border: Border.all(color: Colors.grey.shade300),
             ),
             child: Text(
               widget.account.description,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w400,
+                color: AppTheme.charcoalGray,
+                height: 1.5,
+              ),
             ),
           ),
           SizedBox(height: context.cardPadding),
@@ -707,21 +956,40 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
                   children: [
                     Text(
                       '${l10n.recordCreated}:',
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
                     ),
                     Text(
                       _formatDateTime(widget.account.dateTime),
-                      style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[700]),
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        color: Colors.grey[700],
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding,
+                  vertical: context.smallPadding / 2,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
+                ),
                 child: Text(
                   l10n.ledgerEntry,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.green[700]),
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ],
@@ -746,11 +1014,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
         children: [
           Row(
             children: [
-              Icon(Icons.note_outlined, color: Colors.amber[700], size: context.iconSize('medium')),
+              Icon(
+                Icons.note_outlined,
+                color: Colors.amber[700],
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.additionalNotes,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -760,12 +1036,19 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
             padding: EdgeInsets.all(context.cardPadding),
             decoration: BoxDecoration(
               color: AppTheme.pureWhite,
-              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              borderRadius: BorderRadius.circular(
+                context.borderRadius('small'),
+              ),
               border: Border.all(color: Colors.amber.shade300),
             ),
             child: Text(
               widget.account.notes!,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: AppTheme.charcoalGray, height: 1.5),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w400,
+                color: AppTheme.charcoalGray,
+                height: 1.5,
+              ),
             ),
           ),
         ],
@@ -800,9 +1083,9 @@ class _ViewPrincipalAccountDetailsDialogState extends State<ViewPrincipalAccount
 
   Color _getPersonColor(String person) {
     switch (person) {
-      case 'Shahzain Baloch':
+      case 'Mr Sheikh Parwaiz Maqbool':
         return Colors.blue;
-      case 'Huzaifa':
+      case 'Mr Sheikh Zain Maqbool':
         return Colors.green;
       default:
         return Colors.grey;

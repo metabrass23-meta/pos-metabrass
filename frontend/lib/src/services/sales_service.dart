@@ -623,16 +623,19 @@ class SalesService {
     bool isPartialPayment = false,
   }) async {
     try {
+      final Map<String, dynamic> requestData = {
+        'amount': amount,
+        'payment_method': method,
+        'is_partial_payment': isPartialPayment,
+      };
+
+      if (reference != null) requestData['reference'] = reference;
+      if (notes != null) requestData['notes'] = notes;
+      requestData['split_payment_details'] = splitDetails ?? {};
+
       final response = await _apiClient.post(
         ApiConfig.addSalePayment(id),
-        data: {
-          'amount': amount,
-          'payment_method': method,
-          'reference': reference,
-          'notes': notes,
-          'split_payment_details': splitDetails,
-          'is_partial_payment': isPartialPayment,
-        },
+        data: requestData,
       );
 
       DebugHelper.printApiResponse('POST Add Sale Payment with Workflow', response.data);

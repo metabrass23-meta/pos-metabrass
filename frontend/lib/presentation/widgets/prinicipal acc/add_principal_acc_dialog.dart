@@ -14,10 +14,12 @@ class AddPrincipalAccountDialog extends StatefulWidget {
   const AddPrincipalAccountDialog({super.key});
 
   @override
-  State<AddPrincipalAccountDialog> createState() => _AddPrincipalAccountDialogState();
+  State<AddPrincipalAccountDialog> createState() =>
+      _AddPrincipalAccountDialogState();
 }
 
-class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> with SingleTickerProviderStateMixin {
+class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _sourceIdController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -37,11 +39,18 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -73,18 +82,25 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
         return;
       }
 
-      final provider = Provider.of<PrincipalAccountProvider>(context, listen: false);
+      final provider = Provider.of<PrincipalAccountProvider>(
+        context,
+        listen: false,
+      );
 
       final request = PrincipalAccountCreateRequest(
         date: _selectedDate,
         time: _selectedTime,
         sourceModule: _selectedSourceModule!,
-        sourceId: _sourceIdController.text.trim().isEmpty ? null : _sourceIdController.text.trim(),
+        sourceId: _sourceIdController.text.trim().isEmpty
+            ? null
+            : _sourceIdController.text.trim(),
         description: _descriptionController.text.trim(),
         type: _selectedTransactionType!,
         amount: double.parse(_amountController.text.trim()),
         handledBy: _selectedHandledBy,
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
       );
 
       await provider.addPrincipalAccount(request);
@@ -103,18 +119,28 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.check_circle_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               l10n.principalAccountEntryAddedSuccessfully,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ],
         ),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -124,18 +150,28 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.error_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            Icon(
+              Icons.error_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
             SizedBox(width: context.smallPadding),
             Text(
               message,
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w500, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ],
         ),
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(context.borderRadius()),
+        ),
       ),
     );
   }
@@ -183,15 +219,28 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
               child: Container(
                 width: context.dialogWidth,
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 90.w, small: 85.w, medium: 75.w, large: 65.w, ultrawide: 55.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 90.w,
+                    small: 85.w,
+                    medium: 75.w,
+                    large: 65.w,
+                    ultrawide: 55.w,
+                  ),
                   maxHeight: 90.h,
                 ),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: ResponsiveBreakpoints.responsive(
@@ -212,19 +261,28 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
   Widget _buildTabletLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
+      ),
     );
   }
 
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: true)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: true)],
+      ),
     );
   }
 
   Widget _buildDesktopLayout() {
     return SingleChildScrollView(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [_buildHeader(), _buildFormContent(isCompact: false)]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), _buildFormContent(isCompact: false)],
+      ),
     );
   }
 
@@ -234,7 +292,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -244,8 +304,15 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -253,7 +320,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.addEntry : l10n.addPrincipalAccountEntry,
+                  context.shouldShowCompactLayout
+                      ? l10n.addEntry
+                      : l10n.addPrincipalAccountEntry,
                   style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -282,7 +351,11 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -308,26 +381,37 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                   decoration: InputDecoration(
                     labelText: l10n.sourceModule,
                     prefixIcon: const Icon(Icons.source_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
+                    ),
                   ),
                   items: provider.availableSourceModules
                       .map(
                         (module) => DropdownMenuItem<String>(
-                      value: module,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(color: _getSourceModuleColor(module), shape: BoxShape.circle),
-                            child: Icon(_getSourceModuleIcon(module), color: AppTheme.pureWhite, size: context.iconSize('small')),
+                          value: module,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: _getSourceModuleColor(module),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  _getSourceModuleIcon(module),
+                                  color: AppTheme.pureWhite,
+                                  size: context.iconSize('small'),
+                                ),
+                              ),
+                              SizedBox(width: context.smallPadding),
+                              Text(_getFormattedSourceModule(module)),
+                            ],
                           ),
-                          SizedBox(width: context.smallPadding),
-                          Text(_getFormattedSourceModule(module)),
-                        ],
-                      ),
-                    ),
-                  )
+                        ),
+                      )
                       .toList(),
                   onChanged: (module) {
                     setState(() {
@@ -352,28 +436,43 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                   decoration: InputDecoration(
                     labelText: l10n.transactionType,
                     prefixIcon: const Icon(Icons.swap_horiz_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
+                    ),
                   ),
                   items: provider.availableTransactionTypes
                       .map(
                         (type) => DropdownMenuItem<String>(
-                      value: type,
-                      child: Row(
-                        children: [
-                          Icon(
-                            type.toUpperCase() == 'CREDIT' ? Icons.add_circle_outline : Icons.remove_circle_outline,
-                            color: type.toUpperCase() == 'CREDIT' ? Colors.green : Colors.red,
-                            size: context.iconSize('medium'),
+                          value: type,
+                          child: Row(
+                            children: [
+                              Icon(
+                                type.toUpperCase() == 'CREDIT'
+                                    ? Icons.add_circle_outline
+                                    : Icons.remove_circle_outline,
+                                color: type.toUpperCase() == 'CREDIT'
+                                    ? Colors.green
+                                    : Colors.red,
+                                size: context.iconSize('medium'),
+                              ),
+                              SizedBox(width: context.smallPadding),
+                              Text(
+                                type.toUpperCase() == 'CREDIT'
+                                    ? l10n.creditMoneyIn
+                                    : l10n.debitMoneyOut,
+                                style: TextStyle(
+                                  color: type.toUpperCase() == 'CREDIT'
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: context.smallPadding),
-                          Text(
-                            type.toUpperCase() == 'CREDIT' ? l10n.creditMoneyIn : l10n.debitMoneyOut,
-                            style: TextStyle(color: type.toUpperCase() == 'CREDIT' ? Colors.green : Colors.red, fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                        ),
+                      )
                       .toList(),
                   onChanged: (type) {
                     setState(() {
@@ -393,7 +492,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
             PremiumTextField(
               label: l10n.sourceID,
-              hint: isCompact ? l10n.referenceIDOptional : l10n.referenceIDFromSourceModuleOptional,
+              hint: isCompact
+                  ? l10n.referenceIDOptional
+                  : l10n.referenceIDFromSourceModuleOptional,
               controller: _sourceIdController,
               prefixIcon: Icons.tag_outlined,
             ),
@@ -401,7 +502,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
             PremiumTextField(
               label: l10n.description,
-              hint: isCompact ? l10n.enterDescription : l10n.enterTransactionDescription,
+              hint: isCompact
+                  ? l10n.enterDescription
+                  : l10n.enterTransactionDescription,
               controller: _descriptionController,
               prefixIcon: Icons.description_outlined,
               maxLines: 3,
@@ -419,7 +522,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
             PremiumTextField(
               label: l10n.amount,
-              hint: isCompact ? l10n.enterAmount : l10n.enterTransactionAmountPKR,
+              hint: isCompact
+                  ? l10n.enterAmount
+                  : l10n.enterTransactionAmountPKR,
               controller: _amountController,
               prefixIcon: Icons.attach_money_rounded,
               keyboardType: TextInputType.number,
@@ -443,20 +548,34 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                   decoration: InputDecoration(
                     labelText: l10n.handledByOptional,
                     prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.borderRadius())),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        context.borderRadius(),
+                      ),
+                    ),
                   ),
                   items: [
-                    DropdownMenuItem<String>(value: null, child: Text(l10n.notSpecified)),
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Text(l10n.notSpecified),
+                    ),
                     ...provider.availableHandlers.map(
-                          (handler) => DropdownMenuItem<String>(
+                      (handler) => DropdownMenuItem<String>(
                         value: handler,
                         child: Row(
                           children: [
                             Container(
                               width: 24,
                               height: 24,
-                              decoration: BoxDecoration(color: _getPersonColor(handler), shape: BoxShape.circle),
-                              child: Icon(Icons.person, color: AppTheme.pureWhite, size: context.iconSize('small')),
+                              decoration: BoxDecoration(
+                                color: _getPersonColor(handler),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                color: AppTheme.pureWhite,
+                                size: context.iconSize('small'),
+                              ),
                             ),
                             SizedBox(width: context.smallPadding),
                             Text(handler),
@@ -486,20 +605,37 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                     child: Container(
                       padding: EdgeInsets.all(context.cardPadding),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [AppTheme.primaryMaroon.withOpacity(0.1), AppTheme.secondaryMaroon.withOpacity(0.1)]),
-                        border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
-                        borderRadius: BorderRadius.circular(context.borderRadius()),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryMaroon.withOpacity(0.1),
+                            AppTheme.secondaryMaroon.withOpacity(0.1),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: AppTheme.primaryMaroon.withOpacity(0.3),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          context.borderRadius(),
+                        ),
                       ),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                              Icon(
+                                Icons.date_range_rounded,
+                                color: AppTheme.primaryMaroon,
+                                size: context.iconSize('medium'),
+                              ),
                               SizedBox(width: context.smallPadding),
                               Text(
                                 l10n.selectDateTime,
-                                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                                style: TextStyle(
+                                  fontSize: context.bodyFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.primaryMaroon,
+                                ),
                               ),
                             ],
                           ),
@@ -514,7 +650,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                     style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
-                                      color: AppTheme.charcoalGray.withOpacity(0.7),
+                                      color: AppTheme.charcoalGray.withOpacity(
+                                        0.7,
+                                      ),
                                     ),
                                   ),
                                   Text(
@@ -527,7 +665,11 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                   ),
                                 ],
                               ),
-                              Container(height: 40, width: 1, color: Colors.grey.shade300),
+                              Container(
+                                height: 40,
+                                width: 1,
+                                color: Colors.grey.shade300,
+                              ),
                               Column(
                                 children: [
                                   Text(
@@ -535,7 +677,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
                                     style: TextStyle(
                                       fontSize: context.subtitleFontSize,
                                       fontWeight: FontWeight.w500,
-                                      color: AppTheme.charcoalGray.withOpacity(0.7),
+                                      color: AppTheme.charcoalGray.withOpacity(
+                                        0.7,
+                                      ),
                                     ),
                                   ),
                                   Text(
@@ -562,7 +706,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
             PremiumTextField(
               label: l10n.notes,
-              hint: isCompact ? l10n.additionalNotesOptional : l10n.additionalNotesOrDetailsOptional,
+              hint: isCompact
+                  ? l10n.additionalNotesOptional
+                  : l10n.additionalNotesOrDetailsOptional,
               controller: _notesController,
               prefixIcon: Icons.note_outlined,
               maxLines: 2,
@@ -712,9 +858,9 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog> w
 
   Color _getPersonColor(String person) {
     switch (person) {
-      case 'Shahzain Baloch':
+      case 'Mr Sheikh Parwaiz Maqbool':
         return Colors.blue;
-      case 'Huzaifa':
+      case 'Mr Sheikh Zain Maqbool':
         return Colors.green;
       default:
         return Colors.grey;

@@ -137,6 +137,7 @@ class AdvancePaymentProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         // Refresh the list to include the new record
         await loadAdvancePayments(showLoading: false);
+        await loadLaborers(); // Refresh laborers to get updated balances
         await loadStatistics(); // Refresh statistics
         _clearError();
         return true;
@@ -180,6 +181,7 @@ class AdvancePaymentProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         // Refresh the list to include the updated record
         await loadAdvancePayments(showLoading: false);
+        await loadLaborers(); // Refresh laborers to get updated balances
         await loadStatistics(); // Refresh statistics
         _clearError();
         return true;
@@ -205,6 +207,7 @@ class AdvancePaymentProvider extends ChangeNotifier {
       if (response.success) {
         // Refresh the list to remove the deleted record
         await loadAdvancePayments(showLoading: false);
+        await loadLaborers(); // Refresh laborers to get updated balances
         await loadStatistics(); // Refresh statistics
         _clearError();
         return true;

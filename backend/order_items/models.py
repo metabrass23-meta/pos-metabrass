@@ -24,7 +24,7 @@ class OrderItemQuerySet(models.QuerySet):
             models.Q(customization_notes__icontains=query) |
             models.Q(product__name__icontains=query) |
             models.Q(product__color__icontains=query) |
-            models.Q(product__fabric__icontains=query)
+            models.Q(product__material__icontains=query)
         )
     
     def quantity_range(self, min_quantity=None, max_quantity=None):
@@ -268,7 +268,7 @@ class OrderItem(models.Model):
             return {
                 'name': self.product_name,
                 'color': self.product.color,
-                'fabric': self.product.fabric,
+                'material': self.product.material,
                 'current_stock': self.product.quantity
             }
         return {'name': self.product_name}

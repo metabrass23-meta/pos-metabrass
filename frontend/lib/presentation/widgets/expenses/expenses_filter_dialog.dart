@@ -16,7 +16,8 @@ class ExpensesFilterDialog extends StatefulWidget {
   State<ExpensesFilterDialog> createState() => _ExpensesFilterDialogState();
 }
 
-class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with SingleTickerProviderStateMixin {
+class _ExpensesFilterDialogState extends State<ExpensesFilterDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -30,18 +31,36 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _withdrawalOptions = ['Mr. Shahzain Baloch', 'Mr Sheikh Huzaifa'];
+  final List<String> _withdrawalOptions = [
+    'Mr Sheikh Parwaiz Maqbool',
+    'Mr Sheikh Zain Maqbool',
+  ];
 
-  final List<String> _commonCategories = ['Office', 'Utilities', 'Transport', 'Marketing', 'Maintenance', 'Supplies', 'Services'];
+  final List<String> _commonCategories = [
+    'Office',
+    'Utilities',
+    'Transport',
+    'Marketing',
+    'Maintenance',
+    'Supplies',
+    'Services',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     final provider = context.read<ExpensesProvider>();
     _selectedWithdrawalBy = provider.selectedWithdrawalBy;
@@ -67,7 +86,9 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
   void _handleApplyFilters() async {
     final provider = context.read<ExpensesProvider>();
 
-    final category = _categoryController.text.trim().isEmpty ? null : _categoryController.text.trim();
+    final category = _categoryController.text.trim().isEmpty
+        ? null
+        : _categoryController.text.trim();
     final search = _searchController.text.trim();
 
     if (category != provider.selectedCategory) {
@@ -168,14 +189,27 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
             child: Transform.scale(
               scale: _scaleAnimation.value,
               child: Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 95.w, small: 98.w, medium: 80.w, large: 70.w, ultrawide: 60.w),
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 95.w,
+                  small: 98.w,
+                  medium: 80.w,
+                  large: 70.w,
+                  ultrawide: 60.w,
+                ),
                 constraints: BoxConstraints(maxWidth: 600, maxHeight: 85.h),
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: context.shadowBlur('heavy'), offset: Offset(0, context.cardPadding)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: context.shadowBlur('heavy'),
+                      offset: Offset(0, context.cardPadding),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -199,7 +233,9 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -209,8 +245,15 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.filter_alt_rounded, color: AppTheme.pureWhite, size: context.iconSize('large')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.filter_alt_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('large'),
+            ),
           ),
 
           SizedBox(width: context.cardPadding),
@@ -250,7 +293,11 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
               borderRadius: BorderRadius.circular(context.borderRadius()),
               child: Container(
                 padding: EdgeInsets.all(context.smallPadding),
-                child: Icon(Icons.close_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.pureWhite,
+                  size: context.iconSize('medium'),
+                ),
               ),
             ),
           ),
@@ -268,19 +315,35 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildFilterSection(title: l10n.searchExpenseRecords, icon: Icons.search_outlined, child: _buildSearchFilter()),
+            _buildFilterSection(
+              title: l10n.searchExpenseRecords,
+              icon: Icons.search_outlined,
+              child: _buildSearchFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.expenseCategory, icon: Icons.category_outlined, child: _buildCategoryFilter()),
+            _buildFilterSection(
+              title: l10n.expenseCategory,
+              icon: Icons.category_outlined,
+              child: _buildCategoryFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.withdrawalBy, icon: Icons.verified_user_outlined, child: _buildWithdrawalByFilter()),
+            _buildFilterSection(
+              title: l10n.withdrawalBy,
+              icon: Icons.verified_user_outlined,
+              child: _buildWithdrawalByFilter(),
+            ),
 
             SizedBox(height: context.cardPadding),
 
-            _buildFilterSection(title: l10n.dateRange, icon: Icons.date_range_outlined, child: _buildDateRangeFilter()),
+            _buildFilterSection(
+              title: l10n.dateRange,
+              icon: Icons.date_range_outlined,
+              child: _buildDateRangeFilter(),
+            ),
 
             SizedBox(height: context.mainPadding),
 
@@ -298,7 +361,11 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
     );
   }
 
-  Widget _buildFilterSection({required String title, required IconData icon, required Widget child}) {
+  Widget _buildFilterSection({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
@@ -311,11 +378,19 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
         children: [
           Row(
             children: [
-              Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+              Icon(
+                icon,
+                color: AppTheme.primaryMaroon,
+                size: context.iconSize('medium'),
+              ),
               SizedBox(width: context.smallPadding),
               Text(
                 title,
-                style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ],
           ),
@@ -331,11 +406,21 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
 
     return TextFormField(
       controller: _searchController,
-      style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+      style: TextStyle(
+        fontSize: context.bodyFontSize,
+        color: AppTheme.charcoalGray,
+      ),
       decoration: InputDecoration(
         hintText: l10n.searchByExpenseHint,
-        hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
-        prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: context.iconSize('medium')),
+        hintStyle: TextStyle(
+          fontSize: context.bodyFontSize,
+          color: Colors.grey[500],
+        ),
+        prefixIcon: Icon(
+          Icons.search,
+          color: Colors.grey[500],
+          size: context.iconSize('medium'),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.borderRadius()),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -344,7 +429,10 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
           borderRadius: BorderRadius.circular(context.borderRadius()),
           borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: context.cardPadding,
+          vertical: context.cardPadding / 2,
+        ),
       ),
       onChanged: (value) {
         setState(() {
@@ -361,20 +449,36 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
       children: [
         TextFormField(
           controller: _categoryController,
-          style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
+          style: TextStyle(
+            fontSize: context.bodyFontSize,
+            color: AppTheme.charcoalGray,
+          ),
           decoration: InputDecoration(
             hintText: l10n.enterExpenseCategory,
-            hintStyle: TextStyle(fontSize: context.bodyFontSize, color: Colors.grey[500]),
-            prefixIcon: Icon(Icons.category_outlined, color: Colors.grey[500], size: context.iconSize('medium')),
+            hintStyle: TextStyle(
+              fontSize: context.bodyFontSize,
+              color: Colors.grey[500],
+            ),
+            prefixIcon: Icon(
+              Icons.category_outlined,
+              color: Colors.grey[500],
+              size: context.iconSize('medium'),
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.borderRadius()),
-              borderSide: const BorderSide(color: AppTheme.primaryMaroon, width: 2),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryMaroon,
+                width: 2,
+              ),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.cardPadding / 2),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: context.cardPadding,
+              vertical: context.cardPadding / 2,
+            ),
           ),
           onChanged: (value) {
             setState(() {
@@ -387,7 +491,13 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
           spacing: context.smallPadding / 2,
           runSpacing: context.smallPadding / 4,
           children: _commonCategories
-              .map((category) => _buildQuickSelectChip(label: category, onTap: () => setState(() => _categoryController.text = category)))
+              .map(
+                (category) => _buildQuickSelectChip(
+                  label: category,
+                  onTap: () =>
+                      setState(() => _categoryController.text = category),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -401,11 +511,15 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
       children: [
         Text(
           l10n.selectWithdrawalAuthority,
-          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+          style: TextStyle(
+            fontSize: context.subtitleFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.charcoalGray,
+          ),
         ),
         SizedBox(height: context.smallPadding),
         ...(_withdrawalOptions.map(
-              (person) => RadioListTile<String>(
+          (person) => RadioListTile<String>(
             value: person,
             groupValue: _selectedWithdrawalBy,
             onChanged: (value) {
@@ -415,7 +529,11 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
             },
             title: Text(
               person,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
             ),
             activeColor: AppTheme.primaryMaroon,
             dense: true,
@@ -427,10 +545,17 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
               _selectedWithdrawalBy = null;
             });
           },
-          icon: Icon(Icons.clear, color: Colors.grey[600], size: context.iconSize('small')),
+          icon: Icon(
+            Icons.clear,
+            color: Colors.grey[600],
+            size: context.iconSize('small'),
+          ),
           label: Text(
             l10n.clearWithdrawalFilter,
-            style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: context.captionFontSize,
+              color: Colors.grey[600],
+            ),
           ),
         ),
       ],
@@ -459,11 +584,19 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.date_range_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+                          Icon(
+                            Icons.date_range_rounded,
+                            color: AppTheme.primaryMaroon,
+                            size: context.iconSize('medium'),
+                          ),
                           SizedBox(width: context.smallPadding),
                           Text(
                             l10n.selectDateRange,
-                            style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                            style: TextStyle(
+                              fontSize: context.subtitleFontSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primaryMaroon,
+                            ),
                           ),
                         ],
                       ),
@@ -474,7 +607,9 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                             : l10n.noDateRangeSelected,
                         style: TextStyle(
                           fontSize: context.captionFontSize,
-                          color: _dateFrom != null && _dateTo != null ? AppTheme.charcoalGray : Colors.grey[500],
+                          color: _dateFrom != null && _dateTo != null
+                              ? AppTheme.charcoalGray
+                              : Colors.grey[500],
                         ),
                       ),
                     ],
@@ -496,10 +631,17 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
                       _dateTo = null;
                     });
                   },
-                  icon: Icon(Icons.clear, color: Colors.red[600], size: context.iconSize('small')),
+                  icon: Icon(
+                    Icons.clear,
+                    color: Colors.red[600],
+                    size: context.iconSize('small'),
+                  ),
                   label: Text(
                     l10n.clearDateRange,
-                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.red[600]),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      color: Colors.red[600],
+                    ),
                   ),
                 ),
               ),
@@ -510,20 +652,33 @@ class _ExpensesFilterDialogState extends State<ExpensesFilterDialog> with Single
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.primaryMaroon.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.primaryMaroon.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: AppTheme.primaryMaroon),
+          style: TextStyle(
+            fontSize: context.captionFontSize,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.primaryMaroon,
+          ),
         ),
       ),
     );

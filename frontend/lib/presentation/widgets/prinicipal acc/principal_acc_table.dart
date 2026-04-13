@@ -12,7 +12,12 @@ class PrincipalAccountTable extends StatefulWidget {
   final Function(PrincipalAccount) onDelete;
   final Function(PrincipalAccount) onView;
 
-  const PrincipalAccountTable({super.key, required this.onEdit, required this.onDelete, required this.onView});
+  const PrincipalAccountTable({
+    super.key,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onView,
+  });
 
   @override
   State<PrincipalAccountTable> createState() => _PrincipalAccountTableState();
@@ -30,14 +35,16 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
     // Link the header and content scrolling (Two-way sync) - copied from purchases table
     _headerHorizontalController.addListener(() {
       if (_contentHorizontalController.hasClients &&
-          _headerHorizontalController.offset != _contentHorizontalController.offset) {
+          _headerHorizontalController.offset !=
+              _contentHorizontalController.offset) {
         _contentHorizontalController.jumpTo(_headerHorizontalController.offset);
       }
     });
 
     _contentHorizontalController.addListener(() {
       if (_headerHorizontalController.hasClients &&
-          _contentHorizontalController.offset != _headerHorizontalController.offset) {
+          _contentHorizontalController.offset !=
+              _headerHorizontalController.offset) {
         _headerHorizontalController.jumpTo(_contentHorizontalController.offset);
       }
     });
@@ -57,7 +64,13 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: context.shadowBlur(),
+            offset: Offset(0, context.smallPadding),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(context.borderRadius('large')),
@@ -65,7 +78,8 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           mainAxisSize: MainAxisSize.min, // Use minimum size
           children: [
             Consumer<PrincipalAccountProvider>(
-              builder: (context, provider, _) => _buildBalanceHeader(context, provider),
+              builder: (context, provider, _) =>
+                  _buildBalanceHeader(context, provider),
             ),
             // --- Table Header (Fixed Top) ---
             Container(
@@ -88,15 +102,33 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             ),
 
             // --- Table Body (Scrollable Vertical & Horizontal) ---
-            Flexible( // Use Flexible instead of Expanded
+            Flexible(
+              // Use Flexible instead of Expanded
               child: Consumer<PrincipalAccountProvider>(
                 builder: (context, provider, _) {
                   if (provider.isLoading) {
                     return Center(
                       child: SizedBox(
-                        width: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
-                        height: ResponsiveBreakpoints.responsive(context, tablet: 8.w, small: 6.w, medium: 5.w, large: 4.w, ultrawide: 3.w),
-                        child: const CircularProgressIndicator(color: AppTheme.primaryMaroon, strokeWidth: 3),
+                        width: ResponsiveBreakpoints.responsive(
+                          context,
+                          tablet: 8.w,
+                          small: 6.w,
+                          medium: 5.w,
+                          large: 4.w,
+                          ultrawide: 3.w,
+                        ),
+                        height: ResponsiveBreakpoints.responsive(
+                          context,
+                          tablet: 8.w,
+                          small: 6.w,
+                          medium: 5.w,
+                          large: 4.w,
+                          ultrawide: 3.w,
+                        ),
+                        child: const CircularProgressIndicator(
+                          color: AppTheme.primaryMaroon,
+                          strokeWidth: 3,
+                        ),
                       ),
                     );
                   }
@@ -115,7 +147,8 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                       child: Scrollbar(
                         controller: _contentHorizontalController,
                         thumbVisibility: true,
-                        notificationPredicate: (notification) => notification.depth == 1,
+                        notificationPredicate: (notification) =>
+                            notification.depth == 1,
                         child: SingleChildScrollView(
                           controller: _contentHorizontalController,
                           scrollDirection: Axis.horizontal,
@@ -123,9 +156,16 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                           child: Container(
                             width: _calculateTotalWidth(),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min, // Use minimum size
-                              children: provider.accounts.asMap().entries.map((entry) {
-                                return _buildTableRow(context, entry.value, entry.key);
+                              mainAxisSize:
+                                  MainAxisSize.min, // Use minimum size
+                              children: provider.accounts.asMap().entries.map((
+                                entry,
+                              ) {
+                                return _buildTableRow(
+                                  context,
+                                  entry.value,
+                                  entry.key,
+                                );
                               }).toList(),
                             ),
                           ),
@@ -142,13 +182,18 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
     );
   }
 
-  Widget _buildBalanceHeader(BuildContext context, PrincipalAccountProvider provider) {
+  Widget _buildBalanceHeader(
+    BuildContext context,
+    PrincipalAccountProvider provider,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.all(context.cardPadding),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon]),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryMaroon, AppTheme.secondaryMaroon],
+        ),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(context.borderRadius('large')),
           topRight: Radius.circular(context.borderRadius('large')),
@@ -158,8 +203,15 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
         children: [
           Container(
             padding: EdgeInsets.all(context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
-            child: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.pureWhite, size: context.iconSize('medium')),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: AppTheme.pureWhite,
+              size: context.iconSize('medium'),
+            ),
           ),
           SizedBox(width: context.cardPadding),
           Expanded(
@@ -176,17 +228,31 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                 ),
                 Text(
                   'PKR ${provider.currentBalance?.currentBalance.toStringAsFixed(0) ?? '0'}',
-                  style: TextStyle(fontSize: context.headerFontSize, fontWeight: FontWeight.w700, color: AppTheme.pureWhite),
+                  style: TextStyle(
+                    fontSize: context.headerFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.pureWhite,
+                  ),
                 ),
               ],
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
-            decoration: BoxDecoration(color: AppTheme.pureWhite.withOpacity(0.2), borderRadius: BorderRadius.circular(context.borderRadius())),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.cardPadding,
+              vertical: context.smallPadding,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.pureWhite.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(context.borderRadius()),
+            ),
             child: Text(
               '${provider.accounts.length} ${l10n.transactions}',
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.pureWhite),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.pureWhite,
+              ),
             ),
           ),
         ],
@@ -221,16 +287,46 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
 
     return Row(
       children: [
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.entryID)),
-        Container(width: columnWidths[1], child: _buildHeaderCell(context, l10n.sourceModule)),
-        Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.description)),
-        Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.type)),
-        Container(width: columnWidths[4], child: _buildHeaderCell(context, l10n.amount)),
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.balanceAfter)),
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.handledBy)),
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.date)),
-        Container(width: columnWidths[8], child: _buildHeaderCell(context, l10n.time)),
-        Container(width: columnWidths[9], child: _buildHeaderCell(context, l10n.actions)),
+        Container(
+          width: columnWidths[0],
+          child: _buildHeaderCell(context, l10n.entryID),
+        ),
+        Container(
+          width: columnWidths[1],
+          child: _buildHeaderCell(context, l10n.sourceModule),
+        ),
+        Container(
+          width: columnWidths[2],
+          child: _buildHeaderCell(context, l10n.description),
+        ),
+        Container(
+          width: columnWidths[3],
+          child: _buildHeaderCell(context, l10n.type),
+        ),
+        Container(
+          width: columnWidths[4],
+          child: _buildHeaderCell(context, l10n.amount),
+        ),
+        Container(
+          width: columnWidths[5],
+          child: _buildHeaderCell(context, l10n.balanceAfter),
+        ),
+        Container(
+          width: columnWidths[6],
+          child: _buildHeaderCell(context, l10n.handledBy),
+        ),
+        Container(
+          width: columnWidths[7],
+          child: _buildHeaderCell(context, l10n.date),
+        ),
+        Container(
+          width: columnWidths[8],
+          child: _buildHeaderCell(context, l10n.time),
+        ),
+        Container(
+          width: columnWidths[9],
+          child: _buildHeaderCell(context, l10n.actions),
+        ),
       ],
     );
   }
@@ -245,19 +341,32 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
       alignment: Alignment.centerLeft,
       child: Text(
         title,
-        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: AppTheme.charcoalGray, letterSpacing: 0.5),
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w700,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
 
-  Widget _buildTableRow(BuildContext context, PrincipalAccount account, int index) {
+  Widget _buildTableRow(
+    BuildContext context,
+    PrincipalAccount account,
+    int index,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final columnWidths = _getColumnWidths(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
+        color: index.isEven
+            ? AppTheme.pureWhite
+            : AppTheme.lightGray.withOpacity(0.2),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 0.5),
+        ),
       ),
       padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2.5),
       child: Row(
@@ -268,7 +377,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               account.id,
-              style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+              style: TextStyle(
+                fontSize: context.captionFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primaryMaroon,
+              ),
             ),
           ),
 
@@ -279,12 +392,20 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(_getSourceModuleIcon(account.sourceModule), color: account.sourceModuleColor, size: context.iconSize('small')),
+                Icon(
+                  _getSourceModuleIcon(account.sourceModule),
+                  color: account.sourceModuleColor,
+                  size: context.iconSize('small'),
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     account.sourceModule.replaceAll('_', ' ').toUpperCase(),
-                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: account.sourceModuleColor),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: account.sourceModuleColor,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -299,7 +420,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               account.description,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoalGray,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -312,11 +437,19 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(account.typeIcon, color: account.typeColor, size: context.iconSize('small')),
+                Icon(
+                  account.typeIcon,
+                  color: account.typeColor,
+                  size: context.iconSize('small'),
+                ),
                 const SizedBox(width: 4),
                 Text(
                   account.type.toUpperCase(),
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: account.typeColor,
+                  ),
                 ),
               ],
             ),
@@ -328,7 +461,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               'PKR ${account.amount.toStringAsFixed(0)}',
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: account.typeColor),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w700,
+                color: account.typeColor,
+              ),
             ),
           ),
 
@@ -338,7 +475,11 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               'PKR ${account.balanceAfter.toStringAsFixed(0)}',
-              style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.blue[700]),
+              style: TextStyle(
+                fontSize: context.bodyFontSize,
+                fontWeight: FontWeight.w700,
+                color: Colors.blue[700],
+              ),
             ),
           ),
 
@@ -348,30 +489,43 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: account.handledBy != null
                 ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(color: _getPersonColor(account.handledBy!), shape: BoxShape.circle),
-                  child: Icon(Icons.person, color: AppTheme.pureWhite, size: 10),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    account.handledBy!,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: _getPersonColor(account.handledBy!),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: AppTheme.pureWhite,
+                          size: 10,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          account.handledBy!,
+                          style: TextStyle(
+                            fontSize: context.captionFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: _getPersonColor(account.handledBy!),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    '-',
                     style: TextStyle(
                       fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: _getPersonColor(account.handledBy!),
+                      color: Colors.grey,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            )
-                : Text('-', style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey)),
           ),
 
           // Date
@@ -383,11 +537,19 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
               children: [
                 Text(
                   account.formattedDate,
-                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                  style: TextStyle(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
                 Text(
                   account.relativeDate,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -400,11 +562,19 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.access_time_rounded, color: Colors.purple, size: context.iconSize('small')),
+                Icon(
+                  Icons.access_time_rounded,
+                  color: Colors.purple,
+                  size: context.iconSize('small'),
+                ),
                 const SizedBox(width: 4),
                 Text(
                   account.formattedTime,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.purple),
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.purple,
+                  ),
                 ),
               ],
             ),
@@ -434,8 +604,17 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.visibility_outlined, color: Colors.purple, size: context.iconSize('small')),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(
+                Icons.visibility_outlined,
+                color: Colors.purple,
+                size: context.iconSize('small'),
+              ),
             ),
           ),
         ),
@@ -447,8 +626,17 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(
+                Icons.edit_outlined,
+                color: Colors.blue,
+                size: context.iconSize('small'),
+              ),
             ),
           ),
         ),
@@ -458,14 +646,26 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           child: InkWell(
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${l10n.exportAccountEntry} ${account.id}'), backgroundColor: Colors.green),
+                SnackBar(
+                  content: Text('${l10n.exportAccountEntry} ${account.id}'),
+                  backgroundColor: Colors.green,
+                ),
               );
             },
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.download_outlined, color: Colors.green, size: context.iconSize('small')),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(
+                Icons.download_outlined,
+                color: Colors.green,
+                size: context.iconSize('small'),
+              ),
             ),
           ),
         ),
@@ -477,8 +677,17 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             borderRadius: BorderRadius.circular(context.borderRadius('small')),
             child: Container(
               padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(
+                  context.borderRadius('small'),
+                ),
+              ),
+              child: Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+                size: context.iconSize('small'),
+              ),
             ),
           ),
         ),
@@ -490,34 +699,76 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
     final l10n = AppLocalizations.of(context)!;
 
     return Center(
-      child: SingleChildScrollView( // Add SingleChildScrollView to prevent overflow
-        child: ConstrainedBox( // Constrain the content
+      child: SingleChildScrollView(
+        // Add SingleChildScrollView to prevent overflow
+        child: ConstrainedBox(
+          // Constrain the content
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.5, // Max 50% of screen height
+            maxHeight:
+                MediaQuery.of(context).size.height *
+                0.5, // Max 50% of screen height
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min, // Use minimum size
             children: [
               Container(
-                width: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
-                height: ResponsiveBreakpoints.responsive(context, tablet: 15.w, small: 20.w, medium: 12.w, large: 10.w, ultrawide: 8.w),
-                decoration: BoxDecoration(color: AppTheme.lightGray, borderRadius: BorderRadius.circular(context.borderRadius('xl'))),
-                child: Icon(Icons.account_balance_wallet_outlined, size: context.iconSize('xl'), color: Colors.grey[400]),
+                width: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 15.w,
+                  small: 20.w,
+                  medium: 12.w,
+                  large: 10.w,
+                  ultrawide: 8.w,
+                ),
+                height: ResponsiveBreakpoints.responsive(
+                  context,
+                  tablet: 15.w,
+                  small: 20.w,
+                  medium: 12.w,
+                  large: 10.w,
+                  ultrawide: 8.w,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGray,
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('xl'),
+                  ),
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet_outlined,
+                  size: context.iconSize('xl'),
+                  color: Colors.grey[400],
+                ),
               ),
               SizedBox(height: context.mainPadding),
               Text(
                 l10n.noPrincipalAccountRecordsFound,
-                style: TextStyle(fontSize: context.headerFontSize * 0.8, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                style: TextStyle(
+                  fontSize: context.headerFontSize * 0.8,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
               SizedBox(height: context.smallPadding),
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: ResponsiveBreakpoints.responsive(context, tablet: 80.w, small: 70.w, medium: 60.w, large: 50.w, ultrawide: 40.w),
+                  maxWidth: ResponsiveBreakpoints.responsive(
+                    context,
+                    tablet: 80.w,
+                    small: 70.w,
+                    medium: 60.w,
+                    large: 50.w,
+                    ultrawide: 40.w,
+                  ),
                 ),
                 child: Text(
                   l10n.startByAddingYourFirstPrincipalAccountEntry,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -551,9 +802,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
 
   Color _getPersonColor(String person) {
     switch (person) {
-      case 'Shahzain Baloch':
+      case 'Mr Sheikh Parwaiz Maqbool':
         return Colors.blue;
-      case 'Huzaifa':
+      case 'Mr Sheikh Zain Maqbool':
         return Colors.green;
       default:
         return Colors.grey;

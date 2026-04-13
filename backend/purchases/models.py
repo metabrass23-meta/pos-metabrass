@@ -1,3 +1,4 @@
+from django.utils import timezone
 import uuid
 from django.db import models
 from vendors.models import Vendor
@@ -14,7 +15,7 @@ class Purchase(models.Model):
     )
 
     invoice_number = models.CharField(max_length=100, blank=True, null=True)
-    purchase_date = models.DateField(auto_now_add=True)
+    purchase_date = models.DateField(default=timezone.now)
 
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     tax = models.DecimalField(max_digits=12, decimal_places=2, default=0)

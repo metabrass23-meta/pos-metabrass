@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/sales_provider.dart'; // ✅ CHANGED: Use SalesProvider
+import '../../../src/services/pdf_receipt_service.dart'; // ✅ ADDED: PDF Receipt Service
 import '../../../src/theme/app_theme.dart';
 import '../globals/text_button.dart'; // ✅ Using PremiumButton
 
@@ -29,60 +30,55 @@ class OrderSuccessDialog extends StatefulWidget {
 }
 
 class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
-  bool _isPrinting = false; // ✅ State for loading spinner
+  bool _isPrinting = false; // State for loading spinner
 
-  // ✅ UPDATED PRINT FUNCTION
+  // ✅ UPDATED: Generate PDF Receipt (not thermal)
   Future<void> _handlePrintOrder(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    debugPrint("🖨️ [OrderSuccessDialog] Print Receipt requested for ${widget.invoiceNumber}");
+    debugPrint(
+      " [OrderSuccessDialog] Print PDF Receipt requested for ${widget.invoiceNumber}",
+    );
 
     setState(() => _isPrinting = true);
 
     try {
-      // Use SalesProvider instead of InvoiceProvider
+      // Get sale data from SalesProvider
       final salesProvider = Provider.of<SalesProvider>(context, listen: false);
 
-      debugPrint(" [OrderSuccessDialog] Calling SalesProvider.generateReceiptPdf with saleId: ${widget.saleId}");
+      debugPrint(
+        " [OrderSuccessDialog] Getting sale data for saleId: ${widget.saleId}",
+      );
 
-      // Call the new function in SalesProvider
-      final success = await salesProvider.generateReceiptPdf(widget.saleId);
+      // Find the sale in the provider's sales list
+      final sale = salesProvider.sales.firstWhere(
+        (s) => s.id == widget.saleId,
+        orElse: () => throw Exception('Sale not found'),
+      );
 
-      debugPrint(" [OrderSuccessDialog] generateReceiptPdf result: $success");
+      debugPrint(
+        " [OrderSuccessDialog] Sale data found: ${sale.invoiceNumber}",
+      );
+
+      // Generate PDF Receipt using the new service
+      await PdfReceiptService.previewAndPrintReceipt(sale);
+
+      debugPrint(" [OrderSuccessDialog] PDF Receipt generated successfully");
 
       if (mounted) {
-        if (success) {
-          debugPrint(" [OrderSuccessDialog] Print successful");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Text("Receipt sent to printer/saved"),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.picture_as_pdf, color: Colors.white),
+                const SizedBox(width: 10),
+                Text("Receipt PDF opened successfully"),
+              ],
             ),
-          );
-        } else {
-          debugPrint(" [OrderSuccessDialog] Print failed");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Text("Failed to generate receipt"),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     } catch (e) {
       debugPrint(" [OrderSuccessDialog] Print error: $e");
@@ -260,7 +256,8 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
             fontSize: 26, // ✅ Extra Big for Visibility
           ),
 
-          if (widget.advanceAmount > 0 && widget.advanceAmount < widget.totalPrice) ...[
+          if (widget.advanceAmount > 0 &&
+              widget.advanceAmount < widget.totalPrice) ...[
             SizedBox(height: 12),
             _buildSummaryRow(
               context,
@@ -292,13 +289,13 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
   }
 
   Widget _buildSummaryRow(
-      BuildContext context,
-      String label,
-      String value, {
-        Color? valueColor,
-        bool isHighlight = false,
-        double fontSize = 16, // ✅ Default bigger font
-      }) {
+    BuildContext context,
+    String label,
+    String value, {
+    Color? valueColor,
+    bool isHighlight = false,
+    double fontSize = 16, // ✅ Default bigger font
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -314,7 +311,9 @@ class _OrderSuccessDialogState extends State<OrderSuccessDialog> {
           value,
           style: TextStyle(
             fontSize: fontSize,
-            fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w600, // Thicker font
+            fontWeight: isHighlight
+                ? FontWeight.w800
+                : FontWeight.w600, // Thicker font
             color: valueColor ?? AppTheme.charcoalGray,
           ),
         ),
@@ -437,7 +436,9 @@ class ConfirmationDialog extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(context.smallPadding),
               decoration: BoxDecoration(
-                color: (confirmColor ?? AppTheme.primaryMaroon).withOpacity(0.2),
+                color: (confirmColor ?? AppTheme.primaryMaroon).withOpacity(
+                  0.2,
+                ),
                 borderRadius: BorderRadius.circular(context.borderRadius()),
               ),
               child: Icon(
@@ -586,10 +587,7 @@ class ConfirmationDialog extends StatelessWidget {
 class LoadingDialog extends StatelessWidget {
   final String? message;
 
-  const LoadingDialog({
-    super.key,
-    this.message,
-  });
+  const LoadingDialog({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {

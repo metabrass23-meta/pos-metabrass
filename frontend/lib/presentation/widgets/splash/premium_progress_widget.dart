@@ -162,7 +162,7 @@ class PremiumProgressWidget extends StatelessWidget {
                 ],
               ).createShader(bounds),
               child: Text(
-                'Crafting your exclusive fashion experience...',
+                'Best in the city...',
                 style: TextStyle(
                   fontSize: context.captionFontSize * 1.1,
                   fontWeight: FontWeight.w300,

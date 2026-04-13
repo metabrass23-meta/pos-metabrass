@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/src/utils/responsive_breakpoints.dart';
+import 'package:frontend/src/utils/cnic_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../src/providers/labor_provider.dart';
@@ -17,7 +18,8 @@ class AddLaborDialog extends StatefulWidget {
   State<AddLaborDialog> createState() => _AddLaborDialogState();
 }
 
-class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProviderStateMixin {
+class _AddLaborDialogState extends State<AddLaborDialog>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _cnicController = TextEditingController();
@@ -103,14 +105,18 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     if (_nameController.text.trim().isEmpty) {
       _validationErrors['name'] = l10n.nameIsRequired;
     }
-    if (_cnicController.text.trim().isEmpty) {
-      _validationErrors['cnic'] = l10n.cnicIsRequired;
+    // CNIC is now optional, so no need for mandatory check here
+    if (_cnicController.text.trim().isNotEmpty) {
+      if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(_cnicController.text.trim())) {
+        _validationErrors['cnic'] = l10n.pleaseEnterValidCnicFormat;
+      }
     }
     if (_phoneController.text.trim().isEmpty) {
       _validationErrors['phoneNumber'] = l10n.phoneNumberIsRequired;
     }
-    if (_casteController.text.trim().isEmpty) {
-      _validationErrors['caste'] = l10n.casteIsRequired;
+    // Caste is now optional
+    if (_casteController.text.trim().isNotEmpty) {
+      // Optional extra formatting if needed
     }
     if (_designationController.text.trim().isEmpty) {
       _validationErrors['designation'] = l10n.designationIsRequired;
@@ -213,7 +219,7 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         final success = await provider.createLabor(
           name: _nameController.text.trim(),
           cnic: _cnicController.text.trim(),
-          phoneNumber: _phoneController.text.trim(),
+          phoneNumber: _normalizePhone(_phoneController.text.trim()),
           caste: _casteController.text.trim(),
           designation: _designationController.text.trim(),
           joiningDate: _selectedJoiningDate,
@@ -230,7 +236,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             _clearForm();
             Navigator.of(context).pop();
           } else {
-            _showErrorSnackbar(provider.errorMessage ?? l10n.failedToCreateLabor);
+            _showErrorSnackbar(
+              provider.errorMessage ?? l10n.failedToCreateLabor,
+            );
           }
         }
       } catch (e) {
@@ -374,6 +382,24 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     });
   }
 
+  /// ✅ Convert any Pakistani phone format to +92XXXXXXXXXX
+  String _normalizePhone(String phone) {
+    // Remove spaces and dashes
+    String cleaned = phone.replaceAll(' ', '').replaceAll('-', '');
+
+    if (cleaned.startsWith('+92')) {
+      return cleaned; // already correct
+    } else if (cleaned.startsWith('92') && cleaned.length == 12) {
+      return '+$cleaned'; // 923001234567 → +923001234567
+    } else if (cleaned.startsWith('03') && cleaned.length == 11) {
+      return '+92${cleaned.substring(1)}'; // 03001234567 → +923001234567
+    } else if (cleaned.startsWith('3') && cleaned.length == 10) {
+      return '+92$cleaned'; // 3001234567 → +923001234567
+    }
+    return phone; // fallback
+  }
+
+
   Future<void> _selectDate(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -397,7 +423,11 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
+        Icon(
+          icon,
+          color: AppTheme.primaryMaroon,
+          size: context.iconSize('medium'),
+        ),
         SizedBox(width: context.smallPadding),
         Text(
           title,
@@ -411,16 +441,25 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     );
   }
 
-  Widget _buildQuickSelectChip({required String label, required VoidCallback onTap}) {
+  Widget _buildQuickSelectChip({
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(context.borderRadius('small')),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.smallPadding,
+          vertical: context.smallPadding / 2,
+        ),
         decoration: BoxDecoration(
           color: AppTheme.accentGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(context.borderRadius('small')),
-          border: Border.all(color: AppTheme.accentGold.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: AppTheme.accentGold.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         child: Text(
           label,
@@ -460,7 +499,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
                 margin: EdgeInsets.all(context.mainPadding),
                 decoration: BoxDecoration(
                   color: AppTheme.pureWhite,
-                  borderRadius: BorderRadius.circular(context.borderRadius('large')),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('large'),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -518,7 +559,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.shouldShowCompactLayout ? l10n.addLabor : l10n.addNewLabor,
+                  context.shouldShowCompactLayout
+                      ? l10n.addLabor
+                      : l10n.addNewLabor,
                   style: TextStyle(
                     fontSize: context.headerFontSize,
                     fontWeight: FontWeight.w700,
@@ -602,7 +645,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: l10n.fullNameRequired,
-          hint: context.shouldShowCompactLayout ? l10n.enterName : l10n.enterWorkersFullName,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterName
+              : l10n.enterWorkersFullName,
           controller: _nameController,
           prefixIcon: Icons.person_outline,
           enabled: !_isCreating,
@@ -621,27 +666,29 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: l10n.cnicRequired,
+          label: '${l10n.cnic} (${l10n.optional})',
           hint: context.shouldShowCompactLayout
               ? l10n.enterCnic
               : l10n.enterCnicFormat,
           controller: _cnicController,
           prefixIcon: Icons.credit_card,
           enabled: !_isCreating,
+          inputFormatters: [CnicInputFormatter()],
           validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return l10n.pleaseEnterCnic;
-            }
-            if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value!)) {
-              return l10n.pleaseEnterValidCnicFormat;
+            if (value != null && value.isNotEmpty) {
+              if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(value)) {
+                return l10n.pleaseEnterValidCnicFormat;
+              }
             }
             return null;
           },
         ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
-          label: l10n.caste,
-          hint: context.shouldShowCompactLayout ? l10n.enterCaste : l10n.enterCasteOptional,
+          label: '${l10n.caste} (${l10n.optional})',
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterCaste
+              : l10n.enterCasteOptional,
           controller: _casteController,
           prefixIcon: Icons.group_outlined,
           enabled: !_isCreating,
@@ -656,13 +703,16 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.contactInformation, Icons.contact_phone_outlined),
+        _buildSectionTitle(
+          l10n.contactInformation,
+          Icons.contact_phone_outlined,
+        ),
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: l10n.phoneNumberRequired,
           hint: context.shouldShowCompactLayout
-              ? l10n.enterPhone
-              : l10n.enterPhoneNumberFormat,
+              ? '03001234567'
+              : '03001234567 ya +923001234567',
           controller: _phoneController,
           prefixIcon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
@@ -671,8 +721,15 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             if (value?.isEmpty ?? true) {
               return l10n.pleaseEnterPhoneNumber;
             }
-            if (!RegExp(r'^\+92\d{10}$').hasMatch(value!)) {
-              return l10n.pleaseEnterValidPhoneNumberFormat;
+            final phone = value!.trim().replaceAll(' ', '').replaceAll('-', '');
+            // Accept: 03XXXXXXXXX (11 digits), +923XXXXXXXXX (13 chars), 923XXXXXXXXX (12 digits)
+            final isValid =
+                RegExp(r'^03\d{9}$').hasMatch(phone) ||
+                RegExp(r'^3\d{9}$').hasMatch(phone) ||
+                RegExp(r'^\+923\d{9}$').hasMatch(phone) ||
+                RegExp(r'^923\d{9}$').hasMatch(phone);
+            if (!isValid) {
+              return 'Format: 03001234567';
             }
             return null;
           },
@@ -687,7 +744,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(l10n.locationInformation, Icons.location_on_outlined),
+        _buildSectionTitle(
+          l10n.locationInformation,
+          Icons.location_on_outlined,
+        ),
         SizedBox(height: context.cardPadding),
         ResponsiveBreakpoints.responsive(
           context,
@@ -732,8 +792,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               label: l10n.joiningDateRequired,
               hint: l10n.selectJoiningDate,
               controller: TextEditingController(
-                  text:
-                  '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}'),
+                text:
+                    '${_selectedJoiningDate.day}/${_selectedJoiningDate.month}/${_selectedJoiningDate.year}',
+              ),
               prefixIcon: Icons.calendar_today,
               enabled: !_isCreating,
             ),
@@ -762,7 +823,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         SizedBox(height: context.cardPadding),
         PremiumDropdownField<String>(
           label: l10n.genderRequired,
-          hint: context.shouldShowCompactLayout ? l10n.selectGender : l10n.selectGender,
+          hint: context.shouldShowCompactLayout
+              ? l10n.selectGender
+              : l10n.selectGender,
           prefixIcon: Icons.person_pin_rounded,
           items: [
             DropdownItem<String>(value: 'M', label: l10n.male),
@@ -773,10 +836,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           onChanged: _isCreating
               ? null
               : (value) {
-            setState(() {
-              _selectedGender = value!;
-            });
-          },
+                  setState(() {
+                    _selectedGender = value!;
+                  });
+                },
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.pleaseSelectGender;
@@ -787,7 +850,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
         SizedBox(height: context.cardPadding),
         PremiumTextField(
           label: l10n.ageRequired,
-          hint: context.shouldShowCompactLayout ? l10n.enterAge : l10n.enterAgeMinimum18Years,
+          hint: context.shouldShowCompactLayout
+              ? l10n.enterAge
+              : l10n.enterAgeMinimum18Years,
           controller: _ageController,
           prefixIcon: Icons.cake_outlined,
           keyboardType: TextInputType.number,
@@ -856,10 +921,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               .take(4)
               .map(
                 (city) => _buildQuickSelectChip(
-              label: city,
-              onTap: () => setState(() => _cityController.text = city),
-            ),
-          )
+                  label: city,
+                  onTap: () => setState(() => _cityController.text = city),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -893,10 +958,10 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
               .take(4)
               .map(
                 (area) => _buildQuickSelectChip(
-              label: area,
-              onTap: () => setState(() => _areaController.text = area),
-            ),
-          )
+                  label: area,
+                  onTap: () => setState(() => _areaController.text = area),
+                ),
+              )
               .toList(),
         ),
       ],
@@ -913,7 +978,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
           builder: (context, provider, child) {
             return PremiumButton(
               text: l10n.addLabor,
-              onPressed: (_isCreating || provider.isLoading) ? null : _handleSubmit,
+              onPressed: (_isCreating || provider.isLoading)
+                  ? null
+                  : _handleSubmit,
               isLoading: _isCreating || provider.isLoading,
               height: context.buttonHeight,
               icon: Icons.person_add_alt_1_rounded,
@@ -956,7 +1023,9 @@ class _AddLaborDialogState extends State<AddLaborDialog> with SingleTickerProvid
             builder: (context, provider, child) {
               return PremiumButton(
                 text: l10n.addLabor,
-                onPressed: (_isCreating || provider.isLoading) ? null : _handleSubmit,
+                onPressed: (_isCreating || provider.isLoading)
+                    ? null
+                    : _handleSubmit,
                 isLoading: _isCreating || provider.isLoading,
                 height: context.buttonHeight / 1.5,
                 icon: Icons.person_add_alt_1_rounded,

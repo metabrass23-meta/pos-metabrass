@@ -125,9 +125,9 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
           price: widget.orderItem.unitPrice,
           costPrice: null,
           color: '',
-          fabric: '',
+          material: '',
           pieces: [],
-          quantity: 0,
+          quantity: 0.0,
           categoryId: null,
           categoryName: null,
           stockStatus: '',
@@ -139,6 +139,8 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
           createdBy: null,
           createdById: null,
           createdByEmail: null,
+          barcode: null,
+          sku: null,
         ),
       );
 
@@ -177,7 +179,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
 
       final success = await orderItemProvider.updateOrderItem(
         id: widget.orderItem.id,
-        quantity: int.tryParse(_quantityController.text.trim()) ?? widget.orderItem.quantity,
+        quantity: double.tryParse(_quantityController.text.trim()) ?? widget.orderItem.quantity,
         unitPrice: double.tryParse(_unitPriceController.text.trim()) ?? widget.orderItem.unitPrice,
         customizationNotes: _customizationNotesController.text.trim(),
       );
@@ -246,7 +248,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
   }
 
   double get _lineTotal {
-    final quantity = int.tryParse(_quantityController.text) ?? 0;
+    final quantity = double.tryParse(_quantityController.text) ?? 0.0;
     final unitPrice = double.tryParse(_unitPriceController.text) ?? 0.0;
     return quantity * unitPrice;
   }
@@ -680,7 +682,7 @@ class _EditOrderItemDialogState extends State<EditOrderItemDialog> with SingleTi
                     if (value?.isEmpty ?? true) {
                       return l10n.pleaseEnterQuantity;
                     }
-                    final quantity = int.tryParse(value!);
+                    final quantity = double.tryParse(value!);
                     if (quantity == null || quantity <= 0) {
                       return l10n.quantityMustBePositive;
                     }

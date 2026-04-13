@@ -81,42 +81,28 @@ class ProductGrid extends StatelessWidget {
             ultrawide: 340.0,
           );
 
-          final productsPerRow = ResponsiveBreakpoints.responsive(
-            context,
-            tablet: 3,
-            small: 4,
-            medium: 5,
-            large: 6,
-            ultrawide: 7,
-          );
+          final int productsPerRow = 3;
 
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.only(right: context.cardPadding),
-            child: SizedBox(
-              width: (cardWidth + context.cardPadding) * productsPerRow,
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: productsPerRow,
-                  childAspectRatio: cardWidth / cardHeight,
-                  crossAxisSpacing: context.cardPadding,
-                  mainAxisSpacing: context.cardPadding,
-                ),
-                itemCount: filteredProducts.length,
-                itemBuilder: (context, index) {
-                  final product = filteredProducts[index];
-                  return SizedBox(
-                    width: cardWidth,
-                    height: cardHeight,
-                    child: _buildEnhancedProductCard(
-                      context,
-                      product,
-                      provider,
-                    ),
-                  );
-                },
-              ),
+          return GridView.builder(
+            padding: EdgeInsets.only(
+              right: context.cardPadding,
+              bottom: context.cardPadding * 2,
             ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: productsPerRow,
+              childAspectRatio: cardWidth / cardHeight,
+              crossAxisSpacing: context.cardPadding,
+              mainAxisSpacing: context.cardPadding,
+            ),
+            itemCount: filteredProducts.length,
+            itemBuilder: (context, index) {
+              final product = filteredProducts[index];
+              return _buildEnhancedProductCard(
+                context,
+                product,
+                provider,
+              );
+            },
           );
         },
       ),
@@ -128,7 +114,7 @@ class ProductGrid extends StatelessWidget {
 
     if (selectedCategory != 'All') {
       products = products
-          .where((product) => product.fabric == selectedCategory)
+          .where((product) => product.material == selectedCategory)
           .toList();
     }
 
@@ -136,22 +122,22 @@ class ProductGrid extends StatelessWidget {
       products = products
           .where(
             (product) =>
-        product.name.toLowerCase().contains(
-          searchQuery.toLowerCase(),
-        ) ||
-            product.detail.toLowerCase().contains(
-              searchQuery.toLowerCase(),
-            ) ||
-            product.color.toLowerCase().contains(
-              searchQuery.toLowerCase(),
-            ) ||
-            product.fabric.toLowerCase().contains(
-              searchQuery.toLowerCase(),
-            ) ||
-            product.piecesText.toLowerCase().contains(
-              searchQuery.toLowerCase(),
-            ),
-      )
+                product.name.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.detail.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.color.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.material.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ) ||
+                product.piecesText.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ),
+          )
           .toList();
     }
 
@@ -159,10 +145,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   Widget _buildEnhancedProductCard(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     final isOutOfStock = product.quantity <= 0;
     final isLowStock = product.quantity <= 5 && product.quantity > 0;
 
@@ -206,13 +192,13 @@ class ProductGrid extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              _getCategoryIcon(product.fabric),
+                              _getCategoryIcon(product.material),
                               size: context.iconSize('xl'),
                               color: Colors.grey[400],
                             ),
                             SizedBox(height: context.smallPadding / 2),
                             Text(
-                              product.fabric,
+                              product.material,
                               style: TextStyle(
                                 fontSize: context.captionFontSize,
                                 color: Colors.grey[500],
@@ -229,51 +215,52 @@ class ProductGrid extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () => _showDiscountDialog(
-                                    context,
-                                    product,
-                                    provider,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    context.borderRadius('small'),
-                                  ),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: context.smallPadding / 2,
-                                      vertical: context.smallPadding / 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.withOpacity(0.9),
-                                      borderRadius: BorderRadius.circular(
-                                        context.borderRadius('small'),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.local_offer_rounded,
-                                          color: AppTheme.pureWhite,
-                                          size: context.iconSize('small') * 0.8,
-                                        ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          '%',
-                                          style: TextStyle(
-                                            fontSize:
-                                            context.captionFontSize * 0.7,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppTheme.pureWhite,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // Commented out Discount icon and functionality
+                              // Material(
+                              //   color: Colors.transparent,
+                              //   child: InkWell(
+                              //     onTap: () => _showDiscountDialog(
+                              //       context,
+                              //       product,
+                              //       provider,
+                              //     ),
+                              //     borderRadius: BorderRadius.circular(
+                              //       context.borderRadius('small'),
+                              //     ),
+                              //     child: Container(
+                              //       padding: EdgeInsets.symmetric(
+                              //         horizontal: context.smallPadding / 2,
+                              //         vertical: context.smallPadding / 4,
+                              //       ),
+                              //       decoration: BoxDecoration(
+                              //         color: Colors.orange.withOpacity(0.9),
+                              //         borderRadius: BorderRadius.circular(
+                              //           context.borderRadius('small'),
+                              //         ),
+                              //       ),
+                              //       child: Row(
+                              //         mainAxisSize: MainAxisSize.min,
+                              //         children: [
+                              //           Icon(
+                              //             Icons.local_offer_rounded,
+                              //             color: AppTheme.pureWhite,
+                              //             size: context.iconSize('small') * 0.8,
+                              //           ),
+                              //           const SizedBox(width: 2),
+                              //           Text(
+                              //             '%',
+                              //             style: TextStyle(
+                              //               fontSize:
+                              //                   context.captionFontSize * 0.7,
+                              //               fontWeight: FontWeight.w600,
+                              //               color: AppTheme.pureWhite,
+                              //             ),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.smallPadding / 2,
@@ -369,18 +356,18 @@ class ProductGrid extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: _getCategoryColor(
-                                  product.fabric,
+                                  product.material,
                                 ).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(
                                   context.borderRadius('small'),
                                 ),
                               ),
                               child: Text(
-                                _getCategoryAbbreviation(product.fabric),
+                                _getCategoryAbbreviation(product.material),
                                 style: TextStyle(
                                   fontSize: context.captionFontSize * 0.8,
                                   fontWeight: FontWeight.w600,
-                                  color: _getCategoryColor(product.fabric),
+                                  color: _getCategoryColor(product.material),
                                 ),
                               ),
                             ),
@@ -480,7 +467,7 @@ class ProductGrid extends StatelessWidget {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.add_shopping_cart_rounded,
@@ -529,8 +516,9 @@ class ProductGrid extends StatelessWidget {
                                       context.borderRadius('small'),
                                     ),
                                     border: Border.all(
-                                      color: AppTheme.primaryMaroon
-                                          .withOpacity(0.3),
+                                      color: AppTheme.primaryMaroon.withOpacity(
+                                        0.3,
+                                      ),
                                     ),
                                   ),
                                   child: Icon(
@@ -619,10 +607,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   Widget _buildExistingOrderIndicator(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     final hasExistingOrders = _hasExistingOrders(product, provider);
 
     if (!hasExistingOrders) return const SizedBox.shrink();
@@ -779,74 +767,73 @@ class ProductGrid extends StatelessWidget {
   }
 
   // Helper Methods
-  IconData _getCategoryIcon(String fabric) {
-    switch (fabric.toLowerCase()) {
-      case 'silk':
-        return Icons.auto_awesome_rounded;
-      case 'cotton':
-        return Icons.eco_rounded;
-      case 'chiffon':
-        return Icons.air_rounded;
-      case 'georgette':
-        return Icons.waves_rounded;
-      case 'velvet':
-        return Icons.grade_rounded;
-      case 'net':
-        return Icons.blur_on_rounded;
-      case 'lawn':
-        return Icons.local_florist_rounded;
+  IconData _getCategoryIcon(String material) {
+    switch (material.toLowerCase()) {
+      case 'brass':
+        return Icons.hardware_rounded;
+      case 'stainless steel':
+      case 'steel':
+        return Icons.build_circle_rounded;
+      case 'ceramic':
+        return Icons.spa_rounded;
+      case 'pvc':
+      case 'plastic':
+        return Icons.plumbing_rounded;
+      case 'chrome':
+      case 'nickel':
+        return Icons.shutter_speed_rounded;
+      case 'iron':
+        return Icons.foundation_rounded;
       default:
-        return Icons.checkroom_outlined;
+        return Icons.category_outlined;
     }
   }
 
-  Color _getCategoryColor(String fabric) {
-    switch (fabric.toLowerCase()) {
-      case 'silk':
-        return Colors.purple;
-      case 'cotton':
-        return Colors.green;
-      case 'chiffon':
+  Color _getCategoryColor(String material) {
+    switch (material.toLowerCase()) {
+      case 'brass':
+        return Colors.orange[800]!;
+      case 'stainless steel':
+      case 'steel':
+        return Colors.blueGrey;
+      case 'ceramic':
+        return Colors.blue[300]!;
+      case 'pvc':
+      case 'plastic':
         return Colors.blue;
-      case 'georgette':
-        return Colors.teal;
-      case 'velvet':
-        return Colors.indigo;
-      case 'net':
-        return Colors.cyan;
-      case 'lawn':
-        return Colors.lightGreen;
+      case 'chrome':
+        return Colors.grey[600]!;
+      case 'nickel':
+        return Colors.grey[700]!;
       default:
         return Colors.grey;
     }
   }
 
-  String _getCategoryAbbreviation(String fabric) {
-    switch (fabric.toLowerCase()) {
-      case 'silk':
-        return 'SLK';
-      case 'cotton':
-        return 'CTN';
-      case 'chiffon':
-        return 'CHF';
-      case 'georgette':
-        return 'GEO';
-      case 'velvet':
-        return 'VLV';
-      case 'net':
-        return 'NET';
-      case 'lawn':
-        return 'LWN';
+  String _getCategoryAbbreviation(String material) {
+    switch (material.toLowerCase()) {
+      case 'brass':
+        return 'BRS';
+      case 'stainless steel':
+        return 'SST';
+      case 'ceramic':
+        return 'CRM';
+      case 'pvc':
+        return 'PVC';
+      case 'chrome':
+        return 'CHR';
+      case 'nickel':
+        return 'NKL';
+      case 'plastic':
+        return 'PLS';
       default:
-        return 'OTH';
+        return 'MAT';
     }
   }
 
   bool _isCustomizable(ProductModel product) {
-    return product.name.toLowerCase().contains('bridal') ||
-        product.name.toLowerCase().contains('wedding') ||
-        product.name.toLowerCase().contains('formal') ||
-        product.price > 50000;
+    return product.name.toLowerCase().contains('custom') ||
+        product.price > 100000;
   }
 
   bool _hasStandardDiscount(ProductModel product) {
@@ -862,8 +849,8 @@ class ProductGrid extends StatelessWidget {
   }
 
   int _getExistingOrderCount(ProductModel product, SalesProvider provider) {
-    if (product.name.toLowerCase().contains('bridal')) return 2;
-    if (product.name.toLowerCase().contains('wedding')) return 1;
+    if (product.name.toLowerCase().contains('premium')) return 2;
+    if (product.name.toLowerCase().contains('luxury')) return 1;
     return 0;
   }
 
@@ -909,10 +896,10 @@ class ProductGrid extends StatelessWidget {
 
   // Action Methods
   void _handleAddToCart(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     provider.addToCartWithCustomization(
       productId: product.id,
       productName: product.name,
@@ -923,10 +910,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _handleQuickAddToCart(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     // Direct add to cart without dialog (for card tap)
     provider.addToCartWithCustomization(
       productId: product.id,
@@ -938,10 +925,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _handleCheckoutButton(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     // Show add to cart dialog, then open checkout
     showDialog(
       context: context,
@@ -966,10 +953,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showEnhancedAddToCartDialog(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => EnhancedAddToCartDialog(product: product),
@@ -977,10 +964,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showDiscountDialog(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => DiscountDialog(product: product),
@@ -988,10 +975,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showExistingOrdersDialog(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => ExistingOrdersDialog(product: product),
@@ -999,10 +986,10 @@ class ProductGrid extends StatelessWidget {
   }
 
   void _showProductOptionsMenu(
-      BuildContext context,
-      ProductModel product,
-      SalesProvider provider,
-      ) {
+    BuildContext context,
+    ProductModel product,
+    SalesProvider provider,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1023,7 +1010,10 @@ class ProductGrid extends StatelessWidget {
     );
   }
 
-  void _showCreateCustomOrderDialog(BuildContext context, ProductModel product) {
+  void _showCreateCustomOrderDialog(
+    BuildContext context,
+    ProductModel product,
+  ) {
     showDialog(
       context: context,
       builder: (context) => CreateCustomOrderDialog(product: product),
@@ -1375,24 +1365,24 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             child: InkWell(
                               onTap: _calculatedDiscount > 0
                                   ? () {
-                                Provider.of<SalesProvider>(
-                                  context,
-                                  listen: false,
-                                ).addToCartWithCustomization(
-                                  productId: widget.product.id,
-                                  productName: widget.product.name,
-                                  unitPrice: widget.product.price,
-                                  quantity: 1,
-                                  itemDiscount: _calculatedDiscount,
-                                );
-                                Navigator.of(context).pop();
+                                      Provider.of<SalesProvider>(
+                                        context,
+                                        listen: false,
+                                      ).addToCartWithCustomization(
+                                        productId: widget.product.id,
+                                        productName: widget.product.name,
+                                        unitPrice: widget.product.price,
+                                        quantity: 1,
+                                        itemDiscount: _calculatedDiscount,
+                                      );
+                                      Navigator.of(context).pop();
 
-                                final discountText = _isPercentage
-                                    ? '${_percentageController.text}%'
-                                    : 'PKR ${_calculatedDiscount.toStringAsFixed(0)}';
+                                      final discountText = _isPercentage
+                                          ? '${_percentageController.text}%'
+                                          : 'PKR ${_calculatedDiscount.toStringAsFixed(0)}';
 
-                                // Snackbar removed - no longer shows "added with discount" confirmation
-                              }
+                                      // Snackbar removed - no longer shows "added with discount" confirmation
+                                    }
                                   : null,
                               borderRadius: BorderRadius.circular(
                                 context.borderRadius(),

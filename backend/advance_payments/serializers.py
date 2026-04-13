@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db.models import Q, Sum
+from django.utils import timezone
 from datetime import date, datetime
 from decimal import Decimal
 from .models import AdvancePayment
@@ -120,7 +121,7 @@ class AdvancePaymentCreateSerializer(serializers.ModelSerializer):
     def validate_date(self, value):
         """Validate payment date"""
         from datetime import timedelta
-        max_future_date = date.today() + timedelta(days=365)
+        max_future_date = timezone.localdate() + timedelta(days=365)
         if value > max_future_date:
             raise serializers.ValidationError("Payment date cannot be more than 1 year in the future.")
         return value
@@ -135,7 +136,7 @@ class AdvancePaymentCreateSerializer(serializers.ModelSerializer):
         """Cross-field validation"""
         labor = data.get('labor')
         amount = data.get('amount')
-        payment_date = data.get('date', date.today())
+        payment_date = data.get('date', timezone.localdate())
         
         # Set default time if not provided
         if 'time' not in data or not data.get('time'):
@@ -197,7 +198,7 @@ class AdvancePaymentUpdateSerializer(serializers.ModelSerializer):
     def validate_date(self, value):
         """Validate payment date"""
         from datetime import timedelta
-        max_future_date = date.today() + timedelta(days=365)
+        max_future_date = timezone.localdate() + timedelta(days=365)
         if value > max_future_date:
             raise serializers.ValidationError("Payment date cannot be more than 1 year in the future.")
         return value

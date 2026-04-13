@@ -2,17 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class AppTheme {
+  // Al Noor cloth store
   // Color Palette - Green Look
-  static const Color primaryMaroon = Color(0xFF005F3D);
-  static const Color secondaryMaroon = Color(0xFF5D4037);
-  static const Color accentGold = Color(0xFFD4AF37);
-  static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color creamWhite = Color(0xFFFFFBF5);
-  static const Color charcoalGray = Color(0xFF3E2723);
-  static const Color lightGray = Color(0xFFF5F5F5);
-  static const Color shadowColor = Color(0x1A000000);
+  // static const Color primaryMaroon = Color(0xFF005F3D);
+  // static const Color secondaryMaroon = Color(0xFF5D4037);
+  // static const Color accentGold = Color(0xFFD4AF37);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFFFFBF5);
+  // static const Color charcoalGray = Color(0xFF3E2723);
+  // static const Color lightGray = Color(0xFFF5F5F5);
+  // static const Color shadowColor = Color(0x1A000000);
 
-  //
+  //Maqbool Fabric
+  // static const Color primaryMaroon = Color(0xFF7A0C0C);
+  // static const Color secondaryMaroon = Color(0xFF5A0A0A);
+  // static const Color accentGold = Color(0xFFD4A24C);
+  // static const Color pureWhite = Color(0xFFFFFFFF);
+  // static const Color creamWhite = Color(0xFFF7F2EA);
+  // static const Color charcoalGray = Color(0xFF1C1C1C);
+  // static const Color lightGray = Color(0xFFEDEDED);
+  // static const Color shadowColor = Color(0x33000000);
+
+  // MetaBrass (Sanitary)
+  static const Color primaryMaroon = Color(0xFF2B4EBF);
+  static const Color secondaryMaroon = Color(0xFF1C378A);
+  static const Color accentGold = Color(0xFFA5ACB1);
+  static const Color pureWhite = Color(0xFFFFFFFF);
+  static const Color creamWhite = Color(0xFFF4F6F8);
+  static const Color charcoalGray = Color(0xFF1A1A1B);
+  static const Color lightGray = Color(0xFFE1E4E8);
+  static const Color shadowColor = Color(0x33000000);
+
+  //Maqbool Fabric
   // static const Color primaryMaroon = Color(0xFFD32F2F);
   // static const Color secondaryMaroon = Color(0xFF5D4037);
   // static const Color accentGold = Color(0xFFD4AF37);
@@ -22,12 +43,7 @@ class AppTheme {
   // static const Color lightGray = Color(0xFFF5F5F5);
   // static const Color shadowColor = Color(0x1A000000);
 
-
   //
-
-
-
-
 
   // Font Configuration
   static const String englishFontFamily = 'Inter';
@@ -262,7 +278,7 @@ class AppTheme {
     );
   }
 
-  // Backward compatibility - use Urdu by default
-  static ThemeData get lightTheme => getLightTheme(const Locale('ur'));
-  static ThemeData get darkTheme => getDarkTheme(const Locale('ur'));
+  // Backward compatibility - use English by default
+  static ThemeData get lightTheme => getLightTheme(const Locale('en'));
+  static ThemeData get darkTheme => getDarkTheme(const Locale('en'));
 }

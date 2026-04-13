@@ -179,7 +179,7 @@ class AnimatedLogoWidget extends StatelessWidget {
                               ],
                               stops: const [0.0, 0.3, 0.7, 1.0],
                             ).createShader(bounds),
-                            child: Image.asset('assets/images/logo.png')
+                            child: Image.asset('assets/images/metabras.png')
                           ),
                         ],
                       ),

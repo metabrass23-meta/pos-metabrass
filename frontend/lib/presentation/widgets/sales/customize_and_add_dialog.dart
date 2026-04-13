@@ -30,23 +30,23 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
-  int _quantity = 1;
+  double _quantity = 1.0;
   double _itemDiscount = 0.0;
   bool _isCustomPrice = false;
   bool _hasNotes = false;
 
   String _selectedSize = '';
-  String _selectedFitting = 'Standard';
-  String _selectedEmbroidery = 'None';
-  String _selectedFabricQuality = 'Standard';
+  String _selectedFitting = 'Standard Flow';
+  String _selectedFinish = 'Chrome';
+  String _selectedMaterialQuality = 'Standard';
   Color _selectedAccentColor = Colors.transparent;
   bool _expressDelivery = false;
   bool _giftWrapping = false;
 
-  final List<String> _availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'];
-  final List<String> _fittingOptions = ['Slim Fit', 'Standard', 'Loose Fit', 'Custom Tailored'];
-  final List<String> _embroideryOptions = ['None', 'Basic', 'Premium', 'Luxury Hand Work'];
-  final List<String> _fabricQualityOptions = ['Standard', 'Premium', 'Luxury'];
+  final List<String> _availableSizes = ['Standard', 'Small', 'Compact', 'Large', 'XL', 'Custom'];
+  final List<String> _fittingOptions = ['Standard Flow', 'High Pressure', 'Water Saving', 'Industrial Grade'];
+  final List<String> _finishOptions = ['Chrome', 'Matte Black', 'Brushed Brass', 'Polished Gold', 'Antique Bronze', 'None'];
+  final List<String> _materialQualityOptions = ['Standard', 'Premium', 'Luxury'];
   final List<Color> _accentColors = [Colors.transparent, Colors.red, Colors.blue, Colors.green, Colors.purple, Colors.pink, Colors.orange];
 
   @override
@@ -124,18 +124,18 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
         charges += 500;
         break;
     }
-    switch (_selectedEmbroidery) {
-      case 'Basic':
+    switch (_selectedFinish) {
+      case 'Brushed Brass':
         charges += 1500;
         break;
-      case 'Premium':
+      case 'Polished Gold':
         charges += 4000;
         break;
-      case 'Luxury Hand Work':
-        charges += 8000;
+      case 'Antique Bronze':
+        charges += 3000;
         break;
     }
-    switch (_selectedFabricQuality) {
+    switch (_selectedMaterialQuality) {
       case 'Premium':
         charges += widget.product.price * 0.3;
         break;
@@ -158,8 +158,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     List<String> notes = [];
     notes.add('${l10n.size}: $_selectedSize');
     notes.add('${l10n.fitting}: $_selectedFitting');
-    if (_selectedEmbroidery != 'None') notes.add('${l10n.embroidery}: $_selectedEmbroidery');
-    notes.add('${l10n.fabricQuality}: $_selectedFabricQuality');
+    if (_selectedFinish != 'None') notes.add('Finish: $_selectedFinish');
+    notes.add('${l10n.fabricQuality}: $_selectedMaterialQuality');
     if (_selectedAccentColor != Colors.transparent) {
       notes.add('${l10n.accentColor}: ${_getColorName(_selectedAccentColor)}');
     }
@@ -395,7 +395,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(context.borderRadius())),
-                child: Icon(Icons.checkroom_outlined, color: Colors.grey[500], size: context.iconSize('large')),
+                child: Icon(Icons.category_outlined, color: Colors.grey[500], size: context.iconSize('large')),
               ),
               SizedBox(width: context.cardPadding),
               Expanded(
@@ -420,7 +420,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
                         ),
                         SizedBox(width: context.smallPadding / 2),
                         Text(
-                          '${widget.product.color} • ${widget.product.fabric}',
+                          '${widget.product.color} • ${widget.product.material}',
                           style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                         ),
                       ],
@@ -518,12 +518,12 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
     decoration: InputDecoration(border: InputBorder.none, contentPadding: EdgeInsets.zero),
     onChanged: (value) {
-    final qty = int.tryParse(value) ?? 1;
-    setState(() => _quantity = qty.clamp(1, widget.product.quantity));
+    final qty = double.tryParse(value) ?? 1.0;
+    setState(() => _quantity = qty.clamp(1.0, widget.product.quantity));
     },
     validator: (value) {
-    final qty = int.tryParse(value ?? '') ?? 0;
-    if (qty < 1) return l10n.minQuantity;
+    final qty = double.tryParse(value ?? '') ?? 0.0;
+    if (qty < 1.0) return l10n.minQuantity;
     if (qty > widget.product.quantity) return l10n.maxQuantity(widget.product.quantity);
     return null;
     },
@@ -645,7 +645,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     child: Container(
     padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
     child: Text(
-    l10n.clearDiscount(_itemDiscount.toStringAsFixed(0)),
+    l10n.clearDiscount,
     style: TextStyle(fontSize: context.captionFontSize, color: Colors.red),
     ),
     ),
@@ -780,7 +780,7 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
           ),
           SizedBox(height: context.cardPadding),
           Text(
-            l10n.embroideryWork,
+            'Premium Finish',
             style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
           ),
           SizedBox(height: context.smallPadding),
@@ -791,17 +791,17 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: _selectedEmbroidery,
+                value: _selectedFinish,
                 isExpanded: true,
-                onChanged: (value) => setState(() => _selectedEmbroidery = value ?? 'None'),
-                items: _embroideryOptions
+                onChanged: (value) => setState(() => _selectedFinish = value ?? 'None'),
+                items: _finishOptions
                     .map(
-                      (embroidery) => DropdownMenuItem<String>(
-                    value: embroidery,
+                      (finish) => DropdownMenuItem<String>(
+                    value: finish,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
                       child: Text(
-                        embroidery,
+                        finish,
                         style: TextStyle(fontSize: context.bodyFontSize, color: AppTheme.charcoalGray),
                       ),
                     ),
@@ -824,10 +824,10 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: _selectedFabricQuality,
+                value: _selectedMaterialQuality,
                 isExpanded: true,
-                onChanged: (value) => setState(() => _selectedFabricQuality = value ?? 'Standard'),
-                items: _fabricQualityOptions
+                onChanged: (value) => setState(() => _selectedMaterialQuality = value ?? 'Standard'),
+                items: _materialQualityOptions
                     .map(
                       (quality) => DropdownMenuItem<String>(
                     value: quality,
@@ -1063,8 +1063,8 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
             if (_selectedSize == 'Custom') _buildChargeRow(l10n.customSizeLabel, 2000, l10n),
             if (_selectedFitting == 'Custom Tailored') _buildChargeRow(l10n.customTailoring, 3000, l10n),
             if (_selectedFitting == 'Slim Fit') _buildChargeRow(l10n.slimFit, 500, l10n),
-            if (_selectedEmbroidery != 'None') _buildChargeRow('$_selectedEmbroidery', _getEmbroideryCharge(), l10n),
-            if (_selectedFabricQuality != 'Standard') _buildChargeRow('${_selectedFabricQuality} ${l10n.fabric}', _getFabricQualityCharge(), l10n),
+            if (_selectedFinish != 'None') _buildChargeRow('$_selectedFinish', _getFinishCharge(), l10n),
+            if (_selectedMaterialQuality != 'Standard') _buildChargeRow('${_selectedMaterialQuality} ${l10n.material}', _getMaterialQualityCharge(), l10n),
             if (_expressDelivery) _buildChargeRow(l10n.expressDelivery, 1000, l10n),
             if (_giftWrapping) _buildChargeRow(l10n.giftWrapping, 500, l10n),
           ],
@@ -1205,21 +1205,21 @@ class _CustomizeAndAddDialogState extends State<CustomizeAndAddDialog> with Sing
     }
   }
 
-  double _getEmbroideryCharge() {
-    switch (_selectedEmbroidery) {
-      case 'Basic':
+  double _getFinishCharge() {
+    switch (_selectedFinish) {
+      case 'Brushed Brass':
         return 1500;
-      case 'Premium':
+      case 'Polished Gold':
         return 4000;
-      case 'Luxury Hand Work':
-        return 8000;
+      case 'Antique Bronze':
+        return 3000;
       default:
         return 0;
     }
   }
 
-  double _getFabricQualityCharge() {
-    switch (_selectedFabricQuality) {
+  double _getMaterialQualityCharge() {
+    switch (_selectedMaterialQuality) {
       case 'Premium':
         return widget.product.price * 0.3;
       case 'Luxury':

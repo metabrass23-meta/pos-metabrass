@@ -4,16 +4,20 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/receipt_provider.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
+import '../../../src/services/pdf_receipt_service.dart';
 import '../../../src/services/receipt_service.dart';
 import 'create_simple_receipt_dialog.dart';
 import 'view_receipt_dialog.dart';
 import 'edit_receipt_dialog.dart';
+import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/responsive_breakpoints.dart';
 
 class ReceiptManagementWidget extends StatefulWidget {
   const ReceiptManagementWidget({super.key});
 
   @override
-  State<ReceiptManagementWidget> createState() => _ReceiptManagementWidgetState();
+  State<ReceiptManagementWidget> createState() =>
+      _ReceiptManagementWidgetState();
 }
 
 class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
@@ -50,11 +54,11 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           Expanded(child: _buildReceiptsList()),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateSimpleReceiptDialog(context),
-        tooltip: l10n.createReceipt,
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => _showCreateSimpleReceiptDialog(context),
+      //   tooltip: l10n.createReceipt,
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 
@@ -77,16 +81,27 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                   flex: 2,
                   child: TextField(
                     controller: _searchController,
+                    style: TextStyle(
+                      fontFamily: AppTheme.englishFontFamily,
+                      fontSize: context.bodyFontSize,
+                      color: AppTheme.charcoalGray,
+                    ),
                     decoration: InputDecoration(
                       labelText: l10n.search,
                       hintText: 'Search by invoice number or customer...',
                       prefixIcon: const Icon(Icons.search),
                       border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    onChanged: (value) => context.read<ReceiptProvider>().setFilters(search: value),
+                    onChanged: (value) => context
+                        .read<ReceiptProvider>()
+                        .setFilters(search: value),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -99,16 +114,28 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                     decoration: InputDecoration(
                       labelText: l10n.status,
                       border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                     ),
                     dropdownColor: Colors.white,
                     items: [
-                      DropdownMenuItem(value: '', child: Text(l10n.allStatuses)),
-                      DropdownMenuItem(value: 'GENERATED', child: Text(l10n.generated)),
+                      DropdownMenuItem(
+                        value: '',
+                        child: Text(l10n.allStatuses),
+                      ),
+                      DropdownMenuItem(
+                        value: 'GENERATED',
+                        child: Text(l10n.generated),
+                      ),
                       DropdownMenuItem(value: 'SENT', child: Text(l10n.sent)),
-                      DropdownMenuItem(value: 'VIEWED', child: Text(l10n.viewed)),
+                      DropdownMenuItem(
+                        value: 'VIEWED',
+                        child: Text(l10n.viewed),
+                      ),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -172,7 +199,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           if (_searchController.text.isNotEmpty) {
             final searchLower = _searchController.text.toLowerCase();
             return sale.invoiceNumber.toLowerCase().contains(searchLower) ||
-                   sale.customerName.toLowerCase().contains(searchLower);
+                sale.customerName.toLowerCase().contains(searchLower);
           }
           return true;
         }).toList();
@@ -184,9 +211,15 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
               children: [
                 const Icon(Icons.receipt, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text('No Sales Found', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'No Sales Found',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
-                Text('No sales found in the system', style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  'No sales found in the system',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             ),
           );
@@ -199,8 +232,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             itemCount: filteredSales.length,
             itemBuilder: (context, index) {
               final sale = filteredSales[index];
-              final hasReceipt = receiptProvider.receipts.any((receipt) => receipt.saleId == sale.id);
-              
+              final hasReceipt = receiptProvider.receipts.any(
+                (receipt) => receipt.saleId == sale.id,
+              );
+
               return _buildSaleCard(sale, hasReceipt, receiptProvider);
             },
           ),
@@ -209,7 +244,11 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     );
   }
 
-  Widget _buildSaleCard(SaleModel sale, bool hasReceipt, ReceiptProvider receiptProvider) {
+  Widget _buildSaleCard(
+    SaleModel sale,
+    bool hasReceipt,
+    ReceiptProvider receiptProvider,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
@@ -269,7 +308,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             const SizedBox(width: 8),
             // Actions
             PopupMenuButton<String>(
-              onSelected: (value) => _handleSaleAction(value, sale, receiptProvider),
+              onSelected: (value) =>
+                  _handleSaleAction(value, sale, receiptProvider),
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'view',
@@ -285,23 +325,17 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                   value: 'print',
                   child: Row(
                     children: [
-                      const Icon(Icons.print, size: 16),
+                      const Icon(
+                        Icons.picture_as_pdf,
+                        size: 16,
+                        color: Colors.green,
+                      ),
                       const SizedBox(width: 8),
-                      Text('Print'),
+                      Text('Print PDF'),
                     ],
                   ),
                 ),
-                if (!hasReceipt)
-                  PopupMenuItem(
-                    value: 'create_receipt',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.receipt_long, size: 16),
-                        const SizedBox(width: 8),
-                        Text(l10n.createReceipt),
-                      ],
-                    ),
-                  ),
+
               ],
             ),
           ],
@@ -310,7 +344,11 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     );
   }
 
-  void _handleSaleAction(String action, SaleModel sale, ReceiptProvider receiptProvider) {
+  void _handleSaleAction(
+    String action,
+    SaleModel sale,
+    ReceiptProvider receiptProvider,
+  ) {
     switch (action) {
       case 'view':
         _viewSaleReceipt(sale);
@@ -318,9 +356,9 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
       case 'print':
         _printSaleReceipt(sale);
         break;
-      case 'create_receipt':
-        _createReceiptForSale(sale);
-        break;
+      // case 'create_receipt':
+      //   _createReceiptForSale(sale);
+      //   break;
     }
   }
 
@@ -337,31 +375,52 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
       // Show loading state
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Generating receipt for printing...')),
+          const SnackBar(content: Text('Loading sale details...')),
         );
       }
 
-      // Use SalesProvider to generate and print the receipt (same as ViewReceiptDialog)
+      // Get full sale details with items from SalesProvider
       final salesProvider = context.read<SalesProvider>();
-      final success = await salesProvider.generateReceiptPdf(sale.id);
-      
-      if (success) {
+      final fullSale = await salesProvider.getSaleById(sale.id);
+
+      if (fullSale == null) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Receipt sent to printer successfully!')),
+            const SnackBar(
+              content: Text('Failed to load sale details'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to print receipt')),
-          );
-        }
+        return;
       }
-    } catch (e) {
+
+      debugPrint(
+        '🔍 [ReceiptManagement] Full sale items count: ${fullSale.saleItems.length}',
+      );
+      for (var item in fullSale.saleItems) {
+        debugPrint(
+          '🔍 [ReceiptManagement] Item: ${item.productName}, Qty: ${item.quantity}',
+        );
+      }
+
+      // Use the new PDF receipt service with full sale data
+      await PdfReceiptService.previewAndPrintReceipt(fullSale);
+
+      // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error printing receipt: $e')),
+          const SnackBar(
+            content: Text('PDF receipt opened successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error generating PDF receipt: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating PDF receipt: $e')),
         );
       }
     }
@@ -371,10 +430,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     // Show create receipt dialog with pre-selected sale
     showDialog(
       context: context,
-      builder: (context) => CreateSimpleReceiptDialog(
-        initialSaleId: sale.id,
-        isViewOnly: false,
-      ),
+      builder: (context) =>
+          CreateSimpleReceiptDialog(initialSaleId: sale.id, isViewOnly: false),
     );
   }
 
@@ -391,8 +448,8 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           child: Icon(_getStatusIcon(receipt.status), color: Colors.white),
         ),
         title: Text(
-            receipt.receiptNumber,
-            style: const TextStyle(fontWeight: FontWeight.bold)
+          receipt.receiptNumber,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +458,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             Text('${l10n.customer}: ${receipt.customerName}'),
             Text(
               '${l10n.amount}: ${receipt.formattedPaymentAmount}',
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Row(
               children: [
@@ -423,19 +483,27 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'GENERATED': return Colors.blue;
-      case 'SENT': return Colors.orange;
-      case 'VIEWED': return Colors.green;
-      default: return Colors.grey;
+      case 'GENERATED':
+        return Colors.blue;
+      case 'SENT':
+        return Colors.orange;
+      case 'VIEWED':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
   IconData _getStatusIcon(String status) {
     switch (status) {
-      case 'GENERATED': return Icons.receipt;
-      case 'SENT': return Icons.send;
-      case 'VIEWED': return Icons.visibility;
-      default: return Icons.help_outline;
+      case 'GENERATED':
+        return Icons.receipt;
+      case 'SENT':
+        return Icons.send;
+      case 'VIEWED':
+        return Icons.visibility;
+      default:
+        return Icons.help_outline;
     }
   }
 
@@ -445,26 +513,54 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     return [
       PopupMenuItem(
         value: 'view',
-        child: Row(children: [const Icon(Icons.visibility, color: Colors.blue), const SizedBox(width: 8), Text(l10n.view)]),
+        child: Row(
+          children: [
+            const Icon(Icons.visibility, color: Colors.blue),
+            const SizedBox(width: 8),
+            Text(l10n.view),
+          ],
+        ),
       ),
       if (receipt.pdfFile != null)
         PopupMenuItem(
           value: 'download_pdf',
-          child: Row(children: [const Icon(Icons.picture_as_pdf, color: Colors.green), const SizedBox(width: 8), Text('Download PDF')]),
+          child: Row(
+            children: [
+              const Icon(Icons.picture_as_pdf, color: Colors.green),
+              const SizedBox(width: 8),
+              Text('Download PDF'),
+            ],
+          ),
         ),
       PopupMenuItem(
         value: 'edit',
-        child: Row(children: [const Icon(Icons.edit, color: Colors.orange), const SizedBox(width: 8), Text(l10n.edit)]),
+        child: Row(
+          children: [
+            const Icon(Icons.edit, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(l10n.edit),
+          ],
+        ),
       ),
       const PopupMenuDivider(),
       PopupMenuItem(
         value: 'delete',
-        child: Row(children: [const Icon(Icons.delete, color: Colors.red), const SizedBox(width: 8), Text(l10n.delete)]),
+        child: Row(
+          children: [
+            const Icon(Icons.delete, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(l10n.delete),
+          ],
+        ),
       ),
     ];
   }
 
-  void _handleReceiptAction(String action, ReceiptModel receipt, ReceiptProvider provider) {
+  void _handleReceiptAction(
+    String action,
+    ReceiptModel receipt,
+    ReceiptProvider provider,
+  ) {
     switch (action) {
       case 'view':
         _showReceiptDetails(receipt, provider);
@@ -482,7 +578,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   void _showCreateSimpleReceiptDialog(BuildContext context) {
-    showDialog(context: context, builder: (context) => const CreateSimpleReceiptDialog());
+    showDialog(
+      context: context,
+      builder: (context) => const CreateSimpleReceiptDialog(),
+    );
   }
 
   void _downloadReceiptPdf(ReceiptModel receipt) {
@@ -499,7 +598,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             children: [
               Text('PDF generated successfully!'),
               const SizedBox(height: 8),
-              Text('Available at:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                'Available at:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Text(
                 receipt.pdfFile!,
                 style: TextStyle(fontSize: 12, color: Colors.blue),
@@ -520,7 +622,9 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         builder: (context) => AlertDialog(
           icon: Icon(Icons.info_outline, color: Colors.orange, size: 48),
           title: const Text('PDF Not Available'),
-          content: const Text('PDF not available for this receipt. Please generate the PDF first.'),
+          content: const Text(
+            'PDF not available for this receipt. Please generate the PDF first.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -549,7 +653,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                 _buildDetailRow(l10n.receiptNumber, receipt.receiptNumber),
                 _buildDetailRow(l10n.amount, receipt.formattedPaymentAmount),
                 _buildDetailRow(l10n.status, receipt.statusDisplay),
-                _buildDetailRow(l10n.generatedAt, receipt.formattedGeneratedDate),
+                _buildDetailRow(
+                  l10n.generatedAt,
+                  receipt.formattedGeneratedDate,
+                ),
                 const Divider(),
                 if (receipt.customerName.isNotEmpty)
                   _buildDetailRow(l10n.customer, receipt.customerName),
@@ -563,7 +670,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(l10n.close),
-          )
+          ),
         ],
       ),
     );
@@ -576,7 +683,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
     );
   }
 
-  void _showDeleteReceiptDialog(ReceiptModel receipt, ReceiptProvider provider) {
+  void _showDeleteReceiptDialog(
+    ReceiptModel receipt,
+    ReceiptProvider provider,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     showDialog(
@@ -594,7 +704,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(l10n.thisActionCannotBeUndone, style: const TextStyle(color: Colors.red)),
+            Text(
+              l10n.thisActionCannotBeUndone,
+              style: const TextStyle(color: Colors.red),
+            ),
           ],
         ),
         actions: [
@@ -611,7 +724,10 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                 _showSuccessDialog(l10n.receiptDeletedSuccessfully);
               }
             },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -643,7 +759,13 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
         children: [
           SizedBox(
             width: 140,
-            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            child: Text(
+              '$label:',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
           ),
           Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
         ],
