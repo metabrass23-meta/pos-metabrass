@@ -90,28 +90,14 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # --- DATABASE CONFIGURATION ---
-# This logic prevents UndefinedValueError on Railway
-DATABASE_URL = config('DATABASE_URL', default=None)
-
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='metabrass'),
-            'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default='1234'),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
-        }
-    }
+# Railway automatically provides DATABASE_URL. dj_database_url.config() will pick it up.
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default='postgres://postgres:1234@localhost:5432/metabrass'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 # --- CHANNELS ---
 CHANNEL_LAYERS = {
