@@ -90,14 +90,28 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # --- DATABASE CONFIGURATION ---
-# Railway automatically provides DATABASE_URL. dj_database_url.config() will pick it up.
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='postgres://postgres:1234@localhost:5432/metabrass'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True
+        )
+    }
+else:
+    # Fallback for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'metabrass',
+            'USER': 'postgres',
+            'PASSWORD': '1234',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # --- CHANNELS ---
 CHANNEL_LAYERS = {
