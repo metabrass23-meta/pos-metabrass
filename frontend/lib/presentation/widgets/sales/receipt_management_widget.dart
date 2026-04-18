@@ -23,6 +23,7 @@ class ReceiptManagementWidget extends StatefulWidget {
 class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedStatus = '';
+  final Map<String, bool> _printingStatus = {}; // ✅ Track printing state per sale
 
   @override
   void initState() {
@@ -307,37 +308,42 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             ),
             const SizedBox(width: 8),
             // Actions
-            PopupMenuButton<String>(
-              onSelected: (value) =>
-                  _handleSaleAction(value, sale, receiptProvider),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'view',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.visibility, size: 16),
-                      const SizedBox(width: 8),
-                      Text(l10n.view),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'print',
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.picture_as_pdf,
-                        size: 16,
-                        color: Colors.green,
+            _printingStatus[sale.id] == true
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : PopupMenuButton<String>(
+                    onSelected: (value) =>
+                        _handleSaleAction(value, sale, receiptProvider),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'view',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.visibility, size: 16),
+                            const SizedBox(width: 8),
+                            Text(l10n.view),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      Text('Print PDF'),
+                      PopupMenuItem(
+                        value: 'print',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.picture_as_pdf,
+                              size: 16,
+                              color: Colors.green,
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Print PDF'),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-
-              ],
-            ),
           ],
         ),
       ),
@@ -371,58 +377,38 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
   }
 
   void _printSaleReceipt(SaleModel sale) async {
+    setState(() => _printingStatus[sale.id] = true);
     try {
-      // Show loading state
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Loading sale details...')),
-        );
-      }
-
-      // Get full sale details with items from SalesProvider
-      final salesProvider = context.read<SalesProvider>();
-      final fullSale = await salesProvider.getSaleById(sale.id);
-
-      if (fullSale == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to load sale details'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      // 1. Instant Print: If we already have items (Super Fast)
+      if (sale.saleItems.isNotEmpty) {
+        debugPrint('⚡ [ReceiptManagement] Instant printing local items');
+        await PdfReceiptService.previewAndPrintReceipt(sale);
         return;
       }
 
-      debugPrint(
-        '🔍 [ReceiptManagement] Full sale items count: ${fullSale.saleItems.length}',
-      );
-      for (var item in fullSale.saleItems) {
-        debugPrint(
-          '🔍 [ReceiptManagement] Item: ${item.productName}, Qty: ${item.quantity}',
-        );
-      }
+      // 2. Optimized Print: Use SalesProvider cache
+      final salesProvider = context.read<SalesProvider>();
+      final fullSale = await salesProvider.getSaleById(sale.id);
 
-      // Use the new PDF receipt service with full sale data
-      await PdfReceiptService.previewAndPrintReceipt(fullSale);
-
-      // Show success message
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PDF receipt opened successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      if (fullSale != null) {
+        debugPrint('✅ [ReceiptManagement] Printing after fetch/cache');
+        await PdfReceiptService.previewAndPrintReceipt(fullSale);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not load sale details'), backgroundColor: Colors.red),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error generating PDF receipt: $e');
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDF receipt: $e')),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
+    } finally {
+      if (mounted) setState(() => _printingStatus[sale.id] = false);
     }
   }
 

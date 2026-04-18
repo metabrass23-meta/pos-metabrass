@@ -73,11 +73,11 @@ class ResponsiveBreakpoints {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // More aggressive sidebar sizing for small screens
-    if (screenWidth < 800) return 230.0; // Fixed width for very small screens
-    if (screenWidth < 1024) return 220.0; // Smaller for tablets
-    if (screenWidth < 1366) return 240.0; // Small desktop
-    if (screenWidth < 1920) return 250.0; // Medium desktop
-    return 280.0; // Large desktop
+    if (screenWidth < 800) return 260.0; // Fixed width for very small screens
+    if (screenWidth < 1024) return 260.0; // Smaller for tablets
+    if (screenWidth < 1366) return 280.0; // Small desktop
+    if (screenWidth < 1920) return 290.0; // Medium desktop
+    return 310.0; // Large desktop
 
     // Ensure minimum and maximum constraints
     return (screenWidth * 0.15).clamp(180.0, 300.0);

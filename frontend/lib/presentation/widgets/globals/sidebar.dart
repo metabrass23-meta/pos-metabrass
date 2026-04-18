@@ -403,9 +403,7 @@ class PremiumSidebar extends StatelessWidget {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: EdgeInsets.symmetric(
-                        horizontal: isExpanded
-                            ? context.cardPadding / 4
-                            : context.smallPadding,
+                        horizontal: context.smallPadding / 2,
                         vertical: context.smallPadding / 3,
                       ),
                       child: Material(
@@ -418,9 +416,7 @@ class PremiumSidebar extends StatelessWidget {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: EdgeInsets.symmetric(
-                              horizontal: isExpanded
-                                  ? context.cardPadding
-                                  : context.smallPadding,
+                              horizontal: context.smallPadding * 1.2,
                               vertical: context.cardPadding / 2,
                             ),
                             decoration: BoxDecoration(
@@ -463,22 +459,21 @@ class PremiumSidebar extends StatelessWidget {
                                   SizedBox(width: context.smallPadding),
 
                                   Expanded(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        item['title'],
-                                        style: TextStyle(
-                                          fontSize: context.subtitleFontSize,
-                                          fontWeight: isSelected
-                                              ? FontWeight.w600
-                                              : FontWeight.w400,
-                                          color: isSelected
-                                              ? AppTheme.pureWhite
-                                              : AppTheme.pureWhite.withOpacity(0.85),
-                                          letterSpacing: 0.2,
-                                        ),
+                                    child: Text(
+                                      item['title'],
+                                      style: TextStyle(
+                                        fontSize: context.subtitleFontSize,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                        color: isSelected
+                                            ? AppTheme.pureWhite
+                                            : AppTheme.pureWhite.withOpacity(0.85),
+                                        letterSpacing: 0.2,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.fade,
+                                      softWrap: false,
                                     ),
                                   ),
                                   if (item['badge'] != null) ...[

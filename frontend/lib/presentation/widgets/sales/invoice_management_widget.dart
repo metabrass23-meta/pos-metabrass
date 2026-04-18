@@ -25,6 +25,7 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedStatus = '';
   Timer? _searchDebounce;
+  final Map<String, bool> _printingStatus = {}; // ✅ Track printing state per invoice
 
   @override
   void initState() {
@@ -296,12 +297,18 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
             ),
           ],
         ),
-        trailing: PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
-          onSelected: (value) =>
-              _handleInvoiceAction(value, invoice, provider, l10n),
-          itemBuilder: (context) => _buildInvoiceActionMenu(l10n),
-        ),
+        trailing: _printingStatus[invoice.id] == true
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryMaroon),
+              )
+            : PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) =>
+                    _handleInvoiceAction(value, invoice, provider, l10n),
+                itemBuilder: (context) => _buildInvoiceActionMenu(l10n),
+              ),
         onTap: () => _showInvoiceDetails(invoice, l10n),
       ),
     );
@@ -432,13 +439,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
   }
 
   void _printPdfInvoice(InvoiceModel invoice, AppLocalizations l10n) async {
+    setState(() => _printingStatus[invoice.id] = true);
     try {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Loading sale details...')),
-        );
-      }
-
       final salesProvider = context.read<SalesProvider>();
       final sale = await salesProvider.getSaleById(invoice.saleId);
 
@@ -470,6 +472,8 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
         );
       }
+    } finally {
+      if (mounted) setState(() => _printingStatus[invoice.id] = false);
     }
   }
 

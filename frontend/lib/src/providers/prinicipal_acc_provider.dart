@@ -46,7 +46,7 @@ class PrincipalAccountProvider extends ChangeNotifier {
 
   final List<String> _availableTransactionTypes = ['CREDIT', 'DEBIT'];
 
-  final List<String> _availableHandlers = ['MetaBrass Admin'];
+  final List<String> _availableHandlers = ['META BRASS Admin'];
 
   List<String> get availableSourceModules => _availableSourceModules;
   List<String> get availableTransactionTypes => _availableTransactionTypes;

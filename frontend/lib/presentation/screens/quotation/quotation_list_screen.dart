@@ -7,6 +7,7 @@ import 'package:open_file/open_file.dart';
 import '../../../src/config/api_config.dart';
 import '../../../src/models/quotation/quotation_model.dart';
 import '../../../src/services/quotation_service.dart';
+import '../../../src/services/pdf_quotation_service.dart';
 import 'add_quotation_screen.dart';
 
 class QuotationListScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
   List<QuotationModel> _filteredQuotations = [];
   bool _isLoading = true;
   DateTime? _selectedDate;
+  final Map<String, bool> _printingStatus = {}; // ✅ Track printing state per quotation
 
   @override
   void initState() {
@@ -227,7 +229,7 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
         children: [
           _btn('VIEW', Icons.visibility, Colors.blue, () => _showViewDialog(quote)),
           const SizedBox(width: 6),
-          _btn('PDF', Icons.print, Colors.redAccent, () => _printQuotation(quote)),
+          _btn('PDF', Icons.print, Colors.redAccent, () => _printQuotation(quote), loading: _printingStatus[quote.id] == true),
           const SizedBox(width: 6),
           if (!isConverted) _btn('EDIT', Icons.edit, Colors.grey.shade700, () => _navigateToEdit(quote)),
           const SizedBox(width: 6),
@@ -295,12 +297,17 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
           ),
         ),
         actions: [
-          ElevatedButton.icon(
-            onPressed: () => _printQuotation(quote),
-            icon: const Icon(Icons.print, color: Colors.white),
-            label: const Text('PRINT QUOTATION', style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061E0)),
-          ),
+          _printingStatus[quote.id] == true 
+            ? const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: CircularProgressIndicator(),
+              )
+            : ElevatedButton.icon(
+                onPressed: () => _printQuotation(quote),
+                icon: const Icon(Icons.print, color: Colors.white),
+                label: const Text('PRINT QUOTATION', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061E0)),
+              ),
         ],
       ),
     );
@@ -333,46 +340,24 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
   }
 
   Future<void> _printQuotation(QuotationModel quote) async {
-    final String url = '${ApiConfig.baseUrl}${ApiConfig.generateQuotationPdf(quote.id)}';
-    
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.white)),
-    );
-
+    setState(() => _printingStatus[quote.id] = true);
     try {
-      final dio = Dio();
-      // Get temporary directory
-      final tempDir = await getTemporaryDirectory();
-      final String savePath = '${tempDir.path}/quotation_${quote.quotationNumber}.pdf';
+      // ✅ Speed Optimization: Generate and Print Instantly (Already optimized in service)
+      await PdfQuotationService.previewAndPrintQuotation(quote);
 
-      // Download the file
-      final response = await dio.download(
-        url,
-        savePath,
-        options: Options(
-          validateStatus: (status) => true, // Accept all statuses to see errors
-        ),
-      );
-
-      // Close loading dialog
-      Navigator.pop(context);
-
-      // Check if it's actually a PDF
-      if (response.headers.value('content-type')?.contains('application/pdf') == true) {
-        // Open the file
-        final result = await OpenFile.open(savePath);
-        if (result.type != ResultType.done) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open PDF: ${result.message}')));
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error: Server did not return a valid PDF. Please try again.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Quotation opened successfully'), backgroundColor: Colors.green),
+        );
       }
     } catch (e) {
-      if (Navigator.canPop(context)) Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error downloading PDF: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _printingStatus[quote.id] = false);
     }
   }
 
@@ -392,10 +377,12 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
     );
   }
 
-  Widget _btn(String label, IconData icon, Color col, VoidCallback tap) {
+  Widget _btn(String label, IconData icon, Color col, VoidCallback tap, {bool loading = false}) {
     return ElevatedButton.icon(
-      onPressed: tap,
-      icon: Icon(icon, size: 14, color: Colors.white),
+      onPressed: loading ? null : tap,
+      icon: loading 
+          ? const SizedBox(height: 14, width: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+          : Icon(icon, size: 14, color: Colors.white),
       label: Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
       style: ElevatedButton.styleFrom(backgroundColor: col, padding: const EdgeInsets.symmetric(horizontal: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)), elevation: 0),
     );

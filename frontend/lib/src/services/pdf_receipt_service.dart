@@ -1,21 +1,40 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import '../models/sales/sale_model.dart';
 import '../utils/debug_helper.dart';
 
 class PdfReceiptService {
-  static const String companyName = 'MetaBrass';
+  static const String companyName = 'META BRASS';
   static const String companyAddress =
       'Kacha Eminabadroad Siddique Colony Gujranwala';
   static const String companyPhone = '055-8174471';
   static const String companyTagline =
       'Sanitary Fittings & Bathroom Accessories';
 
-  /// Generate and save PDF Receipt (Receipt Style, not Invoice)
-  static Future<String> generateReceiptPdf(SaleModel sale) async {
+  // ✅ Speed Optimization: Cache logo and fonts
+  static Uint8List? _cachedLogoBytes;
+  static pw.Font? _cachedRegularFont;
+  static pw.Font? _cachedBoldFont;
+
+  /// Preload logo and fonts to make first print instant
+  static Future<void> preloadAssets() async {
+    if (_cachedLogoBytes != null && _cachedRegularFont != null) return;
+    try {
+      final ByteData logoData = await rootBundle.load('assets/images/metabras.png');
+      _cachedLogoBytes = logoData.buffer.asUint8List();
+      _cachedRegularFont = pw.Font.helvetica();
+      _cachedBoldFont = pw.Font.helveticaBold();
+      DebugHelper.printInfo('PdfReceiptService', 'Assets preloaded successfully');
+    } catch (e) {
+      DebugHelper.printError('PdfReceiptService', 'Failed to preload assets: $e');
+    }
+  }
+
+  /// Generate PDF Receipt bytes (Works on Web & Desktop)
+  static Future<Uint8List> generateReceiptPdfBytes(SaleModel sale) async {
     try {
       DebugHelper.printInfo(
         'PdfReceiptService',
@@ -23,43 +42,61 @@ class PdfReceiptService {
       );
 
       final pdf = pw.Document();
-
-      // Load fonts
-      final regularFont = pw.Font.helvetica();
-      final boldFont = pw.Font.helveticaBold();
+      final regularFont = _cachedRegularFont ?? pw.Font.helvetica();
+      final boldFont = _cachedBoldFont ?? pw.Font.helveticaBold();
+      
+      // ✅ Speed Optimization: Use preloaded bytes
+      pw.MemoryImage? logoImage;
+      if (_cachedLogoBytes != null) {
+        logoImage = pw.MemoryImage(_cachedLogoBytes!);
+      } else {
+        // Fallback if not preloaded
+        try {
+          final ByteData logoData = await rootBundle.load('assets/images/metabras.png');
+          _cachedLogoBytes = logoData.buffer.asUint8List();
+          logoImage = pw.MemoryImage(_cachedLogoBytes!);
+        } catch (e) {
+          DebugHelper.printError('PdfReceiptService', 'Fallback logo load failed: $e');
+        }
+      }
 
       // Build PDF content
       pdf.addPage(
         pw.Page(
-          pageFormat: PdfPageFormat.a5,
-          margin: const pw.EdgeInsets.all(20),
+          pageFormat: PdfPageFormat.a5.copyWith(
+            marginBottom: 5,
+            marginLeft: 5,
+            marginRight: 5,
+            marginTop: 5,
+          ),
+          theme: pw.ThemeData.withFont(
+            base: regularFont,
+            bold: boldFont,
+          ),
           build: (pw.Context context) {
-            return pw.Column(
-              children: [
-                _buildReceiptHeader(regularFont, boldFont),
-                pw.SizedBox(height: 10),
-                _buildReceiptInfo(sale, regularFont, boldFont),
-                pw.SizedBox(height: 10),
-                _buildCustomerInfo(sale, regularFont, boldFont),
-                pw.SizedBox(height: 10),
-                _buildItemsTable(sale, regularFont, boldFont),
-                pw.SizedBox(height: 10),
-                _buildTotalsSection(sale, regularFont, boldFont),
-                pw.SizedBox(height: 15),
-                _buildFooter(regularFont, boldFont),
-              ],
+            return pw.Container(
+              width: double.infinity,
+              child: pw.Column(
+                children: [
+                  _buildReceiptHeader(regularFont, boldFont, logoImage),
+                  pw.SizedBox(height: 10),
+                  _buildReceiptInfo(sale, regularFont, boldFont),
+                  pw.SizedBox(height: 10),
+                  _buildCustomerInfo(sale, regularFont, boldFont),
+                  pw.SizedBox(height: 10),
+                  _buildItemsTable(sale, regularFont, boldFont),
+                  pw.SizedBox(height: 10),
+                  _buildTotalsSection(sale, regularFont, boldFont),
+                  pw.SizedBox(height: 15),
+                  _buildFooter(regularFont, boldFont),
+                ],
+              ),
             );
           },
         ),
       );
 
-      // Save PDF
-      final output = await getTemporaryDirectory();
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final file = File('${output.path}/RECEIPT_${sale.invoiceNumber}_$timestamp.pdf');
-      await file.writeAsBytes(await pdf.save());
-
-      return file.path;
+      return await pdf.save();
     } catch (e) {
       DebugHelper.printError(
         'PdfReceiptService',
@@ -70,19 +107,14 @@ class PdfReceiptService {
   }
 
   /// Build receipt header with MetaBrass logo and horizontal blue bar
-  static pw.Widget _buildReceiptHeader(pw.Font regularFont, pw.Font boldFont) {
+  static pw.Widget _buildReceiptHeader(pw.Font regularFont, pw.Font boldFont, pw.MemoryImage? logoImage) {
     pw.Widget logoWidget = pw.SizedBox(height: 60);
-    try {
-      final logoFile = File('assets/images/metabras.png');
-      if (logoFile.existsSync()) {
-        final logoImage = pw.MemoryImage(logoFile.readAsBytesSync());
-        logoWidget = pw.Image(logoImage, height: 65, fit: pw.BoxFit.contain);
-      }
-    } catch (e) {
-      print('Error loading logo for PDF: $e');
+    if (logoImage != null) {
+      logoWidget = pw.Image(logoImage, height: 65, fit: pw.BoxFit.contain);
     }
 
     return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch, // Ensure full width
       children: [
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -101,13 +133,14 @@ class PdfReceiptService {
                 ),
               ],
             ),
+            pw.Spacer(), // Push text to the right
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
                 pw.Text(
                   'CASH RECEIPT',
                   style: pw.TextStyle(
-                    fontSize: 22,
+                    fontSize: 24, // Slightly larger for A5
                     fontWeight: pw.FontWeight.bold,
                     font: boldFont,
                     color: PdfColor.fromInt(0xFF2B4EBF),
@@ -116,26 +149,26 @@ class PdfReceiptService {
                 pw.SizedBox(height: 4),
                 pw.Text(
                   companyName.toUpperCase(),
-                  style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, font: boldFont),
+                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: boldFont), // Larger text
                 ),
                 pw.Text(
                   companyAddress,
-                  style: pw.TextStyle(fontSize: 8, font: regularFont, color: PdfColors.grey800),
+                  style: pw.TextStyle(fontSize: 10, font: regularFont, color: PdfColors.grey800),
                 ),
                 pw.Text(
                   'Phone: $companyPhone',
-                  style: pw.TextStyle(fontSize: 8, font: regularFont, color: PdfColors.grey800),
+                  style: pw.TextStyle(fontSize: 10, font: regularFont, color: PdfColors.grey800),
                 ),
               ],
             ),
           ],
         ),
-        pw.SizedBox(height: 8),
+        pw.SizedBox(height: 10),
         pw.Stack(
           alignment: pw.Alignment.centerLeft,
           children: [
             pw.Container(
-              height: 20,
+              height: 22,
               width: double.infinity,
               decoration: pw.BoxDecoration(
                 color: PdfColor.fromInt(0xFF1C378A), 
@@ -146,7 +179,7 @@ class PdfReceiptService {
                 companyTagline.toUpperCase(),
                 style: pw.TextStyle(
                   color: PdfColors.white,
-                  fontSize: 9,
+                  fontSize: 10,
                   fontWeight: pw.FontWeight.bold,
                   font: boldFont,
                 ),
@@ -351,7 +384,7 @@ class PdfReceiptService {
           decoration: pw.BoxDecoration(color: PdfColors.grey100, borderRadius: pw.BorderRadius.circular(4)),
           child: pw.Column(
             children: [
-              pw.Text('Software: MetaBrass POS System', style: pw.TextStyle(fontSize: 7, font: regularFont)),
+              pw.Text('Software: META BRASS POS System', style: pw.TextStyle(fontSize: 7, font: regularFont)),
               pw.Text('Date: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.now())}', style: pw.TextStyle(fontSize: 7, font: regularFont)),
             ],
           ),
@@ -362,12 +395,8 @@ class PdfReceiptService {
 
   static Future<void> previewAndPrintReceipt(SaleModel sale) async {
     try {
-      final filePath = await generateReceiptPdf(sale);
-      if (Platform.isWindows) {
-        await Process.run('cmd', ['/c', 'start', '', filePath.replaceAll('/', '\\')]);
-      } else {
-        await Process.run('open', [filePath]);
-      }
+      final pdfBytes = await generateReceiptPdfBytes(sale);
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes, name: 'Receipt_${sale.invoiceNumber}');
     } catch (e) {
       throw Exception('Failed to open receipt PDF: $e');
     }

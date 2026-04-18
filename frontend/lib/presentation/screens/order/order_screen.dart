@@ -224,13 +224,18 @@ class _OrderPageState extends State<OrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Order Management',
-                style: TextStyle(
-                  fontSize: context.headingFontSize / 1.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoalGray,
-                  letterSpacing: -0.5,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Order Management',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: context.headingFontSize / 1.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoalGray,
+                    letterSpacing: -0.5,
+                  ),
                 ),
               ),
               SizedBox(height: context.cardPadding / 4),
@@ -253,13 +258,18 @@ class _OrderPageState extends State<OrderPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Page Title
-        Text(
-          'Order Management',
-          style: TextStyle(
-            fontSize: context.headingFontSize / 1.5,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.charcoalGray,
-            letterSpacing: -0.5,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Order Management',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: context.headingFontSize / 1.5,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoalGray,
+              letterSpacing: -0.5,
+            ),
           ),
         ),
         SizedBox(height: context.cardPadding / 4),
@@ -498,7 +508,7 @@ class _OrderPageState extends State<OrderPage> {
               color: hasActiveFilter ? AppTheme.accentGold : Colors.grey[600],
               size: context.iconSize('medium'),
             ),
-            if (!context.isTablet) ...[
+            if (!context.shouldShowCompactLayout) ...[
               SizedBox(width: context.smallPadding),
               Text(
                 hasActiveFilter ? 'Status: ${_getStatusDisplayName(provider.currentStatusFilter)}' : 'Filter Status',
@@ -611,7 +621,7 @@ class _OrderPageState extends State<OrderPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.refresh_rounded, color: Colors.grey[600], size: context.iconSize('medium')),
-            if (!context.isTablet) ...[
+            if (!context.shouldShowCompactLayout) ...[
               SizedBox(width: context.smallPadding),
               Text(
                 'Refresh',

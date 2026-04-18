@@ -9,13 +9,13 @@ class AppLocalizationsUr extends AppLocalizations {
   AppLocalizationsUr([String locale = 'ur']) : super(locale);
 
   @override
-  String get appTitle => 'میٹا براس - پریمیم POS';
+  String get appTitle => 'META BRASS - پریمیم POS';
 
   @override
   String get welcomeBack => 'خوش آمدید';
 
   @override
-  String get brandName => 'میٹا براس';
+  String get brandName => 'META BRASS';
 
   @override
   String get tagline => 'آپ کے جدید گھر کے لیے خوبصورتی کا حسین امتزاج۔\nہماری پریمیم باتھ روم اور سینیٹری کلیکشنز کے ذریعے عیش و آرام کا نیا تجربہ۔';
@@ -629,7 +629,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get brandTagline => 'پریمیم سینیٹری POS';
 
   @override
-  String get welcomeToPos => 'میٹا براس POS میں خوش آمدید';
+  String get welcomeToPos => 'META BRASS POS میں خوش آمدید';
 
   @override
   String get welcomeTagline => 'پریمیم سینیٹری مینجمنٹ - ڈیزائن اور معیار میں عمدگی';

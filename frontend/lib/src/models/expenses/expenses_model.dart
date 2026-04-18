@@ -115,7 +115,7 @@ class Expense {
 
   Color get personColor {
     switch (withdrawalBy) {
-      case 'MetaBrass Admin':
+      case 'META BRASS Admin':
         return Colors.blue;
 
       default:
@@ -376,7 +376,7 @@ class Expense {
 // Helper class for withdrawal authorities
 
 class ExpenseAuthorities {
-  static const List<String> authorities = ['MetaBrass Admin'];
+  static const List<String> authorities = ['META BRASS Admin'];
 
   static String getDisplayName(String authority) {
     return authority;

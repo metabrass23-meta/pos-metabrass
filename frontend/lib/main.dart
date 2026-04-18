@@ -61,7 +61,7 @@ void main() async {
         ..size =
             const Size(1200, 680) // Reduced height to avoid taskbar cutoff
         ..alignment = Alignment.center
-        ..title = "MetaBrass"
+        ..title = "META BRASS"
         ..show();
     });
   }
@@ -132,7 +132,7 @@ class MetaBrassApp extends StatelessWidget {
               return Sizer(
                 builder: (context, orientation, deviceType) {
                   return MaterialApp(
-                    title: 'MetaBrass - Premium POS',
+                    title: 'META BRASS - Premium POS',
                     debugShowCheckedModeBanner: false,
                     theme: AppTheme.lightTheme,
                     darkTheme: AppTheme.darkTheme,

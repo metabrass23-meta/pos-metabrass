@@ -98,7 +98,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'MetaBrass - Premium POS'**
+  /// **'META BRASS - Premium POS'**
   String get appTitle;
 
   /// No description provided for @welcomeBack.
@@ -110,7 +110,7 @@ abstract class AppLocalizations {
   /// No description provided for @brandName.
   ///
   /// In en, this message translates to:
-  /// **'MetaBrass'**
+  /// **'META BRASS'**
   String get brandName;
 
   /// No description provided for @tagline.
@@ -1322,7 +1322,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeToPos.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to MetaBrass POS'**
+  /// **'Welcome to META BRASS POS'**
   String get welcomeToPos;
 
   /// No description provided for @welcomeTagline.

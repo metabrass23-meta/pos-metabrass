@@ -9,13 +9,13 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'MetaBrass - Premium POS';
+  String get appTitle => 'META BRASS - Premium POS';
 
   @override
   String get welcomeBack => 'Welcome Back to';
 
   @override
-  String get brandName => 'MetaBrass';
+  String get brandName => 'META BRASS';
 
   @override
   String get tagline => 'Elegant designs for your modern home.\nExperience luxury with our premium bathroom and sanitary collections.';
@@ -629,7 +629,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Premium Sanitary POS';
 
   @override
-  String get welcomeToPos => 'Welcome to MetaBrass POS';
+  String get welcomeToPos => 'Welcome to META BRASS POS';
 
   @override
   String get welcomeTagline => 'Premium Sanitary Management - Elegant Designs & Quality Fittings';

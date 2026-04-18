@@ -1,26 +1,53 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/sales/sale_model.dart';
 import '../utils/debug_helper.dart';
 
 class PdfInvoiceService {
-  static const String companyName = 'MetaBrass';
+  static const String companyName = 'META BRASS';
   static const String companyAddress =
       'Kacha Eminabadroad Siddique Colony Gujranwala';
   static const String companyPhone = '055-8174471';
   static const String companyTagline =
       'Sanitary Fittings & Bathroom Accessories';
 
-  /// Generate and save PDF invoice
-  static Future<String> generateInvoicePdf(SaleModel sale) async {
+  // ✅ Speed Optimization: Cache logo bytes
+  static Uint8List? _cachedLogoBytes;
+
+  /// Preload logo bytes
+  static Future<void> preloadLogoBytes() async {
+    if (_cachedLogoBytes != null) return;
+    try {
+      final ByteData logoData = await rootBundle.load('assets/images/metabras.png');
+      _cachedLogoBytes = logoData.buffer.asUint8List();
+    } catch (e) {
+      print('Failed to preload logo for Invoice: $e');
+    }
+  }
+
+  /// Generate and return PDF bytes for invoice (Web & Desktop compatible)
+  static Future<Uint8List> generateInvoicePdfBytes(SaleModel sale) async {
     try {
       final pdf = pw.Document();
       final regularFont = pw.Font.helvetica();
       final boldFont = pw.Font.helveticaBold();
+      
+      // ✅ Speed Optimization: Use cached bytes
+      pw.MemoryImage? logoImage;
+      if (_cachedLogoBytes != null) {
+        logoImage = pw.MemoryImage(_cachedLogoBytes!);
+      } else {
+        try {
+          final ByteData logoData = await rootBundle.load('assets/images/metabras.png');
+          _cachedLogoBytes = logoData.buffer.asUint8List();
+          logoImage = pw.MemoryImage(_cachedLogoBytes!);
+        } catch (e) {
+          print('Error loading logo asset: $e');
+        }
+      }
 
       pdf.addPage(
         pw.MultiPage(
@@ -28,7 +55,7 @@ class PdfInvoiceService {
           margin: const pw.EdgeInsets.all(20),
           build: (pw.Context context) {
             return [
-              _buildHeader(regularFont, boldFont),
+              _buildHeader(regularFont, boldFont, logoImage),
               pw.SizedBox(height: 10),
               _buildInvoiceInfo(sale, regularFont, boldFont),
               pw.SizedBox(height: 10),
@@ -44,12 +71,7 @@ class PdfInvoiceService {
         ),
       );
 
-      final fileName = 'Invoice_${sale.invoiceNumber}.pdf';
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/$fileName');
-      await file.writeAsBytes(await pdf.save());
-
-      return file.path;
+      return await pdf.save();
     } catch (e) {
       DebugHelper.printError('PdfInvoiceService', e);
       rethrow;
@@ -57,16 +79,10 @@ class PdfInvoiceService {
   }
 
   /// Build header section with logo and brand bar
-  static pw.Widget _buildHeader(pw.Font regularFont, pw.Font boldFont) {
+  static pw.Widget _buildHeader(pw.Font regularFont, pw.Font boldFont, pw.MemoryImage? logoImage) {
     pw.Widget logoWidget = pw.SizedBox(height: 40);
-    try {
-      final logoFile = File('assets/images/metabras.png');
-      if (logoFile.existsSync()) {
-        final logoImage = pw.MemoryImage(logoFile.readAsBytesSync());
-        logoWidget = pw.Image(logoImage, height: 45);
-      }
-    } catch (e) {
-      print('Error loading logo for Invoice PDF: $e');
+    if (logoImage != null) {
+      logoWidget = pw.Image(logoImage, height: 45);
     }
 
     return pw.Column(
@@ -254,31 +270,8 @@ class PdfInvoiceService {
 
   static Future<void> previewAndPrintInvoice(SaleModel sale) async {
     try {
-      final pdf = pw.Document();
-      final regularFont = pw.Font.helvetica();
-      final boldFont = pw.Font.helveticaBold();
-
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a5,
-          margin: const pw.EdgeInsets.all(20),
-          build: (pw.Context context) => [
-            _buildHeader(regularFont, boldFont),
-               pw.SizedBox(height: 10),
-              _buildInvoiceInfo(sale, regularFont, boldFont),
-               pw.SizedBox(height: 10),
-              _buildCustomerInfo(sale, regularFont, boldFont),
-              pw.SizedBox(height: 10),
-              _buildItemsTable(sale, regularFont, boldFont),
-               pw.SizedBox(height: 10),
-              _buildTotalsSection(sale, regularFont, boldFont),
-               pw.SizedBox(height: 15),
-              _buildFooter(regularFont, boldFont),
-          ],
-        ),
-      );
-
-      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save(), name: 'Invoice_${sale.invoiceNumber}');
+      final pdfBytes = await generateInvoicePdfBytes(sale);
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes, name: 'Invoice_${sale.invoiceNumber}');
     } catch (e) {
       DebugHelper.printError('PdfInvoiceService', e);
       rethrow;

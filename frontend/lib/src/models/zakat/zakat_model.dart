@@ -67,7 +67,7 @@ class Zakat {
       beneficiaryName: beneficiaryName,
       beneficiaryContact: beneficiaryContact,
       notes: notes,
-      authorizedBy: 'MetaBrass Admin', // Default authorizer
+      authorizedBy: 'META BRASS Admin', // Default authorizer
       createdAt: createdAt,
       updatedAt: updatedAt,
       createdByEmail: createdByEmail,
@@ -329,7 +329,7 @@ class Zakat {
 
 // Helper class for authorization choices
 class ZakatAuthorities {
-  static const List<String> authorities = ['MetaBrass Admin'];
+  static const List<String> authorities = ['META BRASS Admin'];
 
   static String getDisplayName(String authority) {
     return authority;

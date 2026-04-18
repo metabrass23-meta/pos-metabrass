@@ -89,20 +89,33 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.purchases ?? "Purchases",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.charcoalGray,
+            SizedBox(
+              width: 30.w,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.purchases ?? "Purchases",
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.charcoalGray,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 15,),
-            Text(
-              l10n.purchasesTagline ?? "Track and manage inventory supply and purchase records",
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.grey[600],
+            SizedBox(
+              width: 40.w,
+              child: Text(
+                l10n.purchasesTagline ?? "Track and manage inventory supply and purchase records",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: Colors.grey[600],
+                ),
               ),
             ),
           ],

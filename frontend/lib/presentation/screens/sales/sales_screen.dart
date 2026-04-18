@@ -264,9 +264,9 @@ class _SalesPageState extends State<SalesPage> {
           Container(
             width: ResponsiveBreakpoints.responsive(
               context,
-              tablet: 18.w,
-              small: 30.w,
-              medium: 18.w,
+              tablet: 20.w,
+              small: 25.w,
+              medium: 20.w,
               large: 22.w,
               ultrawide: 18.w,
             ),
@@ -350,16 +350,21 @@ class _SalesPageState extends State<SalesPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.posSystem,
-                  style: TextStyle(
-                    fontSize: context.headerFontSize,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.charcoalGray,
-                    letterSpacing: -0.5,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    AppLocalizations.of(context)!.posSystem,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: context.headerFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.charcoalGray,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
-                if (!context.isTablet) ...[
+                if (!context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.cardPadding / 4),
                 ],
               ],
@@ -411,7 +416,7 @@ class _SalesPageState extends State<SalesPage> {
                       color: Colors.purple,
                       size: context.iconSize('medium'),
                     ),
-                    if (!context.isTablet) ...[
+                    if (!context.shouldShowCompactLayout) ...[
                       SizedBox(width: context.smallPadding),
                       Text(
                         'Return', // Label for the button
@@ -457,7 +462,7 @@ class _SalesPageState extends State<SalesPage> {
                       color: AppTheme.primaryMaroon,
                       size: context.iconSize('medium'),
                     ),
-                    if (!context.isTablet) ...[
+                    if (!context.shouldShowCompactLayout) ...[
                       SizedBox(width: context.smallPadding),
                       Text(
                         AppLocalizations.of(context)!.viewHistory,
@@ -631,7 +636,7 @@ class _SalesPageState extends State<SalesPage> {
                             letterSpacing: 0.5,
                           ),
                         ),
-                        if (!context.isTablet) ...[
+                        if (!context.shouldShowCompactLayout) ...[
                           SizedBox(height: context.smallPadding / 2),
                           Text(
                             AppLocalizations.of(context)!.viewManageSales,

@@ -23,7 +23,7 @@ class AppTheme {
   // static const Color lightGray = Color(0xFFEDEDED);
   // static const Color shadowColor = Color(0x33000000);
 
-  // MetaBrass (Sanitary)
+  // META BRASS (Sanitary)
   static const Color primaryMaroon = Color(0xFF2B4EBF);
   static const Color secondaryMaroon = Color(0xFF1C378A);
   static const Color accentGold = Color(0xFFA5ACB1);

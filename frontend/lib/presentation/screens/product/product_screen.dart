@@ -602,7 +602,7 @@ class _ProductPageState extends State<ProductPage> {
                   color: AppTheme.primaryMaroon,
                   size: context.iconSize('medium'),
                 ),
-                if (!context.isTablet) ...[
+                if (!context.shouldShowCompactLayout) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
                     AppLocalizations.of(context)!.filter,

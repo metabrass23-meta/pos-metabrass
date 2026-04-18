@@ -10,7 +10,7 @@ import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/services/receipt_service.dart';
 import '../../../src/services/pdf_receipt_service.dart';
-import '../../widgets/globals/text_button.dart';
+import '../../../src/models/sales/sale_model.dart';
 
 class ViewReceiptDialog extends StatefulWidget {
   final SaleModel sale;
@@ -23,6 +23,7 @@ class ViewReceiptDialog extends StatefulWidget {
 
 class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
   bool _isLoading = true;
+  bool _isPrinting = false; // ✅ Track printing state
   ReceiptModel? _receipt;
   String? _error;
 
@@ -148,9 +149,9 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
                   ),
                 ),
                 SizedBox(
-                  width: 120,
+                  width: 140, // Increased width for loader
                   child: ElevatedButton(
-                    onPressed: () => _printReceipt(),
+                    onPressed: _isPrinting ? null : () => _printReceipt(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryMaroon,
                       foregroundColor: Colors.white,
@@ -159,20 +160,26 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.picture_as_pdf, size: 16),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'Print PDF',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    child: _isPrinting 
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.picture_as_pdf, size: 16),
+                            const SizedBox(width: 4),
+                            const Text(
+                              'Print PDF',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
                   ),
                 ),
               ],
@@ -299,306 +306,30 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
 
   // Calculate correct values from sale items
   double _calculateSubtotal() {
-    debugPrint(
-      '🔍 [ViewReceiptDialog] Calculating subtotal from ${widget.sale.saleItems.length} sale items',
-    );
-
     // If sale items exist, calculate from items
     if (widget.sale.saleItems.isNotEmpty) {
       double subtotal = 0.0;
       for (var item in widget.sale.saleItems) {
-        debugPrint(
-          '🔍 [ViewReceiptDialog] Item: ${item.productName}, Qty: ${item.quantity}, Price: ${item.unitPrice}',
-        );
         subtotal += (item.unitPrice * item.quantity);
       }
-      debugPrint(
-        '🔍 [ViewReceiptDialog] Calculated subtotal from items: $subtotal',
-      );
       return subtotal;
     }
-
-    // Fallback to sale's stored subtotal if items are empty
-    debugPrint(
-      '🔍 [ViewReceiptDialog] Using stored subtotal: ${widget.sale.subtotal}',
-    );
     return widget.sale.subtotal;
   }
 
   double _calculateDiscount() {
-    debugPrint(
-      '🔍 [ViewReceiptDialog] Overall discount: ${widget.sale.overallDiscount}',
-    );
     return widget.sale.overallDiscount;
   }
 
   double _calculateGrandTotal() {
-    // If sale items exist, calculate from items
     if (widget.sale.saleItems.isNotEmpty) {
-      double grandTotal = _calculateSubtotal() - _calculateDiscount();
-      debugPrint(
-        '🔍 [ViewReceiptDialog] Calculated grand total from items: $grandTotal',
-      );
-      return grandTotal;
+      return _calculateSubtotal() - _calculateDiscount();
     }
-
-    // Fallback to sale's stored grand total if items are empty
-    debugPrint(
-      '🔍 [ViewReceiptDialog] Using stored grand total: ${widget.sale.grandTotal}',
-    );
     return widget.sale.grandTotal;
   }
 
   double _calculateBalance() {
-    double balance = _calculateGrandTotal() - widget.sale.amountPaid;
-    debugPrint('🔍 [ViewReceiptDialog] Amount paid: ${widget.sale.amountPaid}');
-    debugPrint('🔍 [ViewReceiptDialog] Calculated balance: $balance');
-    debugPrint(
-      '🔍 [ViewReceiptDialog] Original sale.remainingAmount: ${widget.sale.remainingAmount}',
-    );
-    return balance;
-  }
-
-  Widget _buildDottedLine() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: List.generate(
-          30,
-          (index) => Expanded(
-            child: Container(
-              height: 1,
-              margin: EdgeInsets.only(right: index % 2 == 0 ? 2 : 0),
-              color: Colors.grey.shade400,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildThermalHeader() {
-    return Column(
-      children: [
-        Text(
-          'Maqbool Fashion POS',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(2),
-          ),
-          child: Text(
-            'RECEIPT',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Invoice: ${widget.sale.invoiceNumber}',
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-        Text(
-          _formatDate(widget.sale.dateOfSale.toIso8601String()),
-          style: const TextStyle(fontSize: 9, color: Colors.black54),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildThermalCustomerInfo() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Customer: ${widget.sale.customerName}',
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThermalItems() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Items: ${widget.sale.totalItems}',
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 4),
-          // Show actual sale items
-          ...widget.sale.saleItems.map((item) => _buildThermalItem(item)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThermalItem(SaleItemModel item) {
-    final itemTotal = (item.quantity * item.unitPrice) - item.itemDiscount;
-    final itemName = item.productName.length > 25
-        ? '${item.productName.substring(0, 25)}...'
-        : item.productName;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            itemName,
-            style: const TextStyle(fontSize: 9, color: Colors.black),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${item.quantity} x ${_formatCurrency(item.unitPrice.toString())}',
-                style: const TextStyle(fontSize: 9, color: Colors.black54),
-              ),
-              Text(
-                _formatCurrency(itemTotal.toString()),
-                style: const TextStyle(fontSize: 9, color: Colors.black54),
-              ),
-            ],
-          ),
-          if (item.itemDiscount > 0)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '  Discount:',
-                  style: const TextStyle(fontSize: 8, color: Colors.red),
-                ),
-                Text(
-                  '-${_formatCurrency(item.itemDiscount.toString())}',
-                  style: const TextStyle(fontSize: 8, color: Colors.red),
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThermalSummary() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        children: [
-          _buildSummaryRow(
-            'Subtotal:',
-            _formatCurrency(widget.sale.subtotal.toString()),
-          ),
-          if (widget.sale.overallDiscount > 0)
-            _buildSummaryRow(
-              'Discount:',
-              _formatCurrency(widget.sale.overallDiscount.toString()),
-            ),
-          if (widget.sale.taxAmount > 0)
-            _buildSummaryRow(
-              'Tax:',
-              _formatCurrency(widget.sale.taxAmount.toString()),
-            ),
-          _buildDottedLine(),
-          _buildSummaryRow(
-            'Total:',
-            _formatCurrency(widget.sale.grandTotal.toString()),
-            isBold: true,
-          ),
-          _buildSummaryRow(
-            'Paid:',
-            _formatCurrency(widget.sale.amountPaid.toString()),
-          ),
-          if (widget.sale.grandTotal != widget.sale.amountPaid)
-            _buildSummaryRow(
-              'Balance:',
-              _formatCurrency(
-                (widget.sale.grandTotal - widget.sale.amountPaid).toString(),
-              ),
-            ),
-          _buildSummaryRow('Payment:', widget.sale.paymentMethod),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThermalFooter() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        children: [
-          Text(
-            'Thank you for your purchase!',
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Please visit again',
-            style: const TextStyle(fontSize: 9, color: Colors.black54),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryRow(String label, String value, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isBold ? 11 : 10,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isBold ? 11 : 10,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
+    return _calculateGrandTotal() - widget.sale.amountPaid;
   }
 
   String _formatDate(String dateString) {
@@ -620,60 +351,38 @@ class _ViewReceiptDialogState extends State<ViewReceiptDialog> {
   }
 
   void _printReceipt() async {
+    setState(() => _isPrinting = true);
     try {
-      final l10n = AppLocalizations.of(context)!;
-
-      // Show loading state
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Loading sale details...')),
-        );
-      }
-
-      // Get full sale details with items from SalesProvider
-      final salesProvider = context.read<SalesProvider>();
-      final fullSale = await salesProvider.getSaleById(widget.sale.id);
-
-      if (fullSale == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to load sale details'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      // ⚡ INSTANT PRINT: If we already have the data
+      if (widget.sale.saleItems.isNotEmpty) {
+        debugPrint('⚡ [ViewReceiptDialog] Instant printing local items');
+        await PdfReceiptService.previewAndPrintReceipt(widget.sale);
         return;
       }
 
-      debugPrint(
-        '🔍 [ViewReceiptDialog] Full sale items count: ${fullSale.saleItems.length}',
-      );
-      for (var item in fullSale.saleItems) {
-        debugPrint(
-          '🔍 [ViewReceiptDialog] Item: ${item.productName}, Qty: ${item.quantity}',
-        );
-      }
+      // 🌐 CACHED/OPTIMIZED PRINT: Use provider (Instant if in memory)
+      final salesProvider = context.read<SalesProvider>();
+      final fullSale = await salesProvider.getSaleById(widget.sale.id);
 
-      // Use the new PDF receipt service with full sale data
-      await PdfReceiptService.previewAndPrintReceipt(fullSale);
-
-      // Show success message
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PDF receipt opened successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      if (fullSale != null) {
+        debugPrint('✅ [ViewReceiptDialog] Printing after fetch/cache');
+        await PdfReceiptService.previewAndPrintReceipt(fullSale);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not load sale details'), backgroundColor: Colors.red),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Error generating PDF receipt: $e');
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDF receipt: $e')),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isPrinting = false);
     }
   }
 }

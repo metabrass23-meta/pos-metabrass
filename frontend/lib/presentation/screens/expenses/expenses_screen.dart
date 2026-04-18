@@ -462,7 +462,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.filter_list_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
-            if (!context.isTablet) ...[
+            if (!context.shouldShowCompactLayout) ...[
               SizedBox(width: context.smallPadding),
               Text(
                 l10n.filter,
@@ -497,7 +497,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.refresh_rounded, color: AppTheme.primaryMaroon, size: context.iconSize('medium')),
-                if (!context.isTablet) ...[
+                if (!context.shouldShowCompactLayout) ...[
                   SizedBox(width: context.smallPadding),
                   Text(
                     l10n.refresh,

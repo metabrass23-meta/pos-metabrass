@@ -12,7 +12,7 @@ import '../models/profit_loss/profit_loss_models.dart';
 import '../theme/app_theme.dart';
 
 class ProfitLossExportService {
-  static const String _companyName = 'MetaBrass';
+  static const String _companyName = 'META BRASS';
   static const String _companyAddress =
       'Kacha Eminabadroad Siddique Colony Gujranwala';
   static const String _companyPhone = '055-8174471';

@@ -12,13 +12,13 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # Allows local dev and Railway's dynamic domain
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS', 
-    default='127.0.0.1,localhost,django-flutter-pos-production.up.railway.app,.railway.app', 
+    default='127.0.0.1,localhost,pos-metabrass-production.up.railway.app,.railway.app', 
     cast=Csv()
 )
 
 # You MUST also add this for the Admin panel to work on Railway
 CSRF_TRUSTED_ORIGINS = [
-    'https://django-flutter-pos-production.up.railway.app',
+    'https://pos-metabrass-production.up.railway.app',
 ]
 
 INSTALLED_APPS = [

@@ -47,7 +47,7 @@ class ThermalPrintService {
 
     // Company header
     bytes += generator.text(
-      company['name'] ?? 'MetaBrass',
+      company['name'] ?? 'META BRASS',
       styles: const PosStyles(
         align: PosAlign.center,
         bold: true,
