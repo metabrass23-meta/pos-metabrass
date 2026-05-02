@@ -34,6 +34,42 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
   late String _status;
   List<PurchaseItemModel> _items = [];
 
+  // ✅ Per-item controllers - prevents cursor reset on setState
+  final Map<int, TextEditingController> _qtyControllers = {};
+  final Map<int, TextEditingController> _costControllers = {};
+
+  TextEditingController _getQtyController(int index) {
+    if (!_qtyControllers.containsKey(index)) {
+      _qtyControllers[index] = TextEditingController(
+        text: _formatNumber(_items[index].quantity),
+      );
+    }
+    return _qtyControllers[index]!;
+  }
+
+  TextEditingController _getCostController(int index) {
+    if (!_costControllers.containsKey(index)) {
+      _costControllers[index] = TextEditingController(
+        text: _formatNumber(_items[index].unitCost),
+      );
+    }
+    return _costControllers[index]!;
+  }
+
+  void _disposeItemControllers(int index) {
+    _qtyControllers[index]?.dispose();
+    _qtyControllers.remove(index);
+    _costControllers[index]?.dispose();
+    _costControllers.remove(index);
+  }
+
+  String _formatNumber(double value) {
+    if (value == value.roundToDouble()) {
+      return value.toInt().toString();
+    }
+    return value.toString();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +89,15 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
     });
   }
 
+  @override
+  void dispose() {
+    _invoiceController.dispose();
+    _taxController.dispose();
+    for (final c in _qtyControllers.values) c.dispose();
+    for (final c in _costControllers.values) c.dispose();
+    super.dispose();
+  }
+
   double get _subtotal => _items.fold(0, (sum, item) => sum + item.totalPrice);
   double get _taxAmount => double.tryParse(_taxController.text) ?? 0.0;
   double get _total => _subtotal + _taxAmount;
@@ -64,6 +109,27 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
           unitCost: 0,
           totalPrice: 0
       ));
+      final newIndex = _items.length - 1;
+      _qtyControllers[newIndex] = TextEditingController(text: '1');
+      _costControllers[newIndex] = TextEditingController(text: '0');
+    });
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      _disposeItemControllers(index);
+      _items.removeAt(index);
+      final newQty = <int, TextEditingController>{};
+      final newCost = <int, TextEditingController>{};
+      for (int i = 0; i < _items.length; i++) {
+        final oldIndex = i >= index ? i + 1 : i;
+        if (_qtyControllers.containsKey(oldIndex)) newQty[i] = _qtyControllers[oldIndex]!;
+        if (_costControllers.containsKey(oldIndex)) newCost[i] = _costControllers[oldIndex]!;
+      }
+      _qtyControllers.clear();
+      _costControllers.clear();
+      _qtyControllers.addAll(newQty);
+      _costControllers.addAll(newCost);
     });
   }
 
@@ -254,14 +320,14 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   child: Consumer<ProductProvider>(
                     builder: (context, provider, child) {
                       return PremiumDropdownField<String>(
-                        label: l10n.purchasedProducts ?? "Product",
+                        label: l10n.purchasedProducts ?? "Products",
                         value: item.product,
                         items: provider.products.map((p) => DropdownItem<String>(
                             value: p.id!,
                             label: p.name
                         )).toList(),
                         onChanged: (val) => setState(() => _items[index] = item.copyWith(product: val)),
-                        hint: "Product",
+                        hint: "Products",
                       );
                     },
                   ),
@@ -271,8 +337,8 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   flex: 2,
                   child: PremiumTextField(
                     label: "Qty",
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(text: item.quantity.toString()),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    controller: _getQtyController(index),
                     onChanged: (v) {
                       final q = double.tryParse(v) ?? 0;
                       setState(() => _items[index] = item.copyWith(quantity: q, totalPrice: q * item.unitCost));
@@ -284,8 +350,8 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   flex: 2,
                   child: PremiumTextField(
                     label: l10n.unitCost ?? "Cost",
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(text: item.unitCost.toString()),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    controller: _getCostController(index),
                     onChanged: (v) {
                       final c = double.tryParse(v) ?? 0;
                       setState(() => _items[index] = item.copyWith(unitCost: c, totalPrice: c * item.quantity));
@@ -305,7 +371,7 @@ class _EditPurchaseDialogState extends State<EditPurchaseDialog> {
                   ),
                 ),
                 IconButton(
-                    onPressed: () => setState(() => _items.removeAt(index)),
+                    onPressed: () => _removeItem(index),
                     icon: const Icon(Icons.delete_sweep_rounded, color: Colors.red)
                 ),
               ],

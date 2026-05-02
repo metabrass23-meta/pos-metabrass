@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/purchase_model.dart';
 import '../services/purchase_service.dart';
 import '../utils/debug_helper.dart';
+import 'dashboard_provider.dart';
 
 class PurchaseProvider with ChangeNotifier {
   final PurchaseService _purchaseService = PurchaseService();
@@ -51,9 +52,9 @@ class PurchaseProvider with ChangeNotifier {
       final response = await _purchaseService.createPurchase(purchase);
 
       if (response.success && response.data != null) {
-        // Add to the local list at the top and notify UI
-        _purchases.insert(0, response.data!);
-        notifyListeners();
+        // Fetch fresh data from server to ensure all joined fields (like vendorName) are populated
+        await fetchPurchases();
+        DashboardProvider.refreshDashboard();
         return true;
       } else {
         _error = response.message;
@@ -84,11 +85,9 @@ class PurchaseProvider with ChangeNotifier {
       final response = await _purchaseService.updatePurchase(purchase.id!, purchase);
 
       if (response.success && response.data != null) {
-        final index = _purchases.indexWhere((p) => p.id == purchase.id);
-        if (index != -1) {
-          _purchases[index] = response.data!;
-        }
-        notifyListeners();
+        // Fetch fresh data to ensure accurate UI updates
+        await fetchPurchases();
+        DashboardProvider.refreshDashboard();
         return true;
       } else {
         _error = response.message;
@@ -114,8 +113,9 @@ class PurchaseProvider with ChangeNotifier {
       final response = await _purchaseService.deletePurchase(id);
 
       if (response.success) {
-        _purchases.removeWhere((p) => p.id == id);
-        notifyListeners();
+        // Fetch fresh data to keep UI strictly synced with backend
+        await fetchPurchases();
+        DashboardProvider.refreshDashboard();
         return true;
       } else {
         _error = response.message;

@@ -12,6 +12,7 @@ import '../../widgets/globals/text_button.dart';
 import 'create_invoice_dialog.dart';
 import 'edit_invoice_dialog.dart';
 import 'view_invoice_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class InvoiceManagementWidget extends StatefulWidget {
   const InvoiceManagementWidget({super.key});
@@ -62,12 +63,14 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreateInvoiceDialog(context),
-        backgroundColor: AppTheme.primaryMaroon,
-        child: const Icon(Icons.add, color: Colors.white),
-        tooltip: l10n.createInvoice ?? "Create Invoice",
-      ),
+      floatingActionButton: PermissionHelper.canAdd(context, 'Invoices')
+          ? FloatingActionButton(
+              onPressed: () => _showCreateInvoiceDialog(context),
+              backgroundColor: AppTheme.primaryMaroon,
+              child: const Icon(Icons.add, color: Colors.white),
+              tooltip: l10n.createInvoice ?? "Create Invoice",
+            )
+          : null,
     );
   }
 
@@ -263,7 +266,7 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 6),
-            Text('${l10n.customer ?? "Customer"}: ${invoice.customerName}'),
+            Text('${l10n.customer ?? "Customers"}: ${invoice.customerName}'),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -360,16 +363,17 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           ],
         ),
       ),
-      PopupMenuItem(
-        value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange, size: 20),
-            const SizedBox(width: 10),
-            Text(l10n.edit ?? "Edit"),
-          ],
+      if (PermissionHelper.canEdit(context, 'Invoices'))
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              const Icon(Icons.edit, color: Colors.orange, size: 20),
+              const SizedBox(width: 10),
+              Text(l10n.edit ?? "Edit"),
+            ],
+          ),
         ),
-      ),
       const PopupMenuDivider(),
       PopupMenuItem(
         value: 'print_pdf',
@@ -381,17 +385,19 @@ class _InvoiceManagementWidgetState extends State<InvoiceManagementWidget> {
           ],
         ),
       ),
-      const PopupMenuDivider(),
-      PopupMenuItem(
-        value: 'delete',
-        child: Row(
-          children: [
-            const Icon(Icons.delete, color: Colors.red, size: 20),
-            const SizedBox(width: 10),
-            Text(l10n.delete ?? "Delete"),
-          ],
+      if (PermissionHelper.canDelete(context, 'Invoices')) ...[
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              const Icon(Icons.delete, color: Colors.red, size: 20),
+              const SizedBox(width: 10),
+              Text(l10n.delete ?? "Delete"),
+            ],
+          ),
         ),
-      ),
+      ],
     ];
   }
 

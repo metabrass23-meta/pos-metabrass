@@ -26,9 +26,10 @@ class DeletePurchaseDialog extends StatelessWidget {
       child: Container(
         width: 35.w,
         padding: EdgeInsets.all(context.mainPadding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Header with icon
             Container(
               padding: EdgeInsets.all(context.cardPadding),
@@ -136,6 +137,7 @@ class DeletePurchaseDialog extends StatelessWidget {
               },
             ),
           ],
+        ),
         ),
       ),
     );

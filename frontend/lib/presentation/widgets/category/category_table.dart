@@ -6,6 +6,7 @@ import '../../../src/providers/category_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../category/category_filter_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class EnhancedCategoryTable extends StatefulWidget {
   final Function(Category) onEdit;
@@ -175,85 +176,87 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
             return _buildEmptyState(context, message: "No categories match the current filter");
           }
 
-          return Column(
-            children: [
-              // 1. Table Header (Horizontal Scroll Only)
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGray.withOpacity(0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  controller: _headerHorizontalController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  child: Container(
-                    width: _getTableWidth(context),
-                    padding: EdgeInsets.symmetric(
-                      vertical: context.cardPadding * 0.85,
-                      horizontal: context.cardPadding / 2,
-                    ),
-                    child: _buildTableHeader(context),
-                  ),
-                ),
-              ),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final minTableWidth = _getTableMinWidth(context);
+              // Ensure table is at least as wide as the screen, but can be wider for scrolling
+              final tableWidth = constraints.maxWidth > minTableWidth 
+                  ? constraints.maxWidth 
+                  : minTableWidth;
 
-              // 2. Table Content (Vertical + Horizontal Scroll)
-              Expanded(
-                child: Scrollbar(
-                  controller: _verticalController,
-                  thumbVisibility: true,
-                  trackVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _verticalController,
-                    scrollDirection: Axis.vertical,
+              return Column(
+                children: [
+                  // 1. Table Header (Horizontal Scroll Only)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.lightGray.withOpacity(0.5),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(context.borderRadius('large')),
+                        topRight: Radius.circular(context.borderRadius('large')),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      controller: _headerHorizontalController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: Container(
+                        width: tableWidth,
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.cardPadding * 0.85,
+                          horizontal: context.cardPadding / 2,
+                        ),
+                        child: _buildTableHeader(context, tableWidth - context.cardPadding),
+                      ),
+                    ),
+                  ),
+
+                  // 2. Table Content (Vertical + Horizontal Scroll)
+                  Expanded(
                     child: Scrollbar(
-                      controller: _contentHorizontalController,
+                      controller: _verticalController,
                       thumbVisibility: true,
-                      notificationPredicate: (notification) => notification.depth == 1,
+                      trackVisibility: true,
                       child: SingleChildScrollView(
-                        controller: _contentHorizontalController,
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        child: Container(
-                          width: _getTableWidth(context),
-                          // Use Column instead of ListView for better sync in nested scrolls
-                          child: Column(
-                            children: filteredCategories.asMap().entries.map((entry) {
-                              return _buildTableRow(context, entry.value, entry.key);
-                            }).toList(),
+                        controller: _verticalController,
+                        scrollDirection: Axis.vertical,
+                        child: Scrollbar(
+                          controller: _contentHorizontalController,
+                          thumbVisibility: true,
+                          trackVisibility: true,
+                          notificationPredicate: (notification) => notification.depth == 1,
+                          child: SingleChildScrollView(
+                            controller: _contentHorizontalController,
+                            scrollDirection: Axis.horizontal,
+                            physics: const ClampingScrollPhysics(),
+                            child: Container(
+                              width: tableWidth,
+                              child: Column(
+                                children: filteredCategories.asMap().entries.map((entry) {
+                                  return _buildTableRow(context, entry.value, entry.key, tableWidth - context.cardPadding);
+                                }).toList(),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           );
         },
       ),
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    // Fixed table width to ensure all columns are visible
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: 1400.0,
-      small: 1500.0,
-      medium: 1600.0,
-      large: 1700.0,
-      ultrawide: 1800.0,
-    );
+  double _getTableMinWidth(BuildContext context) {
+    return 1100.0; // Minimum width to keep data readable
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
@@ -290,32 +293,46 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
     );
   }
 
-  List<double> _getColumnWidths(BuildContext context) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    // Fixed widths for columns that shouldn't expand
+    final double nameWidth = 220.0;
+    final double createdWidth = 200.0;
+    final double updatedWidth = 200.0;
+    final double actionsWidth = 200.0;
+
+    final double fixedSum = nameWidth + createdWidth + updatedWidth + actionsWidth;
+    
+    // Notes column gets the remaining space
+    final double notesWidth = totalWidth - fixedSum;
+
     return [
-      120.0, // Category ID (Hidden/Unused in UI)
-      200.0, // Name
-      300.0, // Description
-      150.0, // Date Created
-      150.0, // Last Edited
-      280.0, // Actions
+      0.0, // Index 0 (Unused)
+      nameWidth, // Index 1
+      notesWidth > 200.0 ? notesWidth : 200.0, // Index 2
+      createdWidth, // Index 3
+      updatedWidth, // Index 4
+      actionsWidth, // Index 5
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
-  Widget _buildTableRow(BuildContext context, Category category, int index) {
+  Widget _buildTableRow(BuildContext context, Category category, int index, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
@@ -360,7 +377,7 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             )
                 : Container(
@@ -388,26 +405,15 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
           Container(
             width: columnWidths[3],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatDate(category.dateCreated),
-                  style: TextStyle(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-                Text(
-                  _getRelativeDate(category.dateCreated),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
+            child: Text(
+              '${_formatDate(category.dateCreated)} (${_getRelativeDate(category.dateCreated)})',
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -415,26 +421,15 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
           Container(
             width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatDate(category.lastEdited),
-                  style: TextStyle(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
-                Text(
-                  _getRelativeDate(category.lastEdited),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
+            child: Text(
+              '${_formatDate(category.lastEdited)} (${_getRelativeDate(category.lastEdited)})',
+              style: TextStyle(
+                fontSize: context.subtitleFontSize,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoalGray,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -474,51 +469,55 @@ class _EnhancedCategoryTableState extends State<EnhancedCategoryTable> {
           ),
         ),
 
-        SizedBox(width: context.smallPadding / 2),
-
         // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(category),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+        if (PermissionHelper.canEdit(context, 'Category'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => widget.onEdit(category),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  ),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    color: Colors.blue,
+                    size: context.iconSize('small'),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(category),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+        if (PermissionHelper.canDelete(context, 'Category'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => widget.onDelete(category),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  ),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                    size: context.iconSize('small'),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

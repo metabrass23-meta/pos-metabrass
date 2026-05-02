@@ -263,7 +263,7 @@ class _ViewInvoiceDialogState extends State<ViewInvoiceDialog> {
                     'Sale Ref #',
                     widget.invoice.saleInvoiceNumber,
                   ),
-                  _buildThermalRow('Customer', widget.invoice.customerName),
+                  _buildThermalRow('Customers', widget.invoice.customerName),
                   _buildThermalRow('Date', widget.invoice.formattedIssueDate),
                   if (widget.invoice.dueDate != null)
                     _buildThermalRow(

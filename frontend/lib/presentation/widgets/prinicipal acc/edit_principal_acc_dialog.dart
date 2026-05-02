@@ -849,7 +849,7 @@ class _EditPrincipalAccountDialogState extends State<EditPrincipalAccountDialog>
       case 'sales':
         return 'Sales';
       case 'payment':
-        return 'Payment';
+        return 'Payments';
       case 'advance_payment':
         return 'Advance Payment';
       case 'expenses':

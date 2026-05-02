@@ -135,7 +135,7 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1580.0, small: 1680.0, medium: 1780.0, large: 1880.0, ultrawide: 1980.0);
+    return ResponsiveBreakpoints.responsive(context, tablet: 2000.0, small: 2100.0, medium: 2200.0, large: 2300.0, ultrawide: 2400.0);
   }
 
   List<double> _getColumnWidths(BuildContext context) {
@@ -149,14 +149,14 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
       ];
     } else {
       return [
-        120.0, // Zakat ID
-        180.0, // Title
-        200.0, // Beneficiary
-        200.0, // Description
-        200.0, // Notes
-        140.0, // Amount
-        130.0, // Date
-        120.0, // Authority
+        130.0, // Zakat ID
+        220.0, // Title
+        220.0, // Beneficiary
+        350.0, // Description
+        350.0, // Notes
+        160.0, // Amount
+        240.0, // Date
+        160.0, // Authority
         320.0, // Actions
       ];
     }
@@ -186,6 +186,9 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
       style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
@@ -205,6 +208,9 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -249,10 +255,11 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
               child: Text(
                 zakat.id,
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
-                textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -265,9 +272,10 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               children: [
                 Text(
                   zakat.name,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
@@ -316,16 +324,18 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                           children: [
                             Text(
                               zakat.beneficiaryName,
-                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                             ),
                             if (zakat.beneficiaryContact != null && zakat.beneficiaryContact!.isNotEmpty)
                               Text(
                                 zakat.beneficiaryContact!,
-                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                               ),
                           ],
                         ),
@@ -342,9 +352,10 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 zakat.description,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ),
 
@@ -357,9 +368,10 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
                 children: [
                   Text(
                     zakat.notes ?? l10n.noNotes,
-                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                   ),
                 ],
               ),
@@ -377,6 +389,9 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
               ),
               child: Text(
                 zakat.formattedAmount,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.green[700]),
                 textAlign: TextAlign.center,
               ),
@@ -386,16 +401,24 @@ class _EnhancedZakatTableState extends State<EnhancedZakatTable> {
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   zakat.formattedDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
-                Text(
-                  context.shouldShowCompactLayout ? zakat.formattedTime : zakat.relativeDate,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${context.shouldShowCompactLayout ? zakat.formattedTime : zakat.relativeDate})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  ),
                 ),
               ],
             ),

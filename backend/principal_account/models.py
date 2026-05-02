@@ -32,6 +32,7 @@ class PrincipalAccount(models.Model):
 
     HANDLED_BY_CHOICES = [
         ('MetaBrass Admin', 'MetaBrass Admin'),
+        ('META BRASS Admin', 'META BRASS Admin'),
     ]
     
     id = models.UUIDField(

@@ -12,6 +12,7 @@ import '../../widgets/prinicipal acc/edit_principal_acc_dialog.dart';
 import '../../widgets/prinicipal acc/principal_acc_table.dart';
 import '../../widgets/prinicipal acc/view_principal_acc_dialog.dart';
 import '../../widgets/principal_acc/principal_account_filter_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PrincipalAccountPage extends StatefulWidget {
   const PrincipalAccountPage({super.key});
@@ -262,6 +263,10 @@ class _PrincipalAccountPageState extends State<PrincipalAccountPage> {
 
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!PermissionHelper.canAdd(context, 'Principal Account')) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(

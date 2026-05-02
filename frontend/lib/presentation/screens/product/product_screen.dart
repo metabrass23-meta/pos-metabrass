@@ -13,6 +13,7 @@ import '../../widgets/product/filter_product_dialog.dart';
 import '../../widgets/product/product_table.dart';
 import '../../widgets/product/view_product_dialog.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -260,7 +261,8 @@ class _ProductPageState extends State<ProductPage> {
             ],
           ),
         ),
-        _buildAddButton(),
+        if (PermissionHelper.canAdd(context, 'Products'))
+          _buildAddButton(),
       ],
     );
   }
@@ -288,7 +290,8 @@ class _ProductPageState extends State<ProductPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(width: double.infinity, child: _buildAddButton()),
+        if (PermissionHelper.canAdd(context, 'Products'))
+          SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }

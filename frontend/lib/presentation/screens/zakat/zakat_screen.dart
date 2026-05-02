@@ -12,6 +12,7 @@ import '../../widgets/zakat/edit_zakat_dialog.dart';
 import '../../widgets/zakat/view_zakat_dialog.dart';
 import '../../widgets/zakat/zakat_table.dart';
 import '../../widgets/zakat/zakat_filter_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ZakatPage extends StatefulWidget {
   const ZakatPage({super.key});
@@ -235,6 +236,10 @@ class _ZakatPageState extends State<ZakatPage> {
 
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!PermissionHelper.canAdd(context, 'Zakat')) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(

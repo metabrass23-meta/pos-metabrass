@@ -9,6 +9,7 @@ import '../../../src/models/quotation/quotation_model.dart';
 import '../../../src/services/quotation_service.dart';
 import '../../../src/services/pdf_quotation_service.dart';
 import 'add_quotation_screen.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class QuotationListScreen extends StatefulWidget {
   const QuotationListScreen({Key? key}) : super(key: key);
@@ -160,24 +161,25 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                SizedBox(
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddQuotationScreen()));
-                      if (result == true) _fetchQuotations();
-                    },
-                    icon: const Icon(Icons.add_circle, color: Colors.white, size: 24),
-                    label: const Text('NEW QUOTATION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.0)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0061E0),
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 6,
-                      shadowColor: Colors.blueAccent.withOpacity(0.5),
+                if (PermissionHelper.canAdd(context, 'Quotations'))
+                  SizedBox(
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddQuotationScreen()));
+                        if (result == true) _fetchQuotations();
+                      },
+                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 24),
+                      label: const Text('NEW QUOTATION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.0)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0061E0),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 6,
+                        shadowColor: Colors.blueAccent.withOpacity(0.5),
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -198,7 +200,7 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
                             headingRowColor: MaterialStateProperty.all(const Color(0xFFE9ECEF)),
                             columns: const [
                               DataColumn(label: Text('Quotation No', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
-                              DataColumn(label: Text('Customer', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
+                              DataColumn(label: Text('Customers', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
                               DataColumn(label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
                               DataColumn(label: Text('Total', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
                               DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black))),
@@ -231,9 +233,10 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
           const SizedBox(width: 6),
           _btn('PDF', Icons.print, Colors.redAccent, () => _printQuotation(quote), loading: _printingStatus[quote.id] == true),
           const SizedBox(width: 6),
-          if (!isConverted) _btn('EDIT', Icons.edit, Colors.grey.shade700, () => _navigateToEdit(quote)),
+          if (!isConverted && PermissionHelper.canEdit(context, 'Quotations')) 
+            _btn('EDIT', Icons.edit, Colors.grey.shade700, () => _navigateToEdit(quote)),
           const SizedBox(width: 6),
-          if (!isConverted)
+          if (!isConverted && PermissionHelper.canEdit(context, 'Quotations')) // Convert is also an edit/action
             ElevatedButton.icon(
               onPressed: () => _convert(quote.id),
               icon: const Icon(Icons.sync, size: 14, color: Colors.white),
@@ -241,7 +244,8 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, padding: const EdgeInsets.symmetric(horizontal: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
             ),
           const SizedBox(width: 6),
-          if (!isConverted) _btn('DELETE', Icons.delete, Colors.red, () => _delete(quote.id)),
+          if (!isConverted && PermissionHelper.canDelete(context, 'Quotations')) 
+            _btn('DELETE', Icons.delete, Colors.red, () => _delete(quote.id)),
         ],
       )),
     ]);
@@ -276,7 +280,7 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
                   columnWidths: const {0: FlexColumnWidth(3), 1: FlexColumnWidth(1), 2: FlexColumnWidth(2)},
                   children: [
                     const TableRow(children: [
-                      Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('Product', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                      Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('Products', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                       Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('Qty', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                       Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('Total', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                     ]),

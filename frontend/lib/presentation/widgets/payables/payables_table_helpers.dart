@@ -6,6 +6,7 @@ import '../../../src/models/payable/payable_model.dart';
 import '../../../src/providers/payables_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PayablesTableHelpers {
   final Function(Payable) onEdit;
@@ -33,37 +34,39 @@ class PayablesTableHelpers {
           ),
         ),
 
-        SizedBox(width: context.smallPadding / 2),
-
-        // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onEdit(payable),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+        if (PermissionHelper.canEdit(context, 'Payables')) ...[
+          SizedBox(width: context.smallPadding / 2),
+          // Edit Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onEdit(payable),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+              ),
             ),
           ),
-        ),
+        ],
 
-        SizedBox(width: context.smallPadding / 2),
-
-        // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onDelete(payable),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+        if (PermissionHelper.canDelete(context, 'Payables')) ...[
+          SizedBox(width: context.smallPadding / 2),
+          // Delete Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onDelete(payable),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+              ),
             ),
           ),
-        ),
+        ],
 
         SizedBox(width: context.smallPadding / 2),
       ],
@@ -243,6 +246,8 @@ class PayablesTableHelpers {
       child: Text(
         text,
         style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+        maxLines: 1,
+        softWrap: false,
       ),
     );
   }
@@ -262,6 +267,8 @@ class PayablesTableHelpers {
       child: Text(
         text,
         style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: color),
+        maxLines: 1,
+        softWrap: false,
       ),
     );
   }

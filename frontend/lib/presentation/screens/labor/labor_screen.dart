@@ -131,18 +131,9 @@ class _LaborPageState extends State<LaborPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: _buildTabletHeader(),
-                    small: _buildMobileHeader(),
-                    medium: _buildDesktopHeader(),
-                    large: _buildDesktopHeader(),
-                    ultrawide: _buildDesktopHeader(),
-                  ),
+                  _buildHeader(context),
                   SizedBox(height: context.mainPadding),
-                  context.statsCardColumns == 2
-                      ? _buildMobileStatsGrid(provider)
-                      : _buildDesktopStatsRow(provider),
+                  _buildStatsSection(context, provider),
                   SizedBox(height: context.cardPadding * 0.5),
                   _buildSearchSection(provider),
                   SizedBox(height: context.cardPadding * 0.5),
@@ -160,6 +151,107 @@ class _LaborPageState extends State<LaborPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 600;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.laborManagement,
+                        style: TextStyle(
+                          fontSize: context.headingFontSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.charcoalGray,
+                          letterSpacing: -0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (!isNarrow) ...[
+                        SizedBox(height: context.cardPadding / 4),
+                        Text(
+                          l10n.laborManagementDescription,
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                SizedBox(width: context.smallPadding),
+                _buildAddButton(),
+              ],
+            ),
+            if (isNarrow) ...[
+              SizedBox(height: context.smallPadding),
+              Text(
+                l10n.laborManagementDescription,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatsSection(BuildContext context, LaborProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1000 ? 2 : 4);
+        final spacing = context.mainPadding;
+        final itemWidth = (constraints.maxWidth - (spacing * (cardCount - 1))) / cardCount;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            SizedBox(
+              width: itemWidth,
+              child: _buildStatsCard('${l10n.total} ${l10n.labors}', '${provider.totalLabors}', Icons.people, Colors.blue),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _buildStatsCard(l10n.active, '${provider.totalActiveLabors}', Icons.check_circle_rounded, Colors.green),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _buildStatsCard(l10n.inactive, '${provider.totalInactiveLabors}', Icons.cancel, Colors.orange),
+            ),
+            SizedBox(
+              width: itemWidth,
+              child: _buildStatsCard(
+                l10n.newThisMonth,
+                '${provider.statistics?.newLaborsThisMonth ?? 0}',
+                Icons.fiber_new,
+                Colors.purple,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -489,59 +581,31 @@ class _LaborPageState extends State<LaborPage> {
           ),
         ],
       ),
-      child: ResponsiveBreakpoints.responsive(
-        context,
-        tablet: _buildTabletSearchLayout(provider),
-        small: _buildMobileSearchLayout(provider),
-        medium: _buildDesktopSearchLayout(provider),
-        large: _buildDesktopSearchLayout(provider),
-        ultrawide: _buildDesktopSearchLayout(provider),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 700;
+          final itemWidth = isNarrow ? constraints.maxWidth : (constraints.maxWidth - (context.cardPadding * 2)) / 3;
+
+          return Wrap(
+            spacing: context.cardPadding,
+            runSpacing: context.smallPadding,
+            children: [
+              SizedBox(
+                width: isNarrow ? constraints.maxWidth : itemWidth * 1.5,
+                child: _buildSearchBar(provider),
+              ),
+              SizedBox(
+                width: isNarrow ? (constraints.maxWidth - context.cardPadding) / 2 : itemWidth * 0.7,
+                child: _buildShowInactiveToggle(provider),
+              ),
+              SizedBox(
+                width: isNarrow ? (constraints.maxWidth - context.cardPadding) / 2 : itemWidth * 0.7,
+                child: _buildFilterButton(provider),
+              ),
+            ],
+          );
+        },
       ),
-    );
-  }
-
-  Widget _buildDesktopSearchLayout(LaborProvider provider) {
-    return Row(
-      children: [
-        Expanded(flex: 1, child: _buildSearchBar(provider)),
-        SizedBox(width: context.cardPadding),
-        Expanded(flex: 1, child: _buildShowInactiveToggle(provider)),
-        SizedBox(width: context.smallPadding),
-        Expanded(flex: 1, child: _buildFilterButton(provider)),
-        SizedBox(width: context.smallPadding),
-      ],
-    );
-  }
-
-  Widget _buildTabletSearchLayout(LaborProvider provider) {
-    return Column(
-      children: [
-        _buildSearchBar(provider),
-        SizedBox(height: context.cardPadding),
-        Row(
-          children: [
-            Expanded(child: _buildShowInactiveToggle(provider)),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildFilterButton(provider)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileSearchLayout(LaborProvider provider) {
-    return Column(
-      children: [
-        _buildSearchBar(provider),
-        SizedBox(height: context.smallPadding),
-        Row(
-          children: [
-            Expanded(child: _buildShowInactiveToggle(provider)),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildFilterButton(provider)),
-          ],
-        ),
-      ],
     );
   }
 

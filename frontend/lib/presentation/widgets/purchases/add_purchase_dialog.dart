@@ -397,7 +397,7 @@ class _AddPurchaseDialogState extends State<AddPurchaseDialog> {
                   children: [
                     // Search text field
                     PremiumTextField(
-                      label: "Product",
+                      label: "Products",
                       hint: "Type to search product...",
                       controller: _productSearchController,
                       onChanged: (val) {

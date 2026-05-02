@@ -452,7 +452,7 @@ class ProfitLossExportService {
   static pw.Widget _buildProductTable(List<ProductProfitability> products) {
     final headers = [
       'Rank',
-      'Product',
+      'Products',
       'Category',
       'Units Sold',
       'Revenue',
@@ -567,7 +567,7 @@ class ProfitLossExportService {
         ]),
         pw.SizedBox(height: 15),
         _buildDashboardCard('Expense Breakdown', [
-          'Labor: PKR ${dashboard.expenseBreakdown.laborPayments.toStringAsFixed(0)}',
+          'Labour: PKR ${dashboard.expenseBreakdown.laborPayments.toStringAsFixed(0)}',
           'Vendors: PKR ${dashboard.expenseBreakdown.vendorPayments.toStringAsFixed(0)}',
           'Other: PKR ${dashboard.expenseBreakdown.otherExpenses.toStringAsFixed(0)}',
           'Zakat: PKR ${dashboard.expenseBreakdown.zakat.toStringAsFixed(0)}',
@@ -620,7 +620,7 @@ class ProfitLossExportService {
         ]),
         pw.SizedBox(height: 15),
         _buildBreakdownCard('Expense Categories', [
-          'Labor Payments: PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)}',
+          'Labour Payments: PKR ${profitLoss.totalLaborPayments.toStringAsFixed(0)}',
           'Vendor Payments: PKR ${profitLoss.totalVendorPayments.toStringAsFixed(0)}',
           'Other Expenses: PKR ${profitLoss.totalExpensesCalculated.toStringAsFixed(0)}',
           'Zakat: PKR ${profitLoss.totalZakat.toStringAsFixed(0)}',
@@ -843,7 +843,7 @@ class ProfitLossExportService {
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 9)).value =
         'Expense Breakdown';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 10)).value =
-        'Labor Payments';
+        'Labour Payments';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 10)).value =
         dashboard.expenseBreakdown.laborPayments;
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 11)).value =
@@ -881,7 +881,7 @@ class ProfitLossExportService {
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value =
         'Expense Details';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value =
-        'Labor Payments';
+        'Labour Payments';
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value =
         profitLoss.totalLaborPayments;
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 5)).value =

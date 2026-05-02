@@ -562,7 +562,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pop(context);
+                                  Navigator.of(context).pushReplacementNamed('/login');
                                 },
                                 child: Text(
                                   l10n.signIn,

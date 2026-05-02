@@ -14,6 +14,7 @@ import '../../widgets/sales/product_grid.dart';
 import '../../widgets/sales/sales_table.dart';
 import '../../widgets/sales/view_sales_dialog.dart';
 import '../../widgets/sales/create_return_dialog.dart'; // <--- 1. NEW IMPORT
+import '../../../src/utils/permission_helper.dart';
 import '../../../l10n/app_localizations.dart';
 
 class SalesPage extends StatefulWidget {
@@ -333,7 +334,10 @@ class _SalesPageState extends State<SalesPage> {
 
   Widget _buildPOSHeader() {
     return Container(
-      padding: EdgeInsets.all(context.mainPadding),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.mainPadding,
+        vertical: context.mainPadding / 1.5,
+      ),
       decoration: BoxDecoration(
         color: AppTheme.pureWhite,
         boxShadow: [
@@ -346,161 +350,155 @@ class _SalesPageState extends State<SalesPage> {
       ),
       child: Row(
         children: [
+          // Title - stays fixed
+          Text(
+            AppLocalizations.of(context)!.posSystem,
+            style: TextStyle(
+              fontSize: context.headerFontSize,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoalGray,
+              letterSpacing: -0.5,
+            ),
+          ),
+
+          SizedBox(width: context.smallPadding),
+
+          // Stats, Buttons and Time wrapped gracefully
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: context.smallPadding,
+              runSpacing: context.smallPadding,
               children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    AppLocalizations.of(context)!.posSystem,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: context.headerFontSize,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.charcoalGray,
-                      letterSpacing: -0.5,
+                // Quick Stats
+                if (context.isMediumDesktop ||
+                    context.isLargeDesktop ||
+                    context.isUltrawide) ...[
+                  _buildQuickStat(
+                    AppLocalizations.of(context)!.todaySales,
+                    '12',
+                    Icons.shopping_cart_rounded,
+                    Colors.blue,
+                  ),
+                  _buildQuickStat(
+                    AppLocalizations.of(context)!.revenue,
+                    'PKR 125K',
+                    Icons.attach_money_rounded,
+                    Colors.green,
+                  ),
+                ],
+
+                // Return Button
+                if (PermissionHelper.canAdd(context, 'Returns'))
+                  Tooltip(
+                    message: 'Returns',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _showCreateReturnDialog,
+                        borderRadius:
+                            BorderRadius.circular(context.borderRadius()),
+                        child: Container(
+                          padding: EdgeInsets.all(context.smallPadding * 1.2),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.circular(context.borderRadius()),
+                            border: Border.all(
+                              color: Colors.purple.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.assignment_return_outlined,
+                            color: Colors.purple,
+                            size: context.iconSize('medium'),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                if (!context.shouldShowCompactLayout) ...[
-                  SizedBox(height: context.cardPadding / 4),
-                ],
+
+                // View History Button
+                if (PermissionHelper.canView(context, 'Sales'))
+                  Tooltip(
+                    message: AppLocalizations.of(context)!.viewHistory,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _showSalesHistoryDialog,
+                        borderRadius:
+                            BorderRadius.circular(context.borderRadius()),
+                        child: Container(
+                          padding: EdgeInsets.all(context.smallPadding * 1.2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryMaroon.withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.circular(context.borderRadius()),
+                            border: Border.all(
+                              color: AppTheme.primaryMaroon.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.history_rounded,
+                            color: AppTheme.primaryMaroon,
+                            size: context.iconSize('medium'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Time Widget - Inside wrap so it responds to small screens
+                _buildTimeWidget(),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
 
-          // Quick Stats
-          if (context.shouldShowFullLayout) ...[
-            _buildQuickStat(
-              AppLocalizations.of(context)!.todaySales,
-              '12',
-              Icons.shopping_cart_rounded,
-              Colors.blue,
-            ),
-            SizedBox(width: context.cardPadding),
-            _buildQuickStat(
-              AppLocalizations.of(context)!.revenue,
-              'PKR 125K',
-              Icons.attach_money_rounded,
-              Colors.green,
-            ),
-            SizedBox(width: context.cardPadding),
-          ],
+  Widget _buildTimeWidget() {
+    final timeStr = TimeOfDay.now().format(context);
 
-          // 3. NEW RETURN BUTTON ADDED HERE
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _showCreateReturnDialog,
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.cardPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: Colors.purple.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.assignment_return_outlined,
-                      color: Colors.purple,
-                      size: context.iconSize('medium'),
-                    ),
-                    if (!context.shouldShowCompactLayout) ...[
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        'Return', // Label for the button
-                        style: TextStyle(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.purple,
-                        ),
-                      ),
-                    ],
-                  ],
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.smallPadding * 1.2,
+        vertical: context.smallPadding,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.lightGray.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(context.borderRadius()),
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.access_time_rounded,
+            size: context.iconSize('small'),
+            color: AppTheme.charcoalGray,
+          ),
+          SizedBox(width: 4),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                timeStr,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
                 ),
               ),
-            ),
-          ),
-
-          SizedBox(width: context.cardPadding),
-
-          // View History Button
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _showSalesHistoryDialog,
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.cardPadding,
-                  vertical: context.cardPadding / 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryMaroon.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius()),
-                  border: Border.all(
-                    color: AppTheme.primaryMaroon.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.history_rounded,
-                      color: AppTheme.primaryMaroon,
-                      size: context.iconSize('medium'),
-                    ),
-                    if (!context.shouldShowCompactLayout) ...[
-                      SizedBox(width: context.smallPadding),
-                      Text(
-                        AppLocalizations.of(context)!.viewHistory,
-                        style: TextStyle(
-                          fontSize: context.bodyFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryMaroon,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(width: context.cardPadding),
-
-          // Current Time
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.cardPadding,
-              vertical: context.cardPadding / 2,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(context.borderRadius()),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  TimeOfDay.now().format(context),
-                  style: TextStyle(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
-                ),
+              if (!context.shouldShowCompactLayout)
                 Text(
                   AppLocalizations.of(context)!.currentTime,
                   style: TextStyle(
@@ -508,8 +506,7 @@ class _SalesPageState extends State<SalesPage> {
                     color: Colors.grey[600],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ],
       ),
@@ -523,7 +520,10 @@ class _SalesPageState extends State<SalesPage> {
     Color color,
   ) {
     return Container(
-      padding: EdgeInsets.all(context.smallPadding),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.smallPadding * 1.2,
+        vertical: context.smallPadding,
+      ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(context.borderRadius()),
@@ -535,7 +535,9 @@ class _SalesPageState extends State<SalesPage> {
           Icon(icon, color: color, size: context.iconSize('medium')),
           SizedBox(width: context.smallPadding),
           Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 value,

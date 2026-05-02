@@ -72,15 +72,11 @@ class ResponsiveBreakpoints {
   static double getSidebarExpandedWidth(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // More aggressive sidebar sizing for small screens
-    if (screenWidth < 800) return 260.0; // Fixed width for very small screens
-    if (screenWidth < 1024) return 260.0; // Smaller for tablets
+    // Ensure sidebar has enough width for full text even on small screens
+    if (screenWidth < 1024) return 260.0; // Tablet
     if (screenWidth < 1366) return 280.0; // Small desktop
-    if (screenWidth < 1920) return 290.0; // Medium desktop
-    return 310.0; // Large desktop
-
-    // Ensure minimum and maximum constraints
-    return (screenWidth * 0.15).clamp(180.0, 300.0);
+    if (screenWidth < 1920) return 310.0; // Medium desktop
+    return 340.0; // Large desktop/Ultrawide
   }
 
   static double getSidebarCollapsedWidth(BuildContext context) {
@@ -140,13 +136,20 @@ class ResponsiveBreakpoints {
   static double getCaptionFontSize(BuildContext context) {
     return responsive(
       context,
-      tablet: 10.6.sp, // Increased from 8.6.sp
-      small: 10.8.sp, // Increased from 8.8.sp
-      medium: 11.0.sp, // Increased from 9.sp
-      large: 11.2.sp, // Increased from 9.2.sp
-      ultrawide: 11.4.sp, // Increased from 9.4.sp
+      tablet: 10.6.sp,
+      small: 10.8.sp,
+      medium: 11.0.sp,
+      large: 11.2.sp,
+      ultrawide: 11.4.sp,
     );
   }
+
+  // Stable Sidebar Sizes (Fixed pixels for Desktop to maintain consistency)
+  static double getSidebarFontSize(BuildContext context) => 14.0;
+  static double getSidebarIconSize(BuildContext context) => 22.0;
+  static double getSidebarBadgeFontSize(BuildContext context) => 11.0;
+  static double getSidebarPadding(BuildContext context) => 12.0;
+  static double getSidebarItemHeight(BuildContext context) => 45.0;
 
   // Dashboard-specific font sizes (ORIGINAL SIZES TO PREVENT OVERFLOW)
   static double getDashboardHeaderFontSize(BuildContext context) {
@@ -811,6 +814,13 @@ extension ResponsiveContext on BuildContext {
       ResponsiveBreakpoints.getSidebarExpandedWidth(this);
   double get sidebarCollapsedWidth =>
       ResponsiveBreakpoints.getSidebarCollapsedWidth(this);
+  double get sidebarFontSize => ResponsiveBreakpoints.getSidebarFontSize(this);
+  double get sidebarIconSize => ResponsiveBreakpoints.getSidebarIconSize(this);
+  double get sidebarBadgeFontSize =>
+      ResponsiveBreakpoints.getSidebarBadgeFontSize(this);
+  double get sidebarPadding => ResponsiveBreakpoints.getSidebarPadding(this);
+  double get sidebarItemHeight =>
+      ResponsiveBreakpoints.getSidebarItemHeight(this);
 
   // Typography with Sizer scaling
   double get headerFontSize => ResponsiveBreakpoints.getHeaderFontSize(this);

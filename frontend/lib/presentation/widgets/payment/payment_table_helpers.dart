@@ -5,6 +5,7 @@ import '../../../src/models/payment/payment_model.dart';
 import '../../../src/providers/payment_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PaymentTableHelpers {
   final Function(PaymentModel) onEdit;
@@ -35,37 +36,39 @@ class PaymentTableHelpers {
 
         if (payment.hasReceipt) SizedBox(width: context.smallPadding / 2),
 
-        // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onEdit(payment),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+        if (PermissionHelper.canEdit(context, 'Payments')) ...[
+          // Edit Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onEdit(payment),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+              ),
             ),
           ),
-        ),
+          SizedBox(width: context.smallPadding / 2),
+        ],
 
-        SizedBox(width: context.smallPadding / 2),
-
-        // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onDelete(payment),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+        if (PermissionHelper.canDelete(context, 'Payments')) ...[
+          // Delete Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onDelete(payment),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+              ),
             ),
           ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
+          SizedBox(width: context.smallPadding / 2),
+        ],
       ],
     );
   }

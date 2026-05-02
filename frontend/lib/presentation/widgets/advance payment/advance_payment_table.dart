@@ -61,86 +61,95 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
-      ),
-      child: Consumer<AdvancePaymentProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return _buildLoadingState(context);
-          }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = _getTableMinWidth(context);
+        final tableWidth = constraints.maxWidth > minTableWidth 
+            ? constraints.maxWidth 
+            : minTableWidth;
 
-          if (provider.hasError) {
-            return _helpers.buildErrorState(context, provider);
-          }
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
+              ),
+            ],
+          ),
+          child: Consumer<AdvancePaymentProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return _buildLoadingState(context);
+              }
 
-          if (provider.advancePayments.isEmpty) {
-            return _helpers.buildEmptyState(context);
-          }
+              if (provider.hasError) {
+                return _helpers.buildErrorState(context, provider);
+              }
 
-          return Column(
-            children: [
-              // 1. Table Header (Horizontal Scroll)
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGray.withOpacity(0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
+              if (provider.advancePayments.isEmpty) {
+                return _helpers.buildEmptyState(context);
+              }
+
+              return Scrollbar(
+                controller: _headerHorizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
                 child: SingleChildScrollView(
                   controller: _headerHorizontalController,
                   scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
                   child: Container(
-                    width: _getTableWidth(context),
-                    padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
-                    child: _buildTableHeader(context),
-                  ),
-                ),
-              ),
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // Table Header
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.cardPadding * 0.85, 
+                            horizontal: context.cardPadding / 2,
+                          ),
+                          child: _buildTableHeader(context, tableWidth - context.cardPadding),
+                        ),
 
-              // 2. Table Content (Vertical + Horizontal Scroll)
-              Expanded(
-                child: Scrollbar(
-                  controller: _verticalController,
-                  thumbVisibility: true,
-                  trackVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _verticalController,
-                    scrollDirection: Axis.vertical,
-                    child: Scrollbar(
-                      controller: _contentHorizontalController,
-                      thumbVisibility: true,
-                      notificationPredicate: (notification) => notification.depth == 1,
-                      child: SingleChildScrollView(
-                        controller: _contentHorizontalController,
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        child: Container(
-                          width: _getTableWidth(context),
-                          // Use Column instead of ListView for better sync in nested scrolls
-                          child: Column(
-                            children: provider.advancePayments.asMap().entries.map((entry) {
-                              return _buildTableRow(context, entry.value, entry.key);
-                            }).toList(),
+                        // Table Content
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _verticalController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            child: ListView.builder(
+                              controller: _verticalController,
+                              itemCount: provider.advancePayments.length,
+                              itemBuilder: (context, index) {
+                                final payment = provider.advancePayments[index];
+                                return _buildTableRow(context, payment, index, tableWidth - context.cardPadding);
+                              },
+                            ),
                           ),
                         ),
-                      ),
+
+                        if (provider.paginationInfo != null &&
+                            provider.paginationInfo!.totalPages > 1)
+                          _buildPaginationControls(context, provider),
+                      ],
                     ),
                   ),
                 ),
-              ),
-
-              if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -154,59 +163,91 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1580.0, small: 1680.0, medium: 1780.0, large: 1880.0, ultrawide: 1980.0);
+  double _getTableMinWidth(BuildContext context) {
+    if (context.shouldShowCompactLayout) return 1500.0;
+    return 1900.0; 
   }
 
-  List<double> _getColumnWidths(BuildContext context) {
-    if (context.shouldShowCompactLayout) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    final bool isCompact = context.shouldShowCompactLayout;
+    
+    final double idWidth = 130.0;
+    final double nameWidth = 250.0; 
+    final double detailsWidth = 250.0; 
+    final double amountWidth = 220.0; 
+    final double dateWidth = 240.0; 
+    final double receiptWidth = 160.0; 
+    final double actionsWidth = 250.0;
+
+    double fixedSum = idWidth + nameWidth + amountWidth + dateWidth + actionsWidth;
+    if (!isCompact) {
+      fixedSum += detailsWidth + receiptWidth;
+    }
+
+    final double descriptionWidth = totalWidth - fixedSum;
+
+    if (isCompact) {
       return [
-        120.0, // Payment ID
-        200.0, // Labor & Details
-        160.0, // Amount
-        140.0, // Date
-        320.0, // Actions
+        idWidth, // 0
+        nameWidth, // 1
+        amountWidth, // 2
+        dateWidth, // 3
+        actionsWidth, // 4
+        descriptionWidth > 150.0 ? descriptionWidth : 150.0, // Buffer
       ];
     } else {
       return [
-        120.0, // Payment ID
-        180.0, // Labor Name
-        200.0, // Labor Details
-        200.0, // Description
-        140.0, // Amount
-        130.0, // Date
-        120.0, // Receipt
-        320.0, // Actions
+        idWidth, // 0
+        nameWidth, // 1
+        detailsWidth, // 2
+        descriptionWidth > 200.0 ? descriptionWidth : 200.0, // 3
+        amountWidth, // 4
+        dateWidth, // 5
+        receiptWidth, // 6
+        actionsWidth, // 7
       ];
     }
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.paymentId, 'id')),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.paymentId, 'id', isCenter: true)),
         Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, l10n.laborName, 'labor_name')),
         if (!context.shouldShowCompactLayout) Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.laborDetails)),
         if (!context.shouldShowCompactLayout) Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.description)),
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildSortableHeaderCell(context, l10n.amount, 'amount')),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 2 : 4], child: _buildSortableHeaderCell(context, l10n.amount, 'amount', isCenter: true)),
         Container(width: columnWidths[context.shouldShowCompactLayout ? 3 : 5], child: _buildSortableHeaderCell(context, l10n.date, 'date')),
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.receipt)),
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, l10n.actions)),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.receipt, isCenter: true)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 7], child: _buildHeaderCell(context, l10n.actions, isCenter: true)),
       ],
     );
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
+      ),
     );
   }
 
-  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<AdvancePaymentProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -215,13 +256,15 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
                   child: Text(
                     title,
+                    textAlign: isCenter ? TextAlign.center : TextAlign.start,
                     style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
@@ -246,32 +289,38 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, AdvancePayment payment, int index) {
-    final columnWidths = _getColumnWidths(context);
+  Widget _buildTableRow(BuildContext context, AdvancePayment payment, int index, double totalWidth) {
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
         color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
         border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
-      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
+      padding: EdgeInsets.symmetric(
+        vertical: context.cardPadding / 2,
+        horizontal: context.cardPadding / 2, // Matched with header
+      ),
       child: Row(
         children: [
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                payment.id.substring(0, 8),
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  payment.id.substring(0, 8),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -284,9 +333,10 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               children: [
                 Text(
                   payment.laborName,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: context.smallPadding / 4),
@@ -361,26 +411,32 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payment.description,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ),
 
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 2 : 4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
-              ),
-              child: Text(
-                'PKR ${payment.amount.toStringAsFixed(0)}',
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
-                textAlign: TextAlign.center,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 3),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Text(
+                  'PKR ${payment.amount.toStringAsFixed(0)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.orange[700]),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -388,16 +444,24 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   '${payment.date.day}/${payment.date.month}/${payment.date.year}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
-                Text(
-                  context.shouldShowCompactLayout ? payment.time : _getRelativeDate(context, payment.date),
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${context.shouldShowCompactLayout ? payment.time : _getRelativeDate(context, payment.date)})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  ),
                 ),
               ],
             ),
@@ -407,13 +471,13 @@ class _AdvancePaymentTableState extends State<AdvancePaymentTable> {
             Container(
               width: columnWidths[6],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: _helpers.buildReceiptBadge(context, payment),
+              child: Center(child: _helpers.buildReceiptBadge(context, payment)),
             ),
 
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: _helpers.buildActionsRow(context, payment),
+            child: Center(child: _helpers.buildActionsRow(context, payment)),
           ),
         ],
       ),

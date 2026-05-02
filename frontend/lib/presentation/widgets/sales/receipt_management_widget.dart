@@ -11,6 +11,7 @@ import 'view_receipt_dialog.dart';
 import 'edit_receipt_dialog.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ReceiptManagementWidget extends StatefulWidget {
   const ReceiptManagementWidget({super.key});
@@ -298,7 +299,7 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                hasReceipt ? 'Receipt' : 'Invoice',
+                hasReceipt ? 'Receipts' : 'Invoices',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
@@ -518,27 +519,30 @@ class _ReceiptManagementWidgetState extends State<ReceiptManagementWidget> {
             ],
           ),
         ),
-      PopupMenuItem(
-        value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange),
-            const SizedBox(width: 8),
-            Text(l10n.edit),
-          ],
+      if (PermissionHelper.canEdit(context, 'Receipts'))
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              const Icon(Icons.edit, color: Colors.orange),
+              const SizedBox(width: 8),
+              Text(l10n.edit),
+            ],
+          ),
         ),
-      ),
-      const PopupMenuDivider(),
-      PopupMenuItem(
-        value: 'delete',
-        child: Row(
-          children: [
-            const Icon(Icons.delete, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(l10n.delete),
-          ],
+      if (PermissionHelper.canDelete(context, 'Receipts')) ...[
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              const Icon(Icons.delete, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(l10n.delete),
+            ],
+          ),
         ),
-      ),
+      ],
     ];
   }
 

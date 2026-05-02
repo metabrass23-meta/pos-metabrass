@@ -36,6 +36,7 @@ class Expense(models.Model):
     
     WITHDRAWAL_CHOICES = [
             ('MetaBrass Admin', 'MetaBrass Admin'),
+            ('META BRASS Admin', 'META BRASS Admin'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

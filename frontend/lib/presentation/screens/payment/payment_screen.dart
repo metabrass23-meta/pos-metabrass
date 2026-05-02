@@ -12,6 +12,7 @@ import '../../widgets/payment/enhanced_payment_table.dart';
 import '../../widgets/payment/delete_payment_dialog.dart';
 import '../../widgets/payment/edit_payment_dialog.dart';
 import '../../widgets/payment/view_payment_receipt.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -275,6 +276,10 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!PermissionHelper.canAdd(context, 'Payments')) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(

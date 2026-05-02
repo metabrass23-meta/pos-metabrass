@@ -536,7 +536,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get value => 'مالیت';
 
   @override
-  String get searchProductsHint => 'آئی ڈی، نام، رنگ، فیبرک، یا ٹکڑوں کے ذریعے مصنوعات تلاش کریں...';
+  String get searchProductsHint => 'آئی ڈی، نام، فنش، میٹریل، یا اجزاء کے ذریعے مصنوعات تلاش کریں...';
 
   @override
   String get customerManagement => 'کسٹمر مینجمنٹ';
@@ -1058,10 +1058,10 @@ class AppLocalizationsUr extends AppLocalizations {
   String get colorName => 'فنش/رنگ';
 
   @override
-  String get fabricType => 'مٹیریل کی قسم';
+  String get materialType => 'میٹریل کی قسم';
 
   @override
-  String get fabricName => 'مٹیریل کا نام';
+  String get materialName => 'میٹریل کا نام';
 
   @override
   String get pleaseSelectAtLeastOnePiece => 'براہ کرم کم از کم ایک ٹکڑا منتخب کریں';
@@ -2136,7 +2136,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get allColors => 'تمام رنگ';
 
   @override
-  String get allFabrics => 'تمام کپڑے';
+  String get allMaterials => 'تمام میٹریل';
 
   @override
   String get allStockLevels => 'اسٹاک کی تمام سطحیں';
@@ -2199,7 +2199,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get enterColor => 'رنگ درج کریں';
 
   @override
-  String get enterFabric => 'کپڑا درج کریں';
+  String get enterMaterial => 'میٹریل درج کریں';
 
   @override
   String get enterMinPrice => 'کم از کم قیمت درج کریں';
@@ -3132,7 +3132,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get color => 'فنش';
 
   @override
-  String get fabric => 'مٹیریل';
+  String get material => 'مواد';
 
   @override
   String get stockStatus => 'اسٹاک کی حیثیت';
@@ -3307,13 +3307,13 @@ class AppLocalizationsUr extends AppLocalizations {
   String get colorNameMustBeAtLeast2Characters => 'رنگ کا نام کم از کم 2 حروف کا ہونا چاہیے';
 
   @override
-  String get enterFabricType => 'کپڑے کی قسم درج کریں (مثلاً: کاٹن، ریشم، شیفون)';
+  String get enterMaterialType => 'میٹریل کی قسم درج کریں (مثلاً: پیتل، سٹیل، کروم)';
 
   @override
-  String get pleaseEnterFabric => 'براہ کرم کپڑا درج کریں';
+  String get pleaseEnterMaterial => 'براہ کرم میٹریل درج کریں';
 
   @override
-  String get fabricNameMustBeAtLeast2Characters => 'کپڑے کا نام کم از کم 2 حروف کا ہونا چاہیے';
+  String get materialNameMustBeAtLeast2Characters => 'میٹریل کا نام کم از کم 2 حروف کا ہونا چاہیے';
 
   @override
   String get productNameMustBeAtLeast2Characters => 'مصنوعات کا نام کم از کم 2 حروف کا ہونا چاہیے';
@@ -4131,7 +4131,16 @@ class AppLocalizationsUr extends AppLocalizations {
   String get searchProductsShort => 'پروڈکٹس تلاش کریں';
 
   @override
-  String get searchProductsByNameFabricOrColor => 'نام، کپڑے یا رنگ کے ذریعے پروڈکٹس تلاش کریں...';
+  String get searchProductsByNameMaterialOrColor => 'نام، میٹریل یا رنگ کے ذریعے پروڈکٹس تلاش کریں...';
+
+  @override
+  String get searchProductsByNameFabricOrColor => 'Search products by name, fabric, or color...';
+
+  @override
+  String get fabricQuality => 'Fabric Quality';
+
+  @override
+  String get style => 'انداز';
 
   @override
   String get availableProducts => 'دستیاب پروڈکٹس';
@@ -4470,7 +4479,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get pleaseAcceptTerms => 'براہ کرم شرائط و ضوابط کو قبول کریں';
 
   @override
-  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! میٹا براس میں خوش آمدید۔';
+  String get accountCreatedSuccessfully => 'اکاؤنٹ کامیابی سے بن گیا! META BRASS میں خوش آمدید۔';
 
   @override
   String get registrationFailedMessage => 'رجسٹریشن ناکام ہو گئی۔ براہ کرم ذیل میں تفصیلات چیک کریں۔';
@@ -5115,12 +5124,6 @@ class AppLocalizationsUr extends AppLocalizations {
   String get brand => 'برانڈ';
 
   @override
-  String get material => 'مواد';
-
-  @override
-  String get style => 'انداز';
-
-  @override
   String get noAdditionalDetails => 'کوئی اضافی تفصیلات نہیں';
 
   @override
@@ -5620,7 +5623,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get enableDarkThemeForApplication => 'ایپلیکیشن کے لیے ڈارک تھیم فعال کریں';
 
   @override
-  String get alNoorFashionPOS => 'میٹا براس پی او ایس';
+  String get alNoorFashionPOS => 'META BRASS پی او ایس';
 
   @override
   String get version => 'ورژن';
@@ -5816,7 +5819,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get embroidery => 'کڑھائی';
 
   @override
-  String get fabricQuality => 'کپڑے کا معیار';
+  String get materialQuality => 'میٹریل کا معیار';
 
   @override
   String get accentColor => 'لہجے کا رنگ';

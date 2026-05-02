@@ -360,7 +360,7 @@ class PaymentService {
 
       if (response.statusCode == 200) {
         final PaymentListResponse paymentsResponse = PaymentListResponse.fromJson(response.data['data']);
-        return ApiResponse<PaymentListResponse>(success: true, message: 'Labor payments loaded successfully', data: paymentsResponse);
+        return ApiResponse<PaymentListResponse>(success: true, message: 'Labour payments loaded successfully', data: paymentsResponse);
       } else {
         return ApiResponse<PaymentListResponse>(
           success: false,

@@ -23,171 +23,160 @@ class PaymentTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(context.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.lightGray.withOpacity(0.5),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(context.borderRadius('large')),
-                topRight: Radius.circular(context.borderRadius('large')),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double minTableWidth = _getTableMinWidth(context);
+        final double tableWidth = constraints.maxWidth > minTableWidth
+            ? constraints.maxWidth
+            : minTableWidth;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
               ),
-            ),
-            child: _buildResponsiveHeaderRow(context),
+            ],
           ),
-          Expanded(
-            child: Consumer<PaymentProvider>(
-              builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: SizedBox(
-                      width: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
+          child: Scrollbar(
+            thumbVisibility: true,
+            trackVisibility: true,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: tableWidth,
+                child: Column(
+                  children: [
+                    // Header
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: context.cardPadding,
+                        horizontal: context.cardPadding / 2,
                       ),
-                      height: ResponsiveBreakpoints.responsive(
-                        context,
-                        tablet: 8.w,
-                        small: 6.w,
-                        medium: 5.w,
-                        large: 4.w,
-                        ultrawide: 3.w,
+                      decoration: BoxDecoration(
+                        color: AppTheme.lightGray.withOpacity(0.5),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(context.borderRadius('large')),
+                          topRight: Radius.circular(context.borderRadius('large')),
+                        ),
                       ),
-                      child: const CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
-                        strokeWidth: 3,
+                      child: _buildHeaderRow(context, tableWidth),
+                    ),
+                    
+                    // Body
+                    Expanded(
+                      child: Consumer<PaymentProvider>(
+                        builder: (context, provider, child) {
+                          if (provider.isLoading) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primaryMaroon,
+                              ),
+                            );
+                          }
+
+                          if (provider.payments.isEmpty) {
+                            return _buildEmptyState(context);
+                          }
+
+                          return ListView.builder(
+                            itemCount: provider.payments.length,
+                            itemBuilder: (context, index) {
+                              final payment = provider.payments[index];
+                              return _buildTableRow(context, payment, index, tableWidth);
+                            },
+                          );
+                        },
                       ),
                     ),
-                  );
-                }
-
-                if (provider.payments.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-
-                return ListView.builder(
-                  itemCount: provider.payments.length,
-                  itemBuilder: (context, index) {
-                    final payment = provider.payments[index];
-                    return _buildResponsiveTableRow(context, payment, index);
-                  },
-                );
-              },
+                  ],
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildResponsiveHeaderRow(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+  double _getTableMinWidth(BuildContext context) {
+    return 1600.0;
+  }
 
-    final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
-      context,
-      tablet: [1, 3, 2, 0, 0, 0, 2],
-      small: [1, 3, 2, 0, 0, 0, 2],
-      medium: [1, 3, 2, 2, 0, 0, 2],
-      large: [1, 3, 2, 2, 2, 0, 2],
-      ultrawide: [1, 3, 2, 2, 2, 2, 2],
-    );
+  Widget _buildHeaderRow(BuildContext context, double totalWidth) {
+    final l10n = AppLocalizations.of(context)!;
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
-        Expanded(
-          flex: paymentColumnFlexes[0],
-          child: _buildHeaderCell(context, l10n.id),
-        ),
-        Expanded(
-          flex: paymentColumnFlexes[1],
-          child: _buildHeaderCell(context, 'Payer Details'),
-        ),
-        Expanded(
-          flex: paymentColumnFlexes[2],
-          child: _buildHeaderCell(context, l10n.amount),
-        ),
-        if (!context.shouldShowCompactLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[3],
-            child: _buildHeaderCell(context, l10n.paymentInfo),
-          ),
-        ],
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[4],
-            child: _buildHeaderCell(
-              context,
-              context.shouldShowFullLayout ? l10n.dateAndTime : l10n.date,
-            ),
-          ),
-        ],
-        if (context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[5],
-            child: _buildHeaderCell(context, l10n.receipt),
-          ),
-        ],
-        if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-          Expanded(
-            flex: paymentColumnFlexes[6],
-            child: _buildHeaderCell(context, l10n.status),
-          ),
-        ],
-        Expanded(
-          flex: paymentColumnFlexes[7],
-          child: _buildHeaderCell(context, l10n.actions),
-        ),
+        SizedBox(width: columnWidths[0], child: _buildHeaderCell(context, l10n.id)),
+        SizedBox(width: columnWidths[1], child: _buildHeaderCell(context, 'Payer Details')),
+        SizedBox(width: columnWidths[2], child: _buildHeaderCell(context, l10n.amount)),
+        SizedBox(width: columnWidths[3], child: _buildHeaderCell(context, l10n.paymentInfo)),
+        SizedBox(width: columnWidths[4], child: _buildHeaderCell(context, l10n.dateAndTime)),
+        SizedBox(width: columnWidths[5], child: _buildHeaderCell(context, l10n.receipt)),
+        SizedBox(width: columnWidths[6], child: _buildHeaderCell(context, l10n.status)),
+        SizedBox(width: columnWidths[7], child: _buildHeaderCell(context, l10n.actions)),
       ],
     );
   }
 
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    final double idWidth = 100.0;
+    final double amountWidth = 180.0;
+    final double infoWidth = 220.0;
+    final double dateWidth = 220.0;
+    final double receiptWidth = 150.0;
+    final double statusWidth = 180.0;
+    final double actionsWidth = 320.0;
+    
+    final double fixedSum = idWidth + amountWidth + infoWidth + dateWidth + receiptWidth + statusWidth + actionsWidth;
+    final double payerWidth = totalWidth - fixedSum;
+
+    return [
+      idWidth,
+      payerWidth > 250.0 ? payerWidth : 250.0,
+      amountWidth,
+      infoWidth,
+      dateWidth,
+      receiptWidth,
+      statusWidth,
+      actionsWidth,
+    ];
+  }
+
   Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
-  Widget _buildResponsiveTableRow(
+  Widget _buildTableRow(
     BuildContext context,
     PaymentModel payment,
     int index,
+    double totalWidth,
   ) {
-    final l10n = AppLocalizations.of(context)!;
-
-    final paymentColumnFlexes = ResponsiveBreakpoints.responsive(
-      context,
-      tablet: [1, 2, 1, 1, 1, 1, 1, 1],
-      small: [1, 2, 2, 1, 1, 1, 1, 1],
-      medium: [1, 2, 2, 2, 1, 1, 1, 2],
-      large: [1, 2, 2, 3, 2, 1, 1, 2],
-      ultrawide: [1, 2, 2, 3, 2, 1, 1, 2],
-    );
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
-      padding: EdgeInsets.all(context.cardPadding / 2.5),
+      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
       decoration: BoxDecoration(
         color: index.isEven
             ? AppTheme.pureWhite
@@ -198,303 +187,178 @@ class PaymentTable extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            flex: paymentColumnFlexes[0],
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+          // ID
+          SizedBox(
+            width: columnWidths[0],
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding,
+                  vertical: context.smallPadding / 2,
                 ),
-              ),
-              child: Text(
-                payment.id,
-                style: TextStyle(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-                textAlign: TextAlign.center,
+                child: Text(
+                  payment.id,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                ),
               ),
             ),
           ),
-          SizedBox(width: context.smallPadding),
 
-          Expanded(
-            flex: paymentColumnFlexes[1],
+          // Payer Details
+          SizedBox(
+            width: columnWidths[1],
             child: Consumer<VendorProvider>(
               builder: (context, vendorProvider, child) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getPayerDisplayName(payment, vendorProvider),
-                      style: TextStyle(
-                        fontSize: context.bodyFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.charcoalGray,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+                  child: Text(
+                    _getPayerDisplayName(payment, vendorProvider),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.charcoalGray,
                     ),
-                    if (context.shouldShowCompactLayout) ...[
-                      SizedBox(height: context.smallPadding / 4),
-                      Text(
-                        _getPayerSubInfo(payment, vendorProvider),
-                        style: TextStyle(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'PKR ${payment.netAmount.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: context.captionFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green,
-                        ),
-                        maxLines: 1,
-                      ),
-                    ],
-                  ],
+                  ),
                 );
               },
             ),
           ),
-          SizedBox(width: context.smallPadding),
 
-          Expanded(
-            flex: paymentColumnFlexes[2],
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+          // Amount
+          SizedBox(
+            width: columnWidths[2],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding,
+                  vertical: context.smallPadding / 2,
                 ),
-                border: Border.all(
-                  color: Colors.green.withOpacity(0.3),
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'PKR ${payment.netAmount.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      fontSize: context.bodyFontSize,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green,
-                    ),
-                    textAlign: TextAlign.center,
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
                   ),
-                  if (!context.shouldShowCompactLayout &&
-                      (payment.bonus > 0 || payment.deduction > 0)) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (payment.bonus > 0) ...[
-                          Text(
-                            '+${payment.bonus.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                        if (payment.bonus > 0 && payment.deduction > 0)
-                          Text(
-                            ' | ',
-                            style: TextStyle(fontSize: context.captionFontSize),
-                          ),
-                        if (payment.deduction > 0) ...[
-                          Text(
-                            '-${payment.deduction.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: context.captionFontSize,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ],
+                  border: Border.all(
+                    color: Colors.green.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'PKR ${payment.netAmount.toStringAsFixed(0)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: context.bodyFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+
+          // Payment Info
+          SizedBox(
+            width: columnWidths[3],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: Row(
+                children: [
+                  Icon(
+                    payment.paymentMethodIcon,
+                    color: payment.paymentMethodColor,
+                    size: context.iconSize('small'),
+                  ),
+                  SizedBox(width: context.smallPadding / 2),
+                  Expanded(
+                    child: Text(
+                      payment.paymentMethod,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(
+                        fontSize: context.subtitleFontSize,
+                        fontWeight: FontWeight.w500,
+                        color: payment.paymentMethodColor,
+                      ),
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
           ),
-          SizedBox(width: context.smallPadding),
 
-          if (!context.shouldShowCompactLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[3],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        payment.paymentMethodIcon,
-                        color: payment.paymentMethodColor,
-                        size: context.iconSize('small'),
-                      ),
-                      SizedBox(width: context.smallPadding / 2),
-                      Expanded(
-                        child: Text(
-                          payment.paymentMethod,
-                          style: TextStyle(
-                            fontSize: context.subtitleFontSize,
-                            fontWeight: FontWeight.w500,
-                            color: payment.paymentMethodColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    '${payment.paymentMonth.day}/${payment.paymentMonth.month}/${payment.paymentMonth.year}',
-                    style: TextStyle(
-                      fontSize: context.captionFontSize,
-                      color: Colors.grey[700],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: context.smallPadding),
-          ],
-
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[4],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          // Date and Time
+          SizedBox(
+            width: columnWidths[4],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: Row(
                 children: [
                   Text(
                     _formatDate(payment.date),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.charcoalGray,
                     ),
                   ),
-                  if (context.shouldShowFullLayout) ...[
-                    SizedBox(height: context.smallPadding / 4),
-                    Text(
-                      payment.formattedTime,
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '(${payment.formattedTime})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey[500],
                       ),
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          if (context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[5],
-              child: Center(
-                child: payment.hasReceipt
-                    ? Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.smallPadding,
-                          vertical: context.smallPadding / 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius('small'),
-                          ),
-                          border: Border.all(
-                            color: Colors.green.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.receipt_rounded,
-                              color: Colors.green,
-                              size: context.iconSize('small'),
-                            ),
-                            SizedBox(width: context.smallPadding / 2),
-                            Text(
-                              l10n.available,
-                              style: TextStyle(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.smallPadding,
-                          vertical: context.smallPadding / 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(
-                            context.borderRadius('small'),
-                          ),
-                          border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.receipt_long_outlined,
-                              color: Colors.red,
-                              size: context.iconSize('small'),
-                            ),
-                            SizedBox(width: context.smallPadding / 2),
-                            Text(
-                              l10n.missing,
-                              style: TextStyle(
-                                fontSize: context.captionFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-              ),
+          // Receipt
+          SizedBox(
+            width: columnWidths[5],
+            child: Center(
+              child: payment.hasReceipt
+                  ? Icon(Icons.receipt_rounded, color: Colors.green, size: context.iconSize('small'))
+                  : Icon(Icons.receipt_long_outlined, color: Colors.red, size: context.iconSize('small')),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          if (context.isMediumDesktop || context.shouldShowFullLayout) ...[
-            Expanded(
-              flex: paymentColumnFlexes[6],
+          // Status
+          SizedBox(
+            width: columnWidths[6],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.smallPadding,
@@ -502,13 +366,8 @@ class PaymentTable extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: payment.statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(
-                    context.borderRadius('small'),
-                  ),
-                  border: Border.all(
-                    color: payment.statusColor.withOpacity(0.3),
-                    width: 1,
-                  ),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(color: payment.statusColor.withOpacity(0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -516,40 +375,34 @@ class PaymentTable extends StatelessWidget {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: payment.statusColor,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: payment.statusColor, shape: BoxShape.circle),
                     ),
-                    SizedBox(width: context.smallPadding / 2),
+                    SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         payment.statusText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
                         style: TextStyle(
                           fontSize: context.captionFontSize,
                           fontWeight: FontWeight.w500,
                           color: payment.statusColor,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            SizedBox(width: context.smallPadding),
-          ],
+          ),
 
-          Expanded(
-            flex: paymentColumnFlexes[7],
-            child: ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildCompactActions(context, payment),
-              small: _buildCompactActions(context, payment),
-              medium: _buildStandardActions(context, payment),
-              large: _buildExpandedActions(context, payment),
-              ultrawide: _buildExpandedActions(context, payment),
+          // Actions
+          SizedBox(
+            width: columnWidths[7],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+              child: _buildStandardActions(context, payment),
             ),
           ),
         ],
@@ -948,7 +801,7 @@ class PaymentTable extends StatelessWidget {
         return 'Unknown Vendor';
       }
     } else if (payment.payerType.toUpperCase() == 'LABOR') {
-      return payment.laborName ?? 'Labor';
+      return payment.laborName ?? 'Labour';
     } else if (payment.payerType.toUpperCase() == 'SALE') {
       return 'Sale Payment';
     } else if (payment.payerType.toUpperCase() == 'ORDER') {

@@ -145,7 +145,7 @@ class ViewPurchaseDetailsDialog extends StatelessWidget {
                 ),
               ),
               Text(
-                "${l10n.invoiceNumber ?? 'Invoice'}: ${purchase.invoiceNumber}",
+                "${l10n.invoiceNumber ?? 'Invoices'}: ${purchase.invoiceNumber}",
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   color: Colors.grey[600],

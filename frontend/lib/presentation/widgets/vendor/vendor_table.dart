@@ -49,86 +49,96 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
-      ),
-      child: Consumer<VendorProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return _buildLoadingState(context);
-          }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = _getTableMinWidth(context);
+        final tableWidth = constraints.maxWidth > minTableWidth 
+            ? constraints.maxWidth 
+            : minTableWidth;
 
-          if (provider.hasError) {
-            return helpers.buildErrorState(context, provider);
-          }
-
-          if (provider.vendors.isEmpty) {
-            return helpers.buildEmptyState(context);
-          }
-
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: true,
-            child: SingleChildScrollView(
-              controller: _horizontalController,
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              child: Container(
-                width: _getTableWidth(context),
-                child: Column(
-                  children: [
-                    // Table Header
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.lightGray.withOpacity(0.5),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(context.borderRadius('large')),
-                          topRight: Radius.circular(context.borderRadius('large')),
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: context.cardPadding * 0.7,
-                        horizontal: context.cardPadding,
-                      ),
-                      child: _buildTableHeader(context),
-                    ),
-
-                    // Table Content
-                    Expanded(
-                      child: Scrollbar(
-                        controller: _verticalController,
-                        thumbVisibility: true,
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.vendors.length,
-                          itemBuilder: (context, index) {
-                            final vendor = provider.vendors[index];
-                            return _buildTableRow(context, vendor, index);
-                          },
-                        ),
-                      ),
-                    ),
-
-                    // Pagination
-                    if (provider.paginationInfo != null &&
-                        provider.paginationInfo!.totalPages > 1)
-                      _buildPaginationControls(context, provider),
-                  ],
-                ),
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
               ),
-            ),
-          );
-        },
-      ),
+            ],
+          ),
+          child: Consumer<VendorProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return _buildLoadingState(context);
+              }
+
+              if (provider.hasError) {
+                return helpers.buildErrorState(context, provider);
+              }
+
+              if (provider.vendors.isEmpty) {
+                return helpers.buildEmptyState(context);
+              }
+
+              return Scrollbar(
+                controller: _horizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _horizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // Table Header
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.cardPadding * 0.7,
+                            horizontal: context.cardPadding / 2,
+                          ),
+                          child: _buildTableHeader(context, tableWidth - context.cardPadding),
+                        ),
+
+                        // Table Content
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _verticalController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            child: ListView.builder(
+                              controller: _verticalController,
+                              itemCount: provider.vendors.length,
+                              itemBuilder: (context, index) {
+                                final vendor = provider.vendors[index];
+                                return _buildTableRow(context, vendor, index, tableWidth - context.cardPadding);
+                              },
+                            ),
+                          ),
+                        ),
+
+                        // Pagination
+                        if (provider.paginationInfo != null &&
+                            provider.paginationInfo!.totalPages > 1)
+                          _buildPaginationControls(context, provider),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -159,60 +169,71 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: 1200.0, // ✅ REDUCED
-      small: 1300.0,
-      medium: 1400.0,
-      large: 1500.0,
-      ultrawide: 1600.0,
-    );
+  double _getTableMinWidth(BuildContext context) {
+    if (context.shouldShowCompactLayout) return 1500.0;
+    return 2000.0;
   }
 
   // ✅ REDUCED COLUMN WIDTHS FOR TIGHTER SPACING
-  List<double> _getColumnWidths(BuildContext context) {
-    if (context.shouldShowCompactLayout) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    final bool isCompact = context.shouldShowCompactLayout;
+    
+    // Fixed widths for columns that shouldn't expand much
+    final double nameWidth = 250.0; 
+    final double phoneWidth = 200.0;
+    final double locationWidth = 220.0;
+    final double statusWidth = 160.0;
+    final double ledgerWidth = 140.0;
+    final double dateWidth = 240.0;
+    final double actionsWidth = 320.0;
+
+    double fixedSum = nameWidth + phoneWidth + statusWidth + ledgerWidth + dateWidth + actionsWidth;
+    if (!isCompact) {
+      fixedSum += locationWidth;
+    }
+
+    // Business Name column gets the remaining space
+    final double businessWidth = totalWidth - fixedSum;
+
+    if (isCompact) {
       return [
-        140.0, // Name (reduced from 180)
-        160.0, // Business Name (reduced from 200)
-        130.0, // Phone (reduced from 140)
-        100.0, // Status (reduced from 120)
-        70.0,  // Ledger (reduced from 100)
-        120.0, // Created At (reduced from 150)
-        250.0, // Actions (reduced from 300)
+        nameWidth, // 0
+        businessWidth > 180.0 ? businessWidth : 180.0, // 1
+        phoneWidth, // 2
+        statusWidth, // 3
+        ledgerWidth, // 4
+        dateWidth, // 5
+        actionsWidth, // 6
       ];
     } else {
       return [
-        140.0, // Name
-        160.0, // Business Name
-        130.0, // Phone
-        120.0, // Location
-        100.0, // Status
-        70.0,  // Ledger
-        120.0, // Created At
-        250.0, // Actions
+        nameWidth, // 0
+        businessWidth > 180.0 ? businessWidth : 180.0, // 1
+        phoneWidth, // 2
+        locationWidth, // 3
+        statusWidth, // 4
+        ledgerWidth, // 5
+        dateWidth, // 6
+        actionsWidth, // 7
       ];
     }
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
         // Name
         Container(
           width: columnWidths[0],
-          padding: EdgeInsets.only(right: 8),
           child: _buildSortableHeaderCell(context, l10n.name, 'name'),
         ),
 
         // Business Name
         Container(
           width: columnWidths[1],
-          padding: EdgeInsets.only(right: 8),
           child: _buildSortableHeaderCell(
               context, l10n.businessName, 'business_name'),
         ),
@@ -220,7 +241,6 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
         // Phone
         Container(
           width: columnWidths[2],
-          padding: EdgeInsets.only(right: 8),
           child: _buildHeaderCell(context, l10n.phone),
         ),
 
@@ -228,54 +248,58 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[3],
-            padding: EdgeInsets.only(right: 8),
             child: _buildHeaderCell(context, l10n.location),
           ),
 
         // Status
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 3 : 4],
-          padding: EdgeInsets.only(right: 8),
-          child: _buildHeaderCell(context, l10n.status),
+          child: _buildHeaderCell(context, l10n.status, isCenter: true),
         ),
 
         // Ledger
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 4 : 5],
-          padding: EdgeInsets.only(right: 8),
-          child: _buildHeaderCell(context, 'Ledger'),
+          child: _buildHeaderCell(context, 'Ledger', isCenter: true),
         ),
 
         // Created At
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 5 : 6],
-          padding: EdgeInsets.only(right: 8),
           child: _buildSortableHeaderCell(context, l10n.created, 'created_at'),
         ),
 
         // Actions
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 6 : 7],
-          child: _buildHeaderCell(context, l10n.actions),
+          child: _buildHeaderCell(context, l10n.actions, isCenter: true),
         ),
       ],
     );
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
   Widget _buildSortableHeaderCell(
-      BuildContext context, String title, String sortKey) {
+      BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<VendorProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -284,13 +308,18 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
                   child: Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    textAlign: isCenter ? TextAlign.center : TextAlign.start,
                     style: TextStyle(
                       fontSize: context.bodyFontSize,
                       fontWeight: FontWeight.w600,
@@ -299,7 +328,6 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
                           : AppTheme.charcoalGray,
                       letterSpacing: 0.2,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -322,8 +350,8 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, VendorModel vendor, int index) {
-    final columnWidths = _getColumnWidths(context);
+  Widget _buildTableRow(BuildContext context, VendorModel vendor, int index, double totalWidth) {
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
@@ -339,26 +367,27 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
       ),
       padding: EdgeInsets.symmetric(
         vertical: context.cardPadding * 1.2,
-        horizontal: context.cardPadding,
+        horizontal: context.cardPadding / 2, // Matched with header padding
       ),
       child: Row(
         children: [
           // Name Column
           Container(
             width: columnWidths[0],
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   vendor.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (context.shouldShowCompactLayout) ...[
                   SizedBox(height: 2),
@@ -380,32 +409,34 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           // Business Name Column
           Container(
             width: columnWidths[1],
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               vendor.businessName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
 
           // Phone Column
           Container(
             width: columnWidths[2],
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               vendor.formattedPhone,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -413,19 +444,20 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[3],
-              padding: EdgeInsets.only(right: 8),
+              padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     vendor.city,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.charcoalGray,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     vendor.area,
@@ -444,7 +476,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           // Status Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 4],
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Container(
               padding: EdgeInsets.symmetric(
                 horizontal: 8,
@@ -479,7 +511,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           // Ledger Button Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 5],
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Center(
               child: Tooltip(
                 message: 'View Ledger',
@@ -516,29 +548,33 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           // Created At Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 5 : 6],
-            padding: EdgeInsets.only(right: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+            child: Row(
               children: [
                 Text(
                   vendor.formattedCreatedAt,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  vendor.relativeCreatedAt,
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${vendor.relativeCreatedAt})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -547,7 +583,7 @@ class _EnhancedVendorTableState extends State<EnhancedVendorTable> {
           // Actions Column
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 6 : 7],
-            child: helpers.buildActionsRow(context, vendor),
+            child: Center(child: helpers.buildActionsRow(context, vendor)),
           ),
         ],
       ),

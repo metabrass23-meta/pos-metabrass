@@ -744,9 +744,9 @@ class LaborProvider extends ChangeNotifier {
 
     // Name validation
     if (name.trim().isEmpty) {
-      errors['name'] = 'Labor name is required';
+      errors['name'] = 'Labour name is required';
     } else if (name.trim().length < 2) {
-      errors['name'] = 'Labor name must be at least 2 characters';
+      errors['name'] = 'Labour name must be at least 2 characters';
     }
 
     // CNIC validation
@@ -754,7 +754,7 @@ class LaborProvider extends ChangeNotifier {
       if (!RegExp(r'^\d{5}-\d{7}-\d$').hasMatch(cnic.trim())) {
         errors['cnic'] = 'CNIC format should be XXXXX-XXXXXXX-X';
       } else if (_labors.any((labor) => labor.cnic == cnic.trim())) {
-        errors['cnic'] = 'A labor with this CNIC already exists';
+        errors['cnic'] = 'A labour with this CNIC already exists';
       }
     }
 
@@ -764,7 +764,7 @@ class LaborProvider extends ChangeNotifier {
     } else if (phoneNumber.trim().length < 10) {
       errors['phoneNumber'] = 'Phone number must be at least 10 digits';
     } else if (_labors.any((labor) => labor.phoneNumber == phoneNumber.trim())) {
-      errors['phoneNumber'] = 'A labor with this phone number already exists';
+      errors['phoneNumber'] = 'A labour with this phone number already exists';
     }
 
     // Caste validation

@@ -9,7 +9,7 @@ import '../utils/debug_helper.dart';
 class PdfReceiptService {
   static const String companyName = 'META BRASS';
   static const String companyAddress =
-      'Kacha Eminabadroad Siddique Colony Gujranwala';
+      'Kacha Eminabadroad Siddique Colony Gujranwala, 055-8174471';
   static const String companyPhone = '055-8174471';
   static const String companyTagline =
       'Sanitary Fittings & Bathroom Accessories';
@@ -118,48 +118,24 @@ class PdfReceiptService {
       children: [
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          crossAxisAlignment: pw.CrossAxisAlignment.center, // Vertically centered
           children: [
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Container(
-                  padding: const pw.EdgeInsets.all(5),
-                  decoration: pw.BoxDecoration(
-                    border: pw.Border.all(color: PdfColors.grey200, width: 0.5),
-                    borderRadius: pw.BorderRadius.circular(5),
-                  ),
-                  child: logoWidget,
-                ),
-              ],
+            pw.Container(
+              padding: const pw.EdgeInsets.all(5),
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.grey200, width: 0.5),
+                borderRadius: pw.BorderRadius.circular(5),
+              ),
+              child: logoWidget,
             ),
-            pw.Spacer(), // Push text to the right
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-              children: [
-                pw.Text(
-                  'CASH RECEIPT',
-                  style: pw.TextStyle(
-                    fontSize: 24, // Slightly larger for A5
-                    fontWeight: pw.FontWeight.bold,
-                    font: boldFont,
-                    color: PdfColor.fromInt(0xFF2B4EBF),
-                  ),
-                ),
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  companyName.toUpperCase(),
-                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: boldFont), // Larger text
-                ),
-                pw.Text(
-                  companyAddress,
-                  style: pw.TextStyle(fontSize: 10, font: regularFont, color: PdfColors.grey800),
-                ),
-                pw.Text(
-                  'Phone: $companyPhone',
-                  style: pw.TextStyle(fontSize: 10, font: regularFont, color: PdfColors.grey800),
-                ),
-              ],
+            pw.Text(
+              'CASH RECEIPT',
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+                font: boldFont,
+                color: PdfColor.fromInt(0xFF2B4EBF),
+              ),
             ),
           ],
         ),
@@ -194,6 +170,16 @@ class PdfReceiptService {
                   _buildArrow(PdfColor.fromInt(0xFF2B4EBF)),
                 ],
               ),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 4),
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              companyAddress,
+              style: pw.TextStyle(fontSize: 9, font: regularFont, color: PdfColors.grey800),
             ),
           ],
         ),

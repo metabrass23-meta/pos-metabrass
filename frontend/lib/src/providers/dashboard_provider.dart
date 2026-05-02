@@ -42,7 +42,7 @@ class DashboardProvider extends ChangeNotifier {
     'Quotations',
     'Customers',
     'Vendors',
-    'Labor',
+    'Labour',
     'Receivables',
     'Payables',
     'Advance Payments',
@@ -69,6 +69,16 @@ class DashboardProvider extends ChangeNotifier {
 
   void selectMenu(int index) {
     _selectedMenuIndex = index;
+    notifyListeners();
+  }
+
+  void reset() {
+    _selectedMenuIndex = 0;
+    _analytics = null;
+    _errorMessage = null;
+    _isLoading = false;
+    _retryCount = 0;
+    stopPolling();
     notifyListeners();
   }
 

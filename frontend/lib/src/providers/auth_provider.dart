@@ -80,6 +80,7 @@ class AuthProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         _setUser(response.data!.user);
+        await getProfile(); // Fetch full profile including role data
         _setState(AuthState.authenticated);
         debugPrint('✅ Login successful for: $email');
       } else {

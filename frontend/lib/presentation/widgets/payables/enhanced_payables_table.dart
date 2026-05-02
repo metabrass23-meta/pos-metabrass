@@ -48,83 +48,96 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: context.shadowBlur(), offset: Offset(0, context.smallPadding))],
-      ),
-      child: Consumer<PayablesProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return _buildLoadingState(context);
-          }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = _getTableMinWidth(context);
+        final tableWidth = constraints.maxWidth > minTableWidth 
+            ? constraints.maxWidth 
+            : minTableWidth;
 
-          if (provider.hasError) {
-            return _helpers.buildErrorState(context, provider);
-          }
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
+              ),
+            ],
+          ),
+          child: Consumer<PayablesProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return _buildLoadingState(context);
+              }
 
-          if (provider.payables.isEmpty) {
-            return _helpers.buildEmptyState(context);
-          }
+              if (provider.hasError) {
+                return _helpers.buildErrorState(context, provider);
+              }
 
-          return Scrollbar(
-            controller: _headerHorizontalController,
-            thumbVisibility: true,
-            child: Column(
-              children: [
-                // Table Header with Horizontal Scroll
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.lightGray.withOpacity(0.5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(context.borderRadius('large')),
-                      topRight: Radius.circular(context.borderRadius('large')),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: _headerHorizontalController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const ClampingScrollPhysics(),
-                    child: Container(
-                      width: _getTableWidth(context),
-                      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 0.85, horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
-                  ),
-                ),
+              if (provider.payables.isEmpty) {
+                return _helpers.buildEmptyState(context);
+              }
 
-                // Table Content with Synchronized Scroll
-                Expanded(
-                  child: Scrollbar(
-                    controller: _verticalController,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _contentHorizontalController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: Container(
-                        width: _getTableWidth(context),
-                        child: ListView.builder(
-                          controller: _verticalController,
-                          itemCount: provider.payables.length,
-                          itemBuilder: (context, index) {
-                            final payable = provider.payables[index];
-                            return _buildTableRow(context, payable, index);
-                          },
+              return Scrollbar(
+                controller: _headerHorizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // Table Header
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.cardPadding * 0.85,
+                            horizontal: context.cardPadding / 2,
+                          ),
+                          child: _buildTableHeader(context, tableWidth - context.cardPadding),
                         ),
-                      ),
+
+                        // Table Content
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _verticalController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            child: ListView.builder(
+                              controller: _verticalController,
+                              itemCount: provider.payables.length,
+                              itemBuilder: (context, index) {
+                                final payable = provider.payables[index];
+                                return _buildTableRow(context, payable, index, tableWidth - context.cardPadding);
+                              },
+                            ),
+                          ),
+                        ),
+
+                        // Pagination Controls
+                        if (provider.paginationInfo != null &&
+                            provider.paginationInfo!.totalPages > 1)
+                          _buildPaginationControls(context, provider),
+                      ],
                     ),
                   ),
                 ),
-
-                // Pagination Controls
-                if (provider.paginationInfo != null && provider.paginationInfo!.totalPages > 1) _buildPaginationControls(context, provider),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -138,42 +151,64 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1580.0, small: 1680.0, medium: 1780.0, large: 1880.0, ultrawide: 1980.0);
+  double _getTableMinWidth(BuildContext context) {
+    if (context.shouldShowCompactLayout) return 1500.0;
+    return 2000.0;
   }
 
-  List<double> _getColumnWidths(BuildContext context) {
-    if (context.shouldShowCompactLayout) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    final bool isCompact = context.shouldShowCompactLayout;
+    
+    // Fixed widths for columns that shouldn't expand much
+    final double idWidth = 130.0;
+    final double creditorWidth = 250.0; 
+    final double vendorWidth = 220.0; 
+    final double notesWidth = 250.0; 
+    final double amountWidth = 220.0;
+    final double dateWidth = 200.0;
+    final double priorityWidth = 180.0;
+    final double actionsWidth = 320.0;
+
+    double fixedSum = idWidth + creditorWidth + amountWidth + dateWidth + actionsWidth;
+    if (!isCompact) {
+      fixedSum += vendorWidth + notesWidth + priorityWidth;
+    }
+
+    // Reason column gets the remaining space
+    final double reasonWidth = totalWidth - fixedSum;
+
+    if (isCompact) {
       return [
-        120.0, // Payable ID
-        200.0, // Creditor & Reason
-        160.0, // Amount
-        140.0, // Date
-        320.0, // Actions
+        idWidth, // 0
+        creditorWidth, // 1
+        amountWidth, // 2
+        dateWidth, // 3
+        actionsWidth, // 4
+        reasonWidth > 180.0 ? reasonWidth : 180.0, // Extra buffer if needed
       ];
     } else {
       return [
-        120.0, // Payable ID
-        180.0, // Creditor
-        200.0, // Reason/Item
-        200.0, // Vendor
-        200.0, // Notes
-        140.0, // Amount
-        130.0, // Date
-        120.0, // Priority
-        320.0, // Actions
+        idWidth, // 0
+        creditorWidth, // 1
+        reasonWidth > 200.0 ? reasonWidth : 200.0, // 2
+        vendorWidth, // 3
+        notesWidth, // 4
+        amountWidth, // 5
+        dateWidth, // 6
+        priorityWidth, // 7
+        actionsWidth, // 8
       ];
     }
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
         // Payable ID
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.payableId, 'id')),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, l10n.payableId, 'id', isCenter: true)),
 
         // Creditor
         Container(width: columnWidths[1], child: _buildSortableHeaderCell(context, l10n.creditor, 'creditor_name')),
@@ -200,22 +235,35 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
         ),
 
         // Priority (hidden on compact layouts)
-        if (!context.shouldShowCompactLayout) Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, l10n.priority, 'priority')),
+        if (!context.shouldShowCompactLayout) Container(width: columnWidths[7], child: _buildSortableHeaderCell(context, l10n.priority, 'priority', isCenter: true)),
 
         // Actions
-        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, l10n.actions)),
+        Container(width: columnWidths[context.shouldShowCompactLayout ? 4 : 8], child: _buildHeaderCell(context, l10n.actions, isCenter: true)),
       ],
     );
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
+      ),
     );
   }
 
-  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<PayablesProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -224,17 +272,24 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
-                    letterSpacing: 0.2,
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    textAlign: isCenter ? TextAlign.center : TextAlign.start,
+                    style: TextStyle(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
                 SizedBox(width: 4),
@@ -251,34 +306,39 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, Payable payable, int index) {
+  Widget _buildTableRow(BuildContext context, Payable payable, int index, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
         color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
         border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
-      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
+      padding: EdgeInsets.symmetric(
+        vertical: context.cardPadding / 2,
+        horizontal: context.cardPadding / 2, // Matched with header
+      ),
       child: Row(
         children: [
-          // Payable ID Column
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                payable.id.substring(0, 8),
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  payable.id.substring(0, 8),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -294,7 +354,8 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   payable.creditorName,
                   style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  overflow: TextOverflow.visible,
                 ),
                 // Show reason on compact layouts
                 if (context.shouldShowCompactLayout) ...[
@@ -314,6 +375,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                       style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                     ),
                   ],
                 ],
@@ -328,9 +390,10 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payable.reasonOrItem,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ),
 
@@ -349,9 +412,10 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 payable.notes ?? l10n.noNotes,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ),
 
@@ -371,6 +435,9 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
                   ),
                   child: Text(
                     payable.formattedAmountBorrowed,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
                     textAlign: TextAlign.center,
                   ),
@@ -390,16 +457,24 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 3 : 6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   payable.formattedExpectedRepaymentDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
-                Text(
-                  context.shouldShowCompactLayout ? payable.relativeExpectedRepaymentDate : (payable.repaymentStatus ?? l10n.due),
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${context.shouldShowCompactLayout ? payable.relativeExpectedRepaymentDate : (payable.repaymentStatus ?? l10n.due)})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  ),
                 ),
               ],
             ),
@@ -410,13 +485,15 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
             Container(
               width: columnWidths[7],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _helpers.buildPriorityChip(context, payable),
-                  SizedBox(height: context.smallPadding / 4),
-                  _helpers.buildStatusChip(context, payable),
-                ],
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _helpers.buildPriorityChip(context, payable),
+                    SizedBox(height: context.smallPadding / 4),
+                    _helpers.buildStatusChip(context, payable),
+                  ],
+                ),
               ),
             ),
 
@@ -424,7 +501,7 @@ class _EnhancedPayablesTableState extends State<EnhancedPayablesTable> {
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: _helpers.buildActionsRow(context, payable),
+            child: Center(child: _helpers.buildActionsRow(context, payable)),
           ),
         ],
       ),

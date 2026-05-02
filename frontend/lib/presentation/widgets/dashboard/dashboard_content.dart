@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/dashboard_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../src/utils/permission_helper.dart';
 
 // Screens
 import '../../screens/advance payment/advance_payment_screen.dart';
@@ -30,6 +31,9 @@ import '../../screens/tax_management_screen.dart';
 import '../../screens/vendor/vendor_screen.dart';
 import '../../screens/zakat/zakat_screen.dart';
 import '../../screens/quotation/quotation_list_screen.dart';
+import '../../screens/settings/user_management_screen.dart';
+import '../../screens/settings/role_permission_screen.dart';
+
 
 // Dashboard Widgets
 import 'sales_overview_chart.dart';
@@ -86,13 +90,46 @@ class DashboardContent extends StatelessWidget {
       case 19:
         return const ReceiptManagementScreen();
       case 20:
+        return const UserManagementScreen();
+      case 21:
+        return const RolePermissionScreen();
+      case 22:
         return const SettingsScreen();
+
       default:
         return _buildPlaceholderContent(context);
     }
   }
 
   Widget _buildDashboard(BuildContext context) {
+    if (!PermissionHelper.canView(context, 'Dashboard')) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_outline_rounded, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              "Access Denied",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "You don't have permission to view the Dashboard.",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
         // 1. Initial Loading State

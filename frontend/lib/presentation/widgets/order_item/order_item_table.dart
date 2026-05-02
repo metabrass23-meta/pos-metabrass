@@ -162,7 +162,7 @@ class _EnhancedOrderItemTableState extends State<EnhancedOrderItemTable> {
     return Row(
       children: [
         // Product Name
-        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Product', 'product_name')),
+        Container(width: columnWidths[0], child: _buildSortableHeaderCell(context, 'Products', 'product_name')),
 
         // Customization Notes
         Container(width: columnWidths[1], child: _buildHeaderCell(context, 'Customization Notes')),

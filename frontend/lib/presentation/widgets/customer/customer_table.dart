@@ -7,6 +7,7 @@ import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../screens/customer_ledger_screen/customer_ledger.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class EnhancedCustomerTable extends StatefulWidget {
   final Function(Customer) onEdit;
@@ -59,123 +60,118 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
-          ),
-        ],
-      ),
-      child: Consumer<CustomerProvider>(
-        builder: (context, provider, child) {
-          // 1. Loading State
-          if (provider.isLoading && provider.customers.isEmpty) {
-            return Center(
-              child: SizedBox(
-                width: 50,
-                height: 50,
-                child: const CircularProgressIndicator(
-                  color: AppTheme.primaryMaroon,
-                  strokeWidth: 3,
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = _getTableMinWidth(context);
+        final tableWidth = constraints.maxWidth > minTableWidth 
+            ? constraints.maxWidth 
+            : minTableWidth;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
               ),
-            );
-          }
+            ],
+          ),
+          child: Consumer<CustomerProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading && provider.customers.isEmpty) {
+                return _buildLoadingState(context);
+              }
 
-          // 2. Empty State
-          if (provider.customers.isEmpty) {
-            return _buildEmptyState(context);
-          }
+              if (provider.customers.isEmpty) {
+                return _buildEmptyState(context);
+              }
 
-          // 3. Data Table
-          return Column(
-            children: [
-              // --- Table Header (Horizontal Scroll Only) ---
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGray.withOpacity(0.5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(context.borderRadius('large')),
-                    topRight: Radius.circular(context.borderRadius('large')),
-                  ),
-                ),
+              return Scrollbar(
+                controller: _headerHorizontalController,
+                thumbVisibility: true,
+                trackVisibility: true,
                 child: SingleChildScrollView(
                   controller: _headerHorizontalController,
                   scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
                   child: Container(
-                    width: _getTableWidth(context),
-                    padding: EdgeInsets.symmetric(
-                      vertical: context.cardPadding * 0.85,
-                      horizontal: context.cardPadding / 2,
-                    ),
-                    child: _buildTableHeader(context),
-                  ),
-                ),
-              ),
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // 1. Table Header
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.cardPadding * 0.85,
+                            horizontal: context.cardPadding / 2,
+                          ),
+                          child: _buildTableHeader(context, tableWidth - context.cardPadding),
+                        ),
 
-              // --- Table Content (Vertical + Horizontal Scroll) ---
-              Expanded(
-                child: Scrollbar(
-                  controller: _verticalController,
-                  thumbVisibility: true,
-                  trackVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _verticalController,
-                    scrollDirection: Axis.vertical,
-                    child: Scrollbar(
-                      controller: _contentHorizontalController,
-                      thumbVisibility: true,
-                      notificationPredicate: (notification) => notification.depth == 1,
-                      child: SingleChildScrollView(
-                        controller: _contentHorizontalController,
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        child: Container(
-                          width: _getTableWidth(context),
-                          // Using Column ensures all rows render
-                          child: Column(
-                            children: provider.customers.asMap().entries.map((entry) {
-                              return _buildTableRow(context, entry.value, entry.key);
-                            }).toList(),
+                        // 2. Table Content
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _verticalController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            child: ListView.builder(
+                              controller: _verticalController,
+                              itemCount: provider.customers.length,
+                              itemBuilder: (context, index) {
+                                return _buildTableRow(
+                                  context, 
+                                  provider.customers[index], 
+                                  index, 
+                                  tableWidth - context.cardPadding
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
+
+                        if (provider.paginationInfo != null &&
+                            provider.paginationInfo!.totalPages > 1)
+                          _buildPaginationControls(context, provider),
+                      ],
                     ),
                   ),
                 ),
-              ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
-              // Pagination Controls
-              if (provider.paginationInfo != null &&
-                  provider.paginationInfo!.totalPages > 1)
-                _buildPaginationControls(context, provider),
-            ],
-          );
-        },
+  Widget _buildLoadingState(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 50,
+        height: 50,
+        child: const CircularProgressIndicator(
+          color: AppTheme.primaryMaroon,
+          strokeWidth: 3,
+        ),
       ),
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: 1680.0,
-      small: 1780.0,
-      medium: 1880.0,
-      large: 1980.0,
-      ultrawide: 2080.0,
-    );
+  double _getTableMinWidth(BuildContext context) {
+    return 2000.0; // Minimum width for customer table to remain readable and prevent wrapping
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
@@ -183,46 +179,71 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
         SizedBox(width: columnWidths[1], child: _buildHeaderCell(context, l10n.phone)),
         SizedBox(width: columnWidths[2], child: _buildHeaderCell(context, l10n.email)),
         SizedBox(width: columnWidths[3], child: _buildHeaderCell(context, l10n.type)),
-        SizedBox(width: columnWidths[4], child: _buildHeaderCell(context, l10n.status)),
+        SizedBox(width: columnWidths[4], child: _buildHeaderCell(context, l10n.status, isCenter: true)),
         SizedBox(width: columnWidths[5], child: _buildHeaderCell(context, l10n.city)),
         SizedBox(width: columnWidths[6], child: _buildHeaderCell(context, l10n.totalSales)),
         SizedBox(width: columnWidths[7], child: _buildSortableHeaderCell(context, l10n.lastPurchase, 'last_order_date')),
         SizedBox(width: columnWidths[8], child: _buildSortableHeaderCell(context, l10n.since, 'created_at')),
-        SizedBox(width: columnWidths[9], child: _buildHeaderCell(context, l10n.ledger)),
-        SizedBox(width: columnWidths[10], child: _buildHeaderCell(context, l10n.actions)),
+        SizedBox(width: columnWidths[9], child: _buildHeaderCell(context, l10n.ledger, isCenter: true)),
+        SizedBox(width: columnWidths[10], child: _buildHeaderCell(context, l10n.actions, isCenter: true)),
       ],
     );
   }
 
-  List<double> _getColumnWidths(BuildContext context) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    // Fixed widths for columns that shouldn't expand much
+    final double phoneWidth = 160.0;
+    final double emailWidth = 220.0;
+    final double typeWidth = 120.0;
+    final double statusWidth = 120.0;
+    final double cityWidth = 140.0;
+    final double salesWidth = 130.0;
+    final double purchaseWidth = 240.0; // Increased
+    final double sinceWidth = 220.0; // Increased
+    final double ledgerWidth = 100.0; // Increased
+    final double actionsWidth = 280.0; // Increased
+
+    final double fixedSum = phoneWidth + emailWidth + typeWidth + statusWidth + cityWidth + salesWidth + purchaseWidth + sinceWidth + ledgerWidth + actionsWidth;
+    
+    // Name column gets the remaining space
+    final double nameWidth = totalWidth - fixedSum;
+
     return [
-      180.0, // Name
-      160.0, // Phone
-      220.0, // Email
-      110.0, // Type
-      110.0, // Status
-      130.0, // City
-      110.0, // Total Sales
-      130.0, // Last Purchase
-      130.0, // Since
-      70.0,  // Ledger
-      250.0, // Actions
+      nameWidth > 180.0 ? nameWidth : 180.0, // Name
+      phoneWidth,
+      emailWidth,
+      typeWidth,
+      statusWidth,
+      cityWidth,
+      salesWidth,
+      purchaseWidth,
+      sinceWidth,
+      ledgerWidth,
+      actionsWidth,
     ];
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
-  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<CustomerProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -231,12 +252,17 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  textAlign: isCenter ? TextAlign.center : TextAlign.start,
                   style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -260,15 +286,18 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, Customer customer, int index) {
-    final columnWidths = _getColumnWidths(context);
+  Widget _buildTableRow(BuildContext context, Customer customer, int index, double totalWidth) {
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
         color: index.isEven ? AppTheme.pureWhite : AppTheme.lightGray.withOpacity(0.2),
         border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5)),
       ),
-      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
+      padding: EdgeInsets.symmetric(
+        vertical: context.cardPadding / 2,
+        horizontal: context.cardPadding / 2, // Added to match header
+      ),
       child: Row(
         children: [
           // Name
@@ -278,13 +307,14 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 customer.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.bodyFontSize,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.charcoalGray,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -296,13 +326,14 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 customer.phone,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -314,13 +345,14 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 customer.email,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -347,6 +379,9 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                   ),
                   child: Text(
                     customer.customerTypeDisplay,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
@@ -355,8 +390,6 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                           : AppTheme.accentGold,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -380,14 +413,15 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                   ),
                   child: Text(
                     customer.statusDisplay,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.captionFontSize,
                       fontWeight: FontWeight.w600,
                       color: _getStatusColor(customer.status),
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -401,13 +435,14 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 customer.city ?? 'N/A',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: customer.city != null ? AppTheme.charcoalGray : Colors.grey[500],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -443,13 +478,15 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             width: columnWidths[7],
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
                   Text(
                     customer.lastPurchase != null
                         ? 'PKR ${customer.lastPurchase!.toStringAsFixed(0)}'
                         : '(${customer.totalSalesAmount})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
@@ -458,12 +495,18 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
                     ),
                   ),
                   if (customer.lastPurchaseDate != null) ...[
-                    Text(
-                      _formatDate(customer.lastPurchaseDate!),
-                      style: TextStyle(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey[600],
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _formatDate(customer.lastPurchaseDate!),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontSize: context.captionFontSize,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     ),
                   ],
@@ -477,23 +520,31 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             width: columnWidths[8],
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
                   Text(
                     _formatDate(customer.createdAt),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.charcoalGray,
                     ),
                   ),
-                  Text(
-                    customer.relativeCreatedAt,
-                    style: TextStyle(
-                      fontSize: context.captionFontSize,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey[600],
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '(${customer.relativeCreatedAt})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
                 ],
@@ -545,7 +596,7 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
             width: columnWidths[10],
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: _buildActions(context, customer),
+              child: Center(child: _buildActions(context, customer)),
             ),
           ),
         ],
@@ -581,48 +632,50 @@ class _EnhancedCustomerTableState extends State<EnhancedCustomerTable> {
         SizedBox(width: context.smallPadding / 2),
 
         // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(customer),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
+        if (PermissionHelper.canEdit(context, 'Customers'))
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onEdit(customer),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Icon(
+                  Icons.edit_outlined,
+                  color: Colors.blue,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
 
         SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(customer),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
+        if (PermissionHelper.canDelete(context, 'Customers'))
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onDelete(customer),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

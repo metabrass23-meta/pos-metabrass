@@ -141,7 +141,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
     final columnWidths = _getColumnWidths(context);
     final totalWidth = columnWidths.reduce((a, b) => a + b);
 
-    final minWidth = ResponsiveBreakpoints.responsive(context, tablet: 1280.0, small: 1380.0, medium: 1480.0, large: 1580.0, ultrawide: 1680.0);
+    final minWidth = ResponsiveBreakpoints.responsive(context, tablet: 1800.0, small: 1900.0, medium: 2000.0, large: 2100.0, ultrawide: 2200.0);
 
     return totalWidth > minWidth ? totalWidth : minWidth;
   }
@@ -149,23 +149,23 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
   List<double> _getColumnWidths(BuildContext context) {
     if (context.shouldShowCompactLayout) {
       return [
-        100.0,
-        180.0,
-        200.0,
-        150.0,
-        120.0,
-        140.0,
-        280.0,
+        110.0, // Order ID
+        250.0, // Customer
+        350.0, // Description
+        160.0, // Amount
+        140.0, // Status
+        160.0, // Delivery
+        320.0, // Actions
       ];
     } else {
       return [
-        120.0,
-        200.0,
-        250.0,
-        180.0,
-        140.0,
-        160.0,
-        320.0,
+        130.0, // Order ID
+        350.0, // Customer
+        450.0, // Description
+        200.0, // Amount
+        160.0, // Status
+        250.0, // Delivery
+        350.0, // Actions
       ];
     }
   }
@@ -179,7 +179,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         Container(
           width: columnWidths[0],
           constraints: BoxConstraints(maxWidth: columnWidths[0]),
-          child: _buildSortableHeaderCell(context, l10n.orderID, 'id'),
+          child: _buildSortableHeaderCell(context, l10n.orderID, 'id', isCenter: true),
         ),
 
         Container(
@@ -203,7 +203,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         Container(
           width: columnWidths[4],
           constraints: BoxConstraints(maxWidth: columnWidths[4]),
-          child: _buildHeaderCell(context, l10n.status),
+          child: _buildHeaderCell(context, l10n.status, isCenter: true),
         ),
 
         Container(
@@ -215,20 +215,28 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
         Container(
           width: columnWidths[6],
           constraints: BoxConstraints(maxWidth: columnWidths[6]),
-          child: _buildHeaderCell(context, l10n.actions),
+          child: _buildHeaderCell(context, l10n.actions, isCenter: true),
         ),
       ],
     );
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      ),
     );
   }
 
-  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<OrderProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -237,17 +245,24 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: context.bodyFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
-                    letterSpacing: 0.2,
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    textAlign: isCenter ? TextAlign.center : TextAlign.start,
+                    style: TextStyle(
+                      fontSize: context.bodyFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: isCurrentSort ? AppTheme.primaryMaroon : AppTheme.charcoalGray,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
                 SizedBox(width: 4),
@@ -281,19 +296,21 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               width: columnWidths[0],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               constraints: BoxConstraints(maxWidth: columnWidths[0]),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryMaroon.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
-                ),
-                child: Text(
-                  '#${order.id.length >= 8 ? order.id.substring(0, 8) : order.id}',
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMaroon.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(color: AppTheme.primaryMaroon.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    '#${order.id.length >= 8 ? order.id.substring(0, 8) : order.id}',
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),
@@ -306,18 +323,20 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order.customerName.isNotEmpty ? order.customerName : l10n.notAvailable,
-                    style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: context.smallPadding / 4),
-                  Text(
-                    order.customerPhone.isNotEmpty ? order.customerPhone : l10n.noPhone,
-                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  order.customerName.isNotEmpty ? order.customerName : l10n.notAvailable,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
+                ),
+                SizedBox(height: context.smallPadding / 4),
+                Text(
+                  order.customerPhone.isNotEmpty ? order.customerPhone : l10n.noPhone,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                ),
                 ],
               ),
             ),
@@ -328,9 +347,10 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               constraints: BoxConstraints(maxWidth: columnWidths[2]),
               child: Text(
                 order.description.isNotEmpty ? order.description : l10n.noDescription,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
               ),
             ),
 
@@ -344,9 +364,10 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
                   if (order.totalAmount > 0) ...[
                     Text(
                       'PKR ${order.totalAmount.toStringAsFixed(0)}',
-                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                     ),
                     if (order.remainingAmount > 0) ...[
                       SizedBox(height: context.smallPadding / 4),
@@ -421,23 +442,25 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               width: columnWidths[4],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               constraints: BoxConstraints(maxWidth: columnWidths[4]),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-                decoration: BoxDecoration(
-                  color: _helpers.getStatusColor(order.status).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                  border: Border.all(color: _helpers.getStatusColor(order.status).withOpacity(0.3)),
-                ),
-                child: Text(
-                  _helpers.getStatusText(order.status),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: _helpers.getStatusColor(order.status),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                  decoration: BoxDecoration(
+                    color: _helpers.getStatusColor(order.status).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                    border: Border.all(color: _helpers.getStatusColor(order.status).withOpacity(0.3)),
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Text(
+                    _helpers.getStatusText(order.status),
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: _helpers.getStatusColor(order.status),
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),
@@ -446,32 +469,29 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               width: columnWidths[5],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               constraints: BoxConstraints(maxWidth: columnWidths[5]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
                   Text(
                     order.expectedDeliveryDate != null ? _helpers.formatDate(order.expectedDeliveryDate!) : l10n.noDate,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w600,
                       color: order.isOverdue ? Colors.red : AppTheme.charcoalGray,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (order.isOverdue) ...[
-                    Text(
-                      l10n.overdue,
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: Colors.red),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ] else if (order.daysUntilDelivery != null && order.daysUntilDelivery! <= 3 && order.daysUntilDelivery! >= 0) ...[
-                    Text(
-                      '${order.daysUntilDelivery} ${l10n.days}',
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.orange),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  if (order.isOverdue || (order.daysUntilDelivery != null && order.daysUntilDelivery! <= 3)) ...[
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        order.isOverdue ? '(${l10n.overdue})' : '(${order.daysUntilDelivery} ${l10n.days})',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: order.isOverdue ? Colors.red : Colors.orange),
+                      ),
                     ),
                   ],
                 ],
@@ -482,7 +502,7 @@ class _EnhancedOrderTableState extends State<EnhancedOrderTable> {
               width: columnWidths[6],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               constraints: BoxConstraints(maxWidth: columnWidths[6]),
-              child: _helpers.buildActionsRow(context, order),
+              child: Center(child: _helpers.buildActionsRow(context, order)),
             ),
           ],
         ),

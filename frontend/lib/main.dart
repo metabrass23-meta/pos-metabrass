@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/screens/auth/login_screen.dart';
 import 'package:frontend/presentation/screens/auth/signup_screen.dart';
@@ -49,17 +50,12 @@ void main() async {
 
   runApp(const MetaBrassApp());
 
-  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+  if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
     doWhenWindowReady(() {
-      // Use a more conservative size that fits well on HP laptop screens
-      // Account for Windows taskbar and system UI
       appWindow
-        ..minSize =
-            const Size(1000, 550) // Reduced minimum height
-        ..maxSize =
-            const Size(2560, 1400) // Reduced max height for taskbar space
-        ..size =
-            const Size(1200, 680) // Reduced height to avoid taskbar cutoff
+        ..minSize = const Size(1000, 550)
+        ..maxSize = const Size(2560, 1400)
+        ..size = const Size(1200, 680)
         ..alignment = Alignment.center
         ..title = "META BRASS"
         ..show();
@@ -70,143 +66,64 @@ void main() async {
 class MetaBrassApp extends StatelessWidget {
   const MetaBrassApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TaxRatesProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
-        ChangeNotifierProvider(create: (_) => SalesProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => VendorProvider()),
+        ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => OrderItemProvider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),
-        ChangeNotifierProvider(create: (_) => CategoryProvider()),
-        ChangeNotifierProvider(create: (_) => CustomerProvider()),
-        ChangeNotifierProvider(create: (_) => VendorProvider()),
-        ChangeNotifierProvider(create: (_) => LaborProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
-        ChangeNotifierProvider(create: (_) => AdvancePaymentProvider()),
-        ChangeNotifierProvider(create: (_) => ReceivablesProvider()),
-        ChangeNotifierProvider(create: (_) => PayablesProvider()),
         ChangeNotifierProvider(create: (_) => ExpensesProvider()),
+        ChangeNotifierProvider(create: (_) => PurchaseProvider()),
+        ChangeNotifierProvider(create: (_) => TaxRatesProvider()),
+        ChangeNotifierProvider(create: (_) => SalesProvider()),
+        ChangeNotifierProvider(create: (_) => LaborProvider()),
+        ChangeNotifierProvider(create: (_) => PayablesProvider()),
+        ChangeNotifierProvider(create: (_) => ReceivablesProvider()),
+        ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
+        ChangeNotifierProvider(create: (_) => AdvancePaymentProvider()),
         ChangeNotifierProvider(create: (_) => VendorLedgerProvider()),
         ChangeNotifierProvider(create: (_) => CustomerLedgerProvider()),
-        ChangeNotifierProvider(create: (_) => ZakatProvider()),
-        ChangeNotifierProvider(create: (_) => PurchaseProvider()),
         ChangeNotifierProvider(create: (_) => PrincipalAccountProvider()),
-        ChangeNotifierProvider(create: (_) => ProfitLossProvider()),
+        ChangeNotifierProvider(create: (_) => ZakatProvider()),
         ChangeNotifierProvider(create: (_) => ReturnProvider()),
         ChangeNotifierProvider(create: (_) => InvoiceProvider()),
         ChangeNotifierProvider(create: (_) => ReceiptProvider()),
         ChangeNotifierProvider(create: (_) => RefundProvider()),
       ],
-      child: Consumer3<AuthProvider, ProfitLossProvider, AppProvider>(
-        builder:
-            (context, authProvider, profitLossProvider, appProvider, child) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!appProvider.isInitialized) {
-                  appProvider.initialize();
-                }
-              });
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (authProvider.state == AuthState.initial) {
-                  authProvider.initialize();
-                }
-              });
-
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (authProvider.state == AuthState.authenticated) {
-                  if (profitLossProvider.profitLossHistory.isEmpty &&
-                      !profitLossProvider.isLoading) {
-                    profitLossProvider.initialize();
-                  }
-                }
-              });
-
-              return Sizer(
-                builder: (context, orientation, deviceType) {
-                  return MaterialApp(
-                    title: 'META BRASS - Premium POS',
-                    debugShowCheckedModeBanner: false,
-                    theme: AppTheme.lightTheme,
-                    darkTheme: AppTheme.darkTheme,
-                    themeMode: ThemeMode.light,
-                    navigatorKey: navigatorKey,
-
-                    locale: appProvider.locale,
-
-                    supportedLocales: const [Locale('ur'), Locale('en')],
-                    localizationsDelegates: const [
-                      AppLocalizations.delegate,
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                    ],
-
-                    // Add scroll behavior to prevent overflow
-                    scrollBehavior: const MaterialScrollBehavior().copyWith(
-                      overscroll: false,
-                    ),
-
-                    initialRoute: '/',
-                    onGenerateRoute: (settings) {
-                      if (settings.name == '/dashboard') {
-                        if (authProvider.state != AuthState.authenticated) {
-                          return MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                            settings: settings,
-                          );
-                        }
-                      }
-
-                      if (settings.name == '/login' ||
-                          settings.name == '/signup') {
-                        if (authProvider.state == AuthState.authenticated) {
-                          return MaterialPageRoute(
-                            builder: (_) => const DashboardScreen(),
-                            settings: settings,
-                          );
-                        }
-                      }
-
-                      switch (settings.name) {
-                        case '/':
-                          return MaterialPageRoute(
-                            builder: (_) => const SplashScreen(),
-                            settings: settings,
-                          );
-                        case '/login':
-                          return MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                            settings: settings,
-                          );
-                        case '/signup':
-                          return MaterialPageRoute(
-                            builder: (_) => const SignupScreen(),
-                            settings: settings,
-                          );
-                        case '/dashboard':
-                          return MaterialPageRoute(
-                            builder: (_) => const DashboardScreen(),
-                            settings: settings,
-                          );
-                        default:
-                          return MaterialPageRoute(
-                            builder: (_) => const SplashScreen(),
-                            settings: settings,
-                          );
-                      }
-                    },
-                  );
-                },
-              );
+      child: Sizer(
+        builder: (context, orientation, deviceType) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'META BRASS',
+            theme: AppTheme.lightTheme,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''), // English
+              Locale('ur', ''), // Urdu
+            ],
+            locale: const Locale('en'), // Default locale
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const SplashScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignupScreen(),
+              '/dashboard': (context) => const DashboardScreen(),
             },
+          );
+        },
       ),
     );
   }

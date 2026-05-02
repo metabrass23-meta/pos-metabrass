@@ -441,7 +441,7 @@ class ProfitLossProvider extends ChangeNotifier {
     try {
       return [
         {
-          'category': 'Labor Payments',
+          'category': 'Labour Payments',
           'amount': _currentProfitLoss!.totalLaborPayments,
           'percentage': _currentProfitLoss!.laborPercentage,
           'color': Colors.blue,

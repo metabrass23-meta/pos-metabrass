@@ -12,6 +12,7 @@ import '../../widgets/payables/edit_payable_dialog.dart';
 import '../../widgets/payables/view_payable_details.dart';
 import '../../widgets/payables/enhanced_payables_table.dart';
 import '../../widgets/payables/payable_filter_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PayablesPage extends StatefulWidget {
   const PayablesPage({super.key});
@@ -78,40 +79,29 @@ class _PayablesPageState extends State<PayablesPage> {
 
     return Scaffold(
       backgroundColor: AppTheme.creamWhite,
-      body: SingleChildScrollView(
+      body: Padding(
+        padding: EdgeInsets.all(context.mainPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section (now scrolls with content)
-            Container(
-              padding: EdgeInsets.all(context.mainPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ResponsiveBreakpoints.responsive(
-                    context,
-                    tablet: _buildTabletHeader(),
-                    small: _buildMobileHeader(),
-                    medium: _buildDesktopHeader(),
-                    large: _buildDesktopHeader(),
-                    ultrawide: _buildDesktopHeader(),
-                  ),
-                  SizedBox(height: context.mainPadding),
-                  Consumer<PayablesProvider>(
-                    builder: (context, provider, child) {
-                      return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
-                    },
-                  ),
-                  SizedBox(height: context.cardPadding * 0.5),
-                  _buildSearchSection(),
-                  SizedBox(height: context.cardPadding * 0.5),
-                ],
-              ),
+            ResponsiveBreakpoints.responsive(
+              context,
+              tablet: _buildTabletHeader(),
+              small: _buildMobileHeader(),
+              medium: _buildDesktopHeader(),
+              large: _buildDesktopHeader(),
+              ultrawide: _buildDesktopHeader(),
             ),
-            // Table Section with fixed height
-            Container(
-              height: 60.h, // Fixed height for the table
-              padding: EdgeInsets.symmetric(horizontal: context.mainPadding),
+            SizedBox(height: context.mainPadding),
+            Consumer<PayablesProvider>(
+              builder: (context, provider, child) {
+                return context.statsCardColumns == 2 ? _buildMobileStatsGrid(provider) : _buildDesktopStatsRow(provider);
+              },
+            ),
+            SizedBox(height: context.cardPadding * 0.5),
+            _buildSearchSection(),
+            SizedBox(height: context.cardPadding * 0.5),
+            Expanded(
               child: EnhancedPayablesTable(
                 onEdit: _showEditPayableDialog, 
                 onDelete: _showDeletePayableDialog, 

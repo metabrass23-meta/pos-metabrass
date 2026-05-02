@@ -13,6 +13,7 @@ import '../../widgets/advance payment/advance_payment_table.dart';
 import '../../widgets/advance payment/delete_advance_payment_dialog.dart';
 import '../../widgets/advance payment/edit_advance_payment_dialog.dart';
 import '../../widgets/advance payment/view_receipt_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class AdvancePaymentPage extends StatefulWidget {
   const AdvancePaymentPage({super.key});
@@ -306,6 +307,10 @@ class _AdvancePaymentPageState extends State<AdvancePaymentPage> {
 
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!PermissionHelper.canAdd(context, 'Advance Payment')) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(

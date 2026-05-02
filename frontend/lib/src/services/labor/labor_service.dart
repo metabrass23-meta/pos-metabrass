@@ -114,7 +114,7 @@ class LaborService {
 
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor retrieved successfully',
+            message: responseData['message'] as String? ?? 'Labour retrieved successfully',
             data: labor,
           );
         } else {
@@ -196,7 +196,7 @@ class LaborService {
 
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor created successfully',
+            message: responseData['message'] as String? ?? 'Labour created successfully',
             data: labor,
           );
         } else {
@@ -279,7 +279,7 @@ class LaborService {
 
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor updated successfully',
+            message: responseData['message'] as String? ?? 'Labour updated successfully',
             data: labor,
           );
         } else {
@@ -326,7 +326,7 @@ class LaborService {
 
         return ApiResponse<void>(
           success: true,
-          message: response.data['message'] ?? 'Labor deleted permanently',
+          message: response.data['message'] ?? 'Labour deleted permanently',
         );
       } else {
         return ApiResponse<void>(
@@ -364,7 +364,7 @@ class LaborService {
 
         return ApiResponse<void>(
           success: true,
-          message: response.data['message'] ?? 'Labor soft deleted successfully',
+          message: response.data['message'] ?? 'Labour soft deleted successfully',
         );
       } else {
         return ApiResponse<void>(
@@ -405,7 +405,7 @@ class LaborService {
 
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor restored successfully',
+            message: responseData['message'] as String? ?? 'Labour restored successfully',
             data: labor,
           );
         } else {

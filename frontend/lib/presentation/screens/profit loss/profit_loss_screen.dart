@@ -11,6 +11,7 @@ import '../../widgets/profit loss/profit_loss_dashboard_section.dart';
 import '../../widgets/profit loss/profit_loss_product_analysis.dart';
 import '../../widgets/profit loss/profit_loss_calculation_details.dart';
 import '../../widgets/profit loss/profit_loss_export_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ProfitLossPage extends StatefulWidget {
   const ProfitLossPage({super.key});
@@ -157,7 +158,8 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             ],
           ),
         ),
-        _buildExportButton(),
+        if (PermissionHelper.canEdit(context, 'Profit & Loss'))
+          _buildExportButton(),
       ],
     );
   }
@@ -195,8 +197,11 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
         ],
-        SizedBox(height: context.cardPadding),
-        SizedBox(width: double.infinity, child: _buildExportButton()),
+        if (PermissionHelper.canEdit(context, 'Profit & Loss'))
+          Padding(
+            padding: EdgeInsets.only(top: context.cardPadding),
+            child: SizedBox(width: double.infinity, child: _buildExportButton()),
+          ),
       ],
     );
   }
@@ -234,8 +239,11 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
             style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
           ),
         ],
-        SizedBox(height: context.cardPadding),
-        SizedBox(width: double.infinity, child: _buildExportButton()),
+        if (PermissionHelper.canEdit(context, 'Profit & Loss'))
+          Padding(
+            padding: EdgeInsets.only(top: context.cardPadding),
+            child: SizedBox(width: double.infinity, child: _buildExportButton()),
+          ),
       ],
     );
   }
@@ -630,7 +638,7 @@ class _ProfitLossPageState extends State<ProfitLossPage> with SingleTickerProvid
 
   IconData _getExpenseIcon(String category) {
     switch (category.toLowerCase()) {
-      case 'labor payments':
+      case 'labour payments':
         return Icons.people_rounded;
       case 'vendor payments':
         return Icons.store_rounded;

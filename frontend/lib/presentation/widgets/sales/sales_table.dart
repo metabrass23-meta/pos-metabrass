@@ -8,6 +8,7 @@ import '../../../src/providers/sales_provider.dart';
 import '../../../src/providers/receivables_provider.dart';
 import '../../../src/models/sales/sale_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/permission_helper.dart';
 import '../globals/text_button.dart';
 
 class SalesTable extends StatefulWidget {
@@ -175,11 +176,11 @@ class _SalesTableState extends State<SalesTable> {
   double _getTableWidth(BuildContext context) {
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 1800.0, // Increased from 1400.0
-      small: 2000.0, // Increased from 1600.0
-      medium: 2200.0, // Increased from 1800.0
-      large: 2400.0, // Increased from 2000.0
-      ultrawide: 2600.0, // Increased from 2200.0
+      tablet: 2000.0,
+      small: 2200.0,
+      medium: 2400.0,
+      large: 2600.0,
+      ultrawide: 2800.0,
     );
   }
 
@@ -191,11 +192,11 @@ class _SalesTableState extends State<SalesTable> {
       children: [
         Container(
           width: columnWidths[0],
-          child: _buildHeaderCell(context, l10n.saleId),
+          child: _buildHeaderCell(context, l10n.saleId, isCenter: true),
         ),
         Container(
           width: columnWidths[1],
-          child: _buildHeaderCell(context, l10n.invoiceNumber),
+          child: _buildHeaderCell(context, l10n.invoiceNumber, isCenter: true),
         ),
         Container(
           width: columnWidths[2],
@@ -240,11 +241,11 @@ class _SalesTableState extends State<SalesTable> {
         ),
         Container(
           width: columnWidths[12],
-          child: _buildHeaderCell(context, l10n.status),
+          child: _buildHeaderCell(context, l10n.status, isCenter: true),
         ),
         Container(
           width: columnWidths[13],
-          child: _buildHeaderCell(context, l10n.actions),
+          child: _buildHeaderCell(context, l10n.actions, isCenter: true),
         ),
       ],
     );
@@ -252,31 +253,39 @@ class _SalesTableState extends State<SalesTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      120.0, // Sale ID
-      120.0, // Invoice Number
-      200.0, // Customer
+      130.0, // Sale ID
+      150.0, // Invoice Number
+      350.0, // Customer
       80.0, // Items
-      110.0, // Subtotal
-      100.0, // Discount
-      80.0, // GST
-      120.0, // Grand Total
-      110.0, // Amount Paid
-      110.0, // Remaining
-      120.0, // Payment Method
-      120.0, // Date
-      100.0, // Status
-      280.0, // Actions
+      160.0, // Subtotal
+      140.0, // Discount
+      100.0, // GST
+      180.0, // Grand Total
+      160.0, // Amount Paid
+      160.0, // Remaining
+      180.0, // Payment Method
+      250.0, // Date
+      130.0, // Status
+      350.0, // Actions
     ];
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
@@ -301,27 +310,30 @@ class _SalesTableState extends State<SalesTable> {
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding / 2,
+                  vertical: context.smallPadding / 4,
                 ),
-              ),
-              child: Text(
-                sale.id,
-                style: TextStyle(
-                  fontSize: context.captionFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryMaroon,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  sale.id,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: context.captionFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryMaroon,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -330,12 +342,17 @@ class _SalesTableState extends State<SalesTable> {
           Container(
             width: columnWidths[1],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Text(
-              sale.formattedInvoiceNumber,
-              style: TextStyle(
-                fontSize: context.subtitleFontSize,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.charcoalGray,
+            child: Center(
+              child: Text(
+                sale.formattedInvoiceNumber,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(
+                  fontSize: context.subtitleFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
+                ),
               ),
             ),
           ),
@@ -346,13 +363,14 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.customerName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -389,6 +407,9 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.subtotal.toStringAsFixed(0)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w600,
@@ -438,6 +459,9 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${sale.gstPercentage}%',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -463,6 +487,9 @@ class _SalesTableState extends State<SalesTable> {
               ),
               child: Text(
                 'PKR ${sale.grandTotal.toStringAsFixed(0)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w700,
@@ -478,6 +505,9 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               'PKR ${sale.amountPaid.toStringAsFixed(0)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w600,
@@ -582,6 +612,9 @@ class _SalesTableState extends State<SalesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               sale.dateTimeText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
@@ -594,42 +627,44 @@ class _SalesTableState extends State<SalesTable> {
           Container(
             width: columnWidths[12],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding / 2,
-                vertical: context.smallPadding / 4,
-              ),
-              decoration: BoxDecoration(
-                color: sale.statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding / 2,
+                  vertical: context.smallPadding / 4,
                 ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: sale.statusColor,
-                      shape: BoxShape.circle,
-                    ),
+                decoration: BoxDecoration(
+                  color: sale.statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
                   ),
-                  SizedBox(width: context.smallPadding / 2),
-                  Expanded(
-                    child: Text(
-                      _getLocalizedStatus(l10n, sale.status),
-                      style: TextStyle(
-                        fontSize: context.captionFontSize,
-                        fontWeight: FontWeight.w600,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
                         color: sale.statusColor,
+                        shape: BoxShape.circle,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                    SizedBox(width: context.smallPadding / 2),
+                    Flexible(
+                      child: Text(
+                        _getLocalizedStatus(l10n, sale.status),
+                        style: TextStyle(
+                          fontSize: context.captionFontSize,
+                          fontWeight: FontWeight.w600,
+                          color: sale.statusColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -638,7 +673,7 @@ class _SalesTableState extends State<SalesTable> {
           Container(
             width: columnWidths[13],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: _buildActions(context, sale),
+            child: Center(child: _buildActions(context, sale)),
           ),
         ],
       ),
@@ -774,24 +809,48 @@ class _SalesTableState extends State<SalesTable> {
           ),
 
 
-        // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(sale),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+        // Edit Button (If needed and has permission)
+        if (PermissionHelper.canEdit(context, 'Sales'))
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => widget.onEdit(sale),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMaroon.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(
+                      context.borderRadius('small'),
+                    ),
+                  ),
+                  child: Icon(Icons.edit_outlined, color: AppTheme.primaryMaroon, size: 16),
                 ),
               ),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: 16),
             ),
           ),
-        ),
+
+        // Delete Button
+        if (PermissionHelper.canDelete(context, 'Sales'))
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onDelete(sale),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(4.0),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
+                ),
+                child: Icon(Icons.delete_outline, color: Colors.red, size: 16),
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -110,8 +110,8 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
                   value: item.value,
                   child: Text(
                     item.label,
-                    style: TextStyle(
-                      fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
+                    style: const TextStyle(
+                      fontSize: 14.0,
                       fontWeight: FontWeight.w400,
                       color: AppTheme.charcoalGray,
                     ),
@@ -129,8 +129,8 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
           }
               : null,
           validator: widget.validator != null ? (String? value) => widget.validator!(widget.value) : null,
-          style: TextStyle(
-            fontSize: ResponsiveBreakpoints.getDashboardBodyFontSize(context),
+          style: const TextStyle(
+            fontSize: 14.0,
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
           ),
@@ -179,12 +179,12 @@ class _PremiumDropdownFieldState<T> extends State<PremiumDropdownField<T>>
             contentPadding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
             labelStyle: TextStyle(
               color: _isFocused ? AppTheme.primaryMaroon : const Color(0xFF9E9E9E),
-              fontSize: 10.sp,
+              fontSize: 14.0,
               fontWeight: FontWeight.w500,
             ),
-            hintStyle: TextStyle(
-              color: const Color(0xFF9E9E9E),
-              fontSize: 10.sp,
+            hintStyle: const TextStyle(
+              color: Color(0xFF9E9E9E),
+              fontSize: 14.0,
               fontWeight: FontWeight.w400,
             ),
           ),

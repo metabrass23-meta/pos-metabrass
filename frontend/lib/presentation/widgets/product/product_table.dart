@@ -6,6 +6,7 @@ import '../../../src/models/product/product_model.dart';
 import '../../../src/providers/product_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class EnhancedProductTable extends StatefulWidget {
   final Function(ProductModel) onEdit;
@@ -161,11 +162,11 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
   double _getTableWidth(BuildContext context) {
     return ResponsiveBreakpoints.responsive(
       context,
-      tablet: 2100.0 + 120.0, // Increased from 2000.0
-      small: 2200.0 + 120.0, // Increased from 2100.0
-      medium: 2300.0 + 120.0, // Increased from 2200.0
-      large: 2400.0 + 120.0, // Increased from 2300.0
-      ultrawide: 2500.0 + 120.0, // Increased from 2400.0
+      tablet: 2400.0 + 120.0,
+      small: 2500.0 + 120.0,
+      medium: 2600.0 + 120.0,
+      large: 2700.0 + 120.0,
+      ultrawide: 2800.0 + 120.0,
     );
   }
 
@@ -233,25 +234,28 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      200.0,
-      250.0,
-      120.0,
-      120.0,
-      120.0,
-      120.0,
-      120.0,
-      120.0,
-      100.0,
-      130.0,
-      180.0,
-      150.0,
-      280.0,
+      250.0, // Product Name (Increased)
+      300.0, // Details (Increased)
+      140.0, // Price (Increased)
+      140.0, // Cost Price (Increased)
+      180.0, // Barcode (Increased significantly to avoid '..')
+      180.0, // SKU (Increased significantly to avoid '..')
+      150.0, // Color (Increased)
+      150.0, // Material (Increased)
+      110.0, // Quantity (Increased)
+      150.0, // Stock Status (Increased)
+      220.0, // Pieces (Increased)
+      250.0, // Created Date (Increased significantly for single-line Row)
+      280.0, // Actions
     ];
   }
 
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
       style: TextStyle(
         fontSize: context.bodyFontSize,
         fontWeight: FontWeight.w600,
@@ -283,13 +287,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -300,13 +305,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             child: product.detail.isNotEmpty
                 ? Text(
                     product.detail,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(
                       fontSize: context.subtitleFontSize,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.charcoalGray,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   )
                 : Container(
                     padding: EdgeInsets.symmetric(
@@ -337,6 +343,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.formattedPrice,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w700,
@@ -351,6 +360,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               product.formattedCostPrice,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
@@ -380,6 +392,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 product.displayBarcode,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
@@ -387,8 +402,6 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                       ? Colors.blue[600]
                       : Colors.grey[500],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -412,13 +425,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 product.displaySku,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: product.hasSku ? Colors.green[600] : Colors.grey[500],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -457,13 +471,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                   Expanded(
                     child: Text(
                       product.color,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style: TextStyle(
                         fontSize: context.captionFontSize,
                         fontWeight: FontWeight.w500,
                         color: _getColorFromName(product.color),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -488,13 +503,14 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 product.material,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.blueGrey[600],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -505,6 +521,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               '${product.quantity}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w600,
@@ -530,6 +549,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
               ),
               child: Text(
                 product.stockStatusText,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.captionFontSize,
                   fontWeight: FontWeight.w600,
@@ -567,6 +589,9 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
                             ),
                             child: Text(
                               piece,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
                               style: TextStyle(
                                 fontSize: context.captionFontSize * 0.9,
                                 fontWeight: FontWeight.w500,
@@ -628,23 +653,31 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
           Container(
             width: columnWidths[11],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   _formatDate(product.createdAt),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
                   ),
                 ),
-                Text(
-                  _getRelativeDate(context, product.createdAt),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
+                SizedBox(width: context.smallPadding / 2),
+                Expanded(
+                  child: Text(
+                    '(${_getRelativeDate(context, product.createdAt)})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
               ],
@@ -692,52 +725,54 @@ class _EnhancedProductTableState extends State<EnhancedProductTable> {
         SizedBox(width: context.smallPadding / 2),
 
         // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(product),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+        if (PermissionHelper.canEdit(context, 'Products'))
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onEdit(product),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
+                child: Icon(
+                  Icons.edit_outlined,
+                  color: Colors.blue,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
 
         SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(product),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+        if (PermissionHelper.canDelete(context, 'Products'))
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onDelete(product),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

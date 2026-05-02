@@ -578,7 +578,7 @@ class LaborServiceExtended {
           // The contact update endpoint returns partial data, so we create a minimal response
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor contact updated successfully',
+            message: responseData['message'] as String? ?? 'Labour contact updated successfully',
             data: null, // Contact endpoint doesn't return full labor data
           );
         } else {
@@ -639,7 +639,7 @@ class LaborServiceExtended {
           // The salary update endpoint returns partial data, so we create a minimal response
           return ApiResponse<LaborModel>(
             success: true,
-            message: responseData['message'] as String? ?? 'Labor salary updated successfully',
+            message: responseData['message'] as String? ?? 'Labour salary updated successfully',
             data: null, // Salary endpoint doesn't return full labor data
           );
         } else {

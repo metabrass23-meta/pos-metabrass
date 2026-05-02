@@ -926,7 +926,7 @@ abstract class AppLocalizations {
   /// No description provided for @customer.
   ///
   /// In en, this message translates to:
-  /// **'Customer'**
+  /// **'Customers'**
   String get customer;
 
   /// No description provided for @selectCustomer.
@@ -956,7 +956,7 @@ abstract class AppLocalizations {
   /// No description provided for @invoice.
   ///
   /// In en, this message translates to:
-  /// **'Invoice'**
+  /// **'Invoices'**
   String get invoice;
 
   /// No description provided for @view.
@@ -1136,7 +1136,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchProductsHint.
   ///
   /// In en, this message translates to:
-  /// **'Search products by ID, name, color, fabric, or pieces...'**
+  /// **'Search products by ID, name, color, material, or pieces...'**
   String get searchProductsHint;
 
   /// No description provided for @customerManagement.
@@ -1532,7 +1532,7 @@ abstract class AppLocalizations {
   /// No description provided for @payment.
   ///
   /// In en, this message translates to:
-  /// **'Payment'**
+  /// **'Payments'**
   String get payment;
 
   /// No description provided for @searchProductsShortHint.
@@ -2120,7 +2120,7 @@ abstract class AppLocalizations {
   /// No description provided for @product.
   ///
   /// In en, this message translates to:
-  /// **'Product'**
+  /// **'Products'**
   String get product;
 
   /// No description provided for @newProduct.
@@ -2177,17 +2177,17 @@ abstract class AppLocalizations {
   /// **'Finish/Color'**
   String get colorName;
 
-  /// No description provided for @fabricType.
+  /// No description provided for @materialType.
   ///
   /// In en, this message translates to:
   /// **'Material Type'**
-  String get fabricType;
+  String get materialType;
 
-  /// No description provided for @fabricName.
+  /// No description provided for @materialName.
   ///
   /// In en, this message translates to:
   /// **'Material Name'**
-  String get fabricName;
+  String get materialName;
 
   /// No description provided for @pleaseSelectAtLeastOnePiece.
   ///
@@ -2222,31 +2222,31 @@ abstract class AppLocalizations {
   /// No description provided for @labors.
   ///
   /// In en, this message translates to:
-  /// **'Labors'**
+  /// **'Labours'**
   String get labors;
 
   /// No description provided for @laborManagement.
   ///
   /// In en, this message translates to:
-  /// **'Labor Management'**
+  /// **'Labour Management'**
   String get laborManagement;
 
   /// No description provided for @laborManagementDescription.
   ///
   /// In en, this message translates to:
-  /// **'Organize and manage your labor workforce with comprehensive tools'**
+  /// **'Organize and manage your labour workforce with comprehensive tools'**
   String get laborManagementDescription;
 
   /// No description provided for @organizeAndManageLaborWorkforce.
   ///
   /// In en, this message translates to:
-  /// **'Organize and manage labor workforce'**
+  /// **'Organize and manage labour workforce'**
   String get organizeAndManageLaborWorkforce;
 
   /// No description provided for @manageLaborWorkforce.
   ///
   /// In en, this message translates to:
-  /// **'Manage labor workforce'**
+  /// **'Manage labour workforce'**
   String get manageLaborWorkforce;
 
   /// No description provided for @failedToRefresh.
@@ -2276,7 +2276,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchLaborsHint.
   ///
   /// In en, this message translates to:
-  /// **'Search labors by name, CNIC, phone, designation...'**
+  /// **'Search labours by name, CNIC, phone, designation...'**
   String get searchLaborsHint;
 
   /// No description provided for @filters.
@@ -2306,7 +2306,7 @@ abstract class AppLocalizations {
   /// No description provided for @receivable.
   ///
   /// In en, this message translates to:
-  /// **'Receivable'**
+  /// **'Receivables'**
   String get receivable;
 
   /// No description provided for @receivablesManagement.
@@ -2582,7 +2582,7 @@ abstract class AppLocalizations {
   /// No description provided for @payable.
   ///
   /// In en, this message translates to:
-  /// **'Payable'**
+  /// **'Payables'**
   String get payable;
 
   /// No description provided for @payablesManagement.
@@ -2666,7 +2666,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentManagementDescription.
   ///
   /// In en, this message translates to:
-  /// **'Track and manage labor salary payments efficiently'**
+  /// **'Track and manage labour salary payments efficiently'**
   String get paymentManagementDescription;
 
   /// No description provided for @trackManageSalaryPayments.
@@ -2702,7 +2702,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchPaymentsHint.
   ///
   /// In en, this message translates to:
-  /// **'Search by ID, labor name, payment method, month, or description...'**
+  /// **'Search by ID, labour name, payment method, month, or description...'**
   String get searchPaymentsHint;
 
   /// No description provided for @advancePaymentManagement.
@@ -2714,7 +2714,7 @@ abstract class AppLocalizations {
   /// No description provided for @advancePaymentManagementDescription.
   ///
   /// In en, this message translates to:
-  /// **'Track and manage labor advance payments efficiently'**
+  /// **'Track and manage labour advance payments efficiently'**
   String get advancePaymentManagementDescription;
 
   /// No description provided for @advancePayments.
@@ -2726,7 +2726,7 @@ abstract class AppLocalizations {
   /// No description provided for @manageLaborPayments.
   ///
   /// In en, this message translates to:
-  /// **'Manage labor payments'**
+  /// **'Manage labour payments'**
   String get manageLaborPayments;
 
   /// No description provided for @totalPayments.
@@ -2750,7 +2750,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchAdvancePaymentsHint.
   ///
   /// In en, this message translates to:
-  /// **'Search by ID, labor name, phone, role, or description...'**
+  /// **'Search by ID, labour name, phone, role, or description...'**
   String get searchAdvancePaymentsHint;
 
   /// No description provided for @dataRefreshedSuccessfully.
@@ -2762,7 +2762,7 @@ abstract class AppLocalizations {
   /// No description provided for @expense.
   ///
   /// In en, this message translates to:
-  /// **'Expense'**
+  /// **'Expenses'**
   String get expense;
 
   /// No description provided for @expensesManagement.
@@ -3416,19 +3416,19 @@ abstract class AppLocalizations {
   /// No description provided for @addLabor.
   ///
   /// In en, this message translates to:
-  /// **'Add Labor'**
+  /// **'Add Labour'**
   String get addLabor;
 
   /// No description provided for @addNewLabor.
   ///
   /// In en, this message translates to:
-  /// **'Add New Labor'**
+  /// **'Add New Labour'**
   String get addNewLabor;
 
   /// No description provided for @createNewLaborRecord.
   ///
   /// In en, this message translates to:
-  /// **'Create a new labor record'**
+  /// **'Create a new labour record'**
   String get createNewLaborRecord;
 
   /// No description provided for @fullNameRequired.
@@ -3698,19 +3698,19 @@ abstract class AppLocalizations {
   /// No description provided for @laborCreatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Labor created successfully!'**
+  /// **'Labour created successfully!'**
   String get laborCreatedSuccessfully;
 
   /// No description provided for @failedToCreateLabor.
   ///
   /// In en, this message translates to:
-  /// **'Failed to create labor'**
+  /// **'Failed to create labour'**
   String get failedToCreateLabor;
 
   /// No description provided for @errorCreatingLabor.
   ///
   /// In en, this message translates to:
-  /// **'Error creating labor:'**
+  /// **'Error creating labour:'**
   String get errorCreatingLabor;
 
   /// No description provided for @pleaseFixFollowingErrors.
@@ -3818,37 +3818,37 @@ abstract class AppLocalizations {
   /// No description provided for @laborStatusUpdatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Labor status updated successfully!'**
+  /// **'Labour status updated successfully!'**
   String get laborStatusUpdatedSuccessfully;
 
   /// No description provided for @failedToUpdateLaborStatus.
   ///
   /// In en, this message translates to:
-  /// **'Failed to update labor status'**
+  /// **'Failed to update labour status'**
   String get failedToUpdateLaborStatus;
 
   /// No description provided for @errorUpdatingLaborStatus.
   ///
   /// In en, this message translates to:
-  /// **'Error updating labor status:'**
+  /// **'Error updating labour status:'**
   String get errorUpdatingLaborStatus;
 
   /// No description provided for @loadingLaborDetails.
   ///
   /// In en, this message translates to:
-  /// **'Loading labor details...'**
+  /// **'Loading labour details...'**
   String get loadingLaborDetails;
 
   /// No description provided for @laborDetails.
   ///
   /// In en, this message translates to:
-  /// **'Labor Details'**
+  /// **'Labour Details'**
   String get laborDetails;
 
   /// No description provided for @completeLaborInformation.
   ///
   /// In en, this message translates to:
-  /// **'Complete labor information'**
+  /// **'Complete labour information'**
   String get completeLaborInformation;
 
   /// No description provided for @joined.
@@ -3956,19 +3956,19 @@ abstract class AppLocalizations {
   /// No description provided for @newLabor.
   ///
   /// In en, this message translates to:
-  /// **'New Labor'**
+  /// **'New Labour'**
   String get newLabor;
 
   /// No description provided for @restoreLabor.
   ///
   /// In en, this message translates to:
-  /// **'Restore Labor'**
+  /// **'Restore Labour'**
   String get restoreLabor;
 
   /// No description provided for @deactivateLabor.
   ///
   /// In en, this message translates to:
-  /// **'Deactivate Labor'**
+  /// **'Deactivate Labour'**
   String get deactivateLabor;
 
   /// No description provided for @areYouSureDeactivateLabor.
@@ -3986,31 +3986,31 @@ abstract class AppLocalizations {
   /// No description provided for @failedToDeactivateLabor.
   ///
   /// In en, this message translates to:
-  /// **'Failed to deactivate labor'**
+  /// **'Failed to deactivate labour'**
   String get failedToDeactivateLabor;
 
   /// No description provided for @laborDeactivatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Labor deactivated successfully'**
+  /// **'Labour deactivated successfully'**
   String get laborDeactivatedSuccessfully;
 
   /// No description provided for @failedToRestoreLabor.
   ///
   /// In en, this message translates to:
-  /// **'Failed to restore labor'**
+  /// **'Failed to restore labour'**
   String get failedToRestoreLabor;
 
   /// No description provided for @laborRestoredSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Labor restored successfully'**
+  /// **'Labour restored successfully'**
   String get laborRestoredSuccessfully;
 
   /// No description provided for @failedToLoadLabors.
   ///
   /// In en, this message translates to:
-  /// **'Failed to Load Labors'**
+  /// **'Failed to Load Labours'**
   String get failedToLoadLabors;
 
   /// No description provided for @unexpectedErrorOccurred.
@@ -4022,43 +4022,43 @@ abstract class AppLocalizations {
   /// No description provided for @noLaborsFound.
   ///
   /// In en, this message translates to:
-  /// **'No Labors Found'**
+  /// **'No Labours Found'**
   String get noLaborsFound;
 
   /// No description provided for @startByAddingFirstLabor.
   ///
   /// In en, this message translates to:
-  /// **'Start by adding your first labor to manage your workforce effectively'**
+  /// **'Start by adding your first labour to manage your workforce effectively'**
   String get startByAddingFirstLabor;
 
   /// No description provided for @addFirstLabor.
   ///
   /// In en, this message translates to:
-  /// **'Add First Labor'**
+  /// **'Add First Labour'**
   String get addFirstLabor;
 
   /// No description provided for @filterLabors.
   ///
   /// In en, this message translates to:
-  /// **'Filter Labors'**
+  /// **'Filter Labours'**
   String get filterLabors;
 
   /// No description provided for @refineYourLaborList.
   ///
   /// In en, this message translates to:
-  /// **'Refine your labor list with filters'**
+  /// **'Refine your labour list with filters'**
   String get refineYourLaborList;
 
   /// No description provided for @searchLabors.
   ///
   /// In en, this message translates to:
-  /// **'Search Labors'**
+  /// **'Search Labours'**
   String get searchLabors;
 
   /// No description provided for @laborStatus.
   ///
   /// In en, this message translates to:
-  /// **'Labor Status'**
+  /// **'Labour Status'**
   String get laborStatus;
 
   /// No description provided for @searchByNameCnicPhoneDesignation.
@@ -4070,13 +4070,13 @@ abstract class AppLocalizations {
   /// No description provided for @showInactiveLaborsOnly.
   ///
   /// In en, this message translates to:
-  /// **'Show inactive labors only'**
+  /// **'Show inactive labours only'**
   String get showInactiveLaborsOnly;
 
   /// No description provided for @onlyDeactivatedLaborsWillBeShown.
   ///
   /// In en, this message translates to:
-  /// **'Only deactivated labors will be shown'**
+  /// **'Only deactivated labours will be shown'**
   String get onlyDeactivatedLaborsWillBeShown;
 
   /// No description provided for @enterCityName.
@@ -4325,11 +4325,11 @@ abstract class AppLocalizations {
   /// **'All Colors'**
   String get allColors;
 
-  /// No description provided for @allFabrics.
+  /// No description provided for @allMaterials.
   ///
   /// In en, this message translates to:
-  /// **'All Fabrics'**
-  String get allFabrics;
+  /// **'All Materials'**
+  String get allMaterials;
 
   /// No description provided for @allStockLevels.
   ///
@@ -4451,11 +4451,11 @@ abstract class AppLocalizations {
   /// **'Enter color'**
   String get enterColor;
 
-  /// No description provided for @enterFabric.
+  /// No description provided for @enterMaterial.
   ///
   /// In en, this message translates to:
-  /// **'Enter fabric'**
-  String get enterFabric;
+  /// **'Enter Material'**
+  String get enterMaterial;
 
   /// No description provided for @enterMinPrice.
   ///
@@ -5150,7 +5150,7 @@ abstract class AppLocalizations {
   /// No description provided for @laborPayments.
   ///
   /// In en, this message translates to:
-  /// **'Labor Payments'**
+  /// **'Labour Payments'**
   String get laborPayments;
 
   /// No description provided for @notAvailable.
@@ -5174,7 +5174,7 @@ abstract class AppLocalizations {
   /// No description provided for @labor.
   ///
   /// In en, this message translates to:
-  /// **'Labor'**
+  /// **'Labour'**
   String get labor;
 
   /// No description provided for @vendors.
@@ -5204,7 +5204,7 @@ abstract class AppLocalizations {
   /// No description provided for @laborPlusVendorPlusOtherPlusZakat.
   ///
   /// In en, this message translates to:
-  /// **'Labor + Vendor + Other + Zakat'**
+  /// **'Labour + Vendor + Other + Zakat'**
   String get laborPlusVendorPlusOtherPlusZakat;
 
   /// No description provided for @stepThreeNetProfit.
@@ -6281,11 +6281,11 @@ abstract class AppLocalizations {
   /// **'Finish'**
   String get color;
 
-  /// No description provided for @fabric.
+  /// No description provided for @material.
   ///
   /// In en, this message translates to:
   /// **'Material'**
-  String get fabric;
+  String get material;
 
   /// No description provided for @stockStatus.
   ///
@@ -6611,23 +6611,23 @@ abstract class AppLocalizations {
   /// **'Color name must be at least 2 characters'**
   String get colorNameMustBeAtLeast2Characters;
 
-  /// No description provided for @enterFabricType.
+  /// No description provided for @enterMaterialType.
   ///
   /// In en, this message translates to:
-  /// **'Enter fabric type (e.g., Cotton, Silk, Chiffon)'**
-  String get enterFabricType;
+  /// **'Enter material type (e.g., Brass, Steel, Chrome)'**
+  String get enterMaterialType;
 
-  /// No description provided for @pleaseEnterFabric.
+  /// No description provided for @pleaseEnterMaterial.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a fabric'**
-  String get pleaseEnterFabric;
+  /// **'Please enter a material'**
+  String get pleaseEnterMaterial;
 
-  /// No description provided for @fabricNameMustBeAtLeast2Characters.
+  /// No description provided for @materialNameMustBeAtLeast2Characters.
   ///
   /// In en, this message translates to:
-  /// **'Fabric name must be at least 2 characters'**
-  String get fabricNameMustBeAtLeast2Characters;
+  /// **'Material name must be at least 2 characters'**
+  String get materialNameMustBeAtLeast2Characters;
 
   /// No description provided for @productNameMustBeAtLeast2Characters.
   ///
@@ -6656,13 +6656,13 @@ abstract class AppLocalizations {
   /// No description provided for @addLaborPayment.
   ///
   /// In en, this message translates to:
-  /// **'Add Labor Payment'**
+  /// **'Add Labour Payment'**
   String get addLaborPayment;
 
   /// No description provided for @recordNewPaymentWithReceipt.
   ///
   /// In en, this message translates to:
-  /// **'Record new payment to labor with receipt'**
+  /// **'Record new payment to labour with receipt'**
   String get recordNewPaymentWithReceipt;
 
   /// No description provided for @paymentAddedSuccessfully.
@@ -6674,7 +6674,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseSelectAtLeastOneEntity.
   ///
   /// In en, this message translates to:
-  /// **'Please select at least one entity (labor, vendor, order, or sale)'**
+  /// **'Please select at least one entity (labour, vendor, order, or sale)'**
   String get pleaseSelectAtLeastOneEntity;
 
   /// No description provided for @pleaseSelectPaymentMethod.
@@ -6740,19 +6740,19 @@ abstract class AppLocalizations {
   /// No description provided for @selectLabor.
   ///
   /// In en, this message translates to:
-  /// **'Select Labor'**
+  /// **'Select Labour'**
   String get selectLabor;
 
   /// No description provided for @chooseLaborForPayment.
   ///
   /// In en, this message translates to:
-  /// **'Choose labor for payment'**
+  /// **'Choose labour for payment'**
   String get chooseLaborForPayment;
 
   /// No description provided for @pleaseSelectLabor.
   ///
   /// In en, this message translates to:
-  /// **'Please select a labor'**
+  /// **'Please select a labour'**
   String get pleaseSelectLabor;
 
   /// No description provided for @vendorId.
@@ -6788,7 +6788,7 @@ abstract class AppLocalizations {
   /// No description provided for @sale.
   ///
   /// In en, this message translates to:
-  /// **'Sale'**
+  /// **'Sales'**
   String get sale;
 
   /// No description provided for @enterOrderSaleId.
@@ -6956,7 +6956,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectLaborForPayment.
   ///
   /// In en, this message translates to:
-  /// **'Select labor for payment'**
+  /// **'Select labour for payment'**
   String get selectLaborForPayment;
 
   /// No description provided for @available.
@@ -7034,7 +7034,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchByLaborVendorDescription.
   ///
   /// In en, this message translates to:
-  /// **'Search by labor name, vendor, description...'**
+  /// **'Search by labour name, vendor, description...'**
   String get searchByLaborVendorDescription;
 
   /// No description provided for @entityFilters.
@@ -7046,7 +7046,7 @@ abstract class AppLocalizations {
   /// No description provided for @allLabors.
   ///
   /// In en, this message translates to:
-  /// **'All Labors'**
+  /// **'All Labours'**
   String get allLabors;
 
   /// No description provided for @payerType.
@@ -7196,7 +7196,7 @@ abstract class AppLocalizations {
   /// No description provided for @laborName.
   ///
   /// In en, this message translates to:
-  /// **'Labor Name'**
+  /// **'Labour Name'**
   String get laborName;
 
   /// No description provided for @selectSortOrder.
@@ -7274,7 +7274,7 @@ abstract class AppLocalizations {
   /// No description provided for @receipt.
   ///
   /// In en, this message translates to:
-  /// **'Receipt'**
+  /// **'Receipts'**
   String get receipt;
 
   /// No description provided for @missing.
@@ -7304,7 +7304,7 @@ abstract class AppLocalizations {
   /// No description provided for @startByAddingFirstPaymentRecord.
   ///
   /// In en, this message translates to:
-  /// **'Start by adding your first payment record to track labor payments efficiently'**
+  /// **'Start by adding your first payment record to track labour payments efficiently'**
   String get startByAddingFirstPaymentRecord;
 
   /// No description provided for @addFirstPayment.
@@ -7550,13 +7550,13 @@ abstract class AppLocalizations {
   /// No description provided for @laborRole.
   ///
   /// In en, this message translates to:
-  /// **'Labor Role'**
+  /// **'Labour Role'**
   String get laborRole;
 
   /// No description provided for @laborPhone.
   ///
   /// In en, this message translates to:
-  /// **'Labor Phone'**
+  /// **'Labour Phone'**
   String get laborPhone;
 
   /// No description provided for @paymentDeletedSuccessfully.
@@ -8243,11 +8243,29 @@ abstract class AppLocalizations {
   /// **'Search products'**
   String get searchProductsShort;
 
+  /// No description provided for @searchProductsByNameMaterialOrColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Search products by name, material, or color...'**
+  String get searchProductsByNameMaterialOrColor;
+
   /// No description provided for @searchProductsByNameFabricOrColor.
   ///
   /// In en, this message translates to:
   /// **'Search products by name, fabric, or color...'**
   String get searchProductsByNameFabricOrColor;
+
+  /// No description provided for @fabricQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Fabric Quality'**
+  String get fabricQuality;
+
+  /// No description provided for @style.
+  ///
+  /// In en, this message translates to:
+  /// **'Style'**
+  String get style;
 
   /// No description provided for @availableProducts.
   ///
@@ -8402,13 +8420,13 @@ abstract class AppLocalizations {
   /// No description provided for @editLabor.
   ///
   /// In en, this message translates to:
-  /// **'Edit Labor'**
+  /// **'Edit Labour'**
   String get editLabor;
 
   /// No description provided for @editLaborDetails.
   ///
   /// In en, this message translates to:
-  /// **'Edit Labor Details'**
+  /// **'Edit Labour Details'**
   String get editLaborDetails;
 
   /// No description provided for @updateWorkerInformation.
@@ -8420,25 +8438,25 @@ abstract class AppLocalizations {
   /// No description provided for @laborUpdatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Labor updated successfully!'**
+  /// **'Labour updated successfully!'**
   String get laborUpdatedSuccessfully;
 
   /// No description provided for @failedToUpdateLabor.
   ///
   /// In en, this message translates to:
-  /// **'Failed to update labor'**
+  /// **'Failed to update labour'**
   String get failedToUpdateLabor;
 
   /// No description provided for @errorUpdatingLabor.
   ///
   /// In en, this message translates to:
-  /// **'Error updating labor'**
+  /// **'Error updating labour'**
   String get errorUpdatingLabor;
 
   /// No description provided for @updateLabor.
   ///
   /// In en, this message translates to:
-  /// **'Update Labor'**
+  /// **'Update Labour'**
   String get updateLabor;
 
   /// No description provided for @enterWorkerFullName.
@@ -8480,13 +8498,13 @@ abstract class AppLocalizations {
   /// No description provided for @laborCanBeRestoredLater.
   ///
   /// In en, this message translates to:
-  /// **'Labor can be restored later'**
+  /// **'Labour can be restored later'**
   String get laborCanBeRestoredLater;
 
   /// No description provided for @laborID.
   ///
   /// In en, this message translates to:
-  /// **'Labor ID'**
+  /// **'Labour ID'**
   String get laborID;
 
   /// No description provided for @iUnderstandActionCannotBeUndone.
@@ -8498,19 +8516,19 @@ abstract class AppLocalizations {
   /// No description provided for @typeLaborNameToConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Type the labor name to confirm permanent deletion:'**
+  /// **'Type the labour name to confirm permanent deletion:'**
   String get typeLaborNameToConfirm;
 
   /// No description provided for @laborDeletedPermanently.
   ///
   /// In en, this message translates to:
-  /// **'Labor deleted permanently!'**
+  /// **'Labour deleted permanently!'**
   String get laborDeletedPermanently;
 
   /// No description provided for @failedToDeleteLabor.
   ///
   /// In en, this message translates to:
-  /// **'Failed to delete labor'**
+  /// **'Failed to delete labour'**
   String get failedToDeleteLabor;
 
   /// No description provided for @pleaseConfirmYouUnderstandThisAction.
@@ -8528,7 +8546,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseTypeLaborNameExactly.
   ///
   /// In en, this message translates to:
-  /// **'Please type the labor name exactly to confirm permanent deletion'**
+  /// **'Please type the labour name exactly to confirm permanent deletion'**
   String get pleaseTypeLaborNameExactly;
 
   /// No description provided for @pleaseCompleteAllConfirmationSteps.
@@ -8924,7 +8942,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountCreatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'Account created successfully! Welcome to MetaBrass.'**
+  /// **'Account created successfully! Welcome to META BRASS.'**
   String get accountCreatedSuccessfully;
 
   /// No description provided for @registrationFailedMessage.
@@ -10199,18 +10217,6 @@ abstract class AppLocalizations {
   /// **'Brand'**
   String get brand;
 
-  /// No description provided for @material.
-  ///
-  /// In en, this message translates to:
-  /// **'Material'**
-  String get material;
-
-  /// No description provided for @style.
-  ///
-  /// In en, this message translates to:
-  /// **'Style'**
-  String get style;
-
   /// No description provided for @noAdditionalDetails.
   ///
   /// In en, this message translates to:
@@ -10520,7 +10526,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseSelectALabor.
   ///
   /// In en, this message translates to:
-  /// **'Please select a labor'**
+  /// **'Please select a labour'**
   String get pleaseSelectALabor;
 
   /// No description provided for @amountCannotExceedRemainingAdvanceAmount.
@@ -10556,7 +10562,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectALabor.
   ///
   /// In en, this message translates to:
-  /// **'Select a labor'**
+  /// **'Select a labour'**
   String get selectALabor;
 
   /// No description provided for @advanceAmountPkr.
@@ -10682,7 +10688,7 @@ abstract class AppLocalizations {
   /// No description provided for @startByAddingYourFirstAdvancePaymentRecord.
   ///
   /// In en, this message translates to:
-  /// **'Start by adding your first advance payment record to track labor payments effectively'**
+  /// **'Start by adding your first advance payment record to track labour payments effectively'**
   String get startByAddingYourFirstAdvancePaymentRecord;
 
   /// No description provided for @addFirstAdvancePayment.
@@ -10760,7 +10766,7 @@ abstract class AppLocalizations {
   /// No description provided for @laborInformation.
   ///
   /// In en, this message translates to:
-  /// **'Labor Information'**
+  /// **'Labour Information'**
   String get laborInformation;
 
   /// No description provided for @advancePaymentDetails.
@@ -11204,7 +11210,7 @@ abstract class AppLocalizations {
   /// No description provided for @alNoorFashionPOS.
   ///
   /// In en, this message translates to:
-  /// **'MetaBrass POS'**
+  /// **'META BRASS POS'**
   String get alNoorFashionPOS;
 
   /// No description provided for @version.
@@ -11585,11 +11591,11 @@ abstract class AppLocalizations {
   /// **'Embroidery'**
   String get embroidery;
 
-  /// No description provided for @fabricQuality.
+  /// No description provided for @materialQuality.
   ///
   /// In en, this message translates to:
-  /// **'Fabric Quality'**
-  String get fabricQuality;
+  /// **'Material Quality'**
+  String get materialQuality;
 
   /// No description provided for @accentColor.
   ///
@@ -13142,7 +13148,7 @@ abstract class AppLocalizations {
   /// No description provided for @loadingLabors.
   ///
   /// In en, this message translates to:
-  /// **'Loading labors...'**
+  /// **'Loading labours...'**
   String get loadingLabors;
 
   /// No description provided for @loadingVendors.

@@ -338,12 +338,12 @@ class PaymentProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         _payments = response.data!.payments;
         _pagination = response.data!.pagination;
-        _setSuccess('Labor payments loaded');
+        _setSuccess('Labour payments loaded');
       } else {
         _setError(response.message);
       }
     } catch (e) {
-      _setError('Error loading labor payments: $e');
+      _setError('Error loading labour payments: $e');
     } finally {
       _setLoading(false);
     }

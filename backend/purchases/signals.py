@@ -1,5 +1,6 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.db.models import F
 
 from purchases.models import Purchase, PurchaseItem
 from payables.models import Payable
@@ -12,23 +13,34 @@ from payables.models import Payable
 def increase_stock_on_purchase_item(sender, instance, created, **kwargs):
     """
     Increase product stock when a purchase item is created.
+    Uses atomic update to prevent race conditions and bypass full_clean.
     """
     if not created:
         return
 
     product = instance.product
+    model_class = type(product)
 
-    # ✅ FIX: Changed 'stock' to 'quantity' (common naming convention).
-    # If your Product model uses a different name (e.g. 'inventory'), change it here.
     if hasattr(product, 'quantity'):
-        product.quantity += instance.quantity
-        product.save()
+        model_class.objects.filter(pk=product.pk).update(quantity=F('quantity') + instance.quantity)
     elif hasattr(product, 'stock'):
-        product.stock += instance.quantity
-        product.save()
+        model_class.objects.filter(pk=product.pk).update(stock=F('stock') + instance.quantity)
     else:
-        # Fallback log if neither exists (prevents 500 error crash)
         print(f"⚠️ Error updating stock: Product model has no 'quantity' or 'stock' field.")
+
+@receiver(post_delete, sender=PurchaseItem)
+def decrease_stock_on_purchase_item_delete(sender, instance, **kwargs):
+    """
+    Decrease product stock when a purchase item is deleted.
+    Uses atomic update to prevent race conditions and bypass full_clean.
+    """
+    product = instance.product
+    model_class = type(product)
+
+    if hasattr(product, 'quantity'):
+        model_class.objects.filter(pk=product.pk).update(quantity=F('quantity') - instance.quantity)
+    elif hasattr(product, 'stock'):
+        model_class.objects.filter(pk=product.pk).update(stock=F('stock') - instance.quantity)
 
 
 # ====================================

@@ -4,6 +4,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/providers/return_provider.dart';
 import '../../../src/models/sales/return_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/permission_helper.dart';
 import '../globals/text_button.dart';
 import '../globals/text_field.dart';
 import 'create_return_dialog.dart';
@@ -74,7 +75,9 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
             _buildReturnsTab()
           ]
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: !PermissionHelper.canAdd(context, 'Returns')
+          ? null
+          : FloatingActionButton(
         onPressed: () => _showCreateReturnDialog(context),
         tooltip: l10n.createReturn,
         backgroundColor: AppTheme.primaryMaroon,
@@ -452,32 +455,37 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
 
     // Add action buttons based on status
     if (returnItem.status == 'PENDING') {
-      buttons.add(
-        PremiumButton(
-          text: l10n.approve,
-          onPressed: () => _showApproveReturnDialog(returnItem, provider),
-          isOutlined: true,
-          width: 80,
-          height: 35,
-        ),
-      );
-      buttons.add(const SizedBox(width: 8));
-      buttons.add(
-        PremiumButton(
-          text: l10n.cancel,
-          onPressed: () async {
-            final success = await provider.deleteReturn(returnItem.id);
-            if (success && mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.returnDeletedSuccessfully), backgroundColor: Colors.green),
-              );
-            }
-          },
-          isOutlined: true,
-          width: 80,
-          height: 35,
-        ),
-      );
+      if (PermissionHelper.canEdit(context, 'Returns')) {
+        buttons.add(
+          PremiumButton(
+            text: l10n.approve,
+            onPressed: () => _showApproveReturnDialog(returnItem, provider),
+            isOutlined: true,
+            width: 80,
+            height: 35,
+          ),
+        );
+        buttons.add(const SizedBox(width: 8));
+      }
+      
+      if (PermissionHelper.canDelete(context, 'Returns')) {
+        buttons.add(
+          PremiumButton(
+            text: l10n.cancel,
+            onPressed: () async {
+              final success = await provider.deleteReturn(returnItem.id);
+              if (success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.returnDeletedSuccessfully), backgroundColor: Colors.green),
+                );
+              }
+            },
+            isOutlined: true,
+            width: 80,
+            height: 35,
+          ),
+        );
+      }
     }
 
     return buttons;
@@ -521,7 +529,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     final l10n = AppLocalizations.of(context)!;
     final actions = <PopupMenuEntry<String>>[];
 
-    if (returnItem.canBeApproved) {
+    if (returnItem.canBeApproved && PermissionHelper.canEdit(context, 'Returns')) {
       actions.add(
         PopupMenuItem(
           value: 'approve',
@@ -552,8 +560,9 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     }
 
     actions.addAll([
-      PopupMenuItem(
-        value: 'delete',
+      if (PermissionHelper.canDelete(context, 'Returns'))
+        PopupMenuItem(
+          value: 'delete',
         child: Row(
           children: [
             const Icon(Icons.delete, color: Colors.red),
@@ -674,7 +683,7 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     final l10n = AppLocalizations.of(context)!;
     final actions = <PopupMenuEntry<String>>[];
 
-    if (refund.status == 'PENDING') {
+    if (refund.status == 'PENDING' && PermissionHelper.canEdit(context, 'Returns')) {
       actions.add(
         PopupMenuItem(
           value: 'process',
@@ -690,26 +699,28 @@ class _ReturnManagementWidgetState extends State<ReturnManagementWidget> with Si
     }
 
     actions.addAll([
-      PopupMenuItem(
-        value: 'edit',
-        child: Row(
-          children: [
-            const Icon(Icons.edit, color: Colors.orange),
-            const SizedBox(width: 8),
-            Text(l10n.edit),
-          ],
+      if (PermissionHelper.canEdit(context, 'Returns'))
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              const Icon(Icons.edit, color: Colors.orange),
+              const SizedBox(width: 8),
+              Text(l10n.edit),
+            ],
+          ),
         ),
-      ),
-      PopupMenuItem(
-        value: 'delete',
-        child: Row(
-          children: [
-            const Icon(Icons.delete, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(l10n.delete),
-          ],
+      if (PermissionHelper.canDelete(context, 'Returns'))
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              const Icon(Icons.delete, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(l10n.delete),
+            ],
+          ),
         ),
-      ),
     ]);
 
     return actions;

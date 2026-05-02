@@ -9,7 +9,7 @@ import '../utils/debug_helper.dart';
 class PdfQuotationService {
   static const String companyName = 'META BRASS';
   static const String companyAddress =
-      'Kacha Eminabadroad Siddique Colony Gujranwala';
+      'Kacha Eminabadroad Siddique Colony Gujranwala, 055-8174471';
   static const String companyPhone = '055-8174471';
   static const String companyTagline =
       'Sanitary Fittings & Bathroom Accessories';
@@ -98,9 +98,9 @@ class PdfQuotationService {
 
   /// Build header section with logo and brand bar
   static pw.Widget _buildHeader(pw.Font regularFont, pw.Font boldFont, pw.MemoryImage? logoImage) {
-    pw.Widget logoWidget = pw.SizedBox(height: 50);
+    pw.Widget logoWidget = pw.SizedBox(height: 80);
     if (logoImage != null) {
-      logoWidget = pw.Image(logoImage, height: 55);
+      logoWidget = pw.Image(logoImage, height: 90, fit: pw.BoxFit.contain);
     }
 
     return pw.Column(
@@ -108,26 +108,17 @@ class PdfQuotationService {
       children: [
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.start, // Changed from end
+          crossAxisAlignment: pw.CrossAxisAlignment.center, // Vertically centered with logo
           children: [
             logoWidget,
-            pw.Spacer(),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-              children: [
-                pw.Text(
-                  'QUOTATION',
-                  style: pw.TextStyle(
-                    fontSize: 28, // Larger for visibility
-                    fontWeight: pw.FontWeight.bold,
-                    font: boldFont,
-                    color: PdfColor.fromInt(0xFF2B4EBF),
-                  ),
-                ),
-                pw.Text(companyName.toUpperCase(), style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, font: boldFont)),
-                pw.Text(companyAddress, style: pw.TextStyle(fontSize: 10, font: regularFont)),
-                pw.Text('Phone: $companyPhone', style: pw.TextStyle(fontSize: 10, font: regularFont)),
-              ],
+            pw.Text(
+              'QUOTATION',
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+                font: boldFont,
+                color: PdfColor.fromInt(0xFF2B4EBF),
+              ),
             ),
           ],
         ),
@@ -156,6 +147,13 @@ class PdfQuotationService {
                 ],
               ),
             ),
+          ],
+        ),
+        pw.SizedBox(height: 4),
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(companyAddress, style: pw.TextStyle(fontSize: 9, font: regularFont)),
           ],
         ),
       ],
@@ -218,7 +216,7 @@ class PdfQuotationService {
           decoration: const pw.BoxDecoration(color: PdfColors.grey200),
           children: [
             _cell('Sr#', boldFont, align: pw.TextAlign.center),
-            _cell('Product', boldFont),
+            _cell('Products', boldFont),
             _cell('Qty', boldFont, align: pw.TextAlign.center),
             _cell('Price', boldFont, align: pw.TextAlign.right),
             _cell('Total', boldFont, align: pw.TextAlign.right),

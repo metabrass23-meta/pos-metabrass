@@ -1,7 +1,7 @@
 class ApiConfig {
-  // static const String baseUrl = 'http://127.0.0.1:8000/api/v1';
-  static const String baseUrl =
-      'https://pos-metabrass-production.up.railway.app/api/v1';
+  static const String baseUrl = 'http://127.0.0.1:8000/api/v1';
+//   static const String baseUrl =
+//       'https://pos-metabrass-production.up.railway.app/api/v1';
   static const String dashboardAnalytics = '/analytics/dashboard/';
   static const String register = '/auth/register/';
   static const String login = '/auth/login/';
@@ -9,6 +9,10 @@ class ApiConfig {
   static const String profile = '/auth/profile/';
   static const String updateProfile = '/auth/profile/update/';
   static const String changePassword = '/auth/change-password/';
+  static const String roles = '/roles/';
+  static const String userManagement = '/users/';
+  static String updateRolePermissions(int id) => '/roles/$id/permissions/';
+
 
   static const String categories = '/categories/';
   static const String createCategory = '/categories/create/';

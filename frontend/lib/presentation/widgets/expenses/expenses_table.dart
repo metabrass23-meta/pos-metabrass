@@ -6,6 +6,7 @@ import '../../../src/models/expenses/expenses_model.dart';
 import '../../../src/providers/expenses_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ExpensesTable extends StatefulWidget {
   final Function(Expense) onEdit;
@@ -139,7 +140,7 @@ class _ExpensesTableState extends State<ExpensesTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1500.0, small: 1600.0, medium: 1700.0, large: 1800.0, ultrawide: 1900.0);
+    return ResponsiveBreakpoints.responsive(context, tablet: 1900.0, small: 2000.0, medium: 2100.0, large: 2200.0, ultrawide: 2300.0);
   }
 
   Widget _buildTableHeader(BuildContext context) {
@@ -163,12 +164,12 @@ class _ExpensesTableState extends State<ExpensesTable> {
   List<double> _getColumnWidths(BuildContext context) {
     return [
       130.0, // Expense ID
-      180.0, // Expense Name
-      280.0, // Description
-      140.0, // Amount
-      180.0, // Withdrawal By
-      130.0, // Date
-      120.0, // Time
+      220.0, // Expense Name
+      350.0, // Description
+      160.0, // Amount
+      200.0, // Withdrawal By
+      240.0, // Date
+      140.0, // Time
       260.0, // Actions
     ];
   }
@@ -176,6 +177,9 @@ class _ExpensesTableState extends State<ExpensesTable> {
   Widget _buildHeaderCell(BuildContext context, String title) {
     return Text(
       title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
       style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
     );
   }
@@ -203,6 +207,9 @@ class _ExpensesTableState extends State<ExpensesTable> {
               ),
               child: Text(
                 expense.id,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
                 textAlign: TextAlign.center,
               ),
@@ -218,9 +225,10 @@ class _ExpensesTableState extends State<ExpensesTable> {
               decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 expense.expense,
-                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.orange[700]),
               ),
             ),
           ),
@@ -231,9 +239,10 @@ class _ExpensesTableState extends State<ExpensesTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               expense.description,
-              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
             ),
           ),
 
@@ -246,6 +255,9 @@ class _ExpensesTableState extends State<ExpensesTable> {
               decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
               child: Text(
                 'PKR ${expense.amount.toStringAsFixed(0)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w700, color: Colors.red[700]),
               ),
             ),
@@ -288,16 +300,24 @@ class _ExpensesTableState extends State<ExpensesTable> {
           Container(
             width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   expense.formattedDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
-                Text(
-                  expense.relativeDate,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${expense.relativeDate})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                  ),
                 ),
               ],
             ),
@@ -317,6 +337,9 @@ class _ExpensesTableState extends State<ExpensesTable> {
                   SizedBox(width: context.smallPadding / 2),
                   Text(
                     expense.formattedTime,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
                     style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.blue),
                   ),
                 ],
@@ -352,35 +375,41 @@ class _ExpensesTableState extends State<ExpensesTable> {
           ),
         ),
 
-        SizedBox(width: context.smallPadding / 2),
-
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(expense),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+        // Edit Button
+        if (PermissionHelper.canEdit(context, 'Expenses'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => widget.onEdit(expense),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                  child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+                ),
+              ),
             ),
           ),
-        ),
 
-        SizedBox(width: context.smallPadding / 2),
-
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(expense),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+        // Delete Button
+        if (PermissionHelper.canDelete(context, 'Expenses'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => widget.onDelete(expense),
+                borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(context.borderRadius('small'))),
+                  child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+                ),
+              ),
             ),
           ),
-        ),
       ],
     );
   }

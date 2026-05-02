@@ -431,7 +431,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCart => 'Clear Cart';
 
   @override
-  String get customer => 'Customer';
+  String get customer => 'Customers';
 
   @override
   String get selectCustomer => 'Select Customer';
@@ -446,7 +446,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remainingAmount => 'Remaining Amount';
 
   @override
-  String get invoice => 'Invoice';
+  String get invoice => 'Invoices';
 
   @override
   String get view => 'View';
@@ -536,7 +536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get value => 'Value';
 
   @override
-  String get searchProductsHint => 'Search products by ID, name, color, fabric, or pieces...';
+  String get searchProductsHint => 'Search products by ID, name, color, material, or pieces...';
 
   @override
   String get customerManagement => 'Customer Management';
@@ -734,7 +734,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthlyPerformance => 'Monthly Performance';
 
   @override
-  String get payment => 'Payment';
+  String get payment => 'Payments';
 
   @override
   String get searchProductsShortHint => 'Search products...';
@@ -1028,7 +1028,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get update => 'Update';
 
   @override
-  String get product => 'Product';
+  String get product => 'Products';
 
   @override
   String get newProduct => 'New Product';
@@ -1058,10 +1058,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorName => 'Finish/Color';
 
   @override
-  String get fabricType => 'Material Type';
+  String get materialType => 'Material Type';
 
   @override
-  String get fabricName => 'Material Name';
+  String get materialName => 'Material Name';
 
   @override
   String get pleaseSelectAtLeastOnePiece => 'Please select at least one piece';
@@ -1079,19 +1079,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelect => 'Please select';
 
   @override
-  String get labors => 'Labors';
+  String get labors => 'Labours';
 
   @override
-  String get laborManagement => 'Labor Management';
+  String get laborManagement => 'Labour Management';
 
   @override
-  String get laborManagementDescription => 'Organize and manage your labor workforce with comprehensive tools';
+  String get laborManagementDescription => 'Organize and manage your labour workforce with comprehensive tools';
 
   @override
-  String get organizeAndManageLaborWorkforce => 'Organize and manage labor workforce';
+  String get organizeAndManageLaborWorkforce => 'Organize and manage labour workforce';
 
   @override
-  String get manageLaborWorkforce => 'Manage labor workforce';
+  String get manageLaborWorkforce => 'Manage labour workforce';
 
   @override
   String get failedToRefresh => 'Failed to refresh';
@@ -1106,7 +1106,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newLabel => 'New';
 
   @override
-  String get searchLaborsHint => 'Search labors by name, CNIC, phone, designation...';
+  String get searchLaborsHint => 'Search labours by name, CNIC, phone, designation...';
 
   @override
   String get filters => 'Filters';
@@ -1121,7 +1121,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gender => 'Gender';
 
   @override
-  String get receivable => 'Receivable';
+  String get receivable => 'Receivables';
 
   @override
   String get receivablesManagement => 'Receivables Management';
@@ -1259,7 +1259,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expected => 'Expected';
 
   @override
-  String get payable => 'Payable';
+  String get payable => 'Payables';
 
   @override
   String get payablesManagement => 'Payables Management';
@@ -1301,7 +1301,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentManagement => 'Payment Management';
 
   @override
-  String get paymentManagementDescription => 'Track and manage labor salary payments efficiently';
+  String get paymentManagementDescription => 'Track and manage labour salary payments efficiently';
 
   @override
   String get trackManageSalaryPayments => 'Track and manage salary payments';
@@ -1319,19 +1319,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thisWeek => 'This Week';
 
   @override
-  String get searchPaymentsHint => 'Search by ID, labor name, payment method, month, or description...';
+  String get searchPaymentsHint => 'Search by ID, labour name, payment method, month, or description...';
 
   @override
   String get advancePaymentManagement => 'Advance Payment Management';
 
   @override
-  String get advancePaymentManagementDescription => 'Track and manage labor advance payments efficiently';
+  String get advancePaymentManagementDescription => 'Track and manage labour advance payments efficiently';
 
   @override
   String get advancePayments => 'Advance Payments';
 
   @override
-  String get manageLaborPayments => 'Manage labor payments';
+  String get manageLaborPayments => 'Manage labour payments';
 
   @override
   String get totalPayments => 'Total Payments';
@@ -1343,13 +1343,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingAdvancePayments => 'Loading advance payments...';
 
   @override
-  String get searchAdvancePaymentsHint => 'Search by ID, labor name, phone, role, or description...';
+  String get searchAdvancePaymentsHint => 'Search by ID, labour name, phone, role, or description...';
 
   @override
   String get dataRefreshedSuccessfully => 'Data refreshed successfully';
 
   @override
-  String get expense => 'Expense';
+  String get expense => 'Expenses';
 
   @override
   String get expensesManagement => 'Expenses Management';
@@ -1676,13 +1676,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receivableAddedSuccessfully => 'Receivable added successfully!';
 
   @override
-  String get addLabor => 'Add Labor';
+  String get addLabor => 'Add Labour';
 
   @override
-  String get addNewLabor => 'Add New Labor';
+  String get addNewLabor => 'Add New Labour';
 
   @override
-  String get createNewLaborRecord => 'Create a new labor record';
+  String get createNewLaborRecord => 'Create a new labour record';
 
   @override
   String get fullNameRequired => 'Full Name *';
@@ -1817,13 +1817,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ageMustBeLessThan65 => 'Age must be less than 65';
 
   @override
-  String get laborCreatedSuccessfully => 'Labor created successfully!';
+  String get laborCreatedSuccessfully => 'Labour created successfully!';
 
   @override
-  String get failedToCreateLabor => 'Failed to create labor';
+  String get failedToCreateLabor => 'Failed to create labour';
 
   @override
-  String get errorCreatingLabor => 'Error creating labor:';
+  String get errorCreatingLabor => 'Error creating labour:';
 
   @override
   String get pleaseFixFollowingErrors => 'Please fix the following errors:';
@@ -1877,22 +1877,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentLabel => 'RECENT';
 
   @override
-  String get laborStatusUpdatedSuccessfully => 'Labor status updated successfully!';
+  String get laborStatusUpdatedSuccessfully => 'Labour status updated successfully!';
 
   @override
-  String get failedToUpdateLaborStatus => 'Failed to update labor status';
+  String get failedToUpdateLaborStatus => 'Failed to update labour status';
 
   @override
-  String get errorUpdatingLaborStatus => 'Error updating labor status:';
+  String get errorUpdatingLaborStatus => 'Error updating labour status:';
 
   @override
-  String get loadingLaborDetails => 'Loading labor details...';
+  String get loadingLaborDetails => 'Loading labour details...';
 
   @override
-  String get laborDetails => 'Labor Details';
+  String get laborDetails => 'Labour Details';
 
   @override
-  String get completeLaborInformation => 'Complete labor information';
+  String get completeLaborInformation => 'Complete labour information';
 
   @override
   String get joined => 'Joined';
@@ -1946,13 +1946,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createdBy => 'Created By';
 
   @override
-  String get newLabor => 'New Labor';
+  String get newLabor => 'New Labour';
 
   @override
-  String get restoreLabor => 'Restore Labor';
+  String get restoreLabor => 'Restore Labour';
 
   @override
-  String get deactivateLabor => 'Deactivate Labor';
+  String get deactivateLabor => 'Deactivate Labour';
 
   @override
   String areYouSureDeactivateLabor(String name) {
@@ -1965,52 +1965,52 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get failedToDeactivateLabor => 'Failed to deactivate labor';
+  String get failedToDeactivateLabor => 'Failed to deactivate labour';
 
   @override
-  String get laborDeactivatedSuccessfully => 'Labor deactivated successfully';
+  String get laborDeactivatedSuccessfully => 'Labour deactivated successfully';
 
   @override
-  String get failedToRestoreLabor => 'Failed to restore labor';
+  String get failedToRestoreLabor => 'Failed to restore labour';
 
   @override
-  String get laborRestoredSuccessfully => 'Labor restored successfully';
+  String get laborRestoredSuccessfully => 'Labour restored successfully';
 
   @override
-  String get failedToLoadLabors => 'Failed to Load Labors';
+  String get failedToLoadLabors => 'Failed to Load Labours';
 
   @override
   String get unexpectedErrorOccurred => 'An unexpected error occurred';
 
   @override
-  String get noLaborsFound => 'No Labors Found';
+  String get noLaborsFound => 'No Labours Found';
 
   @override
-  String get startByAddingFirstLabor => 'Start by adding your first labor to manage your workforce effectively';
+  String get startByAddingFirstLabor => 'Start by adding your first labour to manage your workforce effectively';
 
   @override
-  String get addFirstLabor => 'Add First Labor';
+  String get addFirstLabor => 'Add First Labour';
 
   @override
-  String get filterLabors => 'Filter Labors';
+  String get filterLabors => 'Filter Labours';
 
   @override
-  String get refineYourLaborList => 'Refine your labor list with filters';
+  String get refineYourLaborList => 'Refine your labour list with filters';
 
   @override
-  String get searchLabors => 'Search Labors';
+  String get searchLabors => 'Search Labours';
 
   @override
-  String get laborStatus => 'Labor Status';
+  String get laborStatus => 'Labour Status';
 
   @override
   String get searchByNameCnicPhoneDesignation => 'Search by name, CNIC, phone, or designation';
 
   @override
-  String get showInactiveLaborsOnly => 'Show inactive labors only';
+  String get showInactiveLaborsOnly => 'Show inactive labours only';
 
   @override
-  String get onlyDeactivatedLaborsWillBeShown => 'Only deactivated labors will be shown';
+  String get onlyDeactivatedLaborsWillBeShown => 'Only deactivated labours will be shown';
 
   @override
   String get enterCityName => 'Enter city name';
@@ -2136,7 +2136,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allColors => 'All Colors';
 
   @override
-  String get allFabrics => 'All Fabrics';
+  String get allMaterials => 'All Materials';
 
   @override
   String get allStockLevels => 'All Stock Levels';
@@ -2199,7 +2199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterColor => 'Enter color';
 
   @override
-  String get enterFabric => 'Enter fabric';
+  String get enterMaterial => 'Enter Material';
 
   @override
   String get enterMinPrice => 'Enter minimum price';
@@ -2551,7 +2551,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get salesRecords => 'Sales Records';
 
   @override
-  String get laborPayments => 'Labor Payments';
+  String get laborPayments => 'Labour Payments';
 
   @override
   String get notAvailable => 'N/A';
@@ -2563,7 +2563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get otherExpenses => 'Other Expenses';
 
   @override
-  String get labor => 'Labor';
+  String get labor => 'Labour';
 
   @override
   String get vendors => 'Vendors';
@@ -2578,7 +2578,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stepTwoTotalExpenses => '2. Total Expenses';
 
   @override
-  String get laborPlusVendorPlusOtherPlusZakat => 'Labor + Vendor + Other + Zakat';
+  String get laborPlusVendorPlusOtherPlusZakat => 'Labour + Vendor + Other + Zakat';
 
   @override
   String get stepThreeNetProfit => '3. Net Profit';
@@ -3132,7 +3132,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get color => 'Finish';
 
   @override
-  String get fabric => 'Material';
+  String get material => 'Material';
 
   @override
   String get stockStatus => 'Stock Status';
@@ -3307,13 +3307,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorNameMustBeAtLeast2Characters => 'Color name must be at least 2 characters';
 
   @override
-  String get enterFabricType => 'Enter fabric type (e.g., Cotton, Silk, Chiffon)';
+  String get enterMaterialType => 'Enter material type (e.g., Brass, Steel, Chrome)';
 
   @override
-  String get pleaseEnterFabric => 'Please enter a fabric';
+  String get pleaseEnterMaterial => 'Please enter a material';
 
   @override
-  String get fabricNameMustBeAtLeast2Characters => 'Fabric name must be at least 2 characters';
+  String get materialNameMustBeAtLeast2Characters => 'Material name must be at least 2 characters';
 
   @override
   String get productNameMustBeAtLeast2Characters => 'Product name must be at least 2 characters';
@@ -3328,16 +3328,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPayment => 'Add Payment';
 
   @override
-  String get addLaborPayment => 'Add Labor Payment';
+  String get addLaborPayment => 'Add Labour Payment';
 
   @override
-  String get recordNewPaymentWithReceipt => 'Record new payment to labor with receipt';
+  String get recordNewPaymentWithReceipt => 'Record new payment to labour with receipt';
 
   @override
   String get paymentAddedSuccessfully => 'Payment added successfully!';
 
   @override
-  String get pleaseSelectAtLeastOneEntity => 'Please select at least one entity (labor, vendor, order, or sale)';
+  String get pleaseSelectAtLeastOneEntity => 'Please select at least one entity (labour, vendor, order, or sale)';
 
   @override
   String get pleaseSelectPaymentMethod => 'Please select a payment method';
@@ -3372,13 +3372,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelectEntityType => 'Please select entity type';
 
   @override
-  String get selectLabor => 'Select Labor';
+  String get selectLabor => 'Select Labour';
 
   @override
-  String get chooseLaborForPayment => 'Choose labor for payment';
+  String get chooseLaborForPayment => 'Choose labour for payment';
 
   @override
-  String get pleaseSelectLabor => 'Please select a labor';
+  String get pleaseSelectLabor => 'Please select a labour';
 
   @override
   String get vendorId => 'Vendor ID';
@@ -3396,7 +3396,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get order => 'Order';
 
   @override
-  String get sale => 'Sale';
+  String get sale => 'Sales';
 
   @override
   String enterOrderSaleId(String type) {
@@ -3486,7 +3486,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get selectLaborForPayment => 'Select labor for payment';
+  String get selectLaborForPayment => 'Select labour for payment';
 
   @override
   String get available => 'Available';
@@ -3525,13 +3525,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentFilters => 'Payment Filters';
 
   @override
-  String get searchByLaborVendorDescription => 'Search by labor name, vendor, description...';
+  String get searchByLaborVendorDescription => 'Search by labour name, vendor, description...';
 
   @override
   String get entityFilters => 'Entity Filters';
 
   @override
-  String get allLabors => 'All Labors';
+  String get allLabors => 'All Labours';
 
   @override
   String get payerType => 'Payer Type';
@@ -3606,7 +3606,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentDate => 'Payment Date';
 
   @override
-  String get laborName => 'Labor Name';
+  String get laborName => 'Labour Name';
 
   @override
   String get selectSortOrder => 'Select sort order';
@@ -3645,7 +3645,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentInfo => 'Payment Info';
 
   @override
-  String get receipt => 'Receipt';
+  String get receipt => 'Receipts';
 
   @override
   String get missing => 'Missing';
@@ -3660,7 +3660,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPaymentRecordsFound => 'No Payment Records Found';
 
   @override
-  String get startByAddingFirstPaymentRecord => 'Start by adding your first payment record to track labor payments efficiently';
+  String get startByAddingFirstPaymentRecord => 'Start by adding your first payment record to track labour payments efficiently';
 
   @override
   String get addFirstPayment => 'Add First Payment';
@@ -3783,10 +3783,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addReceiptForThisPayment => 'Add receipt for this payment';
 
   @override
-  String get laborRole => 'Labor Role';
+  String get laborRole => 'Labour Role';
 
   @override
-  String get laborPhone => 'Labor Phone';
+  String get laborPhone => 'Labour Phone';
 
   @override
   String get paymentDeletedSuccessfully => 'Payment deleted successfully!';
@@ -4131,7 +4131,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchProductsShort => 'Search products';
 
   @override
+  String get searchProductsByNameMaterialOrColor => 'Search products by name, material, or color...';
+
+  @override
   String get searchProductsByNameFabricOrColor => 'Search products by name, fabric, or color...';
+
+  @override
+  String get fabricQuality => 'Fabric Quality';
+
+  @override
+  String get style => 'Style';
 
   @override
   String get availableProducts => 'Available Products';
@@ -4209,25 +4218,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customerName => 'Customer Name';
 
   @override
-  String get editLabor => 'Edit Labor';
+  String get editLabor => 'Edit Labour';
 
   @override
-  String get editLaborDetails => 'Edit Labor Details';
+  String get editLaborDetails => 'Edit Labour Details';
 
   @override
   String get updateWorkerInformation => 'Update worker information';
 
   @override
-  String get laborUpdatedSuccessfully => 'Labor updated successfully!';
+  String get laborUpdatedSuccessfully => 'Labour updated successfully!';
 
   @override
-  String get failedToUpdateLabor => 'Failed to update labor';
+  String get failedToUpdateLabor => 'Failed to update labour';
 
   @override
-  String get errorUpdatingLabor => 'Error updating labor';
+  String get errorUpdatingLabor => 'Error updating labour';
 
   @override
-  String get updateLabor => 'Update Labor';
+  String get updateLabor => 'Update Labour';
 
   @override
   String get enterWorkerFullName => 'Enter worker\'s full name';
@@ -4248,22 +4257,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterMonthlySalaryInPKR => 'Enter monthly salary in PKR';
 
   @override
-  String get laborCanBeRestoredLater => 'Labor can be restored later';
+  String get laborCanBeRestoredLater => 'Labour can be restored later';
 
   @override
-  String get laborID => 'Labor ID';
+  String get laborID => 'Labour ID';
 
   @override
   String get iUnderstandActionCannotBeUndone => 'I understand this action cannot be undone and will affect related records';
 
   @override
-  String get typeLaborNameToConfirm => 'Type the labor name to confirm permanent deletion:';
+  String get typeLaborNameToConfirm => 'Type the labour name to confirm permanent deletion:';
 
   @override
-  String get laborDeletedPermanently => 'Labor deleted permanently!';
+  String get laborDeletedPermanently => 'Labour deleted permanently!';
 
   @override
-  String get failedToDeleteLabor => 'Failed to delete labor';
+  String get failedToDeleteLabor => 'Failed to delete labour';
 
   @override
   String get pleaseConfirmYouUnderstandThisAction => 'Please confirm that you understand this action';
@@ -4272,7 +4281,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseConfirmYouUnderstandConsequences => 'Please confirm that you understand the consequences of permanent deletion';
 
   @override
-  String get pleaseTypeLaborNameExactly => 'Please type the labor name exactly to confirm permanent deletion';
+  String get pleaseTypeLaborNameExactly => 'Please type the labour name exactly to confirm permanent deletion';
 
   @override
   String get pleaseCompleteAllConfirmationSteps => 'Please complete all confirmation steps';
@@ -4470,7 +4479,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseAcceptTerms => 'Please accept the terms and conditions';
 
   @override
-  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to MetaBrass.';
+  String get accountCreatedSuccessfully => 'Account created successfully! Welcome to META BRASS.';
 
   @override
   String get registrationFailedMessage => 'Registration failed. Please check the details below.';
@@ -5115,12 +5124,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brand => 'Brand';
 
   @override
-  String get material => 'Material';
-
-  @override
-  String get style => 'Style';
-
-  @override
   String get noAdditionalDetails => 'No additional details';
 
   @override
@@ -5276,7 +5279,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receiptManagement => 'Receipt Management';
 
   @override
-  String get pleaseSelectALabor => 'Please select a labor';
+  String get pleaseSelectALabor => 'Please select a labour';
 
   @override
   String get amountCannotExceedRemainingAdvanceAmount => 'Amount cannot exceed remaining advance amount of';
@@ -5294,7 +5297,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uploadReceiptImageForBetterRecordKeeping => 'Upload receipt image for better record keeping';
 
   @override
-  String get selectALabor => 'Select a labor';
+  String get selectALabor => 'Select a labour';
 
   @override
   String get advanceAmountPkr => 'Advance Amount (PKR)';
@@ -5359,7 +5362,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noAdvancePaymentRecordsFound => 'No Advance Payment Records Found';
 
   @override
-  String get startByAddingYourFirstAdvancePaymentRecord => 'Start by adding your first advance payment record to track labor payments effectively';
+  String get startByAddingYourFirstAdvancePaymentRecord => 'Start by adding your first advance payment record to track labour payments effectively';
 
   @override
   String get addFirstAdvancePayment => 'Add First Advance Payment';
@@ -5398,7 +5401,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editAdvancePayment => 'Edit Advance Payment';
 
   @override
-  String get laborInformation => 'Labor Information';
+  String get laborInformation => 'Labour Information';
 
   @override
   String get advancePaymentDetails => 'Advance Payment Details';
@@ -5620,7 +5623,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableDarkThemeForApplication => 'Enable dark theme for the application';
 
   @override
-  String get alNoorFashionPOS => 'MetaBrass POS';
+  String get alNoorFashionPOS => 'META BRASS POS';
 
   @override
   String get version => 'Version';
@@ -5816,7 +5819,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get embroidery => 'Embroidery';
 
   @override
-  String get fabricQuality => 'Fabric Quality';
+  String get materialQuality => 'Material Quality';
 
   @override
   String get accentColor => 'Accent Color';
@@ -6649,7 +6652,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelectVendor => 'Please select a vendor';
 
   @override
-  String get loadingLabors => 'Loading labors...';
+  String get loadingLabors => 'Loading labours...';
 
   @override
   String get loadingVendors => 'Loading vendors...';

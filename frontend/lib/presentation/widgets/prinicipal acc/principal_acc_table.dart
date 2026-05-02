@@ -6,6 +6,7 @@ import '../../../src/providers/prinicipal_acc_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/models/principal_account/principal_account_model.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class PrincipalAccountTable extends StatefulWidget {
   final Function(PrincipalAccount) onEdit;
@@ -264,14 +265,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
   // Define exact widths for columns to ensure alignment (copied from purchases table)
   List<double> get _colWidths => [
     130.0, // Entry ID
-    150.0, // Source Module
-    300.0, // Description
-    120.0, // Type
-    140.0, // Amount
-    150.0, // Balance After
-    160.0, // Handled By
-    130.0, // Date
-    120.0, // Time
+    180.0, // Source Module
+    400.0, // Description
+    140.0, // Type
+    160.0, // Amount
+    160.0, // Balance After
+    200.0, // Handled By
+    250.0, // Date
+    140.0, // Time
     260.0, // Actions
   ];
 
@@ -341,6 +342,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
       alignment: Alignment.centerLeft,
       child: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
         style: TextStyle(
           fontSize: context.bodyFontSize,
           fontWeight: FontWeight.w700,
@@ -377,6 +381,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               account.id,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.captionFontSize,
                 fontWeight: FontWeight.w600,
@@ -420,13 +427,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               account.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -445,6 +453,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                 const SizedBox(width: 4),
                 Text(
                   account.type.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w700,
@@ -461,6 +472,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               'PKR ${account.amount.toStringAsFixed(0)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w700,
@@ -475,6 +489,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               'PKR ${account.balanceAfter.toStringAsFixed(0)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.bodyFontSize,
                 fontWeight: FontWeight.w700,
@@ -508,13 +525,14 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                       Expanded(
                         child: Text(
                           account.handledBy!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                             fontSize: context.captionFontSize,
                             fontWeight: FontWeight.w600,
                             color: _getPersonColor(account.handledBy!),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -532,23 +550,31 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           Container(
             width: columnWidths[7],
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 Text(
                   account.formattedDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
                   ),
                 ),
-                Text(
-                  account.relativeDate,
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '(${account.relativeDate})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
               ],
@@ -570,6 +596,9 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
                 const SizedBox(width: 4),
                 Text(
                   account.formattedTime,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.captionFontSize,
                     fontWeight: FontWeight.w500,
@@ -619,28 +648,32 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           ),
         ),
         SizedBox(width: context.smallPadding / 2),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onEdit(account),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+
+        if (PermissionHelper.canEdit(context, 'Principal Account')) ...[
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onEdit(account),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.edit_outlined,
-                color: Colors.blue,
-                size: context.iconSize('small'),
+                child: Icon(
+                  Icons.edit_outlined,
+                  color: Colors.blue,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
-        SizedBox(width: context.smallPadding / 2),
+          SizedBox(width: context.smallPadding / 2),
+        ],
+
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -670,27 +703,31 @@ class _PrincipalAccountTableState extends State<PrincipalAccountTable> {
           ),
         ),
         SizedBox(width: context.smallPadding / 2),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => widget.onDelete(account),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(
-                  context.borderRadius('small'),
+
+        if (PermissionHelper.canDelete(context, 'Principal Account')) ...[
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onDelete(account),
+              borderRadius: BorderRadius.circular(context.borderRadius('small')),
+              child: Container(
+                padding: EdgeInsets.all(context.smallPadding * 0.5),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(
+                    context.borderRadius('small'),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                color: Colors.red,
-                size: context.iconSize('small'),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: context.iconSize('small'),
+                ),
               ),
             ),
           ),
-        ),
+          SizedBox(width: context.smallPadding / 2),
+        ],
       ],
     );
   }

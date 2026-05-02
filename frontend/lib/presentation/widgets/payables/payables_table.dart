@@ -158,7 +158,7 @@ class _PayablesTableState extends State<PayablesTable> {
   }
 
   double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(context, tablet: 1600.0, small: 1700.0, medium: 1800.0, large: 1900.0, ultrawide: 2000.0);
+    return ResponsiveBreakpoints.responsive(context, tablet: 1800.0, small: 1900.0, medium: 2000.0, large: 2100.0, ultrawide: 2200.0);
   }
 
   Widget _buildTableHeader(BuildContext context) {
@@ -167,35 +167,43 @@ class _PayablesTableState extends State<PayablesTable> {
 
     return Row(
       children: [
-        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.id)),
+        Container(width: columnWidths[0], child: _buildHeaderCell(context, l10n.id, isCenter: true)),
         Container(width: columnWidths[1], child: _buildHeaderCell(context, context.isTablet ? l10n.creditor : l10n.creditorDetails)),
         Container(width: columnWidths[2], child: _buildHeaderCell(context, l10n.amounts)),
         Container(width: columnWidths[3], child: _buildHeaderCell(context, l10n.reasonItem)),
         Container(width: columnWidths[4], child: _buildHeaderCell(context, context.shouldShowFullLayout ? l10n.dates : l10n.repaymentDate)),
-        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.progress)),
-        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.status)),
-        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.actions)),
+        Container(width: columnWidths[5], child: _buildHeaderCell(context, l10n.progress, isCenter: true)),
+        Container(width: columnWidths[6], child: _buildHeaderCell(context, l10n.status, isCenter: true)),
+        Container(width: columnWidths[7], child: _buildHeaderCell(context, l10n.actions, isCenter: true)),
       ],
     );
   }
 
   List<double> _getColumnWidths(BuildContext context) {
     return [
-      100.0, // ID
-      200.0, // Creditor Details
-      180.0, // Amounts
-      180.0, // Reason/Item
-      160.0, // Dates
-      120.0, // Progress
-      120.0, // Status
-      260.0, // Actions
+      120.0, // ID
+      250.0, // Creditor Details
+      220.0, // Amounts
+      350.0, // Reason/Item
+      240.0, // Dates
+      150.0, // Progress
+      160.0, // Status
+      320.0, // Actions
     ];
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray, letterSpacing: 0.2),
+      ),
     );
   }
 
@@ -215,16 +223,18 @@ class _PayablesTableState extends State<PayablesTable> {
           Container(
             width: columnWidths[0],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMaroon.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-              ),
-              child: Text(
-                payable.id,
-                style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
-                textAlign: TextAlign.center,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding / 2, vertical: context.smallPadding / 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMaroon.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                ),
+                child: Text(
+                  payable.id,
+                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w600, color: AppTheme.primaryMaroon),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -238,24 +248,34 @@ class _PayablesTableState extends State<PayablesTable> {
               children: [
                 Text(
                   payable.creditorName,
-                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.bodyFontSize, fontWeight: FontWeight.w600, color: AppTheme.charcoalGray),
                 ),
                 SizedBox(height: context.smallPadding / 4),
-                Text(
-                  payable.creditorPhone ?? l10n.notAvailable,
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  l10n.pkrRemaining(payable.balanceRemaining.toStringAsFixed(0)),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: payable.balanceRemaining > 0 ? Colors.orange : Colors.green,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      payable.creditorPhone ?? l10n.notAvailable,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '(${l10n.pkrRemaining(payable.balanceRemaining.toStringAsFixed(0))})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(
+                        fontSize: context.captionFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: payable.balanceRemaining > 0 ? Colors.orange : Colors.green,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -272,35 +292,41 @@ class _PayablesTableState extends State<PayablesTable> {
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
                 border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.trending_down_rounded, color: Colors.red, size: context.iconSize('small')),
-                      SizedBox(width: context.smallPadding / 2),
-                      Expanded(
-                        child: Text(
-                          'PKR ${payable.amountBorrowed.toStringAsFixed(0)}',
-                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (payable.amountPaid > 0) ...[
-                    SizedBox(height: context.smallPadding / 4),
-                    Row(
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.trending_up_rounded, color: Colors.green, size: context.iconSize('small')),
+                        Icon(Icons.trending_down_rounded, color: Colors.red, size: context.iconSize('small')),
                         SizedBox(width: context.smallPadding / 2),
-                        Expanded(
-                          child: Text(
-                            'PKR ${payable.amountPaid.toStringAsFixed(0)}',
-                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
-                            textAlign: TextAlign.center,
-                          ),
+                        Text(
+                          'PKR ${payable.amountBorrowed.toStringAsFixed(0)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w600, color: Colors.red),
                         ),
                       ],
+                    ),
+                  ),
+                  if (payable.amountPaid > 0) ...[
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.trending_up_rounded, color: Colors.green, size: context.iconSize('small')),
+                          SizedBox(width: context.smallPadding / 2),
+                          Text(
+                            'PKR ${payable.amountPaid.toStringAsFixed(0)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.green),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ],
@@ -317,17 +343,19 @@ class _PayablesTableState extends State<PayablesTable> {
               children: [
                 Text(
                   payable.reasonOrItem,
-                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: context.subtitleFontSize, fontWeight: FontWeight.w500, color: AppTheme.charcoalGray),
                 ),
                 if (payable.notes != null && payable.notes!.isNotEmpty) ...[
                   SizedBox(height: context.smallPadding / 4),
                   Text(
                     payable.notes!,
-                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(fontSize: context.captionFontSize, color: Colors.grey[600]),
                   ),
                 ],
               ],
@@ -338,55 +366,58 @@ class _PayablesTableState extends State<PayablesTable> {
           Container(
             width: columnWidths[4],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  payable.formattedExpectedRepaymentDate,
-                  style: TextStyle(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
-                  ),
-                ),
-                SizedBox(height: context.smallPadding / 4),
-                Text(
-                  '${l10n.borrowed}: ${payable.formattedDateBorrowed}',
-                  style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: Colors.grey[500]),
-                ),
-                if (payable.isOverdueComputed) ...[
-                  SizedBox(height: context.smallPadding / 4),
+              child: Row(
+                children: [
                   Text(
-                    l10n.daysOverdueCount(payable.daysOverdue),
-                    style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: Colors.red),
+                    payable.formattedExpectedRepaymentDate,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: context.subtitleFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: payable.isOverdueComputed ? Colors.red : AppTheme.charcoalGray,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '(${payable.isOverdueComputed ? l10n.daysOverdueCount(payable.daysOverdue) : l10n.borrowed + ": " + payable.formattedDateBorrowed})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w400, color: payable.isOverdueComputed ? Colors.red : Colors.grey[500]),
+                    ),
                   ),
                 ],
-              ],
-            ),
+              ),
           ),
 
           // Progress
           Container(
             width: columnWidths[5],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              children: [
-                LinearProgressIndicator(
-                  value: payable.paymentPercentage / 100,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: AlwaysStoppedAnimation<Color>(payable.isFullyPaid ? Colors.green : Colors.orange),
-                  minHeight: 6,
-                ),
-                SizedBox(height: context.smallPadding / 2),
-                Text(
-                  '${payable.paymentPercentage.toStringAsFixed(0)}%',
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: payable.isFullyPaid ? Colors.green : Colors.orange,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LinearProgressIndicator(
+                    value: payable.paymentPercentage / 100,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(payable.isFullyPaid ? Colors.green : Colors.orange),
+                    minHeight: 6,
                   ),
-                ),
-              ],
+                  SizedBox(height: context.smallPadding / 2),
+                  Text(
+                    '${payable.paymentPercentage.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: context.captionFontSize,
+                      fontWeight: FontWeight.w500,
+                      color: payable.isFullyPaid ? Colors.green : Colors.orange,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -394,31 +425,33 @@ class _PayablesTableState extends State<PayablesTable> {
           Container(
             width: columnWidths[6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
-              decoration: BoxDecoration(
-                color: payable.statusColorValue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(color: payable.statusColorValue.withOpacity(0.3), width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(color: payable.statusColorValue, shape: BoxShape.circle),
-                  ),
-                  SizedBox(width: context.smallPadding / 2),
-                  Expanded(
-                    child: Text(
-                      payable.statusText,
-                      style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: payable.statusColorValue),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: context.smallPadding / 2),
+                decoration: BoxDecoration(
+                  color: payable.statusColorValue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(color: payable.statusColorValue.withOpacity(0.3), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(color: payable.statusColorValue, shape: BoxShape.circle),
                     ),
-                  ),
-                ],
+                    SizedBox(width: context.smallPadding / 2),
+                    Flexible(
+                      child: Text(
+                        payable.statusText,
+                        style: TextStyle(fontSize: context.captionFontSize, fontWeight: FontWeight.w500, color: payable.statusColorValue),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -427,7 +460,7 @@ class _PayablesTableState extends State<PayablesTable> {
           Container(
             width: columnWidths[7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: _buildActions(context, payable),
+            child: Center(child: _buildActions(context, payable)),
           ),
         ],
       ),

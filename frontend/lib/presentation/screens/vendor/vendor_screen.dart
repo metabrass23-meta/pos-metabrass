@@ -11,6 +11,7 @@ import '../../widgets/vendor/edit_vendor_dialog.dart';
 import '../../widgets/vendor/vendor_filter_dialog.dart';
 import '../../widgets/vendor/vendor_table.dart';
 import '../../widgets/vendor/view_vendor_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class VendorPage extends StatefulWidget {
   const VendorPage({super.key});
@@ -259,7 +260,8 @@ class _VendorPageState extends State<VendorPage> {
         ),
 
         // Add Vendor Button
-        _buildAddButton(),
+        if (PermissionHelper.canAdd(context, 'Vendor'))
+          _buildAddButton(),
       ],
     );
   }
@@ -292,10 +294,11 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(height: context.cardPadding),
 
         // Add Vendor Button (full width on tablet)
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        if (PermissionHelper.canAdd(context, 'Vendor'))
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddButton(),
+          ),
       ],
     );
   }
@@ -328,10 +331,11 @@ class _VendorPageState extends State<VendorPage> {
         SizedBox(height: context.cardPadding),
 
         // Add Vendor Button (full width)
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        if (PermissionHelper.canAdd(context, 'Vendor'))
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddButton(),
+          ),
       ],
     );
   }

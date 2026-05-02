@@ -394,9 +394,9 @@ class AdvancePaymentProvider extends ChangeNotifier {
         .map(
           (payment) => {
             'Advance ID': payment.id,
-            'Labor Name': payment.laborName,
-            'Labor Phone': payment.laborPhone,
-            'Labor Role': payment.laborRole,
+            'Labour Name': payment.laborName,
+            'Labour Phone': payment.laborPhone,
+            'Labour Role': payment.laborRole,
             'Amount': payment.amount.toStringAsFixed(2),
             'Description': payment.description,
             'Date': payment.date.toString().split(' ')[0],

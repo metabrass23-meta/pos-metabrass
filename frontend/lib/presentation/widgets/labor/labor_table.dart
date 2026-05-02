@@ -97,56 +97,67 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             return _helpers.buildEmptyState(context);
           }
 
-          return Scrollbar(
-            thumbVisibility: true,
-            controller: _headerHorizontalController, // Reusing controller for horizontal scrollbar
-            child: SingleChildScrollView(
-              controller: _headerHorizontalController,
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                width: _getTableWidth(context),
-                child: Column(
-                  children: [
-                    // 1. Table Header
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.lightGray.withOpacity(0.5),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(context.borderRadius('large')),
-                          topRight: Radius.circular(context.borderRadius('large')),
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          vertical: context.cardPadding * 0.85,
-                          horizontal: context.cardPadding / 2),
-                      child: _buildTableHeader(context),
-                    ),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final minTableWidth = _getTableMinWidth(context);
+              // Ensure table is at least as wide as the screen, but can be wider for scrolling
+              final tableWidth = constraints.maxWidth > minTableWidth 
+                  ? constraints.maxWidth 
+                  : minTableWidth;
 
-                    // 2. Table Content
-                    Expanded(
-                      child: Scrollbar(
-                        controller: _verticalController,
-                        thumbVisibility: true,
-                        trackVisibility: true,
-                        child: SingleChildScrollView(
-                          controller: _verticalController,
-                          scrollDirection: Axis.vertical,
-                          child: Column(
-                            children: provider.labors.asMap().entries.map((entry) {
-                              return _buildTableRow(context, entry.value, entry.key);
-                            }).toList(),
+              return Scrollbar(
+                thumbVisibility: true,
+                trackVisibility: true, // Made it more visible like product screen
+                controller: _headerHorizontalController,
+                child: SingleChildScrollView(
+                  controller: _headerHorizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // 1. Table Header
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.lightGray.withOpacity(0.5),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(context.borderRadius('large')),
+                              topRight: Radius.circular(context.borderRadius('large')),
+                            ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: context.cardPadding * 0.85,
+                              horizontal: context.cardPadding / 2),
+                          child: _buildTableHeader(context, tableWidth - context.cardPadding),
+                        ),
+
+                        // 2. Table Content
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _verticalController,
+                            thumbVisibility: true,
+                            trackVisibility: true,
+                            child: SingleChildScrollView(
+                              controller: _verticalController,
+                              scrollDirection: Axis.vertical,
+                              child: Column(
+                                children: provider.labors.asMap().entries.map((entry) {
+                                  return _buildTableRow(context, entry.value, entry.key, tableWidth - context.cardPadding);
+                                }).toList(),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
 
-                    if (provider.paginationInfo != null &&
-                        provider.paginationInfo!.totalPages > 1)
-                      _buildPaginationControls(context, provider),
-                  ],
+                        if (provider.paginationInfo != null &&
+                            provider.paginationInfo!.totalPages > 1)
+                          _buildPaginationControls(context, provider),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -180,46 +191,60 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
     );
   }
 
-  double _getTableWidth(BuildContext context) {
-    return ResponsiveBreakpoints.responsive(
-      context,
-      tablet: 1480.0,
-      small: 1580.0,
-      medium: 1680.0,
-      large: 1780.0,
-      ultrawide: 1880.0,
-    );
+  double _getTableMinWidth(BuildContext context) {
+    if (context.shouldShowCompactLayout) return 1400.0;
+    return 1800.0;
   }
 
-  List<double> _getColumnWidths(BuildContext context) {
-    if (context.shouldShowCompactLayout) {
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    final bool isCompact = context.shouldShowCompactLayout;
+    
+    // Fixed widths for columns that shouldn't expand
+    final double phoneWidth = 180.0;
+    final double cnicWidth = 200.0;
+    final double designationWidth = 200.0;
+    final double salaryWidth = 160.0;
+    final double cityWidth = 160.0;
+    final double statusWidth = 140.0;
+    final double dateWidth = 200.0;
+    final double actionsWidth = 320.0;
+
+    double fixedSum = phoneWidth + cnicWidth + designationWidth + statusWidth + dateWidth + actionsWidth;
+    if (!isCompact) {
+      fixedSum += salaryWidth + cityWidth;
+    }
+
+    // Name column gets the remaining space
+    final double nameWidth = totalWidth - fixedSum;
+
+    if (isCompact) {
       return [
-        180.0, // Name
-        150.0, // Phone
-        180.0, // CNIC
-        150.0, // Designation
-        120.0, // Status
-        150.0, // Joined Date
-        300.0, // Actions
+        nameWidth, // Name
+        phoneWidth,
+        cnicWidth,
+        designationWidth,
+        statusWidth,
+        dateWidth,
+        actionsWidth,
       ];
     } else {
       return [
-        180.0, // Name
-        150.0, // Phone
-        180.0, // CNIC
-        150.0, // Designation
-        120.0, // Salary
-        120.0, // City
-        120.0, // Status
-        150.0, // Joined Date
-        300.0, // Actions
+        nameWidth, // Name
+        phoneWidth,
+        cnicWidth,
+        designationWidth,
+        salaryWidth,
+        cityWidth,
+        statusWidth,
+        dateWidth,
+        actionsWidth,
       ];
     }
   }
 
-  Widget _buildTableHeader(BuildContext context) {
+  Widget _buildTableHeader(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Row(
       children: [
@@ -242,42 +267,51 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[4],
-            child: _buildSortableHeaderCell(context, l10n.salary, 'salary'),
+            child: _buildSortableHeaderCell(context, l10n.salary, 'salary', isCenter: true),
           ),
         if (!context.shouldShowCompactLayout)
           Container(
             width: columnWidths[5],
-            child: _buildSortableHeaderCell(context, l10n.city, 'city'),
+            child: _buildHeaderCell(context, l10n.city),
           ),
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
-          child: _buildHeaderCell(context, l10n.status),
+          child: _buildHeaderCell(context, l10n.status, isCenter: true),
         ),
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
-          child: _buildSortableHeaderCell(context, l10n.joinedDate, 'joining_date'),
+          child: _buildSortableHeaderCell(context, l10n.joinedDate, 'joining_date', isCenter: true),
         ),
         Container(
           width: columnWidths[context.shouldShowCompactLayout ? 6 : 8],
-          child: _buildHeaderCell(context, l10n.actions),
+          child: _buildHeaderCell(context, l10n.actions, isCenter: true),
         ),
       ],
     );
   }
 
-  Widget _buildHeaderCell(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: context.bodyFontSize,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.charcoalGray,
-        letterSpacing: 0.2,
+  Widget _buildHeaderCell(BuildContext context, String title, {bool isCenter = false}) {
+    return Container(
+      alignment: isCenter ? Alignment.center : Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
+      child: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        style: TextStyle(
+          fontSize: context.bodyFontSize,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.charcoalGray,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }
 
-  Widget _buildSortableHeaderCell(BuildContext context, String title, String sortKey) {
+  Widget _buildSortableHeaderCell(
+      BuildContext context, String title, String sortKey, {bool isCenter = false}) {
     return Consumer<LaborProvider>(
       builder: (context, provider, child) {
         final isCurrentSort = provider.sortBy == sortKey;
@@ -286,12 +320,17 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
           onTap: () => provider.setSortBy(sortKey),
           borderRadius: BorderRadius.circular(4),
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: context.smallPadding, vertical: 4),
             child: Row(
+              mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  textAlign: isCenter ? TextAlign.center : TextAlign.start,
                   style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
@@ -315,9 +354,9 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
     );
   }
 
-  Widget _buildTableRow(BuildContext context, LaborModel labor, int index) {
+  Widget _buildTableRow(BuildContext context, LaborModel labor, int index, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-    final columnWidths = _getColumnWidths(context);
+    final columnWidths = _getColumnWidths(context, totalWidth);
 
     return Container(
       decoration: BoxDecoration(
@@ -331,7 +370,10 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
           ),
         ),
       ),
-      padding: EdgeInsets.symmetric(vertical: context.cardPadding / 2),
+      padding: EdgeInsets.symmetric(
+        vertical: context.cardPadding / 2,
+        horizontal: context.cardPadding / 2, // Matched with header padding
+      ),
       child: Row(
         children: [
           Container(
@@ -342,13 +384,14 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               children: [
                 Text(
                   labor.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: context.bodyFontSize,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.charcoalGray,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (labor.isNewLabor || labor.isRecentLabor) ...[
                   SizedBox(height: context.smallPadding / 4),
@@ -399,13 +442,14 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.formattedPhone,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           Container(
@@ -413,13 +457,14 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.cnic ?? '-',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           Container(
@@ -427,25 +472,31 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
             child: Text(
               labor.designation,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
               style: TextStyle(
                 fontSize: context.subtitleFontSize,
                 fontWeight: FontWeight.w500,
                 color: AppTheme.charcoalGray,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (!context.shouldShowCompactLayout)
             Container(
               width: columnWidths[4],
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-              child: Text(
-                'PKR ${labor.salary.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: context.subtitleFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.charcoalGray,
+              child: Center(
+                child: Text(
+                  'PKR ${labor.salary.toStringAsFixed(0)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: context.subtitleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.charcoalGray,
+                  ),
                 ),
               ),
             ),
@@ -455,70 +506,68 @@ class _EnhancedLaborTableState extends State<EnhancedLaborTable> {
               padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
               child: Text(
                 labor.city,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: TextStyle(
                   fontSize: context.subtitleFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.charcoalGray,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 4 : 6],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.smallPadding,
-                vertical: context.smallPadding / 2,
-              ),
-              decoration: BoxDecoration(
-                color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive').withOpacity(0.1),
-                borderRadius: BorderRadius.circular(context.borderRadius('small')),
-                border: Border.all(
-                  color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive').withOpacity(0.3),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.smallPadding,
+                  vertical: context.smallPadding / 2,
                 ),
-              ),
-              child: Text(
-                labor.isActive ? l10n.active : l10n.inactive,
-                style: TextStyle(
-                  fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
-                  fontWeight: FontWeight.w600,
-                  color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive'),
+                decoration: BoxDecoration(
+                  color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive').withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  border: Border.all(
+                    color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive').withOpacity(0.3),
+                  ),
                 ),
-                textAlign: TextAlign.center,
+                child: Text(
+                  labor.isActive ? l10n.active : l10n.inactive,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: ResponsiveBreakpoints.getDashboardCaptionFontSize(context),
+                    fontWeight: FontWeight.w600,
+                    color: _helpers.getStatusColor(labor.isActive ? 'Active' : 'Inactive'),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 5 : 7],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatDate(labor.joiningDate),
-                  style: TextStyle(
-                    fontSize: context.subtitleFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.charcoalGray,
-                  ),
+            child: Center(
+              child: Text(
+                _formatDate(labor.joiningDate),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: TextStyle(
+                  fontSize: context.subtitleFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoalGray,
                 ),
-                Text(
-                  _formatDate(labor.joiningDate),
-                  style: TextStyle(
-                    fontSize: context.captionFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           Container(
             width: columnWidths[context.shouldShowCompactLayout ? 6 : 8],
             padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
-            child: _helpers.buildActionsRow(context, labor),
+            child: Center(child: _helpers.buildActionsRow(context, labor)),
           ),
         ],
       ),

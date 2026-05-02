@@ -3,7 +3,36 @@ from django.db import models
 from django.utils import timezone
 
 
+
+class Role(models.Model):
+    """Model for user roles"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class ModulePermission(models.Model):
+    """Model for role-based module permissions"""
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='permissions')
+    module_name = models.CharField(max_length=100)
+    can_view = models.BooleanField(default=False)
+    can_add = models.BooleanField(default=False)
+    can_edit = models.BooleanField(default=False)
+    can_delete = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'module_permission'
+        unique_together = ('role', 'module_name')
+
+    def __str__(self):
+        return f"{self.role.name} - {self.module_name}"
+
+
 class UserManager(BaseUserManager):
+
     """Custom user manager for email-based authentication"""
     
     def create_user(self, email, password=None, **extra_fields):
@@ -31,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
     agreed_to_terms = models.BooleanField(default=False)
     
     # Additional fields for Django admin and permissions

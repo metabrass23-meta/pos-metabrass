@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../src/models/purchase_model.dart';
 import '../../../src/providers/purchase_provider.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/permission_helper.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
 import 'purchase_table_helpers.dart';
 import 'view_purchase_details_dialog.dart';
@@ -108,134 +109,163 @@ class _PurchaseTableState extends State<PurchaseTable> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.pureWhite,
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: context.shadowBlur(),
-            offset: Offset(0, context.smallPadding),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = _getTableMinWidth(context);
+        final tableWidth = constraints.maxWidth > minTableWidth 
+            ? constraints.maxWidth 
+            : minTableWidth;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.pureWhite,
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: context.shadowBlur(),
+                offset: Offset(0, context.smallPadding),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(context.borderRadius('large')),
-        child: Column(
-          children: [
-            // --- Table Header (Fixed Top) ---
-            Container(
-              decoration: BoxDecoration(
-                color: AppTheme.lightGray.withOpacity(0.5),
-                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: SingleChildScrollView(
-                controller: _headerHorizontalController,
-                scrollDirection: Axis.horizontal,
-                physics: const ClampingScrollPhysics(),
-                child: Container(
-                  width: _calculateTotalWidth(),
-                  padding: EdgeInsets.symmetric(
-                    vertical: context.cardPadding * 0.75,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(context.borderRadius('large')),
+            child: Column(
+              children: [
+                // --- Table Header (Fixed Top) ---
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray.withOpacity(0.5),
+                    border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                   ),
-                  child: Row(children: _buildHeaderCells(context)),
-                ),
-              ),
-            ),
-
-            // --- Table Body (Scrollable Vertical & Horizontal) ---
-            Expanded(
-              child: Consumer<PurchaseProvider>(
-                builder: (context, provider, _) {
-                  // 1. Loading
-                  if (provider.isLoading && provider.purchases.isEmpty) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: AppTheme.primaryMaroon,
+                  child: SingleChildScrollView(
+                    controller: _headerHorizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: Container(
+                      width: tableWidth,
+                      padding: EdgeInsets.symmetric(
+                        vertical: context.cardPadding * 0.75,
                       ),
-                    );
-                  }
+                      child: Row(children: _buildHeaderCells(context, tableWidth)),
+                    ),
+                  ),
+                ),
 
-                  // 2. Empty
-                  if (provider.purchases.isEmpty) {
-                    return _buildEmptyState(context);
-                  }
+                // --- Table Body (Scrollable Vertical & Horizontal) ---
+                Expanded(
+                  child: Consumer<PurchaseProvider>(
+                    builder: (context, provider, _) {
+                      // 1. Loading
+                      if (provider.isLoading && provider.purchases.isEmpty) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppTheme.primaryMaroon,
+                          ),
+                        );
+                      }
 
-                  // Get filtered purchases
-                  final filteredPurchases = _getFilteredPurchases(
-                    provider.purchases,
-                  );
+                      // 2. Empty
+                      if (provider.purchases.isEmpty) {
+                        return _buildEmptyState(context);
+                      }
 
-                  if (filteredPurchases.isEmpty) {
-                    return _buildEmptyState(
-                      context,
-                      message: l10n.noPurchasesMatchFilter,
-                    );
-                  }
+                      // Get filtered purchases
+                      final filteredPurchases = _getFilteredPurchases(
+                        provider.purchases,
+                      );
 
-                  // 3. Data
-                  return Scrollbar(
-                    controller: _verticalController,
-                    thumbVisibility: true,
-                    trackVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: _verticalController,
-                      scrollDirection: Axis.vertical,
-                      child: Scrollbar(
-                        controller: _contentHorizontalController,
+                      if (filteredPurchases.isEmpty) {
+                        return _buildEmptyState(
+                          context,
+                          message: l10n.noPurchasesMatchFilter,
+                        );
+                      }
+
+                      // 3. Data
+                      return Scrollbar(
+                        controller: _verticalController,
                         thumbVisibility: true,
-                        notificationPredicate: (notification) =>
-                            notification.depth == 1,
+                        trackVisibility: true,
                         child: SingleChildScrollView(
-                          controller: _contentHorizontalController,
-                          scrollDirection: Axis.horizontal,
-                          physics: const ClampingScrollPhysics(),
-                          child: Container(
-                            width: _calculateTotalWidth(),
-                            child: Column(
-                              children: filteredPurchases.asMap().entries.map((
-                                entry,
-                              ) {
-                                return _buildTableRow(
-                                  context,
-                                  entry.value,
-                                  entry.key,
-                                );
-                              }).toList(),
+                          controller: _verticalController,
+                          scrollDirection: Axis.vertical,
+                          child: Scrollbar(
+                            controller: _contentHorizontalController,
+                            thumbVisibility: true,
+                            notificationPredicate: (notification) =>
+                                notification.depth == 1,
+                            child: SingleChildScrollView(
+                              controller: _contentHorizontalController,
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              child: Container(
+                                width: tableWidth,
+                                child: Column(
+                                  children: filteredPurchases.asMap().entries.map((
+                                    entry,
+                                  ) {
+                                    return _buildTableRow(
+                                      context,
+                                      entry.value,
+                                      entry.key,
+                                      tableWidth,
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   // --- Configuration ---
-  List<double> get _colWidths => [
-    110.0, // 0. Date
-    130.0, // 1. Invoice
-    180.0, // 2. Vendor
-    110.0, // 3. Subtotal
-    100.0, // 4. Tax
-    120.0, // 5. Total
-    110.0, // 6. Status
-    // 140.0, // 7. Actions - Commented out
-  ];
+  double _getTableMinWidth(BuildContext context) {
+    return 1350.0; // Increased minimum width to prevent column wrapping and ensure full visibility
+  }
 
-  double _calculateTotalWidth() => _colWidths.reduce((a, b) => a + b);
+  List<double> _getColumnWidths(BuildContext context, double totalWidth) {
+    // Fixed widths for columns that shouldn't expand
+    final double dateWidth = 120.0;
+    final double invoiceWidth = 140.0;
+    final double subtotalWidth = 140.0;
+    final double taxWidth = 110.0;
+    final double totalColWidth = 140.0;
+    final double statusWidth = 130.0;
+    final double actionsWidth = 180.0;
 
-  List<Widget> _buildHeaderCells(BuildContext context) {
+    final double fixedSum = dateWidth + invoiceWidth + subtotalWidth + taxWidth + totalColWidth + statusWidth + actionsWidth;
+    
+    // Vendor column (index 2) gets the remaining space, with a safety minimum
+    final double vendorWidth = (totalWidth - fixedSum).clamp(150.0, double.infinity);
+
+    return [
+      dateWidth,
+      invoiceWidth,
+      vendorWidth,
+      subtotalWidth,
+      taxWidth,
+      totalColWidth,
+      statusWidth,
+      actionsWidth,
+    ];
+  }
+
+  double _calculateTotalWidth(BuildContext context, double totalWidth) => totalWidth;
+
+  List<Widget> _buildHeaderCells(BuildContext context, double totalWidth) {
     final l10n = AppLocalizations.of(context)!;
-
-    // Localized Headers
+    final columnWidths = _getColumnWidths(context, totalWidth);
     final headers = [
       l10n.date,
       l10n.invoiceHash, // "Invoice #"
@@ -244,17 +274,21 @@ class _PurchaseTableState extends State<PurchaseTable> {
       l10n.tax,
       l10n.total,
       l10n.status,
+      l10n.actions,
     ];
 
     return List.generate(headers.length, (index) {
       final isNumeric = index >= 3 && index <= 5;
 
       return Container(
-        width: _colWidths[index],
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: columnWidths[index],
+        padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
         alignment: isNumeric ? Alignment.centerRight : Alignment.centerLeft,
         child: Text(
           headers[index].toUpperCase(),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
           style: TextStyle(
             fontSize: context.bodyFontSize,
             fontWeight: FontWeight.w700,
@@ -270,7 +304,9 @@ class _PurchaseTableState extends State<PurchaseTable> {
     BuildContext context,
     PurchaseModel purchase,
     int index,
+    double totalWidth,
   ) {
+    final columnWidths = _getColumnWidths(context, totalWidth);
     return Container(
       decoration: BoxDecoration(
         color: index.isEven
@@ -288,16 +324,18 @@ class _PurchaseTableState extends State<PurchaseTable> {
             DateFormat('dd-MM-yyyy').format(purchase.purchaseDate),
             0,
             context,
+            columnWidths,
           ),
 
           // 1. Invoice #
-          _textCell(purchase.invoiceNumber, 1, context, isBold: true),
+          _textCell(purchase.invoiceNumber, 1, context, columnWidths, isBold: true),
 
           // 2. Vendor
           _textCell(
             purchase.vendorName ?? purchase.vendor ?? 'Unknown',
             2,
             context,
+            columnWidths,
           ),
 
           // 3. Subtotal (Right Aligned)
@@ -305,6 +343,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
             purchase.subtotal.toStringAsFixed(2),
             3,
             context,
+            columnWidths,
             isNumeric: true,
           ),
 
@@ -313,6 +352,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
             purchase.tax.toStringAsFixed(2),
             4,
             context,
+            columnWidths,
             isNumeric: true,
           ),
 
@@ -321,6 +361,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
             purchase.total.toStringAsFixed(2),
             5,
             context,
+            columnWidths,
             isNumeric: true,
             isBold: true,
             color: AppTheme.primaryMaroon,
@@ -328,7 +369,7 @@ class _PurchaseTableState extends State<PurchaseTable> {
 
           // 6. Status
           Container(
-            width: _colWidths[6],
+            width: columnWidths[6],
             padding: const EdgeInsets.symmetric(horizontal: 8),
             alignment: Alignment.centerLeft,
             child: PurchaseTableHelpers.buildStatusBadge(
@@ -337,8 +378,8 @@ class _PurchaseTableState extends State<PurchaseTable> {
             ),
           ),
 
-          // 7. Actions - Commented out
-          // _actionCell(context, purchase, 7),
+          // 7. Actions
+          _actionCell(context, purchase, 7, columnWidths),
         ],
       ),
     );
@@ -347,30 +388,33 @@ class _PurchaseTableState extends State<PurchaseTable> {
   Widget _textCell(
     String text,
     int index,
-    BuildContext context, {
+    BuildContext context,
+    List<double> columnWidths, {
     bool isBold = false,
     Color? color,
     bool isNumeric = false,
   }) {
     return Container(
-      width: _colWidths[index],
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      width: columnWidths[index],
+      padding: EdgeInsets.symmetric(horizontal: context.smallPadding),
       alignment: isNumeric ? Alignment.centerRight : Alignment.centerLeft,
       child: Text(
         text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
         style: TextStyle(
           fontSize: context.bodyFontSize,
           fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
           color: color ?? AppTheme.charcoalGray,
         ),
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
 
-  Widget _actionCell(BuildContext context, PurchaseModel purchase, int index) {
+  Widget _actionCell(BuildContext context, PurchaseModel purchase, int index, List<double> columnWidths) {
     return Container(
-      width: _colWidths[index],
+      width: columnWidths[index],
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -382,19 +426,21 @@ class _PurchaseTableState extends State<PurchaseTable> {
             );
           }),
           const SizedBox(width: 8),
-          _iconButton(Icons.edit_outlined, Colors.orange, () {
-            showDialog(
-              context: context,
-              builder: (_) => EditPurchaseDialog(purchase: purchase),
-            );
-          }),
+          if (PermissionHelper.canEdit(context, 'Purchases'))
+            _iconButton(Icons.edit_outlined, Colors.orange, () {
+              showDialog(
+                context: context,
+                builder: (_) => EditPurchaseDialog(purchase: purchase),
+              );
+            }),
           const SizedBox(width: 8),
-          _iconButton(Icons.delete_outline, Colors.red, () {
-            showDialog(
-              context: context,
-              builder: (_) => DeletePurchaseDialog(purchase: purchase),
-            );
-          }),
+          if (PermissionHelper.canDelete(context, 'Purchases'))
+            _iconButton(Icons.delete_outline, Colors.red, () {
+              showDialog(
+                context: context,
+                builder: (_) => DeletePurchaseDialog(purchase: purchase),
+              );
+            }),
         ],
       ),
     );

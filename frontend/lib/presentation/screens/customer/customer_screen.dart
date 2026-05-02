@@ -11,6 +11,7 @@ import '../../widgets/customer/delete_customer_dialog.dart';
 import '../../widgets/customer/edit_customer_dialog.dart';
 import '../../widgets/customer/view_customer_dialog.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class CustomerPage extends StatefulWidget {
   const CustomerPage({super.key});
@@ -274,7 +275,8 @@ class _CustomerPageState extends State<CustomerPage> {
             ],
           ),
         ),
-        _buildAddButton(),
+        if (PermissionHelper.canAdd(context, 'Customers'))
+          _buildAddButton(),
       ],
     );
   }
@@ -303,7 +305,8 @@ class _CustomerPageState extends State<CustomerPage> {
           ),
         ),
         SizedBox(height: context.cardPadding),
-        SizedBox(width: double.infinity, child: _buildAddButton()),
+        if (PermissionHelper.canAdd(context, 'Customers'))
+          SizedBox(width: double.infinity, child: _buildAddButton()),
       ],
     );
   }

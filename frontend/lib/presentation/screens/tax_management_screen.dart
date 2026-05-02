@@ -9,6 +9,7 @@ import '../../src/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../widgets/sales/tax_configuration_widget.dart';
 import '../../src/services/tax_rates_service.dart';
+import '../../src/utils/permission_helper.dart';
 
 class TaxManagementScreen extends StatefulWidget {
   const TaxManagementScreen({super.key});
@@ -94,14 +95,15 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
       children: [
         _buildSearchField(),
         SizedBox(width: context.cardPadding),
-        ElevatedButton.icon(
-          onPressed: () => _showAddTaxRateDialog(),
-          icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
-          label: Text(
-            l10n.addTaxRate,
-            style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+        if (PermissionHelper.canAdd(context, 'Tax Management'))
+          ElevatedButton.icon(
+            onPressed: () => _showAddTaxRateDialog(),
+            icon: Icon(Icons.add_rounded, color: AppTheme.pureWhite, size: context.iconSize('small')),
+            label: Text(
+              l10n.addTaxRate,
+              style: TextStyle(color: AppTheme.pureWhite, fontWeight: FontWeight.w500),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -352,36 +354,39 @@ class _TaxManagementScreenState extends State<TaxManagementScreen> {
               icon: Icon(Icons.more_vert_rounded, color: AppTheme.charcoalGray),
               onSelected: (value) => _handleTaxRateAction(value, taxRate),
               itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit_rounded, color: AppTheme.primaryMaroon),
-                      SizedBox(width: context.smallPadding),
-                      Text(l10n.edit),
-                    ],
+                if (PermissionHelper.canEdit(context, 'Tax Management'))
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_rounded, color: AppTheme.primaryMaroon),
+                        SizedBox(width: context.smallPadding),
+                        Text(l10n.edit),
+                      ],
+                    ),
                   ),
-                ),
-                PopupMenuItem(
-                  value: 'toggle',
-                  child: Row(
-                    children: [
-                      Icon(taxRate.isActive ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: AppTheme.primaryMaroon),
-                      SizedBox(width: context.smallPadding),
-                      Text(taxRate.isActive ? l10n.deactivate : l10n.activate),
-                    ],
+                if (PermissionHelper.canEdit(context, 'Tax Management'))
+                  PopupMenuItem(
+                    value: 'toggle',
+                    child: Row(
+                      children: [
+                        Icon(taxRate.isActive ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: AppTheme.primaryMaroon),
+                        SizedBox(width: context.smallPadding),
+                        Text(taxRate.isActive ? l10n.deactivate : l10n.activate),
+                      ],
+                    ),
                   ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_rounded, color: Colors.red),
-                      SizedBox(width: context.smallPadding),
-                      Text(l10n.delete),
-                    ],
+                if (PermissionHelper.canDelete(context, 'Tax Management'))
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_rounded, color: Colors.red),
+                        SizedBox(width: context.smallPadding),
+                        Text(l10n.delete),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ],

@@ -96,8 +96,8 @@ class _PremiumTextFieldState extends State<PremiumTextField>
               widget.onSubmitted, // Pass onSubmitted to TextFormField
           inputFormatters:
               widget.inputFormatters, // Pass inputFormatters to TextFormField
-          style: TextStyle(
-            fontSize: 10.sp,
+          style: const TextStyle(
+            fontSize: 14.0,
             fontWeight: FontWeight.w400,
             color: AppTheme.charcoalGray,
           ),
@@ -162,12 +162,12 @@ class _PremiumTextFieldState extends State<PremiumTextField>
               color: _isFocused
                   ? AppTheme.primaryMaroon
                   : const Color(0xFF9E9E9E),
-              fontSize: 10.sp,
+              fontSize: 14.0,
               fontWeight: FontWeight.w500,
             ),
-            hintStyle: TextStyle(
-              color: const Color(0xFF9E9E9E),
-              fontSize: 10.sp,
+            hintStyle: const TextStyle(
+              color: Color(0xFF9E9E9E),
+              fontSize: 14.0,
               fontWeight: FontWeight.w400,
             ),
           ),

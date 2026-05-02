@@ -7,6 +7,7 @@ import '../../../src/providers/labor_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../globals/confirmation_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class LaborTableHelpers {
   final Function(LaborModel) onEdit;
@@ -40,40 +41,46 @@ class LaborTableHelpers {
         SizedBox(width: context.smallPadding / 2),
 
         // Edit Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onEdit(labor),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+        if (PermissionHelper.canEdit(context, 'Labour'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onEdit(labor),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  ),
+                  child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
+                ),
               ),
-              child: Icon(Icons.edit_outlined, color: Colors.blue, size: context.iconSize('small')),
             ),
           ),
-        ),
-
-        SizedBox(width: context.smallPadding / 2),
 
         // Delete Button
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => onDelete(labor),
-            borderRadius: BorderRadius.circular(context.borderRadius('small')),
-            child: Container(
-              padding: EdgeInsets.all(context.smallPadding * 0.5),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+        if (PermissionHelper.canDelete(context, 'Labour'))
+          Padding(
+            padding: EdgeInsets.only(left: context.smallPadding / 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onDelete(labor),
                 borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                child: Container(
+                  padding: EdgeInsets.all(context.smallPadding * 0.5),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(context.borderRadius('small')),
+                  ),
+                  child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
+                ),
               ),
-              child: Icon(Icons.delete_outline, color: Colors.red, size: context.iconSize('small')),
             ),
           ),
-        ),
 
         SizedBox(width: context.smallPadding / 2),
 

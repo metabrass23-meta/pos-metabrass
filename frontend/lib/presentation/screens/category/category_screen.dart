@@ -11,6 +11,7 @@ import '../../widgets/category/delete_category_dialog.dart';
 import '../../widgets/category/edit_category_dialog.dart';
 import '../../widgets/category/view_category_details_dialog.dart';
 import '../../widgets/category/category_filter_dialog.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -93,26 +94,9 @@ class _CategoryPageState extends State<CategoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Responsive Header Section
-            ResponsiveBreakpoints.responsive(
-              context,
-              tablet: _buildTabletHeader(),
-              small: _buildMobileHeader(),
-              medium: _buildDesktopHeader(),
-              large: _buildDesktopHeader(),
-              ultrawide: _buildDesktopHeader(),
-            ),
-
+            _buildHeader(context),
             SizedBox(height: context.mainPadding),
-
-            // Responsive Stats Cards
-            Consumer<CategoryProvider>(
-              builder: (context, provider, child) {
-                return context.statsCardColumns == 2
-                    ? _buildMobileStatsGrid(provider)
-                    : _buildDesktopStatsRow(provider);
-              },
-            ),
+            _buildStatsSection(context),
 
             SizedBox(height: context.cardPadding * 0.5),
 
@@ -133,6 +117,129 @@ class _CategoryPageState extends State<CategoryPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 600;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.category,
+                        style: TextStyle(
+                          fontSize: context.headingFontSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.charcoalGray,
+                          letterSpacing: -0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (!isNarrow) ...[
+                        SizedBox(height: context.cardPadding / 4),
+                        Text(
+                          l10n.manageProductCategories,
+                          style: TextStyle(
+                            fontSize: context.bodyFontSize,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                SizedBox(width: context.smallPadding),
+                if (PermissionHelper.canAdd(context, 'Category'))
+                  _buildAddButton(),
+              ],
+            ),
+            if (isNarrow) ...[
+              SizedBox(height: context.smallPadding),
+              Text(
+                l10n.manageProductCategories,
+                style: TextStyle(
+                  fontSize: context.bodyFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatsSection(BuildContext context) {
+    return Consumer<CategoryProvider>(
+      builder: (context, provider, child) {
+        final l10n = AppLocalizations.of(context)!;
+        final stats = provider.categoryStats;
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final cardCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1000 ? 2 : 4);
+            final spacing = context.mainPadding;
+            final itemWidth = (constraints.maxWidth - (spacing * (cardCount - 1))) / cardCount;
+
+            return Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              children: [
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildStatsCard(
+                      '${l10n.total} ${l10n.category}',
+                      stats['total'].toString(),
+                      Icons.category_rounded,
+                      Colors.blue
+                  ),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildStatsCard(
+                      l10n.recent,
+                      stats['recentlyAdded'].toString(),
+                      Icons.new_releases_rounded,
+                      Colors.green
+                  ),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildStatsCard(
+                      l10n.popular,
+                      stats['mostPopular'],
+                      Icons.trending_up_rounded,
+                      Colors.purple
+                  ),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: _buildStatsCard(
+                      l10n.updated,
+                      stats['recentlyUpdated'].toString(),
+                      Icons.update_rounded,
+                      Colors.orange
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -245,10 +352,11 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(height: context.cardPadding),
 
         // Add Category Button (full width on tablet)
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        if (PermissionHelper.canAdd(context, 'Category'))
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddButton(),
+          ),
       ],
     );
   }
@@ -281,10 +389,11 @@ class _CategoryPageState extends State<CategoryPage> {
         SizedBox(height: context.cardPadding),
 
         // Add Category Button (full width)
-        SizedBox(
-          width: double.infinity,
-          child: _buildAddButton(),
-        ),
+        if (PermissionHelper.canAdd(context, 'Category'))
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddButton(),
+          ),
       ],
     );
   }
@@ -447,74 +556,31 @@ class _CategoryPageState extends State<CategoryPage> {
           ),
         ],
       ),
-      child: ResponsiveBreakpoints.responsive(
-        context,
-        tablet: _buildTabletSearchLayout(),
-        small: _buildMobileSearchLayout(),
-        medium: _buildDesktopSearchLayout(),
-        large: _buildDesktopSearchLayout(),
-        ultrawide: _buildDesktopSearchLayout(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 700;
+          final itemWidth = isNarrow ? constraints.maxWidth : (constraints.maxWidth - (context.cardPadding * 2)) / 3;
+
+          return Wrap(
+            spacing: context.cardPadding,
+            runSpacing: context.smallPadding,
+            children: [
+              SizedBox(
+                width: isNarrow ? constraints.maxWidth : itemWidth * 1.5,
+                child: _buildSearchBar(),
+              ),
+              SizedBox(
+                width: isNarrow ? (constraints.maxWidth - context.cardPadding) / 2 : itemWidth * 0.7,
+                child: _buildFilterButton(),
+              ),
+              SizedBox(
+                width: isNarrow ? (constraints.maxWidth - context.cardPadding) / 2 : itemWidth * 0.7,
+                child: _buildExportButton(),
+              ),
+            ],
+          );
+        },
       ),
-    );
-  }
-
-  Widget _buildDesktopSearchLayout() {
-    return Row(
-      children: [
-        // Search Bar
-        Expanded(
-          flex: 3,
-          child: _buildSearchBar(),
-        ),
-
-        SizedBox(width: context.cardPadding),
-
-        // Filter Button
-        Expanded(
-          flex: 1,
-          child: _buildFilterButton(),
-        ),
-
-        SizedBox(width: context.smallPadding),
-
-        // Export Button
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabletSearchLayout() {
-    return Column(
-      children: [
-        _buildSearchBar(),
-        SizedBox(height: context.cardPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileSearchLayout() {
-    return Column(
-      children: [
-        _buildSearchBar(),
-        SizedBox(height: context.smallPadding),
-        Row(
-          children: [
-            Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
-          ],
-        ),
-      ],
     );
   }
 

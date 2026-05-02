@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../../src/providers/sales_provider.dart';
 import '../../../src/models/customer/customer_model.dart';
 import '../../../src/theme/app_theme.dart';
+import '../../../src/utils/permission_helper.dart';
 import '../sales/order_success_dialog.dart';
 import '../barcode/barcode_scanner_widget.dart';
 
@@ -43,9 +44,18 @@ class _CartSidebarState extends State<CartSidebar> {
       child: Column(
         children: [
           _buildCartHeader(),
-          _buildCustomerSelection(),
-          _buildBarcodeScanner(),
-          Expanded(child: _buildCartItems()),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildCustomerSelection(),
+                  _buildBarcodeScanner(),
+                  _buildCartItems(),
+                ],
+              ),
+            ),
+          ),
           _buildCartSummary(),
           _buildCheckoutButtons(),
         ],
@@ -310,6 +320,8 @@ class _CartSidebarState extends State<CartSidebar> {
         }
 
         return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(vertical: context.smallPadding / 2),
           itemCount: provider.currentCart.length,
           itemBuilder: (context, index) {
@@ -324,7 +336,8 @@ class _CartSidebarState extends State<CartSidebar> {
   Widget _buildEmptyCart() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Center(
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: context.cardPadding * 2),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -625,7 +638,7 @@ class _CartSidebarState extends State<CartSidebar> {
         }
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding),
+          padding: EdgeInsets.symmetric(horizontal: context.cardPadding, vertical: context.smallPadding / 2),
           decoration: BoxDecoration(
             color: AppTheme.lightGray.withOpacity(0.3),
             border: Border(
@@ -763,6 +776,23 @@ class _CartSidebarState extends State<CartSidebar> {
 
   Widget _buildCheckoutButtons() {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!PermissionHelper.canAdd(context, 'Sales')) {
+      return Container(
+        padding: EdgeInsets.all(context.cardPadding / 2),
+        child: Center(
+          child: Text(
+            'You do not have permission to create sales.',
+            style: TextStyle(
+              color: Colors.red.shade700,
+              fontSize: context.captionFontSize,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
 
     return Consumer<SalesProvider>(
       builder: (context, provider, child) {

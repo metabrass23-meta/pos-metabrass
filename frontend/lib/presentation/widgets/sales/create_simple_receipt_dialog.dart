@@ -311,7 +311,7 @@ class _CreateSimpleReceiptDialogState extends State<CreateSimpleReceiptDialog> {
                                     ),
                                     const SizedBox(height: 12),
                                     _buildPreviewRow('Invoice Number', selectedSale.invoiceNumber),
-                                    _buildPreviewRow('Customer', selectedSale.customerName),
+                                    _buildPreviewRow('Customers', selectedSale.customerName),
                                     _buildPreviewRow('Date', _formatDate(selectedSale.dateOfSale.toIso8601String())),
                                     _buildPreviewRow('Payment Method', selectedSale.paymentMethod),
                                     const SizedBox(height: 8),

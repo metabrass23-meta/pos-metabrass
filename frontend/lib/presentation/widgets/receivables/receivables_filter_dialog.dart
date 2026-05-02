@@ -109,7 +109,7 @@ class _ReceivablesFilterDialogState extends State<ReceivablesFilterDialog> {
             Consumer<CustomerProvider>(
               builder: (context, provider, child) {
                 return PremiumDropdownField(
-                  label: l10n.customer ?? "Customer",
+                  label: l10n.customer ?? "Customers",
                   hint: l10n.selectCustomer ?? "Select Customer",
                   value: _currentFilter.customerId,
                   items: [

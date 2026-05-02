@@ -66,3 +66,38 @@ class PurchaseSerializer(serializers.ModelSerializer):
         purchase.save()
 
         return purchase
+
+    def update(self, instance, validated_data):
+        items_data = validated_data.pop('items', None)
+        
+        # Update main purchase fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        if items_data is not None:
+            # Delete old items. This triggers post_delete and reduces stock.
+            instance.items.all().delete()
+            
+            subtotal = 0
+            for item in items_data:
+                product = item['product']
+                quantity = item['quantity']
+                unit_cost = item['unit_cost']
+                total_cost = quantity * unit_cost
+
+                # This triggers post_save and increases stock.
+                PurchaseItem.objects.create(
+                    purchase=instance,
+                    product=product,
+                    quantity=quantity,
+                    unit_cost=unit_cost,
+                    total_cost=total_cost
+                )
+                subtotal += total_cost
+                
+            instance.subtotal = subtotal
+            
+        instance.total = instance.subtotal + instance.tax
+        instance.save()
+        
+        return instance

@@ -16,6 +16,7 @@ import '../../widgets/sales/edit_sale_dialog.dart';
 import '../../widgets/sales/delete_sales_dialog.dart';
 import '../../widgets/sales/view_sales_dialog.dart';
 import '../../../src/models/sales/sale_model.dart';
+import '../../../src/utils/permission_helper.dart';
 
 class ReceivablesPage extends StatefulWidget {
   const ReceivablesPage({super.key});
@@ -374,6 +375,10 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
   Widget _buildAddButton() {
     final l10n = AppLocalizations.of(context)!;
 
+    if (!PermissionHelper.canAdd(context, 'Receivables')) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -552,11 +557,6 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
           flex: 1,
           child: _buildFilterButton(),
         ),
-        SizedBox(width: context.smallPadding),
-        Expanded(
-          flex: 1,
-          child: _buildExportButton(),
-        ),
       ],
     );
   }
@@ -569,8 +569,6 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.cardPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -585,8 +583,6 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
         Row(
           children: [
             Expanded(child: _buildFilterButton()),
-            SizedBox(width: context.smallPadding),
-            Expanded(child: _buildExportButton()),
           ],
         ),
       ],
@@ -687,43 +683,7 @@ class _ReceivablesPageState extends State<ReceivablesPage> {
     );
   }
 
-  Widget _buildExportButton() {
-    final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: context.buttonHeight / 1.5,
-      padding: EdgeInsets.symmetric(horizontal: context.cardPadding / 2),
-      decoration: BoxDecoration(
-        color: AppTheme.accentGold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(context.borderRadius()),
-        border: Border.all(
-          color: AppTheme.accentGold.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.download_rounded,
-            color: AppTheme.accentGold,
-            size: context.iconSize('medium'),
-          ),
-          if (!context.isTablet) ...[
-            SizedBox(width: context.smallPadding),
-            Text(
-              l10n.export,
-              style: TextStyle(
-                fontSize: context.bodyFontSize,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.accentGold,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
 
   Widget _buildStatsCard(String title, String value, IconData icon, Color color) {
     return Container(

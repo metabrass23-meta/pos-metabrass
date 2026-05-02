@@ -54,21 +54,14 @@ def purchase_list(request):
                 'errors': {'detail': str(e)}
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def purchase_detail(request, pk):
     """
-    Retrieve a specific purchase
+    Retrieve, update or delete a specific purchase
     """
     try:
         purchase = Purchase.objects.get(pk=pk)
-        serializer = PurchaseSerializer(purchase)
-        
-        return Response({
-            'success': True,
-            'data': serializer.data
-        }, status=status.HTTP_200_OK)
-        
     except Purchase.DoesNotExist:
         return Response({
             'success': False,
@@ -78,6 +71,58 @@ def purchase_detail(request, pk):
     except Exception as e:
         return Response({
             'success': False,
-            'message': 'An error occurred while fetching purchase details.',
+            'message': 'An error occurred while finding purchase.',
             'errors': {'detail': str(e)}
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    if request.method == 'GET':
+        try:
+            serializer = PurchaseSerializer(purchase)
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'An error occurred while fetching purchase details.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    elif request.method == 'PUT':
+        try:
+            with transaction.atomic():
+                serializer = PurchaseSerializer(purchase, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({
+                        'success': True,
+                        'message': 'Purchase updated successfully.',
+                        'data': serializer.data
+                    }, status=status.HTTP_200_OK)
+                return Response({
+                    'success': False,
+                    'message': 'Failed to update purchase.',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'An error occurred while updating purchase.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    elif request.method == 'DELETE':
+        try:
+            with transaction.atomic():
+                purchase.delete()
+                return Response({
+                    'success': True,
+                    'message': 'Purchase deleted successfully.'
+                }, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'An error occurred while deleting purchase.',
+                'errors': {'detail': str(e)}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

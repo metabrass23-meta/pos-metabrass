@@ -840,7 +840,7 @@ class _AddPrincipalAccountDialogState extends State<AddPrincipalAccountDialog>
       case 'sales':
         return 'Sales';
       case 'payment':
-        return 'Payment';
+        return 'Payments';
       case 'advance_payment':
         return 'Advance Payment';
       case 'expenses':

@@ -2,10 +2,25 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Role, ModulePermission
 
+
+
+class ModulePermissionSerializer(models.Model if False else serializers.ModelSerializer):
+    class Meta:
+        model = ModulePermission
+        fields = ('id', 'module_name', 'can_view', 'can_add', 'can_edit', 'can_delete')
+
+class RoleSerializer(serializers.ModelSerializer):
+    permissions = ModulePermissionSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Role
+        fields = ('id', 'name', 'description', 'permissions', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+
     """Serializer for user registration"""
     
     password = serializers.CharField(
@@ -20,7 +35,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'full_name', 'email', 'password', 'password_confirm', 'agreed_to_terms')
+        fields = ('id', 'full_name', 'email', 'password', 'password_confirm', 'agreed_to_terms', 'role')
+
         extra_kwargs = {
             'password': {'write_only': True},
             'id': {'read_only': True}
@@ -112,11 +128,17 @@ class UserLoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
+    role_name = serializers.SerializerMethodField()
+    role_data = RoleSerializer(source='role', read_only=True)
     
     class Meta:
         model = User
-        fields = ('id', 'full_name', 'email', 'date_joined', 'last_login')
-        read_only_fields = ('id', 'date_joined', 'last_login')
+        fields = ('id', 'full_name', 'email', 'date_joined', 'last_login', 'is_active', 'role', 'role_name', 'role_data')
+        read_only_fields = ('id', 'date_joined', 'last_login', 'role_name', 'role_data')
+
+    def get_role_name(self, obj):
+        return obj.role.name if obj.role else "No Role Assigned"
+
 
 
 class ChangePasswordSerializer(serializers.Serializer):

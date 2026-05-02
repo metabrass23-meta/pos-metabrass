@@ -20,7 +20,10 @@ import '../../../src/providers/invoice_provider.dart';
 import '../../../src/providers/receipt_provider.dart';
 import '../../../src/theme/app_theme.dart';
 import '../../../src/utils/responsive_breakpoints.dart';
+import '../../../src/utils/storage_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../src/providers/dashboard_provider.dart';
+import '../../../src/models/role_model.dart';
 
 class LogoutDialogWidget extends StatefulWidget {
   final bool isExpanded;
@@ -121,13 +124,19 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
                         duration: const Duration(seconds: 2),
                       ),
                     );
+                    final navigator = Navigator.of(context);
+                    final dashboardProvider = context.read<DashboardProvider>();
+                    
                     try {
                       await authProvider.logout();
+                      await StorageService().clearAll();
+                      
+                      dashboardProvider.reset();
+                      navigator.pushNamedAndRemoveUntil(
+                        '/login',
+                        (route) => false,
+                      );
                       if (mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/login',
-                              (route) => false,
-                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -203,8 +212,8 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
         child: Container(
           padding: EdgeInsets.all(
             widget.isExpanded
-                ? context.smallPadding / 1.5
-                : context.smallPadding,
+                ? context.sidebarPadding / 1.5
+                : context.sidebarPadding,
           ),
           decoration: BoxDecoration(
             color: Colors.red.withOpacity(0.15),
@@ -217,13 +226,13 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               Icon(
                 Icons.logout_rounded,
                 color: Colors.red.shade300,
-                size: context.iconSize('small'),
+                size: context.sidebarIconSize * 0.8,
               ),
-              SizedBox(width: context.smallPadding),
+              SizedBox(width: context.sidebarPadding),
               Text(
                 AppLocalizations.of(context)!.logout,
                 style: TextStyle(
-                  fontSize: context.bodyFontSize,
+                  fontSize: context.sidebarFontSize,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.pureWhite,
                 ),
@@ -233,7 +242,7 @@ class _LogoutDialogWidgetState extends State<LogoutDialogWidget> {
               : Icon(
             Icons.logout_rounded,
             color: Colors.red.shade300,
-            size: context.iconSize('medium'),
+            size: context.sidebarIconSize,
           ),
         ),
       ),
@@ -275,29 +284,51 @@ class PremiumSidebar extends StatelessWidget {
     final invoicesCount = context.watch<InvoiceProvider>().invoices.length.toString();
     final receiptsCount = context.watch<ReceiptProvider>().receipts.length.toString();
 
-    return [
-      {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null},
-      {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount},
-      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount},
-      {'icon': Icons.inventory_2_rounded, 'title': l10n.products, 'badge': productsCount},
-      {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount},
-      {'icon': Icons.description_rounded, 'title': 'Quotations', 'badge': null},
-      {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': customersCount},
-      {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': vendorsCount},
-      {'icon': Icons.engineering_rounded, 'title': l10n.labor, 'badge': laborsCount},
-      {'icon': Icons.account_balance_wallet_rounded, 'title': l10n.receivables, 'badge': receivablesCount},
-      {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': payablesCount},
-      {'icon': Icons.payments_rounded, 'title': l10n.advancePayment, 'badge': advancePaymentsCount},
-      {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': paymentsCount},
-      {'icon': Icons.account_balance_rounded, 'title': l10n.expenses, 'badge': expensesCount},
-      {'icon': Icons.account_circle_rounded, 'title': l10n.principalAccount, 'badge': null},
-      {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': zakatCount},
-      {'icon': Icons.calculate_rounded, 'title': l10n.profitLoss, 'badge': null},
-      {'icon': Icons.assignment_return_rounded, 'title': l10n.returns, 'badge': returnsCount},
-      {'icon': Icons.receipt_long_rounded, 'title': l10n.invoices, 'badge': invoicesCount},
-      {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': receiptsCount},
-      {'icon': Icons.settings_rounded, 'title': l10n.settings, 'badge': null},
+    final allItems = [
+      {'icon': Icons.dashboard_rounded, 'title': l10n.dashboard, 'badge': null, 'module': 'Dashboard', 'globalIndex': 0},
+      {'icon': Icons.point_of_sale_rounded, 'title': l10n.sales, 'badge': salesCount, 'module': 'Sales', 'globalIndex': 1},
+      {'icon': Icons.shopping_cart_rounded, 'title': l10n.purchases, 'badge': purchasesCount, 'module': 'Purchases', 'globalIndex': 2},
+      {'icon': Icons.inventory_2_rounded, 'title': l10n.products, 'badge': productsCount, 'module': 'Products', 'globalIndex': 3},
+      {'icon': Icons.category_rounded, 'title': l10n.category, 'badge': categoriesCount, 'module': 'Category', 'globalIndex': 4},
+      {'icon': Icons.description_rounded, 'title': 'Quotations', 'badge': null, 'module': 'Quotations', 'globalIndex': 5},
+      {'icon': Icons.people_rounded, 'title': l10n.customers, 'badge': customersCount, 'module': 'Customers', 'globalIndex': 6},
+      {'icon': Icons.store_rounded, 'title': l10n.vendor, 'badge': vendorsCount, 'module': 'Vendor', 'globalIndex': 7},
+      {'icon': Icons.engineering_rounded, 'title': l10n.labor, 'badge': laborsCount, 'module': 'Labour', 'globalIndex': 8},
+      {'icon': Icons.account_balance_wallet_rounded, 'title': l10n.receivables, 'badge': receivablesCount, 'module': 'Receivables', 'globalIndex': 9},
+      {'icon': Icons.money_off_rounded, 'title': l10n.payables, 'badge': payablesCount, 'module': 'Payables', 'globalIndex': 10},
+      {'icon': Icons.payments_rounded, 'title': l10n.advancePayment, 'badge': advancePaymentsCount, 'module': 'Advance Payment', 'globalIndex': 11},
+      {'icon': Icons.payment_rounded, 'title': l10n.payments, 'badge': paymentsCount, 'module': 'Payments', 'globalIndex': 12},
+      {'icon': Icons.account_balance_rounded, 'title': l10n.expenses, 'badge': expensesCount, 'module': 'Expenses', 'globalIndex': 13},
+      {'icon': Icons.account_circle_rounded, 'title': l10n.principalAccount, 'badge': null, 'module': 'Principal Account', 'globalIndex': 14},
+      {'icon': Icons.handshake_rounded, 'title': l10n.zakat, 'badge': zakatCount, 'module': 'Zakat', 'globalIndex': 15},
+      {'icon': Icons.calculate_rounded, 'title': l10n.profitLoss, 'badge': null, 'module': 'Profit & Loss', 'globalIndex': 16},
+      {'icon': Icons.assignment_return_rounded, 'title': l10n.returns, 'badge': returnsCount, 'module': 'Returns', 'globalIndex': 17},
+      {'icon': Icons.receipt_long_rounded, 'title': l10n.invoices, 'badge': invoicesCount, 'module': 'Invoices', 'globalIndex': 18},
+      {'icon': Icons.receipt_rounded, 'title': l10n.receipts, 'badge': receiptsCount, 'module': 'Receipts', 'globalIndex': 19},
+      {'icon': Icons.manage_accounts_rounded, 'title': 'User Management', 'badge': null, 'module': 'User Management', 'globalIndex': 20},
+      {'icon': Icons.security_rounded, 'title': 'Roles & Permissions', 'badge': null, 'module': 'Roles & Permissions', 'globalIndex': 21},
+      {'icon': Icons.settings_rounded, 'title': l10n.settings, 'badge': null, 'module': 'Settings', 'globalIndex': 22},
     ];
+
+    final user = context.watch<AuthProvider>().currentUser;
+    if (user == null) return allItems;
+    
+    // Admin sees everything
+    if (user.roleName == 'Admin') return allItems;
+
+    // Filter based on permissions
+    return allItems.where((item) {
+      if (item['module'] == null) {
+        // Non-admins cannot see Settings
+        if (item['title'] == l10n.settings) return false;
+        return true; 
+      }
+      final permission = user.roleData?.permissions.firstWhere(
+        (p) => p.moduleName.toLowerCase() == item['module'].toString().toLowerCase(),
+        orElse: () => ModulePermissionModel(moduleName: '', canView: false),
+      );
+      return permission?.canView ?? false;
+    }).toList();
   }
 
   @override
@@ -306,7 +337,7 @@ class PremiumSidebar extends StatelessWidget {
       width: isExpanded
           ? context.sidebarExpandedWidth
           : context.sidebarCollapsedWidth,
-      height: 100.h,
+      height: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -398,7 +429,7 @@ class PremiumSidebar extends StatelessWidget {
                   itemCount: menuItems.length,
                   itemBuilder: (context, index) {
                     final item = menuItems[index];
-                    final isSelected = index == selectedIndex;
+                    final isSelected = item['globalIndex'] == selectedIndex;
 
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -409,15 +440,15 @@ class PremiumSidebar extends StatelessWidget {
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () => onMenuSelected(index),
+                          onTap: () => onMenuSelected(item['globalIndex']),
                           borderRadius: BorderRadius.circular(
                             context.borderRadius(),
                           ),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.smallPadding * 1.2,
-                              vertical: context.cardPadding / 2,
+                              horizontal: context.sidebarPadding,
+                              vertical: context.sidebarPadding / 2,
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
@@ -451,18 +482,18 @@ class PremiumSidebar extends StatelessWidget {
                                     color: isSelected
                                         ? AppTheme.accentGold
                                         : AppTheme.pureWhite.withOpacity(0.8),
-                                    size: context.iconSize('medium'),
+                                    size: context.sidebarIconSize,
                                   ),
                                 ),
 
-                                if (isExpanded) ...[
-                                  SizedBox(width: context.smallPadding),
+                                  if (isExpanded) ...[
+                                    SizedBox(width: context.sidebarPadding),
 
-                                  Expanded(
+                                    Expanded(
                                     child: Text(
                                       item['title'],
                                       style: TextStyle(
-                                        fontSize: context.subtitleFontSize,
+                                        fontSize: context.sidebarFontSize,
                                         fontWeight: isSelected
                                             ? FontWeight.w600
                                             : FontWeight.w400,
@@ -472,16 +503,16 @@ class PremiumSidebar extends StatelessWidget {
                                         letterSpacing: 0.2,
                                       ),
                                       maxLines: 1,
-                                      overflow: TextOverflow.fade,
+                                      overflow: TextOverflow.ellipsis,
                                       softWrap: false,
                                     ),
                                   ),
                                   if (item['badge'] != null) ...[
-                                    SizedBox(width: context.smallPadding / 1.5),
+                                    SizedBox(width: context.sidebarPadding / 2),
                                     Container(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: context.smallPadding,
-                                        vertical: context.smallPadding / 2,
+                                        horizontal: (context.smallPadding * 0.6).clamp(6.0, 12.0),
+                                        vertical: (context.smallPadding * 0.3).clamp(2.0, 6.0),
                                       ),
                                       decoration: BoxDecoration(
                                         color: AppTheme.accentGold.withOpacity(0.9),
@@ -492,7 +523,7 @@ class PremiumSidebar extends StatelessWidget {
                                       child: Text(
                                         item['badge'],
                                         style: TextStyle(
-                                          fontSize: context.captionFontSize,
+                                          fontSize: context.sidebarBadgeFontSize,
                                           fontWeight: FontWeight.w600,
                                           color: AppTheme.pureWhite,
                                         ),
@@ -514,7 +545,7 @@ class PremiumSidebar extends StatelessWidget {
 
           // Footer
           Container(
-            padding: EdgeInsets.all(context.cardPadding),
+            padding: EdgeInsets.all(context.sidebarPadding),
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
@@ -532,26 +563,26 @@ class PremiumSidebar extends StatelessWidget {
                       return Row(
                         children: [
                           CircleAvatar(
-                            radius: context.iconSize('medium') / 2,
+                            radius: context.sidebarIconSize / 2,
                             backgroundColor: AppTheme.accentGold,
                             child: Text(
                               user?.fullName.isNotEmpty == true
                                   ? user!.fullName[0].toUpperCase()
                                   : 'U',
                               style: TextStyle(
-                                fontSize: context.bodyFontSize,
+                                fontSize: context.sidebarFontSize * 0.9,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.primaryMaroon,
                               ),
                             ),
                           ),
-                          SizedBox(width: context.smallPadding),
+                          SizedBox(width: context.sidebarPadding),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  user?.fullName ?? 'User',
+                                  user?.fullName ?? '',
                                   style: TextStyle(
                                     fontSize: context.bodyFontSize * 1.1,
                                     fontWeight: FontWeight.w500,
@@ -559,15 +590,15 @@ class PremiumSidebar extends StatelessWidget {
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(
-                                  user?.email ?? 'user@email.com',
-                                  style: TextStyle(
-                                    fontSize: context.captionFontSize * 1.1,
-                                    fontWeight: FontWeight.w300,
-                                    color: AppTheme.pureWhite.withOpacity(0.7),
+                                  Text(
+                                    user?.email ?? '',
+                                    style: TextStyle(
+                                      fontSize: context.sidebarFontSize * 0.8,
+                                      fontWeight: FontWeight.w300,
+                                      color: AppTheme.pureWhite.withOpacity(0.7),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
                               ],
                             ),
                           ),

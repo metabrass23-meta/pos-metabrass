@@ -6,13 +6,18 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import login, logout
 from django.utils import timezone
 from django.db import transaction
-from .models import User
+from .models import User, Role, ModulePermission
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
     UserSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    RoleSerializer,
+    ModulePermissionSerializer
 )
+from rest_framework import viewsets
+from rest_framework.routers import DefaultRouter
+
 
 
 @api_view(['POST'])
@@ -259,4 +264,139 @@ class UserProfileAPIView(generics.RetrieveUpdateAPIView):
     
     def get_object(self):
         return self.request.user
+
+class RoleViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing roles and permissions"""
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'data': response.data
+        })
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'data': response.data
+        })
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        role = serializer.save()
+        # Initialize default permissions for all modules (Matching Sidebar Labels)
+        modules = [
+            'Dashboard', 'Sales', 'Purchases', 'Products', 'Category', 
+            'Quotations', 'Customers', 'Vendor', 'Labour', 'Receivables', 
+            'Payables', 'Advance Payment', 'Payments', 'Expenses', 
+            'Principal Account', 'Zakat', 'Profit & Loss', 'Returns', 
+            'Invoices', 'Receipts', 'User Management', 'Roles & Permissions', 
+            'Settings', 'Tax Management'
+        ]
+        for module in modules:
+            ModulePermission.objects.get_or_create(
+                role=role,
+                module_name=module,
+                defaults={'can_view': False, 'can_add': False, 'can_edit': False, 'can_delete': False}
+            )
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'message': 'Role created successfully.',
+            'data': response.data
+        }, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_role_permissions(request, role_id):
+    """Update permissions for a specific role"""
+    try:
+        role = Role.objects.get(pk=role_id)
+        permissions_data = request.data.get('permissions', [])
+        
+        for perm_data in permissions_data:
+            module_name = perm_data.get('module_name')
+            ModulePermission.objects.update_or_create(
+                role=role,
+                module_name=module_name,
+                defaults={
+                    'can_view': perm_data.get('can_view', False),
+                    'can_add': perm_data.get('can_add', False),
+                    'can_edit': perm_data.get('can_edit', False),
+                    'can_delete': perm_data.get('can_delete', False),
+                }
+            )
+        
+        return Response({'success': True, 'message': 'Permissions updated successfully.'})
+    except Role.DoesNotExist:
+        return Response({'success': False, 'message': 'Role not found.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'success': False, 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UserManagementViewSet(viewsets.ModelViewSet):
+    """ViewSet for admin to manage users"""
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated] # Should ideally be IsAdminUser
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'data': response.data
+        })
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'data': response.data
+        })
+
+    def perform_create(self, serializer):
+        # Override create to handle password setting if provided
+        password = self.request.data.get('password')
+        user = serializer.save()
+        if password:
+            user.set_password(password)
+            user.save()
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'message': 'User created successfully.',
+            'data': response.data
+        }, status=status.HTTP_201_CREATED)
+
+    def perform_update(self, serializer):
+        password = self.request.data.get('password')
+        user = serializer.save()
+        if password:
+            user.set_password(password)
+            user.save()
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'message': 'User updated successfully.',
+            'data': response.data
+        }, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response({
+            'success': True,
+            'message': 'User deleted successfully.'
+        }, status=status.HTTP_200_OK)
+
     
