@@ -13,12 +13,14 @@ def setup_admin():
         defaults={'description': 'Full System Access'}
     )
     
-    # Set all permissions to True for Admin
+    # Set all permissions to True for Admin (Full Standardized List)
     modules = [
-        'Dashboard', 'Sale', 'Purchase', 'Product', 'Customer', 'Vendor',
-        'Order', 'Expense', 'Labor', 'Payment', 'Receipt', 'Return',
-        'Quotation', 'Inventory', 'Payable', 'Receivable', 'Profit Loss',
-        'Category', 'Zakat', 'User Management'
+        'Dashboard', 'Sales', 'Purchases', 'Products', 'Category', 
+        'Quotations', 'Customers', 'Vendor', 'Labour', 'Receivables', 
+        'Payables', 'Advance Payment', 'Payments', 'Expenses', 
+        'Principal Account', 'Zakat', 'Profit & Loss', 'Returns', 
+        'Invoices', 'Receipts', 'User Management', 'Roles & Permissions', 
+        'Settings', 'Tax Management'
     ]
     
     for module in modules:
@@ -33,15 +35,22 @@ def setup_admin():
             }
         )
     
-    # Assign Admin role to all existing users for now (or just the first one)
-    # The user asked if their first user will be admin.
-    first_user = User.objects.first()
-    if first_user:
-        first_user.role = admin_role
-        first_user.save()
-        print(f"Successfully assigned Admin role to: {first_user.email}")
-    else:
-        print("No users found in the database.")
+    # Target specific user as requested: test@gmail.com
+    target_email = 'test@gmail.com'
+    try:
+        user = User.objects.get(email=target_email)
+        user.role = admin_role
+        user.save()
+        print(f"Successfully assigned Admin role to: {user.email}")
+    except User.DoesNotExist:
+        # Fallback to first user if test@gmail.com doesn't exist
+        first_user = User.objects.first()
+        if first_user:
+            first_user.role = admin_role
+            first_user.save()
+            print(f"Fallback: Assigned Admin role to: {first_user.email}")
+        else:
+            print("No users found in the database.")
 
 if __name__ == '__main__':
     setup_admin()
