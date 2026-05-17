@@ -35,22 +35,26 @@ def setup_admin():
             }
         )
     
-    # Target specific user as requested: test@gmail.com
-    target_email = 'test@gmail.com'
+    # Target specific user as requested: irfan@gmail.com
+    target_email = 'irfan@gmail.com'
     try:
         user = User.objects.get(email=target_email)
         user.role = admin_role
+        user.is_superuser = True
+        user.is_staff = True
         user.save()
-        print(f"Successfully assigned Admin role to: {user.email}")
+        print(f"Successfully assigned Admin role and Superuser status to: {user.email}")
     except User.DoesNotExist:
-        # Fallback to first user if test@gmail.com doesn't exist
+        # Fallback to first user if irfan@gmail.com doesn't exist
         first_user = User.objects.first()
         if first_user:
             first_user.role = admin_role
+            first_user.is_superuser = True
+            first_user.is_staff = True
             first_user.save()
             print(f"Fallback: Assigned Admin role to: {first_user.email}")
         else:
-            print("No users found in the database.")
+            print("No users found in the database. Please register an account first.")
 
 if __name__ == '__main__':
     setup_admin()
