@@ -9,16 +9,19 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-default-key-change-me
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Allows local dev and Railway's dynamic domain
+# Allows local dev, Railway's dynamic domain, and Render's dynamic domain
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS', 
-    default='127.0.0.1,localhost,pos-metabrass-production.up.railway.app,.railway.app', 
+    default='*', 
     cast=Csv()
 )
+if '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('*')
 
-# You MUST also add this for the Admin panel to work on Railway
+# You MUST also add this for the Admin panel to work on Railway and Render
 CSRF_TRUSTED_ORIGINS = [
     'https://pos-metabrass-production.up.railway.app',
+    'https://*.onrender.com',
 ]
 
 INSTALLED_APPS = [
